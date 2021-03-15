@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "rsmm-fabric",
+  "version": "${version}",
+
+  "name": "Redstone Multimeter Fabric",
+  "description": "A Fabric port of Narcolepticfrog's Redstone Multimeter Mod",
+  "authors": [
+    "Space Walker!"
+  ],
+  "contact": {
+  },
+
+  "license": "MIT Licence",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "rsmm.fabric.RedstoneMultimeter"
+    ]
+  },
+  "mixins": [
+    "rsmm-fabric.mixins.json"
+  ],
+
+  "depends": {
+    "minecraft": "1.16.x"
+  }
+}
