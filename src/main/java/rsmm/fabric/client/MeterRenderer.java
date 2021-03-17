@@ -1,7 +1,5 @@
 package rsmm.fabric.client;
 
-import java.util.Map.Entry;
-
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -54,15 +52,17 @@ public class MeterRenderer {
 		
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
 		
-		for (Entry<BlockPos, Meter> entry : meterGroup.getMeters().entrySet()) {
-			BlockPos pos = entry.getKey();
-			Meter meter = entry.getValue();
+		for (Meter meter : meterGroup.getMeters()) {
+			if (meter.isIn(minecraftClient.world)) {
+				return;
+			}
+			
+			BlockPos pos = meter.getPos();
 			
 			int color = meter.getColor();
-			
-			float r = (color >> 16) / 255.0F;
-			float g = (color >> 8) / 255.0F;
-			float b = color / 255.0F;
+			float r = (color >> 16 & 255) / 255.0F;
+			float g = (color >> 8 & 255) / 255.0F;
+			float b = (color & 255) / 255.0F;
 			float a = 0.5F;
 			
 			drawBox(matrices, builder, pos, r, g, b, a);

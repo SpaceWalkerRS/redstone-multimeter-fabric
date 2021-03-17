@@ -16,7 +16,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "rsmm.fabric.RedstoneMultimeter"
+      "rsmm.fabric.RedstoneMultimeterMod"
     ]
   },
   "mixins": [

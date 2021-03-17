@@ -1,12 +1,12 @@
 package rsmm.fabric.common;
 
-import java.util.Random;
+import net.minecraft.world.World;
 
-import rsmm.fabric.RedstoneMultimeter;
+import rsmm.fabric.RedstoneMultimeterMod;
 
 public class Meter {
 	
-	private final MeterGroup meterGroup;
+	private final WorldPos pos;
 	
 	private String name;
 	private int color;
@@ -14,35 +14,35 @@ public class Meter {
 	private boolean powered; // true if the block is receiving power
 	private boolean active;  // true if the block is emitting power
 	
-	public Meter(MeterGroup meterGroup, String name, int color) {
-		this.meterGroup = meterGroup;
+	public Meter(WorldPos pos, String name, int color) {
+		this.pos = pos;
 		
 		this.name = name;
 		this.color = color;
 	}
 	
-	public Meter(MeterGroup meterGroup, String name) {
-		this(meterGroup, name, generateColor());
+	public boolean isIn(World world) {
+		return pos.isOf(world);
 	}
 	
-	public Meter(MeterGroup meterGroup) {
-		this(meterGroup, generateName(meterGroup));
-	}
-	
-	private static int generateColor() {
-		return new Random().nextInt(16777216);
-	}
-	
-	private static String generateName(MeterGroup meterGroup) {
-		return String.format("Meter %d", meterGroup.getMeterCount());
+	public WorldPos getPos() {
+		return pos;
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public int getColor() {
 		return color;
+	}
+	
+	public void setColor(int color) {
+		this.color = color;
 	}
 	
 	public boolean isPowered() {
@@ -57,7 +57,7 @@ public class Meter {
 		if (this.powered != powered) {
 			this.powered = powered;
 			
-			RedstoneMultimeter.LOGGER.info(String.format("%s powered changed to %s", name, this.powered));
+			RedstoneMultimeterMod.LOGGER.info(String.format("%s powered changed to %s", name, this.powered));
 		}
 	}
 	
@@ -65,7 +65,7 @@ public class Meter {
 		if (this.active != active) {
 			this.active = active;
 			
-			RedstoneMultimeter.LOGGER.info(String.format("%s active changed to %s", name, this.active));
+			RedstoneMultimeterMod.LOGGER.info(String.format("%s active changed to %s", name, this.active));
 		}
 	}
 }

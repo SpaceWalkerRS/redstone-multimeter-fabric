@@ -4,15 +4,24 @@
   "package": "rsmm.fabric.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+  	"server.BlockMixin",
   	"server.CommandManagerMixin",
   	"server.CustomPayloadC2SPacketMixin",
   	"server.MinecraftServerMixin",
   	"server.PlayerEntityMixin",
+  	"server.RedstoneTorchBlockMixin",
+  	"server.ServerCommandSourceMixin",
   	"server.ServerPlayNetworkHandlerMixin",
-  	"server.ServerWorldMixin"
+  	"server.ServerWorldMixin",
+  	"server.WallRedstoneTorchBlockMixin",
+  	"server.WorldChunkMixin",
+  	"server.WorldMixin"
   ],
   "client": [
+  	"client.ClientCommandSourceMixin",
   	"client.ClientPlayNetworkHandlerMixin",
+  	"client.GameOptionsMixin",
+  	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
   	"client.WorldRendererMixin"
   ],

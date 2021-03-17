@@ -2,7 +2,7 @@ package rsmm.fabric.interfaces.mixin;
 
 import rsmm.fabric.server.MultimeterServer;
 
-public interface IServerWorld {
+public interface IServerCommandSource {
 	
 	public MultimeterServer getMultimeterServer();
 	

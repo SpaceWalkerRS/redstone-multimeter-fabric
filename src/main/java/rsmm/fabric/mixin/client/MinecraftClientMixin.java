@@ -19,6 +19,18 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	@Inject(method = "<init>", at = @At(value = "RETURN"))
 	private void onInitInjectAtReturn(RunArgs args, CallbackInfo ci) {
 		this.multimeterClient = new MultimeterClient((MinecraftClient)(Object)this);
+		
+		this.multimeterClient.onStartup();
+	}
+	
+	@Inject(
+			method = "handleInputEvents",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onHandleInputEventsInjectAtHead(CallbackInfo ci) {
+		multimeterClient.getInputHandler().handleInputEvents();
 	}
 	
 	@Override

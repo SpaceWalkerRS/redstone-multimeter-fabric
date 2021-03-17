@@ -23,7 +23,7 @@ public class ClientPlayNetworkHandlerMixin {
 	@Inject(
 			method = "onGameJoin",
 			at = @At(
-					value = "HEAD"
+					value = "RETURN"
 			)
 	)
 	private void onOnGameJoinInjectAtHead(GameJoinS2CPacket packet, CallbackInfo ci) {

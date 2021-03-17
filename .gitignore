@@ -3,8 +3,6 @@
 .gradle/
 build/
 out/
-classes/
-logs/
 
 # eclipse
 

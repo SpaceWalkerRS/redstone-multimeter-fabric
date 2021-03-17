@@ -2,17 +2,18 @@ package rsmm.fabric.common.packet.types;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
+import rsmm.fabric.util.PacketUtils;
 
 public class ToggleMeterPacket extends AbstractRSMMPacket {
 	
-	private BlockPos pos;
+	private WorldPos pos;
 	
-	public ToggleMeterPacket(BlockPos pos) {
+	public ToggleMeterPacket(WorldPos pos) {
 		this.pos = pos;
 	}
 	
@@ -22,12 +23,12 @@ public class ToggleMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void encode(PacketByteBuf buffer) {
-		buffer.writeBlockPos(pos);
+		PacketUtils.writeWorldPos(buffer, pos);
 	}
 	
 	@Override
 	public void decode(PacketByteBuf buffer) {
-		pos = buffer.readBlockPos();
+		pos = PacketUtils.readWorldPos(buffer);
 	}
 	
 	@Override
@@ -39,6 +40,6 @@ public class ToggleMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.toggleMeter();
+		
 	}
 }
