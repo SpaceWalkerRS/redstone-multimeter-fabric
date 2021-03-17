@@ -1,6 +1,7 @@
 package rsmm.fabric.mixin.server;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -13,11 +14,14 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.common.Meterable;
 import rsmm.fabric.common.Multimeter;
+import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
 import rsmm.fabric.server.MultimeterServer;
 
 @Mixin(RedstoneTorchBlock.class)
-public class RedstoneTorchBlockMixin implements Meterable {
+public abstract class RedstoneTorchBlockMixin implements IBlock, Meterable {
+	
+	@Shadow protected abstract boolean shouldUnpower(World world, BlockPos pos, BlockState state);
 	
 	@Inject(
 			method = "shouldUnpower",
@@ -34,6 +38,11 @@ public class RedstoneTorchBlockMixin implements Meterable {
 			
 			multimeter.blockUpdate(world, pos, powered);
 		}
+	}
+	
+	@Override
+	public boolean isPowered(World world, BlockPos pos, BlockState state) {
+		return shouldUnpower(world, pos, state);
 	}
 	
 	@Override

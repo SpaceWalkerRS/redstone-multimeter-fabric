@@ -1,16 +1,21 @@
 package rsmm.fabric.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+
+import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.interfaces.mixin.IServerCommandSource;
 import rsmm.fabric.server.MultimeterServer;
+import rsmm.fabric.util.ColorUtils;
 
 public class MeterCommand {
 	
@@ -19,13 +24,27 @@ public class MeterCommand {
 			literal("meter").
 			then(CommandManager.
 				literal("name").
-				executes(context -> 1)).
+				then(CommandManager.
+					argument("index", IntegerArgumentType.integer()).
+					then(CommandManager.
+						argument("name", StringArgumentType.greedyString()).
+						executes(context -> renameMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), StringArgumentType.getString(context, "name"))))).
+				then(CommandManager.
+					argument("name", StringArgumentType.greedyString()).
+					executes(context -> renameMeter(context.getSource(), -1, StringArgumentType.getString(context, "name"))))).
 			then(CommandManager.
 				literal("color").
-				executes(context -> 1)).
+				then(CommandManager.
+					argument("index", IntegerArgumentType.integer()).
+					then(CommandManager.
+						argument("color", IntegerArgumentType.integer(0, ColorUtils.MAX_COLOR)).
+						executes(context -> recolorMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), IntegerArgumentType.getInteger(context, "color"))))).
+				then(CommandManager.
+					argument("color", IntegerArgumentType.integer(0, ColorUtils.MAX_COLOR)).
+					executes(context -> recolorMeter(context.getSource(), -1, IntegerArgumentType.getInteger(context, "color"))))).
 			then(CommandManager.
 				literal("removeAll").
-				executes(context -> 1)).
+				executes(context -> removeAll(context.getSource()))).
 			then(CommandManager.
 				literal("group").
 				then(CommandManager.
@@ -38,13 +57,86 @@ public class MeterCommand {
 		dispatcher.register(builder);
 	}
 	
+	private static int renameMeter(ServerCommandSource source, int index, String name) {
+		try {
+			ServerPlayerEntity player = source.getPlayer();
+			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
+			
+			MeterGroup meterGroup = server.getMultimeter().getSubscription(player);
+			int meterCount = meterGroup.getMeterCount();
+			
+			if (index < 0) {
+				index = -(index + 1);
+			}
+			
+			if (index >= meterCount) {
+				source.sendFeedback(new LiteralText("There is no meter at that index!"), false);
+				
+				return 1;
+			} else {
+				server.renameMeter(index, name, player);
+				source.sendFeedback(new LiteralText(String.format("Renamed meter %d to %s", index, name)), false);
+				
+				return 1;
+			}
+		} catch (CommandSyntaxException e) {
+			
+		}
+		
+		return 0;
+	}
+	
+	private static int recolorMeter(ServerCommandSource source, int index, int color) {
+		try {
+			ServerPlayerEntity player = source.getPlayer();
+			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
+			
+			MeterGroup meterGroup = server.getMultimeter().getSubscription(player);
+			int meterCount = meterGroup.getMeterCount();
+			
+			if (index < 0) {
+				index = -(index + 1);
+			}
+			
+			if (index >= meterCount) {
+				source.sendFeedback(new LiteralText("There is no meter at that index!"), false);
+				
+				return 1;
+			} else {
+				server.recolorMeter(index, color, player);
+				source.sendFeedback(new LiteralText(String.format("Recolored meter %d to %d", index, color)), false);
+				
+				return 1;
+			}
+		} catch (CommandSyntaxException e) {
+			
+		}
+		
+		return 0;
+	}
+	
+	private static int removeAll(ServerCommandSource source) {
+		try {
+			ServerPlayerEntity player = source.getPlayer();
+			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
+			
+			server.removeAllMeters(player);
+			source.sendFeedback(new LiteralText("Removed all meters"), false);
+			
+			return 1;
+		} catch (CommandSyntaxException e) {
+			
+		}
+		
+		return 0;
+	}
+	
 	private static int subscribeToGroup(ServerCommandSource source, String name) {
 		try {
 			ServerPlayerEntity player = source.getPlayer();
 			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
 			
 			server.subscribeToMeterGroup(name, player);
-			
 			source.sendFeedback(new LiteralText(String.format("Subscribed to meter group \'%s\'", name)), false);
 			
 			return 1;

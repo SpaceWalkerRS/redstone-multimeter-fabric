@@ -4,6 +4,8 @@ import java.awt.Color;
 
 public class ColorUtils {
 	
+	public static final int MAX_COLOR = 256 * 256 * 256;
+	
 	private static int colorIndex = 0;
 	
 	public static int nextColor() {

@@ -29,6 +29,22 @@ public class MeterGroup {
 		this.logs = new MeterGroupLogs();
 	}
 	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof MeterGroup) {
+			MeterGroup meterGroup = (MeterGroup)other;
+			
+			return name.equals(meterGroup.name);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -62,17 +78,38 @@ public class MeterGroup {
 		return getMeter(posToIndex.get(pos));
 	}
 	
+	public void removeMeterAt(WorldPos pos) {
+		Meter meter = getMeterAt(pos);
+		
+		if (meter != null) {
+			removeMeter(meter);
+		}
+	}
+	
 	public void addMeter(Meter meter) {
 		meters.add(meter);
 		posToIndex.put(meter.getPos(), meters.size() - 1);
 	}
 	
 	public void removeMeter(Meter meter) {
-		int index = meters.indexOf(meter);
+		WorldPos pos = meter.getPos();
 		
-		if (index >= 0) {
+		if (posToIndex.containsKey(pos)) {
+			int index = posToIndex.get(pos);
+			
 			meters.remove(index);
-			posToIndex.remove(meter.getPos(), index);
+			posToIndex.remove(pos, index);
+			
+			// Since we removed a meter, the pos to index mapping
+			// of all subsequent meters is wrong.
+			int count = meters.size();
+			
+			for (int i = index; i < count; i++) {
+				int newIndex = i;
+				Meter nextMeter = meters.get(newIndex);
+				
+				posToIndex.compute(nextMeter.getPos(), (meterPos, oldIndex) -> newIndex);
+			}
 		}
 	}
 	
@@ -94,6 +131,10 @@ public class MeterGroup {
 	
 	public Set<PlayerEntity> getSubscribers() {
 		return Collections.unmodifiableSet(subscribers);
+	}
+	
+	public boolean hasSubscribers() {
+		return !subscribers.isEmpty();
 	}
 	
 	public boolean addSubscriber(PlayerEntity player) {

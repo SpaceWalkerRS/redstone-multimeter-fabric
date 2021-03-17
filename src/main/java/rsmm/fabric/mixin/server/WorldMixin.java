@@ -33,11 +33,17 @@ public abstract class WorldMixin {
 			)
 	)
 	private void onUpdateNeighborInjectBeforeNeighborUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
+		if (isClient()) {
+			return;
+		}
+		
 		// Block updates for meterable blocks are handled in those classes
 		// to reduce calls to 
 		// World.isReceivingRedstonePower and World.getReceivedRedstonePower
-		if (!isClient() && !((IBlock)state.getBlock()).isMeterable()) {
-			boolean powered = isReceivingRedstonePower(pos);
+		Block block = state.getBlock();
+		
+		if (!((IBlock)block).isMeterable()) {
+			boolean powered = ((IBlock)block).isPowered((World)(Object)this, pos, state);
 			
 			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();

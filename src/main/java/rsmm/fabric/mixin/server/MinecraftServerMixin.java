@@ -37,7 +37,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onRunServerInjectBeforeEndTick(CallbackInfo ci) {
-		multimeterServer.updateMultimeterClients();
+		multimeterServer.syncClientLogs();
 	}
 	
 	@Inject(

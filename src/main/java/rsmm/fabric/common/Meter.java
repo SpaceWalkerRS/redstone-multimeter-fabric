@@ -14,11 +14,14 @@ public class Meter {
 	private boolean powered; // true if the block is receiving power
 	private boolean active;  // true if the block is emitting power
 	
-	public Meter(WorldPos pos, String name, int color) {
+	public Meter(WorldPos pos, String name, int color, boolean initialPowered, boolean initialActive) {
 		this.pos = pos;
 		
 		this.name = name;
 		this.color = color;
+		
+		this.powered = initialPowered;
+		this.active = initialActive;
 	}
 	
 	public boolean isIn(World world) {

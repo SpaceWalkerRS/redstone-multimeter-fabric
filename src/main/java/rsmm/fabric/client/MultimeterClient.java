@@ -1,15 +1,19 @@
 package rsmm.fabric.client;
 
+import java.util.List;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.packet.types.RecolorMeterPacket;
+import rsmm.fabric.common.packet.types.RenameMeterPacket;
 import rsmm.fabric.common.packet.types.ToggleMeterPacket;
+import rsmm.fabric.common.task.MultimeterTask;
 
 public class MultimeterClient {
 	
@@ -59,6 +63,14 @@ public class MultimeterClient {
 	
 	public boolean renderHud() {
 		return renderHud;
+	}
+	
+	public void syncMultimeterTasks(List<MultimeterTask> tasks) {
+		MeterGroup meterGroup = getMeterGroup();
+		
+		for (MultimeterTask task : tasks) {
+			task.run(meterGroup);
+		}
 	}
 	
 	// Return the MeterGroup this client is subscribed to
@@ -114,5 +126,22 @@ public class MultimeterClient {
 	
 	public void toggleHud() {
 		renderHud = !renderHud;
+	}
+	
+	public void renameMeter(int index, String name) {
+		RenameMeterPacket packet = new RenameMeterPacket(index, name);
+		packetHandler.sendPacket(packet);
+	}
+	
+	public void recolorMeter(int index, int color) {
+		RecolorMeterPacket packet = new RecolorMeterPacket(index, color);
+	}
+	
+	public void removeMeters() {
+		
+	}
+	
+	public void subscribeToMeterGroup(String name) {
+		
 	}
 }
