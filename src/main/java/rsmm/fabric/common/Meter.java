@@ -53,19 +53,25 @@ public class Meter {
 		return active;
 	}
 	
-	public void blockUpdate(boolean powered) {
+	public boolean blockUpdate(boolean powered) {
 		if (this.powered != powered) {
 			this.powered = powered;
 			
 			RedstoneMultimeterMod.LOGGER.info(String.format("%s powered changed to %s", name, this.powered));
+			return true;
 		}
+		
+		return false;
 	}
 	
-	public void stateChanged(boolean active) {
+	public boolean stateChanged(boolean active) {
 		if (this.active != active) {
 			this.active = active;
 			
 			RedstoneMultimeterMod.LOGGER.info(String.format("%s active changed to %s", name, this.active));
+			return true;
 		}
+		
+		return false;
 	}
 }

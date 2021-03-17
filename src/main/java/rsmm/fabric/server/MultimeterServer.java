@@ -1,7 +1,5 @@
 package rsmm.fabric.server;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import net.minecraft.server.MinecraftServer;
@@ -17,13 +15,11 @@ public class MultimeterServer {
 	private final MinecraftServer server;
 	private final ServerPacketHandler packetHandler;
 	private final Multimeter multimeter;
-	private final List<MultimeterTask> scheduledTasks;
 	
 	public MultimeterServer(MinecraftServer server) {
 		this.server = server;
 		this.packetHandler = new ServerPacketHandler(this);
 		this.multimeter = new Multimeter();
-		this.scheduledTasks = new LinkedList<>();
 	}
 	
 	public MinecraftServer getMinecraftServer() {
@@ -38,22 +34,13 @@ public class MultimeterServer {
 		return multimeter;
 	}
 	
-	private void scheduleMultimeterTask(Runnable runnable) {
-		scheduledTasks.add(new MultimeterTask(runnable));
-	}
-	
 	public void tick(BooleanSupplier shouldKeepTicking) {
 		// Clear the logs of the previous tick
 		multimeter.clearLogs();
-		
-		for (MultimeterTask task : scheduledTasks) {
-			task.run();
-		}
-		
-		scheduledTasks.clear();
+		multimeter.tick(server.getTicks());
 	}
 	
-	public void syncClientLogs() {
+	public void updateMultimeterClients() {
 		
 	}
 	
@@ -66,7 +53,7 @@ public class MultimeterServer {
 	}
 	
 	public void toggleMeter(WorldPos pos, ServerPlayerEntity player) {
-		scheduleMultimeterTask(() -> {
+		multimeter.scheduleTask(() -> {
 			MeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup != null) {
@@ -87,7 +74,7 @@ public class MultimeterServer {
 	}
 	
 	public void renameMeter(int index, String name, ServerPlayerEntity player) {
-		scheduleMultimeterTask(() -> {
+		multimeter.scheduleTask(() -> {
 			MeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup != null) {
@@ -97,7 +84,7 @@ public class MultimeterServer {
 	}
 	
 	public void recolorMeter(int index, int color, ServerPlayerEntity player) {
-		scheduleMultimeterTask(() -> {
+		multimeter.scheduleTask(() -> {
 			MeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup != null) {
@@ -107,7 +94,7 @@ public class MultimeterServer {
 	}
 	
 	public void removeAllMeters(ServerPlayerEntity player) {
-		scheduleMultimeterTask(() -> {
+		multimeter.scheduleTask(() -> {
 			MeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup != null) {
@@ -117,7 +104,7 @@ public class MultimeterServer {
 	}
 	
 	public void subscribeToMeterGroup(String name, ServerPlayerEntity player) {
-		scheduleMultimeterTask(() -> {
+		multimeter.scheduleTask(() -> {
 			MeterGroup meterGroup = multimeter.getMeterGroup(name);
 			
 			if (meterGroup == null) {

@@ -3,6 +3,8 @@ package rsmm.fabric.common;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,10 +16,14 @@ public class Multimeter {
 	
 	private final Map<String, MeterGroup> meterGroups;
 	private final Map<PlayerEntity, MeterGroup> subscriptions;
+	private final List<MeterGroup> queuedMeterGroups;
+	private final List<MultimeterTask> scheduledTasks;
 	
 	public Multimeter() {
 		this.meterGroups = new LinkedHashMap<>();
 		this.subscriptions = new HashMap<>();
+		this.queuedMeterGroups = new LinkedList<>();
+		this.scheduledTasks = new LinkedList<>();
 		
 		// FOR TESTING ONLY - REMOVE THIS
 		meterGroups.put("group 1", new MeterGroup("group 1"));
@@ -34,7 +40,7 @@ public class Multimeter {
 	}
 	
 	public void addMeterGroup(MeterGroup meterGroup) {
-		meterGroups.put(meterGroup.getName(), meterGroup);
+		queuedMeterGroups.add(meterGroup);
 	}
 	
 	// For use on the client only. The client only receives data
@@ -70,6 +76,34 @@ public class Multimeter {
 		if (meterGroup != null) {
 			meterGroup.removeSubscriber(player);
 		}
+	}
+	
+	public void scheduleTask(Runnable runnable) {
+		scheduledTasks.add(new MultimeterTask(runnable));
+	}
+	
+	private void executeScheduledTasks() {
+		for (MultimeterTask task : scheduledTasks) {
+			task.run();
+		}
+		
+		scheduledTasks.clear();
+	}
+	
+	public void tick(long currentTick) {
+		for (MeterGroup meterGroup : meterGroups.values()) {
+			meterGroup.tick();
+		}
+		
+		executeScheduledTasks();
+		
+		for (MeterGroup meterGroup : queuedMeterGroups) {
+			if (meterGroups.put(meterGroup.getName(), meterGroup) == null) {
+				meterGroup.init(currentTick);
+			}
+		}
+		
+		queuedMeterGroups.clear();
 	}
 	
 	public void clearLogs() {

@@ -82,6 +82,10 @@ public class MultimeterClient {
 		
 	}
 	
+	public void tick(long currentTick) {
+		multimeter.tick(currentTick);
+	}
+	
 	public void toggleMeter() {
 		HitResult hitResult = client.crosshairTarget;
 		

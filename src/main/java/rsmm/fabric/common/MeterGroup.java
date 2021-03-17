@@ -9,15 +9,14 @@ import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.entity.player.PlayerEntity;
-
-import rsmm.fabric.common.logs.MeterGroupLogs;
+import rsmm.fabric.common.log.MeterGroupLogs;
 import rsmm.fabric.util.ColorUtils;
 
 public class MeterGroup {
 	
 	private final String name;
 	private final List<Meter> meters;
-	private final Map<WorldPos, Meter> posToMeter;
+	private final Map<WorldPos, Integer> posToIndex;
 	private final Set<PlayerEntity> subscribers;
 	private final MeterGroupLogs logs;
 	
@@ -25,7 +24,7 @@ public class MeterGroup {
 	public MeterGroup(String name) {
 		this.name = name;
 		this.meters = new ArrayList<>();
-		this.posToMeter = new HashMap<>();
+		this.posToIndex = new HashMap<>();
 		this.subscribers = new HashSet<>();
 		this.logs = new MeterGroupLogs();
 	}
@@ -40,7 +39,7 @@ public class MeterGroup {
 	
 	public void removeMeters() {
 		meters.clear();
-		posToMeter.clear();
+		posToIndex.clear();
 	}
 	
 	public int getMeterCount() {
@@ -56,21 +55,25 @@ public class MeterGroup {
 	}
 	
 	public boolean hasMeterAt(WorldPos pos) {
-		return posToMeter.containsKey(pos);
+		return posToIndex.containsKey(pos);
 	}
 	
 	public Meter getMeterAt(WorldPos pos) {
-		return posToMeter.get(pos);
+		return getMeter(posToIndex.get(pos));
 	}
 	
 	public void addMeter(Meter meter) {
 		meters.add(meter);
-		posToMeter.put(meter.getPos(), meter);
+		posToIndex.put(meter.getPos(), meters.size() - 1);
 	}
 	
 	public void removeMeter(Meter meter) {
-		meters.remove(meter);
-		posToMeter.remove(meter.getPos(), meter);
+		int index = meters.indexOf(meter);
+		
+		if (index >= 0) {
+			meters.remove(index);
+			posToIndex.remove(meter.getPos(), index);
+		}
 	}
 	
 	public void renameMeter(int index, String name) {
@@ -109,6 +112,14 @@ public class MeterGroup {
 		logs.clear();
 	}
 	
+	public void tick() {
+		logs.tick();
+	}
+	
+	public void init(long currentTick) {
+		logs.syncTime(currentTick);
+	}
+	
 	public String nextMeterName() {
 		return String.format("Meter %d", meters.size());
 	}
@@ -118,18 +129,26 @@ public class MeterGroup {
 	}
 	
 	public void blockUpdate(WorldPos pos, boolean powered) {
-		Meter meter = posToMeter.get(pos);
+		int index = posToIndex.get(pos);
 		
-		if (meter != null) {
-			meter.blockUpdate(powered);
+		if (index >= 0) {
+			Meter meter = meters.get(index);
+			
+			if (meter.blockUpdate(powered)) {
+				logs.meterPoweredChanged(index, powered);
+			}
 		}
 	}
 	
 	public void stateChanged(WorldPos pos, boolean active) {
-		Meter meter = posToMeter.get(pos);
+		int index = posToIndex.get(pos);
 		
-		if (meter != null) {
-			meter.stateChanged(active);
+		if (index >= 0) {
+			Meter meter = meters.get(index);
+			
+			if (meter.stateChanged(active)) {
+				logs.meterActiveChanged(index, active);
+			}
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package rsmm.fabric.server;
+package rsmm.fabric.common;
 
 public class MultimeterTask {
 	
