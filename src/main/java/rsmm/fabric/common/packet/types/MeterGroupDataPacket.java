@@ -35,7 +35,7 @@ public class MeterGroupDataPacket extends AbstractRSMMPacket {
 			PacketUtils.writeMeter(buffer, meter);
 		}
 		
-		// TODO: write meter group logs
+		meterGroup.getLogs().encode(buffer);
 	}
 	
 	@Override
@@ -51,12 +51,12 @@ public class MeterGroupDataPacket extends AbstractRSMMPacket {
 			meterGroup.addMeter(meter);
 		}
 		
-		// TODO: read meter group logs
+		meterGroup.getLogs().decode(buffer);
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		
+		server.meterGroupDataReceived(meterGroup, player);
 	}
 	
 	@Override

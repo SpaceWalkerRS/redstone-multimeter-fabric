@@ -1,5 +1,6 @@
 package rsmm.fabric.common;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -41,6 +42,10 @@ public class Multimeter {
 		return Collections.unmodifiableSet(meterGroups.keySet());
 	}
 	
+	public Collection<MeterGroup> getMeterGroups() {
+		return Collections.unmodifiableCollection(meterGroups.values());
+	}
+	
 	public MeterGroup getMeterGroup(String name) {
 		return meterGroups.get(name);
 	}
@@ -67,6 +72,10 @@ public class Multimeter {
 	
 	public Set<PlayerEntity> getPlayers() {
 		return subscriptions.keySet();
+	}
+	
+	public boolean hasSubscription(PlayerEntity player) {
+		return subscriptions.containsKey(player);
 	}
 	
 	public void addSubscription(PlayerEntity player, MeterGroup meterGroup) {

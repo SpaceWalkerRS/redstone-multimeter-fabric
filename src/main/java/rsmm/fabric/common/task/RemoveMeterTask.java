@@ -9,6 +9,10 @@ public class RemoveMeterTask implements MultimeterTask {
 	
 	private WorldPos pos;
 	
+	public RemoveMeterTask() {
+		
+	}
+	
 	public RemoveMeterTask(WorldPos pos) {
 		this.pos = pos;
 	}

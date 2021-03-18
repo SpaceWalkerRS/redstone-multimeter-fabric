@@ -8,7 +8,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-import rsmm.fabric.common.packet.types.ToggleMeterPacket;
+import rsmm.fabric.common.packet.types.*;
 
 public abstract class AbstractPacketHandler {
 	
@@ -49,7 +49,15 @@ public abstract class AbstractPacketHandler {
 	private enum PacketType {
 		
 		INVALID(0, null),
-		TOGGLE_METER(1, ToggleMeterPacket.class);
+		TIME_SYNC(1, TimeSyncPacket.class),
+		MULTIMETER_TASKS(2, MultimeterTasksPacket.class),
+		METER_GROUP_LOGS(3, MeterGroupLogsPacket.class),
+		METER_GROUP_DATA(4, MeterGroupDataPacket.class),
+		TOGGLE_METER(5, ToggleMeterPacket.class),
+		RENAME_METER(6, RenameMeterPacket.class),
+		RECOLOR_METER(7, RecolorMeterPacket.class),
+		REMOVE_METERS(8, RemoveMetersPacket.class),
+		SUBSCRIBE_TO_METER_GROUP(9, SubscribeToMeterGroupPacket.class);
 		
 		private static final PacketType[] PACKET_TYPES;
 		private static final Map<Class<? extends AbstractRSMMPacket>, PacketType> PACKET_TO_TYPE;

@@ -23,7 +23,14 @@ public class WorldRendererMixin {
 	
 	@Shadow @Final private MinecraftClient client;
 	
-	@Inject(method = "render", at = @At(value = "INVOKE", shift = Shift.BEFORE, target = "Lnet/minecraft/client/particle/ParticleManager;renderParticles(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/client/render/Camera;F)V"))
+	@Inject(
+			method = "render",
+			at = @At(
+					value = "INVOKE",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/client/render/BackgroundRenderer;method_23792()V"
+			)
+	)
 	private void onRenderInjectBeforeRenderParticles(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
 		((IMinecraftClient)client).getMultimeterClient().getMeterRenderer().renderMeters(matrices);
 	}

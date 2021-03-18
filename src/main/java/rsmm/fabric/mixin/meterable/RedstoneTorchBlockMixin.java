@@ -1,4 +1,4 @@
-package rsmm.fabric.mixin.server;
+package rsmm.fabric.mixin.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,14 +12,11 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.common.Meterable;
-import rsmm.fabric.common.Multimeter;
+import rsmm.fabric.common.MeterableBlock;
 import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.interfaces.mixin.IServerWorld;
-import rsmm.fabric.server.MultimeterServer;
 
 @Mixin(RedstoneTorchBlock.class)
-public abstract class RedstoneTorchBlockMixin implements IBlock, Meterable {
+public abstract class RedstoneTorchBlockMixin implements MeterableBlock, IBlock {
 	
 	@Shadow protected abstract boolean shouldUnpower(World world, BlockPos pos, BlockState state);
 	
@@ -30,23 +27,21 @@ public abstract class RedstoneTorchBlockMixin implements IBlock, Meterable {
 			)
 	)
 	private void onShouldUnpowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		if (!world.isClient()) {
-			boolean powered = cir.getReturnValue();
-			
-			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
-			Multimeter multimeter = server.getMultimeter();
-			
-			multimeter.blockUpdate(world, pos, powered);
-		}
-	}
-	
-	@Override
-	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return shouldUnpower(world, pos, state);
+		onBlockUpdate(world, pos, cir.getReturnValue());
 	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.LIT);
+	}
+	
+	@Override
+	public boolean standardIsPowered() {
+		return false;
+	}
+	
+	@Override
+	public boolean isPowered(World world, BlockPos pos, BlockState state) {
+		return shouldUnpower(world, pos, state);
 	}
 }

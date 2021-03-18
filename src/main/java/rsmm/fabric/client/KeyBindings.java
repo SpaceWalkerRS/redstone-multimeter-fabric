@@ -17,4 +17,6 @@ public class KeyBindings {
 	public static final KeyBinding STEP_BACKWARD = new KeyBinding("Step Backward", GLFW.GLFW_KEY_PERIOD, CATEGORY);
 	public static final KeyBinding TOGGLE_HUD = new KeyBinding("Toggle HUD", GLFW.GLFW_KEY_H, CATEGORY);
 	
+	public static final KeyBinding PRINT = new KeyBinding("Print Logs", GLFW.GLFW_KEY_P, CATEGORY);
+	
 }

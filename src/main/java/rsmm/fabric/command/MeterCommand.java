@@ -63,13 +63,20 @@ public class MeterCommand {
 			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
 			
 			MeterGroup meterGroup = server.getMultimeter().getSubscription(player);
+			
+			if (meterGroup == null) {
+				source.sendFeedback(new LiteralText("You have to subscribe to a meter group first!"), false);
+				
+				return 1;
+			}
+			
 			int meterCount = meterGroup.getMeterCount();
 			
 			if (index < 0) {
-				index = -(index + 1);
+				index = meterCount + index;
 			}
 			
-			if (index >= meterCount) {
+			if (index < 0 || index >= meterCount) {
 				source.sendFeedback(new LiteralText("There is no meter at that index!"), false);
 				
 				return 1;
@@ -92,13 +99,20 @@ public class MeterCommand {
 			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
 			
 			MeterGroup meterGroup = server.getMultimeter().getSubscription(player);
+			
+			if (meterGroup == null) {
+				source.sendFeedback(new LiteralText("You have to subscribe to a meter group first!"), false);
+				
+				return 1;
+			}
+			
 			int meterCount = meterGroup.getMeterCount();
 			
 			if (index < 0) {
-				index = -(index + 1);
+				index = meterCount + index;
 			}
 			
-			if (index >= meterCount) {
+			if (index < 0 || index >= meterCount) {
 				source.sendFeedback(new LiteralText("There is no meter at that index!"), false);
 				
 				return 1;
@@ -119,6 +133,12 @@ public class MeterCommand {
 		try {
 			ServerPlayerEntity player = source.getPlayer();
 			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
+			
+			if (!server.getMultimeter().hasSubscription(player)) {
+				source.sendFeedback(new LiteralText("You have to subscribe to a meter group first!"), false);
+				
+				return 1;
+			}
 			
 			server.removeAllMeters(player);
 			source.sendFeedback(new LiteralText("Removed all meters"), false);

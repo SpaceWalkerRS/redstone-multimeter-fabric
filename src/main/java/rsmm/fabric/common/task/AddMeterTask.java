@@ -14,6 +14,10 @@ public class AddMeterTask implements MultimeterTask {
 	private boolean initialPowered;
 	private boolean initialActive;
 	
+	public AddMeterTask() {
+		
+	}
+	
 	public AddMeterTask(WorldPos pos, String name, int color, boolean powered, boolean active) {
 		this.pos = pos;
 		this.name = name;

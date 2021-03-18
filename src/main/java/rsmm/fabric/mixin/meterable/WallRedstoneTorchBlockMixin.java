@@ -1,4 +1,4 @@
-package rsmm.fabric.mixin.server;
+package rsmm.fabric.mixin.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,13 +11,10 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.common.Meterable;
-import rsmm.fabric.common.Multimeter;
-import rsmm.fabric.interfaces.mixin.IServerWorld;
-import rsmm.fabric.server.MultimeterServer;
+import rsmm.fabric.common.MeterableBlock;
 
 @Mixin(WallRedstoneTorchBlock.class)
-public class WallRedstoneTorchBlockMixin implements Meterable {
+public class WallRedstoneTorchBlockMixin implements MeterableBlock {
 	
 	@Inject(
 			method = "shouldUnpower",
@@ -26,14 +23,7 @@ public class WallRedstoneTorchBlockMixin implements Meterable {
 			)
 	)
 	private void onShouldUnpowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		if (!world.isClient()) {
-			boolean powered = cir.getReturnValue();
-			
-			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
-			Multimeter multimeter = server.getMultimeter();
-			
-			multimeter.blockUpdate(world, pos, powered);
-		}
+		onBlockUpdate(world, pos, cir.getReturnValue());
 	}
 	
 	@Override

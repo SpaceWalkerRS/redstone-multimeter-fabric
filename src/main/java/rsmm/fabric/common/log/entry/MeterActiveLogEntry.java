@@ -1,11 +1,16 @@
 package rsmm.fabric.common.log.entry;
 
 import net.minecraft.network.PacketByteBuf;
+import rsmm.fabric.common.log.AbstractLogEntry;
 
 public class MeterActiveLogEntry extends AbstractLogEntry {
 	
-	private final int meterIndex;
-	private final boolean active;
+	private int meterIndex;
+	private boolean active;
+	
+	public MeterActiveLogEntry() {
+		
+	}
 	
 	public MeterActiveLogEntry(int meterIndex, boolean active) {
 		this.meterIndex = meterIndex;
@@ -13,13 +18,20 @@ public class MeterActiveLogEntry extends AbstractLogEntry {
 	}
 	
 	@Override
-	public void write(PacketByteBuf buffer) {
-		
+	public void encode(PacketByteBuf buffer) {
+		buffer.writeInt(meterIndex);
+		buffer.writeBoolean(active);
 	}
 	
 	@Override
-	public void read(PacketByteBuf buffer) {
-		
+	public void decode(PacketByteBuf buffer) {
+		meterIndex = buffer.readInt();
+		active = buffer.readBoolean();
+	}
+	
+	@Override
+	public void print() {
+		System.out.println("meter " + meterIndex + " became " + (active ? "active" : "inactive"));
 	}
 	
 	public int getMeterIndex() {

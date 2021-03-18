@@ -34,7 +34,7 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 		try {
 			decodePacket(buffer).execute(server, player);
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		}
 	}
 }

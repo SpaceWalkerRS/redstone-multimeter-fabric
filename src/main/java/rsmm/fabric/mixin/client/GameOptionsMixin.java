@@ -25,7 +25,8 @@ public class GameOptionsMixin {
 			KeyBindings.PAUSE_METERS,
 			KeyBindings.STEP_FORWARD,
 			KeyBindings.STEP_BACKWARD,
-			KeyBindings.TOGGLE_HUD
+			KeyBindings.TOGGLE_HUD,
+			KeyBindings.PRINT
 		};
 		
 		return ArrayUtils.addAll(ArrayUtils.addAll(keyBindings, hotbarKeyBindings), rsmmKeyBindings);

@@ -11,7 +11,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.log.MeterGroupLogs;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
+import rsmm.fabric.common.packet.types.MeterGroupLogsPacket;
 import rsmm.fabric.common.packet.types.MultimeterTasksPacket;
 import rsmm.fabric.common.packet.types.TimeSyncPacket;
 import rsmm.fabric.common.task.MultimeterTask;
@@ -52,20 +54,21 @@ public class MultimeterServer {
 		multimeter.tick();
 		
 		syncMultimeterTasks();
-		
-		long currentTick = multimeter.getTime();
-		
-		if (currentTick % 20 == 0) {
-			TimeSyncPacket packet = new TimeSyncPacket(currentTick);
-			
-			for (PlayerEntity player : multimeter.getPlayers()) {
-				packetHandler.sendPacketToPlayer(packet, (ServerPlayerEntity)player);
-			}
-		}
 	}
 	
 	public void syncClientLogs() {
-		
+		for (MeterGroup meterGroup : multimeter.getMeterGroups()) {
+			if (!meterGroup.hasSubscribers()) {
+				continue;
+			}
+			
+			MeterGroupLogs logs = meterGroup.getLogs();
+			MeterGroupLogsPacket packet = new MeterGroupLogsPacket(logs);
+			
+			for (PlayerEntity player : meterGroup.getSubscribers()) {
+				packetHandler.sendPacketToPlayer(packet, (ServerPlayerEntity)player);
+			}
+		}
 	}
 	
 	private void syncMultimeterTasks() {
@@ -120,6 +123,17 @@ public class MultimeterServer {
 		MeterGroup meterGroup = multimeter.getSubscription(player);
 		
 		multimeter.scheduleTask(task, meterGroup);
+	}
+	
+	public void meterGroupDataReceived(MeterGroup meterGroup, ServerPlayerEntity player) {
+		String name = meterGroup.getName();
+		
+		if (multimeter.getMeterGroup(name) == null) {
+			multimeter.addMeterGroup(meterGroup);
+			multimeter.addSubscription(player, meterGroup);
+		} else {
+			
+		}
 	}
 	
 	public void subscribeToMeterGroup(String name, ServerPlayerEntity player) {

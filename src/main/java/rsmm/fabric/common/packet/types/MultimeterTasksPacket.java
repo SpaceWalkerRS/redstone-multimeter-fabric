@@ -28,7 +28,7 @@ public class MultimeterTasksPacket extends AbstractRSMMPacket {
 		buffer.writeInt(tasks.size());
 		
 		for (MultimeterTask task : tasks) {
-			task.encode(buffer);
+			PacketUtils.writeMultimeterTask(buffer, task);
 		}
 	}
 	

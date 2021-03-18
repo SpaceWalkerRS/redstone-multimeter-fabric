@@ -3,11 +3,17 @@ package rsmm.fabric.interfaces.mixin;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import rsmm.fabric.common.Meterable;
 
 public interface IBlock {
 	
-	public boolean isMeterable();
+	public boolean standardIsPowered();
 	
-	public boolean isPowered(World world, BlockPos pos, BlockState state);
+	default boolean isMeterable() {
+		return this instanceof Meterable;
+	}
 	
+	default boolean isPowered(World world, BlockPos pos, BlockState state) {
+		return world.isReceivingRedstonePower(pos);
+	}
 }

@@ -29,7 +29,7 @@ public class ClientPacketHandler extends AbstractPacketHandler {
 		try {
 			decodePacket(buffer).execute(client);
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		}
 	}
 }

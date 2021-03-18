@@ -37,12 +37,12 @@ public abstract class WorldMixin {
 			return;
 		}
 		
-		// Block updates for meterable blocks are handled in those classes
-		// to reduce calls to 
+		// Block updates for most meterable blocks are handled in those classes
+		// to reduce expensive calls to 
 		// World.isReceivingRedstonePower and World.getReceivedRedstonePower
 		Block block = state.getBlock();
 		
-		if (!((IBlock)block).isMeterable()) {
+		if (((IBlock)block).standardIsPowered()) {
 			boolean powered = ((IBlock)block).isPowered((World)(Object)this, pos, state);
 			
 			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();

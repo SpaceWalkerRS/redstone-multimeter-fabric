@@ -9,6 +9,10 @@ public class RecolorMeterTask implements MultimeterTask {
 	private int index;
 	private int color;
 	
+	public RecolorMeterTask() {
+		
+	}
+	
 	public RecolorMeterTask(int index, int color) {
 		this.index = index;
 		this.color = color;

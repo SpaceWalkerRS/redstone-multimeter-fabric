@@ -3,6 +3,7 @@ package rsmm.fabric.client;
 import java.util.List;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -11,6 +12,7 @@ import net.minecraft.world.World;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.RecolorMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveMetersPacket;
 import rsmm.fabric.common.packet.types.RenameMeterPacket;
@@ -23,6 +25,7 @@ public class MultimeterClient {
 	private final ClientPacketHandler packetHandler;
 	private final InputHandler inputHandler;
 	private final Multimeter multimeter;
+	private final MeterGroup personalMeterGroup;
 	private final MeterRenderer meterRenderer;
 	private final MultimeterHudRenderer multimeterHudRenderer;
 	
@@ -33,6 +36,7 @@ public class MultimeterClient {
 		this.packetHandler = new ClientPacketHandler(this);
 		this.inputHandler = new InputHandler(this);
 		this.multimeter = new Multimeter();
+		this.personalMeterGroup = new MeterGroup(client.getSession().getUsername());
 		this.meterRenderer = new MeterRenderer(this);
 		this.multimeterHudRenderer = new MultimeterHudRenderer(this);
 		
@@ -75,7 +79,18 @@ public class MultimeterClient {
 		MeterGroup meterGroup = getMeterGroup();
 		
 		for (MultimeterTask task : tasks) {
-			task.run(meterGroup);
+			multimeter.scheduleTask(task, meterGroup);
+		}
+		
+		multimeter.tick();
+		multimeter.clearTaskLogs();
+	}
+	
+	public void meterGroupLogsReceived(PacketByteBuf data) {
+		MeterGroup meterGroup = getMeterGroup();
+		
+		if (meterGroup != null) {
+			meterGroup.getLogs().decode(data);
 		}
 	}
 	
@@ -93,15 +108,14 @@ public class MultimeterClient {
 	}
 	
 	public void onConnect() {
+		subscribeToMeterGroup(personalMeterGroup);
 		
+		MeterGroupDataPacket packet = new MeterGroupDataPacket(personalMeterGroup);
+		packetHandler.sendPacket(packet);
 	}
 	
 	public void onDisconnect() {
-		
-	}
-	
-	public void tick() {
-		multimeter.tick();
+		multimeter.removeSubscription(client.player);
 	}
 	
 	public void toggleMeter() {

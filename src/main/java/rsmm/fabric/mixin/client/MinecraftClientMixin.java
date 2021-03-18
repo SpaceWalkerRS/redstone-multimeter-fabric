@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
+import net.minecraft.client.gui.screen.Screen;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.interfaces.mixin.IMinecraftClient;
@@ -31,6 +32,26 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	)
 	private void onHandleInputEventsInjectAtHead(CallbackInfo ci) {
 		multimeterClient.getInputHandler().handleInputEvents();
+	}
+	
+	@Inject(
+			method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onDisconnectInjectAtHead(Screen screen, CallbackInfo ci) {
+		multimeterClient.onDisconnect();
+	}
+	
+	@Inject(
+			method = "close",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onCloseInjectAtHead(CallbackInfo ci) {
+		multimeterClient.onShutdown();
 	}
 	
 	@Override

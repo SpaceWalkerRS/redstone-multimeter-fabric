@@ -21,6 +21,10 @@ public class ToggleMeterTask implements MultimeterTask {
 	private MultimeterServer server;
 	private WorldPos pos;
 	
+	public ToggleMeterTask() {
+		
+	}
+	
 	public ToggleMeterTask(MultimeterServer server, WorldPos pos) {
 		this.server = server;
 		this.pos = pos;
@@ -56,6 +60,9 @@ public class ToggleMeterTask implements MultimeterTask {
 		}
 		
 		if (meterGroup.hasMeterAt(pos)) {
+			RemoveMeterTask task = new RemoveMeterTask(pos);
+			server.getMultimeter().runTask(task, meterGroup);
+		} else {
 			String name = meterGroup.nextMeterName();
 			int color = meterGroup.nextMeterColor();
 			
@@ -77,9 +84,6 @@ public class ToggleMeterTask implements MultimeterTask {
 			}
 			
 			AddMeterTask task = new AddMeterTask(pos, name, color, powered, active);
-			server.getMultimeter().runTask(task, meterGroup);
-		} else {
-			RemoveMeterTask task = new RemoveMeterTask(pos);
 			server.getMultimeter().runTask(task, meterGroup);
 		}
 		

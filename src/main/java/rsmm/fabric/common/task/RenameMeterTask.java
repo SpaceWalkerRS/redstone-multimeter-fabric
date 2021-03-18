@@ -10,6 +10,10 @@ public class RenameMeterTask implements MultimeterTask {
 	private int index;
 	private String name;
 	
+	public RenameMeterTask() {
+		
+	}
+	
 	public RenameMeterTask(int index, String name) {
 		this.index = index;
 		this.name = name;

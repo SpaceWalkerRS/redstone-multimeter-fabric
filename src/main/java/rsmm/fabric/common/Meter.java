@@ -3,7 +3,7 @@ package rsmm.fabric.common;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.world.World;
 
-import rsmm.fabric.RedstoneMultimeterMod;
+import rsmm.fabric.util.PacketUtils;
 
 public class Meter {
 	
@@ -11,6 +11,7 @@ public class Meter {
 	
 	private String name;
 	private int color;
+	private boolean movable;
 	
 	private boolean powered; // true if the block is receiving power
 	private boolean active;  // true if the block is emitting power
@@ -49,6 +50,10 @@ public class Meter {
 		this.color = color;
 	}
 	
+	public boolean isMovable() {
+		return movable;
+	}
+	
 	public boolean isPowered() {
 		return powered;
 	}
@@ -61,7 +66,6 @@ public class Meter {
 		if (this.powered != powered) {
 			this.powered = powered;
 			
-			RedstoneMultimeterMod.LOGGER.info(String.format("%s powered changed to %s", name, this.powered));
 			return true;
 		}
 		
@@ -72,7 +76,6 @@ public class Meter {
 		if (this.active != active) {
 			this.active = active;
 			
-			RedstoneMultimeterMod.LOGGER.info(String.format("%s active changed to %s", name, this.active));
 			return true;
 		}
 		
@@ -80,10 +83,18 @@ public class Meter {
 	}
 	
 	public void encode(PacketByteBuf buffer) {
+		buffer.writeString(name);
+		buffer.writeInt(color);
 		
+		buffer.writeBoolean(powered);
+		buffer.writeBoolean(active);
 	}
 	
 	public void decode(PacketByteBuf buffer) {
+		name = buffer.readString(PacketUtils.MAX_STRING_LENGTH);
+		color = buffer.readInt();
 		
+		powered = buffer.readBoolean();
+		active = buffer.readBoolean();
 	}
 }

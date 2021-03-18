@@ -37,13 +37,17 @@ public class WorldChunkMixin {
 			)
 	)
 	private void onSetBlockStateInjectBeforeStateReplaced(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int chunkX, int y, int chunkZ, ChunkSection chunkSection, boolean isEmpty, BlockState oldState, Block newBlock, Block oldBlock) {
+		if (world.isClient()) {
+			return;
+		}
+		
 		boolean oldMeterable = ((IBlock)oldBlock).isMeterable();
 		boolean newMeterable = ((IBlock)newBlock).isMeterable();
 		
 		if (oldMeterable || newMeterable) {
 			boolean active = newMeterable && ((Meterable)newBlock).isActive(world, pos, newState);
 			
-			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
+			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 			
 			multimeter.stateChanged(world, pos, active);

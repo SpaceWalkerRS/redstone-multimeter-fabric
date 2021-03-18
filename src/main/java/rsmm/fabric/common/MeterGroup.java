@@ -20,6 +20,8 @@ public class MeterGroup {
 	private final Set<PlayerEntity> subscribers;
 	private final MeterGroupLogs logs;
 	
+	// The total number of meters added to this group
+	private int totalMeterCount = 0;
 	
 	public MeterGroup(String name) {
 		this.name = name;
@@ -62,12 +64,12 @@ public class MeterGroup {
 		return meters.size();
 	}
 	
-	public Meter getMeter(int index) {
-		if (index >= 0 && index < meters.size()) {
-			return meters.get(index);
+	public Meter getMeter(Integer index) {
+		if (index == null || index < 0 && index >= meters.size()) {
+			return null;
 		}
 		
-		return null;
+		return meters.get(index);
 	}
 	
 	public boolean hasMeterAt(WorldPos pos) {
@@ -89,6 +91,8 @@ public class MeterGroup {
 	public void addMeter(Meter meter) {
 		meters.add(meter);
 		posToIndex.put(meter.getPos(), meters.size() - 1);
+		
+		totalMeterCount++;
 	}
 	
 	public void removeMeter(Meter meter) {
@@ -162,7 +166,7 @@ public class MeterGroup {
 	}
 	
 	public String nextMeterName() {
-		return String.format("Meter %d", meters.size());
+		return String.format("Meter %d", totalMeterCount);
 	}
 	
 	public int nextMeterColor() {
@@ -170,9 +174,8 @@ public class MeterGroup {
 	}
 	
 	public void blockUpdate(WorldPos pos, boolean powered) {
-		int index = posToIndex.get(pos);
-		
-		if (index >= 0) {
+		if (hasMeterAt(pos)) {
+			int index = posToIndex.get(pos);
 			Meter meter = meters.get(index);
 			
 			if (meter.blockUpdate(powered)) {
@@ -182,9 +185,8 @@ public class MeterGroup {
 	}
 	
 	public void stateChanged(WorldPos pos, boolean active) {
-		int index = posToIndex.get(pos);
-		
-		if (index >= 0) {
+		if (hasMeterAt(pos)) {
+			int index = posToIndex.get(pos);
 			Meter meter = meters.get(index);
 			
 			if (meter.stateChanged(active)) {
