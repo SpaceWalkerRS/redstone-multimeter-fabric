@@ -1,47 +1,37 @@
 package rsmm.fabric.server;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BooleanSupplier;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.World;
 
-import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
-import rsmm.fabric.common.Meterable;
 import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.MultimeterTasksPacket;
-import rsmm.fabric.common.task.AddMeterTask;
+import rsmm.fabric.common.packet.types.TimeSyncPacket;
 import rsmm.fabric.common.task.MultimeterTask;
 import rsmm.fabric.common.task.RecolorMeterTask;
-import rsmm.fabric.common.task.RemoveMeterTask;
 import rsmm.fabric.common.task.RemoveMetersTask;
 import rsmm.fabric.common.task.RenameMeterTask;
-import rsmm.fabric.interfaces.mixin.IBlock;
+import rsmm.fabric.common.task.ToggleMeterTask;
 
 public class MultimeterServer {
 	
 	private final MinecraftServer server;
 	private final ServerPacketHandler packetHandler;
 	private final Multimeter multimeter;
-	private final Map<MeterGroup, List<MultimeterTask>> loggedMultimeterTasks;
 	
 	public MultimeterServer(MinecraftServer server) {
 		this.server = server;
 		this.packetHandler = new ServerPacketHandler(this);
 		this.multimeter = new Multimeter();
-		this.loggedMultimeterTasks = new HashMap<>();
+		
+		multimeter.syncTime(server.getTicks());
 	}
 	
 	public MinecraftServer getMinecraftServer() {
@@ -56,23 +46,22 @@ public class MultimeterServer {
 		return multimeter;
 	}
 	
-	private void logMultimeterTask(MeterGroup meterGroup, MultimeterTask task) {
-		List<MultimeterTask> logs = loggedMultimeterTasks.get(meterGroup);
-		
-		if (logs == null) {
-			logs = new LinkedList<>();
-			loggedMultimeterTasks.put(meterGroup, logs);
-		}
-		
-		logs.add(task);
-	}
-	
 	public void tick(BooleanSupplier shouldKeepTicking) {
 		// Clear the logs of the previous tick
-		multimeter.clearLogs();
-		multimeter.tick(server.getTicks());
+		multimeter.clearMeterLogs();
+		multimeter.tick();
 		
 		syncMultimeterTasks();
+		
+		long currentTick = multimeter.getTime();
+		
+		if (currentTick % 20 == 0) {
+			TimeSyncPacket packet = new TimeSyncPacket(currentTick);
+			
+			for (PlayerEntity player : multimeter.getPlayers()) {
+				packetHandler.sendPacketToPlayer(packet, (ServerPlayerEntity)player);
+			}
+		}
 	}
 	
 	public void syncClientLogs() {
@@ -80,7 +69,7 @@ public class MultimeterServer {
 	}
 	
 	private void syncMultimeterTasks() {
-		for (Entry<MeterGroup, List<MultimeterTask>> entry : loggedMultimeterTasks.entrySet()) {
+		for (Entry<MeterGroup, List<MultimeterTask>> entry : multimeter.getLoggedTasks().entrySet()) {
 			MeterGroup meterGroup = entry.getKey();
 			
 			if (meterGroup.hasSubscribers()) {
@@ -93,11 +82,12 @@ public class MultimeterServer {
 			}
 		}
 		
-		loggedMultimeterTasks.clear();
+		multimeter.clearTaskLogs();
 	}
 	
 	public void onPlayerJoin(ServerPlayerEntity player) {
-		
+		TimeSyncPacket packet = new TimeSyncPacket(multimeter.getTime());
+		packetHandler.sendPacketToPlayer(packet, player);
 	}
 	
 	public void onPlayerLeave(ServerPlayerEntity player) {
@@ -105,97 +95,51 @@ public class MultimeterServer {
 	}
 	
 	public void toggleMeter(WorldPos pos, ServerPlayerEntity player) {
-		multimeter.scheduleTask(() -> {
-			MeterGroup meterGroup = multimeter.getSubscription(player);
-			
-			if (meterGroup != null) {
-				if (meterGroup.hasMeterAt(pos)) {
-					String name = meterGroup.nextMeterName();
-					int color = meterGroup.nextMeterColor();
-					
-					boolean powered = false;
-					boolean active = false;
-					
-					RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, pos.getWorldId());
-					World world = server.getWorld(key);
-					
-					if (world != null) {
-						BlockState state = world.getBlockState(pos);
-						Block block = state.getBlock();
-						
-						powered = ((IBlock)block).isPowered(world, pos, state);
-						
-						if (((IBlock)block).isMeterable()) {
-							active = ((Meterable)block).isActive(world, pos, state);
-						}
-					}
-					
-					Meter meter = new Meter(pos, name, color, powered, active);
-					AddMeterTask task = new AddMeterTask(pos, name, color, powered, active);
-					
-					meterGroup.addMeter(meter);
-					logMultimeterTask(meterGroup, task);
-				} else {
-					Meter meter = meterGroup.getMeterAt(pos);
-					RemoveMeterTask task = new RemoveMeterTask(pos);
-					
-					meterGroup.removeMeter(meter);
-					logMultimeterTask(meterGroup, task);
-				}
-			}
-		});
+		ToggleMeterTask task = new ToggleMeterTask(this, pos);
+		MeterGroup meterGroup = multimeter.getSubscription(player);
+		
+		multimeter.scheduleTask(task, meterGroup);
 	}
 	
 	public void renameMeter(int index, String name, ServerPlayerEntity player) {
-		multimeter.scheduleTask(() -> {
-			MeterGroup meterGroup = multimeter.getSubscription(player);
-			
-			if (meterGroup != null) {
-				RenameMeterTask task = new RenameMeterTask(index, name);
-				
-				meterGroup.renameMeter(index, name);
-				logMultimeterTask(meterGroup, task);
-			}
-		});
+		RenameMeterTask task = new RenameMeterTask(index, name);
+		MeterGroup meterGroup = multimeter.getSubscription(player);
+		
+		multimeter.scheduleTask(task, meterGroup);
 	}
 	
 	public void recolorMeter(int index, int color, ServerPlayerEntity player) {
-		multimeter.scheduleTask(() -> {
-			MeterGroup meterGroup = multimeter.getSubscription(player);
-			
-			if (meterGroup != null) {
-				RecolorMeterTask task = new RecolorMeterTask(index, color);
-				
-				meterGroup.recolorMeter(index, color);
-				logMultimeterTask(meterGroup, task);
-			}
-		});
+		RecolorMeterTask task = new RecolorMeterTask(index, color);
+		MeterGroup meterGroup = multimeter.getSubscription(player);
+		
+		multimeter.scheduleTask(task, meterGroup);
 	}
 	
 	public void removeAllMeters(ServerPlayerEntity player) {
-		multimeter.scheduleTask(() -> {
-			MeterGroup meterGroup = multimeter.getSubscription(player);
-			
-			if (meterGroup != null) {
-				RemoveMetersTask task = new RemoveMetersTask();
-				
-				meterGroup.removeMeters();
-				logMultimeterTask(meterGroup, task);
-			}
-		});
+		RemoveMetersTask task = new RemoveMetersTask();
+		MeterGroup meterGroup = multimeter.getSubscription(player);
+		
+		multimeter.scheduleTask(task, meterGroup);
 	}
 	
 	public void subscribeToMeterGroup(String name, ServerPlayerEntity player) {
-		multimeter.scheduleTask(() -> {
-			MeterGroup meterGroup = multimeter.getMeterGroup(name);
+		MeterGroup currentSubscription = multimeter.getSubscription(player);
+		
+		if (currentSubscription != null) {
+			multimeter.removeSubscription(player, currentSubscription);
+		}
+		
+		MeterGroup meterGroup = multimeter.getMeterGroup(name);
+		
+		if (meterGroup == null) {
+			meterGroup = new MeterGroup(name);
 			
-			if (meterGroup == null) {
-				meterGroup = new MeterGroup(name);
-				
-				multimeter.addMeterGroup(meterGroup);
-			}
-			
-			multimeter.addSubscription(player, meterGroup);
-		});
+			multimeter.addMeterGroup(meterGroup);
+		}
+		
+		multimeter.addSubscription(player, meterGroup);
+		
+		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
+		packetHandler.sendPacketToPlayer(packet, player);
 	}
 }

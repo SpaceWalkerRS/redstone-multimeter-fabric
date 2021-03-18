@@ -35,7 +35,9 @@ public class RemoveMeterTask implements MultimeterTask {
 	}
 	
 	@Override
-	public void run(MeterGroup meterGroup) {
+	public boolean run(MeterGroup meterGroup) {
 		meterGroup.removeMeterAt(pos);
+		
+		return true;
 	}
 }

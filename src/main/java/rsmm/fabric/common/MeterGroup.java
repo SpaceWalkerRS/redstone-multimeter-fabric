@@ -157,7 +157,7 @@ public class MeterGroup {
 		logs.tick();
 	}
 	
-	public void init(long currentTick) {
+	public void syncTime(long currentTick) {
 		logs.syncTime(currentTick);
 	}
 	

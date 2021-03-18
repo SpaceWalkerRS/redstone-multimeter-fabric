@@ -10,6 +10,6 @@ public interface MultimeterTask {
 	
 	public void decode(PacketByteBuf buffer);
 	
-	public void run(MeterGroup meterGroup);
+	public boolean run(MeterGroup meterGroup);
 	
 }

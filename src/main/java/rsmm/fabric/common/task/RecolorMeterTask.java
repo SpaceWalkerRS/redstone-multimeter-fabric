@@ -38,7 +38,9 @@ public class RecolorMeterTask implements MultimeterTask {
 	}
 	
 	@Override
-	public void run(MeterGroup meterGroup) {
+	public boolean run(MeterGroup meterGroup) {
 		meterGroup.recolorMeter(index, color);
+		
+		return true;
 	}
 }

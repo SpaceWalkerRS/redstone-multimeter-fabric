@@ -39,7 +39,9 @@ public class RenameMeterTask implements MultimeterTask {
 	}
 	
 	@Override
-	public void run(MeterGroup meterGroup) {
+	public boolean run(MeterGroup meterGroup) {
 		meterGroup.renameMeter(index, name);
+		
+		return true;
 	}
 }

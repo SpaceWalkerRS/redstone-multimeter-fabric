@@ -1,5 +1,6 @@
 package rsmm.fabric.common;
 
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.world.World;
 
 import rsmm.fabric.RedstoneMultimeterMod;
@@ -76,5 +77,13 @@ public class Meter {
 		}
 		
 		return false;
+	}
+	
+	public void encode(PacketByteBuf buffer) {
+		
+	}
+	
+	public void decode(PacketByteBuf buffer) {
+		
 	}
 }

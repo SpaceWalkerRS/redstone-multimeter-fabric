@@ -3,7 +3,7 @@ package rsmm.fabric.util;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-
+import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.task.MultimeterTask;
 import rsmm.fabric.common.task.TaskType;
@@ -45,5 +45,18 @@ public class PacketUtils {
 		}
 		
 		return null;
+	}
+	
+	public static void writeMeter(PacketByteBuf buffer, Meter meter) {
+		meter.encode(buffer);
+	}
+	
+	public static Meter readMeter(PacketByteBuf buffer) {
+		WorldPos pos = PacketUtils.readWorldPos(buffer);
+		Meter meter = new Meter(pos, null, 0, false, false);
+		
+		meter.decode(buffer);
+		
+		return meter.getName() == null ? null : meter;
 	}
 }

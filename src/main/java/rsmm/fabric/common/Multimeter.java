@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,16 +20,16 @@ public class Multimeter {
 	
 	private final Map<String, MeterGroup> meterGroups;
 	private final Map<PlayerEntity, MeterGroup> subscriptions;
-	private final List<MeterGroup> queuedMeterGroups;
-	private final Set<MultimeterTask> scheduledTasks;
+	private final Map<MeterGroup, Set<MultimeterTask>> scheduledTasks;
+	private final Map<MeterGroup, List<MultimeterTask>> loggedTasks;
 	
 	private long currentTick;
 	
 	public Multimeter() {
 		this.meterGroups = new LinkedHashMap<>();
 		this.subscriptions = new HashMap<>();
-		this.queuedMeterGroups = new LinkedList<>();
-		this.scheduledTasks = new LinkedHashSet<>();
+		this.scheduledTasks = new LinkedHashMap<>();
+		this.loggedTasks = new LinkedHashMap<>();
 		
 		// FOR TESTING ONLY - REMOVE THIS
 		meterGroups.put("group 1", new MeterGroup("group 1"));
@@ -46,7 +47,7 @@ public class Multimeter {
 	
 	public void addMeterGroup(MeterGroup meterGroup) {
 		meterGroups.put(meterGroup.getName(), meterGroup);
-		meterGroup.init(currentTick);
+		meterGroup.syncTime(currentTick);
 	}
 	
 	// For use on the client only. The client only receives data
@@ -62,6 +63,10 @@ public class Multimeter {
 	
 	public MeterGroup getSubscription(PlayerEntity player) {
 		return subscriptions.get(player);
+	}
+	
+	public Set<PlayerEntity> getPlayers() {
+		return subscriptions.keySet();
 	}
 	
 	public void addSubscription(PlayerEntity player, MeterGroup meterGroup) {
@@ -88,35 +93,84 @@ public class Multimeter {
 		}
 	}
 	
-	public void scheduleTask(MultimeterTask task) {
-		scheduledTasks.add(task);
+	public void scheduleTask(MultimeterTask task, MeterGroup meterGroup) {
+		if (meterGroup == null) {
+			return;
+		}
+		
+		Set<MultimeterTask> tasks = scheduledTasks.get(meterGroup);
+		
+		if (tasks == null) {
+			tasks = new LinkedHashSet<>();
+			scheduledTasks.put(meterGroup, tasks);
+		}
+		
+		tasks.add(task);
 	}
 	
 	private void runTasks() {
-		for (MultimeterTask task : scheduledTasks) {
-			task.run(null);
+		loggedTasks.clear();
+		
+		for (Entry<MeterGroup, Set<MultimeterTask>> entry : scheduledTasks.entrySet()) {
+			MeterGroup meterGroup = entry.getKey();
+			Set<MultimeterTask> tasks = entry.getValue();
+			
+			for (MultimeterTask task : tasks) {
+				runTask(task, meterGroup);
+			}
 		}
 		
 		scheduledTasks.clear();
 	}
 	
-	public void tick(long currentTick) {
+	public void runTask(MultimeterTask task, MeterGroup meterGroup) {
+		if (task.run(meterGroup)) {
+			logTask(task, meterGroup);
+		}
+	}
+	
+	private void logTask(MultimeterTask task, MeterGroup meterGroup) {
+		List<MultimeterTask> tasks = loggedTasks.get(meterGroup);
+		
+		if (tasks == null) {
+			tasks = new LinkedList<>();
+			loggedTasks.put(meterGroup, tasks);
+		}
+		
+		tasks.add(task);
+	}
+	
+	public Map<MeterGroup, List<MultimeterTask>> getLoggedTasks() {
+		return loggedTasks;
+	}
+	
+	public void clearTaskLogs() {
+		loggedTasks.clear();
+	}
+	
+	public long getTime() {
+		return currentTick;
+	}
+	
+	public void tick() {
+		currentTick++;
+		
 		for (MeterGroup meterGroup : meterGroups.values()) {
 			meterGroup.tick();
 		}
 		
 		runTasks();
-		
-		for (MeterGroup meterGroup : queuedMeterGroups) {
-			if (meterGroups.put(meterGroup.getName(), meterGroup) == null) {
-				meterGroup.init(currentTick);
-			}
-		}
-		
-		queuedMeterGroups.clear();
 	}
 	
-	public void clearLogs() {
+	public void syncTime(long currentTick) {
+		this.currentTick = currentTick;
+		
+		for (MeterGroup meterGroup : meterGroups.values()) {
+			meterGroup.syncTime(currentTick);
+		}
+	}
+	
+	public void clearMeterLogs() {
 		for (MeterGroup meterGroup : meterGroups.values()) {
 			meterGroup.clearLogs();
 		}

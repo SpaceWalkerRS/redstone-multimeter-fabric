@@ -52,9 +52,10 @@ public class AddMeterTask implements MultimeterTask {
 	}
 	
 	@Override
-	public void run(MeterGroup meterGroup) {
+	public boolean run(MeterGroup meterGroup) {
 		Meter meter = new Meter(pos, name, color, initialPowered, initialActive);
-		
 		meterGroup.addMeter(meter);
+		
+		return true;
 	}
 }

@@ -7,10 +7,12 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.types.RecolorMeterPacket;
+import rsmm.fabric.common.packet.types.RemoveMetersPacket;
 import rsmm.fabric.common.packet.types.RenameMeterPacket;
 import rsmm.fabric.common.packet.types.ToggleMeterPacket;
 import rsmm.fabric.common.task.MultimeterTask;
@@ -65,6 +67,10 @@ public class MultimeterClient {
 		return renderHud;
 	}
 	
+	public void syncTime(long currentTick) {
+		multimeter.syncTime(currentTick);
+	}
+	
 	public void syncMultimeterTasks(List<MultimeterTask> tasks) {
 		MeterGroup meterGroup = getMeterGroup();
 		
@@ -94,11 +100,15 @@ public class MultimeterClient {
 		
 	}
 	
-	public void tick(long currentTick) {
-		multimeter.tick(currentTick);
+	public void tick() {
+		multimeter.tick();
 	}
 	
 	public void toggleMeter() {
+		if (getMeterGroup() == null) {
+			return;
+		}
+		
 		HitResult hitResult = client.crosshairTarget;
 		
 		if (hitResult.getType() == HitResult.Type.BLOCK) {
@@ -135,13 +145,26 @@ public class MultimeterClient {
 	
 	public void recolorMeter(int index, int color) {
 		RecolorMeterPacket packet = new RecolorMeterPacket(index, color);
+		packetHandler.sendPacket(packet);
 	}
 	
 	public void removeMeters() {
-		
+		RemoveMetersPacket packet = new RemoveMetersPacket();
+		packetHandler.sendPacket(packet);
 	}
 	
 	public void subscribeToMeterGroup(String name) {
 		
+	}
+	
+	public void subscribeToMeterGroup(MeterGroup meterGroup) {
+		MeterGroup oldSubscription = getMeterGroup();
+		
+		if (oldSubscription != null) {
+			multimeter.removeMeterGroup(meterGroup);
+		}
+		
+		multimeter.addMeterGroup(meterGroup);
+		multimeter.addSubscription(client.player, meterGroup);
 	}
 }

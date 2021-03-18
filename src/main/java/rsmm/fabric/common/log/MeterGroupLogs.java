@@ -36,7 +36,7 @@ public class MeterGroupLogs {
 	}
 	
 	private void nextTick() {
-		logs.put(currentTick, new LinkedList<>());
+		logs.putIfAbsent(currentTick, new LinkedList<>());
 	}
 	
 	private void addLogEntry(AbstractLogEntry logEntry) {
