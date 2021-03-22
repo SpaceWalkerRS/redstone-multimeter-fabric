@@ -10,8 +10,7 @@ import net.minecraft.block.ComparatorBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import rsmm.fabric.common.MeterableBlock;
+import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(ComparatorBlock.class)
 public class ComparatorBlockMixin implements MeterableBlock {

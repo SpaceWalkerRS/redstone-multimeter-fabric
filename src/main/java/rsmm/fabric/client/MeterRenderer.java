@@ -53,17 +53,8 @@ public class MeterRenderer {
 			if (!meter.isIn(minecraftClient.world)) {
 				continue;
 			}
-		
-			BlockPos pos = meter.getPos();
 			
-			int color = meter.getColor();
-			boolean movable = meter.isMovable();
-			
-			float r = (color >> 16 & 255) / 255.0F;
-			float g = (color >> 8 & 255) / 255.0F;
-			float b = (color & 255) / 255.0F;
-			
-			drawMeter(matrices, builder, tessellator, pos, r, g, b, movable);
+			drawMeter(matrices, builder, tessellator, meter);
 		}
 		
 		matrices.pop();
@@ -74,7 +65,11 @@ public class MeterRenderer {
 		RenderSystem.disableBlend();
 	}
 	
-	private void drawMeter(MatrixStack matrices, BufferBuilder builder, Tessellator tessellator, BlockPos pos, float r, float g, float b, boolean movable) {
+	private void drawMeter(MatrixStack matrices, BufferBuilder builder, Tessellator tessellator, Meter meter) {
+		BlockPos pos = meter.getPos();
+		int color = meter.getColor();
+		boolean movable = meter.isMovable();
+		
 		Matrix4f model = matrices.peek().getModel();
 		
 		float x0 = pos.getX() - 0.001F;
@@ -85,9 +80,13 @@ public class MeterRenderer {
 		float y1 = pos.getY() + 1.001F;
 		float z1 = pos.getZ() + 1.001F;
 		
+		float r = (color >> 16 & 255) / 255.0F;
+		float g = (color >> 8 & 255) / 255.0F;
+		float b = (color & 255) / 255.0F;
+		
 		drawFilledBox(matrices, builder, tessellator, model, x0, y0, z0, x1, y1, z1, r, g, b, 0.5F);
 		
-		if (!movable) {
+		if (movable) {
 			drawBoxOutline(matrices, builder, tessellator, model, x0, y0, z0, x1, y1, z1, r, g, b, 1.0F);
 		}
 	}

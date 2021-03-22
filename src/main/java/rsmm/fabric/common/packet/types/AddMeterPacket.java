@@ -4,44 +4,62 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 import rsmm.fabric.util.PacketUtils;
 
-public class ToggleMeterPacket extends AbstractRSMMPacket {
+public class AddMeterPacket extends AbstractRSMMPacket {
 	
 	private WorldPos pos;
+	private String name;
+	private int color;
 	private boolean movable;
+	private boolean powered;
+	private boolean active;
 	
-	public ToggleMeterPacket() {
+	public AddMeterPacket() {
 		
 	}
 	
-	public ToggleMeterPacket(WorldPos pos, boolean movable) {
+	public AddMeterPacket(WorldPos pos, String name, int color, boolean movable, boolean powered, boolean active) {
 		this.pos = pos;
+		this.name = name;
+		this.color = color;
 		this.movable = movable;
+		this.powered = powered;
+		this.active = active;
 	}
 	
 	@Override
 	public void encode(PacketByteBuf buffer) {
 		PacketUtils.writeWorldPos(buffer, pos);
+		buffer.writeString(name);
+		buffer.writeInt(color);
 		buffer.writeBoolean(movable);
+		buffer.writeBoolean(powered);
+		buffer.writeBoolean(active);
 	}
 	
 	@Override
 	public void decode(PacketByteBuf buffer) {
 		pos = PacketUtils.readWorldPos(buffer);
+		name = buffer.readString(PacketUtils.MAX_STRING_LENGTH);
+		color = buffer.readInt();
 		movable = buffer.readBoolean();
+		powered = buffer.readBoolean();
+		active = buffer.readBoolean();
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().toggleMeter(pos, movable, player);
+		
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		
+		Meter meter = new Meter(pos, name, color, movable, powered, active);
+		client.getMeterGroup().addMeter(meter);
 	}
 }

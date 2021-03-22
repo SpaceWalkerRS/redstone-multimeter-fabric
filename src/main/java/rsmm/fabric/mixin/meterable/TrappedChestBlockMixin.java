@@ -7,8 +7,7 @@ import net.minecraft.block.TrappedChestBlock;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import rsmm.fabric.common.MeterableBlock;
+import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(TrappedChestBlock.class)
 public class TrappedChestBlockMixin implements MeterableBlock {

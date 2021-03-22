@@ -37,7 +37,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onRunServerInjectBeforeEndTick(CallbackInfo ci) {
-		multimeterServer.syncClientLogs();
+		multimeterServer.getMultimeter().broadcastMeterLogs();
 	}
 	
 	@Inject(
@@ -47,7 +47,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onTickInjectAtHead(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		multimeterServer.tick(shouldKeepTicking);
+		multimeterServer.tick();
 	}
 	
 	@Override

@@ -13,6 +13,6 @@ public class PressurePlateBlockMixin implements IPressurePlate {
 	
 	@Override
 	public boolean isActive(BlockState state) {
-		return state.get(Properties.POWERED);
+		return state.get(Properties.POWERED); // Wooden and stone pressure plates
 	}
 }

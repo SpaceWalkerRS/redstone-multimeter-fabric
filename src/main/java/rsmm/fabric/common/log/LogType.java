@@ -1,17 +1,18 @@
-package rsmm.fabric.common.log.entry;
+package rsmm.fabric.common.log;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import rsmm.fabric.common.log.AbstractLogEntry;
+import rsmm.fabric.common.log.entry.*;
 
 public enum LogType {
 	
-	METER_POWRED(0, MeterPoweredLogEntry.class),
-	METER_ACTIVE(1, MeterActiveLogEntry.class);
+	POWERED_CHANGED(0, PoweredChangedLog.class),
+	ACTIVE_CHANGED(1, ActiveChangedLog.class),
+	BLOCK_MOVED(2, BlockMovedLog.class);
 	
 	private static final LogType[] TYPES;
-	private static final Map<Class<? extends AbstractLogEntry>, LogType> LOG_TO_TYPE;
+	private static final Map<Class<? extends LogEntry>, LogType> LOG_TO_TYPE;
 	
 	static {
 		TYPES = new LogType[values().length];
@@ -24,9 +25,9 @@ public enum LogType {
 	}
 	
 	private final int index;
-	private final Class<? extends AbstractLogEntry> clazz;
+	private final Class<? extends LogEntry> clazz;
 	
-	private LogType(int index, Class<? extends AbstractLogEntry> clazz) {
+	private LogType(int index, Class<? extends LogEntry> clazz) {
 		this.index = index;
 		this.clazz = clazz;
 	}
@@ -35,7 +36,7 @@ public enum LogType {
 		return index;
 	}
 	
-	public Class<? extends AbstractLogEntry> getClazz() {
+	public Class<? extends LogEntry> getClazz() {
 		return clazz;
 	}
 	
@@ -47,7 +48,7 @@ public enum LogType {
 		return TYPES[index];
 	}
 	
-	public static LogType fromLogEntry(AbstractLogEntry task) {
+	public static LogType fromLogEntry(LogEntry task) {
 		return LOG_TO_TYPE.get(task.getClass());
 	}
 }

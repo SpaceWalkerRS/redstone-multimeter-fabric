@@ -1,5 +1,7 @@
 package rsmm.fabric.server;
 
+import java.util.Collection;
+
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -28,6 +30,14 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 	
 	public void sendPacketToPlayer(AbstractRSMMPacket packet, ServerPlayerEntity player) {
 		player.networkHandler.sendPacket(encodePacket(packet));
+	}
+	
+	public void sendPacketToPlayers(AbstractRSMMPacket packet, Collection<ServerPlayerEntity> players) {
+		Packet<?> mcPacket = encodePacket(packet);
+		
+		for (ServerPlayerEntity player : players) {
+			player.networkHandler.sendPacket(mcPacket);
+		}
 	}
 	
 	public void onPacketReceived(PacketByteBuf buffer, ServerPlayerEntity player) {

@@ -11,9 +11,8 @@ import net.minecraft.block.RedstoneTorchBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import rsmm.fabric.common.MeterableBlock;
 import rsmm.fabric.interfaces.mixin.IBlock;
+import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(RedstoneTorchBlock.class)
 public abstract class RedstoneTorchBlockMixin implements MeterableBlock, IBlock {

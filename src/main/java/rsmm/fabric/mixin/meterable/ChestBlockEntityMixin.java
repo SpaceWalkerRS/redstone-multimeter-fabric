@@ -14,8 +14,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ChestBlockEntity;
 
-import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
+import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
 
 @Mixin(ChestBlockEntity.class)

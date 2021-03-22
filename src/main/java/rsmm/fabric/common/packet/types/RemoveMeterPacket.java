@@ -1,37 +1,35 @@
 package rsmm.fabric.common.packet.types;
 
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.log.MeterGroupLogs;
+import rsmm.fabric.common.Meter;
+import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 import rsmm.fabric.util.PacketUtils;
 
-public class MeterGroupLogsPacket extends AbstractRSMMPacket {
+public class RemoveMeterPacket extends AbstractRSMMPacket {
 	
-	private PacketByteBuf data;
+	private WorldPos pos;
 	
-	public MeterGroupLogsPacket() {
+	public RemoveMeterPacket() {
 		
 	}
 	
-	public MeterGroupLogsPacket(MeterGroupLogs logs) {
-		data = new PacketByteBuf(Unpooled.buffer());
-		
-		logs.encode(data);
+	public RemoveMeterPacket(WorldPos pos) {
+		this.pos = pos;
 	}
 	
 	@Override
 	public void encode(PacketByteBuf buffer) {
-		PacketUtils.writeData(buffer, data);
+		PacketUtils.writeWorldPos(buffer, pos);
 	}
 	
 	@Override
 	public void decode(PacketByteBuf buffer) {
-		data = PacketUtils.readData(buffer);
+		pos = PacketUtils.readWorldPos(buffer);
 	}
 	
 	@Override
@@ -41,6 +39,10 @@ public class MeterGroupLogsPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.meterGroupLogsReceived(data);
+		Meter meter = client.getMeterGroup().getMeterAt(pos);
+		
+		if (meter != null) {
+			client.getMeterGroup().removeMeter(meter);
+		}
 	}
 }

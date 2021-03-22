@@ -2,6 +2,7 @@ package rsmm.fabric.common;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class WorldPos extends BlockPos {
@@ -40,5 +41,18 @@ public class WorldPos extends BlockPos {
 	
 	public boolean isOf(World world) {
 		return world.getRegistryKey().getValue().equals(worldId);
+	}
+	
+	public WorldPos offset(Direction dir) {
+		return new WorldPos(worldId, super.offset(dir));
+	}
+	
+	/**
+	 * Move this WorldPos to a different dimension
+	 * @param worldId
+	 * @return a WorldPos with the same coordinates but a different world id
+	 */
+	public WorldPos toWorld(Identifier worldId) {
+		return new WorldPos(worldId, this);
 	}
 }

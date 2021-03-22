@@ -3,195 +3,111 @@ package rsmm.fabric.common;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import net.minecraft.entity.player.PlayerEntity;
-import rsmm.fabric.common.log.MeterGroupLogs;
-import rsmm.fabric.util.ColorUtils;
+import net.minecraft.network.PacketByteBuf;
+
+import rsmm.fabric.util.PacketUtils;
 
 public class MeterGroup {
 	
 	private final String name;
 	private final List<Meter> meters;
 	private final Map<WorldPos, Integer> posToIndex;
-	private final Set<PlayerEntity> subscribers;
-	private final MeterGroupLogs logs;
-	
-	// The total number of meters added to this group
-	private int totalMeterCount = 0;
 	
 	public MeterGroup(String name) {
 		this.name = name;
 		this.meters = new ArrayList<>();
 		this.posToIndex = new HashMap<>();
-		this.subscribers = new HashSet<>();
-		this.logs = new MeterGroupLogs();
-	}
-	
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof MeterGroup) {
-			MeterGroup meterGroup = (MeterGroup)other;
-			
-			return name.equals(meterGroup.name);
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public int hashCode() {
-		return name.hashCode();
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
-	public List<Meter> getMeters() {
-		return Collections.unmodifiableList(meters);
-	}
-	
-	public void removeMeters() {
+	public void clear() {
 		meters.clear();
 		posToIndex.clear();
+	}
+	
+	public List<Meter> getMeters() {
+		return Collections.unmodifiableList(meters);
 	}
 	
 	public int getMeterCount() {
 		return meters.size();
 	}
 	
-	public Meter getMeter(Integer index) {
-		if (index == null || index < 0 && index >= meters.size()) {
-			return null;
+	public Meter getMeter(int index) {
+		if (index >= 0 && index < meters.size()) {
+			return meters.get(index);
 		}
 		
-		return meters.get(index);
+		return null;
+	}
+	
+	public Meter getMeterAt(WorldPos pos) {
+		if (posToIndex.containsKey(pos)) {
+			return getMeter(posToIndex.get(pos));
+		}
+		
+		return null;
 	}
 	
 	public boolean hasMeterAt(WorldPos pos) {
 		return posToIndex.containsKey(pos);
 	}
 	
-	public Meter getMeterAt(WorldPos pos) {
-		return getMeter(posToIndex.get(pos));
-	}
-	
-	public void removeMeterAt(WorldPos pos) {
-		Meter meter = getMeterAt(pos);
-		
-		if (meter != null) {
-			removeMeter(meter);
-		}
-	}
-	
 	public void addMeter(Meter meter) {
+		posToIndex.put(meter.getPos(), meters.size());
 		meters.add(meter);
-		posToIndex.put(meter.getPos(), meters.size() - 1);
-		
-		totalMeterCount++;
 	}
 	
-	public void removeMeter(Meter meter) {
+	public boolean removeMeter(Meter meter) {
 		WorldPos pos = meter.getPos();
 		
 		if (posToIndex.containsKey(pos)) {
-			int index = posToIndex.get(pos);
-			
+			int index = posToIndex.remove(pos);
 			meters.remove(index);
-			posToIndex.remove(pos, index);
 			
-			// Since we removed a meter, the pos to index mapping
-			// of all subsequent meters is wrong.
-			int count = meters.size();
+			int meterCount = meters.size();
 			
-			for (int i = index; i < count; i++) {
+			for (int i = index; i < meterCount; i++) {
 				int newIndex = i;
-				Meter nextMeter = meters.get(newIndex);
+				meter = meters.get(newIndex);
 				
-				posToIndex.compute(nextMeter.getPos(), (meterPos, oldIndex) -> newIndex);
+				posToIndex.compute(meter.getPos(), (worldPos, oldIndex) -> newIndex);
 			}
-		}
-	}
-	
-	public void renameMeter(int index, String name) {
-		Meter meter = getMeter(index);
-		
-		if (meter != null) {
-			meter.setName(name);
-		}
-	}
-	
-	public void recolorMeter(int index, int color) {
-		Meter meter = getMeter(index);
-		
-		if (meter != null) {
-			meter.setColor(color);
-		}
-	}
-	
-	public Set<PlayerEntity> getSubscribers() {
-		return Collections.unmodifiableSet(subscribers);
-	}
-	
-	public boolean hasSubscribers() {
-		return !subscribers.isEmpty();
-	}
-	
-	public boolean addSubscriber(PlayerEntity player) {
-		return subscribers.add(player);
-	}
-	
-	public boolean removeSubscriber(PlayerEntity player) {
-		return subscribers.remove(player);
-	}
-	
-	public MeterGroupLogs getLogs() {
-		return logs;
-	}
-	
-	public void clearLogs() {
-		logs.clear();
-	}
-	
-	public void tick() {
-		logs.tick();
-	}
-	
-	public void syncTime(long currentTick) {
-		logs.syncTime(currentTick);
-	}
-	
-	public String nextMeterName() {
-		return String.format("Meter %d", totalMeterCount);
-	}
-	
-	public int nextMeterColor() {
-		return ColorUtils.nextColor();
-	}
-	
-	public void blockUpdate(WorldPos pos, boolean powered) {
-		if (hasMeterAt(pos)) {
-			int index = posToIndex.get(pos);
-			Meter meter = meters.get(index);
 			
-			if (meter.blockUpdate(powered)) {
-				logs.meterPoweredChanged(index, powered);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public void encode(PacketByteBuf buffer) {
+		buffer.writeInt(meters.size());
+		
+		for (Meter meter : meters) {
+			PacketUtils.writeMeter(buffer, meter);
+		}
+	}
+	
+	public void decode(PacketByteBuf buffer) {
+		int meterCount = buffer.readInt();
+		
+		for (int i = 0; i < meterCount; i++) {
+			Meter meter = PacketUtils.readMeter(buffer);
+			
+			if (meter != null) {
+				addMeter(meter);
 			}
 		}
 	}
 	
-	public void stateChanged(WorldPos pos, boolean active) {
-		if (hasMeterAt(pos)) {
-			int index = posToIndex.get(pos);
-			Meter meter = meters.get(index);
-			
-			if (meter.stateChanged(active)) {
-				logs.meterActiveChanged(index, active);
-			}
-		}
+	public void updateFromData(PacketByteBuf data) {
+		clear();
+		decode(data);
 	}
 }

@@ -12,9 +12,9 @@ import net.minecraft.block.DispenserBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
+import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
 
 @Mixin(DispenserBlock.class)

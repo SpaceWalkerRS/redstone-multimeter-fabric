@@ -1,11 +1,14 @@
 package rsmm.fabric.client;
 
+import java.util.List;
+
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 
+import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
-import rsmm.fabric.common.log.MeterGroupLogs;
 
-public class MultimeterHudRenderer {
+public class MultimeterHudRenderer extends DrawableHelper {
 	
 	private final MultimeterClient client;
 	
@@ -15,6 +18,10 @@ public class MultimeterHudRenderer {
 	
 	public void render(MatrixStack matrices) {
 		MeterGroup meterGroup = client.getMeterGroup();
-		MeterGroupLogs logs = meterGroup.getLogs();
+		List<Meter> meters = meterGroup.getMeters();
+		
+		if (meters.isEmpty()) {
+			return;
+		}
 	}
 }

@@ -12,8 +12,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 
 import rsmm.fabric.common.MeterGroup;
-import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.interfaces.mixin.IServerCommandSource;
+import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
 import rsmm.fabric.util.ColorUtils;
 
@@ -61,8 +61,9 @@ public class MeterCommand {
 		try {
 			ServerPlayerEntity player = source.getPlayer();
 			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
+			Multimeter multimeter = server.getMultimeter();
 			
-			MeterGroup meterGroup = server.getMultimeter().getSubscription(player);
+			MeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup == null) {
 				source.sendFeedback(new LiteralText("You have to subscribe to a meter group first!"), false);
@@ -81,7 +82,7 @@ public class MeterCommand {
 				
 				return 1;
 			} else {
-				server.renameMeter(index, name, player);
+				multimeter.renameMeter(index, name, player);
 				source.sendFeedback(new LiteralText(String.format("Renamed meter %d to %s", index, name)), false);
 				
 				return 1;
@@ -97,8 +98,9 @@ public class MeterCommand {
 		try {
 			ServerPlayerEntity player = source.getPlayer();
 			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
+			Multimeter multimeter = server.getMultimeter();
 			
-			MeterGroup meterGroup = server.getMultimeter().getSubscription(player);
+			MeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup == null) {
 				source.sendFeedback(new LiteralText("You have to subscribe to a meter group first!"), false);
@@ -117,7 +119,7 @@ public class MeterCommand {
 				
 				return 1;
 			} else {
-				server.recolorMeter(index, color, player);
+				multimeter.recolorMeter(index, color, player);
 				source.sendFeedback(new LiteralText(String.format("Recolored meter %d to %d", index, color)), false);
 				
 				return 1;
@@ -133,14 +135,15 @@ public class MeterCommand {
 		try {
 			ServerPlayerEntity player = source.getPlayer();
 			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
+			Multimeter multimeter = server.getMultimeter();
 			
-			if (!server.getMultimeter().hasSubscription(player)) {
+			if (!multimeter.hasSubscription(player)) {
 				source.sendFeedback(new LiteralText("You have to subscribe to a meter group first!"), false);
 				
 				return 1;
 			}
 			
-			server.removeAllMeters(player);
+			multimeter.removeAllMeters(player);
 			source.sendFeedback(new LiteralText("Removed all meters"), false);
 			
 			return 1;
@@ -155,8 +158,9 @@ public class MeterCommand {
 		try {
 			ServerPlayerEntity player = source.getPlayer();
 			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
+			Multimeter multimeter = server.getMultimeter();
 			
-			server.subscribeToMeterGroup(name, player);
+			multimeter.subscribeToMeterGroup(name, player);
 			source.sendFeedback(new LiteralText(String.format("Subscribed to meter group \'%s\'", name)), false);
 			
 			return 1;

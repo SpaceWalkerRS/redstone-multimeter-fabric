@@ -3,13 +3,10 @@ package rsmm.fabric.util;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.log.AbstractLogEntry;
-import rsmm.fabric.common.log.entry.LogType;
-import rsmm.fabric.common.task.MultimeterTask;
-import rsmm.fabric.common.task.TaskType;
+import rsmm.fabric.common.log.LogType;
+import rsmm.fabric.common.log.entry.LogEntry;
 
 public class PacketUtils {
 	
@@ -41,43 +38,30 @@ public class PacketUtils {
 		return new WorldPos(worldId, pos);
 	}
 	
-	public static void writeMultimeterTask(PacketByteBuf buffer, MultimeterTask task) {
-		TaskType type = TaskType.fromTask(task);
+	public static void writeMeter(PacketByteBuf buffer, Meter meter) {
+		meter.encode(buffer);
+	}
+	
+	public static Meter readMeter(PacketByteBuf buffer) {
+		Meter meter = new Meter();
+		meter.decode(buffer);
+		
+		return meter.getPos() == null ? null : meter;
+	}
+	
+	public static void writeLogEntry(PacketByteBuf buffer, LogEntry log) {
+		LogType type = LogType.fromLogEntry(log);
 		buffer.writeByte(type.getIndex());
 		
-		task.encode(buffer);
+		log.encode(buffer);
 	}
 	
-	public static MultimeterTask readMultimeterTask(PacketByteBuf buffer) {
-		TaskType type = TaskType.fromIndex(buffer.readByte());
-		
-		try {
-			Class<? extends MultimeterTask> clazz = type.getClazz();
-			MultimeterTask task = clazz.newInstance();
-			
-			task.decode(buffer);
-			
-			return task;
-		} catch (Exception e) {
-			
-		}
-		
-		return null;
-	}
-	
-	public static void writeLogEntry(PacketByteBuf buffer, AbstractLogEntry logEntry) {
-		LogType type = LogType.fromLogEntry(logEntry);
-		buffer.writeByte(type.getIndex());
-		
-		logEntry.encode(buffer);
-	}
-	
-	public static AbstractLogEntry readLogEntry(PacketByteBuf buffer) {
+	public static LogEntry readLogEntry(PacketByteBuf buffer) {
 		LogType type = LogType.fromIndex(buffer.readByte());
 		
 		try {
-			Class<? extends AbstractLogEntry> clazz = type.getClazz();
-			AbstractLogEntry logEntry = clazz.newInstance();
+			Class<? extends LogEntry> clazz = type.getClazz();
+			LogEntry logEntry = clazz.newInstance();
 			
 			logEntry.decode(buffer);
 			
@@ -87,20 +71,5 @@ public class PacketUtils {
 		}
 		
 		return null;
-	}
-	
-	public static void writeMeter(PacketByteBuf buffer, Meter meter) {
-		PacketUtils.writeWorldPos(buffer, meter.getPos());
-		
-		meter.encode(buffer);
-	}
-	
-	public static Meter readMeter(PacketByteBuf buffer) {
-		WorldPos pos = PacketUtils.readWorldPos(buffer);
-		Meter meter = new Meter(pos, null, 0, false, false);
-		
-		meter.decode(buffer);
-		
-		return meter.getName() == null ? null : meter;
 	}
 }

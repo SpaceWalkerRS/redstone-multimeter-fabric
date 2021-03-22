@@ -7,8 +7,7 @@ import net.minecraft.block.ObserverBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import rsmm.fabric.common.MeterableBlock;
+import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(ObserverBlock.class)
 public class ObserverBlockMixin implements MeterableBlock {

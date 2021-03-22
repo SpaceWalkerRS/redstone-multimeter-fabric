@@ -1,8 +1,8 @@
 package rsmm.fabric.client;
 
-import java.util.List;
-
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -10,35 +10,31 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import rsmm.fabric.common.MeterGroup;
-import rsmm.fabric.common.Multimeter;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.RecolorMeterPacket;
-import rsmm.fabric.common.packet.types.RemoveMetersPacket;
+import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
 import rsmm.fabric.common.packet.types.RenameMeterPacket;
 import rsmm.fabric.common.packet.types.ToggleMeterPacket;
-import rsmm.fabric.common.task.MultimeterTask;
 
 public class MultimeterClient {
 	
 	private final MinecraftClient client;
 	private final ClientPacketHandler packetHandler;
 	private final InputHandler inputHandler;
-	private final Multimeter multimeter;
-	private final MeterGroup personalMeterGroup;
 	private final MeterRenderer meterRenderer;
-	private final MultimeterHudRenderer multimeterHudRenderer;
+	private final MultimeterHudRenderer hudRenderer;
 	
+	private MeterGroup meterGroup;
+	private boolean connected; // true if the client is connected to a MultimeterServer
 	private boolean renderHud;
 	
 	public MultimeterClient(MinecraftClient client) {
 		this.client = client;
 		this.packetHandler = new ClientPacketHandler(this);
 		this.inputHandler = new InputHandler(this);
-		this.multimeter = new Multimeter();
-		this.personalMeterGroup = new MeterGroup(client.getSession().getUsername());
 		this.meterRenderer = new MeterRenderer(this);
-		this.multimeterHudRenderer = new MultimeterHudRenderer(this);
+		this.hudRenderer = new MultimeterHudRenderer(this);
 		
 		this.renderHud = true;
 	}
@@ -51,10 +47,6 @@ public class MultimeterClient {
 		return packetHandler;
 	}
 	
-	public Multimeter getMultimeter() {
-		return multimeter;
-	}
-	
 	public InputHandler getInputHandler() {
 		return inputHandler;
 	}
@@ -63,66 +55,46 @@ public class MultimeterClient {
 		return meterRenderer;
 	}
 	
-	public MultimeterHudRenderer getMultimeterHudRenderer() {
-		return multimeterHudRenderer;
+	public MultimeterHudRenderer getHudRenderer() {
+		return hudRenderer;
+	}
+	
+	public MeterGroup getMeterGroup() {
+		return meterGroup;
 	}
 	
 	public boolean renderHud() {
 		return renderHud;
 	}
 	
-	public void syncTime(long currentTick) {
-		multimeter.syncTime(currentTick);
-	}
-	
-	public void syncMultimeterTasks(List<MultimeterTask> tasks) {
-		MeterGroup meterGroup = getMeterGroup();
-		
-		for (MultimeterTask task : tasks) {
-			multimeter.scheduleTask(task, meterGroup);
-		}
-		
-		multimeter.tick();
-		multimeter.clearTaskLogs();
-	}
-	
-	public void meterGroupLogsReceived(PacketByteBuf data) {
-		MeterGroup meterGroup = getMeterGroup();
-		
-		if (meterGroup != null) {
-			meterGroup.getLogs().decode(data);
-		}
-	}
-	
-	// Return the MeterGroup this client is subscribed to
-	public MeterGroup getMeterGroup() {
-		return multimeter.getSubscription(client.player);
-	}
-	
 	public void onStartup() {
-		
+		meterGroup = new MeterGroup(client.getSession().getUsername());
 	}
 	
 	public void onShutdown() {
 		
 	}
 	
+	/**
+	 * Called when this client connects to a MultimeterServer
+	 */
 	public void onConnect() {
-		subscribeToMeterGroup(personalMeterGroup);
+		connected = true;
 		
-		MeterGroupDataPacket packet = new MeterGroupDataPacket(personalMeterGroup);
+		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
+		meterGroup.encode(data);
+		
+		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup.getName(), data);
 		packetHandler.sendPacket(packet);
 	}
 	
 	public void onDisconnect() {
-		multimeter.removeSubscription(client.player);
+		if (connected) {
+			connected = false;
+		}
 	}
 	
 	public void toggleMeter() {
-		if (getMeterGroup() == null) {
-			return;
-		}
-		
 		HitResult hitResult = client.crosshairTarget;
 		
 		if (hitResult.getType() == HitResult.Type.BLOCK) {
@@ -131,21 +103,27 @@ public class MultimeterClient {
 			
 			WorldPos pos = new WorldPos(world, blockPos);
 			
-			ToggleMeterPacket packet = new ToggleMeterPacket(pos);
+			ToggleMeterPacket packet = new ToggleMeterPacket(pos, !Screen.hasControlDown());
 			packetHandler.sendPacket(packet);
 		}
 	}
 	
 	public void pauseMeters() {
-		
+		if (getMeterGroup() == null) {
+			return;
+		}
 	}
 	
 	public void stepForward() {
-		
+		if (getMeterGroup() == null) {
+			return;
+		}
 	}
 	
 	public void stepBackward() {
-		
+		if (getMeterGroup() == null) {
+			return;
+		}
 	}
 	
 	public void toggleHud() {
@@ -163,22 +141,19 @@ public class MultimeterClient {
 	}
 	
 	public void removeMeters() {
-		RemoveMetersPacket packet = new RemoveMetersPacket();
+		RemoveAllMetersPacket packet = new RemoveAllMetersPacket();
 		packetHandler.sendPacket(packet);
 	}
 	
-	public void subscribeToMeterGroup(String name) {
-		
-	}
-	
-	public void subscribeToMeterGroup(MeterGroup meterGroup) {
-		MeterGroup oldSubscription = getMeterGroup();
-		
-		if (oldSubscription != null) {
-			multimeter.removeMeterGroup(meterGroup);
+	public void meterGroupDataReceived(String name, PacketByteBuf data) {
+		if (!meterGroup.getName().equals(name)) {
+			meterGroup = new MeterGroup(name);
 		}
 		
-		multimeter.addMeterGroup(meterGroup);
-		multimeter.addSubscription(client.player, meterGroup);
+		meterGroup.updateFromData(data);
+	}
+	
+	public void meterDataReceived() {
+		
 	}
 }

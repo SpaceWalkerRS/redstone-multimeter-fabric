@@ -25,7 +25,7 @@ public class InputHandler {
 			client.toggleHud();
 		}
 		if (KeyBindings.PRINT.wasPressed()) {
-			client.getMeterGroup().getLogs().print();
+			//client.getMeterGroup().print();
 		}
 	}
 }

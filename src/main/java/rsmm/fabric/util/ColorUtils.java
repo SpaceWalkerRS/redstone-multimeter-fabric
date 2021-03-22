@@ -10,14 +10,14 @@ public class ColorUtils {
 	
 	public static int nextColor() {
 		float hue = ((colorIndex * 11) % 8 + (colorIndex / 8) / 2.0F) / 8.0F;
-		int color = hsb2int(hue, 0.7F, 1.0F);
+		int color = hsbToInt(hue, 0.7F, 1.0F);
 		
 		colorIndex = (colorIndex + 1) % 16;
 		
 		return color;
 	}
 	
-	public static int hsb2int(float h, float s, float b) {
+	public static int hsbToInt(float h, float s, float b) {
         Color c = Color.getHSBColor(h,s,b);
         
         int color = 0xFF000000;

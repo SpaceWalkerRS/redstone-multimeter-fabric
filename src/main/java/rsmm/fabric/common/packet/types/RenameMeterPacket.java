@@ -2,7 +2,9 @@ package rsmm.fabric.common.packet.types;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 import rsmm.fabric.util.PacketUtils;
@@ -35,11 +37,15 @@ public class RenameMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.renameMeter(index, name, player);
+		server.getMultimeter().renameMeter(index, name, player);
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
+		Meter meter = client.getMeterGroup().getMeter(index);
 		
+		if (meter != null) {
+			meter.setName(name);
+		}
 	}
 }

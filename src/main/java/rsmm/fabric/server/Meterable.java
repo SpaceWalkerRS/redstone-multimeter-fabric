@@ -1,4 +1,4 @@
-package rsmm.fabric.common;
+package rsmm.fabric.server;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;

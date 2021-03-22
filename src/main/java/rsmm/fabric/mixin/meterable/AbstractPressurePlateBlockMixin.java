@@ -6,9 +6,8 @@ import net.minecraft.block.AbstractPressurePlateBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import rsmm.fabric.common.MeterableBlock;
 import rsmm.fabric.interfaces.mixin.IPressurePlate;
+import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(AbstractPressurePlateBlock.class)
 public class AbstractPressurePlateBlockMixin implements MeterableBlock {

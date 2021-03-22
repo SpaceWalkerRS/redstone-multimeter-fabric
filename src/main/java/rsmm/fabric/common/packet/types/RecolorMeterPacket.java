@@ -4,6 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
@@ -35,11 +36,15 @@ public class RecolorMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.recolorMeter(index, color, player);
+		server.getMultimeter().recolorMeter(index, color, player);
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
+		Meter meter = client.getMeterGroup().getMeter(index);
 		
+		if (meter != null) {
+			meter.setColor(color);
+		}
 	}
 }

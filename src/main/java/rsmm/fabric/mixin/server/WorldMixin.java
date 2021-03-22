@@ -12,9 +12,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import rsmm.fabric.common.Multimeter;
+
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
+import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
 
 @Mixin(World.class)
@@ -37,11 +38,11 @@ public abstract class WorldMixin {
 			return;
 		}
 		
+		Block block = state.getBlock();
+		
 		// Block updates for most meterable blocks are handled in those classes
 		// to reduce expensive calls to 
 		// World.isReceivingRedstonePower and World.getReceivedRedstonePower
-		Block block = state.getBlock();
-		
 		if (((IBlock)block).standardIsPowered()) {
 			boolean powered = ((IBlock)block).isPowered((World)(Object)this, pos, state);
 			
