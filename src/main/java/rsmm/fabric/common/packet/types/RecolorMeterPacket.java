@@ -36,7 +36,7 @@ public class RecolorMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().recolorMeter(index, color, player);
+		
 	}
 	
 	@Override

@@ -3,7 +3,6 @@ package rsmm.fabric.mixin.client;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
@@ -21,23 +20,13 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	@Inject(
 			method = "<init>",
 			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/client/MinecraftClient;isMultiplayerEnabled()Z"
+					value = "RETURN"
 			)
 	)
 	private void onInitInjectBeforeIsMultiplayerEnabled(RunArgs args, CallbackInfo ci) {
 		this.multimeterClient = new MultimeterClient((MinecraftClient)(Object)this);
-	}
-	
-	@Inject(
-			method = "<init>",
-			at = @At(
-					value = "RETURN"
-			)
-	)
-	private void onInitInjectAtReturn(RunArgs args, CallbackInfo ci) {
-		this.multimeterClient.onStartup();
+		
+		multimeterClient.onStartup();
 	}
 	
 	@Inject(

@@ -12,9 +12,6 @@ import net.minecraft.world.World;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
-import rsmm.fabric.common.packet.types.RecolorMeterPacket;
-import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
-import rsmm.fabric.common.packet.types.RenameMeterPacket;
 import rsmm.fabric.common.packet.types.ToggleMeterPacket;
 
 public class MultimeterClient {
@@ -80,6 +77,7 @@ public class MultimeterClient {
 	 */
 	public void onConnect() {
 		connected = true;
+		renderHud = true;
 		
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		meterGroup.encode(data);
@@ -91,6 +89,7 @@ public class MultimeterClient {
 	public void onDisconnect() {
 		if (connected) {
 			connected = false;
+			renderHud = false;
 		}
 	}
 	
@@ -112,37 +111,28 @@ public class MultimeterClient {
 		if (getMeterGroup() == null) {
 			return;
 		}
+		
+		hudRenderer.pause();
 	}
 	
 	public void stepForward() {
 		if (getMeterGroup() == null) {
 			return;
 		}
+		
+		hudRenderer.stepForward(Screen.hasControlDown() ? 10 : 1);
 	}
 	
 	public void stepBackward() {
 		if (getMeterGroup() == null) {
 			return;
 		}
+		
+		hudRenderer.stepBackward(Screen.hasControlDown() ? 10 : 1);
 	}
 	
 	public void toggleHud() {
 		renderHud = !renderHud;
-	}
-	
-	public void renameMeter(int index, String name) {
-		RenameMeterPacket packet = new RenameMeterPacket(index, name);
-		packetHandler.sendPacket(packet);
-	}
-	
-	public void recolorMeter(int index, int color) {
-		RecolorMeterPacket packet = new RecolorMeterPacket(index, color);
-		packetHandler.sendPacket(packet);
-	}
-	
-	public void removeMeters() {
-		RemoveAllMetersPacket packet = new RemoveAllMetersPacket();
-		packetHandler.sendPacket(packet);
 	}
 	
 	public void meterGroupDataReceived(String name, PacketByteBuf data) {

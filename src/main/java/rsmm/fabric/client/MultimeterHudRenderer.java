@@ -12,6 +12,8 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	
 	private final MultimeterClient client;
 	
+	private boolean paused;
+	
 	public MultimeterHudRenderer(MultimeterClient client) {
 		this.client = client;
 	}
@@ -23,5 +25,17 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		if (meters.isEmpty()) {
 			return;
 		}
+	}
+	
+	public void pause() {
+		paused = !paused;
+	}
+	
+	public void stepForward(int amount) {
+		
+	}
+	
+	public void stepBackward(int amount) {
+		
 	}
 }

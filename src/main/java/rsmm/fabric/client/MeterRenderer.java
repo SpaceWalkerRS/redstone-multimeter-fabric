@@ -50,11 +50,9 @@ public class MeterRenderer {
 		BufferBuilder builder = tessellator.getBuffer();
 		
 		for (Meter meter : meterGroup.getMeters()) {
-			if (!meter.isIn(minecraftClient.world)) {
-				continue;
+			if (meter.isIn(minecraftClient.world)) {
+				drawMeter(matrices, builder, tessellator, meter);
 			}
-			
-			drawMeter(matrices, builder, tessellator, meter);
 		}
 		
 		matrices.pop();

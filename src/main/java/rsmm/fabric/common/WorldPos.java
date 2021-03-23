@@ -48,11 +48,9 @@ public class WorldPos extends BlockPos {
 	}
 	
 	/**
-	 * Move this WorldPos to a different dimension
-	 * @param worldId
-	 * @return a WorldPos with the same coordinates but a different world id
+	 * Return a WorldPos with the same coordinates in a different dimension
 	 */
-	public WorldPos toWorld(Identifier worldId) {
+	public WorldPos withWorld(Identifier worldId) {
 		return new WorldPos(worldId, this);
 	}
 }

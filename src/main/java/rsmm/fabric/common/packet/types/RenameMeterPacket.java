@@ -37,7 +37,7 @@ public class RenameMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().renameMeter(index, name, player);
+		
 	}
 	
 	@Override

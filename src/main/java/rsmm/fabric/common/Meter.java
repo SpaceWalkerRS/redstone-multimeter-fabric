@@ -41,10 +41,6 @@ public class Meter {
 		return pos;
 	}
 	
-	public void setPos(WorldPos pos) {
-		this.pos = pos;
-	}
-	
 	public boolean isIn(World world) {
 		return pos.isOf(world);
 	}
