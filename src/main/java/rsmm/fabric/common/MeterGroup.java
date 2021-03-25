@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.network.PacketByteBuf;
-
+import rsmm.fabric.common.log.LogManager;
 import rsmm.fabric.util.PacketUtils;
 
 public class MeterGroup {
@@ -15,11 +15,13 @@ public class MeterGroup {
 	private final String name;
 	private final List<Meter> meters;
 	private final Map<WorldPos, Integer> posToIndex;
+	private final LogManager logManager;
 	
 	public MeterGroup(String name) {
 		this.name = name;
 		this.meters = new ArrayList<>();
 		this.posToIndex = new HashMap<>();
+		this.logManager = new LogManager(this);
 	}
 	
 	public String getName() {
@@ -84,6 +86,10 @@ public class MeterGroup {
 		}
 		
 		return false;
+	}
+	
+	public LogManager getLogManager() {
+		return logManager;
 	}
 	
 	public void encode(PacketByteBuf buffer) {

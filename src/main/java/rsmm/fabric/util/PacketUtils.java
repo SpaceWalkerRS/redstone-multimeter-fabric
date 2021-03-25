@@ -3,10 +3,11 @@ package rsmm.fabric.util;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.log.LogType;
 import rsmm.fabric.common.log.entry.LogEntry;
+import rsmm.fabric.common.log.entry.LogType;
 
 public class PacketUtils {
 	
@@ -49,19 +50,18 @@ public class PacketUtils {
 		return meter.getPos() == null ? null : meter;
 	}
 	
-	public static void writeLogEntry(PacketByteBuf buffer, LogEntry log) {
-		LogType type = LogType.fromLogEntry(log);
-		buffer.writeByte(type.getIndex());
+	public static void writeLogEntry(PacketByteBuf buffer, LogEntry<?> log) {
+		buffer.writeString(log.getType().getName());
 		
 		log.encode(buffer);
 	}
 	
-	public static LogEntry readLogEntry(PacketByteBuf buffer) {
-		LogType type = LogType.fromIndex(buffer.readByte());
+	public static LogEntry<?> readLogEntry(PacketByteBuf buffer) {
+		LogType<?> type = LogType.fromName(buffer.readString(MAX_STRING_LENGTH));
 		
 		try {
-			Class<? extends LogEntry> clazz = type.getClazz();
-			LogEntry logEntry = clazz.newInstance();
+			Class<? extends LogEntry<?>> entryType = type.entry();
+			LogEntry<?> logEntry = entryType.getDeclaredConstructor(LogType.class).newInstance(type);
 			
 			logEntry.decode(buffer);
 			

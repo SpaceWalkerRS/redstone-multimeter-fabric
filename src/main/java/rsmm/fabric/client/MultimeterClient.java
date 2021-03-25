@@ -64,6 +64,11 @@ public class MultimeterClient {
 		return renderHud;
 	}
 	
+	public void tick() {
+		meterGroup.getLogManager().tick();
+		hudRenderer.tick();
+	}
+	
 	public void onStartup() {
 		meterGroup = new MeterGroup(client.getSession().getUsername());
 	}
@@ -75,9 +80,12 @@ public class MultimeterClient {
 	/**
 	 * Called when this client connects to a MultimeterServer
 	 */
-	public void onConnect() {
+	public void onConnect(long serverTick) {
 		connected = true;
 		renderHud = true;
+		
+		meterGroup.getLogManager().syncTime(serverTick);
+		hudRenderer.syncTime(serverTick);
 		
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		meterGroup.encode(data);
@@ -90,6 +98,8 @@ public class MultimeterClient {
 		if (connected) {
 			connected = false;
 			renderHud = false;
+			
+			meterGroup.getLogManager().clearLogs();
 		}
 	}
 	
@@ -107,30 +117,6 @@ public class MultimeterClient {
 		}
 	}
 	
-	public void pauseMeters() {
-		if (getMeterGroup() == null) {
-			return;
-		}
-		
-		hudRenderer.pause();
-	}
-	
-	public void stepForward() {
-		if (getMeterGroup() == null) {
-			return;
-		}
-		
-		hudRenderer.stepForward(Screen.hasControlDown() ? 10 : 1);
-	}
-	
-	public void stepBackward() {
-		if (getMeterGroup() == null) {
-			return;
-		}
-		
-		hudRenderer.stepBackward(Screen.hasControlDown() ? 10 : 1);
-	}
-	
 	public void toggleHud() {
 		renderHud = !renderHud;
 	}
@@ -141,9 +127,5 @@ public class MultimeterClient {
 		}
 		
 		meterGroup.updateFromData(data);
-	}
-	
-	public void meterDataReceived() {
-		
 	}
 }

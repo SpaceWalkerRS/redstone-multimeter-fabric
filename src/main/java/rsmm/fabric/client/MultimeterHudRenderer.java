@@ -12,19 +12,24 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	
 	private final MultimeterClient client;
 	
+	private long currentServerTick = -1;
+	
 	private boolean paused;
 	
 	public MultimeterHudRenderer(MultimeterClient client) {
 		this.client = client;
 	}
 	
-	public void render(MatrixStack matrices) {
-		MeterGroup meterGroup = client.getMeterGroup();
-		List<Meter> meters = meterGroup.getMeters();
-		
-		if (meters.isEmpty()) {
-			return;
-		}
+	public void tick() {
+		currentServerTick++;
+	}
+	
+	public void syncTime(long serverTick) {
+		currentServerTick = serverTick;
+	}
+	
+	public void onDisconnect() {
+		currentServerTick = -1;
 	}
 	
 	public void pause() {
@@ -37,5 +42,14 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	
 	public void stepBackward(int amount) {
 		
+	}
+	
+	public void render(MatrixStack matrices) {
+		MeterGroup meterGroup = client.getMeterGroup();
+		List<Meter> meters = meterGroup.getMeters();
+		
+		if (meters.isEmpty()) {
+			return;
+		}
 	}
 }

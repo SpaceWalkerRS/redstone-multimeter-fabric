@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
-import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 
 import rsmm.fabric.common.packet.AbstractPacketHandler;
 import rsmm.fabric.interfaces.mixin.IMinecraftClient;
@@ -19,16 +18,6 @@ import rsmm.fabric.interfaces.mixin.IMinecraftClient;
 public class ClientPlayNetworkHandlerMixin {
 	
 	@Shadow private MinecraftClient client;
-	
-	@Inject(
-			method = "onGameJoin",
-			at = @At(
-					value = "RETURN"
-			)
-	)
-	private void onOnGameJoinInjectAtHead(GameJoinS2CPacket packet, CallbackInfo ci) {
-		((IMinecraftClient)client).getMultimeterClient().onConnect();
-	}
 	
 	@Inject(
 			method = "onCustomPayload",

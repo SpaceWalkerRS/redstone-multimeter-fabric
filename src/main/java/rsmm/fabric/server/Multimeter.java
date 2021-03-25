@@ -20,8 +20,10 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.log.LogManager;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
+import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
 import rsmm.fabric.common.packet.types.RecolorMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
@@ -61,11 +63,26 @@ public class Multimeter {
 	}
 	
 	public void tick() {
-		
+		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+			meterGroup.getLogManager().tick();
+		}
 	}
 	
 	public void broadcastMeterLogs() {
-		
+		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+			LogManager logManager = meterGroup.getLogManager();
+			
+			if (!meterGroup.hasSubscribers()) {
+				logManager.clearLogs();
+				continue;
+			}
+			
+			PacketByteBuf data = logManager.collectMeterLogs();
+			logManager.clearLogs();
+			
+			MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
+			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+		}
 	}
 	
 	public void onPlayerJoin(ServerPlayerEntity player) {
@@ -173,7 +190,9 @@ public class Multimeter {
 		
 		if (newSubscription == null) {
 			newSubscription = new ServerMeterGroup(name);
+			
 			meterGroups.put(name, newSubscription);
+			newSubscription.getLogManager().syncTime(server.getMinecraftServer().getTicks());
 		}
 		
 		subscriptions.put(player, newSubscription);
@@ -194,6 +213,7 @@ public class Multimeter {
 			meterGroup.decode(data);
 			
 			meterGroups.put(name, meterGroup);
+			meterGroup.getLogManager().syncTime(server.getMinecraftServer().getTicks());
 		} else {
 			data = new PacketByteBuf(Unpooled.buffer());
 			meterGroup.encode(data);

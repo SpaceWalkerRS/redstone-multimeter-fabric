@@ -34,7 +34,7 @@ public class MultimeterServer {
 	}
 	
 	public void onPlayerJoin(ServerPlayerEntity player) {
-		JoinMultimeterServerPacket packet = new JoinMultimeterServerPacket();
+		JoinMultimeterServerPacket packet = new JoinMultimeterServerPacket(server.getTicks());
 		packetHandler.sendPacketToPlayer(packet, player);
 		
 		multimeter.onPlayerJoin(player);

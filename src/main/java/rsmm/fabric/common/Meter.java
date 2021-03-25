@@ -4,11 +4,12 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
+import rsmm.fabric.common.log.MeterLogs;
 import rsmm.fabric.util.PacketUtils;
 
 public class Meter {
 	
-	//private final MeterLogs logs;
+	private final MeterLogs logs;
 	
 	private WorldPos pos;
 	private String name;
@@ -18,9 +19,9 @@ public class Meter {
 	private boolean powered; // true if the block is receiving power
 	private boolean active;  // true if the block is emitting power or active in another way
 	
-	private boolean dirty;
-	
 	public Meter(WorldPos pos, String name, int color, boolean movable, boolean initialPowered, boolean initialActive) {
+		this.logs = new MeterLogs();
+		
 		this.pos = pos;
 		this.name = name;
 		this.color = color;
@@ -34,7 +35,15 @@ public class Meter {
 	 * Creates an empty Meter, to be populated by packet data
 	 */
 	public Meter() {
-		
+		this.logs = new MeterLogs();
+	}
+	
+	public MeterLogs getLogs() {
+		return logs;
+	}
+	
+	public void clearLogs() {
+		logs.clear();
 	}
 	
 	public WorldPos getPos() {
@@ -73,14 +82,9 @@ public class Meter {
 		return active;
 	}
 	
-	public boolean isDirty() {
-		return dirty;
-	}
-	
 	public boolean blockUpdate(boolean powered) {
 		if (this.powered != powered) {
 			this.powered = powered;
-			dirty = true;
 			
 			return true;
 		}
@@ -91,7 +95,6 @@ public class Meter {
 	public boolean stateChanged(boolean active) {
 		if (this.active != active) {
 			this.active = active;
-			dirty = true;
 			
 			return true;
 		}
@@ -102,7 +105,6 @@ public class Meter {
 	public boolean blockMoved(Direction dir) {
 		if (movable) {
 			pos = pos.offset(dir);
-			dirty = true;
 			
 			return true;
 		}
@@ -131,14 +133,16 @@ public class Meter {
 	}
 	
 	public void writeLogs(PacketByteBuf buffer) {
-		dirty = false;
-		
 		buffer.writeBoolean(powered);
 		buffer.writeBoolean(active);
+		
+		logs.encode(buffer);
 	}
 	
 	public void readLogs(PacketByteBuf buffer) {
 		powered = buffer.readBoolean();
 		active = buffer.readBoolean();
+		
+		logs.decode(buffer);
 	}
 }
