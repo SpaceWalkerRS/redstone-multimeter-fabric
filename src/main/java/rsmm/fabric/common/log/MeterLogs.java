@@ -72,6 +72,14 @@ public class MeterLogs {
 		}
 	}
 	
+	public LogEntry<?> getLog(int index) {
+		if (index >= 0 && index < logs.size()) {
+			return logs.get(index);
+		}
+		
+		return null;
+	}
+	
 	public LogEntry<?> getLastLogBefore(long tick) {
 		return getLastLogBefore(tick, 0);
 	}
