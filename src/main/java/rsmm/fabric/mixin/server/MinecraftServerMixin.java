@@ -37,7 +37,9 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onRunServerInjectBeforeEndTick(CallbackInfo ci) {
-		multimeterServer.getMultimeter().broadcastMeterLogs();
+		if (!isPaused()) {
+			multimeterServer.getMultimeter().broadcastMeterLogs();
+		}
 	}
 	
 	@Inject(
@@ -53,5 +55,10 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	@Override
 	public MultimeterServer getMultimeterServer() {
 		return multimeterServer;
+	}
+	
+	@Override
+	public boolean isPaused() {
+		return false;
 	}
 }

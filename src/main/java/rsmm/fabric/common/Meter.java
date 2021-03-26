@@ -133,6 +133,7 @@ public class Meter {
 	}
 	
 	public void writeLogs(PacketByteBuf buffer) {
+		PacketUtils.writeWorldPos(buffer, pos);
 		buffer.writeBoolean(powered);
 		buffer.writeBoolean(active);
 		
@@ -140,6 +141,7 @@ public class Meter {
 	}
 	
 	public void readLogs(PacketByteBuf buffer) {
+		pos = PacketUtils.readWorldPos(buffer);
 		powered = buffer.readBoolean();
 		active = buffer.readBoolean();
 		

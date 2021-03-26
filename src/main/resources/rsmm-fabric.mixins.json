@@ -39,6 +39,7 @@
   	"client.ClientPlayNetworkHandlerMixin",
   	"client.GameOptionsMixin",
   	"client.InGameHudMixin",
+  	"client.IntegratedServerMixin",
   	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
   	"client.WorldRendererMixin"

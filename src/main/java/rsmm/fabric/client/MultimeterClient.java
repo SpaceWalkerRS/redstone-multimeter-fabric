@@ -8,7 +8,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;

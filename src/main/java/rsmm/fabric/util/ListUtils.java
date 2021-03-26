@@ -13,17 +13,17 @@ public class ListUtils {
 		if (list.isEmpty()) {
 			return -1;
 		}
-		//System.out.println("UP - low: " + low + " - high: " + high);
+		
 		while (high > low) {
 			int mid = (low + high) / 2;
-			//System.out.println("mid: " + mid + " - low: " + low + " - high: " + high);
+			
 			if (tooLow.apply(list.get(mid))) {
 				low = mid + 1;
 			} else {
 				high = mid;
 			}
 		}
-		//System.out.println("found " + low);
+		
 		return low;
 	}
 }

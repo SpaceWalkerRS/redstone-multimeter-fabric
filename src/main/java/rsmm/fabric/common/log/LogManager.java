@@ -50,7 +50,7 @@ public class LogManager {
 	public <T> void log(Meter meter, LogType<? extends LogEntry<T>> type, T value) {
 		try {
 			Constructor<? extends LogEntry<T>> constructor = type.entry().getDeclaredConstructor(LogType.class, long.class, long.class, value.getClass());
-			LogEntry<?> log = constructor.newInstance(type, currentTick, currentSubTick++, value);
+			LogEntry<T> log = constructor.newInstance(type, currentTick, currentSubTick++, value);
 			
 			meter.getLogs().push(log);
 		} catch (Exception e) {

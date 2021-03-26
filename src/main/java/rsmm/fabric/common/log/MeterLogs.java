@@ -17,15 +17,11 @@ import rsmm.fabric.util.PacketUtils;
 public class MeterLogs {
 	
 	private final List<LogEntry<?>> logs;
-	private final List<Long> ticks;
-	private final List<Integer> indices;
 	
 	private long lastLoggedTick = -1;
 	
 	public MeterLogs() {
 		this.logs = new ArrayList<>();
-		this.ticks = new ArrayList<>();
-		this.indices = new ArrayList<>();
 	}
 	
 	public void push(LogEntry<?> log) {
@@ -33,9 +29,6 @@ public class MeterLogs {
 		
 		if (tick > lastLoggedTick) {
 			lastLoggedTick = tick;
-			
-			ticks.add(tick);
-			indices.add(logs.size());
 		}
 		
 		logs.add(log);
@@ -43,8 +36,6 @@ public class MeterLogs {
 	
 	public void clear() {
 		logs.clear();
-		ticks.clear();
-		indices.clear();
 		
 		lastLoggedTick = -1;
 	}
@@ -58,17 +49,6 @@ public class MeterLogs {
 			}
 			
 			logs.remove(0);
-		}
-		
-		while (!ticks.isEmpty()) {
-			long tick = ticks.get(0);
-			
-			if (tick >= cutoff) {
-				break;
-			}
-			
-			ticks.remove(0);
-			indices.remove(0);
 		}
 	}
 	
@@ -123,38 +103,12 @@ public class MeterLogs {
 			return logs.size() - 1;
 		}
 		
-		int tickIndex = ListUtils.binarySearch(ticks, loggedTick -> loggedTick < tick);
+		int logIndex = ListUtils.binarySearch(logs, log -> log.isBefore(tick, subTick));
 		
-		if (tickIndex < 0) {
-			return -1;
-		}
+		LogEntry<?> log = logs.get(logIndex);
 		
-		int low = indices.get(tickIndex++) - 1;
-		
-		if (low < 0) {
-			if (subTick == 0) {
-				return -1;
-			}
-			
-			low = 0;
-		}
-		
-		int high;
-		
-		if (tickIndex < indices.size()) {
-			high = indices.get(tickIndex) - 1;
-		} else {
-			high = logs.size() - 1;
-		}
-		
-		int logIndex = ListUtils.binarySearch(logs, low, high, log -> log.getTick() < tick || log.getSubTick() < subTick);
-		
-		if (logIndex >= 0) {
-			LogEntry<?> log = logs.get(logIndex);
-			
-			if (log.getTick() > tick || (log.getTick() == tick && log.getSubTick() >= subTick)) {
-				logIndex--;
-			}
+		if (!log.isBefore(tick, subTick)) {
+			logIndex--;
 		}
 		
 		return logIndex;

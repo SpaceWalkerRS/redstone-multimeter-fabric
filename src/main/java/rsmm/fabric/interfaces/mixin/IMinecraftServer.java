@@ -6,4 +6,6 @@ public interface IMinecraftServer {
 	
 	public MultimeterServer getMultimeterServer();
 	
+	public boolean isPaused();
+	
 }

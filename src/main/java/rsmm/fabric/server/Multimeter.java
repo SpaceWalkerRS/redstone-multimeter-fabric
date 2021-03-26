@@ -72,16 +72,14 @@ public class Multimeter {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			LogManager logManager = meterGroup.getLogManager();
 			
-			if (!meterGroup.hasSubscribers()) {
-				logManager.clearLogs();
-				continue;
+			if (meterGroup.hasSubscribers()) {
+				PacketByteBuf data = logManager.collectMeterLogs();
+				
+				MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
+				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 			}
 			
-			PacketByteBuf data = logManager.collectMeterLogs();
 			logManager.clearLogs();
-			
-			MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
-			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 		}
 	}
 	

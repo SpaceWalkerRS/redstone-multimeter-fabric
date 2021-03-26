@@ -12,10 +12,10 @@ import rsmm.fabric.util.PacketUtils;
 
 public class MeterGroup {
 	
-	private final String name;
-	private final List<Meter> meters;
-	private final Map<WorldPos, Integer> posToIndex;
-	private final LogManager logManager;
+	protected final String name;
+	protected final List<Meter> meters;
+	protected final Map<WorldPos, Integer> posToIndex;
+	protected final LogManager logManager;
 	
 	public MeterGroup(String name) {
 		this.name = name;

@@ -40,6 +40,18 @@ public abstract class LogEntry<T> {
 		return value;
 	}
 	
+	public boolean isBefore(long tick) {
+		return isBefore(tick, 0);
+	}
+	
+	public boolean isBefore(long tick, long subTick) {
+		if (this.tick == tick) {
+			return this.subTick < subTick;
+		}
+		
+		return this.tick < tick;
+	}
+	
 	public void encode(PacketByteBuf buffer) {
 		buffer.writeLong(tick);
 		buffer.writeLong(subTick);

@@ -67,7 +67,7 @@ public class ServerMeterGroup extends MeterGroup {
 		Meter meter = getMeterAt(pos);
 		
 		if (meter != null && meter.blockUpdate(powered)) {
-			getLogManager().log(meter, LogType.POWERED, powered);
+			logManager.log(meter, LogType.POWERED, powered);
 		}
 	}
 	
@@ -75,15 +75,20 @@ public class ServerMeterGroup extends MeterGroup {
 		Meter meter = getMeterAt(pos);
 		
 		if (meter != null && meter.stateChanged(active)) {
-			getLogManager().log(meter, LogType.ACTIVE, active);
+			logManager.log(meter, LogType.ACTIVE, active);
 		}
 	}
 	
 	public void blockMoved(WorldPos pos, Direction dir) {
 		Meter meter = getMeterAt(pos);
 		
-		if (meter != null && meter.blockMoved(dir)) {
-			getLogManager().log(meter, LogType.MOVED, dir);
+		if (meter != null) {
+			if (meter.blockMoved(dir)) {
+				int index = posToIndex.remove(pos);
+				posToIndex.put(meter.getPos(), index);
+			}
+			
+			logManager.log(meter, LogType.MOVED, dir);
 		}
 	}
 }
