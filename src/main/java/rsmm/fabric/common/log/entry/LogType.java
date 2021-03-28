@@ -3,36 +3,36 @@ package rsmm.fabric.common.log.entry;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LogType<T extends LogEntry<?>> {
+public class LogType {
 	
-	private static final Map<String, LogType<?>> ALL;
+	private static final Map<String, LogType> ALL;
 	
-	public static final LogType<BooleanLogEntry> POWERED;
-	public static final LogType<BooleanLogEntry> ACTIVE;
-	public static final LogType<DirectionLogEntry> MOVED;
+	public static final LogType POWERED;
+	public static final LogType ACTIVE;
+	public static final LogType MOVED;
 	
 	static {
 		
 		ALL = new HashMap<>();
 		
-		POWERED = register(new LogType<>("powered", BooleanLogEntry.class));
-		ACTIVE = register(new LogType<>("active", BooleanLogEntry.class));
-		MOVED = register(new LogType<>("moved", DirectionLogEntry.class));
+		POWERED = register(new LogType("powered", BooleanLogEntry.class));
+		ACTIVE = register(new LogType("active", BooleanLogEntry.class));
+		MOVED = register(new LogType("moved", DirectionLogEntry.class));
 	}
 	
-	private static <T extends LogEntry<?>> LogType<T> register(LogType<T> logType) {
+	private static LogType register(LogType logType) {
 		ALL.put(logType.getName(), logType);
 		return logType;
 	}
 	
-	public static LogType<?> fromName(String name) {
+	public static LogType fromName(String name) {
 		return ALL.get(name);
 	}
 	
 	private final String name;
-	private final Class<T> entryType;
+	private final Class<?> entryType;
 	
-	private LogType(String name, Class<T> entryType) {
+	private LogType(String name, Class<?> entryType) {
 		this.name = name;
 		this.entryType = entryType;
 	}
@@ -41,7 +41,7 @@ public class LogType<T extends LogEntry<?>> {
 		return name;
 	}
 	
-	public Class<T> entry() {
+	public Class<?> entry() {
 		return entryType;
 	}
 }

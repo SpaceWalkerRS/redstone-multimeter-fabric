@@ -74,11 +74,11 @@ public class MeterLogs {
 		return logs.get(logIndex);
 	}
 	
-	public <T> LogEntry<T> getLastLogBefore(long tick, LogType<? extends LogEntry<T>> type) {
+	public <T> LogEntry<T> getLastLogBefore(long tick, LogType type) {
 		return getLastLogBefore(tick, 0, type);
 	}
 	
-	public <T> LogEntry<T> getLastLogBefore(long tick, long subTick, LogType<? extends LogEntry<T>> type) {
+	public <T> LogEntry<T> getLastLogBefore(long tick, long subTick, LogType type) {
 		int logIndex = getLastLogIndexBefore(tick, subTick);
 		
 		if (logIndex < 0) {

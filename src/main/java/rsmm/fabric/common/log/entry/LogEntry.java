@@ -4,18 +4,18 @@ import net.minecraft.network.PacketByteBuf;
 
 public abstract class LogEntry<T> {
 	
-	private final LogType<? extends LogEntry<?>> type;
+	private final LogType type;
 	
 	private long tick;
 	private long subTick;
 	
 	protected T value;
 	
-	protected LogEntry(LogType<? extends LogEntry<?>> logType) {
+	protected LogEntry(LogType logType) {
 		this.type = logType;
 	}
 	
-	protected LogEntry(LogType<? extends LogEntry<?>> logType, long tick, long subTick, T value) {
+	protected LogEntry(LogType logType, long tick, long subTick, T value) {
 		this.type = logType;
 		
 		this.tick = tick;
@@ -24,7 +24,7 @@ public abstract class LogEntry<T> {
 		this.value = value;
 	}
 	
-	public LogType<? extends LogEntry<?>> getType() {
+	public LogType getType() {
 		return type;
 	}
 	
