@@ -1,173 +1,137 @@
 package rsmm.fabric.common.log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.math.Direction;
 
-import rsmm.fabric.RedstoneMultimeterMod;
-import rsmm.fabric.common.log.entry.BooleanLogEntry;
-import rsmm.fabric.common.log.entry.DirectionLogEntry;
-import rsmm.fabric.common.log.entry.LogEntry;
-import rsmm.fabric.common.log.entry.LogType;
+import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.util.ListUtils;
 import rsmm.fabric.util.PacketUtils;
 
 public class MeterLogs {
 	
-	private final List<LogEntry<?>> logs;
+	private final Map<EventType<? extends MeterEvent>, List<MeterEvent>> eventLogs;
 	
 	private long lastLoggedTick = -1;
 	
 	public MeterLogs() {
-		this.logs = new ArrayList<>();
-	}
-	
-	public void push(LogEntry<?> log) {
-		long tick = log.getTick();
-		
-		if (tick > lastLoggedTick) {
-			lastLoggedTick = tick;
-		}
-		
-		logs.add(log);
+		this.eventLogs = new HashMap<>();
 	}
 	
 	public void clear() {
-		logs.clear();
-		
+		eventLogs.clear();
 		lastLoggedTick = -1;
 	}
 	
+	public void add(MeterEvent event) {
+		EventType<? extends MeterEvent> type = event.getType();
+		List<MeterEvent> logs = eventLogs.get(type);
+		
+		if (logs ==  null) {
+			logs = new ArrayList<>();
+			eventLogs.put(type, logs);
+		}
+		
+		logs.add(event);
+		
+		if (event.getTick() > lastLoggedTick) {
+			lastLoggedTick = event.getTick();
+		}
+	}
+	
 	public void clearOldLogs(long cutoff) {
-		while (!logs.isEmpty()) {
-			LogEntry<?> log = logs.get(0);
-			
-			if (log.getTick() >= cutoff) {
-				break;
+		for (List<MeterEvent> logs : eventLogs.values()) {
+			while (!logs.isEmpty()) {
+				MeterEvent event = logs.get(0);
+				
+				if (event.getTick() >= cutoff) {
+					break;
+				}
+				
+				logs.remove(0);
 			}
-			
-			logs.remove(0);
 		}
 	}
 	
-	public LogEntry<?> getLog(int index) {
-		if (index >= 0 && index < logs.size()) {
-			return logs.get(index);
-		}
-		
-		return null;
-	}
-	
-	public LogEntry<?> getLastLogBefore(long tick) {
-		return getLastLogBefore(tick, 0);
-	}
-	
-	public LogEntry<?> getLastLogBefore(long tick, long subTick) {
-		int logIndex = getLastLogIndexBefore(tick, subTick);
-		
-		if (logIndex < 0) {
+	public <T extends MeterEvent> T getLog(EventType<T> type, int index) {
+		if (index < 0) {
 			return null;
 		}
 		
-		return logs.get(logIndex);
-	}
-	
-	public <T> LogEntry<T> getLastLogBefore(long tick, LogType type) {
-		return getLastLogBefore(tick, 0, type);
-	}
-	
-	public <T> LogEntry<T> getLastLogBefore(long tick, long subTick, LogType type) {
-		int logIndex = getLastLogIndexBefore(tick, subTick);
+		List<MeterEvent> logs = eventLogs.get(type);
 		
-		if (logIndex < 0) {
+		if (logs == null || index >= logs.size()) {
 			return null;
 		}
 		
-		LogEntry<?> log = logs.get(logIndex);
-		
-		while (log.getType() != type) {
-			if (--logIndex < 0) {
-				return null;
-			}
-			
-			log = logs.get(logIndex);
-		}
-		
-		return type.entry().cast(log);
+		return type.event().cast(logs.get(index));
 	}
 	
-	private int getLastLogIndexBefore(long tick, long subTick) {
+	public <T extends MeterEvent> T getLastLogBefore(EventType<T> type, long tick) {
+		return getLastLogBefore(type, tick, 0);
+	}
+	
+	public <T extends MeterEvent> T getLastLogBefore(EventType<T> type, long tick, long subTick) {
+		List<MeterEvent> logs = eventLogs.get(type);
+		
+		if (logs == null || logs.isEmpty()) {
+			return null;
+		}
+		
 		if (tick > lastLoggedTick) {
-			return logs.size() - 1;
+			MeterEvent event = logs.get(logs.size() - 1);
+			return type.event().cast(event);
 		}
 		
-		int logIndex = ListUtils.binarySearch(logs, log -> log.isBefore(tick, subTick));
+		int index = ListUtils.binarySearch(logs, event -> event.isBefore(tick, subTick));
+		MeterEvent event = logs.get(index);
 		
-		LogEntry<?> log = logs.get(logIndex);
-		
-		if (!log.isBefore(tick, subTick)) {
-			logIndex--;
+		if (!event.isBefore(tick, subTick)) {
+			event = logs.get(index - 1);
 		}
 		
-		return logIndex;
+		return type.event().cast(event);
+		
 	}
 	
 	public void encode(PacketByteBuf buffer) {
-		buffer.writeInt(logs.size());
+		buffer.writeInt(eventLogs.size());
 		
-		for (LogEntry<?> log : logs) {
-			PacketUtils.writeLogEntry(buffer, log);
+		for (Entry<EventType<? extends MeterEvent>, List<MeterEvent>> entry : eventLogs.entrySet()) {
+			EventType<?> type = entry.getKey();
+			List<MeterEvent> logs = entry.getValue();
+			
+			buffer.writeString(type.getName());
+			buffer.writeInt(logs.size());
+			
+			for (MeterEvent event : logs) {
+				event.encode(buffer);
+			}
 		}
 	}
 	
 	public void decode(PacketByteBuf buffer) {
-		int logCount = buffer.readInt();
+		int typeCount = buffer.readInt();
 		
-		for (int i = 0; i < logCount; i++) {
-			LogEntry<?> log = PacketUtils.readLogEntry(buffer);
+		for (int i = 0; i < typeCount; i++) {
+			EventType<?> type = EventType.fromName(buffer.readString(PacketUtils.MAX_STRING_LENGTH));
+			int logCount = buffer.readInt();
 			
-			if (log != null) {
-				push(log);
-				
-				RedstoneMultimeterMod.LOGGER.info(log.getTick() + " " + log.getSubTick() + " - " + log.getType().getName() + ": " + log.get());
+			for (int j = 0; j < logCount; j++) {
+				try {
+					MeterEvent event = type.event().newInstance();
+					event.decode(buffer);
+					
+					add(event);
+				} catch (Exception e) {
+					
+				}
 			}
 		}
-	}
-	
-	private void test() {
-		push(new BooleanLogEntry(LogType.POWERED, 0, 0, true));
-		push(new BooleanLogEntry(LogType.ACTIVE, 0, 1, true));
-		push(new BooleanLogEntry(LogType.POWERED, 1, 2, false));
-		push(new BooleanLogEntry(LogType.ACTIVE, 1, 3, false));
-		push(new DirectionLogEntry(LogType.MOVED, 2, 4, Direction.NORTH));
-		push(new BooleanLogEntry(LogType.POWERED, 4, 0, true));
-		push(new BooleanLogEntry(LogType.POWERED, 5, 3, false));
-		push(new DirectionLogEntry(LogType.MOVED, 5, 4, Direction.SOUTH));
-		
-		print(getLastLogBefore(0));
-		print(getLastLogBefore(0, 1));
-		print(getLastLogBefore(1));
-		print(getLastLogBefore(1, 3));
-		print(getLastLogBefore(1, LogType.ACTIVE));
-		print(getLastLogBefore(1, 4, LogType.ACTIVE));
-		print(getLastLogBefore(3, 2));
-		print(getLastLogBefore(4, LogType.POWERED));
-		print(getLastLogBefore(5, 3, LogType.POWERED));
-		print(getLastLogBefore(5, 4, LogType.POWERED));
-	}
-	
-	private void print(LogEntry<?> log) {
-		if (log == null) {
-			System.out.println("NO LOG");
-			return;
-		}
-		
-		System.out.println(log.getTick() + " " + log.getSubTick() + ": " + log.getType().getName() + " - " + log.get());
-	}
-	
-	public static void TEST() {
-		new MeterLogs().test();
 	}
 }

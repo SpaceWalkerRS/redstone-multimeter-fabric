@@ -6,8 +6,6 @@ import net.minecraft.util.math.BlockPos;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.log.entry.LogEntry;
-import rsmm.fabric.common.log.entry.LogType;
 
 public class PacketUtils {
 	
@@ -48,28 +46,5 @@ public class PacketUtils {
 		meter.decode(buffer);
 		
 		return meter.getPos() == null ? null : meter;
-	}
-	
-	public static void writeLogEntry(PacketByteBuf buffer, LogEntry<?> log) {
-		buffer.writeString(log.getType().getName());
-		
-		log.encode(buffer);
-	}
-	
-	public static LogEntry<?> readLogEntry(PacketByteBuf buffer) {
-		LogType<?> type = LogType.fromName(buffer.readString(MAX_STRING_LENGTH));
-		
-		try {
-			Class<? extends LogEntry<?>> entryType = type.entry();
-			LogEntry<?> logEntry = entryType.getDeclaredConstructor(LogType.class).newInstance(type);
-			
-			logEntry.decode(buffer);
-			
-			return logEntry;
-		} catch (Exception e) {
-			
-		}
-		
-		return null;
 	}
 }

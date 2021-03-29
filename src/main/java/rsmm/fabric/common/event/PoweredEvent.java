@@ -7,11 +7,11 @@ public class PoweredEvent extends MeterEvent {
 	private boolean powered;
 	
 	public PoweredEvent() {
-		super();
+		super(EventType.POWERED);
 	}
 	
 	public PoweredEvent(long tick, long subTick, boolean powered) {
-		super(tick, subTick);
+		super(EventType.POWERED, tick, subTick);
 		
 		this.powered = powered;
 	}

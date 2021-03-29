@@ -1,7 +1,6 @@
 package rsmm.fabric.client;
 
 import net.minecraft.client.gui.screen.Screen;
-import rsmm.fabric.common.log.MeterLogs;
 
 public class InputHandler {
 	
@@ -26,9 +25,6 @@ public class InputHandler {
 		}
 		if (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
-		}
-		if (KeyBindings.PRINT.wasPressed()) {
-			MeterLogs.TEST();
 		}
 	}
 }

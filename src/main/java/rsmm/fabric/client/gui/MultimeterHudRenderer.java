@@ -9,9 +9,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.log.MeterLogs;
-import rsmm.fabric.common.log.entry.BooleanLogEntry;
-import rsmm.fabric.common.log.entry.LogEntry;
-import rsmm.fabric.common.log.entry.LogType;
 
 public class MultimeterHudRenderer extends DrawableHelper {
 	

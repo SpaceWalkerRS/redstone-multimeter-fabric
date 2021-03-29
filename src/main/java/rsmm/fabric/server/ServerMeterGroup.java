@@ -10,7 +10,6 @@ import net.minecraft.util.math.Direction;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.log.entry.LogType;
 import rsmm.fabric.util.ColorUtils;
 
 public class ServerMeterGroup extends MeterGroup {
@@ -67,7 +66,7 @@ public class ServerMeterGroup extends MeterGroup {
 		Meter meter = getMeterAt(pos);
 		
 		if (meter != null && meter.blockUpdate(powered)) {
-			logManager.log(meter, LogType.POWERED, powered);
+			logManager.logPowered(meter, powered);
 		}
 	}
 	
@@ -75,7 +74,7 @@ public class ServerMeterGroup extends MeterGroup {
 		Meter meter = getMeterAt(pos);
 		
 		if (meter != null && meter.stateChanged(active)) {
-			logManager.log(meter, LogType.ACTIVE, active);
+			logManager.logActive(meter, active);
 		}
 	}
 	
@@ -88,7 +87,7 @@ public class ServerMeterGroup extends MeterGroup {
 				posToIndex.put(meter.getPos(), index);
 			}
 			
-			logManager.log(meter, LogType.MOVED, dir);
+			logManager.logMoved(meter, dir);
 		}
 	}
 }

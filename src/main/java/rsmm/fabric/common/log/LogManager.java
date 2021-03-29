@@ -1,20 +1,24 @@
 package rsmm.fabric.common.log;
 
-import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.math.Direction;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
-import rsmm.fabric.common.log.entry.LogEntry;
-import rsmm.fabric.common.log.entry.LogType;
+import rsmm.fabric.common.event.ActiveEvent;
+import rsmm.fabric.common.event.MovedEvent;
+import rsmm.fabric.common.event.PoweredEvent;
 
 public class LogManager {
 	
 	private static final int MAX_LOG_AGE = 10000;
 	
 	private final MeterGroup meterGroup;
+	private final Map<Long, Long> subTickCount;
 	
 	private long currentTick;
 	private long currentSubTick;
@@ -23,16 +27,23 @@ public class LogManager {
 	
 	public LogManager(MeterGroup meterGroup) {
 		this.meterGroup = meterGroup;
+		this.subTickCount = new HashMap<>();
 	}
 	
 	public void tick() {
+		if (currentSubTick > 0) {
+			subTickCount.put(currentTick, currentSubTick);
+		}
+		
 		currentTick++;
 		currentSubTick = 0;
 		
 		cutoff++;
 		
-		for (Meter meter : meterGroup.getMeters()) {
-			meter.getLogs().clearOldLogs(cutoff);
+		if (subTickCount.remove(cutoff) != null) {
+			for (Meter meter : meterGroup.getMeters()) {
+				meter.getLogs().clearOldLogs(cutoff);
+			}
 		}
 	}
 	
@@ -42,20 +53,23 @@ public class LogManager {
 	}
 	
 	public void clearLogs() {
+		subTickCount.clear();
+		
 		for (Meter meter : meterGroup.getMeters()) {
 			meter.clearLogs();
 		}
 	}
 	
-	public <T> void log(Meter meter, LogType<? extends LogEntry<T>> type, T value) {
-		try {
-			Constructor<? extends LogEntry<T>> constructor = type.entry().getDeclaredConstructor(LogType.class, long.class, long.class, value.getClass());
-			LogEntry<T> log = constructor.newInstance(type, currentTick, currentSubTick++, value);
-			
-			meter.getLogs().push(log);
-		} catch (Exception e) {
-			
-		}
+	public void logPowered(Meter meter, boolean powered) {
+		meter.getLogs().add(new PoweredEvent(currentTick, currentSubTick++, powered));
+	}
+	
+	public void logActive(Meter meter, boolean active) {
+		meter.getLogs().add(new ActiveEvent(currentTick, currentSubTick++, active));
+	}
+	
+	public void logMoved(Meter meter, Direction dir) {
+		meter.getLogs().add(new MovedEvent(currentTick, currentSubTick++, dir));
 	}
 	
 	public PacketByteBuf collectMeterLogs() {
