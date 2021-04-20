@@ -18,7 +18,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-
+import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
 import rsmm.fabric.server.MeterableBlock;
@@ -62,6 +62,11 @@ public abstract class PistonBlockMixin implements MeterableBlock, IBlock {
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.EXTENDED);
+	}
+	
+	@Override
+	public int getDefaultMeteredEvents() {
+		return EventType.ACTIVE.flag() | EventType.MOVED.flag();
 	}
 	
 	@Override

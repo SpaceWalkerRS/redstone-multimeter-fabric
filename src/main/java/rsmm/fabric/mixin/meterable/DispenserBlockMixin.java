@@ -9,16 +9,16 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DispenserBlock;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.interfaces.mixin.IServerWorld;
-import rsmm.fabric.server.Multimeter;
-import rsmm.fabric.server.MultimeterServer;
+import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(DispenserBlock.class)
-public class DispenserBlockMixin implements IBlock {
+public class DispenserBlockMixin implements MeterableBlock, IBlock {
 	
 	@Inject(
 			method = "neighborUpdate",
@@ -30,12 +30,17 @@ public class DispenserBlockMixin implements IBlock {
 			)
 	)
 	private void onNeighborUpdateInjectAtTriggered(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
-		if (!world.isClient()) {
-			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
-			Multimeter multimeter = server.getMultimeter();
-			
-			multimeter.blockUpdate(world, pos, powered);
-		}
+		onBlockUpdate(world, pos, powered);
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.TRIGGERED);
+	}
+	
+	@Override
+	public int getDefaultMeteredEvents() {
+		return EventType.POWERED.flag();
 	}
 	
 	@Override

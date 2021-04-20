@@ -11,7 +11,7 @@ import net.minecraft.block.HopperBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
+import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(HopperBlock.class)
@@ -31,6 +31,11 @@ public class HopperBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return !state.get(Properties.ENABLED);
+		return state.get(Properties.ENABLED);
+	}
+	
+	@Override
+	public int getDefaultMeteredEvents() {
+		return EventType.POWERED.flag();
 	}
 }

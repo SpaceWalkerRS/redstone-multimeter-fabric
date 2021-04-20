@@ -74,6 +74,10 @@ public class MultimeterClient {
 		return currentServerTick + hudRenderer.getOffset();
 	}
 	
+	/**
+	 * At the start of each server tick, the server sends a packet
+	 * to clients with the current server time.
+	 */
 	public void onServerTick(long serverTick) {
 		currentServerTick = serverTick;
 		
@@ -81,6 +85,9 @@ public class MultimeterClient {
 		hudRenderer.tick();
 	}
 	
+	/**
+	 * Called after the MinecraftClient has been initialized
+	 */
 	public void onStartup() {
 		meterGroup = new ClientMeterGroup(this, client.getSession().getUsername());
 	}
@@ -114,6 +121,10 @@ public class MultimeterClient {
 		}
 	}
 	
+	/**
+	 * Add a meter at the position the player is looking at
+	 * or remove it if there already is one
+	 */
 	public void toggleMeter() {
 		HitResult hitResult = client.crosshairTarget;
 		
@@ -132,6 +143,11 @@ public class MultimeterClient {
 		renderHud = !renderHud;
 	}
 	
+	/**
+	 * Whenever a player subscribes to a meter group,
+	 * the server sends all the data pertaining to
+	 * meters in the meter group to that client.
+	 */
 	public void meterGroupDataReceived(String name, PacketByteBuf data) {
 		if (!meterGroup.getName().equals(name)) {
 			meterGroup = new ClientMeterGroup(this, name);

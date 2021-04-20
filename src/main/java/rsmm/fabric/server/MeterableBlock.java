@@ -10,7 +10,7 @@ public interface MeterableBlock extends Meterable {
 	
 	@Override
 	default int getDefaultMeteredEvents() {
-		return EventType.POWERED.flag() | EventType.ACTIVE.flag() | EventType.MOVED.flag();
+		return EventType.ACTIVE.flag();
 	}
 	
 	default void onBlockUpdate(World world, BlockPos pos, boolean powered) {

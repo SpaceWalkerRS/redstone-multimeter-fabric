@@ -68,6 +68,11 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		}
 	}
 	
+	/**
+	 * Render the HUD that displays a 60 tick history
+	 * of metered events in the meter group this client
+	 * is subscribed to.
+	 */
 	public void render(MatrixStack matrices) {
 		ROW_COUNT = client.getMeterGroup().getMeterCount();
 		

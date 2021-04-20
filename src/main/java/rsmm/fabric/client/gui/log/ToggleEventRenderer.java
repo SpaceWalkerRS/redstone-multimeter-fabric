@@ -121,7 +121,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			return;
 		}
 		
-		while (event == null || !event.isAfter(tick)) {
+		while (event == null || event.isBefore(tick, subTickCount)) {
 			boolean eventInTable = (event != null && event.isAt(tick));
 			boolean nextEventInTable = (nextEvent != null && nextEvent.isAt(tick));
 			
