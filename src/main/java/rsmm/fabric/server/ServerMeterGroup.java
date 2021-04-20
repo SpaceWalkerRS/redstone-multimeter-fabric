@@ -42,6 +42,19 @@ public class ServerMeterGroup extends MeterGroup {
 		totalMeterCount++;
 	}
 	
+	@Override
+	public boolean removeMeter(Meter meter) {
+		if (super.removeMeter(meter)) {
+			if (getMeterCount() == 0) {
+				totalMeterCount = 0;
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public String getNextMeterName() {
 		return String.format("Meter %d", totalMeterCount);
 	}

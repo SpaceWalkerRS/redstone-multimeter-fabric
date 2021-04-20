@@ -90,10 +90,12 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				}
 			}
 			
+			long tick = (event == null) ? -1 : event.getTick();
+			
 			do {
 				event = nextEvent;
 				nextEvent = logs.getLog(type, ++index);
-			} while (event != null && nextEvent != null && event.getTick() == nextEvent.getTick());
+			} while (event != null && event.getTick() == tick);
 			
 			if (event == null) {
 				break;

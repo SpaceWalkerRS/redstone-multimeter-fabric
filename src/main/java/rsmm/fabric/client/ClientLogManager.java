@@ -12,10 +12,13 @@ import rsmm.fabric.common.log.LogManager;
 
 public class ClientLogManager extends LogManager {
 	
+	/** The maximum age relative to the selected tick */
 	private static final long AGE_CUTOFF = 10000L;
+	/** The maximum age relative to the current server tick */
 	private static final long MAX_LOG_AGE = 1000000L;
 	
 	private final ClientMeterGroup meterGroup;
+	/** The number of logged events in any tick */
 	private final Map<Long, Integer> subTickCount;
 	
 	public ClientLogManager(ClientMeterGroup meterGroup) {
@@ -44,6 +47,9 @@ public class ClientLogManager extends LogManager {
 		return subTickCount.getOrDefault(tick, 0);
 	}
 	
+	/**
+	 * Log all events from the past server tick
+	 */
 	public void updateMeterLogs(PacketByteBuf data) {
 		subTickCount.put(getCurrentTick(), data.readInt());
 		
@@ -52,6 +58,9 @@ public class ClientLogManager extends LogManager {
 		}
 	}
 	
+	/**
+	 * Remove all logged events that are too old
+	 */
 	public void clearOldLogs() {
 		long selectedTickCutoff = meterGroup.getMultimeterClient().getSelectedTick() - AGE_CUTOFF;
 		long serverTickCutoff = getCurrentTick() - MAX_LOG_AGE;

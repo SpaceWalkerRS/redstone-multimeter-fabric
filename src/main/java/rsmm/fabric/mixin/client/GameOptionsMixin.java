@@ -1,33 +1,40 @@
 package rsmm.fabric.mixin.client;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import java.io.File;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.options.KeyBinding;
 
 import rsmm.fabric.client.KeyBindings;
 
 @Mixin(GameOptions.class)
 public class GameOptionsMixin {
 	
-	@Redirect(
+	@Shadow @Final @Mutable private KeyBinding[] keysAll;
+	
+	@Inject(
 			method = "<init>",
 			at = @At(
-					value = "INVOKE",
-					target = "Lorg/apache/commons/lang3/ArrayUtils;addAll([Ljava/lang/Object;[Ljava/lang/Object;)[Ljava/lang/Object;"
+					value = "RETURN"
 			)
 	)
-	private Object[] onInitInjectAtReturn(Object[] keyBindings, Object[] hotbarKeyBindings) {
-		Object[] rsmmKeyBindings = new Object[] {
+	private void onInitInjectAtReturn(MinecraftClient client, File optionsFile, CallbackInfo ci) {
+		keysAll = ArrayUtils.addAll(keysAll, 
 			KeyBindings.TOGGLE_METER,
 			KeyBindings.PAUSE_METERS,
 			KeyBindings.STEP_FORWARD,
 			KeyBindings.STEP_BACKWARD,
 			KeyBindings.TOGGLE_HUD
-		};
-		
-		return ArrayUtils.addAll(ArrayUtils.addAll(keyBindings, hotbarKeyBindings), rsmmKeyBindings);
+		);
 	}
 }
