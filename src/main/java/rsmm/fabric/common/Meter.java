@@ -17,9 +17,12 @@ public class Meter {
 	private int color;
 	private boolean movable;
 	
-	private int eventTypes;  // The event types being metered
-	private boolean powered; // true if the block is receiving power
-	private boolean active;  // true if the block is emitting power or active in another way
+	/** The event types being metered */
+	private int eventTypes;
+	/** true if the block at this position is receiving power */
+	private boolean powered;
+	/** true if the block at this position is emitting power or active in another way */
+	private boolean active;
 	
 	public Meter(WorldPos pos, String name, int color, boolean movable, int initialEventTypes, boolean initialPowered, boolean initialActive) {
 		this.logs = new MeterLogs();
@@ -89,10 +92,17 @@ public class Meter {
 		eventTypes &= ~type.flag();
 	}
 	
+	/**
+	 * return true if the block at this position is receiving power
+	 */
 	public boolean isPowered() {
 		return powered;
 	}
 	
+	/**
+	 * return true if the block at this position is emitting power
+	 * or active in another way
+	 */
 	public boolean isActive() {
 		return active;
 	}

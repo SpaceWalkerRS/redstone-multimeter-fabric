@@ -70,10 +70,10 @@ public class MeterRenderer {
 		
 		Matrix4f model = matrices.peek().getModel();
 		
+		// The coordinates are slightly offset to prevent z-fighting
 		float x0 = pos.getX() - 0.001F;
 		float y0 = pos.getY() - 0.001F;
 		float z0 = pos.getZ() - 0.001F;
-		
 		float x1 = pos.getX() + 1.001F;
 		float y1 = pos.getY() + 1.001F;
 		float z1 = pos.getZ() + 1.001F;

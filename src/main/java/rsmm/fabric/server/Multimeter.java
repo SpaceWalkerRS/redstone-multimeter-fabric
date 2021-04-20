@@ -73,6 +73,11 @@ public class Multimeter {
 		}
 	}
 	
+	/**
+	 * This is called at the end of every server tick,
+	 * and sends all the logged events of the past tick
+	 * to the clients.
+	 */
 	public void broadcastMeterLogs() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			ServerLogManager logManager = meterGroup.getLogManager();
@@ -101,6 +106,10 @@ public class Multimeter {
 		}
 	}
 	
+	/**
+	 * Add a meter at the position the player is looking at
+	 * or remove it if there already is one.
+	 */
 	public void toggleMeter(WorldPos pos, boolean movable, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		

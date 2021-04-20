@@ -122,8 +122,9 @@ public class MultimeterClient {
 	}
 	
 	/**
-	 * Add a meter at the position the player is looking at
-	 * or remove it if there already is one
+	 * Tell the server to add a meter at the position
+	 * the player is looking at or remove it if there
+	 * already is one
 	 */
 	public void toggleMeter() {
 		HitResult hitResult = client.crosshairTarget;

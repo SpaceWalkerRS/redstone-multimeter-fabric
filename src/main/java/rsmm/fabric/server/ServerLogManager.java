@@ -2,7 +2,6 @@ package rsmm.fabric.server;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.math.Direction;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
@@ -36,18 +35,6 @@ public class ServerLogManager extends LogManager {
 	
 	public void resetSubTickCount() {
 		currentSubTick = 0;
-	}
-	
-	public void logPowered(Meter meter, boolean powered) {
-		logEvent(meter, EventType.POWERED, powered ? 1 : 0);
-	}
-	
-	public void logActive(Meter meter, boolean active) {
-		logEvent(meter, EventType.ACTIVE, active ? 1 : 0);
-	}
-	
-	public void logMoved(Meter meter, Direction dir) {
-		logEvent(meter, EventType.MOVED, dir.getId());
 	}
 	
 	public void logEvent(Meter meter, EventType type, int metaData) {

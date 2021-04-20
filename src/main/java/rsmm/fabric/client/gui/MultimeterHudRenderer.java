@@ -23,7 +23,8 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	private int subTicksWidth;
 	
 	private boolean paused;
-	private int offset; // Offset between the current server tick and the last tick to be displayed in the ticks table
+	/** The offset between the current server tick and the last tick to be displayed in the ticks table */
+	private int offset;
 	
 	public MultimeterHudRenderer(MultimeterClient client) {
 		MinecraftClient minecraftClient = client.getMinecraftClient();
@@ -33,6 +34,9 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		this.eventRenderers = new MeterEventRendererDispatcher();
 	}
 	
+	/**
+	 * The offset between the current server tick and the last tick to be displayed in the ticks table
+	 */
 	public int getOffset() {
 		return offset;
 	}

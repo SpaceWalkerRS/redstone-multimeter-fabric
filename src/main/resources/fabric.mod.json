@@ -12,6 +12,9 @@
     "Narcolepticfrog"
   ],
   "contact": {
+    "homepage": "https://modrinth.com/mod/redstone-multimeter",
+    "sources": "https://github.com/SpaceWalkerRS/redstone-multimeter-fabric",
+    "issues": "https://github.com/SpaceWalkerRS/redstone-multimeter-fabric/issues"
   },
 
   "license": "MIT Licence",
@@ -28,5 +31,13 @@
 
   "depends": {
     "minecraft": "1.16.x"
+  }
+  
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/EJC9zkX"
+      }
+    }
   }
 }

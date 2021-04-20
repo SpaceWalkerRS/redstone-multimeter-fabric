@@ -17,11 +17,11 @@ import rsmm.fabric.common.event.EventType;
 
 public class MeterEventArgumentType implements ArgumentType<EventType> {
 	
-	private static final Collection<String> EXAMPLES = new ArrayList<>();
+	private static final Collection<String> TYPE_NAMES = new ArrayList<>();
 	
 	static {
 		for (EventType type : EventType.TYPES) {
-			EXAMPLES.add(type.getName());
+			TYPE_NAMES.add(type.getName());
 		}
 	}
 	
@@ -51,6 +51,6 @@ public class MeterEventArgumentType implements ArgumentType<EventType> {
 	
 	@Override
 	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-		return CommandSource.suggestMatching(EXAMPLES, builder);
+		return CommandSource.suggestMatching(TYPE_NAMES, builder);
 	}
 }
