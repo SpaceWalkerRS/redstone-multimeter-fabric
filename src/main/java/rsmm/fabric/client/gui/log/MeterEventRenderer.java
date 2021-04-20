@@ -1,36 +1,26 @@
 package rsmm.fabric.client.gui.log;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.event.MeterEvent;
 
-public abstract class MeterEventRenderer<T extends MeterEvent> {
+public abstract class MeterEventRenderer extends DrawableHelper {
 	
-	private static final Map<EventType<? extends MeterEvent>, MeterEventRenderer<? extends MeterEvent>> ALL;
+	protected final EventType type;
 	
-	public static <T extends MeterEvent> void register(EventType<T> type, MeterEventRenderer<T> renderer) {
-		ALL.put(type, renderer);
+	protected MeterEventRenderer(EventType type) {
+		this.type = type;
 	}
 	
-	public static void render(MatrixStack matrices, EventType<? extends MeterEvent> type, Meter meter, int x, int y) {
-		MeterEventRenderer<? extends MeterEvent> renderer = ALL.get(type);
-		
-		if (renderer != null) {
-			renderer.render(matrices, meter, x, y);
-		}
+	public EventType getType() {
+		return type;
 	}
 	
-	static {
-		
-		ALL = new HashMap<>();
-	}
+	public abstract void renderTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long firstTick, Meter meter);
 	
-	public void render(MatrixStack matrices, Meter meter, int x, int y) {
-		
-	}
+	public abstract void renderSubTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter);
+	
 }

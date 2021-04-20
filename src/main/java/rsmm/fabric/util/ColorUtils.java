@@ -18,13 +18,13 @@ public class ColorUtils {
 	}
 	
 	public static int hsbToInt(float h, float s, float b) {
-        Color c = Color.getHSBColor(h,s,b);
-        
-        int color = 0xFF000000;
-        color |= c.getBlue();
-        color |= c.getGreen() << 8;
-        color |= c.getRed() << 16;
-        
-        return color;
-    }
+		Color hsb = Color.getHSBColor(h, s, b);
+		
+		int color = 0xFF000000;
+		color |= hsb.getBlue();
+		color |= hsb.getGreen() << 8;
+		color |= hsb.getRed() << 16;
+		
+		return color;
+	}
 }

@@ -4,6 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
+import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.log.MeterLogs;
 import rsmm.fabric.util.PacketUtils;
 
@@ -16,10 +17,11 @@ public class Meter {
 	private int color;
 	private boolean movable;
 	
+	private int eventTypes;  // The event types being metered
 	private boolean powered; // true if the block is receiving power
 	private boolean active;  // true if the block is emitting power or active in another way
 	
-	public Meter(WorldPos pos, String name, int color, boolean movable, boolean initialPowered, boolean initialActive) {
+	public Meter(WorldPos pos, String name, int color, boolean movable, int initialEventTypes, boolean initialPowered, boolean initialActive) {
 		this.logs = new MeterLogs();
 		
 		this.pos = pos;
@@ -27,6 +29,7 @@ public class Meter {
 		this.color = color;
 		this.movable = movable;
 		
+		this.eventTypes = initialEventTypes;
 		this.powered = initialPowered;
 		this.active = initialActive;
 	}
@@ -74,6 +77,18 @@ public class Meter {
 		return movable;
 	}
 	
+	public boolean isMetering(EventType type) {
+		return (eventTypes & type.flag()) != 0;
+	}
+	
+	public void startMetering(EventType type) {
+		eventTypes |= type.flag();
+	}
+	
+	public void stopMetering(EventType type) {
+		eventTypes &= ~type.flag();
+	}
+	
 	public boolean isPowered() {
 		return powered;
 	}
@@ -118,6 +133,7 @@ public class Meter {
 		buffer.writeInt(color);
 		buffer.writeBoolean(movable);
 		
+		buffer.writeInt(eventTypes);
 		buffer.writeBoolean(powered);
 		buffer.writeBoolean(active);
 	}
@@ -128,6 +144,7 @@ public class Meter {
 		color = buffer.readInt();
 		movable = buffer.readBoolean();
 		
+		eventTypes = buffer.readInt();
 		powered = buffer.readBoolean();
 		active = buffer.readBoolean();
 	}

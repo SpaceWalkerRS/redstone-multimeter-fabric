@@ -2,25 +2,26 @@ package rsmm.fabric.common.event;
 
 import net.minecraft.network.PacketByteBuf;
 
-public abstract class MeterEvent {
+public class MeterEvent {
 	
-	private final EventType<? extends MeterEvent> type;
-	
+	private EventType type;
 	private long tick;
-	private long subTick;
+	private int subTick;
+	private int metaData;
 	
-	protected MeterEvent(EventType<? extends MeterEvent> type) {
-		this.type = type;
+	public MeterEvent() {
+		
 	}
 	
-	protected MeterEvent(EventType<? extends MeterEvent> type, long tick, long subTick) {
+	public MeterEvent(EventType type, long tick, int subTick, int metaData) {
 		this.type = type;
 		
 		this.tick = tick;
 		this.subTick = subTick;
+		this.metaData = metaData;
 	}
 	
-	public EventType<?> getType() {
+	public EventType getType() {
 		return type;
 	}
 	
@@ -28,11 +29,23 @@ public abstract class MeterEvent {
 		return tick;
 	}
 	
-	public long getSubTick() {
+	public int getSubTick() {
 		return subTick;
 	}
 	
-	public boolean isBefore(long tick, long subTick) {
+	public boolean isAt(long tick) {
+		return this.tick == tick;
+	}
+	
+	public boolean isAt(long tick, int subTick) {
+		return this.tick == tick && this.subTick == subTick;
+	}
+	
+	public boolean isBefore(long tick) {
+		return this.tick < tick;
+	}
+	
+	public boolean isBefore(long tick, int subTick) {
 		if (this.tick == tick) {
 			return this.subTick < subTick;
 		}
@@ -40,22 +53,33 @@ public abstract class MeterEvent {
 		return this.tick < tick;
 	}
 	
-	public void encode(PacketByteBuf buffer) {
-		buffer.writeLong(tick);
-		buffer.writeLong(subTick);
-		
-		encodeEvent(buffer);
+	public boolean isAfter(long tick) {
+		return this.tick > tick;
 	}
 	
-	protected abstract void encodeEvent(PacketByteBuf buffer);
+	public boolean isAfter(long tick, int subTick) {
+		if (this.tick == tick) {
+			return this.subTick > subTick;
+		}
+		
+		return this.tick > tick;
+	}
+	
+	public int getMetaData() {
+		return metaData;
+	}
+	
+	public void encode(PacketByteBuf buffer) {
+		buffer.writeByte(type.getIndex());
+		buffer.writeLong(tick);
+		buffer.writeInt(subTick);
+		buffer.writeInt(metaData);
+	}
 	
 	public void decode(PacketByteBuf buffer) {
+		type = EventType.fromIndex(buffer.readByte());
 		tick = buffer.readLong();
-		subTick = buffer.readLong();
-		
-		decodeEvent(buffer);
+		subTick = buffer.readInt();
+		metaData = buffer.readInt();
 	}
-	
-	protected abstract void decodeEvent(PacketByteBuf buffer);
-	
 }

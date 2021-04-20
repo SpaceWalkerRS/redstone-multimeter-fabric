@@ -5,8 +5,8 @@ import net.minecraft.util.Identifier;
 
 public interface ICustomPayloadC2SPacket {
 	
-	public Identifier getPacketChannel();
+	public Identifier getPacketChannelRSMM();
 	
-	public PacketByteBuf getPacketData();
+	public PacketByteBuf getPacketDataRSMM();
 	
 }

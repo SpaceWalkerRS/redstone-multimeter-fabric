@@ -8,4 +8,6 @@ public interface Meterable {
 	
 	public boolean isActive(World world, BlockPos pos, BlockState state);
 	
+	public int getDefaultMeteredEvents();
+	
 }

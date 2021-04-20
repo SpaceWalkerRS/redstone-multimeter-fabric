@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.brigadier.CommandDispatcher;
 
 import net.minecraft.server.command.CommandManager;
-
 import net.minecraft.server.command.ServerCommandSource;
+
 import rsmm.fabric.command.MeterCommand;
 
 @Mixin(CommandManager.class)

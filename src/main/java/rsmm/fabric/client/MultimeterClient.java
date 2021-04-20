@@ -8,8 +8,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
-import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.ToggleMeterPacket;
@@ -22,9 +22,10 @@ public class MultimeterClient {
 	private final MeterRenderer meterRenderer;
 	private final MultimeterHudRenderer hudRenderer;
 	
-	private MeterGroup meterGroup;
+	private ClientMeterGroup meterGroup;
 	private boolean connected; // true if the client is connected to a MultimeterServer
 	private boolean renderHud;
+	private long currentServerTick;
 	
 	public MultimeterClient(MinecraftClient client) {
 		this.client = client;
@@ -34,6 +35,7 @@ public class MultimeterClient {
 		this.hudRenderer = new MultimeterHudRenderer(this);
 		
 		this.renderHud = true;
+		this.currentServerTick = -1;
 	}
 	
 	public MinecraftClient getMinecraftClient() {
@@ -56,21 +58,31 @@ public class MultimeterClient {
 		return hudRenderer;
 	}
 	
-	public MeterGroup getMeterGroup() {
+	public ClientMeterGroup getMeterGroup() {
 		return meterGroup;
 	}
 	
 	public boolean renderHud() {
-		return renderHud;
+		return renderHud && connected;
 	}
 	
-	public void tick() {
-		meterGroup.getLogManager().tick();
+	public long getCurrentServerTick() {
+		return currentServerTick;
+	}
+	
+	public long getSelectedTick() {
+		return currentServerTick + hudRenderer.getOffset();
+	}
+	
+	public void onServerTick(long serverTick) {
+		currentServerTick = serverTick;
+		
+		meterGroup.getLogManager().clearOldLogs();
 		hudRenderer.tick();
 	}
 	
 	public void onStartup() {
-		meterGroup = new MeterGroup(client.getSession().getUsername());
+		meterGroup = new ClientMeterGroup(this, client.getSession().getUsername());
 	}
 	
 	public void onShutdown() {
@@ -81,24 +93,23 @@ public class MultimeterClient {
 	 * Called when this client connects to a MultimeterServer
 	 */
 	public void onConnect(long serverTick) {
-		connected = true;
-		renderHud = true;
-		
-		meterGroup.getLogManager().syncTime(serverTick);
-		hudRenderer.syncTime(serverTick);
-		
-		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-		meterGroup.encode(data);
-		
-		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup.getName(), data);
-		packetHandler.sendPacket(packet);
+		if (!connected) {
+			connected = true;
+			currentServerTick = serverTick;
+			
+			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
+			meterGroup.encode(data);
+			
+			MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup.getName(), data);
+			packetHandler.sendPacket(packet);
+		}
 	}
 	
 	public void onDisconnect() {
 		if (connected) {
 			connected = false;
-			renderHud = false;
 			
+			hudRenderer.reset();
 			meterGroup.getLogManager().clearLogs();
 		}
 	}
@@ -123,7 +134,7 @@ public class MultimeterClient {
 	
 	public void meterGroupDataReceived(String name, PacketByteBuf data) {
 		if (!meterGroup.getName().equals(name)) {
-			meterGroup = new MeterGroup(name);
+			meterGroup = new ClientMeterGroup(this, name);
 		}
 		
 		meterGroup.updateFromData(data);

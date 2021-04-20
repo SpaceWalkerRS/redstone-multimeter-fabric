@@ -79,8 +79,8 @@ public class MeterRenderer {
 		float z1 = pos.getZ() + 1.001F;
 		
 		float r = (color >> 16 & 255) / 255.0F;
-		float g = (color >> 8 & 255) / 255.0F;
-		float b = (color & 255) / 255.0F;
+		float g = (color >> 8  & 255) / 255.0F;
+		float b = (color       & 255) / 255.0F;
 		
 		drawFilledBox(matrices, builder, tessellator, model, x0, y0, z0, x1, y1, z1, r, g, b, 0.5F);
 		

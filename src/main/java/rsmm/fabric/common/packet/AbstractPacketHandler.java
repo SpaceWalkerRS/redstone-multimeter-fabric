@@ -50,14 +50,16 @@ public abstract class AbstractPacketHandler {
 		
 		INVALID(0, null),
 		JOIN_MULTIMETER_SERVER(1, JoinMultimeterServerPacket.class),
-		METER_GROUP_DATA(2, MeterGroupDataPacket.class),
-		METER_LOGS(3, MeterLogsDataPacket.class),
-		TOGGLE_METER(4, ToggleMeterPacket.class),
-		RENAME_METER(5, RenameMeterPacket.class),
-		RECOLOR_METER(6, RecolorMeterPacket.class),
-		REMOVE_ALL_METERS(7, RemoveAllMetersPacket.class),
-		ADD_METER(8, AddMeterPacket.class),
-		REMOVE_METER(9, RemoveMeterPacket.class);
+		SERVER_TICK(2, ServerTickPacket.class),
+		METER_GROUP_DATA(3, MeterGroupDataPacket.class),
+		METER_LOGS(4, MeterLogsDataPacket.class),
+		TOGGLE_METER(5, ToggleMeterPacket.class),
+		RENAME_METER(6, RenameMeterPacket.class),
+		RECOLOR_METER(7, RecolorMeterPacket.class),
+		METERED_EVENTS(8, MeteredEventsPacket.class),
+		REMOVE_ALL_METERS(9, RemoveAllMetersPacket.class),
+		ADD_METER(10, AddMeterPacket.class),
+		REMOVE_METER(11, RemoveMeterPacket.class);
 		
 		private static final PacketType[] PACKET_TYPES;
 		private static final Map<Class<? extends AbstractRSMMPacket>, PacketType> PACKET_TO_TYPE;

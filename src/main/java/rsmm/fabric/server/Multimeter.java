@@ -20,10 +20,11 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.log.LogManager;
+import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
+import rsmm.fabric.common.packet.types.MeteredEventsPacket;
 import rsmm.fabric.common.packet.types.RecolorMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
@@ -40,6 +41,10 @@ public class Multimeter {
 		this.server = server;
 		this.meterGroups = new LinkedHashMap<>();
 		this.subscriptions = new HashMap<>();
+	}
+	
+	public MultimeterServer getMultimeterServer() {
+		return server;
 	}
 	
 	public Collection<ServerMeterGroup> getMeterGroups() {
@@ -64,22 +69,23 @@ public class Multimeter {
 	
 	public void tick() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			meterGroup.getLogManager().tick();
+			meterGroup.getLogManager().resetSubTickCount();
 		}
 	}
 	
 	public void broadcastMeterLogs() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			LogManager logManager = meterGroup.getLogManager();
+			ServerLogManager logManager = meterGroup.getLogManager();
 			
-			if (meterGroup.hasSubscribers()) {
-				PacketByteBuf data = logManager.collectMeterLogs();
+			if (logManager.hasLogs()) {
+				if (meterGroup.hasSubscribers()) {
+					PacketByteBuf data = logManager.collectMeterLogs();
+					MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
+					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+				}
 				
-				MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
-				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+				logManager.clearLogs();
 			}
-			
-			logManager.clearLogs();
 		}
 	}
 	
@@ -115,6 +121,7 @@ public class Multimeter {
 				String name = meterGroup.getNextMeterName();
 				int color = meterGroup.getNextMeterColor();
 				
+				int meteredEvents = EventType.POWERED.flag() | EventType.MOVED.flag();
 				boolean powered = false;
 				boolean active = false;
 				
@@ -124,13 +131,14 @@ public class Multimeter {
 				powered = ((IBlock)block).isPowered(world, pos, state);
 				
 				if (((IBlock)block).isMeterable()) {
+					meteredEvents = ((Meterable)block).getDefaultMeteredEvents();
 					active = ((Meterable)block).isActive(world, pos, state);
 				}
 				
-				Meter meter = new Meter(pos, name, color, movable, powered, active);
+				Meter meter = new Meter(pos, name, color, movable, meteredEvents, powered, active);
 				meterGroup.addMeter(meter);
 				
-				AddMeterPacket packet = new AddMeterPacket(pos, name, color, movable, powered, active);
+				AddMeterPacket packet = new AddMeterPacket(pos, name, color, movable, meteredEvents, powered, active);
 				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 			}
 		}
@@ -166,6 +174,25 @@ public class Multimeter {
 		}
 	}
 	
+	public void updateMeteredEvents(int index, EventType type, boolean start, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup != null) {
+			Meter meter = meterGroup.getMeter(index);
+			
+			if (meter != null) {
+				if (start) {
+					meter.startMetering(type);
+				} else {
+					meter.stopMetering(type);
+				}
+				
+				MeteredEventsPacket packet = new MeteredEventsPacket(index, type, start);
+				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+			}
+		}
+	}
+	
 	public void removeAllMeters(ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
@@ -187,10 +214,9 @@ public class Multimeter {
 		ServerMeterGroup newSubscription = meterGroups.get(name);
 		
 		if (newSubscription == null) {
-			newSubscription = new ServerMeterGroup(name);
+			newSubscription = new ServerMeterGroup(this, name);
 			
 			meterGroups.put(name, newSubscription);
-			newSubscription.getLogManager().syncTime(server.getMinecraftServer().getTicks());
 		}
 		
 		subscriptions.put(player, newSubscription);
@@ -207,11 +233,10 @@ public class Multimeter {
 		ServerMeterGroup meterGroup = meterGroups.get(name);
 		
 		if (meterGroup == null) {
-			meterGroup = new ServerMeterGroup(name);
+			meterGroup = new ServerMeterGroup(this, name);
 			meterGroup.decode(data);
 			
 			meterGroups.put(name, meterGroup);
-			meterGroup.getLogManager().syncTime(server.getMinecraftServer().getTicks());
 		} else {
 			data = new PacketByteBuf(Unpooled.buffer());
 			meterGroup.encode(data);

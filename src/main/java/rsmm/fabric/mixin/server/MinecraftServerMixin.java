@@ -29,14 +29,12 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "runServer",
+			method = "method_16208",
 			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/util/profiler/Profiler;endTick()V"
+					value = "RETURN"
 			)
 	)
-	private void onRunServerInjectBeforeEndTick(CallbackInfo ci) {
+	private void onMethod_16208InjectAtReturn(CallbackInfo ci) {
 		if (!isPaused()) {
 			multimeterServer.getMultimeter().broadcastMeterLogs();
 		}
@@ -45,7 +43,9 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	@Inject(
 			method = "tick",
 			at = @At(
-					value = "HEAD"
+					value = "INVOKE",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/server/MinecraftServer;tickWorlds(Ljava/util/function/BooleanSupplier;)V"
 			)
 	)
 	private void onTickInjectAtHead(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {

@@ -27,8 +27,8 @@ public class ServerPlayNetworkHandlerMixin {
 	private void onCustomPayload(CustomPayloadC2SPacket minecraftPacket, CallbackInfo ci) {
 		ICustomPayloadC2SPacket packet = (ICustomPayloadC2SPacket)minecraftPacket;
 		
-		if (AbstractPacketHandler.PACKET_IDENTIFIER.equals(packet.getPacketChannel())) {
-			PacketByteBuf buffer = packet.getPacketData();
+		if (AbstractPacketHandler.PACKET_IDENTIFIER.equals(packet.getPacketChannelRSMM())) {
+			PacketByteBuf buffer = packet.getPacketDataRSMM();
 			
 			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().onPacketReceived(buffer, player);
 			

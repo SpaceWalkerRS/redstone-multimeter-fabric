@@ -6,6 +6,7 @@ import net.minecraft.block.AbstractPressurePlateBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import rsmm.fabric.interfaces.mixin.IPressurePlate;
 import rsmm.fabric.server.MeterableBlock;
 

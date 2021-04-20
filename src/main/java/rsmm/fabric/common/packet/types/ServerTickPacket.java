@@ -6,28 +6,27 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
-import rsmm.fabric.util.PacketUtils;
 
-public class MeterLogsDataPacket extends AbstractRSMMPacket {
+public class ServerTickPacket extends AbstractRSMMPacket {
 	
-	private PacketByteBuf data;
+	private long currentServerTick;
 	
-	public MeterLogsDataPacket() {
+	public ServerTickPacket() {
 		
 	}
 	
-	public MeterLogsDataPacket(PacketByteBuf data) {
-		this.data = data;
+	public ServerTickPacket(long serverTick) {
+		currentServerTick = serverTick;
 	}
 	
 	@Override
 	public void encode(PacketByteBuf buffer) {
-		PacketUtils.writeData(buffer, data);
+		buffer.writeLong(currentServerTick);
 	}
 	
 	@Override
 	public void decode(PacketByteBuf buffer) {
-		data = PacketUtils.readData(buffer);
+		currentServerTick = buffer.readLong();
 	}
 	
 	@Override
@@ -37,6 +36,6 @@ public class MeterLogsDataPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().getLogManager().updateMeterLogs(data);
+		client.onServerTick(currentServerTick);
 	}
 }

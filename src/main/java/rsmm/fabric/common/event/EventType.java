@@ -3,52 +3,54 @@ package rsmm.fabric.common.event;
 import java.util.HashMap;
 import java.util.Map;
 
-import rsmm.fabric.RedstoneMultimeterMod;
-
-public class EventType<T extends MeterEvent> {
+public enum EventType {
 	
-	private static final Map<String,EventType<? extends MeterEvent>> ALL;
+	POWERED(0, "powered"),
+	ACTIVE(1, "active"),
+	MOVED(2, "moved");
 	
-	public static final EventType<PoweredEvent> POWERED;
-	public static final EventType<ActiveEvent> ACTIVE;
-	public static final EventType<MovedEvent> MOVED;
+	public static final EventType[] TYPES;
+	private static final Map<String, EventType> BY_NAME;
 	
 	static {
+		TYPES = new EventType[values().length];
+		BY_NAME = new HashMap<>();
 		
-		ALL = new HashMap<>();
-		
-		POWERED = register(new EventType<>("powered", PoweredEvent.class));
-		ACTIVE = register(new EventType<>("active", ActiveEvent.class));
-		MOVED = register(new EventType<>("moved", MovedEvent.class));
-	}
-	
-	private static <T extends MeterEvent> EventType<T> register(EventType<T> type) {
-		if (ALL.putIfAbsent(type.getName(), type) == null) {
-			return type;
-		} else {
-			RedstoneMultimeterMod.LOGGER.warn(String.format("Cannot register EventType %s, as a type with that name already exists!", type.getName()));
-			
-			return null;
+		for (EventType type : values()) {
+			TYPES[type.index] = type;
+			BY_NAME.put(type.name, type);
 		}
 	}
 	
-	public static EventType<?> fromName(String name) {
-		return ALL.get(name);
+	private final int index;
+	private final String name;
+	
+	private EventType(int index, String name) {
+		this.index = index;
+		this.name = name;
 	}
 	
-	private final String name;
-	private final Class<T> event;
+	public int getIndex() {
+		return index;
+	}
 	
-	private EventType(String name, Class<T> event) {
-		this.name = name;
-		this.event = event;
+	public static EventType fromIndex(int index) {
+		if (index >= 0 && index < TYPES.length) {
+			return TYPES[index];
+		}
+		
+		return null;
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
-	public Class<T> event() {
-		return event;
+	public static EventType fromName(String name) {
+		return BY_NAME.get(name);
+	}
+	
+	public int flag() {
+		return 1 << index;
 	}
 }

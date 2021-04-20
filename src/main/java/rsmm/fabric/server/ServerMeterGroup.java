@@ -14,14 +14,18 @@ import rsmm.fabric.util.ColorUtils;
 
 public class ServerMeterGroup extends MeterGroup {
 	
+	private final Multimeter multimeter;
 	private final Set<ServerPlayerEntity> subscribers;
+	private final ServerLogManager logManager;
 	
 	private int totalMeterCount; // The total number of meters ever added to this group
 	
-	public ServerMeterGroup(String name) {
+	public ServerMeterGroup(Multimeter multimeter, String name) {
 		super(name);
 		
+		this.multimeter = multimeter;
 		this.subscribers = new HashSet<>();
+		this.logManager = new ServerLogManager(this);
 	}
 	
 	@Override
@@ -46,6 +50,10 @@ public class ServerMeterGroup extends MeterGroup {
 		return ColorUtils.nextColor();
 	}
 	
+	public Multimeter getMultimeter() {
+		return multimeter;
+	}
+	
 	public Set<ServerPlayerEntity> getSubscribers() {
 		return Collections.unmodifiableSet(subscribers);
 	}
@@ -60,6 +68,10 @@ public class ServerMeterGroup extends MeterGroup {
 	
 	public void removeSubscriber(ServerPlayerEntity player) {
 		subscribers.remove(player);
+	}
+	
+	public ServerLogManager getLogManager() {
+		return logManager;
 	}
 	
 	public void blockUpdate(WorldPos pos, boolean powered) {
@@ -82,7 +94,7 @@ public class ServerMeterGroup extends MeterGroup {
 		Meter meter = getMeterAt(pos);
 		
 		if (meter != null) {
-			if (meter.blockMoved(dir)) {
+			if (!hasMeterAt(pos.offset(dir)) && meter.blockMoved(dir)) {
 				int index = posToIndex.remove(pos);
 				posToIndex.put(meter.getPos(), index);
 			}

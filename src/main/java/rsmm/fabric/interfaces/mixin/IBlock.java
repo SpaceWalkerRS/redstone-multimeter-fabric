@@ -7,13 +7,12 @@ import rsmm.fabric.server.Meterable;
 
 public interface IBlock {
 	
-	public boolean standardIsPowered();
-	
 	default boolean isMeterable() {
 		return this instanceof Meterable;
 	}
 	
-	default boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return world.isReceivingRedstonePower(pos);
-	}
+	public boolean standardIsPowered();
+	
+	public boolean isPowered(World world, BlockPos pos, BlockState state);
+	
 }

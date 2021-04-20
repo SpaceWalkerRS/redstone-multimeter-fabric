@@ -10,19 +10,20 @@ import net.minecraft.block.ComparatorBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(ComparatorBlock.class)
 public class ComparatorBlockMixin implements MeterableBlock {
 	
 	@Inject(
-			method = "hasPower",
+			method = "getPower",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void onHasPowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		onBlockUpdate(world, pos, cir.getReturnValue());
+	private void onHasPowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
+		onBlockUpdate(world, pos, cir.getReturnValue() > 0);
 	}
 	
 	@Override

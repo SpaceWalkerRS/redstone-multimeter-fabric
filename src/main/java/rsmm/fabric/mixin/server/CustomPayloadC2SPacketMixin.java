@@ -16,12 +16,12 @@ public class CustomPayloadC2SPacketMixin implements ICustomPayloadC2SPacket {
 	@Shadow private PacketByteBuf data;
 	
 	@Override
-	public Identifier getPacketChannel() {
+	public Identifier getPacketChannelRSMM() {
 		return channel;
 	}
 	
 	@Override
-	public PacketByteBuf getPacketData() {
+	public PacketByteBuf getPacketDataRSMM() {
 		return new PacketByteBuf(data);
 	}
 }

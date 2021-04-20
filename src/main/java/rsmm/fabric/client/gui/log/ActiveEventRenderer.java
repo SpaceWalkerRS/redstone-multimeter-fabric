@@ -3,19 +3,19 @@ package rsmm.fabric.client.gui.log;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 
-public class PoweredEventRenderer extends ToggleEventRenderer {
+public class ActiveEventRenderer extends ToggleEventRenderer {
 	
-	public PoweredEventRenderer() {
-		super(EventType.POWERED);
+	public ActiveEventRenderer() {
+		super(EventType.ACTIVE);
 	}
 	
 	@Override
 	protected void updateMode(Meter meter) {
-		mode = meter.isMetering(EventType.ACTIVE) ? Mode.TOP : Mode.ALL;
+		mode = meter.isMetering(EventType.POWERED) ? Mode.BOTTOM : Mode.ALL;
 	}
 	
 	@Override
 	protected boolean isToggled(Meter meter) {
-		return meter.isPowered();
+		return meter.isActive();
 	}
 }

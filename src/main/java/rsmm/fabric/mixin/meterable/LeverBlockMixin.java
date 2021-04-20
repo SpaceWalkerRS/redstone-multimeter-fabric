@@ -7,6 +7,7 @@ import net.minecraft.block.LeverBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(LeverBlock.class)

@@ -16,6 +16,7 @@ public class AddMeterPacket extends AbstractRSMMPacket {
 	private String name;
 	private int color;
 	private boolean movable;
+	private int meteredEvents;
 	private boolean powered;
 	private boolean active;
 	
@@ -23,11 +24,12 @@ public class AddMeterPacket extends AbstractRSMMPacket {
 		
 	}
 	
-	public AddMeterPacket(WorldPos pos, String name, int color, boolean movable, boolean powered, boolean active) {
+	public AddMeterPacket(WorldPos pos, String name, int color, boolean movable, int meteredEvents, boolean powered, boolean active) {
 		this.pos = pos;
 		this.name = name;
 		this.color = color;
 		this.movable = movable;
+		this.meteredEvents = meteredEvents;
 		this.powered = powered;
 		this.active = active;
 	}
@@ -38,6 +40,7 @@ public class AddMeterPacket extends AbstractRSMMPacket {
 		buffer.writeString(name);
 		buffer.writeInt(color);
 		buffer.writeBoolean(movable);
+		buffer.writeInt(meteredEvents);
 		buffer.writeBoolean(powered);
 		buffer.writeBoolean(active);
 	}
@@ -48,6 +51,7 @@ public class AddMeterPacket extends AbstractRSMMPacket {
 		name = buffer.readString(PacketUtils.MAX_STRING_LENGTH);
 		color = buffer.readInt();
 		movable = buffer.readBoolean();
+		meteredEvents = buffer.readInt();
 		powered = buffer.readBoolean();
 		active = buffer.readBoolean();
 	}
@@ -59,7 +63,7 @@ public class AddMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		Meter meter = new Meter(pos, name, color, movable, powered, active);
+		Meter meter = new Meter(pos, name, color, movable, meteredEvents, powered, active);
 		client.getMeterGroup().addMeter(meter);
 	}
 }

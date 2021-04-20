@@ -7,6 +7,7 @@ import net.minecraft.block.TrappedChestBlock;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(TrappedChestBlock.class)

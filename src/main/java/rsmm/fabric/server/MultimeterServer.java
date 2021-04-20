@@ -4,6 +4,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.common.packet.types.JoinMultimeterServerPacket;
+import rsmm.fabric.common.packet.types.ServerTickPacket;
 
 public class MultimeterServer {
 	
@@ -30,6 +31,9 @@ public class MultimeterServer {
 	}
 	
 	public void tick() {
+		ServerTickPacket packet = new ServerTickPacket(server.getTicks());
+		packetHandler.sendPacket(packet);
+		
 		multimeter.tick();
 	}
 	
