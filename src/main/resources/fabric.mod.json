@@ -18,6 +18,7 @@
   },
 
   "license": "MIT Licence",
+  "icon": "assets/rsmm/fabric/icon.png",
 
   "environment": "*",
   "entrypoints": {
