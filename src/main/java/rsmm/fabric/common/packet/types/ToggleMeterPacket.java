@@ -1,24 +1,24 @@
 package rsmm.fabric.common.packet.types;
 
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.DimPos;
+import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 import rsmm.fabric.util.PacketUtils;
 
 public class ToggleMeterPacket extends AbstractRSMMPacket {
 	
-	private DimPos pos;
+	private WorldPos pos;
 	private boolean movable;
 	
 	public ToggleMeterPacket() {
 		
 	}
 	
-	public ToggleMeterPacket(DimPos pos, boolean movable) {
+	public ToggleMeterPacket(WorldPos pos, boolean movable) {
 		this.pos = pos;
 		this.movable = movable;
 	}

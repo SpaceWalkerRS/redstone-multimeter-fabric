@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.interfaces.mixin.IMinecraftClient;
 
@@ -23,12 +24,12 @@ public class InGameHudMixin {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.AFTER,
-					target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay()V"
+					target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/util/math/MatrixStack;)V"
 			)
 	)
-	private void onRenderInjectAfterRenderStatusEffectOverlay(float tickDelta, CallbackInfo ci) {
+	private void onRenderInjectAfterRenderStatusEffectOverlay(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
 		if (((IMinecraftClient)client).getMultimeterClient().renderHud()) {
-			((IMinecraftClient)client).getMultimeterClient().getHudRenderer().render();
+			((IMinecraftClient)client).getMultimeterClient().getHudRenderer().render(matrices);
 		}
 	}
 }

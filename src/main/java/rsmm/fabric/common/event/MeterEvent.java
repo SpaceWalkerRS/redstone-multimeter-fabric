@@ -1,6 +1,6 @@
 package rsmm.fabric.common.event;
 
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 
 public class MeterEvent {
 	

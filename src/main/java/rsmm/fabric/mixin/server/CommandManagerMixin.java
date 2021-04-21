@@ -25,7 +25,7 @@ public class CommandManagerMixin {
 					"RETURN"
 			)
 	)
-	private void registerCommands(boolean isDedicatedServer, CallbackInfo ci) {
+	private void registerCommands(CommandManager.RegistrationEnvironment environment, CallbackInfo ci) {
 		MeterCommand.registerCommand(dispatcher);
 	}
 }

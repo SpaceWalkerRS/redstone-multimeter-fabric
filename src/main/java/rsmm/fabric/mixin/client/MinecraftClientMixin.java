@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Screen;
 
 import rsmm.fabric.client.MultimeterClient;
@@ -17,12 +18,12 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	private MultimeterClient multimeterClient;
 	
 	@Inject(
-			method = "init",
+			method = "<init>",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void onInitInjectBeforeIsMultiplayerEnabled(CallbackInfo ci) {
+	private void onInitInjectBeforeIsMultiplayerEnabled(RunArgs args, CallbackInfo ci) {
 		this.multimeterClient = new MultimeterClient((MinecraftClient)(Object)this);
 		
 		multimeterClient.onStartup();

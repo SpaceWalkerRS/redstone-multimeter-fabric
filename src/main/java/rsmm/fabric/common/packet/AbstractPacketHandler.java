@@ -5,20 +5,10 @@ import java.util.Map;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 
-import rsmm.fabric.common.packet.types.AddMeterPacket;
-import rsmm.fabric.common.packet.types.JoinMultimeterServerPacket;
-import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
-import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
-import rsmm.fabric.common.packet.types.MeteredEventsPacket;
-import rsmm.fabric.common.packet.types.RecolorMeterPacket;
-import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
-import rsmm.fabric.common.packet.types.RemoveMeterPacket;
-import rsmm.fabric.common.packet.types.RenameMeterPacket;
-import rsmm.fabric.common.packet.types.ServerTickPacket;
-import rsmm.fabric.common.packet.types.ToggleMeterPacket;
+import rsmm.fabric.common.packet.types.*;
 
 public abstract class AbstractPacketHandler {
 	

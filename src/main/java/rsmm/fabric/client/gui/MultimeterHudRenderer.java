@@ -5,6 +5,7 @@ import static rsmm.fabric.client.gui.HudSettings.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.log.MeterEventRendererDispatcher;
@@ -76,7 +77,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	 * of metered events in the meter group this client
 	 * is subscribed to.
 	 */
-	public void render() {
+	public void render(MatrixStack matrices) {
 		ROW_COUNT = client.getMeterGroup().getMeterCount();
 		
 		if (ROW_COUNT <= 0) {
@@ -87,20 +88,20 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		namesWidth = getNamesWidth();
 		ticksWidth = COLUMN_COUNT * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 		
-		renderNamesTable();
-		renderTicksTable();
+		renderNamesTable(matrices);
+		renderTicksTable(matrices);
 		if (paused) {
-			renderSubticksTable();
+			renderSubticksTable(matrices);
 		}
 		
-		font.draw(client.getMeterGroup().getName(), 1, height + 2, METER_GROUP_NAME_COLOR);
+		font.draw(matrices, client.getMeterGroup().getName(), 1, height + 2, METER_GROUP_NAME_COLOR);
 	}
 	
 	private int getNamesWidth() {
 		int width = 0;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			int nameWidth = font.getStringWidth(meter.getName());
+			int nameWidth = font.getWidth(meter.getName());
 			
 			if (nameWidth > width) {
 				width = nameWidth;
@@ -110,40 +111,40 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		return width + NAMES_TICKS_SPACING;
 	}
 	
-	private void renderNamesTable() {
-		drawBackground(0, 0, namesWidth, height);
+	private void renderNamesTable(MatrixStack matrices) {
+		drawBackground(matrices, 0, 0, namesWidth, height);
 		
 		int x = 1;
 		int y = 2;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			font.draw(meter.getName(), x, y, METER_NAME_COLOR);
+			font.draw(matrices, meter.getName(), x, y, METER_NAME_COLOR);
 			
 			y += ROW_HEIGHT + GRID_SIZE;
 		}
 	}
 	
-	private void renderTicksTable() {
+	private void renderTicksTable(MatrixStack matrices) {
 		int x = namesWidth;
 		int y = 0;
 		
 		long firstTick = client.getCurrentServerTick() - COLUMN_COUNT + offset;
 		
-		drawBackground(x, y, ticksWidth, height);
-		drawGridLines(x, y, COLUMN_COUNT, ROW_COUNT);
+		drawBackground(matrices, x, y, ticksWidth, height);
+		drawGridLines(matrices, x, y, COLUMN_COUNT, ROW_COUNT);
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			eventRenderers.renderTickLogs(font, x, y, firstTick, meter);
+			eventRenderers.renderTickLogs(matrices, font, x, y, firstTick, meter);
 			
 			y += ROW_HEIGHT + GRID_SIZE;
 		}
 		
 		if (paused) {
-			drawSelectedTickIndicator();
+			drawSelectedTickIndicator(matrices);
 		}
 	}
 	
-	private void renderSubticksTable() {
+	private void renderSubticksTable(MatrixStack matrices) {
 		long selectedTick = client.getCurrentServerTick() - (COLUMN_COUNT - SELECTED_COLUMN) + offset;
 		int subTickCount = client.getMeterGroup().getLogManager().getSubTickCount(selectedTick);
 		
@@ -156,21 +157,21 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		int x = namesWidth + ticksWidth + TICKS_SUBTICKS_GAP;
 		int y = 0;
 		
-		drawBackground(x, y, subTicksWidth, height);
-		drawGridLines(x, y, subTickCount, ROW_COUNT);
+		drawBackground(matrices, x, y, subTicksWidth, height);
+		drawGridLines(matrices, x, y, subTickCount, ROW_COUNT);
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			eventRenderers.renderSubTickLogs(font, x, y, selectedTick, subTickCount, meter);
+			eventRenderers.renderSubTickLogs(matrices, font, x, y, selectedTick, subTickCount, meter);
 			
 			y += ROW_HEIGHT + GRID_SIZE;
 		}
 	}
 	
-	private void drawBackground(int x, int y, int width, int height) {
-		fill(x, y, x + width, y + height, BACKGROUND_COLOR);
+	private void drawBackground(MatrixStack matrices, int x, int y, int width, int height) {
+		fill(matrices, x, y, x + width, y + height, BACKGROUND_COLOR);
 	}
 	
-	private void drawGridLines(int startX, int startY, int columnCount, int rowCount) {
+	private void drawGridLines(MatrixStack matrices, int startX, int startY, int columnCount, int rowCount) {
 		int width = columnCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 		int height = rowCount * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
 				
@@ -179,17 +180,17 @@ public class MultimeterHudRenderer extends DrawableHelper {
 			int x = startX + i * (COLUMN_WIDTH + GRID_SIZE);
 			int color = (i > 0 && i < columnCount && i % 5 == 0) ? INTERVAL_GRID_COLOR : MAIN_GRID_COLOR;
 			
-			fill(x, startY, x + GRID_SIZE, startY + height, color);
+			fill(matrices, x, startY, x + GRID_SIZE, startY + height, color);
 		}
 		// Horizontal lines
 		for (int i = 0; i <= rowCount; i++) {
 			int y = startY + i * (ROW_HEIGHT + GRID_SIZE);
 			
-			fill(startX, y, startX + width, y + GRID_SIZE, MAIN_GRID_COLOR);
+			fill(matrices, startX, y, startX + width, y + GRID_SIZE, MAIN_GRID_COLOR);
 		}
 	}
 	
-	private void drawSelectedTickIndicator() {
+	private void drawSelectedTickIndicator(MatrixStack matrices) {
 		int x = namesWidth + SELECTED_COLUMN * (COLUMN_WIDTH + GRID_SIZE);
 		int y = 0;
 		
@@ -198,9 +199,9 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		int top = y;
 		int bottom = y + ROW_COUNT * (ROW_HEIGHT + GRID_SIZE);
 		
-		fill(left            , top            , left  + GRID_SIZE, bottom            , SELECTED_TICK_INDICATOR_COLOR); // left
-		fill(left + GRID_SIZE, top            , right + GRID_SIZE, top    + GRID_SIZE, SELECTED_TICK_INDICATOR_COLOR); // top
-		fill(right           , top + GRID_SIZE, right + GRID_SIZE, bottom + GRID_SIZE, SELECTED_TICK_INDICATOR_COLOR); // right
-		fill(left            , bottom         , right            , bottom + GRID_SIZE, SELECTED_TICK_INDICATOR_COLOR); // bottom
+		fill(matrices, left            , top            , left  + GRID_SIZE, bottom            , SELECTED_TICK_INDICATOR_COLOR); // left
+		fill(matrices, left + GRID_SIZE, top            , right + GRID_SIZE, top    + GRID_SIZE, SELECTED_TICK_INDICATOR_COLOR); // top
+		fill(matrices, right           , top + GRID_SIZE, right + GRID_SIZE, bottom + GRID_SIZE, SELECTED_TICK_INDICATOR_COLOR); // right
+		fill(matrices, left            , bottom         , right            , bottom + GRID_SIZE, SELECTED_TICK_INDICATOR_COLOR); // bottom
 	}
 }

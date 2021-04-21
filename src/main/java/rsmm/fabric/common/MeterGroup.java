@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 
 import rsmm.fabric.util.PacketUtils;
 
@@ -14,7 +14,7 @@ public class MeterGroup {
 	
 	protected final String name;
 	protected final List<Meter> meters;
-	protected final Map<DimPos, Integer> posToIndex;
+	protected final Map<WorldPos, Integer> posToIndex;
 	
 	protected MeterGroup(String name) {
 		this.name = name;
@@ -47,7 +47,7 @@ public class MeterGroup {
 		return null;
 	}
 	
-	public Meter getMeterAt(DimPos pos) {
+	public Meter getMeterAt(WorldPos pos) {
 		if (posToIndex.containsKey(pos)) {
 			return getMeter(posToIndex.get(pos));
 		}
@@ -55,11 +55,11 @@ public class MeterGroup {
 		return null;
 	}
 	
-	public boolean hasMeterAt(DimPos pos) {
+	public boolean hasMeterAt(WorldPos pos) {
 		return posToIndex.containsKey(pos);
 	}
 	
-	public int indexOfMeterAt(DimPos pos) {
+	public int indexOfMeterAt(WorldPos pos) {
 		return posToIndex.getOrDefault(pos, -1);
 	}
 	
@@ -69,7 +69,7 @@ public class MeterGroup {
 	}
 	
 	public boolean removeMeter(Meter meter) {
-		DimPos pos = meter.getPos();
+		WorldPos pos = meter.getPos();
 		
 		if (posToIndex.containsKey(pos)) {
 			int index = posToIndex.remove(pos);

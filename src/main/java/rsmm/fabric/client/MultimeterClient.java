@@ -3,14 +3,14 @@ package rsmm.fabric.client;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
-import rsmm.fabric.common.DimPos;
+import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.ToggleMeterPacket;
 
@@ -133,7 +133,7 @@ public class MultimeterClient {
 			World world = client.world;
 			BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
 			
-			DimPos pos = new DimPos(world, blockPos);
+			WorldPos pos = new WorldPos(world, blockPos);
 			
 			ToggleMeterPacket packet = new ToggleMeterPacket(pos, !Screen.hasControlDown());
 			packetHandler.sendPacket(packet);

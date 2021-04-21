@@ -10,23 +10,24 @@ import java.util.Set;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
-import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.Meter;
+import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
 import rsmm.fabric.common.packet.types.MeteredEventsPacket;
 import rsmm.fabric.common.packet.types.RecolorMeterPacket;
-import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
 import rsmm.fabric.common.packet.types.RemoveMeterPacket;
+import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
 import rsmm.fabric.common.packet.types.RenameMeterPacket;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
@@ -109,22 +110,21 @@ public class Multimeter {
 	 * Add a meter at the position the player is looking at
 	 * or remove it if there already is one.
 	 */
-	public void toggleMeter(DimPos dimPos, boolean movable, ServerPlayerEntity player) {
+	public void toggleMeter(WorldPos pos, boolean movable, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
 		if (meterGroup == null) {
 			return;
 		}
 		
-		if (meterGroup.hasMeterAt(dimPos)) {
-			Meter meter = meterGroup.getMeterAt(dimPos);
+		if (meterGroup.hasMeterAt(pos)) {
+			Meter meter = meterGroup.getMeterAt(pos);
 			meterGroup.removeMeter(meter);
 			
-			RemoveMeterPacket packet = new RemoveMeterPacket(dimPos);
+			RemoveMeterPacket packet = new RemoveMeterPacket(pos);
 			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 		} else {
-			BlockPos pos = dimPos.getBlockPos();
-			World world = server.getMinecraftServer().getWorld(DimensionType.byId(dimPos.getDimensionId()));
+			World world = server.getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, pos.getWorldId()));
 			
 			if (world != null) {
 				String name = meterGroup.getNextMeterName();
@@ -144,10 +144,10 @@ public class Multimeter {
 					active = ((Meterable)block).isActive(world, pos, state);
 				}
 				
-				Meter meter = new Meter(dimPos, name, color, movable, meteredEvents, powered, active);
+				Meter meter = new Meter(pos, name, color, movable, meteredEvents, powered, active);
 				meterGroup.addMeter(meter);
 				
-				AddMeterPacket packet = new AddMeterPacket(dimPos, name, color, movable, meteredEvents, powered, active);
+				AddMeterPacket packet = new AddMeterPacket(pos, name, color, movable, meteredEvents, powered, active);
 				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 			}
 		}
@@ -258,33 +258,33 @@ public class Multimeter {
 		meterGroup.addSubscriber(player);
 	}
 	
-	public void blockUpdate(DimPos pos, boolean powered) {
+	public void blockUpdate(WorldPos pos, boolean powered) {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			meterGroup.blockUpdate(pos, powered);
 		}
 	}
 	
 	public void blockUpdate(World world, BlockPos pos, boolean powered) {
-		blockUpdate(new DimPos(world, pos), powered);
+		blockUpdate(new WorldPos(world, pos), powered);
 	}
 	
-	public void stateChanged(DimPos pos, boolean active) {
+	public void stateChanged(WorldPos pos, boolean active) {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			meterGroup.stateChanged(pos, active);
 		}
 	}
 	
 	public void stateChanged(World world, BlockPos pos, boolean active) {
-		stateChanged(new DimPos(world, pos), active);
+		stateChanged(new WorldPos(world, pos), active);
 	}
 	
-	public void blockMoved(DimPos pos, Direction dir) {
+	public void blockMoved(WorldPos pos, Direction dir) {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			meterGroup.blockMoved(pos, dir);
 		}
 	}
 	
 	public void blockMoved(World world, BlockPos pos, Direction dir) {
-		blockMoved(new DimPos(world, pos), dir);
+		blockMoved(new WorldPos(world, pos), dir);
 	}
 }

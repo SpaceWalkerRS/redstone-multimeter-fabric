@@ -1,24 +1,24 @@
 package rsmm.fabric.common.packet.types;
 
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.Meter;
+import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 import rsmm.fabric.util.PacketUtils;
 
 public class RemoveMeterPacket extends AbstractRSMMPacket {
 	
-	private DimPos pos;
+	private WorldPos pos;
 	
 	public RemoveMeterPacket() {
 		
 	}
 	
-	public RemoveMeterPacket(DimPos pos) {
+	public RemoveMeterPacket(WorldPos pos) {
 		this.pos = pos;
 	}
 	
