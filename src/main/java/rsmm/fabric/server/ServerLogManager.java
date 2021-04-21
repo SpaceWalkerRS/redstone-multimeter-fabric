@@ -1,7 +1,7 @@
 package rsmm.fabric.server;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;

@@ -1,7 +1,7 @@
 package rsmm.fabric.command.argument;
 
-import net.minecraft.command.argument.ArgumentTypes;
-import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
+import net.minecraft.command.arguments.ArgumentTypes;
+import net.minecraft.command.arguments.serialize.ConstantArgumentSerializer;
 
 public class RSMMArgumentTypes {
 	

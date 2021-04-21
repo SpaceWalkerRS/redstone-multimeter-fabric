@@ -3,9 +3,9 @@ package rsmm.fabric.server;
 import java.util.Collection;
 
 import net.minecraft.network.Packet;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.common.packet.AbstractPacketHandler;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;

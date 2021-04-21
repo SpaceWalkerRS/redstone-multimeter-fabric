@@ -9,9 +9,9 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 
 import rsmm.fabric.common.Meter;
@@ -64,7 +64,7 @@ public class MeterRenderer {
 	}
 	
 	private void drawMeter(MatrixStack matrices, BufferBuilder builder, Tessellator tessellator, Meter meter) {
-		BlockPos pos = meter.getPos();
+		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
 		

@@ -3,7 +3,6 @@ package rsmm.fabric.client.gui.log;
 import static rsmm.fabric.client.gui.HudSettings.*;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
@@ -17,7 +16,7 @@ public class MovedEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long firstTick, Meter meter) {
+	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, Meter meter) {
 		y += GRID_SIZE;
 		int color = meter.getColor();
 		
@@ -35,7 +34,7 @@ public class MovedEventRenderer extends MeterEventRenderer {
 			int column = (int)(event.getTick() - firstTick);
 			int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 			
-			drawEvent(matrices, columnX, y, color);
+			drawEvent(columnX, y, color);
 			
 			if ((event = logs.getLog(type, ++index)) == null) {
 				break;
@@ -44,7 +43,7 @@ public class MovedEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderSubTickLogs(TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
 		y += GRID_SIZE;
 		int color = meter.getColor();
 		
@@ -60,7 +59,7 @@ public class MovedEventRenderer extends MeterEventRenderer {
 			int column = event.getSubTick();
 			int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 			
-			drawEvent(matrices, columnX, y, color);
+			drawEvent(columnX, y, color);
 			
 			if ((event = logs.getLog(type, ++index)) == null) {
 				break;
@@ -68,10 +67,10 @@ public class MovedEventRenderer extends MeterEventRenderer {
 		}
 	}
 	
-	private void drawEvent(MatrixStack matrices, int x, int y, int color) {
+	private void drawEvent(int x, int y, int color) {
 		int half = ROW_HEIGHT / 2;
 		
-		fill(matrices, x, y + half - 1, x + COLUMN_WIDTH, y + ROW_HEIGHT - half + 1, color);
-		fill(matrices, x, y + half, x + COLUMN_WIDTH, y + ROW_HEIGHT - half, 0xFFFFFFFF);
+		fill(x, y + half - 1, x + COLUMN_WIDTH, y + ROW_HEIGHT - half + 1, color);
+		fill(x, y + half, x + COLUMN_WIDTH, y + ROW_HEIGHT - half, 0xFFFFFFFF);
 	}
 }

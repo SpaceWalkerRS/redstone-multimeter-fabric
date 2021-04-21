@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 import rsmm.fabric.command.argument.MeterEventArgumentType;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
-import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IServerCommandSource;
 import rsmm.fabric.server.Multimeter;
@@ -108,13 +108,13 @@ public class MeterCommand {
 			int meterCount = meterGroup.getMeterCount();
 			
 			if (index == null) {
-				HitResult hitResult = player.raycast(player.interactionManager.getGameMode().isCreative() ? 5.0F : 4.5F, server.getMinecraftServer().getTickTime(), false);
+				HitResult hitResult = player.rayTrace(player.interactionManager.getGameMode().isCreative() ? 5.0F : 4.5F, server.getMinecraftServer().getTickTime(), false);
 				
 				if (hitResult.getType() == HitResult.Type.BLOCK) {
 					World world = player.world;
 					BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
 					
-					WorldPos pos = new WorldPos(world, blockPos);
+					DimPos pos = new DimPos(world, blockPos);
 					
 					index = meterGroup.indexOfMeterAt(pos);
 				} else {

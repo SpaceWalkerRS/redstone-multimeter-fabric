@@ -18,6 +18,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
@@ -50,7 +51,7 @@ public abstract class PistonBlockMixin implements MeterableBlock, IBlock {
 					target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
 			)
 	)
-	private void onMoveInjectBeforeOffset1(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonHandler pistonHandler, Map<BlockPos, BlockState> movedPosToState, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, BlockState[] removedStates, Direction moveDir, int removedIndex, int brokenIndex, BlockPos movedPos, BlockState movedState) {
+	private void onMoveInjectBeforeOffset1(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonHandler pistonHandler, Map<BlockPos, BlockState> movedPosToState, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, int affectedIndex, BlockState[] removedStates, Direction moveDir, int index, BlockPos movedPos, BlockState movedState) {
 		if (!world.isClient()) {
 			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();

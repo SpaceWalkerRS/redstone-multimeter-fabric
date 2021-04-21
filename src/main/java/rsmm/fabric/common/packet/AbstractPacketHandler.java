@@ -5,8 +5,8 @@ import java.util.Map;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.Packet;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.common.packet.types.*;
 

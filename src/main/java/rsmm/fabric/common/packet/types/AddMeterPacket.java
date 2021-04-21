@@ -1,18 +1,18 @@
 package rsmm.fabric.common.packet.types;
 
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 import rsmm.fabric.util.PacketUtils;
 
 public class AddMeterPacket extends AbstractRSMMPacket {
 	
-	private WorldPos pos;
+	private DimPos pos;
 	private String name;
 	private int color;
 	private boolean movable;
@@ -24,7 +24,7 @@ public class AddMeterPacket extends AbstractRSMMPacket {
 		
 	}
 	
-	public AddMeterPacket(WorldPos pos, String name, int color, boolean movable, int meteredEvents, boolean powered, boolean active) {
+	public AddMeterPacket(DimPos pos, String name, int color, boolean movable, int meteredEvents, boolean powered, boolean active) {
 		this.pos = pos;
 		this.name = name;
 		this.color = color;

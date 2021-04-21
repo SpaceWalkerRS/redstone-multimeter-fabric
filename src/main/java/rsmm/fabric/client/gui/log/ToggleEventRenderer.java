@@ -3,7 +3,6 @@ package rsmm.fabric.client.gui.log;
 import static rsmm.fabric.client.gui.HudSettings.*;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
@@ -19,7 +18,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long firstTick, Meter meter) {
+	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, Meter meter) {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
@@ -33,7 +32,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		if (nextEvent == null) {
 			if (isToggled(meter)) {
-				draw(matrices, x + GRID_SIZE, y, color, COLUMN_COUNT);
+				draw(x + GRID_SIZE, y, color, COLUMN_COUNT);
 			}
 			
 			return;
@@ -50,9 +49,9 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
 				if (wasToggled(event)) {
-					drawOn(matrices, columnX, y, color);
+					drawOn(columnX, y, color);
 				} else {
-					drawOff(matrices, columnX, y, color);
+					drawOff(columnX, y, color);
 				}
 			}
 			
@@ -63,7 +62,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int column = (int)(start - firstTick);
 				int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
-				draw(matrices, columnX, y, color, (int)(end - start));
+				draw(columnX, y, color, (int)(end - start));
 			}
 			
 			if (drawPulseLength && event != null && nextEvent != null) {
@@ -76,7 +75,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					String text = String.valueOf(pulseLength);
 					
 					int availableWidth = endX - startX;
-					int requiredWidth = font.getWidth(text);
+					int requiredWidth = font.getStringWidth(text);
 					
 					if (requiredWidth < availableWidth) {
 						boolean toggled = wasToggled(event);
@@ -84,8 +83,8 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 						int bgColor = toggled ? color : BACKGROUND_COLOR;
 						int textColor = toggled ? POWERED_TEXT_COLOR : UNPOWERED_TEXT_COLOR;
 						
-						fill(matrices, startX, y, startX + requiredWidth, y + ROW_HEIGHT, bgColor);
-						font.draw(matrices, text, startX + 1, y + 1, textColor);
+						fill(startX, y, startX + requiredWidth, y + ROW_HEIGHT, bgColor);
+						font.draw(text, startX + 1, y + 1, textColor);
 					}
 				}
 			}
@@ -104,7 +103,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderSubTickLogs(TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
@@ -117,7 +116,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		if (nextEvent == null) {
 			if (isToggled(meter)) {
-				draw(matrices, x + GRID_SIZE, y, color, subTickCount);
+				draw(x + GRID_SIZE, y, color, subTickCount);
 			}
 			
 			return;
@@ -132,9 +131,9 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
 				if (wasToggled(event)) {
-					drawOn(matrices, columnX, y, color);
+					drawOn(columnX, y, color);
 				} else {
-					drawOff(matrices, columnX, y, color);
+					drawOff(columnX, y, color);
 				}
 			}
 			
@@ -144,7 +143,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			if (nextEvent == null ? isToggled(meter) : !wasToggled(nextEvent)) {
 				int columnX = x + start * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
-				draw(matrices, columnX, y, color, end - start);
+				draw(columnX, y, color, end - start);
 			}
 			
 			event = nextEvent;
@@ -164,47 +163,47 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	
 	protected abstract boolean isToggled(Meter meter);
 	
-	private void draw(MatrixStack matrices, int x, int y, int color) {
+	private void draw(int x, int y, int color) {
 		switch (mode) {
 		case ALL:
-			fill(matrices, x, y, x + COLUMN_WIDTH, y + ROW_HEIGHT, color);
+			fill(x, y, x + COLUMN_WIDTH, y + ROW_HEIGHT, color);
 			break;
 		case TOP:
-			fill(matrices, x, y, x + COLUMN_WIDTH, y + ROW_HEIGHT - (ROW_HEIGHT / 2), color);
+			fill(x, y, x + COLUMN_WIDTH, y + ROW_HEIGHT - (ROW_HEIGHT / 2), color);
 			break;
 		case BOTTOM:
-			fill(matrices, x, y + ROW_HEIGHT / 2, x + COLUMN_WIDTH, y + ROW_HEIGHT, color);
+			fill(x, y + ROW_HEIGHT / 2, x + COLUMN_WIDTH, y + ROW_HEIGHT, color);
 			break;
 		default:
 			break;
 		}
 	}
 	
-	private void draw(MatrixStack matrices, int x, int y, int color, int count) {
+	private void draw(int x, int y, int color, int count) {
 		for (int i = 0; i < count; i++) {
-			draw(matrices, x + i * (COLUMN_WIDTH + GRID_SIZE), y, color);
+			draw(x + i * (COLUMN_WIDTH + GRID_SIZE), y, color);
 		}
 	}
 	
-	private void drawOn(MatrixStack matrices, int x, int y, int color) {
+	private void drawOn(int x, int y, int color) {
 		switch (mode) {
 		case ALL:
-			fill(matrices, x + 1, y + 1, x + COLUMN_WIDTH - 1, y + ROW_HEIGHT - 1, color);
+			fill(x + 1, y + 1, x + COLUMN_WIDTH - 1, y + ROW_HEIGHT - 1, color);
 			break;
 		case TOP:
-			fill(matrices, x + 1, y + 1, x + COLUMN_WIDTH - 1, y + ROW_HEIGHT / 2, color);
+			fill(x + 1, y + 1, x + COLUMN_WIDTH - 1, y + ROW_HEIGHT / 2, color);
 			break;
 		case BOTTOM:
-			fill(matrices, x + 1, y + ROW_HEIGHT - (ROW_HEIGHT / 2), x + COLUMN_WIDTH - 1, y + ROW_HEIGHT - 1, color);
+			fill(x + 1, y + ROW_HEIGHT - (ROW_HEIGHT / 2), x + COLUMN_WIDTH - 1, y + ROW_HEIGHT - 1, color);
 			break;
 		default:
 			break;
 		}
 	}
 	
-	private void drawOff(MatrixStack matrices, int x, int y, int color) {
-		draw(matrices, x, y, color);
-		drawOn(matrices, x, y, BACKGROUND_COLOR);
+	private void drawOff(int x, int y, int color) {
+		draw(x, y, color);
+		drawOn(x, y, BACKGROUND_COLOR);
 	}
 	
 	protected enum Mode {
