@@ -24,6 +24,9 @@ public class Meter {
 	/** true if the block at this position is emitting power or active in another way */
 	private boolean active;
 	
+	/** This property is used on the server to mark this meter as having changes that need to be synced with clients */
+	private boolean dirty;
+	
 	public Meter(WorldPos pos, String name, int color, boolean movable, int initialEventTypes, boolean initialPowered, boolean initialActive) {
 		this.logs = new MeterLogs();
 		
@@ -107,6 +110,20 @@ public class Meter {
 		return active;
 	}
 	
+	/**
+	 * Check if this meter has changes that need to be synced with clients
+	 */
+	public boolean isDirty() {
+		return dirty;
+	}
+	
+	/**
+	 * Mark this meter as having changes that need to be synced with clients
+	 */
+	public void markDirty() {
+		dirty = true;
+	}
+	
 	public boolean blockUpdate(boolean powered) {
 		if (this.powered != powered) {
 			this.powered = powered;
@@ -159,7 +176,9 @@ public class Meter {
 		active = buffer.readBoolean();
 	}
 	
-	public void writeLogs(PacketByteBuf buffer) {
+	public void writeData(PacketByteBuf buffer) {
+		dirty = false;
+		
 		PacketUtils.writeWorldPos(buffer, pos);
 		buffer.writeBoolean(powered);
 		buffer.writeBoolean(active);
@@ -167,7 +186,7 @@ public class Meter {
 		logs.encode(buffer);
 	}
 	
-	public void readLogs(PacketByteBuf buffer) {
+	public void readData(PacketByteBuf buffer) {
 		pos = PacketUtils.readWorldPos(buffer);
 		powered = buffer.readBoolean();
 		active = buffer.readBoolean();

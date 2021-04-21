@@ -21,6 +21,9 @@ public class ServerMeterGroup extends MeterGroup {
 	
 	private int totalMeterCount; // The total number of meters ever added to this group
 	
+	/** Used to mark this meter group as having changes that need to be synced with clients */
+	private boolean dirty;
+	
 	public ServerMeterGroup(Multimeter multimeter, String name) {
 		super(name);
 		
@@ -86,6 +89,25 @@ public class ServerMeterGroup extends MeterGroup {
 	
 	public ServerLogManager getLogManager() {
 		return logManager;
+	}
+	
+	/**
+	 * Check if this meter group has changes that need to be synced with clients
+	 */
+	public boolean isDirty() {
+		return dirty;
+	}
+	
+	/**
+	 * Mark this meter group as having changes that need to be synced with cients
+	 */
+	public void markDirty() {
+		dirty = true;
+	}
+	
+	public void cleanUp() {
+		dirty = false;
+		logManager.clearLogs();
 	}
 	
 	public void blockUpdate(WorldPos pos, boolean powered) {

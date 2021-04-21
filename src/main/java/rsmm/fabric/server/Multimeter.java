@@ -78,18 +78,16 @@ public class Multimeter {
 	 * and sends all the logged events of the past tick
 	 * to the clients.
 	 */
-	public void broadcastMeterLogs() {
+	public void broadcastMeterData() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			ServerLogManager logManager = meterGroup.getLogManager();
-			
-			if (logManager.hasLogs()) {
+			if (meterGroup.isDirty()) {
 				if (meterGroup.hasSubscribers()) {
-					PacketByteBuf data = logManager.collectMeterLogs();
+					PacketByteBuf data = meterGroup.getLogManager().collectMeterData();
 					MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
 					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 				}
 				
-				logManager.clearLogs();
+				meterGroup.cleanUp();
 			}
 		}
 	}

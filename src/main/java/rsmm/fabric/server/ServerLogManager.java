@@ -29,26 +29,37 @@ public class ServerLogManager extends LogManager {
 		return meterGroup.getMultimeter().getMultimeterServer().getMinecraftServer().getTicks();
 	}
 	
-	public boolean hasLogs() {
-		return currentSubTick > 0;
-	}
-	
 	public void resetSubTickCount() {
 		currentSubTick = 0;
 	}
 	
 	public void logEvent(Meter meter, EventType type, int metaData) {
-		meter.getLogs().add(new MeterEvent(type, getCurrentTick(), currentSubTick++, metaData));
+		if (meter.isMetering(type)) {
+			MeterEvent event = new MeterEvent(type, getCurrentTick(), currentSubTick++, metaData);
+			meter.getLogs().add(event);
+		}
+		
+		meterGroup.markDirty();
+		meter.markDirty();
 	}
 	
-	public PacketByteBuf collectMeterLogs() {
+	public PacketByteBuf collectMeterData() {
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		
 		data.writeInt(currentSubTick);
 		
-		for (Meter meter : meterGroup.getMeters()) {
-			meter.writeLogs(data);
+		for (int index = 0; index < meterGroup.getMeterCount(); index++) {
+			Meter meter = meterGroup.getMeter(index);
+			
+			if (meter.isDirty()) {
+				data.writeBoolean(true);
+				data.writeInt(index);
+				
+				meter.writeData(data);
+			}
 		}
+		
+		data.writeBoolean(false); // mark that there is no further data
 		
 		return data;
 	}

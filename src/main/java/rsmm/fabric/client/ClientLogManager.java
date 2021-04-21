@@ -53,8 +53,11 @@ public class ClientLogManager extends LogManager {
 	public void updateMeterLogs(PacketByteBuf data) {
 		subTickCount.put(getCurrentTick(), data.readInt());
 		
-		for (Meter meter : meterGroup.getMeters()) {
-			meter.readLogs(data);
+		while (data.readBoolean()) {
+			int index = data.readInt();
+			Meter meter = meterGroup.getMeter(index);
+			
+			meter.readData(data);
 		}
 	}
 	
