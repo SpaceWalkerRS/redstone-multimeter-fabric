@@ -1,11 +1,11 @@
 package rsmm.fabric.util;
 
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.DimPos;
 
 public class PacketUtils {
 	
@@ -25,16 +25,16 @@ public class PacketUtils {
 		return data;
 	}
 	
-	public static void writeWorldPos(PacketByteBuf buffer, WorldPos pos) {
-		buffer.writeIdentifier(pos.getWorldId());
-		buffer.writeBlockPos(pos);
+	public static void writeWorldPos(PacketByteBuf buffer, DimPos pos) {
+		buffer.writeIdentifier(pos.getDimensionId());
+		buffer.writeBlockPos(pos.getBlockPos());
 	}
 	
-	public static WorldPos readWorldPos(PacketByteBuf buffer) {
+	public static DimPos readWorldPos(PacketByteBuf buffer) {
 		Identifier worldId = buffer.readIdentifier();
 		BlockPos pos = buffer.readBlockPos();
 		
-		return new WorldPos(worldId, pos);
+		return new DimPos(worldId, pos);
 	}
 	
 	public static void writeMeter(PacketByteBuf buffer, Meter meter) {

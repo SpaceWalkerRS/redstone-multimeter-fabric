@@ -20,7 +20,6 @@
   	"meterable.RedstoneLampBlockMixin",
   	"meterable.RedstoneTorchBlockMixin",
   	"meterable.RedstoneWireBlockMixin",
-  	"meterable.TargetBlockMixin",
   	"meterable.TrappedChestBlockMixin",
   	"meterable.TripwireHookBlockMixin",
   	"meterable.WallRedstoneTorchBlockMixin",

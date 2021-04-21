@@ -1,7 +1,7 @@
 package rsmm.fabric.common.packet;
 
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.server.MultimeterServer;

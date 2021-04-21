@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;

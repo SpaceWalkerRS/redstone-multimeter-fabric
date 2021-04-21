@@ -1,6 +1,6 @@
 package rsmm.fabric.common;
 
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
@@ -12,7 +12,7 @@ public class Meter {
 	
 	private final MeterLogs logs;
 	
-	private WorldPos pos;
+	private DimPos pos;
 	private String name;
 	private int color;
 	private boolean movable;
@@ -24,7 +24,7 @@ public class Meter {
 	/** true if the block at this position is emitting power or active in another way */
 	private boolean active;
 	
-	public Meter(WorldPos pos, String name, int color, boolean movable, int initialEventTypes, boolean initialPowered, boolean initialActive) {
+	public Meter(DimPos pos, String name, int color, boolean movable, int initialEventTypes, boolean initialPowered, boolean initialActive) {
 		this.logs = new MeterLogs();
 		
 		this.pos = pos;
@@ -52,7 +52,7 @@ public class Meter {
 		logs.clear();
 	}
 	
-	public WorldPos getPos() {
+	public DimPos getPos() {
 		return pos;
 	}
 	

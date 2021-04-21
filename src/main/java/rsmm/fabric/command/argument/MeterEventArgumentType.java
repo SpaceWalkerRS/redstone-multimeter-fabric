@@ -12,7 +12,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import net.minecraft.command.CommandSource;
+import net.minecraft.server.command.CommandSource;
+
 import rsmm.fabric.common.event.EventType;
 
 public class MeterEventArgumentType implements ArgumentType<EventType> {

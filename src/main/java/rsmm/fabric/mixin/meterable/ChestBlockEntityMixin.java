@@ -33,7 +33,7 @@ public class ChestBlockEntityMixin extends BlockEntity {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/world/World;addSyncedBlockEvent(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;II)V"
+					target = "Lnet/minecraft/world/World;addBlockAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;II)V"
 			)
 	)
 	private void onOnInvOpenOrCloseInjectBeforeAddSyncedBlockEvent(CallbackInfo ci, Block cachedBlock) {

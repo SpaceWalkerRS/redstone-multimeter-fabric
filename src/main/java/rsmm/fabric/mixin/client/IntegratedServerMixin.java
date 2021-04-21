@@ -10,10 +10,10 @@ import rsmm.fabric.interfaces.mixin.IMinecraftServer;
 @Mixin(IntegratedServer.class)
 public abstract class IntegratedServerMixin implements IMinecraftServer {
 	
-	@Shadow private boolean paused;
+	@Shadow private boolean field_5524;
 	
 	@Override
 	public boolean isPaused() {
-		return paused;
+		return field_5524;
 	}
 }
