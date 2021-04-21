@@ -1,21 +1,23 @@
 package rsmm.fabric.common;
 
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 public class DimPos {
 	
-	private final int dimensionId;
+	private final Identifier dimensionId;
 	private final BlockPos pos;
 	
-	public DimPos(int dimensionId, BlockPos pos) {
+	public DimPos(Identifier dimensionId, BlockPos pos) {
 		this.dimensionId = dimensionId;
 		this.pos = pos;
 	}
 	
 	public DimPos(World world, BlockPos pos) {
-		this(world.dimension.getType().getRawId(), pos);
+		this(DimensionType.getId(world.dimension.getType()), pos);
 	}
 	
 	@Override
@@ -23,7 +25,7 @@ public class DimPos {
 		if (o instanceof DimPos) {
 			DimPos dimPos = (DimPos)o;
 			
-			return dimensionId == dimPos.dimensionId && pos.equals(dimPos.pos);
+			return dimensionId.equals(dimPos.dimensionId) && pos.equals(dimPos.pos);
 		}
 		
 		return false;
@@ -31,15 +33,15 @@ public class DimPos {
 	
 	@Override
 	public int hashCode() {
-		return super.hashCode() + 31 * dimensionId;
+		return pos.hashCode() + 31 * dimensionId.hashCode();
 	}
 	
-	public int getDimensionId() {
+	public Identifier getDimensionId() {
 		return dimensionId;
 	}
 	
 	public boolean isOf(World world) {
-		return world.dimension.getType().getRawId() == dimensionId;
+		return DimensionType.getId(world.dimension.getType()).equals(dimensionId);
 	}
 	
 	public BlockPos getBlockPos() {
@@ -53,7 +55,7 @@ public class DimPos {
 	/**
 	 * Return a DimPos with the same coordinates in a different dimension
 	 */
-	public DimPos withWorld(int dimensionId) {
+	public DimPos withWorld(Identifier dimensionId) {
 		return new DimPos(dimensionId, pos);
 	}
 }

@@ -1,5 +1,6 @@
 package rsmm.fabric.util;
 
+import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 
@@ -25,12 +26,12 @@ public class PacketUtils {
 	}
 	
 	public static void writeWorldPos(PacketByteBuf buffer, DimPos pos) {
-		buffer.writeInt(pos.getDimensionId());
+		buffer.writeIdentifier(pos.getDimensionId());
 		buffer.writeBlockPos(pos.getBlockPos());
 	}
 	
 	public static DimPos readWorldPos(PacketByteBuf buffer) {
-		int dimensionId = buffer.readInt();
+		Identifier dimensionId = buffer.readIdentifier();
 		BlockPos pos = buffer.readBlockPos();
 		
 		return new DimPos(dimensionId, pos);

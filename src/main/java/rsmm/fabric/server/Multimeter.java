@@ -123,7 +123,7 @@ public class Multimeter {
 			RemoveMeterPacket packet = new RemoveMeterPacket(dimPos);
 			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 		} else {
-			World world = server.getMinecraftServer().getWorld(DimensionType.byRawId(dimPos.getDimensionId()));
+			World world = server.getMinecraftServer().getWorld(DimensionType.byId(dimPos.getDimensionId()));
 			BlockPos pos = dimPos.getBlockPos();
 			
 			if (world != null) {
