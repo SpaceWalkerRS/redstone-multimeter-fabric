@@ -39,12 +39,15 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		}
 		
 		long lastTick = firstTick + COLUMN_COUNT;
+		long currentTick = -1;
 		
 		while (event == null || event.isBefore(lastTick)) {
 			boolean eventInTable = (event != null && !event.isBefore(firstTick));
 			boolean nextEventInTable = (nextEvent != null && nextEvent.isBefore(lastTick));
 			
-			if (eventInTable) {
+			if (eventInTable && event.getTick() != currentTick) {
+				currentTick = event.getTick();
+				
 				int column = (int)(event.getTick() - firstTick);
 				int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
@@ -89,12 +92,10 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				}
 			}
 			
-			long tick = (event == null) ? -1 : event.getTick();
-			
 			do {
 				event = nextEvent;
 				nextEvent = logs.getLog(type, ++index);
-			} while (event != null && event.getTick() == tick);
+			} while (nextEvent != null && nextEvent.getTick() == currentTick);
 			
 			if (event == null) {
 				break;
