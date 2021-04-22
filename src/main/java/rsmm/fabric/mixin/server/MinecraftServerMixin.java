@@ -36,7 +36,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void onMethod_16208InjectAtReturn(CallbackInfo ci) {
 		if (!isPaused()) {
-			multimeterServer.getMultimeter().broadcastMeterLogs();
+			multimeterServer.getMultimeter().broadcastMeterData();
 		}
 	}
 	
