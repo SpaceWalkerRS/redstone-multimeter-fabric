@@ -1,7 +1,5 @@
 package rsmm.fabric.mixin.client;
 
-import java.io.File;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 
@@ -28,7 +25,7 @@ public class GameOptionsMixin {
 					value = "HEAD"
 			)
 	)
-	private void onLoadInjectAtHead(MinecraftClient client, File optionsFile, CallbackInfo ci) {
+	private void onLoadInjectAtHead(CallbackInfo ci) {
 		keysAll = ArrayUtils.addAll(keysAll, 
 			KeyBindings.TOGGLE_METER,
 			KeyBindings.PAUSE_METERS,
