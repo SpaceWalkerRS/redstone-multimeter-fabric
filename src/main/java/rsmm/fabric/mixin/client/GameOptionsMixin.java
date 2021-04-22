@@ -23,12 +23,12 @@ public class GameOptionsMixin {
 	@Shadow @Final @Mutable private KeyBinding[] keysAll;
 	
 	@Inject(
-			method = "<init>",
+			method = "load",
 			at = @At(
-					value = "RETURN"
+					value = "HEAD"
 			)
 	)
-	private void onInitInjectAtReturn(MinecraftClient client, File optionsFile, CallbackInfo ci) {
+	private void onLoadInjectAtHead(MinecraftClient client, File optionsFile, CallbackInfo ci) {
 		keysAll = ArrayUtils.addAll(keysAll, 
 			KeyBindings.TOGGLE_METER,
 			KeyBindings.PAUSE_METERS,
