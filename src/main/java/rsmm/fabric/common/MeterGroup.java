@@ -2,24 +2,18 @@ package rsmm.fabric.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import net.minecraft.util.PacketByteBuf;
-
-import rsmm.fabric.util.PacketUtils;
+import net.minecraft.nbt.CompoundTag;
 
 public class MeterGroup {
 	
 	protected final String name;
 	protected final List<Meter> meters;
-	protected final Map<DimPos, Integer> posToIndex;
 	
 	protected MeterGroup(String name) {
 		this.name = name;
 		this.meters = new ArrayList<>();
-		this.posToIndex = new HashMap<>();
 	}
 	
 	public String getName() {
@@ -28,7 +22,6 @@ public class MeterGroup {
 	
 	public void clear() {
 		meters.clear();
-		posToIndex.clear();
 	}
 	
 	public List<Meter> getMeters() {
@@ -47,71 +40,51 @@ public class MeterGroup {
 		return null;
 	}
 	
-	public Meter getMeterAt(DimPos pos) {
-		if (posToIndex.containsKey(pos)) {
-			return getMeter(posToIndex.get(pos));
+	public boolean addMeter(Meter meter) {
+		return meters.add(meter);
+	}
+	
+	public boolean removeMeter(int index) {
+		return meters.remove(index) != null;
+	}
+	
+	public CompoundTag toTag() {
+		CompoundTag tag = new CompoundTag();
+		
+		int meterCount = meters.size();
+		tag.putInt("meterCount", meterCount);
+		
+		for (int index = 0; index < meterCount; index++) {
+			Meter meter = meters.get(index);
+			tag.put(String.valueOf(index), meter.toTag());
 		}
 		
-		return null;
+		return tag;
 	}
 	
-	public boolean hasMeterAt(DimPos pos) {
-		return posToIndex.containsKey(pos);
-	}
-	
-	public int indexOfMeterAt(DimPos pos) {
-		return posToIndex.getOrDefault(pos, -1);
-	}
-	
-	public void addMeter(Meter meter) {
-		posToIndex.put(meter.getPos(), meters.size());
-		meters.add(meter);
-	}
-	
-	public boolean removeMeter(Meter meter) {
-		DimPos pos = meter.getPos();
+	/**
+	 * Update this MeterGroup from a CompoundTag - ONLY USE THIS METHOD ON A NEW MeterGroup!
+	 */
+	public void fromTag(CompoundTag data) {
+		int meterCount = data.getInt("meterCount");
 		
-		if (posToIndex.containsKey(pos)) {
-			int index = posToIndex.remove(pos);
-			meters.remove(index);
+		for (int index = 0; index < meterCount; index++) {
+			String key = String.valueOf(index);
 			
-			int meterCount = meters.size();
-			
-			for (int i = index; i < meterCount; i++) {
-				int newIndex = i;
-				meter = meters.get(newIndex);
+			if (data.contains(key)) {
+				CompoundTag meterData = data.getCompound(key);
+				Meter meter = Meter.createFromTag(meterData);
 				
-				posToIndex.compute(meter.getPos(), (worldPos, oldIndex) -> newIndex);
-			}
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public void encode(PacketByteBuf buffer) {
-		buffer.writeInt(meters.size());
-		
-		for (Meter meter : meters) {
-			PacketUtils.writeMeter(buffer, meter);
-		}
-	}
-	
-	public void decode(PacketByteBuf buffer) {
-		int meterCount = buffer.readInt();
-		
-		for (int i = 0; i < meterCount; i++) {
-			Meter meter = PacketUtils.readMeter(buffer);
-			
-			if (meter != null) {
 				addMeter(meter);
 			}
 		}
 	}
 	
-	public void updateFromData(PacketByteBuf data) {
+	/**
+	 * Update this MeterGroup from a CompoundTag
+	 */
+	public void updateFromTag(CompoundTag data) {
 		clear();
-		decode(data);
+		fromTag(data);
 	}
 }

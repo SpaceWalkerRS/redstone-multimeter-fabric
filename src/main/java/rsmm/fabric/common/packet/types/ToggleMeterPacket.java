@@ -1,43 +1,38 @@
 package rsmm.fabric.common.packet.types;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
-import rsmm.fabric.util.PacketUtils;
 
 public class ToggleMeterPacket extends AbstractRSMMPacket {
 	
-	private DimPos pos;
-	private boolean movable;
+	private CompoundTag properties;
 	
 	public ToggleMeterPacket() {
 		
 	}
 	
-	public ToggleMeterPacket(DimPos pos, boolean movable) {
-		this.pos = pos;
-		this.movable = movable;
+	public ToggleMeterPacket(CompoundTag properties) {
+		this.properties = properties;
 	}
 	
 	@Override
 	public void encode(PacketByteBuf buffer) {
-		PacketUtils.writeWorldPos(buffer, pos);
-		buffer.writeBoolean(movable);
+		buffer.writeCompoundTag(properties);
 	}
 	
 	@Override
 	public void decode(PacketByteBuf buffer) {
-		pos = PacketUtils.readWorldPos(buffer);
-		movable = buffer.readBoolean();
+		properties = buffer.readCompoundTag();
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().toggleMeter(pos, movable, player);
+		server.getMultimeter().toggleMeter(properties, player);
 	}
 	
 	@Override

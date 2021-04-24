@@ -1,7 +1,9 @@
 package rsmm.fabric.server;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -16,18 +18,17 @@ import rsmm.fabric.util.ColorUtils;
 public class ServerMeterGroup extends MeterGroup {
 	
 	private final Multimeter multimeter;
+	private final Map<DimPos, Integer> posToIndex;
 	private final Set<ServerPlayerEntity> subscribers;
 	private final ServerLogManager logManager;
 	
 	private int totalMeterCount; // The total number of meters ever added to this group
 	
-	/** Used to mark this meter group as having changes that need to be synced with clients */
-	private boolean dirty;
-	
 	public ServerMeterGroup(Multimeter multimeter, String name) {
 		super(name);
 		
 		this.multimeter = multimeter;
+		this.posToIndex = new HashMap<>();
 		this.subscribers = new HashSet<>();
 		this.logManager = new ServerLogManager(this);
 	}
@@ -36,21 +37,38 @@ public class ServerMeterGroup extends MeterGroup {
 	public void clear() {
 		super.clear();
 		
+		posToIndex.clear();
 		totalMeterCount = 0;
 	}
 	
 	@Override
-	public void addMeter(Meter meter) {
-		super.addMeter(meter);
+	public boolean addMeter(Meter meter) {
+		boolean success = super.addMeter(meter);
 		
+		posToIndex.put(meter.getPos(), meters.size() - 1);
 		totalMeterCount++;
+		
+		return success;
 	}
 	
 	@Override
-	public boolean removeMeter(Meter meter) {
-		if (super.removeMeter(meter)) {
-			if (getMeterCount() == 0) {
+	public boolean removeMeter(int index) {
+		Meter meter = getMeter(index);
+		
+		if (meter != null && super.removeMeter(index)) {
+			int meterCount = meters.size();
+			
+			if (meterCount == 0) {
 				totalMeterCount = 0;
+			}
+			
+			posToIndex.remove(meter.getPos());
+			
+			for (;index < meterCount; index++) {
+				int newIndex = index;
+				meter = meters.get(newIndex);
+				
+				posToIndex.compute(meter.getPos(), (pos, oldIndex) -> newIndex);
 			}
 			
 			return true;
@@ -59,16 +77,33 @@ public class ServerMeterGroup extends MeterGroup {
 		return false;
 	}
 	
+	public Multimeter getMultimeter() {
+		return multimeter;
+	}
+	
+	public Meter getMeterAt(DimPos pos) {
+		return getMeter(indexOfMeterAt(pos));
+	}
+	
+	public boolean hasMeterAt(DimPos pos) {
+		return posToIndex.containsKey(pos);
+	}
+	
+	public int indexOfMeterAt(DimPos pos) {
+		return posToIndex.getOrDefault(pos, -1);
+	}
+	
+	public int removeMeterAt(DimPos pos) {
+		int index = indexOfMeterAt(pos);
+		return removeMeter(index) ? index : -1;
+	}
+	
 	public String getNextMeterName() {
 		return String.format("Meter %d", totalMeterCount);
 	}
 	
 	public int getNextMeterColor() {
 		return ColorUtils.nextColor();
-	}
-	
-	public Multimeter getMultimeter() {
-		return multimeter;
 	}
 	
 	public Set<ServerPlayerEntity> getSubscribers() {
@@ -95,19 +130,21 @@ public class ServerMeterGroup extends MeterGroup {
 	 * Check if this meter group has changes that need to be synced with clients
 	 */
 	public boolean isDirty() {
-		return dirty;
-	}
-	
-	/**
-	 * Mark this meter group as having changes that need to be synced with clients
-	 */
-	public void markDirty() {
-		dirty = true;
+		for (Meter meter : meters) {
+			if (meter.isDirty()) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public void cleanUp() {
-		dirty = false;
-		logManager.clearLogs();
+		for (Meter meter : meters) {
+			if (meter.isDirty()) {
+				meter.cleanUp();
+			}
+		}
 	}
 	
 	public void blockUpdate(DimPos pos, boolean powered) {

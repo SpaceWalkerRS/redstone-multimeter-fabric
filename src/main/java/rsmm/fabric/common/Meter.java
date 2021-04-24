@@ -1,12 +1,12 @@
 package rsmm.fabric.common;
 
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.log.MeterLogs;
-import rsmm.fabric.util.PacketUtils;
+import rsmm.fabric.util.NBTUtils;
 
 public class Meter {
 	
@@ -43,7 +43,7 @@ public class Meter {
 	/**
 	 * Creates an empty Meter, to be populated by packet data
 	 */
-	public Meter() {
+	private Meter() {
 		this.logs = new MeterLogs();
 	}
 	
@@ -154,43 +154,53 @@ public class Meter {
 		return false;
 	}
 	
-	public void encode(PacketByteBuf buffer) {
-		PacketUtils.writeWorldPos(buffer, pos);
-		buffer.writeString(name);
-		buffer.writeInt(color);
-		buffer.writeBoolean(movable);
-		
-		buffer.writeInt(eventTypes);
-		buffer.writeBoolean(powered);
-		buffer.writeBoolean(active);
-	}
-	
-	public void decode(PacketByteBuf buffer) {
-		pos = PacketUtils.readWorldPos(buffer);
-		name = buffer.readString(PacketUtils.MAX_STRING_LENGTH);
-		color = buffer.readInt();
-		movable = buffer.readBoolean();
-		
-		eventTypes = buffer.readInt();
-		powered = buffer.readBoolean();
-		active = buffer.readBoolean();
-	}
-	
-	public void writeData(PacketByteBuf buffer) {
+	public void cleanUp() {
 		dirty = false;
-		
-		PacketUtils.writeWorldPos(buffer, pos);
-		buffer.writeBoolean(powered);
-		buffer.writeBoolean(active);
-		
-		logs.encode(buffer);
+		logs.clear();
 	}
 	
-	public void readData(PacketByteBuf buffer) {
-		pos = PacketUtils.readWorldPos(buffer);
-		powered = buffer.readBoolean();
-		active = buffer.readBoolean();
+	public CompoundTag toTag() {
+		CompoundTag tag = new CompoundTag();
 		
-		logs.decode(buffer);
+		tag.put("pos", NBTUtils.dimPosToTag(pos));
+		tag.putString("name", name);
+		tag.putInt("color", color);
+		tag.putBoolean("movable", movable);
+		
+		tag.putInt("eventTypes", eventTypes);
+		tag.putBoolean("powered", powered);
+		tag.putBoolean("active", active);
+		
+		return tag;
+	}
+	
+	public void fromTag(CompoundTag tag) {
+		pos = NBTUtils.tagToDimPos(tag.getCompound("pos"));
+		name = tag.getString("name");
+		color = tag.getInt("color");
+		movable = tag.getBoolean("movable");
+		
+		eventTypes = tag.getInt("eventTypes");
+		powered = tag.getBoolean("powered");
+		active = tag.getBoolean("active");
+	}
+	
+	public static Meter createFromTag(CompoundTag tag) {
+		Meter meter = new Meter();
+		meter.fromTag(tag);
+		
+		return meter;
+	}
+	
+	public CompoundTag collectData() {
+		CompoundTag data = toTag();
+		data.put("logs", logs.toTag());
+		
+		return data;
+	}
+	
+	public void updateFromData(CompoundTag data) {
+		fromTag(data);
+		logs.updateFromTag(data.getCompound("logs"));
 	}
 }

@@ -15,15 +15,15 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.command.argument.HexColorArgumentType;
 import rsmm.fabric.command.argument.MeterEventArgumentType;
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IServerCommandSource;
 import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
-import rsmm.fabric.util.ColorUtils;
+import rsmm.fabric.server.ServerMeterGroup;
 
 public class MeterCommand {
 	
@@ -45,11 +45,11 @@ public class MeterCommand {
 				then(CommandManager.
 					argument("index", IntegerArgumentType.integer()).
 					then(CommandManager.
-						argument("color", IntegerArgumentType.integer(0, ColorUtils.MAX_COLOR)).
-						executes(context -> recolorMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), IntegerArgumentType.getInteger(context, "color"))))).
+						argument("color", HexColorArgumentType.color()).
+						executes(context -> recolorMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), HexColorArgumentType.getColor(context, "color"))))).
 				then(CommandManager.
-					argument("color", IntegerArgumentType.integer(0, ColorUtils.MAX_COLOR)).
-					executes(context -> recolorMeter(context.getSource(), null, IntegerArgumentType.getInteger(context, "color"))))).
+					argument("color", HexColorArgumentType.color()).
+					executes(context -> recolorMeter(context.getSource(), null, HexColorArgumentType.getColor(context, "color"))))).
 			then(CommandManager.
 				literal("event").
 				executes(context -> listMeteredEvents(context.getSource(), null)).
@@ -97,7 +97,7 @@ public class MeterCommand {
 			MultimeterServer server = ((IServerCommandSource)source).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 			
-			MeterGroup meterGroup = multimeter.getSubscription(player);
+			ServerMeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup == null) {
 				source.sendFeedback(new LiteralText("You have to subscribe to a meter group first!"), false);

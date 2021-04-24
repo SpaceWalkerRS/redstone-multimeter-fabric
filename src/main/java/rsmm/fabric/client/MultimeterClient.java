@@ -1,9 +1,8 @@
 package rsmm.fabric.client;
 
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -13,6 +12,7 @@ import rsmm.fabric.client.gui.MultimeterHudRenderer;
 import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.ToggleMeterPacket;
+import rsmm.fabric.util.NBTUtils;
 
 public class MultimeterClient {
 	
@@ -104,10 +104,7 @@ public class MultimeterClient {
 			connected = true;
 			currentServerTick = serverTick;
 			
-			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-			meterGroup.encode(data);
-			
-			MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup.getName(), data);
+			MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
 			packetHandler.sendPacket(packet);
 		}
 	}
@@ -122,20 +119,23 @@ public class MultimeterClient {
 	}
 	
 	/**
-	 * Tell the server to add a meter at the position
+	 * Request the server to add a meter at the position
 	 * the player is looking at or remove it if there
-	 * already is one
+	 * already is one.
 	 */
 	public void toggleMeter() {
 		HitResult hitResult = client.crosshairTarget;
 		
 		if (hitResult.getType() == HitResult.Type.BLOCK) {
 			World world = client.world;
-			BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
+			BlockPos pos = ((BlockHitResult)hitResult).getBlockPos();
 			
-			DimPos pos = new DimPos(world, blockPos);
+			CompoundTag properties = new CompoundTag();
 			
-			ToggleMeterPacket packet = new ToggleMeterPacket(pos, !Screen.hasControlDown());
+			properties.put("pos", NBTUtils.dimPosToTag(new DimPos(world, pos)));
+			properties.putBoolean("movable", !Screen.hasControlDown());
+			
+			ToggleMeterPacket packet = new ToggleMeterPacket(properties);
 			packetHandler.sendPacket(packet);
 		}
 	}
@@ -147,13 +147,13 @@ public class MultimeterClient {
 	/**
 	 * Whenever a player subscribes to a meter group,
 	 * the server sends all the data pertaining to
-	 * meters in the meter group to that client.
+	 * meters in that meter group to that client.
 	 */
-	public void meterGroupDataReceived(String name, PacketByteBuf data) {
+	public void meterGroupDataReceived(String name, CompoundTag data) {
 		if (!meterGroup.getName().equals(name)) {
 			meterGroup = new ClientMeterGroup(this, name);
 		}
 		
-		meterGroup.updateFromData(data);
+		meterGroup.updateFromTag(data);
 	}
 }
