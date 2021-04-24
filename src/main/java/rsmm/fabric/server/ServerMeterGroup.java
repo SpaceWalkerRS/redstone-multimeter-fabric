@@ -84,7 +84,7 @@ public class ServerMeterGroup extends MeterGroup {
 	public Meter getMeterAt(WorldPos pos) {
 		return getMeter(indexOfMeterAt(pos));
 	}
-
+	
 	public boolean hasMeterAt(WorldPos pos) {
 		return posToIndex.containsKey(pos);
 	}
