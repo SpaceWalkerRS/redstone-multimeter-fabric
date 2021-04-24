@@ -188,6 +188,8 @@ public class Multimeter {
 				} else {
 					meter.stopMetering(type);
 				}
+				
+				meter.markDirty();
 			}
 		}
 	}
