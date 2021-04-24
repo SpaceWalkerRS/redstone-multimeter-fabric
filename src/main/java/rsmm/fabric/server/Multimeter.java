@@ -23,7 +23,6 @@ import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
-import rsmm.fabric.common.packet.types.MeteredEventsPacket;
 import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
 import rsmm.fabric.interfaces.mixin.IBlock;
@@ -189,9 +188,6 @@ public class Multimeter {
 				} else {
 					meter.stopMetering(type);
 				}
-				
-				MeteredEventsPacket packet = new MeteredEventsPacket(index, type, start);
-				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 			}
 		}
 	}
