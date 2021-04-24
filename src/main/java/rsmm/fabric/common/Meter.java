@@ -144,11 +144,6 @@ public class Meter {
 		return false;
 	}
 	
-	public void cleanUp() {
-		dirty = false;
-		logs.clear();
-	}
-	
 	public boolean blockMoved(Direction dir) {
 		if (movable) {
 			pos = pos.offset(dir);
@@ -157,6 +152,11 @@ public class Meter {
 		}
 		
 		return false;
+	}
+	
+	public void cleanUp() {
+		dirty = false;
+		logs.clear();
 	}
 	
 	public CompoundTag toTag() {
