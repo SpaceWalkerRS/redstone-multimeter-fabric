@@ -7,11 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -23,12 +22,10 @@ import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
-import rsmm.fabric.common.packet.types.MeteredEventsPacket;
-import rsmm.fabric.common.packet.types.RecolorMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
 import rsmm.fabric.common.packet.types.RemoveMeterPacket;
-import rsmm.fabric.common.packet.types.RenameMeterPacket;
 import rsmm.fabric.interfaces.mixin.IBlock;
+import rsmm.fabric.util.NBTUtils;
 
 public class Multimeter {
 	
@@ -75,13 +72,13 @@ public class Multimeter {
 	/**
 	 * This is called at the end of every server tick,
 	 * and sends all the logged events of the past tick
-	 * to the clients.
+	 * to clients.
 	 */
 	public void broadcastMeterData() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			if (meterGroup.isDirty()) {
 				if (meterGroup.hasSubscribers()) {
-					PacketByteBuf data = meterGroup.getLogManager().collectMeterData();
+					CompoundTag data = meterGroup.getLogManager().collectMeterData();
 					MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
 					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 				}
@@ -107,26 +104,28 @@ public class Multimeter {
 	 * Add a meter at the position the player is looking at
 	 * or remove it if there already is one.
 	 */
-	public void toggleMeter(DimPos dimPos, boolean movable, ServerPlayerEntity player) {
+	public void toggleMeter(CompoundTag properties, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
 		if (meterGroup == null) {
 			return;
 		}
 		
+		DimPos dimPos = NBTUtils.tagToDimPos(properties.getCompound("pos"));
+		
 		if (meterGroup.hasMeterAt(dimPos)) {
-			Meter meter = meterGroup.getMeterAt(dimPos);
-			meterGroup.removeMeter(meter);
+			int index = meterGroup.removeMeterAt(dimPos);
 			
-			RemoveMeterPacket packet = new RemoveMeterPacket(dimPos);
+			RemoveMeterPacket packet = new RemoveMeterPacket(index);
 			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 		} else {
-			BlockPos pos = dimPos.getBlockPos();
 			World world = server.getMinecraftServer().getWorld(DimensionType.byId(dimPos.getDimensionId()));
+			BlockPos pos = dimPos.getBlockPos();
 			
 			if (world != null) {
 				String name = meterGroup.getNextMeterName();
 				int color = meterGroup.getNextMeterColor();
+				boolean movable = properties.getBoolean("movable");
 				
 				int meteredEvents = EventType.POWERED.flag() | EventType.MOVED.flag();
 				boolean powered = false;
@@ -145,7 +144,7 @@ public class Multimeter {
 				Meter meter = new Meter(dimPos, name, color, movable, meteredEvents, powered, active);
 				meterGroup.addMeter(meter);
 				
-				AddMeterPacket packet = new AddMeterPacket(dimPos, name, color, movable, meteredEvents, powered, active);
+				AddMeterPacket packet = new AddMeterPacket(meter);
 				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 			}
 		}
@@ -159,9 +158,7 @@ public class Multimeter {
 			
 			if (meter != null) {
 				meter.setName(name);
-				
-				RenameMeterPacket packet = new RenameMeterPacket(index, name);
-				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+				meter.markDirty();
 			}
 		}
 	}
@@ -174,9 +171,7 @@ public class Multimeter {
 			
 			if (meter != null) {
 				meter.setColor(color);
-				
-				RecolorMeterPacket packet = new RecolorMeterPacket(index, color);
-				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+				meter.markDirty();
 			}
 		}
 	}
@@ -194,8 +189,7 @@ public class Multimeter {
 					meter.stopMetering(type);
 				}
 				
-				MeteredEventsPacket packet = new MeteredEventsPacket(index, type, start);
-				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+				meter.markDirty();
 			}
 		}
 	}
@@ -212,48 +206,41 @@ public class Multimeter {
 	}
 	
 	public void subscribeToMeterGroup(String name, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = meterGroups.get(name);
+		
+		if (meterGroup == null) {
+			meterGroup = new ServerMeterGroup(this, name);
+			meterGroups.put(name, meterGroup);
+		}
+		
+		subscribeToMeterGroup(meterGroup, player);
+	}
+	
+	public void subscribeToMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
 		ServerMeterGroup prevSubscription = subscriptions.remove(player);
 		
 		if (prevSubscription != null) {
 			prevSubscription.removeSubscriber(player);
 		}
 		
-		ServerMeterGroup newSubscription = meterGroups.get(name);
+		subscriptions.put(player, meterGroup);
+		meterGroup.addSubscriber(player);
 		
-		if (newSubscription == null) {
-			newSubscription = new ServerMeterGroup(this, name);
-			
-			meterGroups.put(name, newSubscription);
-		}
-		
-		subscriptions.put(player, newSubscription);
-		newSubscription.addSubscriber(player);
-		
-		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-		newSubscription.encode(data);
-		
-		MeterGroupDataPacket packet = new MeterGroupDataPacket(name, data);
+		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
 		server.getPacketHandler().sendPacketToPlayer(packet, player);
 	}
 	
-	public void meterGroupDataReceived(String name, PacketByteBuf data, ServerPlayerEntity player) {
+	public void meterGroupDataReceived(String name, CompoundTag data, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = meterGroups.get(name);
 		
 		if (meterGroup == null) {
 			meterGroup = new ServerMeterGroup(this, name);
-			meterGroup.decode(data);
+			meterGroup.fromTag(data);
 			
 			meterGroups.put(name, meterGroup);
-		} else {
-			data = new PacketByteBuf(Unpooled.buffer());
-			meterGroup.encode(data);
-			
-			MeterGroupDataPacket packet = new MeterGroupDataPacket(name, data);
-			server.getPacketHandler().sendPacketToPlayer(packet, player);
 		}
 		
-		subscriptions.put(player, meterGroup);
-		meterGroup.addSubscriber(player);
+		subscribeToMeterGroup(meterGroup, player);
 	}
 	
 	public void blockUpdate(DimPos pos, boolean powered) {

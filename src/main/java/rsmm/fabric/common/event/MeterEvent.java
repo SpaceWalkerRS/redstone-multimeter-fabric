@@ -1,6 +1,8 @@
 package rsmm.fabric.common.event;
 
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.nbt.CompoundTag;
+
+import rsmm.fabric.util.NBTUtils;
 
 public class MeterEvent {
 	
@@ -9,7 +11,7 @@ public class MeterEvent {
 	private int subTick;
 	private int metaData;
 	
-	public MeterEvent() {
+	private MeterEvent() {
 		
 	}
 	
@@ -69,17 +71,28 @@ public class MeterEvent {
 		return metaData;
 	}
 	
-	public void encode(PacketByteBuf buffer) {
-		buffer.writeByte(type.getIndex());
-		buffer.writeLong(tick);
-		buffer.writeInt(subTick);
-		buffer.writeInt(metaData);
+	public CompoundTag toTag() {
+		CompoundTag data = new CompoundTag();
+		
+		NBTUtils.putEventType(data, "type", type);
+		data.putLong("tick", tick);
+		data.putInt("subTick", subTick);
+		data.putInt("metaData", metaData);
+		
+		return data;
 	}
 	
-	public void decode(PacketByteBuf buffer) {
-		type = EventType.fromIndex(buffer.readByte());
-		tick = buffer.readLong();
-		subTick = buffer.readInt();
-		metaData = buffer.readInt();
+	public void fromTag(CompoundTag data) {
+		type = NBTUtils.getEventType(data, "type");
+		tick = data.getLong("tick");
+		subTick = data.getInt("subTick");
+		metaData = data.getInt("metaData");
+	}
+	
+	public static MeterEvent createFromTag(CompoundTag tag) {
+		MeterEvent event = new MeterEvent();
+		event.fromTag(tag);
+		
+		return event;
 	}
 }

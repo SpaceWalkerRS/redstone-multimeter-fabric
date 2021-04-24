@@ -8,17 +8,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 
-import rsmm.fabric.common.packet.types.AddMeterPacket;
-import rsmm.fabric.common.packet.types.JoinMultimeterServerPacket;
-import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
-import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
-import rsmm.fabric.common.packet.types.MeteredEventsPacket;
-import rsmm.fabric.common.packet.types.RecolorMeterPacket;
-import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
-import rsmm.fabric.common.packet.types.RemoveMeterPacket;
-import rsmm.fabric.common.packet.types.RenameMeterPacket;
-import rsmm.fabric.common.packet.types.ServerTickPacket;
-import rsmm.fabric.common.packet.types.ToggleMeterPacket;
+import rsmm.fabric.common.packet.types.*;
 
 public abstract class AbstractPacketHandler {
 	
@@ -64,12 +54,9 @@ public abstract class AbstractPacketHandler {
 		METER_GROUP_DATA(3, MeterGroupDataPacket.class),
 		METER_LOGS(4, MeterLogsDataPacket.class),
 		TOGGLE_METER(5, ToggleMeterPacket.class),
-		RENAME_METER(6, RenameMeterPacket.class),
-		RECOLOR_METER(7, RecolorMeterPacket.class),
-		METERED_EVENTS(8, MeteredEventsPacket.class),
-		REMOVE_ALL_METERS(9, RemoveAllMetersPacket.class),
-		ADD_METER(10, AddMeterPacket.class),
-		REMOVE_METER(11, RemoveMeterPacket.class);
+		REMOVE_ALL_METERS(6, RemoveAllMetersPacket.class),
+		ADD_METER(7, AddMeterPacket.class),
+		REMOVE_METER(8, RemoveMeterPacket.class);
 		
 		private static final PacketType[] PACKET_TYPES;
 		private static final Map<Class<? extends AbstractRSMMPacket>, PacketType> PACKET_TO_TYPE;
