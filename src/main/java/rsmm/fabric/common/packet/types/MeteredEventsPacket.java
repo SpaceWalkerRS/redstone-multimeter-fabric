@@ -5,7 +5,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
@@ -48,17 +47,13 @@ public class MeteredEventsPacket extends AbstractRSMMPacket {
 	@Override
 	public void execute(MultimeterClient client) {
 		if (type != null) {
-			MeterGroup meterGroup = client.getMeterGroup();
+			Meter meter = client.getMeterGroup().getMeter(index);
 			
-			if (meterGroup != null) {
-				Meter meter = meterGroup.getMeter(index);
-				
-				if (meter != null) {
-					if (start) {
-						meter.startMetering(type);
-					} else {
-						meter.stopMetering(type);
-					}
+			if (meter != null) {
+				if (start) {
+					meter.startMetering(type);
+				} else {
+					meter.stopMetering(type);
 				}
 			}
 		}

@@ -9,10 +9,14 @@ public class WorldPos extends BlockPos {
 	
 	private final Identifier worldId;
 	
-	public WorldPos(Identifier worldId, BlockPos pos) {
-		super(pos.getX(), pos.getY(), pos.getZ());
+	public WorldPos(Identifier worldId, int x, int y, int z) {
+		super(x, y, z);
 		
 		this.worldId = worldId;
+	}
+	
+	public WorldPos(Identifier worldId, BlockPos pos) {
+		this(worldId, pos.getX(), pos.getY(), pos.getZ());
 	}
 	
 	public WorldPos(World world, BlockPos pos) {

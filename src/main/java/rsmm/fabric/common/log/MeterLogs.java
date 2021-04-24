@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.nbt.CompoundTag;
 
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
@@ -26,14 +27,20 @@ public class MeterLogs {
 		lastLoggedTick = -1;
 	}
 	
-	public void add(MeterEvent event) {
-		EventType type = event.getType();
+	private List<MeterEvent> getLogs(EventType type) {
 		List<MeterEvent> logs = eventLogs.get(type);
 		
 		if (logs ==  null) {
 			logs = new ArrayList<>();
 			eventLogs.put(type, logs);
 		}
+		
+		return logs;
+	}
+	
+	public void add(MeterEvent event) {
+		EventType type = event.getType();
+		List<MeterEvent> logs = getLogs(type);
 		
 		logs.add(event);
 		
@@ -99,28 +106,67 @@ public class MeterLogs {
 		
 	}
 	
-	public void encode(PacketByteBuf buffer) {
-		buffer.writeInt(eventLogs.size());
+	public CompoundTag toTag() {
+		CompoundTag data = new CompoundTag();
 		
-		for (List<MeterEvent> logs : eventLogs.values()) {
-			buffer.writeInt(logs.size());
+		for (EventType type : eventLogs.keySet()) {
+			data.put(type.getName(), toTag(type));
+		}
+		
+		return data;
+	}
+	
+	public CompoundTag toTag(EventType type) {
+		CompoundTag data = new CompoundTag();
+		
+		List<MeterEvent> logs = eventLogs.get(type);
+		int logCount = logs.size();
+		
+		for (int index = 0; index < logCount; index++) {
+			MeterEvent event = logs.get(index);
 			
-			for (MeterEvent event : logs) {
-				event.encode(buffer);
+			String key = String.valueOf(index);
+			CompoundTag eventData = event.toTag();
+			
+			data.put(key, eventData);
+		}
+		
+		return data;
+	}
+	
+	public void updateFromTag(CompoundTag data) {
+		for (String key : data.getKeys()) {
+			EventType type = EventType.fromName(key);
+			
+			if (type != null) {
+				updateFromTag(data.getCompound(key), type);
 			}
 		}
 	}
 	
-	public void decode(PacketByteBuf buffer) {
-		int typeCount = buffer.readInt();
+	public void updateFromTag(CompoundTag data, EventType type) {
+		Set<String> keys = data.getKeys();
+		int size = keys.size();
+		CompoundTag[] tags = new CompoundTag[size];
 		
-		for (int i = 0; i < typeCount; i++) {
-			int logCount = buffer.readInt();
-			
-			for (int j = 0; j < logCount; j++) {
-				MeterEvent event = new MeterEvent();
-				event.decode(buffer);
+		// Since the order of tags is not preserved
+		// we need to re-order them first
+		for (String key : keys) {
+			try {
+				int index = Integer.valueOf(key);
+				CompoundTag eventData = data.getCompound(key);
 				
+				tags[index] = eventData;
+			} catch (NumberFormatException e) {
+				
+			} catch (IndexOutOfBoundsException e) {
+				
+			}
+		}
+		
+		for (CompoundTag tag : tags) {
+			if (tag != null) {
+				MeterEvent event = MeterEvent.createFromTag(tag);
 				add(event);
 			}
 		}

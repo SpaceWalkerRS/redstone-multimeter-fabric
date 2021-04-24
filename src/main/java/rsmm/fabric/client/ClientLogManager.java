@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.nbt.CompoundTag;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
@@ -50,14 +50,21 @@ public class ClientLogManager extends LogManager {
 	/**
 	 * Log all events from the past server tick
 	 */
-	public void updateMeterLogs(PacketByteBuf data) {
-		subTickCount.put(getCurrentTick(), data.readInt());
+	public void updateMeterLogs(CompoundTag data) {
+		int subTicks = data.getInt("subTickCount");
+		int meterCount = meterGroup.getMeterCount();
 		
-		while (data.readBoolean()) {
-			int index = data.readInt();
-			Meter meter = meterGroup.getMeter(index);
+		subTickCount.put(getCurrentTick(), subTicks);
+		
+		for (int index = 0; index < meterCount; index++) {
+			String key = String.valueOf(index);
 			
-			meter.readData(data);
+			if (data.contains(key)) {
+				Meter meter = meterGroup.getMeter(index);
+				CompoundTag meterData = data.getCompound(key);
+				
+				meter.updateFromData(meterData);
+			}
 		}
 	}
 	

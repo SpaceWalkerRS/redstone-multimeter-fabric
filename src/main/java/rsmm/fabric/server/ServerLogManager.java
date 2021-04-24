@@ -1,7 +1,6 @@
 package rsmm.fabric.server;
 
-import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.nbt.CompoundTag;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
@@ -39,27 +38,27 @@ public class ServerLogManager extends LogManager {
 			meter.getLogs().add(event);
 		}
 		
-		meterGroup.markDirty();
 		meter.markDirty();
 	}
 	
-	public PacketByteBuf collectMeterData() {
-		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
+	public CompoundTag collectMeterData() {
+		CompoundTag data = new CompoundTag();
 		
-		data.writeInt(currentSubTick);
+		int subTickCount = currentSubTick;
+		int meterCount = meterGroup.getMeterCount();
 		
-		for (int index = 0; index < meterGroup.getMeterCount(); index++) {
+		data.putInt("subTickCount", subTickCount);
+		
+		for (int index = 0; index < meterCount; index++) {
 			Meter meter = meterGroup.getMeter(index);
 			
 			if (meter.isDirty()) {
-				data.writeBoolean(true);
-				data.writeInt(index);
+				String key = String.valueOf(index);
+				CompoundTag meterData = meter.collectData();
 				
-				meter.writeData(data);
+				data.put(key, meterData);
 			}
 		}
-		
-		data.writeBoolean(false); // mark that there is no further data
 		
 		return data;
 	}

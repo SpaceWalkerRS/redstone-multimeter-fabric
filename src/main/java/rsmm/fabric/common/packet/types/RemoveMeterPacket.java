@@ -4,32 +4,29 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
-import rsmm.fabric.util.PacketUtils;
 
 public class RemoveMeterPacket extends AbstractRSMMPacket {
 	
-	private WorldPos pos;
+	private int meterIndex;
 	
 	public RemoveMeterPacket() {
 		
 	}
 	
-	public RemoveMeterPacket(WorldPos pos) {
-		this.pos = pos;
+	public RemoveMeterPacket(int meterIndex) {
+		this.meterIndex = meterIndex;
 	}
 	
 	@Override
 	public void encode(PacketByteBuf buffer) {
-		PacketUtils.writeWorldPos(buffer, pos);
+		buffer.writeInt(meterIndex);
 	}
 	
 	@Override
 	public void decode(PacketByteBuf buffer) {
-		pos = PacketUtils.readWorldPos(buffer);
+		meterIndex = buffer.readInt();
 	}
 	
 	@Override
@@ -39,10 +36,6 @@ public class RemoveMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		Meter meter = client.getMeterGroup().getMeterAt(pos);
-		
-		if (meter != null) {
-			client.getMeterGroup().removeMeter(meter);
-		}
+		client.getMeterGroup().removeMeter(meterIndex);
 	}
 }

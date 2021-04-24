@@ -1,9 +1,11 @@
 package rsmm.fabric.common.packet.types;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 import rsmm.fabric.util.PacketUtils;
@@ -11,27 +13,27 @@ import rsmm.fabric.util.PacketUtils;
 public class MeterGroupDataPacket extends AbstractRSMMPacket {
 	
 	private String name;
-	private PacketByteBuf data;
+	private CompoundTag data;
 	
 	public MeterGroupDataPacket() {
 		
 	}
 	
-	public MeterGroupDataPacket(String name, PacketByteBuf data) {
-		this.name = name;
-		this.data = data;
+	public MeterGroupDataPacket(MeterGroup meterGroup) {
+		this.name = meterGroup.getName();
+		this.data = meterGroup.toTag();
 	}
 	
 	@Override
 	public void encode(PacketByteBuf buffer) {
 		buffer.writeString(name);
-		PacketUtils.writeData(buffer, data);
+		buffer.writeCompoundTag(data);
 	}
 	
 	@Override
 	public void decode(PacketByteBuf buffer) {
 		name = buffer.readString(PacketUtils.MAX_STRING_LENGTH);
-		data = PacketUtils.readData(buffer);
+		data = buffer.readCompoundTag();
 	}
 	
 	@Override
