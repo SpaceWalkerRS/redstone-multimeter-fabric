@@ -39,10 +39,6 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			return;
 		}
 		
-		if (meter.getName().equals("Meter 7")) {
-			System.out.println("c: " + color + " - bg: " + BACKGROUND_COLOR);
-		}
-		
 		long lastTick = firstTick + COLUMN_COUNT;
 		long currentTick = -1;
 		
@@ -55,10 +51,6 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				
 				int column = (int)(event.getTick() - firstTick);
 				int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
-				
-				if (meter.getName().equals("Meter 7")) {
-					System.out.println("DRAW EVENT " + columnX + " - " + y);
-				}
 				
 				if (wasToggled(event)) {
 					drawOn(matrices, columnX, y, color);
@@ -73,10 +65,6 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			if (nextEvent == null ? isToggled(meter) : !wasToggled(nextEvent)) {
 				int column = (int)(start - firstTick);
 				int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
-				
-				if (meter.getName().equals("Meter 7")) {
-					System.out.println("DRAW PULSE " + columnX + " - " + y + " - " + (end - start));
-				}
 				
 				draw(matrices, columnX, y, color, (int)(end - start));
 			}
