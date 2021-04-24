@@ -1,2 +1,2 @@
 # redstone-multimeter-fabric
-A Fabric port of Narcolepticfrog's Redstone Multimeter Mod
+A Fabric port of NarcolepticFrog's Redstone Multimeter Mod
