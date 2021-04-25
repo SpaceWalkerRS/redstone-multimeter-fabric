@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.server.MinecraftServer;
 
+import rsmm.fabric.common.event.TickPhase;
 import rsmm.fabric.interfaces.mixin.IMinecraftServer;
 import rsmm.fabric.server.MultimeterServer;
 
@@ -26,6 +27,18 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void onInitInjectAtReturn(CallbackInfo ci) {
 		this.multimeterServer = new MultimeterServer((MinecraftServer)(Object)this);
+	}
+	
+	@Inject(
+			method = "method_16208",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onMethod_16208InjectAtHead(CallbackInfo ci) {
+		if (!isPaused()) {
+			multimeterServer.getMultimeter().onTickPhase(TickPhase.HANDLE_PACKETS);
+		}
 	}
 	
 	@Inject(

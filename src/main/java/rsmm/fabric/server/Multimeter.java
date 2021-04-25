@@ -20,6 +20,7 @@ import net.minecraft.world.World;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.event.TickPhase;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
@@ -44,6 +45,12 @@ public class Multimeter {
 		return server;
 	}
 	
+	public void onTickPhase(TickPhase phase) {
+		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+			meterGroup.getLogManager().onTickPhase(phase);
+		}
+	}
+	
 	public Collection<ServerMeterGroup> getMeterGroups() {
 		return Collections.unmodifiableCollection(meterGroups.values());
 	}
@@ -66,7 +73,7 @@ public class Multimeter {
 	
 	public void tick() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			meterGroup.getLogManager().resetSubTickCount();
+			meterGroup.getLogManager().tick();
 		}
 	}
 	

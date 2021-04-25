@@ -18,11 +18,14 @@ public class ClientLogManager extends LogManager {
 	private static final long MAX_LOG_AGE = 1000000L;
 	
 	private final ClientMeterGroup meterGroup;
+	/** The start times of every tick phase for every tick */
+	private final Map<Long, int[]> tickPhaseLogs;
 	/** The number of logged events in any tick */
 	private final Map<Long, Integer> subTickCount;
 	
 	public ClientLogManager(ClientMeterGroup meterGroup) {
 		this.meterGroup = meterGroup;
+		this.tickPhaseLogs = new LinkedHashMap<>();
 		this.subTickCount = new LinkedHashMap<>();
 	}
 	
@@ -40,6 +43,7 @@ public class ClientLogManager extends LogManager {
 	public void clearLogs() {
 		super.clearLogs();
 		
+		tickPhaseLogs.clear();
 		subTickCount.clear();
 	}
 	
@@ -52,9 +56,12 @@ public class ClientLogManager extends LogManager {
 	 */
 	public void updateMeterLogs(CompoundTag data) {
 		int subTicks = data.getInt("subTickCount");
-		int meterCount = meterGroup.getMeterCount();
+		int[] tickPhases = data.getIntArray("tickPhaseLogs");
 		
 		subTickCount.put(getCurrentTick(), subTicks);
+		tickPhaseLogs.put(getCurrentTick(), tickPhases);
+		
+		int meterCount = meterGroup.getMeterCount();
 		
 		for (int index = 0; index < meterCount; index++) {
 			String key = String.valueOf(index);
@@ -76,14 +83,22 @@ public class ClientLogManager extends LogManager {
 		long serverTickCutoff = getCurrentTick() - MAX_LOG_AGE;
 		
 		long cutoff = (selectedTickCutoff > serverTickCutoff) ? selectedTickCutoff : serverTickCutoff;
-		Iterator<Long> it = subTickCount.keySet().iterator();
+		Iterator<Long> it1 = tickPhaseLogs.keySet().iterator();
+		Iterator<Long> it2 = subTickCount.keySet().iterator();
 		
-		while (it.hasNext()) {
-			if (it.next() > cutoff) {
+		while (it1.hasNext()) {
+			if (it1.next() > cutoff) {
 				break;
 			}
 			
-			it.remove();
+			it1.remove();
+		}
+		while (it2.hasNext()) {
+			if (it2.next() > cutoff) {
+				break;
+			}
+			
+			it2.remove();
 		}
 		
 		for (Meter meter : meterGroup.getMeters()) {
