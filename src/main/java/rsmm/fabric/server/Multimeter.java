@@ -18,15 +18,16 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 import rsmm.fabric.common.Meter;
+import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.event.TickPhase;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
 import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
 import rsmm.fabric.interfaces.mixin.IBlock;
+import rsmm.fabric.util.ColorUtils;
 import rsmm.fabric.util.NBTUtils;
 
 public class Multimeter {
@@ -34,6 +35,8 @@ public class Multimeter {
 	private final MultimeterServer server;
 	private final Map<String, ServerMeterGroup> meterGroups;
 	private final Map<ServerPlayerEntity, ServerMeterGroup> subscriptions;
+	
+	private TickPhase currentTickPhase = TickPhase.UNKNOWN;
 	
 	public Multimeter(MultimeterServer server) {
 		this.server = server;
@@ -43,12 +46,6 @@ public class Multimeter {
 	
 	public MultimeterServer getMultimeterServer() {
 		return server;
-	}
-	
-	public void onTickPhase(TickPhase phase) {
-		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			meterGroup.getLogManager().onTickPhase(phase);
-		}
 	}
 	
 	public Collection<ServerMeterGroup> getMeterGroups() {
@@ -69,6 +66,14 @@ public class Multimeter {
 	
 	public boolean hasSubscription(ServerPlayerEntity player) {
 		return subscriptions.containsKey(player);
+	}
+
+	public TickPhase getCurrentTickPhase() {
+		return currentTickPhase;
+	}
+	
+	public void onTickPhase(TickPhase phase) {
+		currentTickPhase = phase;
 	}
 	
 	public void tick() {
@@ -120,40 +125,60 @@ public class Multimeter {
 		}
 		
 		WorldPos pos = NBTUtils.tagToWorldPos(properties.getCompound("pos"));
+		boolean movable = properties.getBoolean("movable");
 		
 		if (meterGroup.hasMeterAt(pos)) {
-			int index = meterGroup.removeMeterAt(pos);
+			removeMeter(meterGroup.indexOfMeterAt(pos), player);
+		} else {
+			addMeter(pos, movable, null, null, player);
+		}
+	}
+	
+	public void addMeter(WorldPos pos, boolean movable, String name, Integer color, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup == null) {
+			return;
+		}
+		
+		World world = server.getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, pos.getWorldId()));
+		
+		if (world != null) {
+			if (name == null) {
+				name = meterGroup.getNextMeterName();
+			}
+			if (color == null) {
+				color = ColorUtils.nextColor();
+			}
 			
+			int meteredEvents = EventType.POWERED.flag() | EventType.MOVED.flag();
+			boolean powered = false;
+			boolean active = false;
+			
+			BlockState state = world.getBlockState(pos);
+			Block block = state.getBlock();
+			
+			powered = ((IBlock)block).isPowered(world, pos, state);
+			
+			if (((IBlock)block).isMeterable()) {
+				meteredEvents = ((Meterable)block).getDefaultMeteredEvents();
+				active = ((Meterable)block).isActive(world, pos, state);
+			}
+			
+			Meter meter = new Meter(pos, name, color, movable, meteredEvents, powered, active);
+			meterGroup.addMeter(meter);
+			
+			AddMeterPacket packet = new AddMeterPacket(meter);
+			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+		}
+	}
+	
+	public void removeMeter(int index, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup != null && meterGroup.removeMeter(index)) {
 			RemoveMeterPacket packet = new RemoveMeterPacket(index);
 			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
-		} else {
-			World world = server.getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, pos.getWorldId()));
-			
-			if (world != null) {
-				String name = meterGroup.getNextMeterName();
-				int color = meterGroup.getNextMeterColor();
-				boolean movable = properties.getBoolean("movable");
-				
-				int meteredEvents = EventType.POWERED.flag() | EventType.MOVED.flag();
-				boolean powered = false;
-				boolean active = false;
-				
-				BlockState state = world.getBlockState(pos);
-				Block block = state.getBlock();
-				
-				powered = ((IBlock)block).isPowered(world, pos, state);
-				
-				if (((IBlock)block).isMeterable()) {
-					meteredEvents = ((Meterable)block).getDefaultMeteredEvents();
-					active = ((Meterable)block).isActive(world, pos, state);
-				}
-				
-				Meter meter = new Meter(pos, name, color, movable, meteredEvents, powered, active);
-				meterGroup.addMeter(meter);
-				
-				AddMeterPacket packet = new AddMeterPacket(meter);
-				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
-			}
 		}
 	}
 	

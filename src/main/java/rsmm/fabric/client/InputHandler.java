@@ -1,6 +1,9 @@
 package rsmm.fabric.client;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+
+import rsmm.fabric.client.gui.MultimeterScreen;
 
 public class InputHandler {
 	
@@ -25,6 +28,13 @@ public class InputHandler {
 		}
 		if (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
+		}
+		if (KeyBindings.OPEN_MULTIMETER_SCREEN.wasPressed()) {
+			MinecraftClient minecraftClient = client.getMinecraftClient();
+			
+			if (minecraftClient.currentScreen == null) {
+				minecraftClient.openScreen(new MultimeterScreen(client));
+			}
 		}
 	}
 }

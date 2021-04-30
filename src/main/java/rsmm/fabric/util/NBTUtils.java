@@ -2,7 +2,7 @@ package rsmm.fabric.util;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
-
+import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
 
@@ -22,6 +22,14 @@ public class NBTUtils {
 	
 	public static EventType getEventType(CompoundTag tag, String key) {
 		return tag.contains(key) ? EventType.fromIndex(tag.getByte(key)) : null;
+	}
+	
+	public static void putTickPhase(CompoundTag tag, String key, TickPhase tickPhase) {
+		tag.putByte(key, (byte)tickPhase.getIndex());
+	}
+	
+	public static TickPhase getTickPhase(CompoundTag tag, String key) {
+		return tag.contains(key) ? TickPhase.fromIndex(tag.getByte(key)) : null;
 	}
 	
 	public static CompoundTag worldPosToTag(WorldPos pos) {

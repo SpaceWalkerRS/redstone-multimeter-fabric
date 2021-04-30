@@ -18,14 +18,11 @@ public class ClientLogManager extends LogManager {
 	private static final long MAX_LOG_AGE = 1000000L;
 	
 	private final ClientMeterGroup meterGroup;
-	/** The start times of every tick phase for every tick */
-	private final Map<Long, int[]> tickPhaseLogs;
 	/** The number of logged events in any tick */
 	private final Map<Long, Integer> subTickCount;
 	
 	public ClientLogManager(ClientMeterGroup meterGroup) {
 		this.meterGroup = meterGroup;
-		this.tickPhaseLogs = new LinkedHashMap<>();
 		this.subTickCount = new LinkedHashMap<>();
 	}
 	
@@ -43,7 +40,6 @@ public class ClientLogManager extends LogManager {
 	public void clearLogs() {
 		super.clearLogs();
 		
-		tickPhaseLogs.clear();
 		subTickCount.clear();
 	}
 	
@@ -55,13 +51,11 @@ public class ClientLogManager extends LogManager {
 	 * Log all events from the past server tick
 	 */
 	public void updateMeterLogs(CompoundTag data) {
-		int subTicks = data.getInt("subTickCount");
-		int[] tickPhases = data.getIntArray("tickPhaseLogs");
-		
-		subTickCount.put(getCurrentTick(), subTicks);
-		tickPhaseLogs.put(getCurrentTick(), tickPhases);
-		
+		long currentTick = getCurrentTick();
 		int meterCount = meterGroup.getMeterCount();
+		
+		int subTicks = data.getInt("subTickCount");
+		subTickCount.put(currentTick, subTicks);
 		
 		for (int index = 0; index < meterCount; index++) {
 			String key = String.valueOf(index);
@@ -79,26 +73,18 @@ public class ClientLogManager extends LogManager {
 	 * Remove all logged events that are too old
 	 */
 	public void clearOldLogs() {
-		long selectedTickCutoff = meterGroup.getMultimeterClient().getSelectedTick() - AGE_CUTOFF;
+		long selectedTickCutoff = meterGroup.getMultimeterClient().getHudRenderer().getSelectedTick() - AGE_CUTOFF;
 		long serverTickCutoff = getCurrentTick() - MAX_LOG_AGE;
-		
 		long cutoff = (selectedTickCutoff > serverTickCutoff) ? selectedTickCutoff : serverTickCutoff;
-		Iterator<Long> it1 = tickPhaseLogs.keySet().iterator();
-		Iterator<Long> it2 = subTickCount.keySet().iterator();
 		
-		while (it1.hasNext()) {
-			if (it1.next() > cutoff) {
+		Iterator<Long> it = subTickCount.keySet().iterator();
+		
+		while (it.hasNext()) {
+			if (it.next() > cutoff) {
 				break;
 			}
 			
-			it1.remove();
-		}
-		while (it2.hasNext()) {
-			if (it2.next() > cutoff) {
-				break;
-			}
-			
-			it2.remove();
+			it.remove();
 		}
 		
 		for (Meter meter : meterGroup.getMeters()) {

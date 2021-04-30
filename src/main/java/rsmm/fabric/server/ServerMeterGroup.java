@@ -13,7 +13,6 @@ import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.util.ColorUtils;
 
 public class ServerMeterGroup extends MeterGroup {
 	
@@ -100,10 +99,6 @@ public class ServerMeterGroup extends MeterGroup {
 	
 	public String getNextMeterName() {
 		return String.format("Meter %d", totalMeterCount);
-	}
-	
-	public int getNextMeterColor() {
-		return ColorUtils.nextColor();
 	}
 	
 	public Set<ServerPlayerEntity> getSubscribers() {

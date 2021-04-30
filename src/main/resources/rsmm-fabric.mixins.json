@@ -30,6 +30,7 @@
   	"server.CustomPayloadC2SPacketMixin",
   	"server.MinecraftServerMixin",
   	"server.PlayerManagerMixin",
+  	"server.RaidManagerMixin",
   	"server.ServerChunkManagerMixin",
   	"server.ServerCommandSourceMixin",
   	"server.ServerPlayNetworkHandlerMixin",

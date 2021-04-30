@@ -16,5 +16,6 @@ public class KeyBindings {
 	public static final KeyBinding STEP_FORWARD = new KeyBinding("Step Forward", GLFW.GLFW_KEY_COMMA, CATEGORY);
 	public static final KeyBinding STEP_BACKWARD = new KeyBinding("Step Backward", GLFW.GLFW_KEY_PERIOD, CATEGORY);
 	public static final KeyBinding TOGGLE_HUD = new KeyBinding("Toggle HUD", GLFW.GLFW_KEY_H, CATEGORY);
+	public static final KeyBinding OPEN_MULTIMETER_SCREEN = new KeyBinding("Open Multimeter Screen", GLFW.GLFW_KEY_G, CATEGORY);
 	
 }

@@ -9,10 +9,16 @@ public class ColorUtils {
 	private static int colorIndex = 0;
 	
 	public static int nextColor() {
+		return nextColor(true);
+	}
+	
+	public static int nextColor(boolean cycleIndex) {
 		float hue = ((colorIndex * 11) % 8 + (colorIndex / 8) / 2.0F) / 8.0F;
 		int color = hsbToInt(hue, 0.7F, 1.0F);
 		
-		colorIndex = (colorIndex + 1) % 16;
+		if (cycleIndex) {
+			colorIndex = (colorIndex + 1) % 16;
+		}
 		
 		return color;
 	}
@@ -23,7 +29,7 @@ public class ColorUtils {
 		int color = 0xFF000000;
 		color |= hsb.getBlue();
 		color |= hsb.getGreen() << 8;
-		color |= hsb.getRed() << 16;
+		color |= hsb.getRed()   << 16;
 		
 		return color;
 	}

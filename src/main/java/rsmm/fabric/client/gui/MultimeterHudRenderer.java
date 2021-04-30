@@ -2,14 +2,20 @@ package rsmm.fabric.client.gui;
 
 import static rsmm.fabric.client.gui.HudSettings.*;
 
+import java.util.Collections;
+import java.util.List;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.log.MeterEventRendererDispatcher;
 import rsmm.fabric.common.Meter;
+import rsmm.fabric.common.event.MeterEvent;
+import rsmm.fabric.common.log.MeterLogs;
 
 public class MultimeterHudRenderer extends DrawableHelper {
 	
@@ -17,14 +23,14 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	private final TextRenderer font;
 	private final MeterEventRendererDispatcher eventRenderers;
 	
-	private int height;
-	private int namesWidth;
-	private int ticksWidth;
-	private int subTicksWidth;
-	
 	private boolean paused;
-	/** The offset between the current server tick and the last tick to be displayed in the ticks table */
+	/** The offset between the current server tick and the first tick to be displayed in the ticks table */
 	private int offset;
+	
+	private int hoveredRow;
+	private int hoveredNameColumn;
+	private int hoveredTickColumn;
+	private int hoveredSubTickColumn;
 	
 	public MultimeterHudRenderer(MultimeterClient client) {
 		MinecraftClient minecraftClient = client.getMinecraftClient();
@@ -32,18 +38,18 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		this.client = client;
 		this.font = minecraftClient.textRenderer;
 		this.eventRenderers = new MeterEventRendererDispatcher();
+		
+		this.reset();
 	}
 	
-	/**
-	 * The offset between the current server tick and the last tick to be displayed in the ticks table
-	 */
-	public int getOffset() {
-		return offset;
+	public void resetOffset() {
+		offset = -COLUMN_COUNT;
 	}
 	
 	public void reset() {
 		paused = false;
-		offset = 0;
+		resetOffset();
+		resetHoveredElement();
 	}
 	
 	public void tick() {
@@ -56,7 +62,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		paused = !paused;
 		
 		if (!paused) {
-			offset = 0;
+			resetOffset();
 		}
 	}
 	
@@ -72,32 +78,63 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		}
 	}
 	
+	public long getSelectedTick() {
+		return client.getCurrentServerTick() + offset + SELECTED_COLUMN;
+	}
+	
+	public int getHeight() {
+		return ROW_COUNT * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
+	}
+	
+	public int getHoveredRow() {
+		return hoveredRow;
+	}
+	
+	public int getHoveredNameColumn() {
+		return hoveredNameColumn;
+	}
+	
+	public int getHoveredTickColumn() {
+		return hoveredTickColumn;
+	}
+	
+	public int getHoveredSubTickColumn() {
+		return hoveredSubTickColumn;
+	}
+	
+	public void render(MatrixStack matrices) {
+		render(matrices, 0, 0);
+	}
+	
 	/**
 	 * Render the HUD that displays a 60 tick history
 	 * of metered events in the meter group this client
 	 * is subscribed to.
 	 */
-	public void render(MatrixStack matrices) {
-		ROW_COUNT = client.getMeterGroup().getMeterCount();
+	public void render(MatrixStack matrices, int x, int y) {
+		updateRowCount();
 		
 		if (ROW_COUNT <= 0) {
 			return;
 		}
 		
-		height = ROW_COUNT * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
-		namesWidth = getNamesWidth();
-		ticksWidth = COLUMN_COUNT * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
+		int namesWidth = getNamesWidth();
+		int height = getHeight();
 		
-		renderNamesTable(matrices);
-		renderTicksTable(matrices);
+		renderNamesTable(matrices, x, y, namesWidth, height);
+		renderTicksTable(matrices, x + namesWidth, y, TICKS_TABLE_WIDTH, height);
 		if (paused) {
-			renderSubticksTable(matrices);
+			renderSubTicks(matrices, x + namesWidth + TICKS_TABLE_WIDTH + TICKS_SUB_TICKS_GAP, y, height);
 		}
 		
-		font.draw(matrices, client.getMeterGroup().getName(), 1, height + 2, METER_GROUP_NAME_COLOR);
+		font.draw(matrices, client.getMeterGroup().getName(), x + 2, y + height + 2, METER_GROUP_NAME_COLOR);
 	}
 	
-	private int getNamesWidth() {
+	private void updateRowCount() {
+		ROW_COUNT = client.getMeterGroup().getMeterCount();
+	}
+	
+	public int getNamesWidth() {
 		int width = 0;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
@@ -111,97 +148,210 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		return width + NAMES_TICKS_SPACING;
 	}
 	
-	private void renderNamesTable(MatrixStack matrices) {
-		drawBackground(matrices, 0, 0, namesWidth, height);
+	private void renderNamesTable(MatrixStack matrices, int x, int y, int width, int height) {
+		drawBackground(matrices, x, y, width, height);
 		
-		int x = 1;
-		int y = 2;
+		int nameX = x + 2;
+		int nameY = y + 2;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			font.draw(matrices, meter.getName(), x, y, METER_NAME_COLOR);
+			font.draw(matrices, meter.getName(), nameX, nameY, METER_NAME_COLOR);
 			
-			y += ROW_HEIGHT + GRID_SIZE;
+			nameY += ROW_HEIGHT + GRID_SIZE;
 		}
 	}
 	
-	private void renderTicksTable(MatrixStack matrices) {
-		int x = namesWidth;
-		int y = 0;
+	private void renderTicksTable(MatrixStack matrices, int x, int y, int width, int height) {
+		long firstTick = getSelectedTick() - SELECTED_COLUMN;
 		
-		long firstTick = client.getCurrentServerTick() - COLUMN_COUNT + offset;
+		drawBackground(matrices, x, y, width, height);
+		drawGridLines(matrices, x, y, height, COLUMN_COUNT);
 		
-		drawBackground(matrices, x, y, ticksWidth, height);
-		drawGridLines(matrices, x, y, COLUMN_COUNT, ROW_COUNT);
+		int rowX = x;
+		int rowY = y;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			eventRenderers.renderTickLogs(matrices, font, x, y, firstTick, meter);
+			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, meter);
 			
-			y += ROW_HEIGHT + GRID_SIZE;
+			rowY += ROW_HEIGHT + GRID_SIZE;
 		}
 		
 		if (paused) {
-			drawSelectedTickIndicator(matrices);
+			drawSelectedTickIndicator(matrices, x + SELECTED_COLUMN * (COLUMN_WIDTH + GRID_SIZE), y);
 		}
 	}
 	
-	private void renderSubticksTable(MatrixStack matrices) {
-		long selectedTick = client.getCurrentServerTick() - (COLUMN_COUNT - SELECTED_COLUMN) + offset;
+	private void renderSubTicks(MatrixStack matrices, int x, int y, int height) {
+		long selectedTick = getSelectedTick();
 		int subTickCount = client.getMeterGroup().getLogManager().getSubTickCount(selectedTick);
 		
 		if (subTickCount <= 0) {
 			return;
 		}
 		
-		subTicksWidth = subTickCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
+		int width = subTickCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 		
-		int x = namesWidth + ticksWidth + TICKS_SUBTICKS_GAP;
-		int y = 0;
+		drawBackground(matrices, x, y, width, height);
+		drawGridLines(matrices, x, y, height, subTickCount);
 		
-		drawBackground(matrices, x, y, subTicksWidth, height);
-		drawGridLines(matrices, x, y, subTickCount, ROW_COUNT);
+		int rowX = x;
+		int rowY = y;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			eventRenderers.renderSubTickLogs(matrices, font, x, y, selectedTick, subTickCount, meter);
+			eventRenderers.renderSubTickLogs(matrices, font, rowX, rowY, selectedTick, subTickCount, meter);
 			
-			y += ROW_HEIGHT + GRID_SIZE;
+			rowY += ROW_HEIGHT + GRID_SIZE;
 		}
 	}
 	
-	private void drawBackground(MatrixStack matrices, int x, int y, int width, int height) {
+	public void drawBackground(MatrixStack matrices, int x, int y, int width, int height) {
 		fill(matrices, x, y, x + width, y + height, BACKGROUND_COLOR);
 	}
 	
-	private void drawGridLines(MatrixStack matrices, int startX, int startY, int columnCount, int rowCount) {
+	private void drawGridLines(MatrixStack matrices, int x, int y, int height, int columnCount) {
 		int width = columnCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
-		int height = rowCount * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
 				
 		// Vertical lines
 		for (int i = 0; i <= columnCount; i++) {
-			int x = startX + i * (COLUMN_WIDTH + GRID_SIZE);
+			int lineX = x + i * (COLUMN_WIDTH + GRID_SIZE);
 			int color = (i > 0 && i < columnCount && i % 5 == 0) ? INTERVAL_GRID_COLOR : MAIN_GRID_COLOR;
 			
-			fill(matrices, x, startY, x + GRID_SIZE, startY + height, color);
+			fill(matrices, lineX, y, lineX + GRID_SIZE, y + height, color);
 		}
 		// Horizontal lines
-		for (int i = 0; i <= rowCount; i++) {
-			int y = startY + i * (ROW_HEIGHT + GRID_SIZE);
+		for (int i = 0; i <= ROW_COUNT; i++) {
+			int lineY = y + i * (ROW_HEIGHT + GRID_SIZE);
 			
-			fill(matrices, startX, y, startX + width, y + GRID_SIZE, MAIN_GRID_COLOR);
+			fill(matrices, x, lineY, x + width, lineY + GRID_SIZE, MAIN_GRID_COLOR);
 		}
 	}
 	
-	private void drawSelectedTickIndicator(MatrixStack matrices) {
-		int x = namesWidth + SELECTED_COLUMN * (COLUMN_WIDTH + GRID_SIZE);
-		int y = 0;
-		
+	public void renderSelectionIndicators(MatrixStack matrices, int x, int y, int selectedRow, int selectedNameColumn, int selectedTickColumn, int selectedSubTickColumn) {
+		if (selectedRow >= 0) {
+			int namesWidth = getNamesWidth();
+			
+			int indicatorY = y + selectedRow * (ROW_HEIGHT + GRID_SIZE);
+			int indicatorHeight = ROW_HEIGHT + GRID_SIZE;
+			
+			if (selectedNameColumn >= 0) {
+				int indicatorX = x;
+				int indicatorWidth = namesWidth - GRID_SIZE;
+				
+				drawSelectionIndicator(matrices, indicatorX, indicatorY, indicatorWidth, indicatorHeight);
+			}
+			if (paused) {
+				if (selectedTickColumn >= 0) {
+					int indicatorX = x + namesWidth + selectedTickColumn * (COLUMN_WIDTH + GRID_SIZE);
+					int indicatorWidth = COLUMN_WIDTH + GRID_SIZE;
+					
+					drawSelectionIndicator(matrices, indicatorX, indicatorY, indicatorWidth, indicatorHeight);
+				}
+				if (selectedSubTickColumn >= 0) {
+					int indicatorX = x + namesWidth + TICKS_TABLE_WIDTH + TICKS_SUB_TICKS_GAP + selectedSubTickColumn * (COLUMN_WIDTH + GRID_SIZE);
+					int indicatorWidth = COLUMN_WIDTH + GRID_SIZE;
+					
+					drawSelectionIndicator(matrices, indicatorX, indicatorY, indicatorWidth, indicatorHeight);
+				}
+			}
+		}
+	}
+	
+	private void drawSelectedTickIndicator(MatrixStack matrices, int x, int y) {
+		drawSelectionIndicator(matrices, x, y, COLUMN_WIDTH + GRID_SIZE, ROW_COUNT * (ROW_HEIGHT + GRID_SIZE));
+	}
+	
+	private void drawSelectionIndicator(MatrixStack matrices, int x, int y, int width, int height) {
 		int left = x;
-		int right = x + (COLUMN_WIDTH + GRID_SIZE);
+		int right = x + width;
 		int top = y;
-		int bottom = y + ROW_COUNT * (ROW_HEIGHT + GRID_SIZE);
+		int bottom = y + height;
 		
-		fill(matrices, left            , top            , left  + GRID_SIZE, bottom            , SELECTED_TICK_INDICATOR_COLOR); // left
-		fill(matrices, left + GRID_SIZE, top            , right + GRID_SIZE, top    + GRID_SIZE, SELECTED_TICK_INDICATOR_COLOR); // top
-		fill(matrices, right           , top + GRID_SIZE, right + GRID_SIZE, bottom + GRID_SIZE, SELECTED_TICK_INDICATOR_COLOR); // right
-		fill(matrices, left            , bottom         , right            , bottom + GRID_SIZE, SELECTED_TICK_INDICATOR_COLOR); // bottom
+		fill(matrices, left            , top            , left  + GRID_SIZE, bottom            , SELECTION_INDICATOR_COLOR); // left
+		fill(matrices, left + GRID_SIZE, top            , right + GRID_SIZE, top    + GRID_SIZE, SELECTION_INDICATOR_COLOR); // top
+		fill(matrices, right           , top + GRID_SIZE, right + GRID_SIZE, bottom + GRID_SIZE, SELECTION_INDICATOR_COLOR); // right
+		fill(matrices, left            , bottom         , right            , bottom + GRID_SIZE, SELECTION_INDICATOR_COLOR); // bottom
+	}
+	
+	public void resetHoveredElement() {
+		hoveredRow = -1;
+		hoveredNameColumn = -1;
+		hoveredTickColumn = -1;
+		hoveredSubTickColumn = -1;
+	}
+	
+	public void updateHoveredElement(int x, int y, double mouseX, double mouseY) {
+		updateRowCount();
+		resetHoveredElement();
+		
+		if (ROW_COUNT >= 0) {
+			int height = ROW_COUNT * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
+			
+			if (mouseY >= y && mouseY <= (y + height)) {
+				hoveredRow = (int)(mouseY / (ROW_HEIGHT + GRID_SIZE));
+				
+				if (hoveredRow >= ROW_COUNT) {
+					hoveredRow = ROW_COUNT - 1;
+				}
+			}
+		}
+		
+		if (hoveredRow >= 0) {
+			int width = getNamesWidth();
+			
+			if (mouseX >= x && mouseX <= (x + width)) {
+				hoveredNameColumn = 0;
+				return;
+			}
+			
+			if (!paused) {
+				return;
+			}
+			
+			x += width;
+			width = TICKS_TABLE_WIDTH;
+			
+			if (mouseX >= x && mouseX <= (x + width)) {
+				hoveredTickColumn = (int)((mouseX - x) / (COLUMN_WIDTH + GRID_SIZE));
+				
+				if (hoveredTickColumn >= COLUMN_COUNT) {
+					hoveredTickColumn = COLUMN_COUNT - 1;
+				}
+				
+				return;
+			}
+			
+			long selectedTick = getSelectedTick();
+			int subTickCount = client.getMeterGroup().getLogManager().getSubTickCount(selectedTick);
+			
+			x += width + TICKS_SUB_TICKS_GAP;
+			width = subTickCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
+			
+			if (mouseX >= x && mouseX <= (x + width)) {
+				hoveredSubTickColumn = (int)((mouseX - x) / (COLUMN_WIDTH + GRID_SIZE));
+				
+				if (hoveredSubTickColumn >= subTickCount) {
+					hoveredSubTickColumn = subTickCount - 1;
+				}
+			}
+		}
+	}
+	
+	public List<Text> getTextForTooltip() {
+		if (hoveredRow >= 0) { 
+			if (hoveredSubTickColumn >= 0) {
+				long tick = getSelectedTick();
+				int subTick = hoveredSubTickColumn;
+				
+				Meter meter = client.getMeterGroup().getMeter(hoveredRow);
+				MeterLogs logs = meter.getLogs();
+				MeterEvent event = logs.getLastLogBefore(tick, subTick + 1);
+				
+				if (event != null && event.isAt(tick, subTick)) {
+					return event.getTextForTooltip();
+				}
+			}
+		}
+		
+		return Collections.emptyList();
 	}
 }

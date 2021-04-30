@@ -84,7 +84,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					if (requiredWidth < availableWidth) {
 						boolean toggled = wasToggled(event);
 						
-						int bgColor = toggled ? color : BACKGROUND_COLOR;
+						int bgColor = toggled ? color : BACKGROUND_COLOR_TRANSPARENT;
 						int textColor = toggled ? POWERED_TEXT_COLOR : UNPOWERED_TEXT_COLOR;
 						
 						fill(matrices, startX, y, startX + requiredWidth, y + ROW_HEIGHT, bgColor);

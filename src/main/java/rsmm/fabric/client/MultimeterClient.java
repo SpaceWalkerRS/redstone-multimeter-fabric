@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
+import rsmm.fabric.client.gui.MultimeterScreen;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.ToggleMeterPacket;
@@ -63,15 +64,11 @@ public class MultimeterClient {
 	}
 	
 	public boolean renderHud() {
-		return renderHud && connected;
+		return renderHud && connected && !hasMultimeterScreenOpen();
 	}
 	
 	public long getCurrentServerTick() {
 		return currentServerTick;
-	}
-	
-	public long getSelectedTick() {
-		return currentServerTick + hudRenderer.getOffset();
 	}
 	
 	/**
@@ -142,6 +139,10 @@ public class MultimeterClient {
 	
 	public void toggleHud() {
 		renderHud = !renderHud;
+	}
+	
+	public boolean hasMultimeterScreenOpen() {
+		return client.currentScreen != null && client.currentScreen instanceof MultimeterScreen;
 	}
 	
 	/**

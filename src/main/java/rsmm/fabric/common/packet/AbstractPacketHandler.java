@@ -8,11 +8,12 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
+import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.common.packet.types.*;
 
 public abstract class AbstractPacketHandler {
 	
-	public static final Identifier PACKET_IDENTIFIER = new Identifier("rsmm-fabric");
+	public static final Identifier PACKET_IDENTIFIER = new Identifier(RedstoneMultimeterMod.MOD_ID, "network");
 	
 	protected Packet<?> encodePacket(AbstractRSMMPacket packet) {
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());

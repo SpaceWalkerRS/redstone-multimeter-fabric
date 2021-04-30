@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Redstone Multimeter Fabric",
-  "description": "A Fabric port of Narcolepticfrog's Redstone Multimeter Mod",
+  "description": "A Fabric port of NarcolepticFrog's Redstone Multimeter Mod",
   "authors": [
     "Space Walker"
   ],
