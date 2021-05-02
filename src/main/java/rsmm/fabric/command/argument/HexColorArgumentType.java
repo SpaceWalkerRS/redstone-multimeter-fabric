@@ -1,9 +1,11 @@
 package rsmm.fabric.command.argument;
 
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 
 public class HexColorArgumentType implements ArgumentType<Integer> {
 	
@@ -38,7 +40,7 @@ public class HexColorArgumentType implements ArgumentType<Integer> {
 			
 			return 0xFF000000 | (r << 16) | (g << 8) | b;
 		} catch (Exception e) {
-			throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().createWithContext(reader);
+			throw new DynamicCommandExceptionType(value -> new LiteralMessage(String.format("Invalid color \'%s\'", value))).createWithContext(reader, asString);
 		}
 	}
 }

@@ -73,12 +73,8 @@ public class MeterCommand {
 					suggests((context, suggestionsBuilder) -> indexSuggestions(context.getSource(), suggestionsBuilder, null)).
 					then(CommandManager.
 						argument("name", StringArgumentType.greedyString()).
-						//suggests((context, suggestionsBuilder) -> nameSuggestions(context.getSource(), suggestionsBuilder, IntegerArgumentType.getInteger(context, "index"))).
-						executes(context -> renameMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, StringArgumentType.getString(context, "name"))))).
-				then(CommandManager.
-					argument("name", StringArgumentType.greedyString()).
-					suggests((context, suggestionsBuilder) -> nameSuggestions(context.getSource(), suggestionsBuilder, null)).
-					executes(context -> renameMeter(context.getSource(), null, null, StringArgumentType.getString(context, "name"))))).
+						suggests((context, suggestionsBuilder) -> nameSuggestions(context.getSource(), suggestionsBuilder, IntegerArgumentType.getInteger(context, "index"))).
+						executes(context -> renameMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, StringArgumentType.getString(context, "name")))))).
 			then(CommandManager.
 				literal("color").
 				then(CommandManager.
@@ -87,14 +83,9 @@ public class MeterCommand {
 					then(CommandManager.
 						argument("color", HexColorArgumentType.color()).
 						suggests((context, suggestionsBuilder) -> colorSuggestions(context.getSource(), suggestionsBuilder, IntegerArgumentType.getInteger(context, "index"))).
-						executes(context -> recolorMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, HexColorArgumentType.getColor(context, "color"))))).
-				then(CommandManager.
-					argument("color", HexColorArgumentType.color()).
-					suggests((context, suggestionsBuilder) -> colorSuggestions(context.getSource(), suggestionsBuilder, null)).
-					executes(context -> recolorMeter(context.getSource(), null, null, HexColorArgumentType.getColor(context, "color"))))).
+						executes(context -> recolorMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, HexColorArgumentType.getColor(context, "color")))))).
 			then(CommandManager.
 				literal("event").
-				executes(context -> listMeteredEvents(context.getSource(), null, null)).
 				then(CommandManager.
 					argument("index", IntegerArgumentType.integer()).
 					suggests((context, suggestionsBuilder) -> indexSuggestions(context.getSource(), suggestionsBuilder, null)).
@@ -106,10 +97,7 @@ public class MeterCommand {
 						suggests((context, suggestionsBuilder) -> indexSuggestions(context.getSource(), suggestionsBuilder, null)).
 						then(CommandManager.
 							argument("type", MeterEventArgumentType.eventType()).
-							executes(context -> updateMeteredEvents(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, MeterEventArgumentType.getEventType(context, "type"), true)))).
-					then(CommandManager.
-						argument("type", MeterEventArgumentType.eventType()).
-						executes(context -> updateMeteredEvents(context.getSource(), null, null, MeterEventArgumentType.getEventType(context, "type"), true)))).
+							executes(context -> updateMeteredEvents(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, MeterEventArgumentType.getEventType(context, "type"), true))))).
 				then(CommandManager.
 					literal("stop").
 					then(CommandManager.
@@ -117,10 +105,7 @@ public class MeterCommand {
 						suggests((context, suggestionsBuilder) -> indexSuggestions(context.getSource(), suggestionsBuilder, null)).
 						then(CommandManager.
 							argument("type", MeterEventArgumentType.eventType()).
-							executes(context -> updateMeteredEvents(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, MeterEventArgumentType.getEventType(context, "type"), false)))).
-					then(CommandManager.
-						argument("type", MeterEventArgumentType.eventType()).
-						executes(context -> updateMeteredEvents(context.getSource(), null, null, MeterEventArgumentType.getEventType(context, "type"), false))))).
+							executes(context -> updateMeteredEvents(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, MeterEventArgumentType.getEventType(context, "type"), false)))))).
 			then(CommandManager.
 				literal("group").
 				then(CommandManager.
@@ -241,8 +226,10 @@ public class MeterCommand {
 	
 	private static int recolorMeter(ServerCommandSource source, Integer meterIndex, BlockPos pos, int color) {
 		return updateMeter(source, meterIndex, pos, (multimeter, index, player) -> {
+			int rgb = 0xFFFFFF & color;
+			
 			multimeter.recolorMeter(index, color, player);
-			source.sendFeedback(new LiteralText(String.format("Recolored meter #%d to %d", index, color)), false);
+			source.sendFeedback(new LiteralText(String.format("Recolored meter #%d to %s", index, Integer.toHexString(rgb))), false);
 		});
 	}
 	
@@ -334,6 +321,8 @@ public class MeterCommand {
 			ServerMeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup != null) {
+				int meterCount = meterGroup.getMeterCount();
+				
 				if (index == null) {
 					HitResult hitResult = player.raycast(player.interactionManager.getGameMode().isCreative() ? 5.0F : 4.5F, server.getMinecraftServer().getTickTime(), false);
 					
@@ -346,6 +335,11 @@ public class MeterCommand {
 					} else {
 						index = -1;
 					}
+				} else if (index < 0) {
+					index = meterCount + index;
+				}
+				if (index >= meterCount) {
+					index = -1;
 				}
 				
 				addSuggestions.accept(suggestions, meterGroup, index);
@@ -373,7 +367,7 @@ public class MeterCommand {
 			if (index >= 0) {
 				suggestions.add(meterGroup.getMeter(index).getName());
 			} else {
-				suggestions.add(meterGroup.getNextMeterName());
+				suggestions.add(String.format("\"%s\"", meterGroup.getNextMeterName()));
 			}
 		});
 	}

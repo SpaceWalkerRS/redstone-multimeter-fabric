@@ -147,8 +147,11 @@ public class Multimeter {
 			if (name == null) {
 				name = meterGroup.getNextMeterName();
 			}
+			
+			int nextColor = ColorUtils.nextColor();
+			
 			if (color == null) {
-				color = ColorUtils.nextColor();
+				color = nextColor;
 			}
 			
 			int meteredEvents = EventType.POWERED.flag() | EventType.MOVED.flag();

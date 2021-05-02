@@ -18,6 +18,15 @@ public interface IParentElement extends IElement {
 	}
 	
 	@Override
+	default void mouseMove(double mouseX, double mouseY) {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).mouseMove(mouseX, mouseY);
+		}
+	}
+	
+	@Override
 	default boolean mouseClick(double mouseX, double mouseY, int button) {
 		if (!isHovered(mouseX, mouseY)) {
 			return false;
@@ -50,7 +59,7 @@ public interface IParentElement extends IElement {
 		for (int index = 0; index < children.size(); index++) {
 			IElement child = children.get(index);
 			
-			if (child.mouseClick(mouseX, mouseY, button)) {
+			if (child.mouseRelease(mouseX, mouseY, button)) {
 				released = true;
 			}
 		}

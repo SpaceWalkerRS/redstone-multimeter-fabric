@@ -49,7 +49,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	public void reset() {
 		paused = false;
 		resetOffset();
-		resetHoveredElement();
+		resetHoveredElements();
 	}
 	
 	public void tick() {
@@ -83,7 +83,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	public int getHeight() {
-		return ROW_COUNT * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
+		return (ROW_COUNT + 1) * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
 	}
 	
 	public int getHoveredRow() {
@@ -124,7 +124,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		renderNamesTable(matrices, x, y, namesWidth, height);
 		renderTicksTable(matrices, x + namesWidth, y, TICKS_TABLE_WIDTH, height);
 		if (paused) {
-			renderSubTicks(matrices, x + namesWidth + TICKS_TABLE_WIDTH + TICKS_SUB_TICKS_GAP, y, height);
+			renderSubTicksTable(matrices, x + namesWidth + TICKS_TABLE_WIDTH + TICKS_SUB_TICKS_GAP, y, height);
 		}
 		
 		font.draw(matrices, client.getMeterGroup().getName(), x + 2, y + height + 2, METER_GROUP_NAME_COLOR);
@@ -181,7 +181,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		}
 	}
 	
-	private void renderSubTicks(MatrixStack matrices, int x, int y, int height) {
+	private void renderSubTicksTable(MatrixStack matrices, int x, int y, int height) {
 		long selectedTick = getSelectedTick();
 		int subTickCount = client.getMeterGroup().getLogManager().getSubTickCount(selectedTick);
 		
@@ -226,38 +226,21 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		}
 	}
 	
-	public void renderSelectionIndicators(MatrixStack matrices, int x, int y, int selectedRow, int selectedNameColumn, int selectedTickColumn, int selectedSubTickColumn) {
-		if (selectedRow >= 0) {
-			int namesWidth = getNamesWidth();
-			
-			int indicatorY = y + selectedRow * (ROW_HEIGHT + GRID_SIZE);
-			int indicatorHeight = ROW_HEIGHT + GRID_SIZE;
-			
-			if (selectedNameColumn >= 0) {
-				int indicatorX = x;
-				int indicatorWidth = namesWidth - GRID_SIZE;
-				
-				drawSelectionIndicator(matrices, indicatorX, indicatorY, indicatorWidth, indicatorHeight);
-			}
-			if (paused) {
-				if (selectedTickColumn >= 0) {
-					int indicatorX = x + namesWidth + selectedTickColumn * (COLUMN_WIDTH + GRID_SIZE);
-					int indicatorWidth = COLUMN_WIDTH + GRID_SIZE;
-					
-					drawSelectionIndicator(matrices, indicatorX, indicatorY, indicatorWidth, indicatorHeight);
-				}
-				if (selectedSubTickColumn >= 0) {
-					int indicatorX = x + namesWidth + TICKS_TABLE_WIDTH + TICKS_SUB_TICKS_GAP + selectedSubTickColumn * (COLUMN_WIDTH + GRID_SIZE);
-					int indicatorWidth = COLUMN_WIDTH + GRID_SIZE;
-					
-					drawSelectionIndicator(matrices, indicatorX, indicatorY, indicatorWidth, indicatorHeight);
-				}
-			}
-		}
-	}
-	
 	private void drawSelectedTickIndicator(MatrixStack matrices, int x, int y) {
 		drawSelectionIndicator(matrices, x, y, COLUMN_WIDTH + GRID_SIZE, ROW_COUNT * (ROW_HEIGHT + GRID_SIZE));
+	}
+	
+	public void renderSelectedMeterIndicator(MatrixStack matrices, int x, int y, int selectedMeter) {
+		if (selectedMeter >= 0) {
+			int namesWidth = getNamesWidth();
+			
+			int indicatorX = x;
+			int indicatorY = y + selectedMeter * (ROW_HEIGHT + GRID_SIZE);
+			int indicatorHeight = ROW_HEIGHT + GRID_SIZE;
+			int indicatorWidth = namesWidth - GRID_SIZE;
+			
+			drawSelectionIndicator(matrices, indicatorX, indicatorY, indicatorWidth, indicatorHeight);
+		}
 	}
 	
 	private void drawSelectionIndicator(MatrixStack matrices, int x, int y, int width, int height) {
@@ -272,16 +255,16 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		fill(matrices, left            , bottom         , right            , bottom + GRID_SIZE, SELECTION_INDICATOR_COLOR); // bottom
 	}
 	
-	public void resetHoveredElement() {
+	public void resetHoveredElements() {
 		hoveredRow = -1;
 		hoveredNameColumn = -1;
 		hoveredTickColumn = -1;
 		hoveredSubTickColumn = -1;
 	}
 	
-	public void updateHoveredElement(int x, int y, double mouseX, double mouseY) {
+	public void updateHoveredElements(int x, int y, double mouseX, double mouseY) {
 		updateRowCount();
-		resetHoveredElement();
+		resetHoveredElements();
 		
 		if (ROW_COUNT >= 0) {
 			int height = ROW_COUNT * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
@@ -292,45 +275,43 @@ public class MultimeterHudRenderer extends DrawableHelper {
 				if (hoveredRow >= ROW_COUNT) {
 					hoveredRow = ROW_COUNT - 1;
 				}
-			}
-		}
-		
-		if (hoveredRow >= 0) {
-			int width = getNamesWidth();
-			
-			if (mouseX >= x && mouseX <= (x + width)) {
-				hoveredNameColumn = 0;
-				return;
-			}
-			
-			if (!paused) {
-				return;
-			}
-			
-			x += width;
-			width = TICKS_TABLE_WIDTH;
-			
-			if (mouseX >= x && mouseX <= (x + width)) {
-				hoveredTickColumn = (int)((mouseX - x) / (COLUMN_WIDTH + GRID_SIZE));
 				
-				if (hoveredTickColumn >= COLUMN_COUNT) {
-					hoveredTickColumn = COLUMN_COUNT - 1;
+				int width = getNamesWidth();
+				
+				if (mouseX >= x && mouseX <= (x + width)) {
+					hoveredNameColumn = 0;
+					return;
 				}
 				
-				return;
-			}
-			
-			long selectedTick = getSelectedTick();
-			int subTickCount = client.getMeterGroup().getLogManager().getSubTickCount(selectedTick);
-			
-			x += width + TICKS_SUB_TICKS_GAP;
-			width = subTickCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
-			
-			if (mouseX >= x && mouseX <= (x + width)) {
-				hoveredSubTickColumn = (int)((mouseX - x) / (COLUMN_WIDTH + GRID_SIZE));
+				if (!paused) {
+					return;
+				}
 				
-				if (hoveredSubTickColumn >= subTickCount) {
-					hoveredSubTickColumn = subTickCount - 1;
+				x += width;
+				width = TICKS_TABLE_WIDTH;
+				
+				if (mouseX >= x && mouseX <= (x + width)) {
+					hoveredTickColumn = (int)((mouseX - x) / (COLUMN_WIDTH + GRID_SIZE));
+					
+					if (hoveredTickColumn >= COLUMN_COUNT) {
+						hoveredTickColumn = COLUMN_COUNT - 1;
+					}
+					
+					return;
+				}
+				
+				long selectedTick = getSelectedTick();
+				int subTickCount = client.getMeterGroup().getLogManager().getSubTickCount(selectedTick);
+				
+				x += width + TICKS_SUB_TICKS_GAP;
+				width = subTickCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
+				
+				if (mouseX >= x && mouseX <= (x + width)) {
+					hoveredSubTickColumn = (int)((mouseX - x) / (COLUMN_WIDTH + GRID_SIZE));
+					
+					if (hoveredSubTickColumn >= subTickCount) {
+						hoveredSubTickColumn = subTickCount - 1;
+					}
 				}
 			}
 		}

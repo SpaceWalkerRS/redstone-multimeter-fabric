@@ -48,4 +48,8 @@ public abstract class AbstractParentElement implements IParentElement {
 			element.focus();
 		}
 	}
+	
+	protected void addChild(IElement child) {
+		children.add(child);
+	}
 }
