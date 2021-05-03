@@ -9,7 +9,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Tickable;
+
 import rsmm.fabric.client.MultimeterClient;
 
 public abstract class RSMMScreen extends Screen implements IParentElement {
@@ -88,11 +88,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	
 	@Override
 	public void tick() {
-		IElement focused = getFocusedElement();
-		
-		if (focused != null && focused instanceof Tickable) {
-			((Tickable)focused).tick();
-		}
+		IParentElement.super.tick();
 	}
 	
 	@Override

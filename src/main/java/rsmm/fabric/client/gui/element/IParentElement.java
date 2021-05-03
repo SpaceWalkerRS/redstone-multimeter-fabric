@@ -9,7 +9,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Tickable;
 
-public interface IParentElement extends IElement, Tickable {
+public interface IParentElement extends IElement {
 	
 	@Override
 	default void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -125,19 +125,6 @@ public interface IParentElement extends IElement, Tickable {
 		return hoveredElement == null ? Collections.emptyList() : hoveredElement.getTooltip(mouseX, mouseY);
 	}
 	
-	@Override
-	default void tick() {
-		List<IElement> children = getChildren();
-		
-		for (int index = 0; index < children.size(); index++) {
-			IElement child = children.get(index);
-			
-			if (child instanceof Tickable) {
-				((Tickable)child).tick();
-			}
-		}
-	}
-	
 	public List<IElement> getChildren();
 	
 	default void clearChildren() {
@@ -166,4 +153,17 @@ public interface IParentElement extends IElement, Tickable {
 	
 	public void setFocusedElement(IElement element);
 	
+	default void tick() {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			IElement child = children.get(index);
+			
+			if (child instanceof Tickable) {
+				((Tickable)child).tick();
+			} else if (child instanceof IParentElement) {
+				((IParentElement)child).tick();
+			}
+		}
+	}
 }
