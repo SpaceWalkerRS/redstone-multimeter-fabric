@@ -97,6 +97,20 @@ public class ServerMeterGroup extends MeterGroup {
 		return removeMeter(index) ? index : -1;
 	}
 	
+	public void moveMeter(int index, WorldPos pos) {
+		if (index < 0 || posToIndex.containsKey(pos)) {
+			return;
+		}
+		
+		Meter meter = meters.get(index);
+		
+		posToIndex.remove(meter.getPos());
+		posToIndex.put(pos, index);
+		
+		meter.setPos(pos);
+		meter.markDirty();
+	}
+	
 	public String getNextMeterName() {
 		return String.format("Meter %d", totalMeterCount);
 	}
@@ -159,12 +173,13 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	public void blockMoved(WorldPos pos, Direction dir) {
-		Meter meter = getMeterAt(pos);
+		int index = indexOfMeterAt(pos);
 		
-		if (meter != null) {
-			if (!hasMeterAt(pos.offset(dir)) && meter.blockMoved(dir)) {
-				int index = posToIndex.remove(pos);
-				posToIndex.put(meter.getPos(), index);
+		if (index >= 0) {
+			Meter meter = getMeter(index);
+			
+			if (meter.isMovable()) {
+				multimeter.moveMeter(index, pos.offset(dir), this);
 			}
 			
 			logManager.logEvent(meter, EventType.MOVED, dir.getId());

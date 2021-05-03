@@ -7,6 +7,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 
+import rsmm.fabric.util.ColorUtils;
+
 public class HexColorArgumentType implements ArgumentType<Integer> {
 	
 	private HexColorArgumentType() {
@@ -29,16 +31,8 @@ public class HexColorArgumentType implements ArgumentType<Integer> {
 			throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().createWithContext(reader);
 		}
 		
-		while (asString.length() < 6) {
-			asString += 0;
-		}
-		
 		try {
-			int r = Integer.valueOf(asString.substring(0, 2), 16);
-			int g = Integer.valueOf(asString.substring(2, 4), 16);
-			int b = Integer.valueOf(asString.substring(4, 6), 16);
-			
-			return 0xFF000000 | (r << 16) | (g << 8) | b;
+			return ColorUtils.fromString(asString);
 		} catch (Exception e) {
 			throw new DynamicCommandExceptionType(value -> new LiteralMessage(String.format("Invalid color \'%s\'", value))).createWithContext(reader, asString);
 		}

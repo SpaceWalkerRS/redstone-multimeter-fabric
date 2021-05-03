@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
@@ -21,6 +22,8 @@ public class MultimeterScreen extends RSMMScreen {
 	private static final int DRAG = 1;
 	private static final int PULL = 2;
 	
+	private boolean isPauseScreen;
+	
 	private double scrollAmount;
 	private int scrollSpeed = 7;
 	private int mouseScrollType;
@@ -32,6 +35,8 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	public MultimeterScreen(MultimeterClient client) {
 		super(client);
+		
+		this.isPauseScreen = !Screen.hasShiftDown();
 	}
 	
 	@Override
@@ -100,6 +105,12 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 	
 	@Override
+	public void onRemoved() {
+		client.keyboard.setRepeatEvents(false);
+		super.onRemoved();
+	}
+	
+	@Override
 	public void focus() {
 		
 	}
@@ -119,13 +130,8 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 	
 	@Override
-	public void removed() {
-		client.keyboard.setRepeatEvents(false);
-	}
-	
-	@Override
 	public boolean isPauseScreen() {
-		return false;
+		return isPauseScreen;
 	}
 	
 	@Override
@@ -180,7 +186,7 @@ public class MultimeterScreen extends RSMMScreen {
 		if (scrollAmount < 0) {
 			scrollAmount = 0;
 		}
-		this.tick();
+		
 		double maxAmount = getMaxScrollAmount();
 		
 		if (scrollAmount > maxAmount) {

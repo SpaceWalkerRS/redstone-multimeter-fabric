@@ -1,33 +1,28 @@
 package rsmm.fabric.client.gui.widget;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.Tickable;
+import net.minecraft.text.Text;
 
 import rsmm.fabric.client.gui.element.IElement;
 
-public class TextField extends TextFieldWidget implements IElement, Tickable {
+public class Button extends ButtonWidget implements IElement {
 	
-	private final Supplier<String> textSupplier;
+	private final Supplier<Text> textSupplier;
+	private final OnPress onPress;
 	
-	private boolean deaf;
-	
-	public TextField(TextRenderer textRenderer, int x, int y, int width, int height, Supplier<String> textSupplier, Consumer<String> textChangedListener) {
-		super(textRenderer, x + 1, y + 1, width - 2, height - 2, new LiteralText(textSupplier.get()));
+	public Button(int x, int y, int width, int height, Supplier<Text> textSupplier, OnPress onPress) {
+		super(x, y, width, height, textSupplier.get(), button -> {});
 		
 		this.textSupplier = textSupplier;
-		
-		this.updateMessage();
-		this.setChangedListener((text) -> {
-			if (!deaf) {
-				textChangedListener.accept(text);
-			}
-		});
+		this.onPress = onPress;
+	}
+	
+	@Override
+	public void onPress() {
+		onPress.press(this);
 	}
 	
 	@Override
@@ -92,48 +87,47 @@ public class TextField extends TextFieldWidget implements IElement, Tickable {
 	
 	@Override
 	public void focus() {
-		setFocused(true);
+		
 	}
 	
 	@Override
 	public void unfocus() {
-		setFocused(false);
-		updateMessage();
+		
 	}
 	
 	@Override
 	public int getX() {
-		return x - 1;
+		return x;
 	}
 	
 	@Override
 	public void setX(int x) {
-		this.x = x + 1;
+		this.x = x;
 	}
 	
 	@Override
 	public int getY() {
-		return y - 1;
+		return y;
 	}
 	
 	@Override
 	public void setY(int y) {
-		this.y = y + 1;
+		this.y = y;
 	}
 	
 	@Override
 	public int getWidth() {
-		return width + 2;
+		return width;
 	}
 	
 	@Override
 	public void setWidth(int width) {
-		this.width = width - 2;
+		this.width = width;
 	}
 	
 	@Override
 	public int getHeight() {
-		return height + 2;
+		return height;
 	}
 	
 	@Override
@@ -142,10 +136,10 @@ public class TextField extends TextFieldWidget implements IElement, Tickable {
 	}
 	
 	public void updateMessage() {
-		if (!isFocused()) {
-			deaf = true;
-			setText(textSupplier.get());
-			deaf = false;
-		}
+		setMessage(textSupplier.get());
+	}
+	
+	public interface OnPress {
+		public void press(Button button);
 	}
 }

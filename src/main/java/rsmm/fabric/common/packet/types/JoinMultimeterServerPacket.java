@@ -1,6 +1,6 @@
 package rsmm.fabric.common.packet.types;
 
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
@@ -20,13 +20,13 @@ public class JoinMultimeterServerPacket extends AbstractRSMMPacket {
 	}
 	
 	@Override
-	public void encode(PacketByteBuf buffer) {
-		buffer.writeLong(currentServerTick);
+	public void encode(CompoundTag data) {
+		data.putLong("serverTime", currentServerTick);
 	}
 	
 	@Override
-	public void decode(PacketByteBuf buffer) {
-		currentServerTick = buffer.readLong();
+	public void decode(CompoundTag data) {
+		currentServerTick = data.getLong("serverTime");
 	}
 	
 	@Override

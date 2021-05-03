@@ -82,7 +82,11 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		return client.getCurrentServerTick() + offset + SELECTED_COLUMN;
 	}
 	
-	public int getHeight() {
+	public int getTableHeight() {
+		return ROW_COUNT * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
+	}
+	
+	public int getTotalHeight() {
 		return (ROW_COUNT + 1) * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
 	}
 	
@@ -119,7 +123,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		}
 		
 		int namesWidth = getNamesWidth();
-		int height = getHeight();
+		int height = getTableHeight();
 		
 		renderNamesTable(matrices, x, y, namesWidth, height);
 		renderTicksTable(matrices, x + namesWidth, y, TICKS_TABLE_WIDTH, height);
@@ -267,10 +271,10 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		resetHoveredElements();
 		
 		if (ROW_COUNT >= 0) {
-			int height = ROW_COUNT * (ROW_HEIGHT + GRID_SIZE) + GRID_SIZE;
+			int height = getTableHeight();
 			
 			if (mouseY >= y && mouseY <= (y + height)) {
-				hoveredRow = (int)(mouseY / (ROW_HEIGHT + GRID_SIZE));
+				hoveredRow = (int)((mouseY - y) / (ROW_HEIGHT + GRID_SIZE));
 				
 				if (hoveredRow >= ROW_COUNT) {
 					hoveredRow = ROW_COUNT - 1;

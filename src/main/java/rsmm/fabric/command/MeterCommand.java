@@ -226,10 +226,8 @@ public class MeterCommand {
 	
 	private static int recolorMeter(ServerCommandSource source, Integer meterIndex, BlockPos pos, int color) {
 		return updateMeter(source, meterIndex, pos, (multimeter, index, player) -> {
-			int rgb = 0xFFFFFF & color;
-			
 			multimeter.recolorMeter(index, color, player);
-			source.sendFeedback(new LiteralText(String.format("Recolored meter #%d to %s", index, Integer.toHexString(rgb))), false);
+			source.sendFeedback(new LiteralText(String.format("Recolored meter #%d to %s", index, ColorUtils.toHexString(color))), false);
 		});
 	}
 	
@@ -382,10 +380,7 @@ public class MeterCommand {
 				intColor = ColorUtils.nextColor(false);
 			}
 			
-			int rgb = (intColor & 0xFFFFFF);
-			String hex = Integer.toHexString(rgb);
-			
-			suggestions.add(hex);
+			suggestions.add(ColorUtils.toHexString(intColor));
 		});
 	}
 	

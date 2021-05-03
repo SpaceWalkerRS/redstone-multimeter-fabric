@@ -80,7 +80,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	
 	@Override
 	protected final void init() {
-		content.clear();
+		clearChildren();
 		initScreen();
 	}
 	
@@ -93,6 +93,11 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		if (focused != null && focused instanceof Tickable) {
 			((Tickable)focused).tick();
 		}
+	}
+	
+	@Override
+	public void removed() {
+		onRemoved();
 	}
 	
 	@Override

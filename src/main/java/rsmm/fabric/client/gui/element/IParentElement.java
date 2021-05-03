@@ -7,8 +7,9 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Tickable;
 
-public interface IParentElement extends IElement {
+public interface IParentElement extends IElement, Tickable {
 	
 	@Override
 	default void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -105,6 +106,15 @@ public interface IParentElement extends IElement {
 	}
 	
 	@Override
+	default void onRemoved() {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).onRemoved();
+		}
+	}
+	
+	@Override
 	default void unfocus() {
 		setFocusedElement(null);
 	}
@@ -115,7 +125,30 @@ public interface IParentElement extends IElement {
 		return hoveredElement == null ? Collections.emptyList() : hoveredElement.getTooltip(mouseX, mouseY);
 	}
 	
+	@Override
+	default void tick() {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			IElement child = children.get(index);
+			
+			if (child instanceof Tickable) {
+				((Tickable)child).tick();
+			}
+		}
+	}
+	
 	public List<IElement> getChildren();
+	
+	default void clearChildren() {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).onRemoved();
+		}
+		
+		children.clear();
+	}
 	
 	default IElement getHoveredElement(double mouseX, double mouseY) {
 		if (isHovered(mouseX, mouseY)) {

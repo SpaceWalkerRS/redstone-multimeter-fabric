@@ -1,7 +1,6 @@
 package rsmm.fabric.common.packet.types;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
@@ -11,24 +10,24 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class AddMeterPacket extends AbstractRSMMPacket {
 	
-	private CompoundTag tag;
+	private CompoundTag properties;
 	
 	public AddMeterPacket() {
 		
 	}
 	
 	public AddMeterPacket(Meter meter) {
-		this.tag = meter.toTag();
+		this.properties = meter.toTag();
 	}
 	
 	@Override
-	public void encode(PacketByteBuf buffer) {
-		buffer.writeCompoundTag(tag);
+	public void encode(CompoundTag data) {
+		data.put("properties", properties);
 	}
 	
 	@Override
-	public void decode(PacketByteBuf buffer) {
-		tag = buffer.readCompoundTag();
+	public void decode(CompoundTag data) {
+		properties = data.getCompound("properties");
 	}
 	
 	@Override
@@ -38,7 +37,7 @@ public class AddMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		Meter meter = Meter.createFromTag(tag);
+		Meter meter = Meter.createFromTag(properties);
 		client.getMeterGroup().addMeter(meter);
 	}
 }

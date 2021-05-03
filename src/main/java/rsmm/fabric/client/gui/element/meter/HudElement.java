@@ -28,7 +28,7 @@ public class HudElement extends AbstractParentElement {
 		this.y = y;
 		this.width = width;
 		
-		this.meterControls = new MeterControlsElement(this.client, x, y + hudRenderer.getHeight(), width);
+		this.meterControls = new MeterControlsElement(this.client, x, y + hudRenderer.getTotalHeight(), width);
 		
 		addChild(meterControls);
 	}
@@ -46,7 +46,7 @@ public class HudElement extends AbstractParentElement {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean success = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success) {
+		if (!success && mouseY <= (y + hudRenderer.getTotalHeight())) {
 			int hoveredRow = hudRenderer.getHoveredRow();
 			int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
 			
@@ -84,7 +84,7 @@ public class HudElement extends AbstractParentElement {
 	@Override
 	public void setY(int y) {
 		this.y = y;
-		meterControls.setY(y + hudRenderer.getHeight());
+		meterControls.setY(y + hudRenderer.getTotalHeight());
 	}
 	
 	@Override
@@ -100,7 +100,7 @@ public class HudElement extends AbstractParentElement {
 	
 	@Override
 	public int getHeight() {
-		return hudRenderer.getHeight() + meterControls.getHeight();
+		return hudRenderer.getTotalHeight() + meterControls.getHeight();
 	}
 	
 	@Override

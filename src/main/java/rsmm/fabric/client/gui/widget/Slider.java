@@ -1,33 +1,39 @@
 package rsmm.fabric.client.gui.widget;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.Tickable;
+import net.minecraft.text.Text;
 
 import rsmm.fabric.client.gui.element.IElement;
 
-public class TextField extends TextFieldWidget implements IElement, Tickable {
+public class Slider extends SliderWidget implements IElement {
 	
-	private final Supplier<String> textSupplier;
+	private final Supplier<Text> textSupplier;
+	private final Supplier<Double> valueSupplier;
+	private final SlideAction onSlide;
+	private final Consumer<Double> snap;
 	
-	private boolean deaf;
+	private boolean dragging;
 	
-	public TextField(TextRenderer textRenderer, int x, int y, int width, int height, Supplier<String> textSupplier, Consumer<String> textChangedListener) {
-		super(textRenderer, x + 1, y + 1, width - 2, height - 2, new LiteralText(textSupplier.get()));
+	public Slider(int x, int y, int width, int height, Supplier<Text> textSupplier, Supplier<Double> valueSupplier, SlideAction onSlide, Function<Double, Double> snap) {
+		super(x, y, width, height, textSupplier.get(), valueSupplier.get());
 		
 		this.textSupplier = textSupplier;
+		this.valueSupplier = valueSupplier;
+		this.onSlide = onSlide;
+		this.snap = v -> setValue(snap.apply(v));
 		
 		this.updateMessage();
-		this.setChangedListener((text) -> {
-			if (!deaf) {
-				textChangedListener.accept(text);
-			}
-		});
+	}
+	
+	@Override
+	protected void applyValue() {
+		snap();
+		onSlide.onSlide(this);
 	}
 	
 	@Override
@@ -77,12 +83,12 @@ public class TextField extends TextFieldWidget implements IElement, Tickable {
 	
 	@Override
 	public boolean isDragging() {
-		return false;
+		return dragging;
 	}
 	
 	@Override
 	public void setDragging(boolean dragging) {
-		
+		this.dragging = dragging;
 	}
 	
 	@Override
@@ -92,48 +98,47 @@ public class TextField extends TextFieldWidget implements IElement, Tickable {
 	
 	@Override
 	public void focus() {
-		setFocused(true);
+		
 	}
 	
 	@Override
 	public void unfocus() {
-		setFocused(false);
-		updateMessage();
+		
 	}
 	
 	@Override
 	public int getX() {
-		return x - 1;
+		return x;
 	}
 	
 	@Override
 	public void setX(int x) {
-		this.x = x + 1;
+		this.x = x;
 	}
 	
 	@Override
 	public int getY() {
-		return y - 1;
+		return y;
 	}
 	
 	@Override
 	public void setY(int y) {
-		this.y = y + 1;
+		this.y = y;
 	}
 	
 	@Override
 	public int getWidth() {
-		return width + 2;
+		return width;
 	}
 	
 	@Override
 	public void setWidth(int width) {
-		this.width = width - 2;
+		this.width = width;
 	}
 	
 	@Override
 	public int getHeight() {
-		return height + 2;
+		return height;
 	}
 	
 	@Override
@@ -141,11 +146,30 @@ public class TextField extends TextFieldWidget implements IElement, Tickable {
 		this.height = height - 2;
 	}
 	
+	@Override
 	public void updateMessage() {
-		if (!isFocused()) {
-			deaf = true;
-			setText(textSupplier.get());
-			deaf = false;
-		}
+		snap();
+		setMessage(textSupplier.get());
+	}
+	
+	public double getValue() {
+		return value;
+	}
+	
+	public void setValue(double newValue) {
+		value = newValue;
+	}
+	
+	public void snap() {
+		snap.accept(value);
+	}
+	
+	public void update() {
+		setValue(valueSupplier.get());
+		updateMessage();
+	}
+	
+	public interface SlideAction {
+		void onSlide(Slider slider);
 	}
 }

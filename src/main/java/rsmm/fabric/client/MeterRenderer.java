@@ -16,6 +16,7 @@ import net.minecraft.util.math.Vec3d;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
+import rsmm.fabric.util.ColorUtils;
 
 public class MeterRenderer {
 	
@@ -67,9 +68,9 @@ public class MeterRenderer {
 		
 		Matrix4f model = matrices.peek().getModel();
 		
-		float r = (color >> 16 & 255) / 255.0F;
-		float g = (color >> 8  & 255) / 255.0F;
-		float b = (color       & 255) / 255.0F;
+		float r = ColorUtils.getRed(color) / 255.0F;
+		float g = ColorUtils.getGreen(color) / 255.0F;
+		float b = ColorUtils.getBlue(color) / 255.0F;
 		
 		drawFilledBox(builder, tessellator, model, r, g, b, 0.5F);
 		

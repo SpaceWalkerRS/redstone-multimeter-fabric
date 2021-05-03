@@ -185,6 +185,22 @@ public class Multimeter {
 		}
 	}
 	
+	public void moveMeter(int index, WorldPos pos, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup != null) {
+			moveMeter(index, pos, meterGroup);
+		}
+	}
+	
+	public void moveMeter(int index, WorldPos pos, ServerMeterGroup meterGroup) {
+		World world = server.getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, pos.getWorldId()));
+		
+		if (world != null) {
+			meterGroup.moveMeter(index, pos);
+		}
+	}
+	
 	public void renameMeter(int index, String name, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
@@ -206,6 +222,37 @@ public class Multimeter {
 			
 			if (meter != null) {
 				meter.setColor(color);
+				meter.markDirty();
+			}
+		}
+	}
+	
+	public void changeMeterMovability(int index, boolean movable, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup != null) {
+			Meter meter = meterGroup.getMeter(index);
+			
+			if (meter != null) {
+				meter.setIsMovable(movable);
+				meter.markDirty();
+			}
+		}
+	}
+	
+	public void toggleEventType(int index, EventType type, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup != null) {
+			Meter meter = meterGroup.getMeter(index);
+			
+			if (meter != null) {
+				if (meter.isMetering(type)) {
+					meter.stopMetering(type);
+				} else {
+					meter.startMetering(type);
+				}
+				
 				meter.markDirty();
 			}
 		}

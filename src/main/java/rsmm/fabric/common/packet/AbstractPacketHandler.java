@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.netty.buffer.Unpooled;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -17,14 +18,16 @@ public abstract class AbstractPacketHandler {
 	
 	protected Packet<?> encodePacket(AbstractRSMMPacket packet) {
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
+		CompoundTag data = new CompoundTag();
 		
 		PacketType packetType = PacketType.fromPacket(packet);
 		if (packetType == PacketType.INVALID) {
 			throw new IllegalStateException("Unable to encode packet: " + packet.getClass());
 		}
-		buffer.writeByte(packetType.getIndex());
+		packet.encode(data);
 		
-		packet.encode(buffer);
+		buffer.writeByte(packetType.getIndex());
+		buffer.writeCompoundTag(data);
 		
 		return toCustomPayloadPacket(buffer);
 	}
@@ -33,6 +36,7 @@ public abstract class AbstractPacketHandler {
 	
 	protected AbstractRSMMPacket decodePacket(PacketByteBuf buffer) throws InstantiationException, IllegalAccessException {
 		byte index = buffer.readByte();
+		CompoundTag data = buffer.readCompoundTag();
 		
 		PacketType type = PacketType.fromIndex(index);
 		if (type == PacketType.INVALID) {
@@ -40,7 +44,7 @@ public abstract class AbstractPacketHandler {
 		}
 		AbstractRSMMPacket packet = type.getClazz().newInstance();
 		
-		packet.decode(buffer);
+		packet.decode(data);
 		
 		return packet;
 	}
@@ -57,7 +61,8 @@ public abstract class AbstractPacketHandler {
 		TOGGLE_METER(5, ToggleMeterPacket.class),
 		REMOVE_ALL_METERS(6, RemoveAllMetersPacket.class),
 		ADD_METER(7, AddMeterPacket.class),
-		REMOVE_METER(8, RemoveMeterPacket.class);
+		REMOVE_METER(8, RemoveMeterPacket.class),
+		METER_CHANGE(9, MeterChangePacket.class);
 		
 		private static final PacketType[] PACKET_TYPES;
 		private static final Map<Class<? extends AbstractRSMMPacket>, PacketType> PACKET_TO_TYPE;

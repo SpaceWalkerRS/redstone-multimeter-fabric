@@ -32,6 +32,8 @@ public interface IElement extends Drawable {
 	
 	public void setDragging(boolean dragging);
 	
+	public void onRemoved();
+	
 	public void focus();
 	
 	public void unfocus();
