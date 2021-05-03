@@ -200,7 +200,7 @@ public class MeterCommand {
 			}
 			
 			multimeter.addMeter(pos, movable, name, color, player);
-			source.sendFeedback(new LiteralText(String.format("Added a meter at %s!", pos.toShortString())), false);
+			source.sendFeedback(new LiteralText(String.format("Added a meter at %s!", pos.toString())), false);
 			
 			return 1;
 		} catch (CommandSyntaxException e) {
