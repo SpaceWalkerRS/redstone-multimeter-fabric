@@ -41,7 +41,7 @@ public class WorldPos extends BlockPos {
 	
 	@Override
 	public String toString() {
-		return String.format("%s{%d,%d,%d}", worldId.toString(), getX(), getY(), getZ());
+		return String.format("%s[%d, %d, %d]", worldId.toString(), getX(), getY(), getZ());
 	}
 	
 	public Identifier getWorldId() {
