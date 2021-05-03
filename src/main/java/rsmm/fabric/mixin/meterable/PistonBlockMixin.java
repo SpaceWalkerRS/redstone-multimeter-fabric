@@ -38,7 +38,7 @@ public abstract class PistonBlockMixin implements MeterableBlock, IBlock {
 			)
 	)
 	private void onShouldExtendInjectAtReturn(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
-		onBlockUpdate(world, pos, cir.getReturnValue());
+		logPowered(world, pos, cir.getReturnValue());
 	}
 	
 	@Inject(

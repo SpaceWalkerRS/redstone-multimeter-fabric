@@ -95,8 +95,8 @@ public class MeterRenderer {
 	
 	private void drawBox(BufferBuilder builder, Matrix4f model, float r, float g, float b, float a, boolean outline) {
 		// The box is slightly larger than 1x1 to prevent z-fighting
-		float c0 = -0.001F;
-		float c1 = 1.001F;
+		float c0 = -0.002F;
+		float c1 = 1.002F;
 		
 		// Back Face
 		builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();

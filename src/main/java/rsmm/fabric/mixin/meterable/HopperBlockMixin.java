@@ -26,7 +26,7 @@ public class HopperBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onUpdateEnabledInjectAtGet(World world, BlockPos pos, BlockState state, CallbackInfo ci, boolean shouldBeEnabled) {
-		onBlockUpdate(world, pos, !shouldBeEnabled);
+		logPowered(world, pos, !shouldBeEnabled);
 	}
 	
 	@Override

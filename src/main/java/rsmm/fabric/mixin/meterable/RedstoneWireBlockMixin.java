@@ -27,7 +27,7 @@ public abstract class RedstoneWireBlockMixin implements MeterableBlock, IBlock {
 			)
 	)
 	private void onGetReceivedRedstonePower(World world, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
-		onBlockUpdate(world, pos, cir.getReturnValue() > 0);
+		logPowered(world, pos, cir.getReturnValue() > 0);
 	}
 	
 	@Override

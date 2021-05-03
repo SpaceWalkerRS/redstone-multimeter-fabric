@@ -13,7 +13,7 @@ public interface MeterableBlock extends Meterable {
 		return EventType.ACTIVE.flag();
 	}
 	
-	default void onBlockUpdate(World world, BlockPos pos, boolean powered) {
+	default void logPowered(World world, BlockPos pos, boolean powered) {
 		if (!world.isClient()) {
 			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
