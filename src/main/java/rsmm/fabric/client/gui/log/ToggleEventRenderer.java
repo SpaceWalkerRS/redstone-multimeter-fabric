@@ -62,7 +62,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			long start = eventInTable ? event.getTick() + 1 : firstTick;
 			long end = nextEventInTable ? nextEvent.getTick() : lastTick;
 			
-			if (nextEvent == null ? isToggled(meter) : !wasToggled(nextEvent)) {
+			if (event == null ? isToggled(meter) : wasToggled(event)) {
 				int column = (int)(start - firstTick);
 				int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
@@ -142,7 +142,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			int start = eventInTable ? event.getSubTick() + 1 : 0;
 			int end = nextEventInTable ? nextEvent.getSubTick() : subTickCount;
 			
-			if (nextEvent == null ? isToggled(meter) : !wasToggled(nextEvent)) {
+			if (event == null ? isToggled(meter) : wasToggled(event)) {
 				int columnX = x + start * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
 				draw(matrices, columnX, y, color, end - start);

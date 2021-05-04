@@ -32,7 +32,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	
 	private static final int SPACING = 160;
 	private static final int ROW_HEIGHT = 22;
-	private static final int BUTTON_WIDTH = 140;
+	private static final int BUTTON_WIDTH = 150;
 	private static final int BUTTON_HEIGHT = 20;
 	
 	private static int lastSelectedMeter = -1;
@@ -85,57 +85,68 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			int x = this.x + 2;
 			int y = this.y + 20;
 			
+			int x1;
+			int dx = 7;
+			
 			Text title = new LiteralText(String.format("Edit Meter #%d (%s)", meterIndex, meter.getName())).formatted(Formatting.UNDERLINE);
 			font.drawWithShadow(matrices, title, x, y, 0xFFFFFF);
 			
-			Text posText = new LiteralText("Pos:");
+			Text posText = new LiteralText("Pos:").formatted(Formatting.ITALIC);
 			y = dimensionField.getY() + 6;
 			font.drawWithShadow(matrices, posText, x, y, 0xFFFFFF);
 			
 			Text dimensionText = new LiteralText("dimension");
-			font.drawWithShadow(matrices, dimensionText, dimensionField.getX() - 50, y, 0xFFFFFF);
+			x1 = dimensionField.getX() - dx - font.getWidth(dimensionText);
+			font.drawWithShadow(matrices, dimensionText, x1, y, 0xFFFFFF);
 			
 			Text xText = new LiteralText("x");
+			x1 = xField.getX() - dx - font.getWidth(xText);
 			y = xField.getY() + 6;
-			font.drawWithShadow(matrices, xText, xField.getX() - 50, y, 0xFFFFFF);
+			font.drawWithShadow(matrices, xText, x1, y, 0xFFFFFF);
 			
 			Text yText = new LiteralText("y");
+			x1 = yField.getX() - dx - font.getWidth(yText);
 			y = yField.getY() + 6;
-			font.drawWithShadow(matrices, yText, yField.getX() - 50, y, 0xFFFFFF);
+			font.drawWithShadow(matrices, yText, x1, y, 0xFFFFFF);
 			
 			Text zText = new LiteralText("z");
+			x1 = zField.getX() - dx - font.getWidth(zText);
 			y = zField.getY() + 6;
-			font.drawWithShadow(matrices, zText, zField.getX() - 50, y, 0xFFFFFF);
+			font.drawWithShadow(matrices, zText, x1, y, 0xFFFFFF);
 			
-			Text nameText = new LiteralText("Name:");
+			Text nameText = new LiteralText("Name:").formatted(Formatting.ITALIC);
 			y = nameField.getY() + 6;
 			font.drawWithShadow(matrices, nameText, x, y, 0xFFFFFF);
 			
-			Text colorText = new LiteralText("Color:");
+			Text colorText = new LiteralText("Color:").formatted(Formatting.ITALIC);
 			y = colorField.getY() + 6;
 			font.drawWithShadow(matrices, colorText, x, y, 0xFFFFFF);
 			
 			Text rgbText = new LiteralText("rgb");
-			font.drawWithShadow(matrices, rgbText, colorField.getX() - 50, y, meter.getColor());
+			x1 = colorField.getX() - dx - font.getWidth(rgbText);
+			font.drawWithShadow(matrices, rgbText, x1, y, meter.getColor());
 			
 			Text redText = new LiteralText("red").formatted(Formatting.RED);
+			x1 = redSlider.getX() - dx - font.getWidth(redText);
 			y = redSlider.getY() + 6;
-			font.drawWithShadow(matrices, redText, redSlider.getX() - 50, y, 0xFFFFFF);
+			font.drawWithShadow(matrices, redText, x1, y, 0xFFFFFF);
 			
 			Text greenText = new LiteralText("green").formatted(Formatting.GREEN);
+			x1 = greenSlider.getX() - dx - font.getWidth(greenText);
 			y = greenSlider.getY() + 6;
-			font.drawWithShadow(matrices, greenText, greenSlider.getX() - 50, y, 0xFFFFFF);
+			font.drawWithShadow(matrices, greenText, x1, y, 0xFFFFFF);
 			
 			Text blueText = new LiteralText("blue").formatted(Formatting.BLUE);
+			x1 = blueSlider.getX() - dx - font.getWidth(blueText);
 			y = blueSlider.getY() + 6;
-			font.drawWithShadow(matrices, blueText, blueSlider.getX() - 50, y, 0xFFFFFF);
+			font.drawWithShadow(matrices, blueText, x1, y, 0xFFFFFF);
 			
-			Text movableText = new LiteralText("Movable:");
+			Text movableText = new LiteralText("Movable:").formatted(Formatting.ITALIC);
 			y = movableButton.getY() + 6;
 			font.drawWithShadow(matrices, movableText, x, y, 0xFFFFFF);
 			
 			
-			Text eventsText = new LiteralText("Metered Events:");
+			Text eventsText = new LiteralText("Metered Events:").formatted(Formatting.ITALIC);
 			y = eventTypeButtons.get(0).getY() + 6;
 			font.drawWithShadow(matrices, eventsText, x, y, 0xFFFFFF);
 			
@@ -143,8 +154,9 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 				Button button = eventTypeButtons.get(type.getIndex());
 				
 				Text eventTypeText = new LiteralText(type.getName());
+				x1 = button.getX() - dx - font.getWidth(eventTypeText);
 				y = button.getY() + 6;
-				font.drawWithShadow(matrices, eventTypeText, button.getX() - 50, y, 0xFFFFFF);
+				font.drawWithShadow(matrices, eventTypeText, x1, y, 0xFFFFFF);
 			}
 		}
 	}
