@@ -278,24 +278,6 @@ public class Multimeter {
 		}
 	}
 	
-	public void updateMeteredEvents(int index, EventType type, boolean start, ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
-		
-		if (meterGroup != null) {
-			Meter meter = meterGroup.getMeter(index);
-			
-			if (meter != null) {
-				if (start) {
-					meter.startMetering(type);
-				} else {
-					meter.stopMetering(type);
-				}
-				
-				meter.markDirty();
-			}
-		}
-	}
-	
 	public void removeAllMeters(ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		

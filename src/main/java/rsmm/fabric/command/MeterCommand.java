@@ -285,7 +285,12 @@ public class MeterCommand {
 	
 	private static int updateMeteredEvents(ServerCommandSource source, Integer meterIndex, BlockPos pos, EventType type, boolean start) {
 		return updateMeter(source, meterIndex, pos, (multimeter, index, player) -> {
-			multimeter.updateMeteredEvents(index, type, start, player);
+			Meter meter = multimeter.getSubscription(player).getMeter(index);
+			
+			if (meter.isMetering(type) != start) {
+				multimeter.toggleEventType(index, type, player);
+			}
+			
 			source.sendFeedback(new LiteralText(String.format("%s %s metering %s", multimeter.getSubscription(player).getMeter(index).getName(),start ? "started" : "stopped", type.getName())), false);
 		});
 	}
