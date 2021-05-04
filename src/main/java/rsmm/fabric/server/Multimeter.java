@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -222,52 +223,29 @@ public class Multimeter {
 	}
 	
 	public void renameMeter(int index, String name, ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
-		
-		if (meterGroup != null) {
-			Meter meter = meterGroup.getMeter(index);
-			
-			if (meter != null) {
-				meter.setName(name);
-				meter.markDirty();
-			}
-		}
+		changeMeter(index, meter -> meter.setName(name), player);
 	}
 	
 	public void recolorMeter(int index, int color, ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
-		
-		if (meterGroup != null) {
-			Meter meter = meterGroup.getMeter(index);
-			
-			if (meter != null) {
-				meter.setColor(color);
-				meter.markDirty();
-			}
-		}
+		changeMeter(index, meter -> meter.setColor(color), player);
 	}
 	
 	public void changeMeterMovability(int index, boolean movable, ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
-		
-		if (meterGroup != null) {
-			Meter meter = meterGroup.getMeter(index);
-			
-			if (meter != null) {
-				meter.setIsMovable(movable);
-				meter.markDirty();
-			}
-		}
+		changeMeter(index, meter -> meter.setIsMovable(movable), player);
 	}
 	
 	public void toggleEventType(int index, EventType type, ServerPlayerEntity player) {
+		changeMeter(index, meter -> meter.toggleEventType(type), player);
+	}
+	
+	private void changeMeter(int index, Consumer<Meter> update, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
 		if (meterGroup != null) {
 			Meter meter = meterGroup.getMeter(index);
 			
 			if (meter != null) {
-				meter.toggleEventType(type);
+				update.accept(meter);
 				meter.markDirty();
 			}
 		}
