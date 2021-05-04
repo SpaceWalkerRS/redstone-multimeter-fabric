@@ -282,6 +282,10 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	}
 	
 	public boolean selectMeter(int index) {
+		if (index >= client.getMeterGroup().getMeterCount()) {
+			index = -1;
+		}
+		
 		meterIndex = index;
 		lastSelectedMeter = meterIndex;
 		
