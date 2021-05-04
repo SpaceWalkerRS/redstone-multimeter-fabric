@@ -1,15 +1,19 @@
 package rsmm.fabric.command;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
@@ -24,8 +28,6 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.command.argument.HexColorArgumentType;
-import rsmm.fabric.command.argument.MeterEventArgumentType;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
@@ -37,6 +39,14 @@ import rsmm.fabric.server.ServerMeterGroup;
 import rsmm.fabric.util.ColorUtils;
 
 public class MeterCommand {
+	
+	private static final Collection<String> TYPE_NAMES = new ArrayList<>();
+	
+	static {
+		for (EventType type : EventType.TYPES) {
+			TYPE_NAMES.add(type.getName());
+		}
+	}
 	
 	public static void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralArgumentBuilder<ServerCommandSource> builder = CommandManager.
@@ -54,9 +64,9 @@ public class MeterCommand {
 							suggests((context, suggestionsBuilder) -> nameSuggestions(context.getSource(), suggestionsBuilder, null)).
 							executes(context -> addMeter(context.getSource(), BlockPosArgumentType.getBlockPos(context, "pos"), BoolArgumentType.getBool(context, "movable"), StringArgumentType.getString(context, "name"), null)).
 							then(CommandManager.
-								argument("color", HexColorArgumentType.color()).
+								argument("color", StringArgumentType.word()).
 								suggests((context, suggestionsBuilder) -> colorSuggestions(context.getSource(), suggestionsBuilder, null)).
-								executes(context -> addMeter(context.getSource(), BlockPosArgumentType.getBlockPos(context, "pos"), BoolArgumentType.getBool(context, "movable"), StringArgumentType.getString(context, "name"), HexColorArgumentType.getColor(context, "color")))))))).
+								executes(context -> addMeter(context.getSource(), BlockPosArgumentType.getBlockPos(context, "pos"), BoolArgumentType.getBool(context, "movable"), StringArgumentType.getString(context, "name"), parseColor(context, "color")))))))).
 			then(CommandManager.
 				literal("remove").
 				then(CommandManager.
@@ -81,9 +91,9 @@ public class MeterCommand {
 					argument("index", IntegerArgumentType.integer()).
 					suggests((context, suggestionsBuilder) -> indexSuggestions(context.getSource(), suggestionsBuilder, null)).
 					then(CommandManager.
-						argument("color", HexColorArgumentType.color()).
+						argument("color", StringArgumentType.word()).
 						suggests((context, suggestionsBuilder) -> colorSuggestions(context.getSource(), suggestionsBuilder, IntegerArgumentType.getInteger(context, "index"))).
-						executes(context -> recolorMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, HexColorArgumentType.getColor(context, "color")))))).
+						executes(context -> recolorMeter(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, parseColor(context, "color")))))).
 			then(CommandManager.
 				literal("event").
 				then(CommandManager.
@@ -96,16 +106,18 @@ public class MeterCommand {
 						argument("index", IntegerArgumentType.integer()).
 						suggests((context, suggestionsBuilder) -> indexSuggestions(context.getSource(), suggestionsBuilder, null)).
 						then(CommandManager.
-							argument("type", MeterEventArgumentType.eventType()).
-							executes(context -> updateMeteredEvents(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, MeterEventArgumentType.getEventType(context, "type"), true))))).
+							argument("type", StringArgumentType.word()).
+							suggests((context, suggestionsBuilder) -> CommandSource.suggestMatching(TYPE_NAMES, suggestionsBuilder)).
+							executes(context -> updateMeteredEvents(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, parseEventType(context, "type"), true))))).
 				then(CommandManager.
 					literal("stop").
 					then(CommandManager.
 						argument("index", IntegerArgumentType.integer()).
 						suggests((context, suggestionsBuilder) -> indexSuggestions(context.getSource(), suggestionsBuilder, null)).
 						then(CommandManager.
-							argument("type", MeterEventArgumentType.eventType()).
-							executes(context -> updateMeteredEvents(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, MeterEventArgumentType.getEventType(context, "type"), false)))))).
+							argument("type", StringArgumentType.word()).
+							suggests((context, suggestionsBuilder) -> CommandSource.suggestMatching(TYPE_NAMES, suggestionsBuilder)).
+							executes(context -> updateMeteredEvents(context.getSource(), IntegerArgumentType.getInteger(context, "index"), null, parseEventType(context, "type"), false)))))).
 			then(CommandManager.
 				literal("group").
 				then(CommandManager.
@@ -117,6 +129,31 @@ public class MeterCommand {
 				executes(context -> listGroups(context.getSource())));
 		
 		dispatcher.register(builder);
+	}
+	
+	private static <S> int parseColor(CommandContext<S> context, String name) throws CommandSyntaxException {
+		String asString = StringArgumentType.getString(context, name);
+		
+		if (asString.length() > 6) {
+			throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create();
+		}
+		
+		try {
+			return ColorUtils.fromString(asString);
+		} catch (Exception e) {
+			throw new DynamicCommandExceptionType(value -> new LiteralMessage(String.format("Invalid color \'%s\'", value))).create(asString);
+		}
+	}
+	
+	private static <S> EventType parseEventType(CommandContext<S> context, String name) throws CommandSyntaxException {
+		String typeName = StringArgumentType.getString(context, name);
+		EventType type = EventType.fromName(typeName);
+		
+		if (type == null) {
+			throw new DynamicCommandExceptionType(value -> new LiteralMessage(String.format("Unknown event type \'%s\'", value))).create(typeName);
+		}
+		
+		return type;
 	}
 	
 	private static int updateMeter(ServerCommandSource source, Integer index, BlockPos blockPos, UpdateMeter update) {

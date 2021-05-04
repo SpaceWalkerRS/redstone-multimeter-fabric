@@ -21,7 +21,7 @@ public class HudSettings {
 	public static final int TICKS_SUB_TICKS_GAP = 3;
 	
 	public static final int BACKGROUND_COLOR = 0xFF202020;
-	public static final int BACKGROUND_COLOR_TRANSPARENT = 0x80202020;
+	public static final int BACKGROUND_COLOR_TRANSPARENT = 0xB0202020;
 	public static final int MAIN_GRID_COLOR = 0xFF404040;
 	public static final int INTERVAL_GRID_COLOR = 0xFF606060;
 	public static final int SELECTION_INDICATOR_COLOR = 0xFFFFFFFF;
