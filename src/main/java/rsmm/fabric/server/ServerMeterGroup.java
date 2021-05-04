@@ -99,7 +99,7 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	public void moveMeter(int index, WorldPos pos) {
-		if (index < 0 || posToIndex.containsKey(pos)) {
+		if (index < 0 || index >= meters.size() || posToIndex.containsKey(pos)) {
 			return;
 		}
 		
