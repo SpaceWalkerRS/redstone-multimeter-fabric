@@ -114,12 +114,8 @@ public class Meter {
 		return (eventTypes & type.flag()) != 0;
 	}
 	
-	public void startMetering(EventType type) {
-		setMeteredEventTypes(eventTypes | type.flag());
-	}
-	
-	public void stopMetering(EventType type) {
-		setMeteredEventTypes(eventTypes & ~type.flag());
+	public void toggleEventType(EventType type) {
+		setMeteredEventTypes(eventTypes ^ type.flag());
 	}
 	
 	public void setMeteredEventTypes(int eventTypes) {

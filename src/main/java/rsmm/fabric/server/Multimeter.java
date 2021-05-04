@@ -267,12 +267,7 @@ public class Multimeter {
 			Meter meter = meterGroup.getMeter(index);
 			
 			if (meter != null) {
-				if (meter.isMetering(type)) {
-					meter.stopMetering(type);
-				} else {
-					meter.startMetering(type);
-				}
-				
+				meter.toggleEventType(type);
 				meter.markDirty();
 			}
 		}
