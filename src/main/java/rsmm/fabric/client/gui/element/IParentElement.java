@@ -120,7 +120,7 @@ public interface IParentElement extends IElement {
 	}
 	
 	@Override
-	default List<Text> getTooltip(double mouseX, double mouseY) {
+	default List<List<Text>> getTooltip(double mouseX, double mouseY) {
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
 		return hoveredElement == null ? Collections.emptyList() : hoveredElement.getTooltip(mouseX, mouseY);
 	}

@@ -109,8 +109,8 @@ public class HudElement extends AbstractParentElement {
 	}
 	
 	@Override
-	public List<Text> getTooltip(double mouseX, double mouseY) {
-		List<Text> tooltip = super.getTooltip(mouseX, mouseY);
+	public List<List<Text>> getTooltip(double mouseX, double mouseY) {
+		List<List<Text>> tooltip = super.getTooltip(mouseX, mouseY);
 		
 		if (tooltip.isEmpty()) {
 			tooltip = hudRenderer.getTextForTooltip();

@@ -92,16 +92,32 @@ public class MeterEvent {
 		return metaData;
 	}
 	
-	public List<Text> getTextForTooltip() {
-		List<Text> text = new ArrayList<>();
+	public List<List<Text>> getTextForTooltip() {
+		List<List<Text>> lines = new ArrayList<>();
 		
-		text.add(new LiteralText("event type: ").formatted(Formatting.GOLD).append(type.getName()));
-		text.add(new LiteralText("tick: ").formatted(Formatting.GOLD).append(String.valueOf(tick)));
-		text.add(new LiteralText("subtick: ").formatted(Formatting.GOLD).append(String.valueOf(subTick)));
-		text.add(new LiteralText("tick phase: ").formatted(Formatting.GOLD).append(tickPhase.getName()));
-		type.addTextForTooltip(text, metaData);
+		List<Text> line0 = new ArrayList<>();
+		line0.add(new LiteralText("event type: ").formatted(Formatting.GOLD));
+		line0.add(new LiteralText(type.getName()));
+		lines.add(line0);
 		
-		return text;
+		List<Text> line1 = new ArrayList<>();
+		line0.add(new LiteralText("tick: ").formatted(Formatting.GOLD));
+		line0.add(new LiteralText(String.valueOf(tick)));
+		lines.add(line1);
+		
+		List<Text> line2 = new ArrayList<>();
+		line0.add(new LiteralText("subtick: ").formatted(Formatting.GOLD));
+		line0.add(new LiteralText(String.valueOf(subTick)));
+		lines.add(line2);
+		
+		List<Text> line3 = new ArrayList<>();
+		line0.add(new LiteralText("tick phase: ").formatted(Formatting.GOLD));
+		line0.add(new LiteralText(tickPhase.getName()));
+		lines.add(line3);
+		
+		type.addTextForTooltip(lines, metaData);
+		
+		return lines;
 	}
 	
 	public CompoundTag toTag() {

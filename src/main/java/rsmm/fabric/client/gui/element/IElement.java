@@ -54,7 +54,7 @@ public interface IElement extends Drawable {
 	
 	public void setHeight(int height);
 	
-	default List<Text> getTooltip(double mouseX, double mouseY) {
+	default List<List<Text>> getTooltip(double mouseX, double mouseY) {
 		return Collections.emptyList();
 	}
 }
