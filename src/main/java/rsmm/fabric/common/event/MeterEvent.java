@@ -101,18 +101,18 @@ public class MeterEvent {
 		lines.add(line0);
 		
 		List<Text> line1 = new ArrayList<>();
-		line0.add(new LiteralText("tick: ").formatted(Formatting.GOLD));
-		line0.add(new LiteralText(String.valueOf(tick)));
+		line1.add(new LiteralText("tick: ").formatted(Formatting.GOLD));
+		line1.add(new LiteralText(String.valueOf(tick)));
 		lines.add(line1);
 		
 		List<Text> line2 = new ArrayList<>();
-		line0.add(new LiteralText("subtick: ").formatted(Formatting.GOLD));
-		line0.add(new LiteralText(String.valueOf(subTick)));
+		line2.add(new LiteralText("subtick: ").formatted(Formatting.GOLD));
+		line2.add(new LiteralText(String.valueOf(subTick)));
 		lines.add(line2);
 		
 		List<Text> line3 = new ArrayList<>();
-		line0.add(new LiteralText("tick phase: ").formatted(Formatting.GOLD));
-		line0.add(new LiteralText(tickPhase.getName()));
+		line3.add(new LiteralText("tick phase: ").formatted(Formatting.GOLD));
+		line3.add(new LiteralText(tickPhase.getName()));
 		lines.add(line3);
 		
 		type.addTextForTooltip(lines, metaData);

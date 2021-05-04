@@ -236,6 +236,8 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		int borderColorStart = 0x505000FF;
 		int borderColorEnd   = 0x5028007F;
 		
+		matrices.push();
+		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		Matrix4f model = matrices.peek().getModel();
@@ -246,7 +248,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.shadeModel(GL11.GL_SMOOTH);
 		
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
 		
 		fillGradient(model, bufferBuilder, left - 3        , top - 4         , left + width + 3, top - 3         , z, backgroundColor, backgroundColor);
 		fillGradient(model, bufferBuilder, left - 3        , top + height + 3, left + width + 3, top + height + 4, z, backgroundColor, backgroundColor);
@@ -268,7 +270,6 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		
 		VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 		
-		matrices.push();
 		matrices.translate(0.0D, 0.0D, 400.0D);
 		
 		int textX;
