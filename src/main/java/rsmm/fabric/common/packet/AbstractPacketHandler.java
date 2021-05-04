@@ -58,11 +58,12 @@ public abstract class AbstractPacketHandler {
 		SERVER_TICK(2, ServerTickPacket.class),
 		METER_GROUP_DATA(3, MeterGroupDataPacket.class),
 		METER_LOGS(4, MeterLogsDataPacket.class),
-		TOGGLE_METER(5, ToggleMeterPacket.class),
-		REMOVE_ALL_METERS(6, RemoveAllMetersPacket.class),
-		ADD_METER(7, AddMeterPacket.class),
-		REMOVE_METER(8, RemoveMeterPacket.class),
-		METER_CHANGE(9, MeterChangePacket.class);
+		METER_CHANGES(5, MeterChangesPacket.class),
+		TOGGLE_METER(6, ToggleMeterPacket.class),
+		REMOVE_ALL_METERS(7, RemoveAllMetersPacket.class),
+		ADD_METER(8, AddMeterPacket.class),
+		REMOVE_METER(9, RemoveMeterPacket.class),
+		METER_CHANGE(10, MeterChangePacket.class);
 		
 		private static final PacketType[] PACKET_TYPES;
 		private static final Map<Class<? extends AbstractRSMMPacket>, PacketType> PACKET_TO_TYPE;

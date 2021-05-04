@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
 
@@ -148,10 +149,50 @@ public class ServerMeterGroup extends MeterGroup {
 		return false;
 	}
 	
+	/**
+	 * Check if this meter group has new logs that need to be sent to clients
+	 */
+	public boolean hasNewLogs() {
+		for (Meter meter : meters) {
+			if (meter.hasNewLogs()) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public CompoundTag collectMeterChanges() {
+		CompoundTag meterChanges = new CompoundTag();
+		
+		int meterCount = getMeterCount();
+		
+		for (int index = 0; index < meterCount; index++) {
+			Meter meter = getMeter(index);
+			
+			if (meter.isDirty()) {
+				String key = String.valueOf(index);
+				CompoundTag meterData = meter.toTag();
+				
+				meterChanges.put(key, meterData);
+			}
+		}
+		
+		return meterChanges;
+	}
+	
 	public void cleanUp() {
 		for (Meter meter : meters) {
 			if (meter.isDirty()) {
 				meter.cleanUp();
+			}
+		}
+	}
+	
+	public void cleanLogs() {
+		for (Meter meter : meters) {
+			if (meter.hasNewLogs()) {
+				meter.cleanLogs();
 			}
 		}
 	}

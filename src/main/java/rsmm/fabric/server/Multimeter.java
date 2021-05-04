@@ -22,6 +22,7 @@ import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
+import rsmm.fabric.common.packet.types.MeterChangesPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
 import rsmm.fabric.common.packet.types.RemoveMeterPacket;
@@ -84,19 +85,38 @@ public class Multimeter {
 	
 	/**
 	 * This is called at the end of every server tick,
-	 * and sends all the logged events of the past tick
-	 * to clients.
+	 * and sends meter changes of the past tick to
+	 * clients.
 	 */
 	public void broadcastMeterData() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			if (meterGroup.isDirty()) {
 				if (meterGroup.hasSubscribers()) {
-					CompoundTag data = meterGroup.getLogManager().collectMeterData();
-					MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
+					CompoundTag data = meterGroup.collectMeterChanges();
+					MeterChangesPacket packet = new MeterChangesPacket(data);
 					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 				}
 				
 				meterGroup.cleanUp();
+			}
+		}
+	}
+	
+	/**
+	 * This is called at the end of every server tick,
+	 * and sends all the logged events of the past tick
+	 * to clients.
+	 */
+	public void broadcastMeterLogs() {
+		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+			if (meterGroup.hasNewLogs()) {
+				if (meterGroup.hasSubscribers()) {
+					CompoundTag data = meterGroup.getLogManager().collectMeterLogs();
+					MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
+					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+				}
+				
+				meterGroup.cleanLogs();
 			}
 		}
 	}

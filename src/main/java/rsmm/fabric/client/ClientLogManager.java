@@ -62,9 +62,9 @@ public class ClientLogManager extends LogManager {
 			
 			if (data.contains(key)) {
 				Meter meter = meterGroup.getMeter(index);
-				CompoundTag meterData = data.getCompound(key);
+				CompoundTag logs = data.getCompound(key);
 				
-				meter.updateFromData(meterData);
+				meter.getLogs().updateFromTag(logs);
 			}
 		}
 	}

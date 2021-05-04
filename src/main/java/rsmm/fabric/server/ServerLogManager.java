@@ -41,12 +41,14 @@ public class ServerLogManager extends LogManager {
 			
 			MeterEvent event = new MeterEvent(type, tick, subTick, phase, metaData);
 			meter.getLogs().add(event);
+			
+			meter.markLogged();
 		}
 		
 		meter.markDirty();
 	}
 	
-	public CompoundTag collectMeterData() {
+	public CompoundTag collectMeterLogs() {
 		CompoundTag data = new CompoundTag();
 		
 		int subTickCount = currentSubTick;
@@ -57,11 +59,11 @@ public class ServerLogManager extends LogManager {
 		for (int index = 0; index < meterCount; index++) {
 			Meter meter = meterGroup.getMeter(index);
 			
-			if (meter.isDirty()) {
+			if (meter.hasNewLogs()) {
 				String key = String.valueOf(index);
-				CompoundTag meterData = meter.collectData();
+				CompoundTag logs = meter.getLogs().toTag();
 				
-				data.put(key, meterData);
+				data.put(key, logs);
 			}
 		}
 		
