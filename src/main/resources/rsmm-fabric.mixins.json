@@ -26,6 +26,7 @@
   	"meterable.RedstoneLampBlockMixin",
   	"meterable.RedstoneTorchBlockMixin",
   	"meterable.RedstoneWireBlockMixin",
+  	"meterable.RepeaterBlockMixin",
   	"meterable.TargetBlockMixin",
   	"meterable.TrapdoorBlockMixin",
   	"meterable.TrappedChestBlockMixin",
