@@ -12,11 +12,12 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(RedstoneTorchBlock.class)
-public abstract class RedstoneTorchBlockMixin implements MeterableBlock, IBlock {
+public abstract class RedstoneTorchBlockMixin implements IBlock, MeterableBlock {
 	
 	@Shadow protected abstract boolean shouldUnpower(World world, BlockPos pos, BlockState state);
 	
@@ -31,8 +32,8 @@ public abstract class RedstoneTorchBlockMixin implements MeterableBlock, IBlock 
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.LIT);
+	public int getDefaultMeteredEvents() {
+		return EventType.ACTIVE.flag();
 	}
 	
 	@Override
@@ -43,5 +44,10 @@ public abstract class RedstoneTorchBlockMixin implements MeterableBlock, IBlock 
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
 		return shouldUnpower(world, pos, state);
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.LIT);
 	}
 }

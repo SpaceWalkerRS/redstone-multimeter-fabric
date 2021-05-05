@@ -14,12 +14,11 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(NoteBlock.class)
-public class NoteBlockMixin implements MeterableBlock, IBlock {
+public class NoteBlockMixin implements IBlock, MeterableBlock {
 	
 	@Inject(
 			method = "neighborUpdate",
@@ -36,16 +35,6 @@ public class NoteBlockMixin implements MeterableBlock, IBlock {
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED);
-	}
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.POWERED.flag() | EventType.MOVED.flag();
-	}
-	
-	@Override
 	public boolean standardIsPowered() {
 		return false;
 	}
@@ -53,5 +42,10 @@ public class NoteBlockMixin implements MeterableBlock, IBlock {
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
 		return world.isReceivingRedstonePower(pos);
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.POWERED);
 	}
 }

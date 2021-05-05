@@ -8,10 +8,17 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(EndPortalFrameBlock.class)
-public class EndPortalFrameBlockMixin implements MeterableBlock {
+public class EndPortalFrameBlockMixin implements IBlock, MeterableBlock {
+	
+	@Override
+	public int getDefaultMeteredEvents() {
+		return EventType.ACTIVE.flag();
+	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {

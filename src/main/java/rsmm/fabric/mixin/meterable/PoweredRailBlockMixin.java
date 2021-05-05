@@ -13,12 +13,11 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(PoweredRailBlock.class)
-public abstract class PoweredRailBlockMixin implements MeterableBlock, IBlock {
+public abstract class PoweredRailBlockMixin implements IBlock, MeterableBlock {
 	
 	@Shadow protected abstract boolean isPoweredByOtherRails(World world, BlockPos pos, BlockState state, boolean boolean4, int distance);
 	
@@ -33,16 +32,6 @@ public abstract class PoweredRailBlockMixin implements MeterableBlock, IBlock {
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED);
-	}
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag() | EventType.MOVED.flag();
-	}
-	
-	@Override
 	public boolean standardIsPowered() {
 		return false;
 	}
@@ -50,5 +39,10 @@ public abstract class PoweredRailBlockMixin implements MeterableBlock, IBlock {
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
 		return world.isReceivingRedstonePower(pos) || isPoweredByOtherRails(world, pos, state, true, 0) || isPoweredByOtherRails(world, pos, state, false, 0);
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.POWERED);
 	}
 }

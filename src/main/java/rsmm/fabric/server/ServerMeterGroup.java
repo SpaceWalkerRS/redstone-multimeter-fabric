@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.block.Block;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
@@ -14,6 +15,7 @@ import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.interfaces.mixin.IBlock;
 
 public class ServerMeterGroup extends MeterGroup {
 	
@@ -202,6 +204,20 @@ public class ServerMeterGroup extends MeterGroup {
 		
 		if (meter != null && meter.blockUpdate(powered)) {
 			logManager.logEvent(meter, EventType.POWERED, powered ? 1 : 0);
+		}
+	}
+	
+	public void blockChanged(WorldPos pos, Block oldBlock , Block newBlock) {
+		Meter meter = getMeterAt(pos);
+		
+		if (meter != null) {
+			int oldBlockDefaults = ((IBlock)oldBlock).getDefaultMeteredEvents();
+			int newBlockDefaults = ((IBlock)newBlock).getDefaultMeteredEvents();
+			
+			if (meter.getMeteredEventTypes() == oldBlockDefaults) {
+				meter.setMeteredEventTypes(newBlockDefaults);
+				meter.markDirty();
+			}
 		}
 	}
 	

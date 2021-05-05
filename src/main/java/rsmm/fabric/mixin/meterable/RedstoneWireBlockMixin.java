@@ -12,6 +12,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.server.MeterableBlock;
 
@@ -31,8 +32,8 @@ public abstract class RedstoneWireBlockMixin implements MeterableBlock, IBlock {
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWER) > 0;
+	public int getDefaultMeteredEvents() {
+		return EventType.ACTIVE.flag();
 	}
 	
 	@Override
@@ -43,5 +44,10 @@ public abstract class RedstoneWireBlockMixin implements MeterableBlock, IBlock {
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
 		return getReceivedRedstonePower(world, pos) > 0;
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.POWER) > 0;
 	}
 }

@@ -175,19 +175,12 @@ public class Multimeter {
 				color = nextColor;
 			}
 			
-			int meteredEvents = EventType.POWERED.flag() | EventType.MOVED.flag();
-			boolean powered = false;
-			boolean active = false;
-			
 			BlockState state = world.getBlockState(pos);
 			Block block = state.getBlock();
 			
-			powered = ((IBlock)block).isPowered(world, pos, state);
-			
-			if (((IBlock)block).isMeterable()) {
-				meteredEvents = ((Meterable)block).getDefaultMeteredEvents();
-				active = ((Meterable)block).isActive(world, pos, state);
-			}
+			int meteredEvents = ((IBlock)block).getDefaultMeteredEvents();
+			boolean powered = ((IBlock)block).isPowered(world, pos, state);
+			boolean active = ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, pos, state);
 			
 			Meter meter = new Meter(pos, name, color, movable, meteredEvents, powered, active);
 			meterGroup.addMeter(meter);
@@ -310,6 +303,16 @@ public class Multimeter {
 	
 	public void blockUpdate(World world, BlockPos pos, boolean powered) {
 		blockUpdate(new WorldPos(world, pos), powered);
+	}
+	
+	public void blockChanged(WorldPos pos, Block oldBlock, Block newBlock) {
+		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+			meterGroup.blockChanged(pos, oldBlock, newBlock);
+		}
+	}
+	
+	public void blockChanged(World world, BlockPos pos, Block oldBlock, Block newBlock) {
+		blockChanged(new WorldPos(world, pos), oldBlock, newBlock);
 	}
 	
 	public void stateChanged(WorldPos pos, boolean active) {

@@ -8,10 +8,17 @@ import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(TrappedChestBlock.class)
-public class TrappedChestBlockMixin implements MeterableBlock {
+public class TrappedChestBlockMixin implements IBlock, MeterableBlock {
+	
+	@Override
+	public int getDefaultMeteredEvents() {
+		return EventType.ACTIVE.flag();
+	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {

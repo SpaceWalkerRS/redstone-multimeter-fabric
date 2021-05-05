@@ -27,7 +27,7 @@ import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
 
 @Mixin(PistonBlock.class)
-public abstract class PistonBlockMixin implements MeterableBlock, IBlock {
+public abstract class PistonBlockMixin implements IBlock, MeterableBlock {
 	
 	@Shadow protected abstract boolean shouldExtend(World world, BlockPos pos, Direction facing);
 	
@@ -61,11 +61,6 @@ public abstract class PistonBlockMixin implements MeterableBlock, IBlock {
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.EXTENDED);
-	}
-	
-	@Override
 	public int getDefaultMeteredEvents() {
 		return EventType.ACTIVE.flag() | EventType.MOVED.flag();
 	}
@@ -78,5 +73,10 @@ public abstract class PistonBlockMixin implements MeterableBlock, IBlock {
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
 		return shouldExtend(world, pos, state.get(Properties.FACING));
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.EXTENDED);
 	}
 }

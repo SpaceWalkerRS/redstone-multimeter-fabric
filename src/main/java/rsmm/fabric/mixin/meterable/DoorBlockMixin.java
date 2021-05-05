@@ -15,12 +15,13 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(DoorBlock.class)
-public class DoorBlockMixin implements MeterableBlock, IBlock {
+public class DoorBlockMixin implements IBlock, MeterableBlock {
 	
 	@Inject(
 			method = "neighborUpdate",
@@ -37,13 +38,8 @@ public class DoorBlockMixin implements MeterableBlock, IBlock {
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.OPEN);
-	}
-	
-	@Override
 	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag() | EventType.MOVED.flag();
+		return EventType.POWERED.flag();
 	}
 	
 	@Override
@@ -61,5 +57,10 @@ public class DoorBlockMixin implements MeterableBlock, IBlock {
 		Direction dir = (half == DoubleBlockHalf.LOWER) ? Direction.UP : Direction.DOWN;
 		
 		return world.isReceivingRedstonePower(pos.offset(dir));
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.OPEN);
 	}
 }
