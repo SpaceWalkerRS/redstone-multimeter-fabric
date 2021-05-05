@@ -1,13 +1,19 @@
 package rsmm.fabric.client;
 
+import java.util.function.Function;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
 import rsmm.fabric.client.gui.MultimeterScreen;
 import rsmm.fabric.common.WorldPos;
@@ -16,6 +22,18 @@ import rsmm.fabric.common.packet.types.ToggleMeterPacket;
 import rsmm.fabric.util.NBTUtils;
 
 public class MultimeterClient {
+	
+	private static final Function<String, String> VERSION_WARNING = (modVersion) -> {
+		String warning;
+		
+		if (modVersion.isEmpty()) {
+			warning = "WARNING: the server is running an unknown version of Redstone Multimeter. If you are experiencing issues, ask the server operator for the correct version of Redstone Multimeter to intall.";
+		} else {
+			warning = "WARNING: the server is running a different version of Redstone Multimeter. If you are experiencing issues, install version " + modVersion + " of Redstone Multimeter.";
+		}
+		
+		return warning;
+	};
 	
 	private final MinecraftClient client;
 	private final ClientPacketHandler packetHandler;
@@ -96,8 +114,13 @@ public class MultimeterClient {
 	/**
 	 * Called when this client connects to a MultimeterServer
 	 */
-	public void onConnect(long serverTick) {
+	public void onConnect(String modVersion, long serverTick) {
 		if (!connected) {
+			if (!RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
+				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
+				client.player.sendMessage(warning, false);
+			}
+			
 			connected = true;
 			currentServerTick = serverTick;
 			

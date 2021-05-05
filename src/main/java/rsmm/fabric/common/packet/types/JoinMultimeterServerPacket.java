@@ -3,12 +3,14 @@ package rsmm.fabric.common.packet.types;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
 public class JoinMultimeterServerPacket extends AbstractRSMMPacket {
 	
+	private String modVersion;
 	private long currentServerTick;
 	
 	public JoinMultimeterServerPacket() {
@@ -16,16 +18,19 @@ public class JoinMultimeterServerPacket extends AbstractRSMMPacket {
 	}
 	
 	public JoinMultimeterServerPacket(long serverTick) {
+		modVersion = RedstoneMultimeterMod.MOD_VERSION;
 		currentServerTick = serverTick;
 	}
 	
 	@Override
 	public void encode(CompoundTag data) {
+		data.putString("modVersion", modVersion);
 		data.putLong("serverTime", currentServerTick);
 	}
 	
 	@Override
 	public void decode(CompoundTag data) {
+		modVersion = data.getString("modVersion");
 		currentServerTick = data.getLong("serverTime");
 	}
 	
@@ -36,6 +41,6 @@ public class JoinMultimeterServerPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.onConnect(currentServerTick);
+		client.onConnect(modVersion, currentServerTick);
 	}
 }
