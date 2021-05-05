@@ -27,6 +27,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	private final List<IElement> content;
 	
 	private IElement focused;
+	private boolean dragging;
 	
 	protected RSMMScreen(MultimeterClient multimeterClient) {
 		super(new LiteralText(""));
@@ -73,6 +74,16 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	@Override
 	public final boolean charTyped(char chr, int modifiers) {
 		return typeChar(chr, modifiers);
+	}
+
+	@Override
+	public boolean isDraggingMouse() {
+		return dragging;
+	}
+	
+	@Override
+	public void setDraggingMouse(boolean dragging) {
+		this.dragging = dragging;
 	}
 	
 	@Override

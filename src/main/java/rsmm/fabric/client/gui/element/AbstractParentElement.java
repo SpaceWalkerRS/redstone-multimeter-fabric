@@ -11,12 +11,12 @@ public abstract class AbstractParentElement implements IParentElement {
 	private IElement focused;
 	
 	@Override
-	public boolean isDragging() {
+	public boolean isDraggingMouse() {
 		return dragging;
 	}
 	
 	@Override
-	public void setDragging(boolean dragging) {
+	public void setDraggingMouse(boolean dragging) {
 		this.dragging = dragging;
 	}
 	

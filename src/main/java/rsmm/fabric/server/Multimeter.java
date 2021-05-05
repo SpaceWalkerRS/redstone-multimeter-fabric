@@ -238,14 +238,14 @@ public class Multimeter {
 		changeMeter(index, meter -> meter.toggleEventType(type), player);
 	}
 	
-	private void changeMeter(int index, Consumer<Meter> update, ServerPlayerEntity player) {
+	private void changeMeter(int index, Consumer<Meter> change, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
 		if (meterGroup != null) {
 			Meter meter = meterGroup.getMeter(index);
 			
 			if (meter != null) {
-				update.accept(meter);
+				change.accept(meter);
 				meter.markDirty();
 			}
 		}
@@ -290,6 +290,8 @@ public class Multimeter {
 	public void meterGroupDataReceived(String name, CompoundTag data, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = meterGroups.get(name);
 		
+		// This allows a player to carry over a meter group
+		// between different worlds and/or servers
 		if (meterGroup == null) {
 			meterGroup = new ServerMeterGroup(this, name);
 			meterGroup.fromTag(data);

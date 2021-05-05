@@ -28,9 +28,9 @@ public interface IElement extends Drawable {
 	
 	public boolean typeChar(char chr, int modifiers);
 	
-	public boolean isDragging();
+	public boolean isDraggingMouse();
 	
-	public void setDragging(boolean dragging);
+	public void setDraggingMouse(boolean dragging);
 	
 	public void onRemoved();
 	

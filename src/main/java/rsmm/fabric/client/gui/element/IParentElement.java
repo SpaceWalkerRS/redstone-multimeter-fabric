@@ -34,7 +34,7 @@ public interface IParentElement extends IElement {
 		}
 		
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			setDragging(true);
+			setDraggingMouse(true);
 		}
 		
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
@@ -51,7 +51,7 @@ public interface IParentElement extends IElement {
 	@Override
 	default boolean mouseRelease(double mouseX, double mouseY, int button) {
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			setDragging(false);
+			setDraggingMouse(false);
 		}
 		
 		boolean released = false;
@@ -70,7 +70,7 @@ public interface IParentElement extends IElement {
 	
 	@Override
 	default boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (isDragging() && (button == GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
+		if (isDraggingMouse() && (button == GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
 			IElement focused = getFocusedElement();
 			
 			if (focused != null) {

@@ -71,12 +71,12 @@ public class Button extends ButtonWidget implements IElement {
 	}
 	
 	@Override
-	public boolean isDragging() {
+	public boolean isDraggingMouse() {
 		return false;
 	}
 	
 	@Override
-	public void setDragging(boolean dragging) {
+	public void setDraggingMouse(boolean dragging) {
 		
 	}
 	
