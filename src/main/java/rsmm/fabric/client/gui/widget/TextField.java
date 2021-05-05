@@ -7,11 +7,10 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Tickable;
 
 import rsmm.fabric.client.gui.element.IElement;
 
-public class TextField extends TextFieldWidget implements IElement, Tickable {
+public class TextField extends TextFieldWidget implements IElement {
 	
 	private final Supplier<String> textSupplier;
 	
@@ -28,11 +27,6 @@ public class TextField extends TextFieldWidget implements IElement, Tickable {
 				textChangedListener.accept(text);
 			}
 		});
-	}
-	
-	@Override
-	public void tick() {
-		super.tick();
 	}
 	
 	@Override

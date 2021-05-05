@@ -7,7 +7,8 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.Tickable;
+
+import rsmm.fabric.client.gui.widget.TextField;
 
 public interface IParentElement extends IElement {
 	
@@ -159,10 +160,10 @@ public interface IParentElement extends IElement {
 		for (int index = 0; index < children.size(); index++) {
 			IElement child = children.get(index);
 			
-			if (child instanceof Tickable) {
-				((Tickable)child).tick();
-			} else if (child instanceof IParentElement) {
+			if (child instanceof IParentElement) {
 				((IParentElement)child).tick();
+			} else if (child instanceof TextField) {
+				((TextField)child).tick();
 			}
 		}
 	}
