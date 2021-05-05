@@ -81,6 +81,13 @@ public class MultimeterClient {
 		return meterGroup;
 	}
 	
+	/**
+	 * Check if this client is connected to a Multimeter server
+	 */
+	public boolean isConnected() {
+		return connected;
+	}
+	
 	public boolean renderHud() {
 		return renderHud && connected && !hasMultimeterScreenOpen();
 	}
@@ -112,7 +119,7 @@ public class MultimeterClient {
 	}
 	
 	/**
-	 * Called when this client connects to a MultimeterServer
+	 * Called when this client connects to a Multimeter server
 	 */
 	public void onConnect(String modVersion, long serverTick) {
 		if (!connected) {

@@ -14,6 +14,10 @@ public class InputHandler {
 	}
 	
 	public void handleInputEvents() {
+		if (!client.isConnected()) {
+			return;
+		}
+		
 		if (KeyBindings.TOGGLE_METER.wasPressed()) {
 			client.toggleMeter();
 		}
