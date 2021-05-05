@@ -136,6 +136,19 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		if (multimeterClient.getMeterGroup().getMeterCount() <= 0) {
+			String text = "Nothing to see here! Add a meter to get started.";
+			
+			int textWidth = textRenderer.getWidth(text);
+			int textHeight = textRenderer.fontHeight;
+			int x = getX() + (getWidth() - textWidth) / 2;
+			int y = getY() + (getHeight() - textHeight) / 2;
+			
+			textRenderer.drawWithShadow(matrices, text, x, y, 0xFFFFFF);
+			
+			return;
+		}
+		
 		int y = getY() - (int)(scrollAmount);
 		
 		for (IElement element : getChildren()) {
