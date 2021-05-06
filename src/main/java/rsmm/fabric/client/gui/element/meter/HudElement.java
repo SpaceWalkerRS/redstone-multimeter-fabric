@@ -2,10 +2,13 @@ package rsmm.fabric.client.gui.element.meter;
 
 import java.util.List;
 
+import org.lwjgl.glfw.GLFW;
+
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.gui.HudSettings;
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
 
@@ -19,6 +22,9 @@ public class HudElement extends AbstractParentElement {
 	private int width;
 	
 	private MeterControlsElement meterControls;
+	
+	private boolean draggingTicksTable;
+	private double mouseDragDeltaX;
 	
 	public HudElement(MultimeterClient client, int x, int y, int width) {
 		this.client = client;
@@ -46,18 +52,55 @@ public class HudElement extends AbstractParentElement {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean success = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success && mouseY <= (y + hudRenderer.getTotalHeight())) {
+		if (!success && button == GLFW.GLFW_MOUSE_BUTTON_LEFT && mouseY >= y && mouseY <= (y + hudRenderer.getTotalHeight())) {
 			int hoveredRow = hudRenderer.getHoveredRow();
 			int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
 			
 			if (hoveredRow >= 0 && hoveredNameColumn >= 0) {
-				success = meterControls.selectMeter(hoveredRow);
+				meterControls.selectMeter(hoveredRow);
 			} else {
 				meterControls.selectMeter(-1);
 			}
+			
+			if (mouseY <= (y + hudRenderer.getTableHeight())) {
+				int hoveredTickColumn = hudRenderer.getHoveredTickColumn();
+				
+				if (hoveredTickColumn >= 0) {
+					draggingTicksTable = true;
+				}
+			}
+			
+			success = true;
 		}
 		
 		return success;
+	}
+	
+	@Override
+	public boolean mouseRelease(double mouseX, double mouseY, int button) {
+		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			draggingTicksTable = false;
+			mouseDragDeltaX = 0.0D;
+		}
+		
+		return super.mouseRelease(mouseX, mouseY, button);
+	}
+	
+	@Override
+	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+		boolean dragged = super.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
+		
+		if (draggingTicksTable && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			mouseDragDeltaX += deltaX;
+			int scrollAmount = (int)(mouseDragDeltaX / (HudSettings.COLUMN_WIDTH + HudSettings.GRID_SIZE));
+			mouseDragDeltaX -= scrollAmount * (HudSettings.COLUMN_WIDTH + HudSettings.GRID_SIZE);
+			
+			hudRenderer.stepForward(scrollAmount);
+			
+			dragged = true;
+		}
+		
+		return dragged;
 	}
 	
 	@Override
