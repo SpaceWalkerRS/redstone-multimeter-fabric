@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
@@ -210,7 +211,7 @@ public class ServerMeterGroup extends MeterGroup {
 	public void blockChanged(WorldPos pos, Block oldBlock , Block newBlock) {
 		Meter meter = getMeterAt(pos);
 		
-		if (meter != null) {
+		if (meter != null && newBlock != Blocks.MOVING_PISTON) {
 			int oldBlockDefaults = ((IBlock)oldBlock).getDefaultMeteredEvents();
 			int newBlockDefaults = ((IBlock)newBlock).getDefaultMeteredEvents();
 			

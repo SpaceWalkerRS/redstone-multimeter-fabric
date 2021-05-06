@@ -40,11 +40,6 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 	
 	@Override
-	public void mouseMove(double mouseX, double mouseY) {
-		
-	}
-	
-	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean success = super.mouseClick(mouseX, mouseY, button);
 		
@@ -65,11 +60,13 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
+		boolean released = super.mouseRelease(mouseX, mouseY, button);
+		
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			mouseScrollType = 0;
 		}
 		
-		return true;
+		return released;
 	}
 	
 	@Override

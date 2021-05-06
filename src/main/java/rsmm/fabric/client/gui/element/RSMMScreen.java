@@ -121,7 +121,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		if (IParentElement.super.keyPress(keyCode, scanCode, modifiers)) {
 			return true;
 		}
-		if (shouldCloseOnEsc() && keyCode == GLFW.GLFW_KEY_ESCAPE) {
+		if (shouldCloseOnEsc() && (keyCode == GLFW.GLFW_KEY_ESCAPE)) {
 			onClose();
 			return true;
 		}

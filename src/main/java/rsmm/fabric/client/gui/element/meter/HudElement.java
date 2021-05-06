@@ -25,6 +25,7 @@ public class HudElement extends AbstractParentElement {
 	
 	private boolean draggingTicksTable;
 	private double mouseDragDeltaX;
+	private boolean mouseDragged;
 	
 	public HudElement(MultimeterClient client, int x, int y, int width) {
 		this.client = client;
@@ -52,22 +53,11 @@ public class HudElement extends AbstractParentElement {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean success = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success && button == GLFW.GLFW_MOUSE_BUTTON_LEFT && mouseY >= y && mouseY <= (y + hudRenderer.getTotalHeight())) {
-			int hoveredRow = hudRenderer.getHoveredRow();
-			int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
+		if (!success && button == GLFW.GLFW_MOUSE_BUTTON_LEFT && mouseY >= y && mouseY <= (y + hudRenderer.getTableHeight())) {
+			int hoveredTickColumn = hudRenderer.getHoveredTickColumn();
 			
-			if (hoveredRow >= 0 && hoveredNameColumn >= 0) {
-				meterControls.selectMeter(hoveredRow);
-			} else {
-				meterControls.selectMeter(-1);
-			}
-			
-			if (mouseY <= (y + hudRenderer.getTableHeight())) {
-				int hoveredTickColumn = hudRenderer.getHoveredTickColumn();
-				
-				if (hoveredTickColumn >= 0) {
-					draggingTicksTable = true;
-				}
+			if (hoveredTickColumn >= 0) {
+				draggingTicksTable = true;
 			}
 			
 			success = true;
@@ -78,26 +68,47 @@ public class HudElement extends AbstractParentElement {
 	
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
+		boolean success = super.mouseRelease(mouseX, mouseY, button);
+		
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			draggingTicksTable = false;
 			mouseDragDeltaX = 0.0D;
+			
+			if (!mouseDragged && mouseX >= x && mouseX <= (x + width) && mouseY >= y && mouseY <= (y + hudRenderer.getTotalHeight())) {
+				int hoveredRow = hudRenderer.getHoveredRow();
+				int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
+				
+				if (hoveredRow >= 0 && hoveredNameColumn >= 0) {
+					meterControls.selectMeter(hoveredRow);
+				} else {
+					meterControls.selectMeter(-1);
+				}
+				
+				success = true;
+			}
+			
+			mouseDragged = false;
 		}
 		
-		return super.mouseRelease(mouseX, mouseY, button);
+		return success;
 	}
 	
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		boolean dragged = super.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
 		
-		if (draggingTicksTable && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			mouseDragDeltaX += deltaX;
-			int scrollAmount = (int)(mouseDragDeltaX / (HudSettings.COLUMN_WIDTH + HudSettings.GRID_SIZE));
-			mouseDragDeltaX -= scrollAmount * (HudSettings.COLUMN_WIDTH + HudSettings.GRID_SIZE);
+		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			if (draggingTicksTable) {
+				mouseDragDeltaX += deltaX;
+				int scrollAmount = (int)Math.round(mouseDragDeltaX / (HudSettings.COLUMN_WIDTH + HudSettings.GRID_SIZE));
+				mouseDragDeltaX -= scrollAmount * (HudSettings.COLUMN_WIDTH + HudSettings.GRID_SIZE);
+				
+				hudRenderer.stepForward(scrollAmount);
+				
+				dragged = true;
+			}
 			
-			hudRenderer.stepForward(scrollAmount);
-			
-			dragged = true;
+			mouseDragged = true;
 		}
 		
 		return dragged;

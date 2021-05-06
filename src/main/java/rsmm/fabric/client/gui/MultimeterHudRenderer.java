@@ -58,6 +58,10 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		}
 	}
 	
+	public boolean isPaused() {
+		return paused;
+	}
+	
 	public void pause() {
 		paused = !paused;
 		
