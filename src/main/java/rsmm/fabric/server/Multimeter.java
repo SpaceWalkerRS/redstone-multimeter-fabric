@@ -25,7 +25,7 @@ import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterChangesPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
-import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
+import rsmm.fabric.common.packet.types.MeterLogsPacket;
 import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
 import rsmm.fabric.interfaces.mixin.IBlock;
@@ -113,7 +113,7 @@ public class Multimeter {
 			if (meterGroup.hasNewLogs()) {
 				if (meterGroup.hasSubscribers()) {
 					CompoundTag data = meterGroup.getLogManager().collectMeterLogs();
-					MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
+					MeterLogsPacket packet = new MeterLogsPacket(data);
 					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 				}
 				

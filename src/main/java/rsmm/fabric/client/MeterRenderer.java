@@ -30,6 +30,7 @@ public class MeterRenderer {
 	
 	public void renderMeters(MatrixStack matrices) {
 		MeterGroup meterGroup = multimeterClient.getMeterGroup();
+		
 		if (meterGroup == null) {
 			return;
 		}

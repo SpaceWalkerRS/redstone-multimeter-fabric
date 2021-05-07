@@ -7,15 +7,15 @@ import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
-public class MeterLogsDataPacket extends AbstractRSMMPacket {
+public class MeterLogsPacket extends AbstractRSMMPacket {
 	
 	private CompoundTag logsData;
 	
-	public MeterLogsDataPacket() {
+	public MeterLogsPacket() {
 		
 	}
 	
-	public MeterLogsDataPacket(CompoundTag data) {
+	public MeterLogsPacket(CompoundTag data) {
 		this.logsData = data;
 	}
 	

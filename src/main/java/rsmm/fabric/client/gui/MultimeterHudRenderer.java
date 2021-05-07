@@ -170,13 +170,13 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	private void renderTicksTable(MatrixStack matrices, int x, int y, int width, int height) {
-		long firstTick = getSelectedTick() - SELECTED_COLUMN;
-		
 		drawBackground(matrices, x, y, width, height);
 		drawGridLines(matrices, x, y, height, COLUMN_COUNT);
 		
 		int rowX = x;
 		int rowY = y;
+		
+		long firstTick = getSelectedTick() - SELECTED_COLUMN;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
 			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, meter);

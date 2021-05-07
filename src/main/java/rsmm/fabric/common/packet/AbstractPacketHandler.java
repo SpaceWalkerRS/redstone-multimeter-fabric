@@ -57,7 +57,7 @@ public abstract class AbstractPacketHandler {
 		JOIN_MULTIMETER_SERVER(1, JoinMultimeterServerPacket.class),
 		SERVER_TICK(2, ServerTickPacket.class),
 		METER_GROUP_DATA(3, MeterGroupDataPacket.class),
-		METER_LOGS(4, MeterLogsDataPacket.class),
+		METER_LOGS(4, MeterLogsPacket.class),
 		METER_CHANGES(5, MeterChangesPacket.class),
 		TOGGLE_METER(6, ToggleMeterPacket.class),
 		REMOVE_ALL_METERS(7, RemoveAllMetersPacket.class),

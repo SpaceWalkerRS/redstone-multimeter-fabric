@@ -1,8 +1,6 @@
 package rsmm.fabric.client.gui.log;
 
-import static rsmm.fabric.client.gui.HudSettings.COLUMN_COUNT;
-import static rsmm.fabric.client.gui.HudSettings.COLUMN_WIDTH;
-import static rsmm.fabric.client.gui.HudSettings.GRID_SIZE;
+import static rsmm.fabric.client.gui.HudSettings.*;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;

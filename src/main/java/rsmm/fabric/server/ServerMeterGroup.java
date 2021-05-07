@@ -46,12 +46,14 @@ public class ServerMeterGroup extends MeterGroup {
 	
 	@Override
 	public boolean addMeter(Meter meter) {
-		boolean success = super.addMeter(meter);
+		if (super.addMeter(meter)) {
+			posToIndex.put(meter.getPos(), meters.size() - 1);
+			totalMeterCount++;
+			
+			return true;
+		}
 		
-		posToIndex.put(meter.getPos(), meters.size() - 1);
-		totalMeterCount++;
-		
-		return success;
+		return false;
 	}
 	
 	@Override

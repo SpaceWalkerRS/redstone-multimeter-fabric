@@ -279,7 +279,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		RenderSystem.disableBlend();
 		RenderSystem.enableTexture();
 		
-		VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+		VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(bufferBuilder);
 		
 		matrices.translate(0.0D, 0.0D, 400.0D);
 		
