@@ -1,6 +1,6 @@
 package rsmm.fabric.client.gui.log;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.font.TextRenderer;
@@ -13,7 +13,7 @@ public class MeterEventRendererDispatcher {
 	private final List<MeterEventRenderer> eventRenderers;
 	
 	public MeterEventRendererDispatcher() {
-		eventRenderers = new LinkedList<>();
+		eventRenderers = new ArrayList<>();
 		
 		eventRenderers.add(new PoweredEventRenderer());
 		eventRenderers.add(new ActiveEventRenderer());

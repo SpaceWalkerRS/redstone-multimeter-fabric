@@ -61,7 +61,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			long start = eventInTable ? event.getTick() + 1 : firstTick;
 			long end = nextEventInTable ? nextEvent.getTick() : lastTick;
 			
-			if (nextEvent == null ? isToggled(meter) : !wasToggled(nextEvent)) {
+			if (event == null ? !wasToggled(nextEvent) : wasToggled(event)) {
 				int column = (int)(start - firstTick);
 				int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
@@ -83,7 +83,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					if (requiredWidth < availableWidth) {
 						boolean toggled = wasToggled(event);
 						
-						int bgColor = toggled ? color : BACKGROUND_COLOR;
+						int bgColor = toggled ? color : BACKGROUND_COLOR_TRANSPARENT;
 						int textColor = toggled ? POWERED_TEXT_COLOR : UNPOWERED_TEXT_COLOR;
 						
 						fill(startX, y, startX + requiredWidth, y + ROW_HEIGHT, bgColor);
@@ -141,7 +141,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			int start = eventInTable ? event.getSubTick() + 1 : 0;
 			int end = nextEventInTable ? nextEvent.getSubTick() : subTickCount;
 			
-			if (nextEvent == null ? isToggled(meter) : !wasToggled(nextEvent)) {
+			if (event == null ? !wasToggled(nextEvent) : wasToggled(event)) {
 				int columnX = x + start * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
 				draw(columnX, y, color, end - start);

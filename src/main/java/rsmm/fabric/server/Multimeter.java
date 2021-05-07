@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -18,13 +19,16 @@ import net.minecraft.world.dimension.DimensionType;
 
 import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.Meter;
+import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
+import rsmm.fabric.common.packet.types.MeterChangesPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
-import rsmm.fabric.common.packet.types.MeterLogsDataPacket;
+import rsmm.fabric.common.packet.types.MeterLogsPacket;
 import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
 import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.interfaces.mixin.IBlock;
+import rsmm.fabric.util.ColorUtils;
 import rsmm.fabric.util.NBTUtils;
 
 public class Multimeter {
@@ -32,6 +36,8 @@ public class Multimeter {
 	private final MultimeterServer server;
 	private final Map<String, ServerMeterGroup> meterGroups;
 	private final Map<ServerPlayerEntity, ServerMeterGroup> subscriptions;
+	
+	private TickPhase currentTickPhase = TickPhase.UNKNOWN;
 	
 	public Multimeter(MultimeterServer server) {
 		this.server = server;
@@ -63,9 +69,36 @@ public class Multimeter {
 		return subscriptions.containsKey(player);
 	}
 	
+	public TickPhase getCurrentTickPhase() {
+		return currentTickPhase;
+	}
+	
+	public void onTickPhase(TickPhase phase) {
+		currentTickPhase = phase;
+	}
+	
 	public void tick() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			meterGroup.getLogManager().resetSubTickCount();
+			meterGroup.getLogManager().tick();
+		}
+	}
+	
+	/**
+	 * This is called at the end of every server tick,
+	 * and sends meter changes of the past tick to
+	 * clients.
+	 */
+	public void broadcastMeterData() {
+		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+			if (meterGroup.isDirty()) {
+				if (meterGroup.hasSubscribers()) {
+					CompoundTag data = meterGroup.collectMeterChanges();
+					MeterChangesPacket packet = new MeterChangesPacket(data);
+					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+				}
+				
+				meterGroup.cleanUp();
+			}
 		}
 	}
 	
@@ -74,16 +107,16 @@ public class Multimeter {
 	 * and sends all the logged events of the past tick
 	 * to clients.
 	 */
-	public void broadcastMeterData() {
+	public void broadcastMeterLogs() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			if (meterGroup.isDirty()) {
+			if (meterGroup.hasNewLogs()) {
 				if (meterGroup.hasSubscribers()) {
-					CompoundTag data = meterGroup.getLogManager().collectMeterData();
-					MeterLogsDataPacket packet = new MeterLogsDataPacket(data);
+					CompoundTag data = meterGroup.getLogManager().collectMeterLogs();
+					MeterLogsPacket packet = new MeterLogsPacket(data);
 					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 				}
 				
-				meterGroup.cleanUp();
+				meterGroup.cleanLogs();
 			}
 		}
 	}
@@ -111,84 +144,101 @@ public class Multimeter {
 			return;
 		}
 		
-		DimPos dimPos = NBTUtils.tagToDimPos(properties.getCompound("pos"));
+		DimPos pos = NBTUtils.tagToDimPos(properties.getCompound("pos"));
+		boolean movable = properties.getBoolean("movable");
 		
-		if (meterGroup.hasMeterAt(dimPos)) {
-			int index = meterGroup.removeMeterAt(dimPos);
+		if (meterGroup.hasMeterAt(pos)) {
+			removeMeter(meterGroup.indexOfMeterAt(pos), player);
+		} else {
+			addMeter(pos, movable, null, null, player);
+		}
+	}
+	
+	public void addMeter(DimPos pos, boolean movable, String name, Integer color, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup == null) {
+			return;
+		}
+		
+		World world = server.getMinecraftServer().getWorld(DimensionType.byId(pos.getDimensionId()));
+		
+		if (world != null) {
+			if (name == null) {
+				name = meterGroup.getNextMeterName();
+			}
 			
+			int nextColor = ColorUtils.nextColor();
+			
+			if (color == null) {
+				color = nextColor;
+			}
+			
+			BlockPos blockPos = pos.asBlockPos();
+			BlockState state = world.getBlockState(blockPos);
+			Block block = state.getBlock();
+			
+			int meteredEvents = ((IBlock)block).getDefaultMeteredEvents();
+			boolean powered = ((IBlock)block).isPowered(world, blockPos, state);
+			boolean active = ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, blockPos, state);
+			
+			Meter meter = new Meter(pos, name, color, movable, meteredEvents, powered, active);
+			meterGroup.addMeter(meter);
+			
+			AddMeterPacket packet = new AddMeterPacket(meter);
+			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+		}
+	}
+	
+	public void removeMeter(int index, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup != null && meterGroup.removeMeter(index)) {
 			RemoveMeterPacket packet = new RemoveMeterPacket(index);
 			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
-		} else {
-			World world = server.getMinecraftServer().getWorld(DimensionType.byId(dimPos.getDimensionId()));
-			BlockPos pos = dimPos.getBlockPos();
-			
-			if (world != null) {
-				String name = meterGroup.getNextMeterName();
-				int color = meterGroup.getNextMeterColor();
-				boolean movable = properties.getBoolean("movable");
-				
-				int meteredEvents = EventType.POWERED.flag() | EventType.MOVED.flag();
-				boolean powered = false;
-				boolean active = false;
-				
-				BlockState state = world.getBlockState(pos);
-				Block block = state.getBlock();
-				
-				powered = ((IBlock)block).isPowered(world, pos, state);
-				
-				if (((IBlock)block).isMeterable()) {
-					meteredEvents = ((Meterable)block).getDefaultMeteredEvents();
-					active = ((Meterable)block).isActive(world, pos, state);
-				}
-				
-				Meter meter = new Meter(dimPos, name, color, movable, meteredEvents, powered, active);
-				meterGroup.addMeter(meter);
-				
-				AddMeterPacket packet = new AddMeterPacket(meter);
-				server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
-			}
+		}
+	}
+	
+	public void moveMeter(int index, DimPos pos, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup != null) {
+			moveMeter(index, pos, meterGroup);
+		}
+	}
+	
+	public void moveMeter(int index, DimPos pos, ServerMeterGroup meterGroup) {
+		World world = server.getMinecraftServer().getWorld(DimensionType.byId(pos.getDimensionId()));
+		
+		if (world != null) {
+			meterGroup.moveMeter(index, pos);
 		}
 	}
 	
 	public void renameMeter(int index, String name, ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
-		
-		if (meterGroup != null) {
-			Meter meter = meterGroup.getMeter(index);
-			
-			if (meter != null) {
-				meter.setName(name);
-				meter.markDirty();
-			}
-		}
+		changeMeter(index, meter -> meter.setName(name), player);
 	}
 	
 	public void recolorMeter(int index, int color, ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
-		
-		if (meterGroup != null) {
-			Meter meter = meterGroup.getMeter(index);
-			
-			if (meter != null) {
-				meter.setColor(color);
-				meter.markDirty();
-			}
-		}
+		changeMeter(index, meter -> meter.setColor(color), player);
 	}
 	
-	public void updateMeteredEvents(int index, EventType type, boolean start, ServerPlayerEntity player) {
+	public void changeMeterMovability(int index, boolean movable, ServerPlayerEntity player) {
+		changeMeter(index, meter -> meter.setIsMovable(movable), player);
+	}
+	
+	public void toggleEventType(int index, EventType type, ServerPlayerEntity player) {
+		changeMeter(index, meter -> meter.toggleEventType(type), player);
+	}
+	
+	private void changeMeter(int index, Consumer<Meter> change, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
 		if (meterGroup != null) {
 			Meter meter = meterGroup.getMeter(index);
 			
 			if (meter != null) {
-				if (start) {
-					meter.startMetering(type);
-				} else {
-					meter.stopMetering(type);
-				}
-				
+				change.accept(meter);
 				meter.markDirty();
 			}
 		}
@@ -233,6 +283,8 @@ public class Multimeter {
 	public void meterGroupDataReceived(String name, CompoundTag data, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = meterGroups.get(name);
 		
+		// This allows a player to carry over a meter group
+		// between different worlds and/or servers
 		if (meterGroup == null) {
 			meterGroup = new ServerMeterGroup(this, name);
 			meterGroup.fromTag(data);
@@ -251,6 +303,16 @@ public class Multimeter {
 	
 	public void blockUpdate(World world, BlockPos pos, boolean powered) {
 		blockUpdate(new DimPos(world, pos), powered);
+	}
+	
+	public void blockChanged(DimPos pos, Block oldBlock, Block newBlock) {
+		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+			meterGroup.blockChanged(pos, oldBlock, newBlock);
+		}
+	}
+	
+	public void blockChanged(World world, BlockPos pos, Block oldBlock, Block newBlock) {
+		blockChanged(new DimPos(world, pos), oldBlock, newBlock);
 	}
 	
 	public void stateChanged(DimPos pos, boolean active) {

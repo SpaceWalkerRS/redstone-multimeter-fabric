@@ -1,16 +1,16 @@
 package rsmm.fabric.common.packet;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.server.MultimeterServer;
 
 public abstract class AbstractRSMMPacket {
 	
-	public abstract void encode(PacketByteBuf buffer);
+	public abstract void encode(CompoundTag data);
 	
-	public abstract void decode(PacketByteBuf buffer);
+	public abstract void decode(CompoundTag data);
 	
 	public abstract void execute(MultimeterServer server, ServerPlayerEntity player);
 	

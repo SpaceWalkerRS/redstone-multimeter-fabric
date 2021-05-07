@@ -1,10 +1,10 @@
 package rsmm.fabric.common;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.listeners.MeterChangeDispatcher;
 import rsmm.fabric.common.log.MeterLogs;
 import rsmm.fabric.util.NBTUtils;
 
@@ -26,6 +26,8 @@ public class Meter {
 	
 	/** This property is used on the server to mark this meter as having changes that need to be synced with clients */
 	private boolean dirty;
+	/** This property is used on the server to mark this meter as having logged events in the past tick */
+	private boolean hasNewLogs;
 	
 	public Meter(DimPos pos, String name, int color, boolean movable, int initialEventTypes, boolean initialPowered, boolean initialActive) {
 		this.logs = new MeterLogs();
@@ -63,12 +65,22 @@ public class Meter {
 		return pos.isOf(world);
 	}
 	
+	public void setPos(DimPos pos) {
+		if (this.pos == null || !this.pos.equals(pos)) {
+			this.pos = pos;
+			MeterChangeDispatcher.posChanged(this);
+		}
+	}
+	
 	public String getName() {
 		return name;
 	}
 	
 	public void setName(String name) {
-		this.name = name;
+		if (this.name == null || !this.name.equals(name)) {
+			this.name = name;
+			MeterChangeDispatcher.nameChanged(this);
+		}
 	}
 	
 	public int getColor() {
@@ -76,23 +88,40 @@ public class Meter {
 	}
 	
 	public void setColor(int color) {
-		this.color = color;
+		if (this.color != color) {
+			this.color = color;
+			MeterChangeDispatcher.colorChanged(this);
+		}
 	}
 	
 	public boolean isMovable() {
 		return movable;
 	}
 	
+	public void setIsMovable(boolean movable) {
+		if (this.movable != movable) {
+			this.movable = movable;
+			MeterChangeDispatcher.isMovableChanged(this);
+		}
+	}
+	
+	public int getMeteredEventTypes() {
+		return eventTypes;
+	}
+	
 	public boolean isMetering(EventType type) {
 		return (eventTypes & type.flag()) != 0;
 	}
 	
-	public void startMetering(EventType type) {
-		eventTypes |= type.flag();
+	public void toggleEventType(EventType type) {
+		setMeteredEventTypes(eventTypes ^ type.flag());
 	}
 	
-	public void stopMetering(EventType type) {
-		eventTypes &= ~type.flag();
+	public void setMeteredEventTypes(int eventTypes) {
+		if (this.eventTypes != eventTypes) {
+			this.eventTypes = eventTypes;
+			MeterChangeDispatcher.meteredEventsChanged(this);
+		}
 	}
 	
 	/**
@@ -124,6 +153,29 @@ public class Meter {
 		dirty = true;
 	}
 	
+	/**
+	 * Check if this meter has new logs that need to be sent to clients
+	 */
+	public boolean hasNewLogs() {
+		return hasNewLogs;
+	}
+	
+	/**
+	 * Mark this meter as having new logs that need to be sent to clients
+	 */
+	public void markLogged() {
+		hasNewLogs = true;
+	}
+	
+	public void cleanUp() {
+		dirty = false;
+	}
+	
+	public void cleanLogs() {
+		logs.clear();
+		hasNewLogs = false;
+	}
+	
 	public boolean blockUpdate(boolean powered) {
 		if (this.powered != powered) {
 			this.powered = powered;
@@ -144,24 +196,11 @@ public class Meter {
 		return false;
 	}
 	
-	public boolean blockMoved(Direction dir) {
-		if (movable) {
-			pos = pos.offset(dir);
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public void cleanUp() {
-		dirty = false;
-		logs.clear();
-	}
-	
 	public CompoundTag toTag() {
-		CompoundTag tag = new CompoundTag();
-		
+		return toTag(new CompoundTag());
+	}
+	
+	public CompoundTag toTag(CompoundTag tag) {
 		tag.put("pos", NBTUtils.dimPosToTag(pos));
 		tag.putString("name", name);
 		tag.putInt("color", color);
@@ -174,33 +213,20 @@ public class Meter {
 		return tag;
 	}
 	
-	public void fromTag(CompoundTag tag) {
-		pos = NBTUtils.tagToDimPos(tag.getCompound("pos"));
-		name = tag.getString("name");
-		color = tag.getInt("color");
-		movable = tag.getBoolean("movable");
+	public Meter fromTag(CompoundTag tag) {
+		setPos(NBTUtils.tagToDimPos(tag.getCompound("pos")));
+		setName(tag.getString("name"));
+		setColor(tag.getInt("color"));
+		setIsMovable(tag.getBoolean("movable"));
 		
-		eventTypes = tag.getInt("eventTypes");
+		setMeteredEventTypes(tag.getInt("eventTypes"));
 		powered = tag.getBoolean("powered");
 		active = tag.getBoolean("active");
+		
+		return this;
 	}
 	
 	public static Meter createFromTag(CompoundTag tag) {
-		Meter meter = new Meter();
-		meter.fromTag(tag);
-		
-		return meter;
-	}
-	
-	public CompoundTag collectData() {
-		CompoundTag data = toTag();
-		data.put("logs", logs.toTag());
-		
-		return data;
-	}
-	
-	public void updateFromData(CompoundTag data) {
-		fromTag(data);
-		logs.updateFromTag(data.getCompound("logs"));
+		return new Meter().fromTag(tag);
 	}
 }

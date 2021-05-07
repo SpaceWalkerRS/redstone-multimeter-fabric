@@ -5,6 +5,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 import rsmm.fabric.common.DimPos;
+import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.event.EventType;
 
 public class NBTUtils {
@@ -25,13 +26,21 @@ public class NBTUtils {
 		return tag.contains(key) ? EventType.fromIndex(tag.getByte(key)) : null;
 	}
 	
+	public static void putTickPhase(CompoundTag tag, String key, TickPhase tickPhase) {
+		tag.putByte(key, (byte)tickPhase.getIndex());
+	}
+	
+	public static TickPhase getTickPhase(CompoundTag tag, String key) {
+		return tag.contains(key) ? TickPhase.fromIndex(tag.getByte(key)) : null;
+	}
+	
 	public static CompoundTag dimPosToTag(DimPos pos) {
 		CompoundTag tag = new CompoundTag();
 		
 		putIdentifier(tag, "dimensionId", pos.getDimensionId());
-		tag.putInt("x", pos.getBlockPos().getX());
-		tag.putInt("y", pos.getBlockPos().getY());
-		tag.putInt("z", pos.getBlockPos().getZ());
+		tag.putInt("x", pos.asBlockPos().getX());
+		tag.putInt("y", pos.asBlockPos().getY());
+		tag.putInt("z", pos.asBlockPos().getZ());
 		
 		return tag;
 	}

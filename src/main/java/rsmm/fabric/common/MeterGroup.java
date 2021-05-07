@@ -6,6 +6,8 @@ import java.util.List;
 
 import net.minecraft.nbt.CompoundTag;
 
+import rsmm.fabric.common.listeners.MeterGroupChangeDispatcher;
+
 public class MeterGroup {
 	
 	protected final String name;
@@ -22,6 +24,7 @@ public class MeterGroup {
 	
 	public void clear() {
 		meters.clear();
+		MeterGroupChangeDispatcher.cleared(this);
 	}
 	
 	public List<Meter> getMeters() {
@@ -41,11 +44,23 @@ public class MeterGroup {
 	}
 	
 	public boolean addMeter(Meter meter) {
-		return meters.add(meter);
+		if (meters.add(meter)) {
+			MeterGroupChangeDispatcher.meterAdded(this, meters.size() - 1);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public boolean removeMeter(int index) {
-		return meters.remove(index) != null;
+		if (index >= 0 && index < meters.size()) {
+			if (meters.remove(index) != null) {
+				MeterGroupChangeDispatcher.meterRemoved(this, index);
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public CompoundTag toTag() {

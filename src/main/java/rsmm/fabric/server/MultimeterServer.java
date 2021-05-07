@@ -32,7 +32,12 @@ public class MultimeterServer {
 	
 	public void tick() {
 		ServerTickPacket packet = new ServerTickPacket(server.getTicks());
-		packetHandler.sendPacket(packet);
+		
+		for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+			if (multimeter.hasSubscription(player)) {
+				packetHandler.sendPacketToPlayer(packet, player);
+			}
+		}
 		
 		multimeter.tick();
 	}

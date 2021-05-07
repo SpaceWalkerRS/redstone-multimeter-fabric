@@ -38,7 +38,7 @@ public abstract class PistonBlockMixin implements MeterableBlock, IBlock {
 			)
 	)
 	private void onShouldExtendInjectAtReturn(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
-		onBlockUpdate(world, pos, cir.getReturnValue());
+		logPowered(world, pos, cir.getReturnValue());
 	}
 	
 	@Inject(
@@ -61,11 +61,6 @@ public abstract class PistonBlockMixin implements MeterableBlock, IBlock {
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.EXTENDED);
-	}
-	
-	@Override
 	public int getDefaultMeteredEvents() {
 		return EventType.ACTIVE.flag() | EventType.MOVED.flag();
 	}
@@ -78,5 +73,10 @@ public abstract class PistonBlockMixin implements MeterableBlock, IBlock {
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
 		return shouldExtend(world, pos, state.get(Properties.FACING));
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.EXTENDED);
 	}
 }

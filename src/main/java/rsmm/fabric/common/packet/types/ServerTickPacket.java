@@ -1,7 +1,7 @@
 package rsmm.fabric.common.packet.types;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
@@ -9,7 +9,7 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class ServerTickPacket extends AbstractRSMMPacket {
 	
-	private long currentServerTick;
+private long currentServerTick;
 	
 	public ServerTickPacket() {
 		
@@ -20,13 +20,13 @@ public class ServerTickPacket extends AbstractRSMMPacket {
 	}
 	
 	@Override
-	public void encode(PacketByteBuf buffer) {
-		buffer.writeLong(currentServerTick);
+	public void encode(CompoundTag data) {
+		data.putLong("serverTime", currentServerTick);
 	}
 	
 	@Override
-	public void decode(PacketByteBuf buffer) {
-		currentServerTick = buffer.readLong();
+	public void decode(CompoundTag data) {
+		currentServerTick = data.getLong("serverTime");
 	}
 	
 	@Override

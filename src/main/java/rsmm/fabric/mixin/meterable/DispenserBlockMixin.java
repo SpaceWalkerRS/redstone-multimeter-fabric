@@ -18,7 +18,7 @@ import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(DispenserBlock.class)
-public class DispenserBlockMixin implements MeterableBlock, IBlock {
+public class DispenserBlockMixin implements IBlock, MeterableBlock {
 	
 	@Inject(
 			method = "neighborUpdate",
@@ -30,12 +30,7 @@ public class DispenserBlockMixin implements MeterableBlock, IBlock {
 			)
 	)
 	private void onNeighborUpdateInjectAtTriggered(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
-		onBlockUpdate(world, pos, powered);
-	}
-	
-	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.TRIGGERED);
+		logPowered(world, pos, powered);
 	}
 	
 	@Override
@@ -51,5 +46,10 @@ public class DispenserBlockMixin implements MeterableBlock, IBlock {
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
 		return world.isReceivingRedstonePower(pos) || world.isReceivingRedstonePower(pos.up());
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.TRIGGERED);
 	}
 }

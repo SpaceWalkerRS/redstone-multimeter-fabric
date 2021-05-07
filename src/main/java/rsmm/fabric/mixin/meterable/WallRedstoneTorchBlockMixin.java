@@ -23,7 +23,7 @@ public class WallRedstoneTorchBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onShouldUnpowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		onBlockUpdate(world, pos, cir.getReturnValue());
+		logPowered(world, pos, cir.getReturnValue());
 	}
 	
 	@Override

@@ -1,7 +1,7 @@
 package rsmm.fabric.common.packet.types;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
@@ -9,17 +9,17 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class RemoveAllMetersPacket extends AbstractRSMMPacket {
 	
-	public RemoveAllMetersPacket() {
+public RemoveAllMetersPacket() {
 		
 	}
 	
 	@Override
-	public void encode(PacketByteBuf buffer) {
+	public void encode(CompoundTag data) {
 		
 	}
 	
 	@Override
-	public void decode(PacketByteBuf buffer) {
+	public void decode(CompoundTag data) {
 		
 	}
 	

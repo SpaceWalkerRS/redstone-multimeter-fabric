@@ -13,7 +13,7 @@ public class DimPos {
 	
 	public DimPos(Identifier dimensionId, BlockPos pos) {
 		this.dimensionId = dimensionId;
-		this.pos = pos;
+		this.pos = pos.toImmutable();
 	}
 	
 	public DimPos(World world, BlockPos pos) {
@@ -36,6 +36,11 @@ public class DimPos {
 		return pos.hashCode() + 31 * dimensionId.hashCode();
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("%s[%d, %d, %d]", dimensionId.toString(), pos.getX(), pos.getY(), pos.getZ());
+	}
+	
 	public Identifier getDimensionId() {
 		return dimensionId;
 	}
@@ -44,7 +49,7 @@ public class DimPos {
 		return DimensionType.getId(world.dimension.getType()).equals(dimensionId);
 	}
 	
-	public BlockPos getBlockPos() {
+	public BlockPos asBlockPos() {
 		return pos;
 	}
 	
@@ -55,7 +60,7 @@ public class DimPos {
 	/**
 	 * Return a DimPos with the same coordinates in a different dimension
 	 */
-	public DimPos withWorld(Identifier dimensionId) {
+	public DimPos withDimension(Identifier dimensionId) {
 		return new DimPos(dimensionId, pos);
 	}
 }
