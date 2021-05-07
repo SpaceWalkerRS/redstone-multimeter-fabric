@@ -2,7 +2,6 @@ package rsmm.fabric.common.packet.types;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.packet.AbstractRSMMPacket;
@@ -21,13 +20,13 @@ public class ToggleMeterPacket extends AbstractRSMMPacket {
 	}
 	
 	@Override
-	public void encode(PacketByteBuf buffer) {
-		buffer.writeCompoundTag(properties);
+	public void encode(CompoundTag data) {
+		data.put("properties", properties);
 	}
 	
 	@Override
-	public void decode(PacketByteBuf buffer) {
-		properties = buffer.readCompoundTag();
+	public void decode(CompoundTag data) {
+		properties = data.getCompound("properties");
 	}
 	
 	@Override

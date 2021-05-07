@@ -13,6 +13,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
 import rsmm.fabric.server.Multimeter;
@@ -23,6 +24,18 @@ public abstract class WorldMixin {
 	
 	@Shadow public abstract boolean isClient();
 	@Shadow public abstract boolean isReceivingRedstonePower(BlockPos pos);
+	
+	@Inject(
+			method = "tickBlockEntities",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onTickBlockEntitiesInjectAtHead(CallbackInfo ci) {
+		if (!isClient()) {
+			((IServerWorld)this).getMultimeterServer().getMultimeter().onTickPhase(TickPhase.TICK_BLOCK_ENTITIES);
+		}
+	}
 	
 	@Inject(
 			method = "updateNeighbor",

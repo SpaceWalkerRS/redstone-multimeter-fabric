@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
+import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.log.LogManager;
@@ -28,20 +29,26 @@ public class ServerLogManager extends LogManager {
 		return meterGroup.getMultimeter().getMultimeterServer().getMinecraftServer().getTicks();
 	}
 	
-	public void resetSubTickCount() {
+	public void tick() {
 		currentSubTick = 0;
 	}
 	
 	public void logEvent(Meter meter, EventType type, int metaData) {
 		if (meter.isMetering(type)) {
-			MeterEvent event = new MeterEvent(type, getCurrentTick(), currentSubTick++, metaData);
+			long tick = getCurrentTick();
+			int subTick = currentSubTick++;
+			TickPhase phase = meterGroup.getMultimeter().getCurrentTickPhase();
+			
+			MeterEvent event = new MeterEvent(type, tick, subTick, phase, metaData);
 			meter.getLogs().add(event);
+			
+			meter.markLogged();
 		}
 		
 		meter.markDirty();
 	}
 	
-	public CompoundTag collectMeterData() {
+	public CompoundTag collectMeterLogs() {
 		CompoundTag data = new CompoundTag();
 		
 		int subTickCount = currentSubTick;
@@ -52,11 +59,11 @@ public class ServerLogManager extends LogManager {
 		for (int index = 0; index < meterCount; index++) {
 			Meter meter = meterGroup.getMeter(index);
 			
-			if (meter.isDirty()) {
+			if (meter.hasNewLogs()) {
 				String key = String.valueOf(index);
-				CompoundTag meterData = meter.collectData();
+				CompoundTag logs = meter.getLogs().toTag();
 				
-				data.put(key, meterData);
+				data.put(key, logs);
 			}
 		}
 		

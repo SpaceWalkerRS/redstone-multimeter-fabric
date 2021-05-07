@@ -13,15 +13,19 @@ public class HudSettings {
 	public static final int SELECTED_COLUMN = 44;
 	public static int ROW_COUNT;
 	
+	/** The width of the ticks table */
+	public static final int TICKS_TABLE_WIDTH = COLUMN_COUNT * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 	/** The spacing between the names table and the ticks table */
-	public static final int NAMES_TICKS_SPACING = 4;
+	public static final int NAMES_TICKS_SPACING = 3;
 	/** The gap between the ticks table and the subticks table */
-	public static final int TICKS_SUBTICKS_GAP = 3;
+	public static final int TICKS_SUB_TICKS_GAP = 3;
 	
 	public static final int BACKGROUND_COLOR = 0xFF202020;
+	public static final int BACKGROUND_COLOR_TRANSPARENT = 0xB0202020;
 	public static final int MAIN_GRID_COLOR = 0xFF404040;
 	public static final int INTERVAL_GRID_COLOR = 0xFF606060;
-	public static final int SELECTED_TICK_INDICATOR_COLOR = 0xFFFFFFFF;
+	public static final int SELECTION_INDICATOR_COLOR = 0xFFFFFFFF;
+	public static final int TICK_PHASE_INDICATOR_COLOR = 0xFFEEEEEE;
 	
 	public static final int POWERED_TEXT_COLOR = 0xFF000000;
 	public static final int UNPOWERED_TEXT_COLOR = 0xFF707070;

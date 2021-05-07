@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
 
@@ -13,7 +16,7 @@ import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.util.ColorUtils;
+import rsmm.fabric.interfaces.mixin.IBlock;
 
 public class ServerMeterGroup extends MeterGroup {
 	
@@ -43,12 +46,14 @@ public class ServerMeterGroup extends MeterGroup {
 	
 	@Override
 	public boolean addMeter(Meter meter) {
-		boolean success = super.addMeter(meter);
+		if (super.addMeter(meter)) {
+			posToIndex.put(meter.getPos(), meters.size() - 1);
+			totalMeterCount++;
+			
+			return true;
+		}
 		
-		posToIndex.put(meter.getPos(), meters.size() - 1);
-		totalMeterCount++;
-		
-		return success;
+		return false;
 	}
 	
 	@Override
@@ -98,12 +103,22 @@ public class ServerMeterGroup extends MeterGroup {
 		return removeMeter(index) ? index : -1;
 	}
 	
-	public String getNextMeterName() {
-		return String.format("Meter %d", totalMeterCount);
+	public void moveMeter(int index, DimPos pos) {
+		if (index < 0 || index >= meters.size() || posToIndex.containsKey(pos)) {
+			return;
+		}
+		
+		Meter meter = meters.get(index);
+		
+		posToIndex.remove(meter.getPos());
+		posToIndex.put(pos, index);
+		
+		meter.setPos(pos);
+		meter.markDirty();
 	}
 	
-	public int getNextMeterColor() {
-		return ColorUtils.nextColor();
+	public String getNextMeterName() {
+		return String.format("Meter %d", totalMeterCount);
 	}
 	
 	public Set<ServerPlayerEntity> getSubscribers() {
@@ -139,10 +154,50 @@ public class ServerMeterGroup extends MeterGroup {
 		return false;
 	}
 	
+	/**
+	 * Check if this meter group has new logs that need to be sent to clients
+	 */
+	public boolean hasNewLogs() {
+		for (Meter meter : meters) {
+			if (meter.hasNewLogs()) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public CompoundTag collectMeterChanges() {
+		CompoundTag meterChanges = new CompoundTag();
+		
+		int meterCount = getMeterCount();
+		
+		for (int index = 0; index < meterCount; index++) {
+			Meter meter = getMeter(index);
+			
+			if (meter.isDirty()) {
+				String key = String.valueOf(index);
+				CompoundTag meterData = meter.toTag();
+				
+				meterChanges.put(key, meterData);
+			}
+		}
+		
+		return meterChanges;
+	}
+	
 	public void cleanUp() {
 		for (Meter meter : meters) {
 			if (meter.isDirty()) {
 				meter.cleanUp();
+			}
+		}
+	}
+	
+	public void cleanLogs() {
+		for (Meter meter : meters) {
+			if (meter.hasNewLogs()) {
+				meter.cleanLogs();
 			}
 		}
 	}
@@ -155,6 +210,20 @@ public class ServerMeterGroup extends MeterGroup {
 		}
 	}
 	
+	public void blockChanged(DimPos pos, Block oldBlock , Block newBlock) {
+		Meter meter = getMeterAt(pos);
+		
+		if (meter != null && newBlock != Blocks.MOVING_PISTON) {
+			int oldBlockDefaults = ((IBlock)oldBlock).getDefaultMeteredEvents();
+			int newBlockDefaults = ((IBlock)newBlock).getDefaultMeteredEvents();
+			
+			if (meter.getMeteredEventTypes() == oldBlockDefaults) {
+				meter.setMeteredEventTypes(newBlockDefaults);
+				meter.markDirty();
+			}
+		}
+	}
+	
 	public void stateChanged(DimPos pos, boolean active) {
 		Meter meter = getMeterAt(pos);
 		
@@ -164,12 +233,13 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	public void blockMoved(DimPos pos, Direction dir) {
-		Meter meter = getMeterAt(pos);
+		int index = indexOfMeterAt(pos);
 		
-		if (meter != null) {
-			if (!hasMeterAt(pos.offset(dir)) && meter.blockMoved(dir)) {
-				int index = posToIndex.remove(pos);
-				posToIndex.put(meter.getPos(), index);
+		if (index >= 0) {
+			Meter meter = getMeter(index);
+			
+			if (meter.isMovable()) {
+				multimeter.moveMeter(index, pos.offset(dir), this);
 			}
 			
 			logManager.logEvent(meter, EventType.MOVED, dir.getId());

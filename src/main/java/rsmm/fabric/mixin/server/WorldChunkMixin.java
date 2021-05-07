@@ -36,20 +36,23 @@ public class WorldChunkMixin {
 					target = "Lnet/minecraft/block/BlockState;onBlockRemoved(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Z)V"
 			)
 	)
-	private void onSetBlockStateInjectBeforeStateReplaced(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int chunkX, int y, int chunkZ, ChunkSection chunkSection, boolean isEmpty, BlockState prevState, Block newBlock, Block prevBlock) {
+	private void onSetBlockStateInjectBeforeStateReplaced(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int chunkX, int y, int chunkZ, ChunkSection chunkSection, boolean isEmpty, BlockState oldState, Block newBlock, Block oldBlock) {
 		if (world.isClient()) {
 			return;
 		}
 		
-		boolean prevMeterable = ((IBlock)prevBlock).isMeterable();
+		MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
+		Multimeter multimeter = server.getMultimeter();
+		
+		if (oldBlock != newBlock) {
+			multimeter.blockChanged(world, pos, oldBlock, newBlock);
+		}
+		
+		boolean prevMeterable = ((IBlock)oldBlock).isMeterable();
 		boolean newMeterable = ((IBlock)newBlock).isMeterable();
 		
 		if (prevMeterable || newMeterable) {
 			boolean active = newMeterable && ((Meterable)newBlock).isActive(world, pos, newState);
-			
-			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
-			Multimeter multimeter = server.getMultimeter();
-			
 			multimeter.stateChanged(world, pos, active);
 		}
 	}

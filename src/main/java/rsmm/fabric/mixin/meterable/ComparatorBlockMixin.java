@@ -23,7 +23,7 @@ public class ComparatorBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onHasPowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
-		onBlockUpdate(world, pos, cir.getReturnValue() > 0);
+		logPowered(world, pos, cir.getReturnValue() > 0);
 	}
 	
 	@Override

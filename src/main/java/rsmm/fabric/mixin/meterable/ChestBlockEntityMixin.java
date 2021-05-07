@@ -41,7 +41,7 @@ public class ChestBlockEntityMixin extends BlockEntity {
 			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 			
-			multimeter.blockUpdate(world, pos, viewerCount > 0);
+			multimeter.stateChanged(world, pos, viewerCount > 0);
 		}
 	}
 }

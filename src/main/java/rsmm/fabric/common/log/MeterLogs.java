@@ -84,7 +84,7 @@ public class MeterLogs {
 	public int getLastLogBefore(EventType type, long tick, int subTick) {
 		List<MeterEvent> logs = eventLogs.get(type);
 		
-		if (logs == null || logs.isEmpty() || tick <= logs.get(0).getTick()) {
+		if (logs == null || logs.isEmpty() || !logs.get(0).isBefore(tick, subTick)) {
 			return -1;
 		}
 		if (tick > lastLoggedTick) {
@@ -104,6 +104,25 @@ public class MeterLogs {
 		
 		return index;
 		
+	}
+	
+	public MeterEvent getLastLogBefore(long tick) {
+		return getLastLogBefore(tick, 0);
+	}
+	
+	public MeterEvent getLastLogBefore(long tick, int subTick) {
+		MeterEvent event = null;
+		
+		for (EventType type : EventType.TYPES) {
+			int index = getLastLogBefore(type, tick, subTick);
+			MeterEvent log = getLog(type, index);
+			
+			if (event == null || (log != null && log.isAfter(event))) {
+				event = log;
+			}
+		}
+		
+		return event;
 	}
 	
 	public CompoundTag toTag() {
