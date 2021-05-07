@@ -3,6 +3,7 @@ package rsmm.fabric.client.gui;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -232,6 +233,16 @@ public class MultimeterScreen extends RSMMScreen {
 		int maxScroll = (int)getMaxScrollAmount();
 		
 		if (maxScroll > 0) {
+			RenderSystem.disableDepthTest();
+			RenderSystem.enableBlend();
+			RenderSystem.blendFuncSeparate(
+				GlStateManager.SrcFactor.SRC_ALPHA,
+				GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA,
+				GlStateManager.SrcFactor.ZERO,
+				GlStateManager.DstFactor.ONE
+			);
+			RenderSystem.disableAlphaTest();
+			RenderSystem.shadeModel(GL11.GL_SMOOTH);
 			RenderSystem.disableTexture();
 			
 			Tessellator tessellator = Tessellator.getInstance();
@@ -269,6 +280,9 @@ public class MultimeterScreen extends RSMMScreen {
 			tessellator.draw();
 			
 			RenderSystem.enableTexture();
+			RenderSystem.shadeModel(GL11.GL_SMOOTH);
+			RenderSystem.enableAlphaTest();
+			RenderSystem.disableBlend();
 		}
 	}
 }

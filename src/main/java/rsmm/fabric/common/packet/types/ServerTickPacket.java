@@ -9,7 +9,7 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class ServerTickPacket extends AbstractRSMMPacket {
 	
-private long currentServerTick;
+	private long currentServerTick;
 	
 	public ServerTickPacket() {
 		

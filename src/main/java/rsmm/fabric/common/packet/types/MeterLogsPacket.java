@@ -9,7 +9,7 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class MeterLogsPacket extends AbstractRSMMPacket {
 	
-private CompoundTag logsData;
+	private CompoundTag logsData;
 	
 	public MeterLogsPacket() {
 		

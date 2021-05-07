@@ -9,7 +9,7 @@ import net.minecraft.client.options.KeyBinding;
 @Environment(EnvType.CLIENT)
 public class KeyBindings {
 	
-public static final String CATEGORY = "Redstone Multimeter";
+	public static final String CATEGORY = "Redstone Multimeter";
 	
 	public static final KeyBinding TOGGLE_METER = new KeyBinding("Toggle Meter", GLFW.GLFW_KEY_M, CATEGORY);
 	public static final KeyBinding PAUSE_METERS = new KeyBinding("Pause Meters", GLFW.GLFW_KEY_N, CATEGORY);

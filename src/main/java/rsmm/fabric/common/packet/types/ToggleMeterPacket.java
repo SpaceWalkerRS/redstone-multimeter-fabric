@@ -9,7 +9,7 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class ToggleMeterPacket extends AbstractRSMMPacket {
 	
-private CompoundTag properties;
+	private CompoundTag properties;
 	
 	public ToggleMeterPacket() {
 		

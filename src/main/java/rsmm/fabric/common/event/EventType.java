@@ -12,7 +12,7 @@ import net.minecraft.util.math.Direction;
 
 public enum EventType {
 	
-POWERED(0, "powered") {
+	POWERED(0, "powered") {
 		
 		@Override
 		public void addTextForTooltip(List<List<Text>> tooltip, int metaData) {

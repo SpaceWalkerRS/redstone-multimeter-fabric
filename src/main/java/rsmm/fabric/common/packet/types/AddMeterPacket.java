@@ -10,7 +10,7 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class AddMeterPacket extends AbstractRSMMPacket {
 	
-private CompoundTag properties;
+	private CompoundTag properties;
 	
 	public AddMeterPacket() {
 		

@@ -9,7 +9,7 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class RemoveAllMetersPacket extends AbstractRSMMPacket {
 	
-public RemoveAllMetersPacket() {
+	public RemoveAllMetersPacket() {
 		
 	}
 	
