@@ -1,7 +1,6 @@
 package rsmm.fabric.common;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import rsmm.fabric.common.event.EventType;
@@ -190,16 +189,6 @@ public class Meter {
 	public boolean stateChanged(boolean active) {
 		if (this.active != active) {
 			this.active = active;
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public boolean blockMoved(Direction dir) {
-		if (movable) {
-			setPos(pos.offset(dir));
 			
 			return true;
 		}
