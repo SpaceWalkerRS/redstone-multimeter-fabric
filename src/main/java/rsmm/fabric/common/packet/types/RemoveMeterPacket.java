@@ -31,7 +31,7 @@ public class RemoveMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		
+		server.getMultimeter().removeMeter(meterIndex, player);
 	}
 	
 	@Override

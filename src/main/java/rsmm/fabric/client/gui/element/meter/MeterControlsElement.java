@@ -26,6 +26,7 @@ import rsmm.fabric.common.listeners.MeterChangeDispatcher;
 import rsmm.fabric.common.listeners.MeterGroupChangeDispatcher;
 import rsmm.fabric.common.listeners.MeterGroupListener;
 import rsmm.fabric.common.packet.types.MeterChangePacket;
+import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.util.ColorUtils;
 
 public class MeterControlsElement extends AbstractParentElement implements MeterListener, MeterGroupListener {
@@ -48,6 +49,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	private int meterIndex;
 	private Meter meter;
 	
+	private Button deleteButton;
 	private TextField dimensionField;
 	private TextField xField;
 	private TextField yField;
@@ -59,6 +61,8 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	private Slider blueSlider;
 	private Button movableButton;
 	private List<Button> eventTypeButtons;
+	
+	private boolean triedDeleting;
 	
 	public MeterControlsElement(MultimeterClient client, int x, int y, int width) {
 		MinecraftClient minecraftClient = client.getMinecraftClient();
@@ -88,8 +92,14 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			int x1;
 			int dx = 7;
 			
-			Text title = new LiteralText(String.format("Edit Meter #%d (%s)", meterIndex, meter.getName())).formatted(Formatting.UNDERLINE);
+			Text title = getTitleText();
 			font.drawWithShadow(matrices, title, x, y, 0xFFFFFF);
+			
+			if (triedDeleting) {
+				Text deleteText = new LiteralText("Are you sure you want to delete this meter? YOU CAN'T UNDO THIS").formatted(Formatting.ITALIC);
+				x1 = deleteButton.getX() + deleteButton.getWidth() + 5;
+				font.drawWithShadow(matrices, deleteText, x1, y, 0xFFFFFF);
+			}
 			
 			Text posText = new LiteralText("Pos:").formatted(Formatting.ITALIC);
 			y = dimensionField.getY() + 6;
@@ -162,6 +172,17 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	}
 	
 	@Override
+	public boolean mouseClick(double mouseX, double mouseY, int button) {
+		boolean success = super.mouseClick(mouseX, mouseY, button);
+		
+		if (triedDeleting && getFocusedElement() != deleteButton) {
+			undoTryDelete();
+		}
+		
+		return success;
+	}
+	
+	@Override
 	public void onRemoved() {
 		super.onRemoved();
 		MeterChangeDispatcher.removeListener(this);
@@ -229,6 +250,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	public void nameChanged(Meter meter) {
 		if (this.meter == meter) {
 			nameField.updateMessage();
+			updateDeleteButtonX();
 		}
 	}
 	
@@ -274,7 +296,17 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			selectMeter(-1);
 		} else if (meterIndex > index) {
 			selectMeter(meterIndex - 1);
+			updateDeleteButtonX();
 		}
+	}
+	
+	private Text getTitleText() {
+		return new LiteralText(String.format("Edit Meter #%d (\'%s\')", meterIndex, meter.getName())).formatted(Formatting.UNDERLINE);
+	}
+	
+	private void updateDeleteButtonX() {
+		int x = getX() + font.getWidth(getTitleText()) + 10;
+		deleteButton.setX(x);
 	}
 	
 	public int getSelectedMeter() {
@@ -308,6 +340,11 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		clearChildren();
 		
 		if (meter != null) {
+			deleteButton = new Button(x, y, BUTTON_HEIGHT, BUTTON_HEIGHT, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), (button) -> {
+				tryDelete();
+			});
+			addChild(deleteButton);
+			
 			dimensionField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> meter.getPos().getWorldId().toString(), (text) -> {
 				changePos();
 			});
@@ -416,6 +453,8 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 				addChild(eventTypeButton);
 			}
 		}
+		
+		undoTryDelete();
 	}
 	
 	private void updateCoordinates() {
@@ -423,17 +462,46 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		
 		if (meter != null) {
 			int x = this.x + SPACING;
-			y += 40;
+			y += 14;
 			
-			for (IElement element : getChildren()) {
+			updateDeleteButtonX();
+			deleteButton.setY(y);
+			
+			y += 26;
+			
+			List<IElement> children = getChildren();
+			
+			// We ignore the first element; it's the delete button
+			for (int index = 1; index < children.size(); index++) {
+				IElement element = children.get(index);
+				
 				element.setX(x);
 				element.setY(y);
 				
 				y += ROW_HEIGHT;
 			}
+			
+			
 		}
 		
 		this.height = y - this.y;
+	}
+	
+	private void tryDelete() {
+		if (triedDeleting) {
+			RemoveMeterPacket packet = new RemoveMeterPacket(meterIndex);
+			client.getPacketHandler().sendPacket(packet);
+		}
+		
+		triedDeleting = !triedDeleting;
+		deleteButton.updateMessage();
+	}
+	
+	private void undoTryDelete() {
+		if (triedDeleting) {
+			triedDeleting = false;
+			deleteButton.updateMessage();
+		}
 	}
 	
 	private void changePos() {

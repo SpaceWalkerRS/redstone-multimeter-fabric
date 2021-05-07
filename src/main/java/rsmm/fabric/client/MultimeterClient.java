@@ -169,6 +169,9 @@ public class MultimeterClient {
 	
 	public void toggleHud() {
 		renderHud = !renderHud;
+		
+		Text text = new LiteralText(String.format("%s Multimeter HUD", renderHud ? "Enabled" : "Disabled"));
+		client.player.sendMessage(text, true);
 	}
 	
 	public boolean hasMultimeterScreenOpen() {
