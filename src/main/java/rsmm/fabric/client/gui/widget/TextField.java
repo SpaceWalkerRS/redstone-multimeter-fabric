@@ -3,6 +3,8 @@ package rsmm.fabric.client.gui.widget;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.lwjgl.glfw.GLFW;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -46,7 +48,7 @@ public class TextField extends TextFieldWidget implements IElement {
 	
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		return super.mouseReleased(mouseX, mouseY, button);
+		return isHovered(mouseX, mouseY) && super.mouseReleased(mouseX, mouseY, button);
 	}
 	
 	@Override
@@ -61,7 +63,18 @@ public class TextField extends TextFieldWidget implements IElement {
 	
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		return super.keyPressed(keyCode, scanCode, modifiers) || isFocused();
+		if (super.keyPressed(keyCode, scanCode, modifiers)) {
+			return true;
+		}
+		if (isFocused()) {
+			if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+				unfocus();
+			}
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	@Override

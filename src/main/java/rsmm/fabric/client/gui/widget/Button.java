@@ -2,20 +2,28 @@ package rsmm.fabric.client.gui.widget;
 
 import java.util.function.Supplier;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-
+import net.minecraft.util.math.MathHelper;
+import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.element.IElement;
 
 public class Button extends ButtonWidget implements IElement {
 	
-	private final Supplier<Text> textSupplier;
-	private final OnPress onPress;
+	protected final MultimeterClient client;
+	protected final Supplier<Text> textSupplier;
+	protected final OnPress onPress;
 	
-	public Button(int x, int y, int width, int height, Supplier<Text> textSupplier, OnPress onPress) {
+	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, OnPress onPress) {
 		super(x, y, width, height, textSupplier.get(), button -> {});
 		
+		this.client = client;
 		this.textSupplier = textSupplier;
 		this.onPress = onPress;
 	}
@@ -23,6 +31,49 @@ public class Button extends ButtonWidget implements IElement {
 	@Override
 	public void onPress() {
 		onPress.press(this);
+	}
+	
+	@Override
+	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		MinecraftClient minecraftClient = client.getMinecraftClient();
+		TextureManager textureManager = minecraftClient.getTextureManager();
+		TextRenderer font = minecraftClient.textRenderer;
+		
+		textureManager.bindTexture(WIDGETS_LOCATION);
+		
+		int i = getYImage(isHovered());
+		int halfWidth = width / 2;
+		int topBorder = 2;
+		
+		int x0 = x;
+		int x1 = x + halfWidth;
+		int y0 = y;
+		int y1 = y + topBorder;
+		int textureX0 = 0;
+		int textureX1 = 200 - halfWidth;
+		int textureY0 = 46 + i * 20;
+		int textureY1 = textureY0 + 20 - height + topBorder;
+		
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableDepthTest();
+		
+		drawTexture(matrices, x0, y0, textureX0, textureY0, halfWidth, topBorder);
+		drawTexture(matrices, x1, y0, textureX1, textureY0, halfWidth, topBorder);
+		drawTexture(matrices, x0, y1, textureX0, textureY1, halfWidth, height - topBorder);
+		drawTexture(matrices, x1, y1, textureX1, textureY1, halfWidth, height - topBorder);
+		
+		int rgb = active ? 0xFFFFFF : 0xA0A0A0;
+		int a = MathHelper.ceil(alpha * 255.0F);
+		int color = rgb | (a << 24);
+		
+		Text message = getMessage();
+		int textWidth = font.getWidth(message);
+		int textX = x + (width - textWidth) / 2;
+		int textY = y + (height - font.fontHeight + 1) / 2;
+		
+		font.drawWithShadow(matrices, message, textX, textY, color);
 	}
 	
 	@Override
@@ -42,7 +93,7 @@ public class Button extends ButtonWidget implements IElement {
 	
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		return super.mouseReleased(mouseX, mouseY, button);
+		return isHovered(mouseX, mouseY) && super.mouseReleased(mouseX, mouseY, button);
 	}
 	
 	@Override

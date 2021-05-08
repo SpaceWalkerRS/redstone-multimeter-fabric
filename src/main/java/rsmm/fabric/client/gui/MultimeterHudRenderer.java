@@ -170,16 +170,19 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	private void renderTicksTable(MatrixStack matrices, int x, int y, int width, int height) {
+		long currentTick = client.getCurrentServerTick();
+		long firstTick = getSelectedTick() - SELECTED_COLUMN;
+		
+		int markerColumn = (currentTick < firstTick || currentTick > (firstTick + COLUMN_COUNT)) ? -1 : (int)(currentTick - firstTick);
+		
 		drawBackground(matrices, x, y, width, height);
-		drawGridLines(matrices, x, y, height, COLUMN_COUNT);
+		drawGridLines(matrices, x, y, height, COLUMN_COUNT, markerColumn);
 		
 		int rowX = x;
 		int rowY = y;
 		
-		long firstTick = getSelectedTick() - SELECTED_COLUMN;
-		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, meter);
+			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, currentTick, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;
 		}
@@ -217,8 +220,12 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	private void drawGridLines(MatrixStack matrices, int x, int y, int height, int columnCount) {
+		drawGridLines(matrices, x, y, height, columnCount, -1);
+	}
+	
+	private void drawGridLines(MatrixStack matrices, int x, int y, int height, int columnCount, int markedColumn) {
 		int width = columnCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
-				
+		
 		// Vertical lines
 		for (int i = 0; i <= columnCount; i++) {
 			int lineX = x + i * (COLUMN_WIDTH + GRID_SIZE);
@@ -230,7 +237,14 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		for (int i = 0; i <= ROW_COUNT; i++) {
 			int lineY = y + i * (ROW_HEIGHT + GRID_SIZE);
 			
-			fill(matrices, x, lineY, x + width, lineY + GRID_SIZE, MAIN_GRID_COLOR);
+			fill(matrices, x, lineY, x + width - GRID_SIZE, lineY + GRID_SIZE, MAIN_GRID_COLOR);
+		}
+		// Marked column
+		if (markedColumn >= 0 && markedColumn <= columnCount) {
+			int lineX = x + markedColumn * (COLUMN_WIDTH + GRID_SIZE);
+			int color = MARKER_GRID_COLOR;
+			
+			fill(matrices, lineX, y + GRID_SIZE, lineX + GRID_SIZE, y + height - GRID_SIZE, color);
 		}
 	}
 	

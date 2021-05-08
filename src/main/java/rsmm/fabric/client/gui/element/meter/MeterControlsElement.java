@@ -62,6 +62,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	private Button movableButton;
 	private List<Button> eventTypeButtons;
 	
+	private int firstControlButtonIndex;
 	private boolean triedDeleting;
 	
 	public MeterControlsElement(MultimeterClient client, int x, int y, int width) {
@@ -304,11 +305,6 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		return new LiteralText(String.format("Edit Meter #%d (\'%s\')", meterIndex, meter.getName())).formatted(Formatting.UNDERLINE);
 	}
 	
-	private void updateDeleteButtonX() {
-		int x = getX() + font.getWidth(getTitleText()) + 10;
-		deleteButton.setX(x);
-	}
-	
 	public int getSelectedMeter() {
 		return meterIndex;
 	}
@@ -340,10 +336,12 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		clearChildren();
 		
 		if (meter != null) {
-			deleteButton = new Button(x, y, BUTTON_HEIGHT, BUTTON_HEIGHT, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), (button) -> {
+			deleteButton = new Button(client, x, y, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), (button) -> {
 				tryDelete();
 			});
 			addChild(deleteButton);
+			
+			firstControlButtonIndex = getChildren().size();
 			
 			dimensionField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> meter.getPos().getWorldId().toString(), (text) -> {
 				changePos();
@@ -427,7 +425,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			});
 			addChild(blueSlider);
 			
-			movableButton = new Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
+			movableButton = new Button(client, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
 				String text = String.valueOf(meter.isMovable());
 				Formatting formatting = meter.isMovable() ? Formatting.GREEN : Formatting.RED;
 				
@@ -440,7 +438,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			eventTypeButtons = new ArrayList<>();
 			
 			for (EventType type : EventType.TYPES) {
-				Button eventTypeButton = new Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
+				Button eventTypeButton = new Button(client, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
 					String text = String.valueOf(meter.isMetering(type));
 					Formatting formatting = meter.isMetering(type) ? Formatting.GREEN : Formatting.RED;
 					
@@ -462,17 +460,16 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		
 		if (meter != null) {
 			int x = this.x + SPACING;
-			y += 14;
+			y += 15;
 			
 			updateDeleteButtonX();
 			deleteButton.setY(y);
 			
-			y += 26;
+			y += 25;
 			
 			List<IElement> children = getChildren();
 			
-			// We ignore the first element; it's the delete button
-			for (int index = 1; index < children.size(); index++) {
+			for (int index = firstControlButtonIndex; index < children.size(); index++) {
 				IElement element = children.get(index);
 				
 				element.setX(x);
@@ -485,6 +482,11 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		}
 		
 		this.height = y - this.y;
+	}
+	
+	private void updateDeleteButtonX() {
+		int x = getX() + font.getWidth(getTitleText()) + 10;
+		deleteButton.setX(x);
 	}
 	
 	private void tryDelete() {
