@@ -10,7 +10,7 @@ public class HudSettings {
 	public static final int GRID_SIZE = 1;
 	
 	public static final int COLUMN_COUNT = 60;
-	public static final int SELECTED_COLUMN = 44;
+	public static final int SELECTED_COLUMN = 45;
 	public static int ROW_COUNT;
 	
 	/** The width of the ticks table */

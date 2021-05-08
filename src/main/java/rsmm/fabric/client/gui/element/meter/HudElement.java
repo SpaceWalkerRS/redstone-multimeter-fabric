@@ -83,6 +83,10 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		HudChangeDispatcher.addListener(this);
 		MeterChangeDispatcher.addListener(this);
 		MeterGroupChangeDispatcher.addListener(this);
+		
+		if (!hudRenderer.isPaused()) {
+			hudRenderer.pause();
+		}
 	}
 	
 	@Override
@@ -163,6 +167,10 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		HudChangeDispatcher.removeListener(this);
 		MeterChangeDispatcher.removeListener(this);
 		MeterGroupChangeDispatcher.removeListener(this);
+		
+		if (hudRenderer.isPaused()) {
+			hudRenderer.pause();
+		}
 	}
 	
 	@Override
@@ -193,7 +201,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		this.y = y;
 		
 		int y0 = y + hudRenderer.getTotalHeight();
-		int y1 = y + hudRenderer.getTableHeight();
+		int y1 = y + hudRenderer.getTableHeight() + 2;
 		
 		meterControls.setY(y0);
 		playPauseButton.setY(y1);

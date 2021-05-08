@@ -15,6 +15,7 @@ import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.log.MeterEventRendererDispatcher;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.MeterEvent;
+import rsmm.fabric.common.listeners.HudChangeDispatcher;
 import rsmm.fabric.common.log.MeterLogs;
 
 public class MultimeterHudRenderer extends DrawableHelper {
@@ -68,6 +69,8 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		if (!paused) {
 			resetOffset();
 		}
+		
+		HudChangeDispatcher.paused();
 	}
 	
 	public void stepForward(int amount) {
@@ -135,7 +138,8 @@ public class MultimeterHudRenderer extends DrawableHelper {
 			renderSubTicksTable(matrices, x + namesWidth + TICKS_TABLE_WIDTH + TICKS_SUB_TICKS_GAP, y, height);
 		}
 		
-		font.draw(matrices, client.getMeterGroup().getName(), x + 2, y + height + 2, METER_GROUP_NAME_COLOR);
+		int color = client.hasMultimeterScreenOpen() ? 0xFFFFFF : METER_GROUP_NAME_COLOR;
+		font.draw(matrices, client.getMeterGroup().getName(), x + 2, y + height + 2, color);
 	}
 	
 	private void updateRowCount() {
@@ -170,10 +174,10 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	private void renderTicksTable(MatrixStack matrices, int x, int y, int width, int height) {
-		long currentTick = client.getCurrentServerTick();
 		long firstTick = getSelectedTick() - SELECTED_COLUMN;
+		long lastTick = client.getCurrentServerTick();
 		
-		int markerColumn = (currentTick < firstTick || currentTick > (firstTick + COLUMN_COUNT)) ? -1 : (int)(currentTick - firstTick);
+		int markerColumn = (lastTick < firstTick || lastTick > (firstTick + COLUMN_COUNT)) ? -1 : (int)(lastTick - firstTick);
 		
 		drawBackground(matrices, x, y, width, height);
 		drawGridLines(matrices, x, y, height, COLUMN_COUNT, markerColumn);
@@ -182,7 +186,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		int rowY = y;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, currentTick, meter);
+			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, lastTick, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;
 		}
