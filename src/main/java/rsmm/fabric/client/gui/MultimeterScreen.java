@@ -26,7 +26,7 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	private boolean isPauseScreen;
 	
-	private double scrollAmount;
+	private double scrollAmount = -1;
 	private int scrollSpeed = 7;
 	private int mouseScrollType;
 	
@@ -174,7 +174,9 @@ public class MultimeterScreen extends RSMMScreen {
 			}
 		}
 		
-		renderScrollBar(matrices);
+		if (getMaxScrollAmount() > 0.0D) {
+			renderScrollBar(matrices);
+		}
 	}
 	
 	private double getMaxScrollAmount() {
