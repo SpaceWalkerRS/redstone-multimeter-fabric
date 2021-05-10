@@ -177,10 +177,10 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		long firstTick = getSelectedTick() - SELECTED_COLUMN;
 		long currentTick = client.getLastServerTick() + 1;
 		
-		int markerColumn = (currentTick < firstTick || currentTick > (firstTick + COLUMN_COUNT)) ? -1 : (int)(currentTick - firstTick);
+		int markedColumn = (currentTick < firstTick || currentTick > (firstTick + COLUMN_COUNT)) ? -1 : (int)(currentTick - firstTick);
 		
 		drawBackground(matrices, x, y, width, height);
-		drawGridLines(matrices, x, y, height, COLUMN_COUNT, markerColumn);
+		drawGridLines(matrices, x, y, height, COLUMN_COUNT, markedColumn);
 		
 		int rowX = x;
 		int rowY = y;
