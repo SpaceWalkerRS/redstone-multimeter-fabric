@@ -55,11 +55,8 @@ public class InputHandler {
 		} else if (KeyBindings.TOGGLE_HUD.matchesMouse(button)) {
 			client.toggleHud();
 		} else if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
-			MinecraftClient minecraftClient = client.getMinecraftClient();
-			Screen screen = minecraftClient.currentScreen;
-
-			if (screen != null && screen instanceof MultimeterScreen) {
-				minecraftClient.openScreen(null);
+			if (client.hasMultimeterScreenOpen()) {
+				client.getMinecraftClient().openScreen(null);
 			}
 		} else {
 			return false;
@@ -78,11 +75,8 @@ public class InputHandler {
 		} else if (KeyBindings.TOGGLE_HUD.matchesKey(keyCode, scanCode)) {
 			client.toggleHud();
 		} else if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
-			MinecraftClient minecraftClient = client.getMinecraftClient();
-			Screen screen = minecraftClient.currentScreen;
-
-			if (screen != null && screen instanceof MultimeterScreen) {
-				minecraftClient.openScreen(null);
+			if (client.hasMultimeterScreenOpen()) {
+				client.getMinecraftClient().openScreen(null);
 			}
 		} else {
 			return false;

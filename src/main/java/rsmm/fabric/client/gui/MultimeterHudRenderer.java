@@ -9,10 +9,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.text.Text;
+
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.log.MeterEventRendererDispatcher;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.MeterEvent;
+import rsmm.fabric.common.listeners.HudChangeDispatcher;
 import rsmm.fabric.common.log.MeterLogs;
 
 public class MultimeterHudRenderer extends DrawableHelper {
@@ -22,7 +24,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	private final MeterEventRendererDispatcher eventRenderers;
 	
 	private boolean paused;
-	/** The offset between the current server tick and the first tick to be displayed in the ticks table */
+	/** The offset between the last server tick and the first tick to be displayed in the ticks table */
 	private int offset;
 	
 	private int hoveredRow;
@@ -41,7 +43,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	public void resetOffset() {
-		offset = -COLUMN_COUNT;
+		offset = 1 - COLUMN_COUNT;
 	}
 	
 	public void reset() {
@@ -66,6 +68,8 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		if (!paused) {
 			resetOffset();
 		}
+		
+		HudChangeDispatcher.paused();
 	}
 	
 	public void stepForward(int amount) {
@@ -81,7 +85,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	public long getSelectedTick() {
-		return client.getCurrentServerTick() + offset + SELECTED_COLUMN;
+		return client.getLastServerTick() + offset + SELECTED_COLUMN;
 	}
 	
 	public int getTableHeight() {
@@ -133,14 +137,15 @@ public class MultimeterHudRenderer extends DrawableHelper {
 			renderSubTicksTable(x + namesWidth + TICKS_TABLE_WIDTH + TICKS_SUB_TICKS_GAP, y, height);
 		}
 		
-		font.draw(client.getMeterGroup().getName(), x + 2, y + height + 2, METER_GROUP_NAME_COLOR);
+		int color = client.hasMultimeterScreenOpen() ? METER_GROUP_NAME_COLOR_LIGHT : METER_GROUP_NAME_COLOR_DARK;
+		font.draw(client.getMeterGroup().getName(), x + 2, y + height + 2, color);
 	}
 	
 	private void updateRowCount() {
 		ROW_COUNT = client.getMeterGroup().getMeterCount();
 	}
 	
-	private int getNamesWidth() {
+	public int getNamesWidth() {
 		int width = 0;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
@@ -168,16 +173,19 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	private void renderTicksTable(int x, int y, int width, int height) {
+		long firstTick = getSelectedTick() - SELECTED_COLUMN;
+		long currentTick = client.getLastServerTick() + 1;
+		
+		int markerColumn = (currentTick < firstTick || currentTick > (firstTick + COLUMN_COUNT)) ? -1 : (int)(currentTick - firstTick);
+		
 		drawBackground(x, y, width, height);
-		drawGridLines(x, y, height, COLUMN_COUNT);
+		drawGridLines(x, y, height, COLUMN_COUNT, markerColumn);
 		
 		int rowX = x;
 		int rowY = y;
 		
-		long firstTick = getSelectedTick() - SELECTED_COLUMN;
-		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			eventRenderers.renderTickLogs(font, rowX, rowY, firstTick, meter);
+			eventRenderers.renderTickLogs(font, rowX, rowY, firstTick, currentTick, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;
 		}
@@ -215,6 +223,10 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	private void drawGridLines(int x, int y, int height, int columnCount) {
+		drawGridLines(x, y, height, columnCount, -1);
+	}
+	
+	private void drawGridLines(int x, int y, int height, int columnCount, int markedColumn) {
 		int width = columnCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
 		// Vertical lines
@@ -229,6 +241,13 @@ public class MultimeterHudRenderer extends DrawableHelper {
 			int lineY = y + i * (ROW_HEIGHT + GRID_SIZE);
 			
 			fill(x, lineY, x + width, lineY + GRID_SIZE, MAIN_GRID_COLOR);
+		}
+		// Marked column
+		if (markedColumn >= 0 && markedColumn <= columnCount) {
+			int lineX = x + markedColumn * (COLUMN_WIDTH + GRID_SIZE);
+			int color = MARKER_GRID_COLOR;
+			
+			fill(lineX, y + GRID_SIZE, lineX + GRID_SIZE, y + height - GRID_SIZE, color);
 		}
 	}
 	
@@ -261,7 +280,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		fill(left            , bottom         , right            , bottom + GRID_SIZE, SELECTION_INDICATOR_COLOR); // bottom
 	}
 	
-	public void resetHoveredElements() {
+	private void resetHoveredElements() {
 		hoveredRow = -1;
 		hoveredNameColumn = -1;
 		hoveredTickColumn = -1;

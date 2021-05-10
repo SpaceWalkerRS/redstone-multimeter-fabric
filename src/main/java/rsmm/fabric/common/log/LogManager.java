@@ -7,7 +7,7 @@ public abstract class LogManager {
 	
 	protected abstract MeterGroup getMeterGroup();
 	
-	protected abstract long getCurrentTick();
+	protected abstract long getLastTick();
 	
 	public void clearLogs() {
 		for (Meter meter : getMeterGroup().getMeters()) {

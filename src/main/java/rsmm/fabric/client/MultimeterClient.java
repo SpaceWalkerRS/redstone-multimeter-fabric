@@ -44,7 +44,7 @@ public class MultimeterClient {
 	private ClientMeterGroup meterGroup;
 	private boolean connected; // true if the client is connected to a MultimeterServer
 	private boolean renderHud;
-	private long currentServerTick;
+	private long lastServerTick;
 	
 	public MultimeterClient(MinecraftClient client) {
 		this.client = client;
@@ -54,7 +54,7 @@ public class MultimeterClient {
 		this.hudRenderer = new MultimeterHudRenderer(this);
 		
 		this.renderHud = true;
-		this.currentServerTick = -1;
+		this.lastServerTick = -1;
 	}
 	
 	public MinecraftClient getMinecraftClient() {
@@ -92,16 +92,16 @@ public class MultimeterClient {
 		return renderHud && connected && !hasMultimeterScreenOpen();
 	}
 	
-	public long getCurrentServerTick() {
-		return currentServerTick;
+	public long getLastServerTick() {
+		return lastServerTick;
 	}
 	
 	/**
-	 * At the start of each server tick, the server sends a packet
+	 * At the end of each server tick, the server sends a packet
 	 * to clients with the current server time.
 	 */
 	public void onServerTick(long serverTick) {
-		currentServerTick = serverTick;
+		lastServerTick = serverTick;
 		
 		meterGroup.getLogManager().clearOldLogs();
 		hudRenderer.tick();
@@ -129,7 +129,7 @@ public class MultimeterClient {
 			}
 			
 			connected = true;
-			currentServerTick = serverTick;
+			lastServerTick = serverTick;
 			
 			MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
 			packetHandler.sendPacket(packet);
@@ -169,6 +169,9 @@ public class MultimeterClient {
 	
 	public void toggleHud() {
 		renderHud = !renderHud;
+		
+		Text text = new LiteralText(String.format("%s Multimeter HUD", renderHud ? "Enabled" : "Disabled"));
+		client.player.addChatMessage(text, true);
 	}
 	
 	public boolean hasMultimeterScreenOpen() {

@@ -77,10 +77,20 @@ public class Multimeter {
 		currentTickPhase = phase;
 	}
 	
-	public void tick() {
+	public void tickStart() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			meterGroup.getLogManager().tick();
 		}
+	}
+	
+	public void tickEnd(boolean paused) {
+		broadcastMeterData();
+		
+		if (!paused) {
+			broadcastMeterLogs();
+		}
+		
+		onTickPhase(TickPhase.UNKNOWN);
 	}
 	
 	/**
@@ -88,7 +98,7 @@ public class Multimeter {
 	 * and sends meter changes of the past tick to
 	 * clients.
 	 */
-	public void broadcastMeterData() {
+	private void broadcastMeterData() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			if (meterGroup.isDirty()) {
 				if (meterGroup.hasSubscribers()) {
@@ -107,7 +117,7 @@ public class Multimeter {
 	 * and sends all the logged events of the past tick
 	 * to clients.
 	 */
-	public void broadcastMeterLogs() {
+	private void broadcastMeterLogs() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			if (meterGroup.hasNewLogs()) {
 				if (meterGroup.hasSubscribers()) {

@@ -7,8 +7,6 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.text.Text;
 
-import rsmm.fabric.client.gui.widget.TextField;
-
 public interface IParentElement extends IElement {
 	
 	@Override
@@ -120,6 +118,15 @@ public interface IParentElement extends IElement {
 	}
 	
 	@Override
+	default void tick() {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).tick();
+		}
+	}
+	
+	@Override
 	default List<List<Text>> getTooltip(double mouseX, double mouseY) {
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
 		return hoveredElement == null ? Collections.emptyList() : hoveredElement.getTooltip(mouseX, mouseY);
@@ -153,17 +160,4 @@ public interface IParentElement extends IElement {
 	
 	public void setFocusedElement(IElement element);
 	
-	default void tick() {
-		List<IElement> children = getChildren();
-		
-		for (int index = 0; index < children.size(); index++) {
-			IElement child = children.get(index);
-			
-			if (child instanceof IParentElement) {
-				((IParentElement)child).tick();
-			} else if (child instanceof TextField) {
-				((TextField)child).tick();
-			}
-		}
-	}
 }

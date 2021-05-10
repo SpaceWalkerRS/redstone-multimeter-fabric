@@ -16,7 +16,7 @@ public abstract class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, Meter meter) {
+	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter) {
 		y += GRID_SIZE;
 		
 		MeterLogs logs = meter.getLogs();
@@ -27,9 +27,13 @@ public abstract class BasicEventRenderer extends MeterEventRenderer {
 			return;
 		}
 		
-		long lastTick = firstTick + COLUMN_COUNT;
+		long lastHudTick = firstTick + COLUMN_COUNT;
 		
-		while (event.isBefore(lastTick)) {
+		if (lastHudTick > lastTick) {
+			lastHudTick = lastTick;
+		}
+		
+		while (event.isBefore(lastHudTick)) {
 			int column = (int)(event.getTick() - firstTick); // The event is no older than 1M ticks, so we can safely cast to int
 			int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 			

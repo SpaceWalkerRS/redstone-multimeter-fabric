@@ -20,12 +20,12 @@ public class MeterEventRendererDispatcher {
 		eventRenderers.add(new MovedEventRenderer());
 	}
 	
-	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, Meter meter) {
+	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter) {
 		for (MeterEventRenderer eventRenderer : eventRenderers) {
 			EventType type = eventRenderer.getType();
 			
 			if (meter.isMetering(type)) {
-				eventRenderer.renderTickLogs(font, x, y, firstTick, meter);
+				eventRenderer.renderTickLogs(font, x, y, firstTick, lastTick, meter);
 			}
 		}
 	}

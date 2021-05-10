@@ -47,11 +47,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onMethod_16208InjectAtReturn(CallbackInfo ci) {
-		multimeterServer.getMultimeter().broadcastMeterData();
-		
-		if (!isPaused()) {
-			multimeterServer.getMultimeter().broadcastMeterLogs();
-		}
+		multimeterServer.tickEnd(isPaused());
 	}
 	
 	@Inject(
@@ -63,7 +59,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onTickInjectAtHead(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		multimeterServer.tick();
+		multimeterServer.tickStart();
 	}
 	
 	@Override

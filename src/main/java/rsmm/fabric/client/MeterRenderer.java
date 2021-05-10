@@ -39,7 +39,7 @@ public class MeterRenderer {
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableTexture();
 		RenderSystem.depthMask(false);
-        RenderSystem.disableLighting();
+		RenderSystem.disableLighting();
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();

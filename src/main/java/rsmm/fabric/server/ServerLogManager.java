@@ -25,7 +25,7 @@ public class ServerLogManager extends LogManager {
 	}
 	
 	@Override
-	protected long getCurrentTick() {
+	protected long getLastTick() {
 		return meterGroup.getMultimeter().getMultimeterServer().getMinecraftServer().getTicks();
 	}
 	
@@ -35,7 +35,7 @@ public class ServerLogManager extends LogManager {
 	
 	public void logEvent(Meter meter, EventType type, int metaData) {
 		if (meter.isMetering(type)) {
-			long tick = getCurrentTick();
+			long tick = getLastTick();
 			int subTick = currentSubTick++;
 			TickPhase phase = meterGroup.getMultimeter().getCurrentTickPhase();
 			
