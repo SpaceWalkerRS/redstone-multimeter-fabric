@@ -46,7 +46,7 @@ public class TextField extends TextFieldWidget implements IElement {
 	
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		return super.mouseReleased(mouseX, mouseY, button);
+		return isHovered(mouseX, mouseY) && super.mouseReleased(mouseX, mouseY, button);
 	}
 	
 	@Override

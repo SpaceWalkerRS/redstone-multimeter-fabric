@@ -478,8 +478,6 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 				
 				y += ROW_HEIGHT;
 			}
-			
-			
 		}
 		
 		this.height = y - this.y;

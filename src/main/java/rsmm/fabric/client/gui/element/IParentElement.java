@@ -11,8 +11,10 @@ public interface IParentElement extends IElement {
 	
 	@Override
 	default void render(int mouseX, int mouseY, float delta) {
-		for (IElement child : getChildren()) {
-			child.render(mouseX, mouseY, delta);
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).render(mouseX, mouseY, delta);
 		}
 	}
 	
@@ -48,13 +50,14 @@ public interface IParentElement extends IElement {
 	
 	@Override
 	default boolean mouseRelease(double mouseX, double mouseY, int button) {
+		boolean released = false;
+		
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			setDraggingMouse(false);
 		}
 		
-		boolean released = false;
-		
 		List<IElement> children = getChildren();
+		
 		for (int index = 0; index < children.size(); index++) {
 			IElement child = children.get(index);
 			
@@ -146,7 +149,11 @@ public interface IParentElement extends IElement {
 	
 	default IElement getHoveredElement(double mouseX, double mouseY) {
 		if (isHovered(mouseX, mouseY)) {
-			for (IElement child : getChildren()) {
+			List<IElement> children = getChildren();
+			
+			for (int index = 0; index < children.size(); index++) {
+				IElement child = children.get(index);
+				
 				if (child.isHovered(mouseX, mouseY)) {
 					return child;
 				}
