@@ -30,16 +30,22 @@ public class MultimeterServer {
 		return multimeter;
 	}
 	
-	public void tick() {
-		ServerTickPacket packet = new ServerTickPacket(server.getTicks());
-		
-		for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-			if (multimeter.hasSubscription(player)) {
-				packetHandler.sendPacketToPlayer(packet, player);
+	public void tickStart() {
+		multimeter.tickStart();
+	}
+	
+	public void tickEnd(boolean paused) {
+		if (!paused) {
+			ServerTickPacket packet = new ServerTickPacket(server.getTicks());
+			
+			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+				if (multimeter.hasSubscription(player)) {
+					packetHandler.sendPacketToPlayer(packet, player);
+				}
 			}
 		}
 		
-		multimeter.tick();
+		multimeter.tickEnd(paused);
 	}
 	
 	public void onPlayerJoin(ServerPlayerEntity player) {

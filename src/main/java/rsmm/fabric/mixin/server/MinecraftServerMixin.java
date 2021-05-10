@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.server.MinecraftServer;
+
 import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.interfaces.mixin.IMinecraftServer;
 import rsmm.fabric.server.MultimeterServer;
@@ -47,11 +48,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onMethod_16208InjectAtReturn(CallbackInfo ci) {
-		multimeterServer.getMultimeter().broadcastMeterData();
-		
-		if (!isPaused()) {
-			multimeterServer.getMultimeter().broadcastMeterLogs();
-		}
+		multimeterServer.tickEnd(isPaused());
 	}
 	
 	@Inject(
@@ -63,7 +60,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onTickInjectAtHead(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		multimeterServer.tick();
+		multimeterServer.tickStart();
 	}
 	
 	@Override

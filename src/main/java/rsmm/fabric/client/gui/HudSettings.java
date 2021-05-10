@@ -10,7 +10,7 @@ public class HudSettings {
 	public static final int GRID_SIZE = 1;
 	
 	public static final int COLUMN_COUNT = 60;
-	public static final int SELECTED_COLUMN = 45;
+	public static final int SELECTED_COLUMN = 44;
 	public static int ROW_COUNT;
 	
 	/** The width of the ticks table */
@@ -31,6 +31,7 @@ public class HudSettings {
 	public static final int POWERED_TEXT_COLOR = 0xFF000000;
 	public static final int UNPOWERED_TEXT_COLOR = 0xFF707070;
 	public static final int METER_NAME_COLOR = 0xFFFFFFFF;
-	public static final int METER_GROUP_NAME_COLOR = 0xFF000000;
+	public static final int METER_GROUP_NAME_COLOR_DARK = 0xFF000000;
+	public static final int METER_GROUP_NAME_COLOR_LIGHT = 0xFFD0D0D0;
 	
 }

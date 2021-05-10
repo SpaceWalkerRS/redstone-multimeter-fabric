@@ -26,8 +26,8 @@ import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterChangesPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
 import rsmm.fabric.common.packet.types.MeterLogsPacket;
-import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.common.packet.types.RemoveAllMetersPacket;
+import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.util.ColorUtils;
 import rsmm.fabric.util.NBTUtils;
@@ -74,14 +74,24 @@ public class Multimeter {
 		return currentTickPhase;
 	}
 	
-	public void onTickPhase(TickPhase phase) {
-		currentTickPhase = phase;
+	public void onTickPhase(TickPhase tickPhase) {
+		currentTickPhase = tickPhase;
 	}
 	
-	public void tick() {
+	public void tickStart() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			meterGroup.getLogManager().tick();
 		}
+	}
+	
+	public void tickEnd(boolean paused) {
+		broadcastMeterData();
+		
+		if (!paused) {
+			broadcastMeterLogs();
+		}
+		
+		onTickPhase(TickPhase.UNKNOWN);
 	}
 	
 	/**
@@ -89,7 +99,7 @@ public class Multimeter {
 	 * and sends meter changes of the past tick to
 	 * clients.
 	 */
-	public void broadcastMeterData() {
+	private void broadcastMeterData() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			if (meterGroup.isDirty()) {
 				if (meterGroup.hasSubscribers()) {
@@ -108,7 +118,7 @@ public class Multimeter {
 	 * and sends all the logged events of the past tick
 	 * to clients.
 	 */
-	public void broadcastMeterLogs() {
+	private void broadcastMeterLogs() {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			if (meterGroup.hasNewLogs()) {
 				if (meterGroup.hasSubscribers()) {

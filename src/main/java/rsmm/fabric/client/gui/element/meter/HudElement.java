@@ -244,6 +244,11 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	@Override
 	public void paused() {
 		playPauseButton.updateMessage();
+		
+		boolean paused = hudRenderer.isPaused();
+		
+		fastForwardButton.active = paused;
+		fastBackwardButton.active = paused;
 	}
 	
 	@Override

@@ -25,7 +25,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	private final MeterEventRendererDispatcher eventRenderers;
 	
 	private boolean paused;
-	/** The offset between the current server tick and the first tick to be displayed in the ticks table */
+	/** The offset between the last server tick and the first tick to be displayed in the ticks table */
 	private int offset;
 	
 	private int hoveredRow;
@@ -44,7 +44,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	public void resetOffset() {
-		offset = -COLUMN_COUNT;
+		offset = 1 - COLUMN_COUNT;
 	}
 	
 	public void reset() {
@@ -86,7 +86,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	public long getSelectedTick() {
-		return client.getCurrentServerTick() + offset + SELECTED_COLUMN;
+		return client.getLastServerTick() + offset + SELECTED_COLUMN;
 	}
 	
 	public int getTableHeight() {
@@ -138,7 +138,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 			renderSubTicksTable(matrices, x + namesWidth + TICKS_TABLE_WIDTH + TICKS_SUB_TICKS_GAP, y, height);
 		}
 		
-		int color = client.hasMultimeterScreenOpen() ? 0xFFFFFF : METER_GROUP_NAME_COLOR;
+		int color = client.hasMultimeterScreenOpen() ? METER_GROUP_NAME_COLOR_LIGHT : METER_GROUP_NAME_COLOR_DARK;
 		font.draw(matrices, client.getMeterGroup().getName(), x + 2, y + height + 2, color);
 	}
 	
@@ -175,9 +175,9 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	
 	private void renderTicksTable(MatrixStack matrices, int x, int y, int width, int height) {
 		long firstTick = getSelectedTick() - SELECTED_COLUMN;
-		long lastTick = client.getCurrentServerTick();
+		long currentTick = client.getLastServerTick() + 1;
 		
-		int markerColumn = (lastTick < firstTick || lastTick > (firstTick + COLUMN_COUNT)) ? -1 : (int)(lastTick - firstTick);
+		int markerColumn = (currentTick < firstTick || currentTick > (firstTick + COLUMN_COUNT)) ? -1 : (int)(currentTick - firstTick);
 		
 		drawBackground(matrices, x, y, width, height);
 		drawGridLines(matrices, x, y, height, COLUMN_COUNT, markerColumn);
@@ -186,7 +186,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		int rowY = y;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, lastTick, meter);
+			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, currentTick, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;
 		}

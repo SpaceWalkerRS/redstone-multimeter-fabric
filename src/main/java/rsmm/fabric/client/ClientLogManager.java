@@ -32,8 +32,8 @@ public class ClientLogManager extends LogManager {
 	}
 	
 	@Override
-	protected long getCurrentTick() {
-		return meterGroup.getMultimeterClient().getCurrentServerTick();
+	protected long getLastTick() {
+		return meterGroup.getMultimeterClient().getLastServerTick();
 	}
 	
 	@Override
@@ -51,11 +51,11 @@ public class ClientLogManager extends LogManager {
 	 * Log all events from the past server tick
 	 */
 	public void updateMeterLogs(CompoundTag data) {
-		long currentTick = getCurrentTick();
+		long lastTick = getLastTick();
 		int meterCount = meterGroup.getMeterCount();
 		
 		int subTicks = data.getInt("subTickCount");
-		subTickCount.put(currentTick, subTicks);
+		subTickCount.put(lastTick, subTicks);
 		
 		for (int index = 0; index < meterCount; index++) {
 			String key = String.valueOf(index);
@@ -74,7 +74,7 @@ public class ClientLogManager extends LogManager {
 	 */
 	public void clearOldLogs() {
 		long selectedTickCutoff = meterGroup.getMultimeterClient().getHudRenderer().getSelectedTick() - AGE_CUTOFF;
-		long serverTickCutoff = getCurrentTick() - MAX_LOG_AGE;
+		long serverTickCutoff = getLastTick() - MAX_LOG_AGE;
 		long cutoff = (selectedTickCutoff > serverTickCutoff) ? selectedTickCutoff : serverTickCutoff;
 		
 		Iterator<Long> it = subTickCount.keySet().iterator();

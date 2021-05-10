@@ -22,6 +22,8 @@ public class MultimeterScreen extends RSMMScreen {
 	private static final int DRAG = 1;
 	private static final int PULL = 2;
 	
+	private static double lastScrollAmount;
+	
 	private boolean isPauseScreen;
 	
 	private double scrollAmount;
@@ -124,6 +126,8 @@ public class MultimeterScreen extends RSMMScreen {
 		int width = scrollBarX - 2 - getX();
 		
 		addContent(new HudElement(multimeterClient, 0, 0, width));
+		
+		setScrollAmount(lastScrollAmount);
 	}
 	
 	@Override
@@ -146,18 +150,6 @@ public class MultimeterScreen extends RSMMScreen {
 			return;
 		}
 		
-		int y = getY() - (int)(scrollAmount);
-		
-		for (IElement element : getChildren()) {
-			element.setY(y);
-			
-			if ((y + element.getHeight()) >= getY() && y <= (getY() + getHeight())) {
-				element.render(matrices, mouseX, mouseY, delta);
-			}
-			
-			y += element.getHeight();
-		}
-		
 		if (mouseScrollType == PULL) {
 			int maxScroll = (int)getMaxScrollAmount();
 			
@@ -171,6 +163,14 @@ public class MultimeterScreen extends RSMMScreen {
 				setScrollAmount(scrollAmount - scrollSpeed);
 			} else if (mouseY > (middle + margin)) {
 				setScrollAmount(scrollAmount + scrollSpeed);
+			}
+		}
+		
+		for (IElement element : getChildren()) {
+			int y = element.getY();
+			
+			if ((y + element.getHeight()) >= getY() && y <= (getY() + getHeight())) {
+				element.render(matrices, mouseX, mouseY, delta);
 			}
 		}
 		
@@ -191,16 +191,28 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 	
 	private void setScrollAmount(double amount) {
+		double oldScrollAmount = scrollAmount;
 		scrollAmount = amount;
 		
-		if (scrollAmount < 0) {
-			scrollAmount = 0;
+		if (scrollAmount < 0.0D) {
+			scrollAmount = 0.0D;
 		}
 		
 		double maxAmount = getMaxScrollAmount();
 		
 		if (scrollAmount > maxAmount) {
 			scrollAmount = maxAmount;
+		}
+		
+		lastScrollAmount = scrollAmount;
+		
+		if (scrollAmount != oldScrollAmount) {
+			int y = getY() - (int)scrollAmount;
+			
+			for (IElement element : getChildren()) {
+				element.setY(y);
+				y += element.getHeight();
+			}
 		}
 	}
 	
