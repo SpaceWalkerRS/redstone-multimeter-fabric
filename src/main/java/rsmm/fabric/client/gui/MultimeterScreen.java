@@ -183,8 +183,8 @@ public class MultimeterScreen extends RSMMScreen {
 		for (IElement element : getChildren()) {
 			amount += element.getHeight();
 		}
-		if (amount < 0) {
-			amount = 0;
+		if (amount < 0.0D) {
+			amount = 0.0D;
 		}
 		
 		return amount;
@@ -223,10 +223,8 @@ public class MultimeterScreen extends RSMMScreen {
 		int bot = scrollBarY + scrollBarHeight;
 		
 		if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bot) {
-			int maxScroll = (int)getMaxScrollAmount();
-			
 			int screenHeight = getHeight();
-			int totalHeight = maxScroll + screenHeight;
+			int totalHeight = screenHeight + (int)getMaxScrollAmount();
 			
 			int barTop = scrollBarY + scrollBarHeight * (int)scrollAmount / totalHeight;
 			int barBot = scrollBarY + scrollBarHeight * ((int)scrollAmount + getHeight()) / totalHeight;
@@ -242,46 +240,42 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 	
 	private void renderScrollBar(MatrixStack matrices) {
-		int maxScroll = (int)getMaxScrollAmount();
+		RenderSystem.disableTexture();
 		
-		if (maxScroll > 0) {
-			RenderSystem.disableTexture();
-			
-			Tessellator tessellator = Tessellator.getInstance();
-			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			
-			int screenHeight = getHeight();
-			int totalHeight = maxScroll + screenHeight;
-			
-			int bgLeft = scrollBarX;
-			int bgRight = scrollBarX + scrollBarWidth;
-			int bgTop = scrollBarY;
-			int bgBot = scrollBarY + scrollBarHeight;
-			
-			int barLeft = bgLeft;
-			int barRight = bgRight;
-			int barTop = scrollBarY + scrollBarHeight * (int)scrollAmount / totalHeight;
-			int barBot = scrollBarY + scrollBarHeight * ((int)scrollAmount + getHeight()) / totalHeight;
-			
-			bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-			
-			bufferBuilder.vertex(bgLeft, bgBot, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(bgRight, bgBot, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(bgRight, bgTop, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(bgLeft, bgTop, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 255).next();
-			
-			bufferBuilder.vertex(barLeft, barBot, 0.0D).texture(0.0F, 1.0F).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(barRight, barBot, 0.0D).texture(1.0F, 1.0F).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(barRight, barTop, 0.0D).texture(1.0F, 0.0F).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(barLeft, barTop, 0.0D).texture(0.0F, 0.0F).color(128, 128, 128, 255).next();
-			bufferBuilder.vertex(barLeft, barBot - 1, 0.0D).texture(0.0F, 1.0F).color(192, 192, 192, 255).next();
-			bufferBuilder.vertex(barRight - 1, barBot - 1, 0.0D).texture(1.0F, 1.0F).color(192, 192, 192, 255).next();
-			bufferBuilder.vertex(barRight - 1, barTop, 0.0D).texture(1.0F, 0.0F).color(192, 192, 192, 255).next();
-			bufferBuilder.vertex(barLeft, barTop, 0.0D).texture(0.0F, 0.0F).color(192, 192, 192, 255).next();
-			
-			tessellator.draw();
-			
-			RenderSystem.enableTexture();
-		}
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		
+		int screenHeight = getHeight();
+		int totalHeight = screenHeight + (int)getMaxScrollAmount();
+		
+		int bgLeft = scrollBarX;
+		int bgRight = scrollBarX + scrollBarWidth;
+		int bgTop = scrollBarY;
+		int bgBot = scrollBarY + scrollBarHeight;
+		
+		int barLeft = bgLeft;
+		int barRight = bgRight;
+		int barTop = scrollBarY + scrollBarHeight * (int)scrollAmount / totalHeight;
+		int barBot = scrollBarY + scrollBarHeight * ((int)scrollAmount + getHeight()) / totalHeight;
+		
+		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+		
+		bufferBuilder.vertex(bgLeft, bgBot, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(bgRight, bgBot, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(bgRight, bgTop, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(bgLeft, bgTop, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 255).next();
+		
+		bufferBuilder.vertex(barLeft, barBot, 0.0D).texture(0.0F, 1.0F).color(128, 128, 128, 255).next();
+		bufferBuilder.vertex(barRight, barBot, 0.0D).texture(1.0F, 1.0F).color(128, 128, 128, 255).next();
+		bufferBuilder.vertex(barRight, barTop, 0.0D).texture(1.0F, 0.0F).color(128, 128, 128, 255).next();
+		bufferBuilder.vertex(barLeft, barTop, 0.0D).texture(0.0F, 0.0F).color(128, 128, 128, 255).next();
+		bufferBuilder.vertex(barLeft, barBot - 1, 0.0D).texture(0.0F, 1.0F).color(192, 192, 192, 255).next();
+		bufferBuilder.vertex(barRight - 1, barBot - 1, 0.0D).texture(1.0F, 1.0F).color(192, 192, 192, 255).next();
+		bufferBuilder.vertex(barRight - 1, barTop, 0.0D).texture(1.0F, 0.0F).color(192, 192, 192, 255).next();
+		bufferBuilder.vertex(barLeft, barTop, 0.0D).texture(0.0F, 0.0F).color(192, 192, 192, 255).next();
+		
+		tessellator.draw();
+		
+		RenderSystem.enableTexture();
 	}
 }

@@ -219,7 +219,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		}
 	}
 	
-	public void drawBackground(MatrixStack matrices, int x, int y, int width, int height) {
+	private void drawBackground(MatrixStack matrices, int x, int y, int width, int height) {
 		fill(matrices, x, y, x + width, y + height, BACKGROUND_COLOR);
 	}
 	
@@ -281,7 +281,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		fill(matrices, left            , bottom         , right            , bottom + GRID_SIZE, SELECTION_INDICATOR_COLOR); // bottom
 	}
 	
-	public void resetHoveredElements() {
+	private void resetHoveredElements() {
 		hoveredRow = -1;
 		hoveredNameColumn = -1;
 		hoveredTickColumn = -1;

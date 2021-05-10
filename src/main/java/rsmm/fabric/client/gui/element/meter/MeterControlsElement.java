@@ -84,14 +84,13 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		super.render(matrices, mouseX, mouseY, delta);
-		
 		if (meter != null) {
 			int x = this.x + 2;
 			int y = this.y + 20;
 			
 			int x1;
 			int dx = 7;
+			int dy = 6;
 			
 			Text title = getTitleText();
 			font.drawWithShadow(matrices, title, x, y, 0xFFFFFF);
@@ -103,7 +102,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			}
 			
 			Text posText = new LiteralText("Pos:").formatted(Formatting.ITALIC);
-			y = dimensionField.getY() + 6;
+			y = dimensionField.getY() + dy;
 			font.drawWithShadow(matrices, posText, x, y, 0xFFFFFF);
 			
 			Text dimensionText = new LiteralText("dimension");
@@ -112,25 +111,25 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			
 			Text xText = new LiteralText("x");
 			x1 = xField.getX() - dx - font.getWidth(xText);
-			y = xField.getY() + 6;
+			y = xField.getY() + dy;
 			font.drawWithShadow(matrices, xText, x1, y, 0xFFFFFF);
 			
 			Text yText = new LiteralText("y");
 			x1 = yField.getX() - dx - font.getWidth(yText);
-			y = yField.getY() + 6;
+			y = yField.getY() + dy;
 			font.drawWithShadow(matrices, yText, x1, y, 0xFFFFFF);
 			
 			Text zText = new LiteralText("z");
 			x1 = zField.getX() - dx - font.getWidth(zText);
-			y = zField.getY() + 6;
+			y = zField.getY() + dy;
 			font.drawWithShadow(matrices, zText, x1, y, 0xFFFFFF);
 			
 			Text nameText = new LiteralText("Name:").formatted(Formatting.ITALIC);
-			y = nameField.getY() + 6;
+			y = nameField.getY() + dy;
 			font.drawWithShadow(matrices, nameText, x, y, 0xFFFFFF);
 			
 			Text colorText = new LiteralText("Color:").formatted(Formatting.ITALIC);
-			y = colorField.getY() + 6;
+			y = colorField.getY() + dy;
 			font.drawWithShadow(matrices, colorText, x, y, 0xFFFFFF);
 			
 			Text rgbText = new LiteralText("rgb");
@@ -139,26 +138,26 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			
 			Text redText = new LiteralText("red").formatted(Formatting.RED);
 			x1 = redSlider.getX() - dx - font.getWidth(redText);
-			y = redSlider.getY() + 6;
+			y = redSlider.getY() + dy;
 			font.drawWithShadow(matrices, redText, x1, y, 0xFFFFFF);
 			
 			Text greenText = new LiteralText("green").formatted(Formatting.GREEN);
 			x1 = greenSlider.getX() - dx - font.getWidth(greenText);
-			y = greenSlider.getY() + 6;
+			y = greenSlider.getY() + dy;
 			font.drawWithShadow(matrices, greenText, x1, y, 0xFFFFFF);
 			
 			Text blueText = new LiteralText("blue").formatted(Formatting.BLUE);
 			x1 = blueSlider.getX() - dx - font.getWidth(blueText);
-			y = blueSlider.getY() + 6;
+			y = blueSlider.getY() + dy;
 			font.drawWithShadow(matrices, blueText, x1, y, 0xFFFFFF);
 			
 			Text movableText = new LiteralText("Movable:").formatted(Formatting.ITALIC);
-			y = movableButton.getY() + 6;
+			y = movableButton.getY() + dy;
 			font.drawWithShadow(matrices, movableText, x, y, 0xFFFFFF);
 			
 			
 			Text eventsText = new LiteralText("Metered Events:").formatted(Formatting.ITALIC);
-			y = eventTypeButtons.get(0).getY() + 6;
+			y = eventTypeButtons.get(0).getY() + dy;
 			font.drawWithShadow(matrices, eventsText, x, y, 0xFFFFFF);
 			
 			for (EventType type : EventType.TYPES) {
@@ -166,17 +165,19 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 				
 				Text eventTypeText = new LiteralText(type.getName());
 				x1 = button.getX() - dx - font.getWidth(eventTypeText);
-				y = button.getY() + 6;
+				y = button.getY() + dy;
 				font.drawWithShadow(matrices, eventTypeText, x1, y, 0xFFFFFF);
 			}
 		}
+		
+		super.render(matrices, mouseX, mouseY, delta);
 	}
 	
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean success = super.mouseClick(mouseX, mouseY, button);
 		
-		if (triedDeleting && getFocusedElement() != deleteButton) {
+		if (triedDeleting && (getFocusedElement() != deleteButton)) {
 			undoTryDelete();
 		}
 		
@@ -186,6 +187,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
+		
 		MeterChangeDispatcher.removeListener(this);
 		MeterGroupChangeDispatcher.removeListener(this);
 	}
@@ -297,7 +299,6 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			selectMeter(-1);
 		} else if (meterIndex > index) {
 			selectMeter(meterIndex - 1);
-			updateDeleteButtonX();
 		}
 	}
 	

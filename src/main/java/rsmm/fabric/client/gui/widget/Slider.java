@@ -68,7 +68,7 @@ public class Slider extends SliderWidget implements IElement {
 	
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		return super.keyPressed(keyCode, scanCode, modifiers) || isFocused();
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 	
 	@Override
@@ -143,7 +143,7 @@ public class Slider extends SliderWidget implements IElement {
 	
 	@Override
 	public void setHeight(int height) {
-		this.height = height - 2;
+		this.height = height;
 	}
 	
 	@Override

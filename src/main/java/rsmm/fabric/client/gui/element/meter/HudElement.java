@@ -128,7 +128,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 				int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
 				
 				if (hoveredRow >= 0 && hoveredNameColumn >= 0) {
-					success = meterControls.selectMeter(hoveredRow);
+					success |= meterControls.selectMeter(hoveredRow);
 				} else if (!success) {
 					meterControls.selectMeter(-1);
 				}
@@ -164,6 +164,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
+		
 		HudChangeDispatcher.removeListener(this);
 		MeterChangeDispatcher.removeListener(this);
 		MeterGroupChangeDispatcher.removeListener(this);
