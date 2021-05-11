@@ -73,8 +73,8 @@ public class Multimeter {
 		return currentTickPhase;
 	}
 	
-	public void onTickPhase(TickPhase phase) {
-		currentTickPhase = phase;
+	public void onTickPhase(TickPhase tickPhase) {
+		currentTickPhase = tickPhase;
 	}
 	
 	public void tickStart() {

@@ -151,10 +151,8 @@ public class MultimeterScreen extends RSMMScreen {
 		}
 		
 		if (mouseScrollType == PULL) {
-			int maxScroll = (int)getMaxScrollAmount();
-			
 			int screenHeight = getHeight();
-			int totalHeight = maxScroll + screenHeight;
+			int totalHeight = screenHeight + (int)getMaxScrollAmount();
 			
 			int middle = scrollBarY + scrollBarHeight * ((int)scrollAmount + getHeight() / 2) / totalHeight;
 			int margin = 5;

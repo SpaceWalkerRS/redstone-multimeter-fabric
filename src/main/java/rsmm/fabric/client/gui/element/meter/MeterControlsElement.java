@@ -6,7 +6,6 @@ import java.util.List;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -92,7 +91,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			int dx = 7;
 			int dy = 6;
 			
-			String title = getTitleText().asFormattedString();
+			String title = getTitleText();
 			font.drawWithShadow(title, x, y, 0xFFFFFF);
 			
 			if (triedDeleting) {
@@ -302,8 +301,8 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		}
 	}
 	
-	private Text getTitleText() {
-		return new LiteralText(String.format("Edit Meter #%d (\'%s\')", meterIndex, meter.getName())).formatted(Formatting.UNDERLINE);
+	private String getTitleText() {
+		return new LiteralText(String.format("Edit Meter #%d (\'%s\')", meterIndex, meter.getName())).formatted(Formatting.UNDERLINE).asFormattedString();
 	}
 	
 	public int getSelectedMeter() {
@@ -484,7 +483,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	}
 	
 	private void updateDeleteButtonX() {
-		int x = getX() + font.getStringWidth(getTitleText().asFormattedString()) + 10;
+		int x = getX() + font.getStringWidth(getTitleText()) + 10;
 		deleteButton.setX(x);
 	}
 	
