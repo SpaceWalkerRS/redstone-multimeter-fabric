@@ -25,6 +25,7 @@ import rsmm.fabric.common.listeners.MeterGroupChangeDispatcher;
 import rsmm.fabric.common.listeners.MeterGroupListener;
 import rsmm.fabric.common.listeners.MeterListener;
 import rsmm.fabric.common.packet.types.MeterChangePacket;
+import rsmm.fabric.common.packet.types.RemoveMeterPacket;
 import rsmm.fabric.util.ColorUtils;
 
 public class MeterControlsElement extends AbstractParentElement implements MeterListener, MeterGroupListener {
@@ -47,6 +48,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	private int meterIndex;
 	private Meter meter;
 	
+	private Button deleteButton;
 	private TextField dimensionField;
 	private TextField xField;
 	private TextField yField;
@@ -58,6 +60,9 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	private Slider blueSlider;
 	private Button movableButton;
 	private List<Button> eventTypeButtons;
+	
+	private int firstControlButtonIndex;
+	private boolean triedDeleting;
 	
 	public MeterControlsElement(MultimeterClient client, int x, int y, int width) {
 		MinecraftClient minecraftClient = client.getMinecraftClient();
@@ -78,20 +83,25 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
-		super.render(mouseX, mouseY, delta);
-		
 		if (meter != null) {
 			int x = this.x + 2;
 			int y = this.y + 20;
 			
 			int x1;
 			int dx = 7;
+			int dy = 6;
 			
-			String title = new LiteralText(String.format("Edit Meter #%d (%s)", meterIndex, meter.getName())).formatted(Formatting.UNDERLINE).asFormattedString();
+			String title = getTitleText();
 			font.drawWithShadow(title, x, y, 0xFFFFFF);
 			
+			if (triedDeleting) {
+				String deleteText = new LiteralText("Are you sure you want to delete this meter? YOU CAN'T UNDO THIS").formatted(Formatting.ITALIC).asFormattedString();
+				x1 = deleteButton.getX() + deleteButton.getWidth() + 5;
+				font.drawWithShadow(deleteText, x1, y, 0xFFFFFF);
+			}
+			
 			String posText = new LiteralText("Pos:").formatted(Formatting.ITALIC).asFormattedString();
-			y = dimensionField.getY() + 6;
+			y = dimensionField.getY() + dy;
 			font.drawWithShadow(posText, x, y, 0xFFFFFF);
 			
 			String dimensionText = new LiteralText("dimension").asFormattedString();
@@ -100,25 +110,25 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			
 			String xText = new LiteralText("x").asFormattedString();
 			x1 = xField.getX() - dx - font.getStringWidth(xText);
-			y = xField.getY() + 6;
+			y = xField.getY() + dy;
 			font.drawWithShadow(xText, x1, y, 0xFFFFFF);
 			
 			String yText = new LiteralText("y").asFormattedString();
 			x1 = yField.getX() - dx - font.getStringWidth(yText);
-			y = yField.getY() + 6;
+			y = yField.getY() + dy;
 			font.drawWithShadow(yText, x1, y, 0xFFFFFF);
 			
 			String zText = new LiteralText("z").asFormattedString();
 			x1 = zField.getX() - dx - font.getStringWidth(zText);
-			y = zField.getY() + 6;
+			y = zField.getY() + dy;
 			font.drawWithShadow(zText, x1, y, 0xFFFFFF);
 			
 			String nameText = new LiteralText("Name:").formatted(Formatting.ITALIC).asFormattedString();
-			y = nameField.getY() + 6;
+			y = nameField.getY() + dy;
 			font.drawWithShadow(nameText, x, y, 0xFFFFFF);
 			
 			String colorText = new LiteralText("Color:").formatted(Formatting.ITALIC).asFormattedString();
-			y = colorField.getY() + 6;
+			y = colorField.getY() + dy;
 			font.drawWithShadow(colorText, x, y, 0xFFFFFF);
 			
 			String rgbText = new LiteralText("rgb").asFormattedString();
@@ -127,26 +137,26 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			
 			String redText = new LiteralText("red").formatted(Formatting.RED).asFormattedString();
 			x1 = redSlider.getX() - dx - font.getStringWidth(redText);
-			y = redSlider.getY() + 6;
+			y = redSlider.getY() + dy;
 			font.drawWithShadow(redText, x1, y, 0xFFFFFF);
 			
 			String greenText = new LiteralText("green").formatted(Formatting.GREEN).asFormattedString();
 			x1 = greenSlider.getX() - dx - font.getStringWidth(greenText);
-			y = greenSlider.getY() + 6;
+			y = greenSlider.getY() + dy;
 			font.drawWithShadow(greenText, x1, y, 0xFFFFFF);
 			
 			String blueText = new LiteralText("blue").formatted(Formatting.BLUE).asFormattedString();
 			x1 = blueSlider.getX() - dx - font.getStringWidth(blueText);
-			y = blueSlider.getY() + 6;
+			y = blueSlider.getY() + dy;
 			font.drawWithShadow(blueText, x1, y, 0xFFFFFF);
 			
 			String movableText = new LiteralText("Movable:").formatted(Formatting.ITALIC).asFormattedString();
-			y = movableButton.getY() + 6;
+			y = movableButton.getY() + dy;
 			font.drawWithShadow(movableText, x, y, 0xFFFFFF);
 			
 			
 			String eventsText = new LiteralText("Metered Events:").formatted(Formatting.ITALIC).asFormattedString();
-			y = eventTypeButtons.get(0).getY() + 6;
+			y = eventTypeButtons.get(0).getY() + dy;
 			font.drawWithShadow(eventsText, x, y, 0xFFFFFF);
 			
 			for (EventType type : EventType.TYPES) {
@@ -154,15 +164,29 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 				
 				String eventTypeText = new LiteralText(type.getName()).asFormattedString();
 				x1 = button.getX() - dx - font.getStringWidth(eventTypeText);
-				y = button.getY() + 6;
+				y = button.getY() + dy;
 				font.drawWithShadow(eventTypeText, x1, y, 0xFFFFFF);
 			}
 		}
+		
+		super.render(mouseX, mouseY, delta);
+	}
+	
+	@Override
+	public boolean mouseClick(double mouseX, double mouseY, int button) {
+		boolean success = super.mouseClick(mouseX, mouseY, button);
+		
+		if (triedDeleting && (getFocusedElement() != deleteButton)) {
+			undoTryDelete();
+		}
+		
+		return success;
 	}
 	
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
+		
 		MeterChangeDispatcher.removeListener(this);
 		MeterGroupChangeDispatcher.removeListener(this);
 	}
@@ -228,6 +252,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	public void nameChanged(Meter meter) {
 		if (this.meter == meter) {
 			nameField.updateMessage();
+			updateDeleteButtonX();
 		}
 	}
 	
@@ -276,6 +301,10 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		}
 	}
 	
+	private String getTitleText() {
+		return new LiteralText(String.format("Edit Meter #%d (\'%s\')", meterIndex, meter.getName())).formatted(Formatting.UNDERLINE).asFormattedString();
+	}
+	
 	public int getSelectedMeter() {
 		return meterIndex;
 	}
@@ -307,6 +336,13 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		clearChildren();
 		
 		if (meter != null) {
+			deleteButton = new Button(client, x, y, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), (button) -> {
+				tryDelete();
+			});
+			addChild(deleteButton);
+			
+			firstControlButtonIndex = getChildren().size();
+			
 			dimensionField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> meter.getPos().getDimensionId().toString(), (text) -> {
 				changePos();
 			});
@@ -389,7 +425,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			});
 			addChild(blueSlider);
 			
-			movableButton = new Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
+			movableButton = new Button(client, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
 				String text = String.valueOf(meter.isMovable());
 				Formatting formatting = meter.isMovable() ? Formatting.GREEN : Formatting.RED;
 				
@@ -402,7 +438,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			eventTypeButtons = new ArrayList<>();
 			
 			for (EventType type : EventType.TYPES) {
-				Button eventTypeButton = new Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
+				Button eventTypeButton = new Button(client, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
 					String text = String.valueOf(meter.isMetering(type));
 					Formatting formatting = meter.isMetering(type) ? Formatting.GREEN : Formatting.RED;
 					
@@ -422,9 +458,18 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		
 		if (meter != null) {
 			int x = this.x + SPACING;
-			y += 40;
+			y += 15;
 			
-			for (IElement element : getChildren()) {
+			updateDeleteButtonX();
+			deleteButton.setY(y);
+			
+			y += 25;
+			
+			List<IElement> children = getChildren();
+			
+			for (int index = firstControlButtonIndex; index < children.size(); index++) {
+				IElement element = children.get(index);
+				
 				element.setX(x);
 				element.setY(y);
 				
@@ -433,6 +478,28 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		}
 		
 		this.height = y - this.y;
+	}
+	
+	private void updateDeleteButtonX() {
+		int x = getX() + font.getStringWidth(getTitleText()) + 10;
+		deleteButton.setX(x);
+	}
+	
+	private void tryDelete() {
+		if (triedDeleting) {
+			RemoveMeterPacket packet = new RemoveMeterPacket(meterIndex);
+			client.getPacketHandler().sendPacket(packet);
+		}
+		
+		triedDeleting = !triedDeleting;
+		deleteButton.updateMessage();
+	}
+	
+	private void undoTryDelete() {
+		if (triedDeleting) {
+			triedDeleting = false;
+			deleteButton.updateMessage();
+		}
 	}
 	
 	private void changePos() {

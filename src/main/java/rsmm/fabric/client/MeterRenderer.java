@@ -42,7 +42,7 @@ public class MeterRenderer {
 			GlStateManager.DestFactor.ZERO
 		);
 		GlStateManager.depthMask(false);
-        GlStateManager.disableLighting();
+		GlStateManager.disableLighting();
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();

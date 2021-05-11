@@ -24,12 +24,14 @@ public class HudSettings {
 	public static final int BACKGROUND_COLOR_TRANSPARENT = 0xB0202020;
 	public static final int MAIN_GRID_COLOR = 0xFF404040;
 	public static final int INTERVAL_GRID_COLOR = 0xFF606060;
+	public static final int MARKER_GRID_COLOR = 0xFFC0C0C0;
 	public static final int SELECTION_INDICATOR_COLOR = 0xFFFFFFFF;
 	public static final int TICK_PHASE_INDICATOR_COLOR = 0xFFEEEEEE;
 	
 	public static final int POWERED_TEXT_COLOR = 0xFF000000;
 	public static final int UNPOWERED_TEXT_COLOR = 0xFF707070;
 	public static final int METER_NAME_COLOR = 0xFFFFFFFF;
-	public static final int METER_GROUP_NAME_COLOR = 0xFF000000;
+	public static final int METER_GROUP_NAME_COLOR_DARK = 0xFF000000;
+	public static final int METER_GROUP_NAME_COLOR_LIGHT = 0xFFD0D0D0;
 	
 }

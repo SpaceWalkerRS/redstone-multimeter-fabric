@@ -38,6 +38,10 @@ public interface IElement extends Drawable {
 	
 	public void unfocus();
 	
+	default void tick() {
+		
+	}
+	
 	public int getX();
 	
 	public void setX(int x);

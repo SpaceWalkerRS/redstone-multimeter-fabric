@@ -18,7 +18,7 @@ public abstract class MeterEventRenderer extends DrawableHelper {
 		return type;
 	}
 	
-	public abstract void renderTickLogs(TextRenderer font, int x, int y, long firstTick, Meter meter);
+	public abstract void renderTickLogs(TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter);
 	
 	public abstract void renderSubTickLogs(TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter);
 	

@@ -18,7 +18,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, Meter meter) {
+	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter) {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
@@ -30,20 +30,25 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		MeterEvent event = logs.getLog(type, index);
 		MeterEvent nextEvent = logs.getLog(type, ++index);
 		
+		long lastHudTick = firstTick + COLUMN_COUNT;
+		
+		if (lastHudTick > lastTick) {
+			lastHudTick = lastTick;
+		}
+		
 		if (nextEvent == null) {
 			if (isToggled(meter)) {
-				draw(x + GRID_SIZE, y, color, COLUMN_COUNT);
+				draw(x + GRID_SIZE, y, color, (int)(lastHudTick - firstTick));
 			}
 			
 			return;
 		}
 		
-		long lastTick = firstTick + COLUMN_COUNT;
 		long currentTick = -1;
 		
-		while (event == null || event.isBefore(lastTick)) {
+		while (event == null || event.isBefore(lastHudTick)) {
 			boolean eventInTable = (event != null && !event.isBefore(firstTick));
-			boolean nextEventInTable = (nextEvent != null && nextEvent.isBefore(lastTick));
+			boolean nextEventInTable = (nextEvent != null && nextEvent.isBefore(lastHudTick));
 			
 			if (eventInTable && event.getTick() != currentTick) {
 				currentTick = event.getTick();
@@ -59,7 +64,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			}
 			
 			long start = eventInTable ? event.getTick() + 1 : firstTick;
-			long end = nextEventInTable ? nextEvent.getTick() : lastTick;
+			long end = nextEventInTable ? nextEvent.getTick() : lastHudTick;
 			
 			if (event == null ? !wasToggled(nextEvent) : wasToggled(event)) {
 				int column = (int)(start - firstTick);
