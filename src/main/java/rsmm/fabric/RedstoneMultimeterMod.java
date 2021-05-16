@@ -8,7 +8,7 @@ import net.fabricmc.api.ModInitializer;
 public class RedstoneMultimeterMod implements ModInitializer {
 	
 	public static final String MOD_ID = "rsmm-fabric";
-	public static final String MOD_VERSION = "1.2.0";
+	public static final String MOD_VERSION = "1.2.1";
 	public static final Logger LOGGER = LogManager.getLogger("Redstone Multimeter");
 	
 	@Override
