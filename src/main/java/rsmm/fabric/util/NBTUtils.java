@@ -2,6 +2,8 @@ package rsmm.fabric.util;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+
 import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
@@ -36,9 +38,9 @@ public class NBTUtils {
 		CompoundTag tag = new CompoundTag();
 		
 		putIdentifier(tag, "worldId", pos.getWorldId());
-		tag.putInt("x", pos.getX());
-		tag.putInt("y", pos.getY());
-		tag.putInt("z", pos.getZ());
+		tag.putInt("x", pos.asBlockPos().getX());
+		tag.putInt("y", pos.asBlockPos().getY());
+		tag.putInt("z", pos.asBlockPos().getZ());
 		
 		return tag;
 	}
@@ -53,6 +55,6 @@ public class NBTUtils {
 		int y = tag.getInt("y");
 		int z = tag.getInt("z");
 		
-		return new WorldPos(worldId, x, y, z);
+		return new WorldPos(worldId, new BlockPos(x, y, z));
 	}
 }

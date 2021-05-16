@@ -10,6 +10,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
@@ -349,17 +350,17 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			});
 			addChild(dimensionField);
 			
-			xField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().getX()), (text) -> {
+			xField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().asBlockPos().getX()), (text) -> {
 				changePos();
 			});
 			addChild(xField);
 			
-			yField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().getY()), (text) -> {
+			yField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().asBlockPos().getY()), (text) -> {
 				changePos();
 			});
 			addChild(yField);
 			
-			zField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().getZ()), (text) -> {
+			zField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().asBlockPos().getZ()), (text) -> {
 				changePos();
 			});
 			addChild(zField);
@@ -512,7 +513,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			int y = Integer.valueOf(yField.getText());
 			int z = Integer.valueOf(zField.getText());
 			
-			WorldPos pos = new WorldPos(worldId, x, y, z);
+			WorldPos pos = new WorldPos(worldId, new BlockPos(x, y, z));
 			
 			MeterChangePacket packet = new MeterChangePacket(meterIndex);
 			packet.addPos(pos);

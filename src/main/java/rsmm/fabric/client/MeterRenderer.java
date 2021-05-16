@@ -57,7 +57,7 @@ public class MeterRenderer {
 	}
 	
 	private void drawMeter(MatrixStack matrices, BufferBuilder builder, Tessellator tessellator, Meter meter) {
-		BlockPos pos = meter.getPos();
+		BlockPos pos = meter.getPos().asBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
 		

@@ -185,12 +185,13 @@ public class Multimeter {
 				color = nextColor;
 			}
 			
-			BlockState state = world.getBlockState(pos);
+			BlockPos blockPos = pos.asBlockPos();
+			BlockState state = world.getBlockState(blockPos);
 			Block block = state.getBlock();
 			
 			int meteredEvents = ((IBlock)block).getDefaultMeteredEvents();
-			boolean powered = ((IBlock)block).isPowered(world, pos, state);
-			boolean active = ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, pos, state);
+			boolean powered = ((IBlock)block).isPowered(world, blockPos, state);
+			boolean active = ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, blockPos, state);
 			
 			Meter meter = new Meter(pos, name, color, movable, meteredEvents, powered, active);
 			meterGroup.addMeter(meter);
