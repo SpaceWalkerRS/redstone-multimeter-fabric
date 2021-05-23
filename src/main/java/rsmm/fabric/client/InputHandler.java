@@ -18,22 +18,22 @@ public class InputHandler {
 			return;
 		}
 		
-		if (KeyBindings.TOGGLE_METER.wasPressed()) {
+		while (KeyBindings.TOGGLE_METER.wasPressed()) {
 			client.toggleMeter();
 		}
-		if (KeyBindings.PAUSE_METERS.wasPressed()) {
+		while (KeyBindings.PAUSE_METERS.wasPressed()) {
 			client.getHudRenderer().pause();
 		}
-		if (KeyBindings.STEP_FORWARD.wasPressed()) {
+		while (KeyBindings.STEP_FORWARD.wasPressed()) {
 			client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
 		}
-		if (KeyBindings.STEP_BACKWARD.wasPressed()) {
+		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
 			client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
 		}
-		if (KeyBindings.TOGGLE_HUD.wasPressed()) {
+		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
 		}
-		if (KeyBindings.OPEN_MULTIMETER_SCREEN.wasPressed()) {
+		while (KeyBindings.OPEN_MULTIMETER_SCREEN.wasPressed()) {
 			MinecraftClient minecraftClient = client.getMinecraftClient();
 			
 			if (minecraftClient.currentScreen == null) {
