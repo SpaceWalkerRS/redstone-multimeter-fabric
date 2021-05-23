@@ -282,6 +282,12 @@ public class Multimeter {
 		
 		if (prevSubscription != null) {
 			prevSubscription.removeSubscriber(player);
+			
+			// If a meter group is empty and no players
+			// are subscribed to it, remove it.
+			if (!prevSubscription.hasSubscribers() && prevSubscription.getMeterCount() == 0) {
+				meterGroups.remove(prevSubscription.getName(), prevSubscription);
+			}
 		}
 		
 		subscriptions.put(player, meterGroup);
