@@ -1,14 +1,19 @@
 package rsmm.fabric.common;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.listeners.MeterChangeDispatcher;
 import rsmm.fabric.common.log.MeterLogs;
 import rsmm.fabric.util.NBTUtils;
 
 public class Meter {
+	
+	public static final Meter DUMMY = new Meter(new WorldPos(new Identifier(RedstoneMultimeterMod.MOD_ID, "dummy"), new BlockPos(0, 0, 0)), "dummy", 0, false, 0, false, false);
 	
 	private final MeterLogs logs;
 	
@@ -176,7 +181,7 @@ public class Meter {
 		hasNewLogs = false;
 	}
 	
-	public boolean blockUpdate(boolean powered) {
+	public boolean updatePowered(boolean powered) {
 		if (this.powered != powered) {
 			this.powered = powered;
 			
@@ -186,7 +191,7 @@ public class Meter {
 		return false;
 	}
 	
-	public boolean stateChanged(boolean active) {
+	public boolean updateActive(boolean active) {
 		if (this.active != active) {
 			this.active = active;
 			

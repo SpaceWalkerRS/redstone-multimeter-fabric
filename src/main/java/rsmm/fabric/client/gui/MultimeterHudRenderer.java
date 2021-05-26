@@ -343,7 +343,7 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		}
 	}
 	
-	public List<List<Text>> getTextForTooltip() {
+	public List<Text> getTextForTooltip() {
 		if (hoveredRow >= 0) { 
 			if (hoveredSubTickColumn >= 0) {
 				long tick = getSelectedTick();

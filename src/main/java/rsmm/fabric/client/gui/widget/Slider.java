@@ -147,6 +147,16 @@ public class Slider extends SliderWidget implements IElement {
 	}
 	
 	@Override
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	@Override
 	public void updateMessage() {
 		snap();
 		setMessage(textSupplier.get());

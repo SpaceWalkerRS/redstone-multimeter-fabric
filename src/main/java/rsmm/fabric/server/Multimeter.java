@@ -4,24 +4,42 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
+import com.ibm.icu.text.NumberFormat;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.BlockEvent;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 
+import rsmm.fabric.block.Meterable;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
 import rsmm.fabric.common.packet.types.MeterChangesPacket;
 import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
@@ -210,19 +228,19 @@ public class Multimeter {
 		}
 	}
 	
-	public void moveMeter(int index, WorldPos pos, ServerPlayerEntity player) {
+	public void moveMeter(int index, WorldPos toPos, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
 		if (meterGroup != null) {
-			moveMeter(index, pos, meterGroup);
+			moveMeter(index, toPos, meterGroup);
 		}
 	}
 	
-	public void moveMeter(int index, WorldPos pos, ServerMeterGroup meterGroup) {
-		World world = server.getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, pos.getWorldId()));
+	public void moveMeter(int index, WorldPos toPos, ServerMeterGroup meterGroup) {
+		World world = server.getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, toPos.getWorldId()));
 		
 		if (world != null) {
-			meterGroup.moveMeter(index, pos);
+			meterGroup.tryMoveMeter(index, toPos, true);
 		}
 	}
 	
@@ -248,7 +266,7 @@ public class Multimeter {
 		if (meterGroup != null) {
 			Meter meter = meterGroup.getMeter(index);
 			
-			if (meter != null) {
+			if (meter != Meter.DUMMY) {
 				change.accept(meter);
 				meter.markDirty();
 			}
@@ -312,43 +330,129 @@ public class Multimeter {
 		subscribeToMeterGroup(meterGroup, player);
 	}
 	
-	public void blockUpdate(WorldPos pos, boolean powered) {
-		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			meterGroup.blockUpdate(pos, powered);
+	public void teleportToMeter(int index, ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup != null) {
+			Meter meter = meterGroup.getMeter(index);
+			
+			if (meter != null) {
+				WorldPos pos = meter.getPos();
+				Identifier worldId = pos.getWorldId();
+				
+				RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, worldId);
+				ServerWorld newWorld = server.getMinecraftServer().getWorld(key);
+				
+				if (newWorld != null) {
+					ServerWorld oldWorld = player.getServerWorld();
+					double oldX = player.getX();
+					double oldY = player.getY();
+					double oldZ = player.getZ();
+					
+					BlockPos blockPos = pos.asBlockPos();
+					
+					double newX = blockPos.getX() + 0.5D;
+					double newY = blockPos.getY();
+					double newZ = blockPos.getZ() + 0.5D;
+					float yaw = player.yaw;
+					float pitch = player.pitch;
+					
+					player.teleport(newWorld, newX, newY, newZ, yaw, pitch);
+					sendTeleportToMessage(oldWorld, oldX, oldY, oldZ, yaw, pitch, player);
+				}
+			}
 		}
 	}
 	
-	public void blockUpdate(World world, BlockPos pos, boolean powered) {
-		blockUpdate(new WorldPos(world, pos), powered);
+	private void sendTeleportToMessage(ServerWorld world, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayerEntity player) {
+		NumberFormat f = NumberFormat.getNumberInstance(Locale.US); // use . as decimal separator
+		
+		String worldId = world.getRegistryKey().getValue().toString();
+		String x = f.format(_x);
+		String y = f.format(_y);
+		String z = f.format(_z);
+		String yaw = f.format(_yaw);
+		String pitch = f.format(_pitch);
+		
+		Text message = new LiteralText("Click ").
+			append(new LiteralText("[here]").styled((style) -> {
+				return style.
+					withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Teleport to").
+						append(MeterEvent.formatTextForTooltip("\n  dimension", worldId)).
+						append(MeterEvent.formatTextForTooltip("\n  x", x)).
+						append(MeterEvent.formatTextForTooltip("\n  y", y)).
+						append(MeterEvent.formatTextForTooltip("\n  z", z)).
+						append(MeterEvent.formatTextForTooltip("\n  yaw", yaw)).
+						append(MeterEvent.formatTextForTooltip("\n  pitch", pitch)))).
+					withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/execute in %s run tp @s %s %s %s %s %s", worldId, x, y, z, yaw, pitch))).
+					withColor(Formatting.GREEN);
+			})).
+			append(new LiteralText(" to return to your previous location"));
+		
+		player.sendMessage(message, false);
 	}
 	
-	public void blockChanged(WorldPos pos, Block oldBlock, Block newBlock) {
+	public void blockChanged(World world, BlockPos blockPos, Block oldBlock, Block newBlock) {
+		WorldPos pos = new WorldPos(world, blockPos);
+		
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			meterGroup.blockChanged(pos, oldBlock, newBlock);
 		}
 	}
 	
-	public void blockChanged(World world, BlockPos pos, Block oldBlock, Block newBlock) {
-		blockChanged(new WorldPos(world, pos), oldBlock, newBlock);
+	public void logPowered(World world, BlockPos pos, boolean powered) {
+		tryLogEvent(new WorldPos(world, pos), EventType.POWERED, powered ? 1 : 0, meter -> meter.updatePowered(powered), (m, i) -> {});
 	}
 	
-	public void stateChanged(WorldPos pos, boolean active) {
-		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			meterGroup.stateChanged(pos, active);
+	public void logActive(World world, BlockPos pos, boolean active) {
+		tryLogEvent(new WorldPos(world, pos), EventType.ACTIVE, active ? 1 : 0, meter -> meter.updateActive(active), (m, i) -> {});
+	}
+	
+	public void logMoved(World world, BlockPos blockPos, Direction dir) {
+		WorldPos pos = new WorldPos(world, blockPos);
+		
+		tryLogEvent(pos, EventType.MOVED, dir.getId(), meter -> true, (meterGroup, index) -> {
+			meterGroup.tryMoveMeter(index, pos.offset(dir));
+		});
+	}
+	
+	public void logPowerChange(World world, BlockPos pos, int oldPower, int newPower) {
+		if (oldPower != newPower) {
+			tryLogEvent(world, pos, EventType.POWER_CHANGE, (oldPower << 8) | newPower);
 		}
 	}
 	
-	public void stateChanged(World world, BlockPos pos, boolean active) {
-		stateChanged(new WorldPos(world, pos), active);
+	public void logRandomTick(World world, BlockPos pos) {
+		tryLogEvent(world, pos, EventType.RANDOM_TICK, 0);
 	}
 	
-	public void blockMoved(WorldPos pos, Direction dir) {
+	public <T> void logScheduledTick(World world, ScheduledTick<T> scheduledTick) {
+		tryLogEvent(world, scheduledTick.pos, EventType.SCHEDULED_TICK, scheduledTick.priority.getIndex());
+	}
+	
+	public void logBlockEvent(World world, BlockEvent blockEvent) {
+		tryLogEvent(world, blockEvent.getPos(), EventType.BLOCK_EVENT, blockEvent.getType());
+	}
+	
+	public void logEntityTick(World world, Entity entity) {
+		tryLogEvent(world, entity.getBlockPos(), EventType.ENTITY_TICK, 0);
+	}
+	
+	public void logBlockEntityTick(World world, BlockEntity blockEntity) {
+		tryLogEvent(world, blockEntity.getPos(), EventType.BLOCK_ENTITY_TICK, 0);
+	}
+	
+	private void tryLogEvent(World world, BlockPos pos, EventType type, int metaData) {
+		tryLogEvent(new WorldPos(world, pos), type, metaData, m -> true, (m, i) -> {});
+	}
+	
+	private void tryLogEvent(WorldPos pos, EventType type, int metaData, Function<Meter, Boolean> eventValidator, BiConsumer<ServerMeterGroup, Integer> onLog) {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			meterGroup.blockMoved(pos, dir);
+			if (!meterGroup.hasSubscribers() || !meterGroup.hasMeters()) {
+				continue;
+			}
+			
+			meterGroup.tryLogEvent(pos, type, metaData, eventValidator, onLog);
 		}
-	}
-	
-	public void blockMoved(World world, BlockPos pos, Direction dir) {
-		blockMoved(new WorldPos(world, pos), dir);
 	}
 }

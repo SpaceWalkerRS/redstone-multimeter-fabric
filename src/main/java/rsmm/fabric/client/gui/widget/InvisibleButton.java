@@ -11,10 +11,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.gui.action.MousePress;
 
 public class InvisibleButton extends Button {
 	
-	public InvisibleButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, OnPress onPress) {
+	public InvisibleButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, MousePress<Button> onPress) {
 		super(client, x, y, width, height, textSupplier, onPress);
 	}
 	

@@ -12,9 +12,8 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.block.MeterableBlock;
 import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(AbstractRedstoneGateBlock.class)
 public abstract class AbstractRedstoneGateBlockMixin implements IBlock, MeterableBlock {
@@ -28,12 +27,7 @@ public abstract class AbstractRedstoneGateBlockMixin implements IBlock, Meterabl
 			)
 	)
 	private void onHasPowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		logPowered(world, pos, cir.getReturnValue());
-	}
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag();
+		logPowered(world, pos, cir.getReturnValue()); // repeaters
 	}
 	
 	@Override
@@ -48,6 +42,6 @@ public abstract class AbstractRedstoneGateBlockMixin implements IBlock, Meterabl
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED); // repeaters
+		return state.get(Properties.POWERED);
 	}
 }

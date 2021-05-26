@@ -19,7 +19,7 @@ public interface IElement extends Drawable {
 	public boolean mouseScroll(double mouseX, double mouseY, double amount);
 	
 	default boolean isHovered(double mouseX, double mouseY) {
-		return mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= getY() && mouseY <= (getY() + getHeight());
+		return isVisible() && mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= getY() && mouseY <= (getY() + getHeight());
 	}
 	
 	public boolean keyPress(int keyCode, int scanCode, int modifiers);
@@ -58,7 +58,11 @@ public interface IElement extends Drawable {
 	
 	public void setHeight(int height);
 	
-	default List<List<Text>> getTooltip(double mouseX, double mouseY) {
+	public boolean isVisible();
+	
+	public void setVisible(boolean visible);
+	
+	default List<Text> getTooltip(double mouseX, double mouseY) {
 		return Collections.emptyList();
 	}
 }

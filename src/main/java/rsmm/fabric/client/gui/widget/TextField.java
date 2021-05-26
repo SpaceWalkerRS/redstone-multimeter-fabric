@@ -153,6 +153,16 @@ public class TextField extends TextFieldWidget implements IElement {
 		this.height = height - 2;
 	}
 	
+	@Override
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
 	public void updateMessage() {
 		if (!isFocused()) {
 			deaf = true;

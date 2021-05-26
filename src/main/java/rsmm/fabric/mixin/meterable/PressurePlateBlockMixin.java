@@ -5,14 +5,29 @@ import org.spongepowered.asm.mixin.Mixin;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.PressurePlateBlock;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-import rsmm.fabric.interfaces.mixin.IPressurePlate;
+import rsmm.fabric.block.MeterableBlock;
+import rsmm.fabric.block.PowerSource;
+import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(PressurePlateBlock.class)
-public class PressurePlateBlockMixin implements IPressurePlate {
+public class PressurePlateBlockMixin implements IBlock, MeterableBlock, PowerSource {
 	
 	@Override
-	public boolean isActive(BlockState state) {
-		return state.get(Properties.POWERED); // Wooden and stone pressure plates
+	public int getDefaultMeteredEvents() {
+		return EventType.ACTIVE.flag();
+	}
+	
+	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.POWERED);
+	}
+	
+	@Override
+	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.POWERED) ? MAX_POWER : 0;
 	}
 }

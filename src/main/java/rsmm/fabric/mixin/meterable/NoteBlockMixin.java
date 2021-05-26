@@ -14,8 +14,8 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.block.MeterableBlock;
 import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(NoteBlock.class)
 public class NoteBlockMixin implements IBlock, MeterableBlock {

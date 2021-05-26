@@ -6,14 +6,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 
+import rsmm.fabric.block.chest.TrappedChestHelper;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
 import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
@@ -28,20 +28,41 @@ public class ChestBlockEntityMixin extends BlockEntity {
 	}
 	
 	@Inject(
-			method = "onInvOpenOrClose",
-			locals = LocalCapture.CAPTURE_FAILHARD,
+			method = "onOpen",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/world/World;addSyncedBlockEvent(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;II)V"
+					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose"
 			)
 	)
-	private void onOnInvOpenOrCloseInjectBeforeAddSyncedBlockEvent(CallbackInfo ci, Block cachedBlock) {
-		if (!world.isClient() && cachedBlock == Blocks.TRAPPED_CHEST) {
+	private void onOnOpenInjectBeforeOnInvOpenOrClose(PlayerEntity player, CallbackInfo ci) {
+		invOpenOrClose(true);
+	}
+	
+	@Inject(
+			method = "onClose",
+			at = @At(
+					value = "INVOKE",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose"
+			)
+	)
+	private void onOnCloseInjectBeforeOnInvOpenOrClose(PlayerEntity player, CallbackInfo ci) {
+		invOpenOrClose(false);
+	}
+	
+	private void invOpenOrClose(boolean open) {
+		if (!world.isClient() && getCachedState().isOf(Blocks.TRAPPED_CHEST)) {
 			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 			
-			multimeter.stateChanged(world, pos, viewerCount > 0);
+			int oldViewerCount = open ? viewerCount - 1 : viewerCount + 1;
+			
+			int oldPower = TrappedChestHelper.getPowerFromViewerCount(oldViewerCount);
+			int newPower = TrappedChestHelper.getPowerFromViewerCount(viewerCount);
+			
+			multimeter.logPowerChange(world, pos, oldPower, newPower);
+			multimeter.logActive(world, pos, newPower > 0);
 		}
 	}
 }

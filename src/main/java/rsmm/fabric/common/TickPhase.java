@@ -13,15 +13,12 @@ public enum TickPhase {
 	HANDLE_PACKETS(9, "handle packets");
 	
 	public static final TickPhase[] PHASES;
-	private static final int[] EMPTY_LOGS;
 	
 	static {
 		PHASES = new TickPhase[values().length + 1];
-		EMPTY_LOGS = new int[values().length + 1];
 		
 		for (TickPhase phase : values()) {
 			PHASES[phase.index] = phase;
-			EMPTY_LOGS[phase.index] = 0;
 		}
 	}
 	
@@ -38,7 +35,7 @@ public enum TickPhase {
 	}
 	
 	public static TickPhase fromIndex(int index) {
-		if (index > 0 || index < PHASES.length) {
+		if (index > 0 && index < PHASES.length) {
 			return PHASES[index];
 		}
 		
@@ -47,9 +44,5 @@ public enum TickPhase {
 	
 	public String getName() {
 		return name;
-	}
-	
-	public static int[] emptyLogs() {
-		return EMPTY_LOGS;
 	}
 }

@@ -2,6 +2,8 @@ package rsmm.fabric.client.gui.log;
 
 import static rsmm.fabric.client.gui.HudSettings.*;
 
+import java.util.function.BiFunction;
+
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -10,10 +12,20 @@ import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.log.MeterLogs;
 
-public abstract class BasicEventRenderer extends MeterEventRenderer {
+public class BasicEventRenderer extends MeterEventRenderer {
+	
+	protected final BiFunction<Meter, MeterEvent, Integer> edgeColorProvider;
+	protected final BiFunction<Meter, MeterEvent, Integer> centerColorProvider;
 	
 	public BasicEventRenderer(EventType type) {
+		this(type, (m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
+	}
+	
+	public BasicEventRenderer(EventType type, BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {
 		super(type);
+		
+		this.edgeColorProvider = edgeColorProvider;
+		this.centerColorProvider = centerColorProvider;
 	}
 	
 	@Override
@@ -70,6 +82,22 @@ public abstract class BasicEventRenderer extends MeterEventRenderer {
 		}
 	}
 	
-	protected abstract void drawEvent(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event);
+	protected void drawEvent(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
+		drawEdges(matrices, x, y, meter ,event);
+		drawCenter(matrices, x, y, meter ,event);
+	}
 	
+	protected void drawEdges(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
+		int half = ROW_HEIGHT / 2;
+		int color = edgeColorProvider.apply(meter, event);
+		
+		fill(matrices, x, y + half - 1, x + COLUMN_WIDTH, y + ROW_HEIGHT - half + 1, color);
+	}
+	
+	protected void drawCenter(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
+		int half = ROW_HEIGHT / 2;
+		int color = centerColorProvider.apply(meter, event);
+		
+		fill(matrices, x, y + half, x + COLUMN_WIDTH, y + ROW_HEIGHT - half, color);
+	}
 }

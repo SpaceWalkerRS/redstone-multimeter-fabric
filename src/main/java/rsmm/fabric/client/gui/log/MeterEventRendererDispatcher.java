@@ -18,7 +18,13 @@ public class MeterEventRendererDispatcher {
 		
 		eventRenderers.add(new PoweredEventRenderer());
 		eventRenderers.add(new ActiveEventRenderer());
-		eventRenderers.add(new MovedEventRenderer());
+		eventRenderers.add(new BasicEventRenderer(EventType.MOVED));
+		eventRenderers.add(new PowerChangeEventRenderer());
+		eventRenderers.add(new BasicEventRenderer(EventType.RANDOM_TICK));
+		eventRenderers.add(new BasicEventRenderer(EventType.SCHEDULED_TICK));
+		eventRenderers.add(new BasicEventRenderer(EventType.BLOCK_EVENT));
+		eventRenderers.add(new BasicEventRenderer(EventType.ENTITY_TICK));
+		eventRenderers.add(new BasicEventRenderer(EventType.BLOCK_ENTITY_TICK));
 	}
 	
 	public void renderTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter) {

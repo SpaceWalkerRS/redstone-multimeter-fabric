@@ -35,12 +35,16 @@ public class MeterGroup {
 		return meters.size();
 	}
 	
+	public boolean hasMeters() {
+		return !meters.isEmpty();
+	}
+	
 	public Meter getMeter(int index) {
 		if (index >= 0 && index < meters.size()) {
 			return meters.get(index);
 		}
 		
-		return null;
+		return Meter.DUMMY;
 	}
 	
 	public boolean addMeter(Meter meter) {

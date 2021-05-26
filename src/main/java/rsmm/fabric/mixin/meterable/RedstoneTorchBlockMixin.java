@@ -12,12 +12,13 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.block.MeterableBlock;
+import rsmm.fabric.block.PowerSource;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(RedstoneTorchBlock.class)
-public abstract class RedstoneTorchBlockMixin implements IBlock, MeterableBlock {
+public abstract class RedstoneTorchBlockMixin implements IBlock, MeterableBlock, PowerSource {
 	
 	@Shadow protected abstract boolean shouldUnpower(World world, BlockPos pos, BlockState state);
 	
@@ -28,7 +29,7 @@ public abstract class RedstoneTorchBlockMixin implements IBlock, MeterableBlock 
 			)
 	)
 	private void onShouldUnpowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		logPowered(world, pos, cir.getReturnValue());
+		logPowered(world, pos, cir.getReturnValue()); // floor redstone torches only
 	}
 	
 	@Override
@@ -49,5 +50,10 @@ public abstract class RedstoneTorchBlockMixin implements IBlock, MeterableBlock 
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.LIT);
+	}
+	
+	@Override
+	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.LIT) ? MAX_POWER : 0;
 	}
 }

@@ -19,10 +19,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
+import rsmm.fabric.block.MeterableBlock;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
-import rsmm.fabric.server.MeterableBlock;
 import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
 
@@ -56,7 +56,7 @@ public abstract class PistonBlockMixin implements IBlock, MeterableBlock {
 			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 			
-			multimeter.blockMoved(world, movedPos, moveDir);
+			multimeter.logMoved(world, movedPos, moveDir);
 		}
 	}
 	

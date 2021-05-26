@@ -14,7 +14,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.server.MeterableBlock;
+import rsmm.fabric.block.MeterableBlock;
 
 @Mixin(TrapdoorBlock.class)
 public class TrapdoorBlockMixin implements MeterableBlock {

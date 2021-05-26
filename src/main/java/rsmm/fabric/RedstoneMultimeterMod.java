@@ -13,6 +13,6 @@ public class RedstoneMultimeterMod implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Redstone Multimeter has been initialized!");
+		LOGGER.info(String.format("Redstone Multimeter %s has been initialized!", MOD_VERSION));
 	}
 }

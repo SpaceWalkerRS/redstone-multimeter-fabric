@@ -13,15 +13,16 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.gui.action.MousePress;
 import rsmm.fabric.client.gui.element.IElement;
 
 public class Button extends ButtonWidget implements IElement {
 	
 	protected final MultimeterClient client;
 	protected final Supplier<Text> textSupplier;
-	protected final OnPress onPress;
+	protected final MousePress<Button> onPress;
 	
-	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, OnPress onPress) {
+	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, MousePress<Button> onPress) {
 		super(x, y, width, height, textSupplier.get(), button -> {});
 		
 		this.client = client;
@@ -187,11 +188,17 @@ public class Button extends ButtonWidget implements IElement {
 		this.height = height;
 	}
 	
-	public void updateMessage() {
-		setMessage(textSupplier.get());
+	@Override
+	public boolean isVisible() {
+		return visible;
 	}
 	
-	public interface OnPress {
-		public void press(Button button);
+	@Override
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	public void updateMessage() {
+		setMessage(textSupplier.get());
 	}
 }

@@ -5,12 +5,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Direction;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
@@ -103,17 +104,25 @@ public class ServerMeterGroup extends MeterGroup {
 		return removeMeter(index) ? index : -1;
 	}
 	
-	public void moveMeter(int index, WorldPos pos) {
-		if (index < 0 || index >= meters.size() || posToIndex.containsKey(pos)) {
+	public void tryMoveMeter(int index, WorldPos toPos) {
+		tryMoveMeter(index, toPos, false);
+	}
+	
+	public void tryMoveMeter(int index, WorldPos toPos, boolean force) {
+		if (index < 0 || index >= meters.size() || posToIndex.containsKey(toPos)) {
 			return;
 		}
 		
 		Meter meter = meters.get(index);
 		
-		posToIndex.remove(meter.getPos());
-		posToIndex.put(pos, index);
+		if (!meter.isMovable() && !force) {
+			return;
+		}
 		
-		meter.setPos(pos);
+		posToIndex.remove(meter.getPos());
+		posToIndex.put(toPos, index);
+		
+		meter.setPos(toPos);
 		meter.markDirty();
 	}
 	
@@ -202,18 +211,10 @@ public class ServerMeterGroup extends MeterGroup {
 		}
 	}
 	
-	public void blockUpdate(WorldPos pos, boolean powered) {
-		Meter meter = getMeterAt(pos);
-		
-		if (meter != null && meter.blockUpdate(powered)) {
-			logManager.logEvent(meter, EventType.POWERED, powered ? 1 : 0);
-		}
-	}
-	
 	public void blockChanged(WorldPos pos, Block oldBlock , Block newBlock) {
 		Meter meter = getMeterAt(pos);
 		
-		if (meter != null && newBlock != Blocks.MOVING_PISTON) {
+		if (meter != null && oldBlock != Blocks.MOVING_PISTON && newBlock != Blocks.MOVING_PISTON) {
 			int oldBlockDefaults = ((IBlock)oldBlock).getDefaultMeteredEvents();
 			int newBlockDefaults = ((IBlock)newBlock).getDefaultMeteredEvents();
 			
@@ -224,25 +225,16 @@ public class ServerMeterGroup extends MeterGroup {
 		}
 	}
 	
-	public void stateChanged(WorldPos pos, boolean active) {
-		Meter meter = getMeterAt(pos);
-		
-		if (meter != null && meter.stateChanged(active)) {
-			logManager.logEvent(meter, EventType.ACTIVE, active ? 1 : 0);
-		}
-	}
-	
-	public void blockMoved(WorldPos pos, Direction dir) {
+	public void tryLogEvent(WorldPos pos, EventType type, int metaData, Function<Meter, Boolean> eventValidator,BiConsumer<ServerMeterGroup, Integer> onLog) {
 		int index = indexOfMeterAt(pos);
 		
 		if (index >= 0) {
 			Meter meter = getMeter(index);
 			
-			if (meter.isMovable()) {
-				multimeter.moveMeter(index, pos.offset(dir), this);
+			if (eventValidator.apply(meter)) {
+				onLog.accept(this, index);
+				logManager.logEvent(meter, type, metaData);
 			}
-			
-			logManager.logEvent(meter, EventType.MOVED, dir.getId());
 		}
 	}
 }

@@ -63,7 +63,8 @@ public abstract class AbstractPacketHandler {
 		REMOVE_ALL_METERS(7, RemoveAllMetersPacket.class),
 		ADD_METER(8, AddMeterPacket.class),
 		REMOVE_METER(9, RemoveMeterPacket.class),
-		METER_CHANGE(10, MeterChangePacket.class);
+		METER_CHANGE(10, MeterChangePacket.class),
+		TELEPORT_TO_METER(11, TeleportToMeterPacket.class);
 		
 		private static final PacketType[] PACKET_TYPES;
 		private static final Map<Class<? extends AbstractRSMMPacket>, PacketType> PACKET_TO_TYPE;

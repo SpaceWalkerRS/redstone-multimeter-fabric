@@ -53,9 +53,12 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		this.playPauseButton = new InvisibleButton(client, x, y, 9, 9, () -> new LiteralText(hudRenderer.isPaused() ? "\u23f5" : "\u23f8"), (button) -> {
 			client.getHudRenderer().pause();
 			button.updateMessage();
+			
+			return true;
 		});
 		this.fastBackwardButton = new InvisibleButton(client, x, y, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ed" : "\u23e9"), (button) -> {
 			client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
+			return true;
 		}) {
 			
 			@Override
@@ -65,6 +68,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		};
 		this.fastForwardButton = new InvisibleButton(client, x, y, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ee" : "\u23ea"), (button) -> {
 			client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
+			return true;
 		}) {
 			
 			@Override
@@ -232,8 +236,8 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	}
 	
 	@Override
-	public List<List<Text>> getTooltip(double mouseX, double mouseY) {
-		List<List<Text>> tooltip = super.getTooltip(mouseX, mouseY);
+	public List<Text> getTooltip(double mouseX, double mouseY) {
+		List<Text> tooltip = super.getTooltip(mouseX, mouseY);
 		
 		if (tooltip.isEmpty()) {
 			tooltip = hudRenderer.getTextForTooltip();
