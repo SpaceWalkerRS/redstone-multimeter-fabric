@@ -13,6 +13,7 @@ import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.HudSettings;
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
+import rsmm.fabric.client.gui.widget.Button;
 import rsmm.fabric.client.gui.widget.InvisibleButton;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
@@ -48,6 +49,8 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		this.x = x;
 		this.y = y;
 		this.width = width;
+		
+		hudRenderer.ignoreHiddenMeters(false);
 		
 		this.meterControls = new MeterControlsElement(this.client, x, y + hudRenderer.getTotalHeight(), width);
 		this.playPauseButton = new InvisibleButton(client, x, y, 9, 9, () -> new LiteralText(hudRenderer.isPaused() ? "\u23f5" : "\u23f8"), (button) -> {
@@ -133,6 +136,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 				
 				if (hoveredRow >= 0 && hoveredNameColumn >= 0) {
 					success |= meterControls.selectMeter(hoveredRow);
+					Button.playClickSound(client);
 				} else if (!success) {
 					meterControls.selectMeter(-1);
 				}
@@ -172,6 +176,8 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		HudChangeDispatcher.removeListener(this);
 		MeterChangeDispatcher.removeListener(this);
 		MeterGroupChangeDispatcher.removeListener(this);
+		
+		hudRenderer.ignoreHiddenMeters(true);
 		
 		if (hudRenderer.isPaused()) {
 			hudRenderer.pause();
@@ -293,6 +299,11 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	
 	@Override
 	public void meteredEventsChanged(Meter meter) {
+		
+	}
+	
+	@Override
+	public void isHiddenChanged(Meter meter) {
 		
 	}
 	

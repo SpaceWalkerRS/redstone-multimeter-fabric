@@ -11,7 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.client.gui.action.MousePress;
+import rsmm.fabric.client.gui.element.action.MousePress;
 
 public class InvisibleButton extends Button {
 	

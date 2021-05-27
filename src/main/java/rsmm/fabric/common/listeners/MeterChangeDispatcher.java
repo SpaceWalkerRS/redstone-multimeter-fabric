@@ -36,4 +36,8 @@ public class MeterChangeDispatcher {
 	public static void meteredEventsChanged(Meter meter) {
 		LISTENERS.forEach(listener -> listener.meteredEventsChanged(meter));
 	}
+	
+	public static void isHiddenChanged(Meter meter) {
+		LISTENERS.forEach(listener -> listener.isHiddenChanged(meter));
+	}
 }

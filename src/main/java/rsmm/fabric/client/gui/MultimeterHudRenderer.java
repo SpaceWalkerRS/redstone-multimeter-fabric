@@ -1,6 +1,22 @@
 package rsmm.fabric.client.gui;
 
-import static rsmm.fabric.client.gui.HudSettings.*;
+import static rsmm.fabric.client.gui.HudSettings.BACKGROUND_COLOR;
+import static rsmm.fabric.client.gui.HudSettings.COLUMN_COUNT;
+import static rsmm.fabric.client.gui.HudSettings.COLUMN_WIDTH;
+import static rsmm.fabric.client.gui.HudSettings.GRID_SIZE;
+import static rsmm.fabric.client.gui.HudSettings.IGNORE_HIDDEN_METERS;
+import static rsmm.fabric.client.gui.HudSettings.INTERVAL_GRID_COLOR;
+import static rsmm.fabric.client.gui.HudSettings.MAIN_GRID_COLOR;
+import static rsmm.fabric.client.gui.HudSettings.MARKER_GRID_COLOR;
+import static rsmm.fabric.client.gui.HudSettings.METER_GROUP_NAME_COLOR_DARK;
+import static rsmm.fabric.client.gui.HudSettings.METER_GROUP_NAME_COLOR_LIGHT;
+import static rsmm.fabric.client.gui.HudSettings.NAMES_TICKS_SPACING;
+import static rsmm.fabric.client.gui.HudSettings.ROW_COUNT;
+import static rsmm.fabric.client.gui.HudSettings.ROW_HEIGHT;
+import static rsmm.fabric.client.gui.HudSettings.SELECTED_COLUMN;
+import static rsmm.fabric.client.gui.HudSettings.SELECTION_INDICATOR_COLOR;
+import static rsmm.fabric.client.gui.HudSettings.TICKS_SUB_TICKS_GAP;
+import static rsmm.fabric.client.gui.HudSettings.TICKS_TABLE_WIDTH;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,8 +25,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-
+import net.minecraft.util.Formatting;
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.log.MeterEventRendererDispatcher;
 import rsmm.fabric.common.Meter;
@@ -39,8 +57,6 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		this.client = client;
 		this.font = minecraftClient.textRenderer;
 		this.eventRenderers = new MeterEventRendererDispatcher();
-		
-		this.reset();
 	}
 	
 	public void resetOffset() {
@@ -83,6 +99,11 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		if (paused) {
 			offset += amount;
 		}
+	}
+	
+	public void ignoreHiddenMeters(boolean ignore) {
+		IGNORE_HIDDEN_METERS = ignore;
+		updateRowCount();
 	}
 	
 	public long getSelectedTick() {
@@ -143,13 +164,25 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	private void updateRowCount() {
-		ROW_COUNT = client.getMeterGroup().getMeterCount();
+		ROW_COUNT = 0;
+		
+		for (Meter meter : client.getMeterGroup().getMeters()) {
+			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
+				continue;
+			}
+			
+			ROW_COUNT++;
+		}
 	}
 	
 	public int getNamesWidth() {
 		int width = 0;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
+			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
+				continue;
+			}
+			
 			int nameWidth = font.getWidth(meter.getName());
 			
 			if (nameWidth > width) {
@@ -167,7 +200,15 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		int nameY = y + 2;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
-			font.draw(matrices, meter.getName(), nameX, nameY, METER_NAME_COLOR);
+			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
+				continue;
+			}
+			
+			MutableText name = new LiteralText(meter.getName());
+			if (meter.isHidden()) {
+				name.formatted(Formatting.GRAY, Formatting.ITALIC);
+			}
+			font.draw(matrices, name, nameX, nameY, 0xFFFFFFFF);
 			
 			nameY += ROW_HEIGHT + GRID_SIZE;
 		}
@@ -186,6 +227,10 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		int rowY = y;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
+			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
+				continue;
+			}
+			
 			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, currentTick, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;
@@ -213,6 +258,10 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		int rowY = y;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
+			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
+				continue;
+			}
+			
 			eventRenderers.renderSubTickLogs(matrices, font, rowX, rowY, selectedTick, subTickCount, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;

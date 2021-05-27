@@ -5,16 +5,13 @@ import java.util.function.Supplier;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.client.gui.action.MousePress;
-import rsmm.fabric.client.gui.action.MouseRelease;
+import rsmm.fabric.client.gui.element.action.MousePress;
+import rsmm.fabric.client.gui.element.action.MouseRelease;
+import rsmm.fabric.client.gui.widget.Button;
 
 public class TextElement implements IElement {
 	
@@ -71,7 +68,7 @@ public class TextElement implements IElement {
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		if (mousePress.press(this)) {
-			playClickSound();
+			Button.playClickSound(client);
 			return true;
 		}
 		
@@ -81,7 +78,7 @@ public class TextElement implements IElement {
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		if (mouseRelease.release(this)) {
-			playClickSound();
+			Button.playClickSound(client);
 			return true;
 		}
 		
@@ -222,11 +219,5 @@ public class TextElement implements IElement {
 	
 	protected void drawText(MatrixStack matrices, int x, int y, Text text, int color) {
 		font.draw(matrices, text, x, y, color);
-	}
-	
-	protected void playClickSound() {
-		SoundManager soundManager = client.getMinecraftClient().getSoundManager();
-		SoundInstance sound = PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F);
-		soundManager.play(sound);
 	}
 }

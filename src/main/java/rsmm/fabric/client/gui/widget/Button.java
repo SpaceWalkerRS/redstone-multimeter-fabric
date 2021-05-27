@@ -7,14 +7,18 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.client.gui.action.MousePress;
 import rsmm.fabric.client.gui.element.IElement;
+import rsmm.fabric.client.gui.element.action.MousePress;
 
 public class Button extends ButtonWidget implements IElement {
 	
@@ -200,5 +204,11 @@ public class Button extends ButtonWidget implements IElement {
 	
 	public void updateMessage() {
 		setMessage(textSupplier.get());
+	}
+	
+	public static void playClickSound(MultimeterClient client) {
+		SoundManager soundManager = client.getMinecraftClient().getSoundManager();
+		SoundInstance sound = PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F);
+		soundManager.play(sound);
 	}
 }

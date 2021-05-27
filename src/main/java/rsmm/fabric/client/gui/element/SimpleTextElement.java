@@ -8,8 +8,8 @@ import java.util.function.Supplier;
 import net.minecraft.text.Text;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.client.gui.action.MousePress;
-import rsmm.fabric.client.gui.action.MouseRelease;
+import rsmm.fabric.client.gui.element.action.MousePress;
+import rsmm.fabric.client.gui.element.action.MouseRelease;
 
 public class SimpleTextElement extends TextElement {
 	

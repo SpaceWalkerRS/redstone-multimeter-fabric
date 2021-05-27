@@ -358,13 +358,18 @@ public class Multimeter {
 					float pitch = player.pitch;
 					
 					player.teleport(newWorld, newX, newY, newZ, yaw, pitch);
-					sendTeleportToMessage(oldWorld, oldX, oldY, oldZ, yaw, pitch, player);
+					sendClickableReturnMessage(oldWorld, oldX, oldY, oldZ, yaw, pitch, player);
 				}
 			}
 		}
 	}
 	
-	private void sendTeleportToMessage(ServerWorld world, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayerEntity player) {
+	/**
+	 * Send the player a message they can click
+	 * to return to the location they were at
+	 * before teleporting to a meter.
+	 */
+	private void sendClickableReturnMessage(ServerWorld world, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayerEntity player) {
 		NumberFormat f = NumberFormat.getNumberInstance(Locale.US); // use . as decimal separator
 		
 		String worldId = world.getRegistryKey().getValue().toString();

@@ -131,6 +131,8 @@ public class MultimeterClient {
 			connected = true;
 			lastServerTick = serverTick;
 			
+			hudRenderer.reset();
+			
 			MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
 			packetHandler.sendPacket(packet);
 		}

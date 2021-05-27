@@ -1,4 +1,4 @@
-package rsmm.fabric.client.gui.action;
+package rsmm.fabric.client.gui.element.action;
 
 import rsmm.fabric.client.gui.element.IElement;
 

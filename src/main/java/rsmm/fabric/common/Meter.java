@@ -34,6 +34,9 @@ public class Meter {
 	/** This property is used on the server to mark this meter as having logged events in the past tick */
 	private boolean hasNewLogs;
 	
+	/** This property is used on the client to hide a meter in the HUD */
+	private boolean hidden;
+	
 	public Meter(WorldPos pos, String name, int color, boolean movable, int initialEventTypes, boolean initialPowered, boolean initialActive) {
 		this.logs = new MeterLogs();
 		
@@ -179,6 +182,19 @@ public class Meter {
 	public void cleanLogs() {
 		logs.clear();
 		hasNewLogs = false;
+	}
+	
+	public boolean isHidden() {
+		return hidden;
+	}
+	
+	public void toggleHidden() {
+		setHidden(!hidden);
+	}
+	
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+		MeterChangeDispatcher.isHiddenChanged(this);
 	}
 	
 	public boolean updatePowered(boolean powered) {

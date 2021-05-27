@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -56,6 +57,8 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	private List<List<IElement>> grid;
 	
 	private TextElement title;
+	private Button hideButton;
+	private Button deleteButton;
 	private TextElement deleteConfirm;
 	
 	private TextElement pos;
@@ -74,7 +77,6 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	private TextElement blue;
 	private List<TextElement> eventTypeText;
 	
-	private Button deleteButton;
 	private TextField dimensionField;
 	private TextField xField;
 	private TextField yField;
@@ -221,6 +223,13 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	}
 	
 	@Override
+	public void isHiddenChanged(Meter meter) {
+		if (this.meter == meter) {
+			hideButton.updateMessage();
+		}
+	}
+	
+	@Override
 	public void cleared(MeterGroup meterGroup) {
 		selectMeter(-1);
 	}
@@ -265,7 +274,6 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		meter = newMeter;
 		
 		updateControls();
-		undoTryDelete();
 		updateHeight();
 		setVisible(meter != Meter.DUMMY);
 		
@@ -285,6 +293,21 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		});
 		addChild(title);
 		
+		hideButton = new Button(client, x, y, 18, 18, () -> new LiteralText(meter.isHidden() ? "\u25A0" : "\u25A1"), (button) -> {
+			meter.toggleHidden();
+			return true;
+		}) {
+			
+			@Override
+			public List<Text> getTooltip(double mouseX, double mouseY) {
+				List<Text> tooltip = new ArrayList<>();
+				tooltip.add(new LiteralText(String.format("%s meter", meter.isHidden() ? "Unhide" : "Hide")));
+				
+				return tooltip;
+			}
+		};
+		addChild(hideButton);
+		
 		deleteButton = new Button(client, x, y, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), (button) -> {
 			tryDelete();
 			
@@ -293,7 +316,16 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			}
 			
 			return true;
-		});
+		}) {
+			
+			@Override
+			public List<Text> getTooltip(double mouseX, double mouseY) {
+				List<Text> tooltip = new ArrayList<>();
+				tooltip.add(new LiteralText("Delete meter"));
+				
+				return tooltip;
+			}
+		};
 		addChild(deleteButton);
 		
 		deleteConfirm = new SimpleTextElement(client, x, y, () -> new LiteralText("Are you sure you want to delete this meter? YOU CAN'T UNDO THIS").formatted(Formatting.ITALIC));
@@ -498,14 +530,18 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	}
 
 	private void onTitleChanged() {
-		int deleteX = title.getX() + title.getWidth() + 10;
+		int x = title.getX() + title.getWidth() + 10;
 		
-		deleteButton.setX(deleteX);
-		deleteConfirm.setX(deleteX + deleteButton.getWidth() + 5);
+		hideButton.setX(x);
+		deleteButton.setX(x + hideButton.getWidth() + 2);
+		deleteConfirm.setX(x + hideButton.getWidth() + 2 + deleteButton.getWidth() + 5);
 	}
 	
 	private void updateControls() {
 		updateTitle();
+		hideButton.updateMessage();
+		undoTryDelete();
+		
 		rgb.setColor(meter.getColor());
 		
 		dimensionField.updateMessage();
@@ -553,6 +589,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		int dy = 6;
 		
 		title.setY(titleY);
+		hideButton.setY(titleY - dy);
 		deleteButton.setY(titleY - dy);
 		deleteConfirm.setY(titleY);
 		
