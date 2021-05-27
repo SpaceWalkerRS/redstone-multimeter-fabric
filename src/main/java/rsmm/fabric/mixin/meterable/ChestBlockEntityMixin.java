@@ -32,7 +32,7 @@ public class ChestBlockEntityMixin extends BlockEntity {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose"
+					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose()V"
 			)
 	)
 	private void onOnOpenInjectBeforeOnInvOpenOrClose(PlayerEntity player, CallbackInfo ci) {
@@ -44,7 +44,7 @@ public class ChestBlockEntityMixin extends BlockEntity {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose"
+					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose()V"
 			)
 	)
 	private void onOnCloseInjectBeforeOnInvOpenOrClose(PlayerEntity player, CallbackInfo ci) {
