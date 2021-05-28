@@ -292,7 +292,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		});
 		addChild(title);
 		
-		hideButton = new Button(client, x, y, 18, 18, () -> new LiteralText(meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter.isHidden() ? "Unhide" : "Hide"))), (button) -> {
+		hideButton = new Button(client, x, y, 18, 18, () -> new LiteralText(meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter.isHidden() ? "Reveal" : "Hide"))), (button) -> {
 			meter.toggleHidden();
 			return true;
 		});

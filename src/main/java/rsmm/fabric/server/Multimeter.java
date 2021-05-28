@@ -336,7 +336,7 @@ public class Multimeter {
 		if (meterGroup != null) {
 			Meter meter = meterGroup.getMeter(index);
 			
-			if (meter != null) {
+			if (meter != Meter.DUMMY) {
 				WorldPos pos = meter.getPos();
 				Identifier worldId = pos.getWorldId();
 				
