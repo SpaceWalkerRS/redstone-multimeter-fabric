@@ -152,7 +152,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		boolean dragged = super.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
 		
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (isDraggingMouse() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			if (draggingTicksTable) {
 				mouseDragDeltaX += deltaX;
 				int scrollAmount = (int)Math.round(mouseDragDeltaX / (HudSettings.COLUMN_WIDTH + HudSettings.GRID_SIZE));
@@ -163,7 +163,9 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 				dragged = true;
 			}
 			
-			mouseDragged = true;
+			if (deltaX > 0.25D || deltaY > 0.25D) {
+				mouseDragged = true;
+			}
 		}
 		
 		return dragged;
@@ -178,10 +180,6 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		MeterGroupChangeDispatcher.removeListener(this);
 		
 		hudRenderer.ignoreHiddenMeters(true);
-		
-		if (hudRenderer.isPaused()) {
-			hudRenderer.pause();
-		}
 	}
 	
 	@Override

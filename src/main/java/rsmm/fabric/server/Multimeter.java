@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.ibm.icu.text.NumberFormat;
 
@@ -401,6 +401,10 @@ public class Multimeter {
 		WorldPos pos = new WorldPos(world, blockPos);
 		
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+			if (!meterGroup.hasSubscribers() || !meterGroup.hasMeters()) {
+				continue;
+			}
+			
 			meterGroup.blockChanged(pos, oldBlock, newBlock);
 		}
 	}
@@ -451,13 +455,13 @@ public class Multimeter {
 		tryLogEvent(new WorldPos(world, pos), type, metaData, m -> true, (m, i) -> {});
 	}
 	
-	private void tryLogEvent(WorldPos pos, EventType type, int metaData, Function<Meter, Boolean> eventValidator, BiConsumer<ServerMeterGroup, Integer> onLog) {
+	private void tryLogEvent(WorldPos pos, EventType type, int metaData, Predicate<Meter> meterPredicate, BiConsumer<ServerMeterGroup, Integer> onLog) {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			if (!meterGroup.hasSubscribers() || !meterGroup.hasMeters()) {
 				continue;
 			}
 			
-			meterGroup.tryLogEvent(pos, type, metaData, eventValidator, onLog);
+			meterGroup.tryLogEvent(pos, type, metaData, meterPredicate, onLog);
 		}
 	}
 }

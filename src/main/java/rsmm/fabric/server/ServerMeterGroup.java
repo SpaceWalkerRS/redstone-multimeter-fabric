@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -225,13 +225,13 @@ public class ServerMeterGroup extends MeterGroup {
 		}
 	}
 	
-	public void tryLogEvent(WorldPos pos, EventType type, int metaData, Function<Meter, Boolean> eventValidator,BiConsumer<ServerMeterGroup, Integer> onLog) {
+	public void tryLogEvent(WorldPos pos, EventType type, int metaData, Predicate<Meter> meterPredicate,BiConsumer<ServerMeterGroup, Integer> onLog) {
 		int index = indexOfMeterAt(pos);
 		
 		if (index >= 0) {
 			Meter meter = getMeter(index);
 			
-			if (eventValidator.apply(meter)) {
+			if (meterPredicate.test(meter)) {
 				onLog.accept(this, index);
 				logManager.logEvent(meter, type, metaData);
 			}

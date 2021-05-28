@@ -1,5 +1,7 @@
 package rsmm.fabric.client.gui.widget;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -16,7 +18,11 @@ import rsmm.fabric.client.gui.element.action.MousePress;
 public class InvisibleButton extends Button {
 	
 	public InvisibleButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, MousePress<Button> onPress) {
-		super(client, x, y, width, height, textSupplier, onPress);
+		this(client, x, y, width, height, textSupplier, () -> Collections.emptyList(), onPress);
+	}
+	
+	public InvisibleButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<Button> onPress) {
+		super(client, x, y, width, height, textSupplier, tooltipSupplier, onPress);
 	}
 	
 	@Override

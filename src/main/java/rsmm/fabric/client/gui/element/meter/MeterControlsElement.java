@@ -8,7 +8,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -293,39 +292,21 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		});
 		addChild(title);
 		
-		hideButton = new Button(client, x, y, 18, 18, () -> new LiteralText(meter.isHidden() ? "\u25A0" : "\u25A1"), (button) -> {
+		hideButton = new Button(client, x, y, 18, 18, () -> new LiteralText(meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter.isHidden() ? "Unhide" : "Hide"))), (button) -> {
 			meter.toggleHidden();
 			return true;
-		}) {
-			
-			@Override
-			public List<Text> getTooltip(double mouseX, double mouseY) {
-				List<Text> tooltip = new ArrayList<>();
-				tooltip.add(new LiteralText(String.format("%s meter", meter.isHidden() ? "Unhide" : "Hide")));
-				
-				return tooltip;
-			}
-		};
+		});
 		addChild(hideButton);
 		
-		deleteButton = new Button(client, x, y, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), (button) -> {
+		deleteButton = new Button(client, x, y, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Arrays.asList(new LiteralText("Delete Meter")), (button) -> {
 			tryDelete();
 			
 			if (Screen.hasShiftDown()) {
-				tryDelete();
+				tryDelete(); // Delete without asking for confirmation first
 			}
 			
 			return true;
-		}) {
-			
-			@Override
-			public List<Text> getTooltip(double mouseX, double mouseY) {
-				List<Text> tooltip = new ArrayList<>();
-				tooltip.add(new LiteralText("Delete meter"));
-				
-				return tooltip;
-			}
-		};
+		});
 		addChild(deleteButton);
 		
 		deleteConfirm = new SimpleTextElement(client, x, y, () -> new LiteralText("Are you sure you want to delete this meter? YOU CAN'T UNDO THIS").formatted(Formatting.ITALIC));
@@ -422,9 +403,9 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		});
 		addToGrid(2, nameField);
 		
-		colorField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> ColorUtils.toHexString(meter.getColor()), (text) -> {
+		colorField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> ColorUtils.toRGBString(meter.getColor()), (text) -> {
 			try {
-				changeColor(ColorUtils.fromString(text));
+				changeColor(ColorUtils.fromRGBString(text));
 			} catch (Exception e) {
 				
 			}

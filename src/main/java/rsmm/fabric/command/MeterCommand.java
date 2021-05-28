@@ -139,7 +139,7 @@ public class MeterCommand {
 		}
 		
 		try {
-			return ColorUtils.fromString(asString);
+			return ColorUtils.fromRGBString(asString);
 		} catch (Exception e) {
 			throw new DynamicCommandExceptionType(value -> new LiteralMessage(String.format("Invalid color \'%s\'", value))).create(asString);
 		}
@@ -264,7 +264,7 @@ public class MeterCommand {
 	private static int recolorMeter(ServerCommandSource source, Integer meterIndex, BlockPos pos, int color) {
 		return updateMeter(source, meterIndex, pos, (multimeter, index, player) -> {
 			multimeter.recolorMeter(index, color, player);
-			source.sendFeedback(new LiteralText(String.format("Recolored meter #%d to %s", index, ColorUtils.toHexString(color))), false);
+			source.sendFeedback(new LiteralText(String.format("Recolored meter #%d to %s", index, ColorUtils.toRGBString(color))), false);
 		});
 	}
 	
@@ -422,7 +422,7 @@ public class MeterCommand {
 				intColor = ColorUtils.nextColor(false);
 			}
 			
-			suggestions.add(ColorUtils.toHexString(intColor));
+			suggestions.add(ColorUtils.toRGBString(intColor));
 		});
 	}
 	

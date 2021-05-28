@@ -1,5 +1,7 @@
 package rsmm.fabric.client.gui.widget;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -24,13 +26,19 @@ public class Button extends ButtonWidget implements IElement {
 	
 	protected final MultimeterClient client;
 	protected final Supplier<Text> textSupplier;
+	protected final Supplier<List<Text>> tooltipSupplier;
 	protected final MousePress<Button> onPress;
 	
 	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, MousePress<Button> onPress) {
+		this(client, x, y, width, height, textSupplier, () -> Collections.emptyList(), onPress);
+	}
+	
+	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<Button> onPress) {
 		super(x, y, width, height, textSupplier.get(), button -> {});
 		
 		this.client = client;
 		this.textSupplier = textSupplier;
+		this.tooltipSupplier = tooltipSupplier;
 		this.onPress = onPress;
 	}
 	
@@ -200,6 +208,11 @@ public class Button extends ButtonWidget implements IElement {
 	@Override
 	public void setVisible(boolean visible) {
 		this.visible = visible;
+	}
+	
+	@Override
+	public List<Text> getTooltip(double mouseX, double mouseY) {
+		return tooltipSupplier.get();
 	}
 	
 	public void updateMessage() {
