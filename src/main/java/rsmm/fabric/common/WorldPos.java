@@ -53,7 +53,15 @@ public class WorldPos {
 	}
 	
 	public WorldPos offset(Direction dir) {
-		return new WorldPos(worldId, pos.offset(dir));
+		return offset(dir, 1);
+	}
+	
+	public WorldPos offset(Direction dir, int distance) {
+		return new WorldPos(worldId, pos.offset(dir, distance));
+	}
+	
+	public WorldPos offset(int dx, int dy, int dz) {
+		return new WorldPos(worldId, pos.add(dx, dy, dz));
 	}
 	
 	/**

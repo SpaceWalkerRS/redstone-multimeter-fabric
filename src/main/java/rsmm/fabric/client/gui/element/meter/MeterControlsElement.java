@@ -18,6 +18,7 @@ import rsmm.fabric.client.gui.element.IElement;
 import rsmm.fabric.client.gui.element.SimpleTextElement;
 import rsmm.fabric.client.gui.element.TextElement;
 import rsmm.fabric.client.gui.widget.Button;
+import rsmm.fabric.client.gui.widget.InvisibleButton;
 import rsmm.fabric.client.gui.widget.Slider;
 import rsmm.fabric.client.gui.widget.TextField;
 import rsmm.fabric.common.Meter;
@@ -36,9 +37,9 @@ import rsmm.fabric.util.ColorUtils;
 public class MeterControlsElement extends AbstractParentElement implements MeterListener, MeterGroupListener {
 	
 	private static final int SPACING = 200;
-	private static final int ROW_HEIGHT = 22;
 	private static final int BUTTON_WIDTH = 150;
 	private static final int BUTTON_HEIGHT = 20;
+	private static final int ROW_HEIGHT = BUTTON_HEIGHT + 2;
 	
 	private static int lastSelectedMeter = -1;
 	
@@ -78,8 +79,14 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	
 	private TextField dimensionField;
 	private TextField xField;
+	private Button xPlus;
+	private Button xMinus;
 	private TextField yField;
+	private Button yPlus;
+	private Button yMinus;
 	private TextField zField;
+	private Button zPlus;
+	private Button zMinus;
 	private TextField nameField;
 	private TextField colorField;
 	private Slider redSlider;
@@ -280,6 +287,8 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	}
 	
 	private void initControls() {
+		int half = BUTTON_HEIGHT / 2 - 1;
+		
 		grid = new ArrayList<>();
 		
 		for (int column = 0; column < 3; column++) {
@@ -292,7 +301,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		});
 		addChild(title);
 		
-		hideButton = new Button(client, x, y, 18, 18, () -> new LiteralText(meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter.isHidden() ? "Reveal" : "Hide"))), (button) -> {
+		hideButton = new Button(client, x, y, 18, 18, () -> new LiteralText(meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter.isHidden() ? "Unhide" : "Hide"))), (button) -> {
 			meter.toggleHidden();
 			return true;
 		});
@@ -388,15 +397,51 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		});
 		addToGrid(2, xField);
 		
+		xPlus = new InvisibleButton(client, x, y, half, half, () -> new LiteralText("+"), (button) -> {
+			changePos(meter.getPos().offset(Screen.hasControlDown() ? 10 : 1, 0, 0));
+			return true;
+		});
+		addChild(xPlus);
+		
+		xMinus = new InvisibleButton(client, x, y, half, half, () -> new LiteralText("-"), (button) -> {
+			changePos(meter.getPos().offset(Screen.hasControlDown() ? -10 : -1, 0, 0));
+			return true;
+		});
+		addChild(xMinus);
+		
 		yField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().asBlockPos().getY()), (text) -> {
 			changePos();
 		});
 		addToGrid(2, yField);
 		
+		yPlus = new InvisibleButton(client, x, y, half, half, () -> new LiteralText("+"), (button) -> {
+			changePos(meter.getPos().offset(0, Screen.hasControlDown() ? 10 : 1, 0));
+			return true;
+		});
+		addChild(yPlus);
+		
+		yMinus = new InvisibleButton(client, x, y, half, half, () -> new LiteralText("-"), (button) -> {
+			changePos(meter.getPos().offset(0, Screen.hasControlDown() ? -10 : -1, 0));
+			return true;
+		});
+		addChild(yMinus);
+		
 		zField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().asBlockPos().getZ()), (text) -> {
 			changePos();
 		});
 		addToGrid(2, zField);
+		
+		zPlus = new InvisibleButton(client, x, y, half, half, () -> new LiteralText("+"), (button) -> {
+			changePos(meter.getPos().offset(0, 0, Screen.hasControlDown() ? 10 : 1));
+			return true;
+		});
+		addChild(zPlus);
+		
+		zMinus = new InvisibleButton(client, x, y, half, half, () -> new LiteralText("-"), (button) -> {
+			changePos(meter.getPos().offset(0, 0, Screen.hasControlDown() ? -10 : -1));
+			return true;
+		});
+		addChild(zMinus);
 		
 		nameField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> meter.getName(), (text) -> {
 			changeName(text);
@@ -563,6 +608,15 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 				e.setX(controlsX);
 			}
 		}
+		
+		int plusMinusX = xField.getX() + xField.getWidth();
+		
+		xPlus.setX(plusMinusX);
+		xMinus.setX(plusMinusX);
+		yPlus.setX(plusMinusX);
+		yMinus.setX(plusMinusX);
+		zPlus.setX(plusMinusX);
+		zMinus.setX(plusMinusX);
 	}
 	
 	private void updateControlsY() {
@@ -589,6 +643,13 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 				controlY += ROW_HEIGHT;
 			}
 		}
+		
+		xPlus.setY(xField.getY() + 1);
+		xMinus.setY(xPlus.getY() + xPlus.getHeight());
+		yPlus.setY(yField.getY() + 1);
+		yMinus.setY(yPlus.getY() + yPlus.getHeight());
+		zPlus.setY(zField.getY() + 1);
+		zMinus.setY(zPlus.getY() + zPlus.getHeight());
 	}
 	
 	private void updateHeight() {
@@ -631,14 +692,16 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 			int y = Integer.valueOf(yField.getText());
 			int z = Integer.valueOf(zField.getText());
 			
-			WorldPos pos = new WorldPos(worldId, new BlockPos(x, y, z));
-			
-			MeterChangePacket packet = new MeterChangePacket(meterIndex);
-			packet.addPos(pos);
-			client.getPacketHandler().sendPacket(packet);
+			changePos(new WorldPos(worldId, new BlockPos(x, y, z)));
 		} catch (Exception e) {
 			
 		}
+	}
+	
+	private void changePos(WorldPos pos) {
+		MeterChangePacket packet = new MeterChangePacket(meterIndex);
+		packet.addPos(pos);
+		client.getPacketHandler().sendPacket(packet);
 	}
 	
 	private void changeName(String name) {

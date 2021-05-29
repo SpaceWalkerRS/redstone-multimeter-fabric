@@ -407,7 +407,7 @@ public class MeterCommand {
 			if (index >= 0) {
 				suggestions.add(meterGroup.getMeter(index).getName());
 			} else {
-				suggestions.add(String.format("\"%s\"", meterGroup.getNextMeterName()));
+				suggestions.add(String.format("\"%s\"", meterGroup.getNextMeterName(null)));
 			}
 		});
 	}

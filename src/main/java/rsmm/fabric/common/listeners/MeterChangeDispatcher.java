@@ -1,13 +1,13 @@
 package rsmm.fabric.common.listeners;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import rsmm.fabric.common.Meter;
 
 public class MeterChangeDispatcher {
 	
-	private static final Set<MeterListener> LISTENERS = new HashSet<>();
+	private static final Set<MeterListener> LISTENERS = new LinkedHashSet<>();
 	
 	public static void addListener(MeterListener listener) {
 		LISTENERS.add(listener);

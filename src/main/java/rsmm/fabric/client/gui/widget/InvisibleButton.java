@@ -33,13 +33,13 @@ public class InvisibleButton extends Button {
 			MinecraftClient minecraftClient = client.getMinecraftClient();
 			TextRenderer font = minecraftClient.textRenderer;
 			
-			int rgb = active ? (isHovered() ? 0xC0C0C0 : 0xFFFFFF) : 0xA0A0A0;
+			int rgb = active ? (isHovered() ? 0xC0C0C0 : 0xFFFFFF) : 0x909090;
 			int a = MathHelper.ceil(alpha * 255.0F);
 			int color = rgb | (a << 24);
 			
 			int textWidth = font.getWidth(message);
-			int textX = x + (width - textWidth) / 2;
-			int textY = y + (height - font.fontHeight + 1) / 2;
+			int textX = x + width - (width + textWidth) / 2;
+			int textY = y + (height - font.fontHeight) / 2 + 1;
 			
 			RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
 			RenderSystem.enableBlend();

@@ -193,8 +193,12 @@ public class Multimeter {
 		World world = server.getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, pos.getWorldId()));
 		
 		if (world != null) {
+			BlockPos blockPos = pos.asBlockPos();
+			BlockState state = world.getBlockState(blockPos);
+			Block block = state.getBlock();
+			
 			if (name == null) {
-				name = meterGroup.getNextMeterName();
+				name = meterGroup.getNextMeterName(block);
 			}
 			
 			int nextColor = ColorUtils.nextColor();
@@ -202,10 +206,6 @@ public class Multimeter {
 			if (color == null) {
 				color = nextColor;
 			}
-			
-			BlockPos blockPos = pos.asBlockPos();
-			BlockState state = world.getBlockState(blockPos);
-			Block block = state.getBlock();
 			
 			int meteredEvents = ((IBlock)block).getDefaultMeteredEvents();
 			boolean powered = ((IBlock)block).isPowered(world, blockPos, state);
@@ -386,9 +386,7 @@ public class Multimeter {
 						append(MeterEvent.formatTextForTooltip("\n  dimension", worldId)).
 						append(MeterEvent.formatTextForTooltip("\n  x", x)).
 						append(MeterEvent.formatTextForTooltip("\n  y", y)).
-						append(MeterEvent.formatTextForTooltip("\n  z", z)).
-						append(MeterEvent.formatTextForTooltip("\n  yaw", yaw)).
-						append(MeterEvent.formatTextForTooltip("\n  pitch", pitch)))).
+						append(MeterEvent.formatTextForTooltip("\n  z", z)))).
 					withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/execute in %s run tp @s %s %s %s %s %s", worldId, x, y, z, yaw, pitch))).
 					withColor(Formatting.GREEN);
 			})).

@@ -1,22 +1,6 @@
 package rsmm.fabric.client.gui;
 
-import static rsmm.fabric.client.gui.HudSettings.BACKGROUND_COLOR;
-import static rsmm.fabric.client.gui.HudSettings.COLUMN_COUNT;
-import static rsmm.fabric.client.gui.HudSettings.COLUMN_WIDTH;
-import static rsmm.fabric.client.gui.HudSettings.GRID_SIZE;
-import static rsmm.fabric.client.gui.HudSettings.IGNORE_HIDDEN_METERS;
-import static rsmm.fabric.client.gui.HudSettings.INTERVAL_GRID_COLOR;
-import static rsmm.fabric.client.gui.HudSettings.MAIN_GRID_COLOR;
-import static rsmm.fabric.client.gui.HudSettings.MARKER_GRID_COLOR;
-import static rsmm.fabric.client.gui.HudSettings.METER_GROUP_NAME_COLOR_DARK;
-import static rsmm.fabric.client.gui.HudSettings.METER_GROUP_NAME_COLOR_LIGHT;
-import static rsmm.fabric.client.gui.HudSettings.NAMES_TICKS_SPACING;
-import static rsmm.fabric.client.gui.HudSettings.ROW_COUNT;
-import static rsmm.fabric.client.gui.HudSettings.ROW_HEIGHT;
-import static rsmm.fabric.client.gui.HudSettings.SELECTED_COLUMN;
-import static rsmm.fabric.client.gui.HudSettings.SELECTION_INDICATOR_COLOR;
-import static rsmm.fabric.client.gui.HudSettings.TICKS_SUB_TICKS_GAP;
-import static rsmm.fabric.client.gui.HudSettings.TICKS_TABLE_WIDTH;
+import static rsmm.fabric.client.gui.HudSettings.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,14 +13,18 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.log.MeterEventRendererDispatcher;
 import rsmm.fabric.common.Meter;
+import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.listeners.HudChangeDispatcher;
+import rsmm.fabric.common.listeners.MeterGroupChangeDispatcher;
+import rsmm.fabric.common.listeners.MeterGroupListener;
 import rsmm.fabric.common.log.MeterLogs;
 
-public class MultimeterHudRenderer extends DrawableHelper {
+public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupListener {
 	
 	private final MultimeterClient client;
 	private final TextRenderer font;
@@ -57,6 +45,29 @@ public class MultimeterHudRenderer extends DrawableHelper {
 		this.client = client;
 		this.font = minecraftClient.textRenderer;
 		this.eventRenderers = new MeterEventRendererDispatcher();
+	}
+	
+	@Override
+	public void cleared(MeterGroup meterGroup) {
+		updateRowCount();
+	}
+	
+	@Override
+	public void meterAdded(MeterGroup meterGroup, int index) {
+		updateRowCount();
+	}
+	
+	@Override
+	public void meterRemoved(MeterGroup meterGroup, int index) {
+		updateRowCount();
+	}
+	
+	public void onStartup() {
+		MeterGroupChangeDispatcher.addListener(this);
+	}
+	
+	public void onShutdown() {
+		MeterGroupChangeDispatcher.removeListener(this);
 	}
 	
 	public void resetOffset() {
@@ -80,6 +91,10 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	public void pause() {
+		if (ROW_COUNT == 0) {
+			return;
+		}
+		
 		paused = !paused;
 		
 		if (!paused) {
@@ -144,8 +159,6 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	 * is subscribed to.
 	 */
 	public void render(MatrixStack matrices, int x, int y) {
-		updateRowCount();
-		
 		if (ROW_COUNT <= 0) {
 			return;
 		}
@@ -338,7 +351,6 @@ public class MultimeterHudRenderer extends DrawableHelper {
 	}
 	
 	public void updateHoveredElements(int x, int y, double mouseX, double mouseY) {
-		updateRowCount();
 		resetHoveredElements();
 		
 		if (ROW_COUNT >= 0) {

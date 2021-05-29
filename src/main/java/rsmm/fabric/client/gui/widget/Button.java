@@ -56,15 +56,16 @@ public class Button extends ButtonWidget implements IElement {
 		textureManager.bindTexture(WIDGETS_LOCATION);
 		
 		int i = getYImage(isHovered());
-		int halfWidth = width / 2;
+		int leftWidth = width / 2;
+		int rightWidth = width - leftWidth;
 		int topBorder = 2;
 		
 		int x0 = x;
-		int x1 = x + halfWidth;
+		int x1 = x + leftWidth;
 		int y0 = y;
 		int y1 = y + topBorder;
 		int textureX0 = 0;
-		int textureX1 = 200 - halfWidth;
+		int textureX1 = 200 - rightWidth;
 		int textureY0 = 46 + i * 20;
 		int textureY1 = textureY0 + 20 - height + topBorder;
 		
@@ -73,10 +74,10 @@ public class Button extends ButtonWidget implements IElement {
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.enableDepthTest();
 		
-		drawTexture(matrices, x0, y0, textureX0, textureY0, halfWidth, topBorder);
-		drawTexture(matrices, x1, y0, textureX1, textureY0, halfWidth, topBorder);
-		drawTexture(matrices, x0, y1, textureX0, textureY1, halfWidth, height - topBorder);
-		drawTexture(matrices, x1, y1, textureX1, textureY1, halfWidth, height - topBorder);
+		drawTexture(matrices, x0, y0, textureX0, textureY0, leftWidth, topBorder);
+		drawTexture(matrices, x1, y0, textureX1, textureY0, rightWidth, topBorder);
+		drawTexture(matrices, x0, y1, textureX0, textureY1, leftWidth, height - topBorder);
+		drawTexture(matrices, x1, y1, textureX1, textureY1, rightWidth, height - topBorder);
 		
 		int rgb = active ? 0xFFFFFF : 0xA0A0A0;
 		int a = MathHelper.ceil(alpha * 255.0F);
@@ -84,8 +85,8 @@ public class Button extends ButtonWidget implements IElement {
 		
 		Text message = getMessage();
 		int textWidth = font.getWidth(message);
-		int textX = x + (width - textWidth) / 2;
-		int textY = y + (height - font.fontHeight + 1) / 2;
+		int textX = x + rightWidth - textWidth / 2;
+		int textY = y + (height - font.fontHeight) / 2 + 1;
 		
 		font.drawWithShadow(matrices, message, textX, textY, color);
 	}

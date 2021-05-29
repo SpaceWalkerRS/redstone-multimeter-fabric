@@ -12,7 +12,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.WorldPos;
@@ -126,8 +127,15 @@ public class ServerMeterGroup extends MeterGroup {
 		meter.markDirty();
 	}
 	
-	public String getNextMeterName() {
-		return String.format("Meter %d", totalMeterCount);
+	public String getNextMeterName(Block block) {
+		String name = "Meter";
+		
+		if (block != null && ((IBlock)block).isMeterable()) {
+			Identifier id = Registry.BLOCK.getId(block);
+			name = id.getPath();
+		}
+		
+		return String.format("%s %d", name, totalMeterCount);
 	}
 	
 	public Set<ServerPlayerEntity> getSubscribers() {
