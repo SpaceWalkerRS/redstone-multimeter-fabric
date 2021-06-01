@@ -9,7 +9,7 @@ import rsmm.fabric.common.event.EventType;
 
 public abstract class MeterEventRenderer extends DrawableHelper {
 	
-	protected final EventType type;
+	protected EventType type;
 	
 	protected MeterEventRenderer(EventType type) {
 		this.type = type;

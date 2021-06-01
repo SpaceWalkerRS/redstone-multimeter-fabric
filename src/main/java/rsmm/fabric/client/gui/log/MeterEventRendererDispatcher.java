@@ -1,7 +1,7 @@
 package rsmm.fabric.client.gui.log;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -11,38 +11,45 @@ import rsmm.fabric.common.event.EventType;
 
 public class MeterEventRendererDispatcher {
 	
-	private final List<MeterEventRenderer> eventRenderers;
+	private final Map<EventType, MeterEventRenderer> eventRenderers;
+	private final BasicEventRenderer basicEventRenderer;
 	
 	public MeterEventRendererDispatcher() {
-		eventRenderers = new ArrayList<>();
+		eventRenderers = new HashMap<>();
+		basicEventRenderer = new BasicEventRenderer();
 		
-		eventRenderers.add(new PoweredEventRenderer());
-		eventRenderers.add(new ActiveEventRenderer());
-		eventRenderers.add(new BasicEventRenderer(EventType.MOVED));
-		eventRenderers.add(new PowerChangeEventRenderer());
-		eventRenderers.add(new BasicEventRenderer(EventType.RANDOM_TICK));
-		eventRenderers.add(new BasicEventRenderer(EventType.SCHEDULED_TICK));
-		eventRenderers.add(new BasicEventRenderer(EventType.BLOCK_EVENT));
-		eventRenderers.add(new BasicEventRenderer(EventType.ENTITY_TICK));
-		eventRenderers.add(new BasicEventRenderer(EventType.BLOCK_ENTITY_TICK));
+		registerEventRenderer(new PoweredEventRenderer());
+		registerEventRenderer(new ActiveEventRenderer());
+		registerEventRenderer(new PowerChangeEventRenderer());
+	}
+	
+	private void registerEventRenderer(MeterEventRenderer eventRenderer) {
+		eventRenderers.put(eventRenderer.getType(), eventRenderer);
+	}
+	
+	private MeterEventRenderer getEventRenderer(EventType type) {
+		MeterEventRenderer eventRenderer = eventRenderers.get(type);
+		
+		if (eventRenderer == null) {
+			basicEventRenderer.setType(type);
+			return basicEventRenderer;
+		}
+		
+		return eventRenderer;
 	}
 	
 	public void renderTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter) {
-		for (MeterEventRenderer eventRenderer : eventRenderers) {
-			EventType type = eventRenderer.getType();
-			
+		for (EventType type : EventType.TYPES) {
 			if (meter.isMetering(type)) {
-				eventRenderer.renderTickLogs(matrices, font, x, y, firstTick, lastTick, meter);
+				getEventRenderer(type).renderTickLogs(matrices, font, x, y, firstTick, lastTick, meter);
 			}
 		}
 	}
 	
 	public void renderSubTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
-		for (MeterEventRenderer eventRenderer : eventRenderers) {
-			EventType type = eventRenderer.getType();
-			
+		for (EventType type : EventType.TYPES) {
 			if (meter.isMetering(type)) {
-				eventRenderer.renderSubTickLogs(matrices, font, x, y, tick, subTickCount, meter);
+				getEventRenderer(type).renderSubTickLogs(matrices, font, x, y, tick, subTickCount, meter);
 			}
 		}
 	}

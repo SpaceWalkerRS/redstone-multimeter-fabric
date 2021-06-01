@@ -11,7 +11,9 @@ import rsmm.fabric.common.event.MeterEvent;
 public class PowerChangeEventRenderer extends BasicEventRenderer {
 	
 	public PowerChangeEventRenderer() {
-		super(EventType.POWER_CHANGE, (m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
+		super((m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
+		
+		this.setType(EventType.POWER_CHANGE);
 	}
 	
 	@Override

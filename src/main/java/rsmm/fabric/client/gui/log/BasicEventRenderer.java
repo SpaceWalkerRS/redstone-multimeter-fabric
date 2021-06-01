@@ -17,12 +17,12 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	protected final BiFunction<Meter, MeterEvent, Integer> edgeColorProvider;
 	protected final BiFunction<Meter, MeterEvent, Integer> centerColorProvider;
 	
-	public BasicEventRenderer(EventType type) {
-		this(type, (m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
+	public BasicEventRenderer() {
+		this((m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
 	}
 	
-	public BasicEventRenderer(EventType type, BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {
-		super(type);
+	public BasicEventRenderer(BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {
+		super(null);
 		
 		this.edgeColorProvider = edgeColorProvider;
 		this.centerColorProvider = centerColorProvider;
@@ -80,6 +80,10 @@ public class BasicEventRenderer extends MeterEventRenderer {
 				break;
 			}
 		}
+	}
+	
+	public void setType(EventType type) {
+		this.type = type;
 	}
 	
 	protected void drawEvent(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
