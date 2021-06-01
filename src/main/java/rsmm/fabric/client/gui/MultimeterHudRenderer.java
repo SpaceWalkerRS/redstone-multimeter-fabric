@@ -209,7 +209,7 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 	private void renderNamesTable(MatrixStack matrices, int x, int y, int width, int height) {
 		drawBackground(matrices, x, y, width, height);
 		
-		int nameX = x + 2;
+		int nameX;
 		int nameY = y + 2;
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
@@ -218,9 +218,13 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 			}
 			
 			MutableText name = new LiteralText(meter.getName());
+			int nameWidth = font.getWidth(name);
+			nameX = (x + width) - (nameWidth + 1);
+			
 			if (meter.isHidden()) {
 				name.formatted(Formatting.GRAY, Formatting.ITALIC);
 			}
+			
 			font.draw(matrices, name, nameX, nameY, 0xFFFFFFFF);
 			
 			nameY += ROW_HEIGHT + GRID_SIZE;

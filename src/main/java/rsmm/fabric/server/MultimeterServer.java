@@ -1,8 +1,15 @@
 package rsmm.fabric.server;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 
+import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.packet.types.JoinMultimeterServerPacket;
 import rsmm.fabric.common.packet.types.ServerTickPacket;
 
@@ -57,5 +64,24 @@ public class MultimeterServer {
 	
 	public void onPlayerLeave(ServerPlayerEntity player) {
 		multimeter.onPlayerLeave(player);
+	}
+	
+	public ServerWorld getWorld(Identifier worldId) {
+		RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, worldId);
+		return server.getWorld(key);
+	}
+	
+	public ServerWorld getWorldOf(WorldPos pos) {
+		return getWorld(pos.getWorldId());
+	}
+	
+	public BlockState getBlockState(WorldPos pos) {
+		World world = getWorldOf(pos);
+		
+		if (world != null) {
+			return world.getBlockState(pos.asBlockPos());
+		}
+		
+		return null;
 	}
 }

@@ -26,11 +26,8 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 
@@ -190,7 +187,7 @@ public class Multimeter {
 			return;
 		}
 		
-		World world = server.getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, pos.getWorldId()));
+		World world = server.getWorldOf(pos);
 		
 		if (world != null) {
 			BlockPos blockPos = pos.asBlockPos();
@@ -237,7 +234,7 @@ public class Multimeter {
 	}
 	
 	public void moveMeter(int index, WorldPos toPos, ServerMeterGroup meterGroup) {
-		World world = server.getMinecraftServer().getWorld(RegistryKey.of(Registry.DIMENSION, toPos.getWorldId()));
+		World world = server.getWorldOf(toPos);
 		
 		if (world != null) {
 			meterGroup.tryMoveMeter(index, toPos, true);
@@ -338,10 +335,7 @@ public class Multimeter {
 			
 			if (meter != Meter.DUMMY) {
 				WorldPos pos = meter.getPos();
-				Identifier worldId = pos.getWorldId();
-				
-				RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, worldId);
-				ServerWorld newWorld = server.getMinecraftServer().getWorld(key);
+				ServerWorld newWorld = server.getWorldOf(pos);
 				
 				if (newWorld != null) {
 					ServerWorld oldWorld = player.getServerWorld();
