@@ -19,7 +19,7 @@ public interface IElement extends Drawable {
 	public boolean mouseScroll(double mouseX, double mouseY, double amount);
 	
 	default boolean isHovered(double mouseX, double mouseY) {
-		return isVisible() && mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= getY() && mouseY <= (getY() + getHeight());
+		return mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= getY() && mouseY <= (getY() + getHeight());
 	}
 	
 	public boolean keyPress(int keyCode, int scanCode, int modifiers);

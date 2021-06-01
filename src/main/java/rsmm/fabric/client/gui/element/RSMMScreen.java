@@ -34,7 +34,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	
 	@Override
 	public final boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return mouseClick(mouseX, mouseY, button);
+		return isHovered(mouseX, mouseY) && mouseClick(mouseX, mouseY, button);
 	}
 	
 	@Override
