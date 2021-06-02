@@ -295,24 +295,28 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 	
 	private void drawGridLines(MatrixStack matrices, int x, int y, int height, int columnCount, int markedColumn) {
 		int width = columnCount * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
+		int lineX;
+		int lineY;
+		int color;
 		
 		// Vertical lines
 		for (int i = 0; i <= columnCount; i++) {
-			int lineX = x + i * (COLUMN_WIDTH + GRID_SIZE);
-			int color = (i > 0 && i < columnCount && i % 5 == 0) ? INTERVAL_GRID_COLOR : MAIN_GRID_COLOR;
+			lineX = x + i * (COLUMN_WIDTH + GRID_SIZE);
+			color = (i > 0 && i < columnCount && i % 5 == 0) ? INTERVAL_GRID_COLOR : MAIN_GRID_COLOR;
 			
 			fill(matrices, lineX, y, lineX + GRID_SIZE, y + height, color);
 		}
 		// Horizontal lines
 		for (int i = 0; i <= ROW_COUNT; i++) {
-			int lineY = y + i * (ROW_HEIGHT + GRID_SIZE);
+			lineY = y + i * (ROW_HEIGHT + GRID_SIZE);
+			color = MAIN_GRID_COLOR;
 			
-			fill(matrices, x, lineY, x + width - GRID_SIZE, lineY + GRID_SIZE, MAIN_GRID_COLOR);
+			fill(matrices, x, lineY, x + width - GRID_SIZE, lineY + GRID_SIZE, color);
 		}
 		// Marked column
 		if (markedColumn >= 0 && markedColumn <= columnCount) {
-			int lineX = x + markedColumn * (COLUMN_WIDTH + GRID_SIZE);
-			int color = MARKER_GRID_COLOR;
+			lineX = x + markedColumn * (COLUMN_WIDTH + GRID_SIZE);
+			color = MARKER_GRID_COLOR;
 			
 			fill(matrices, lineX, y + GRID_SIZE, lineX + GRID_SIZE, y + height - GRID_SIZE, color);
 		}
