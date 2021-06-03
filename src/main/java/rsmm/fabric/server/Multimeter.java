@@ -174,19 +174,13 @@ public class Multimeter {
 		boolean movable = properties.getBoolean("movable");
 		
 		if (meterGroup.hasMeterAt(pos)) {
-			removeMeter(meterGroup.indexOfMeterAt(pos), player);
+			removeMeter(meterGroup, meterGroup.indexOfMeterAt(pos));
 		} else {
-			addMeter(pos, movable, null, null, player);
+			addMeter(meterGroup, pos, movable, null, null);
 		}
 	}
 	
-	public void addMeter(WorldPos pos, boolean movable, String name, Integer color, ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
-		
-		if (meterGroup == null) {
-			return;
-		}
-		
+	public void addMeter(ServerMeterGroup meterGroup, WorldPos pos, boolean movable, String name, Integer color) {
 		World world = server.getWorldOf(pos);
 		
 		if (world != null) {
@@ -219,7 +213,13 @@ public class Multimeter {
 	public void removeMeter(int index, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
-		if (meterGroup != null && meterGroup.removeMeter(index)) {
+		if (meterGroup != null) {
+			removeMeter(meterGroup, index);
+		}
+	}
+	
+	public void removeMeter(ServerMeterGroup meterGroup, int index) {
+		if (meterGroup.removeMeter(index)) {
 			RemoveMeterPacket packet = new RemoveMeterPacket(index);
 			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 		}
