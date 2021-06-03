@@ -4,14 +4,15 @@ import static rsmm.fabric.client.gui.HudSettings.*;
 
 import net.minecraft.client.util.math.MatrixStack;
 
+import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 
 public class PowerChangeEventRenderer extends BasicEventRenderer {
 	
-	public PowerChangeEventRenderer() {
-		super((m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
+	public PowerChangeEventRenderer(MultimeterClient client) {
+		super(client, (m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
 		
 		this.setType(EventType.POWER_CHANGE);
 	}

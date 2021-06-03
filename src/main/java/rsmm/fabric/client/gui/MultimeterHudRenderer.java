@@ -44,7 +44,7 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		
 		this.client = client;
 		this.font = minecraftClient.textRenderer;
-		this.eventRenderers = new MeterEventRendererDispatcher();
+		this.eventRenderers = new MeterEventRendererDispatcher(this.client);
 	}
 	
 	@Override
@@ -248,7 +248,7 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 				continue;
 			}
 			
-			eventRenderers.renderTickLogs(matrices, font, rowX, rowY, firstTick, currentTick, meter);
+			eventRenderers.renderTickLogs(matrices, rowX, rowY, firstTick, currentTick, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;
 		}
@@ -279,7 +279,7 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 				continue;
 			}
 			
-			eventRenderers.renderSubTickLogs(matrices, font, rowX, rowY, selectedTick, subTickCount, meter);
+			eventRenderers.renderSubTickLogs(matrices, rowX, rowY, selectedTick, subTickCount, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;
 		}

@@ -4,9 +4,9 @@ import static rsmm.fabric.client.gui.HudSettings.*;
 
 import java.util.function.BiFunction;
 
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
+import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
@@ -17,19 +17,19 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	protected final BiFunction<Meter, MeterEvent, Integer> edgeColorProvider;
 	protected final BiFunction<Meter, MeterEvent, Integer> centerColorProvider;
 	
-	public BasicEventRenderer() {
-		this((m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
+	public BasicEventRenderer(MultimeterClient client) {
+		this(client, (m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
 	}
 	
-	public BasicEventRenderer(BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {
-		super(null);
+	public BasicEventRenderer(MultimeterClient client, BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {
+		super(client, null);
 		
 		this.edgeColorProvider = edgeColorProvider;
 		this.centerColorProvider = centerColorProvider;
 	}
 	
 	@Override
-	public void renderTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long firstTick, long lastTick,  Meter meter) {
+	public void renderTickLogs(MatrixStack matrices, int x, int y, long firstTick, long lastTick,  Meter meter) {
 		y += GRID_SIZE;
 		
 		MeterLogs logs = meter.getLogs();
@@ -59,7 +59,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderSubTickLogs(MatrixStack matrices, int x, int y, long tick, int subTickCount, Meter meter) {
 		y += GRID_SIZE;
 		
 		MeterLogs logs = meter.getLogs();

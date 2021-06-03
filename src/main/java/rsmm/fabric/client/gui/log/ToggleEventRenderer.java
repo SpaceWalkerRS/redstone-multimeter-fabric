@@ -2,9 +2,9 @@ package rsmm.fabric.client.gui.log;
 
 import static rsmm.fabric.client.gui.HudSettings.*;
 
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
+import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
@@ -14,12 +14,12 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	
 	protected Mode mode;
 	
-	protected ToggleEventRenderer(EventType type) {
-		super(type);
+	protected ToggleEventRenderer(MultimeterClient client, EventType type) {
+		super(client, type);
 	}
 	
 	@Override
-	public void renderTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderTickLogs(MatrixStack matrices, int x, int y, long firstTick, long lastTick, Meter meter) {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
@@ -110,7 +110,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderSubTickLogs(MatrixStack matrices, int x, int y, long tick, int subTickCount, Meter meter) {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
