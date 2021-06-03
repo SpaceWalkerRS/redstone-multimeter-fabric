@@ -207,7 +207,7 @@ public class MultimeterScreen extends RSMMScreen {
 		lastScrollAmount = scrollAmount;
 		
 		if (scrollAmount != oldScrollAmount) {
-			int y = getY() - (int)(scrollAmount);
+			int y = getY() - (int)scrollAmount;
 			
 			for (IElement element : getChildren()) {
 				element.setY(y);

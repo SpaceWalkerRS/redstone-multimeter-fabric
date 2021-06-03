@@ -14,9 +14,9 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.block.MeterableBlock;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(BellBlock.class)
 public class BellBlockMixin implements IBlock, MeterableBlock {
@@ -31,7 +31,7 @@ public class BellBlockMixin implements IBlock, MeterableBlock {
 					target = "Lnet/minecraft/block/BellBlock;field_20648:Lnet/minecraft/state/property/BooleanProperty;"
 			)
 	)
-	private void onNeighborUpdateInjectBeforefield_20648_0(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
+	private void onNeighborUpdateInjectBeforePowered0(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
 		logPowered(world, pos, powered);
 	}
 	

@@ -1,12 +1,13 @@
 package rsmm.fabric.client.gui.log;
 
+import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 
 public class ActiveEventRenderer extends ToggleEventRenderer {
 	
-	public ActiveEventRenderer() {
-		super(EventType.ACTIVE);
+	public ActiveEventRenderer(MultimeterClient client) {
+		super(client, EventType.ACTIVE);
 	}
 	
 	@Override

@@ -1,9 +1,11 @@
-package rsmm.fabric.server;
+package rsmm.fabric.block;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import rsmm.fabric.interfaces.mixin.IServerWorld;
+import rsmm.fabric.server.Multimeter;
+import rsmm.fabric.server.MultimeterServer;
 
 public interface MeterableBlock extends Meterable {
 	
@@ -12,7 +14,7 @@ public interface MeterableBlock extends Meterable {
 			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 			
-			multimeter.blockUpdate(world, pos, powered);
+			multimeter.logPowered(world, pos, powered);
 		}
 	}
 }

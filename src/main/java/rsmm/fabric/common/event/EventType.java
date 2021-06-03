@@ -1,13 +1,10 @@
 package rsmm.fabric.common.event;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Direction;
 
 public enum EventType {
@@ -15,37 +12,68 @@ public enum EventType {
 	POWERED(0, "powered") {
 		
 		@Override
-		public void addTextForTooltip(List<List<Text>> tooltip, int metaData) {
-			boolean powered = (metaData == 1);
-			
-			List<Text> line0 = new ArrayList<>();
-			line0.add(new LiteralText("became powered: ").formatted(Formatting.GOLD));
-			line0.add(new LiteralText(String.valueOf(powered)));
-			tooltip.add(line0);
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			MeterEvent.addTextForTooltip(lines, "became powered", metaData == 1);
 		}
 	},
 	ACTIVE(1, "active") {
 		
 		@Override
-		public void addTextForTooltip(List<List<Text>> tooltip, int metaData) {
-			boolean active = (metaData == 1);
-			
-			List<Text> line0 = new ArrayList<>();
-			line0.add(new LiteralText("became active: ").formatted(Formatting.GOLD));
-			line0.add(new LiteralText(String.valueOf(active)));
-			tooltip.add(line0);
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			MeterEvent.addTextForTooltip(lines, "became active", metaData == 1);
 		}
 	},
 	MOVED(2, "moved") {
 		
 		@Override
-		public void addTextForTooltip(List<List<Text>> tooltip, int metaData) {
-			Direction dir = Direction.byId(metaData);
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			MeterEvent.addTextForTooltip(lines, "direction", Direction.byId(metaData).getName());
+		}
+	},
+	POWER_CHANGE(3, "power_change") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			int oldPower = (metaData >> 8) & 0xFF;
+			int newPower = metaData        & 0xFF;
 			
-			List<Text> line0 = new ArrayList<>();
-			line0.add(new LiteralText("direction: ").formatted(Formatting.GOLD));
-			line0.add(new LiteralText(dir.getName()));
-			tooltip.add(line0);
+			MeterEvent.addTextForTooltip(lines, "old power", oldPower);
+			MeterEvent.addTextForTooltip(lines, "new power", newPower);
+		}
+	},
+	RANDOM_TICK(4, "random_tick") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			
+		}
+	},
+	SCHEDULED_TICK(5, "scheduled_tick") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			MeterEvent.addTextForTooltip(lines, "priority", metaData);
+		}
+	},
+	BLOCK_EVENT(6, "block_event") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			MeterEvent.addTextForTooltip(lines, "type", metaData);
+		}
+	},
+	ENTITY_TICK(7, "entity_tick") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			
+		}
+	},
+	BLOCK_ENTITY_TICK(8, "block_entity_tick") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			
 		}
 	};
 	
@@ -94,6 +122,6 @@ public enum EventType {
 		return 1 << index;
 	}
 	
-	public abstract void addTextForTooltip(List<List<Text>> tooltip, int metaData);
+	public abstract void addTextForTooltip(List<Text> lines, int metaData);
 	
 }

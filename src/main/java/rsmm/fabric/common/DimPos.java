@@ -54,7 +54,15 @@ public class DimPos {
 	}
 	
 	public DimPos offset(Direction dir) {
-		return new DimPos(dimensionId, pos.offset(dir));
+		return offset(dir, 1);
+	}
+	
+	public DimPos offset(Direction dir, int distance) {
+		return new DimPos(dimensionId, pos.offset(dir, distance));
+	}
+	
+	public DimPos offset(int dx, int dy, int dz) {
+		return new DimPos(dimensionId, pos.add(dx, dy, dz));
 	}
 	
 	/**

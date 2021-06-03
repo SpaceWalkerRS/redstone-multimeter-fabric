@@ -1,5 +1,7 @@
 package rsmm.fabric.client.gui.widget;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -7,19 +9,26 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.text.Text;
 
 import rsmm.fabric.client.gui.element.IElement;
 
 public class TextField extends TextFieldWidget implements IElement {
 	
 	private final Supplier<String> textSupplier;
+	private final Supplier<List<Text>> tooltipSupplier;
 	
 	private boolean deaf;
 	
 	public TextField(TextRenderer textRenderer, int x, int y, int width, int height, Supplier<String> textSupplier, Consumer<String> textChangedListener) {
+		this(textRenderer, x, y, width, height, textSupplier, () -> Collections.emptyList(), textChangedListener);
+	}
+	
+	public TextField(TextRenderer textRenderer, int x, int y, int width, int height, Supplier<String> textSupplier, Supplier<List<Text>> tooltipSupplier, Consumer<String> textChangedListener) {
 		super(textRenderer, x + 1, y + 1, width - 2, height - 2, textSupplier.get());
 		
 		this.textSupplier = textSupplier;
+		this.tooltipSupplier = tooltipSupplier;
 		
 		this.updateMessage();
 		this.setChangedListener((text) -> {
@@ -149,6 +158,21 @@ public class TextField extends TextFieldWidget implements IElement {
 	@Override
 	public void setHeight(int height) {
 		this.height = height - 2;
+	}
+	
+	@Override
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	@Override
+	public List<Text> getTooltip(double mouseX, double mouseY) {
+		return tooltipSupplier.get();
 	}
 	
 	public void updateMessage() {

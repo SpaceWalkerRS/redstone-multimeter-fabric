@@ -14,7 +14,11 @@ public interface IParentElement extends IElement {
 		List<IElement> children = getChildren();
 		
 		for (int index = 0; index < children.size(); index++) {
-			children.get(index).render(mouseX, mouseY, delta);
+			IElement child = children.get(index);
+			
+			if (child.isVisible()) {
+				child.render(mouseX, mouseY, delta);
+			}
 		}
 	}
 	
@@ -23,16 +27,16 @@ public interface IParentElement extends IElement {
 		List<IElement> children = getChildren();
 		
 		for (int index = 0; index < children.size(); index++) {
-			children.get(index).mouseMove(mouseX, mouseY);
+			IElement child = children.get(index);
+			
+			if (child.isVisible()) {
+				child.mouseMove(mouseX, mouseY);
+			}
 		}
 	}
 	
 	@Override
 	default boolean mouseClick(double mouseX, double mouseY, int button) {
-		if (!isHovered(mouseX, mouseY)) {
-			return false;
-		}
-		
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			setDraggingMouse(true);
 		}
@@ -61,7 +65,7 @@ public interface IParentElement extends IElement {
 		for (int index = 0; index < children.size(); index++) {
 			IElement child = children.get(index);
 			
-			if (child.mouseRelease(mouseX, mouseY, button)) {
+			if (child.isVisible() && child.mouseRelease(mouseX, mouseY, button)) {
 				released = true;
 			}
 		}
@@ -125,12 +129,16 @@ public interface IParentElement extends IElement {
 		List<IElement> children = getChildren();
 		
 		for (int index = 0; index < children.size(); index++) {
-			children.get(index).tick();
+			IElement child = children.get(index);
+			
+			if (child.isVisible()) {
+				child.tick();
+			}
 		}
 	}
 	
 	@Override
-	default List<List<Text>> getTooltip(double mouseX, double mouseY) {
+	default List<Text> getTooltip(double mouseX, double mouseY) {
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
 		return hoveredElement == null ? Collections.emptyList() : hoveredElement.getTooltip(mouseX, mouseY);
 	}
@@ -154,7 +162,7 @@ public interface IParentElement extends IElement {
 			for (int index = 0; index < children.size(); index++) {
 				IElement child = children.get(index);
 				
-				if (child.isHovered(mouseX, mouseY)) {
+				if (child.isVisible() && child.isHovered(mouseX, mouseY)) {
 					return child;
 				}
 			}

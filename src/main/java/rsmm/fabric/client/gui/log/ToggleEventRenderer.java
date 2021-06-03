@@ -2,8 +2,7 @@ package rsmm.fabric.client.gui.log;
 
 import static rsmm.fabric.client.gui.HudSettings.*;
 
-import net.minecraft.client.font.TextRenderer;
-
+import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
@@ -13,12 +12,12 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	
 	protected Mode mode;
 	
-	protected ToggleEventRenderer(EventType type) {
-		super(type);
+	protected ToggleEventRenderer(MultimeterClient client, EventType type) {
+		super(client, type);
 	}
 	
 	@Override
-	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderTickLogs(int x, int y, long firstTick, long lastTick, Meter meter) {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
@@ -109,7 +108,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubTickLogs(TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderSubTickLogs(int x, int y, long tick, int subTickCount, Meter meter) {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
@@ -213,6 +212,6 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	protected enum Mode {
-		ALL, TOP, BOTTOM;
+		ALL, TOP, BOTTOM
 	}
 }

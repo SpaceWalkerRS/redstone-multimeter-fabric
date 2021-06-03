@@ -5,14 +5,7 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.Matrix4f;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
@@ -40,7 +33,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	
 	@Override
 	public final boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return mouseClick(mouseX, mouseY, button);
+		return isHovered(mouseX, mouseY) && mouseClick(mouseX, mouseY, button);
 	}
 	
 	@Override
@@ -88,10 +81,16 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		renderBackground();
 		renderContent(mouseX, mouseY, delta);
 		
-		List<List<Text>> tooltip = getTooltip(mouseX, mouseY);
+		List<Text> tooltip = getTooltip(mouseX, mouseY);
 		
 		if (!tooltip.isEmpty()) {
-			drawTooltip(tooltip, mouseX, mouseY + 15);
+			List<String> lines = new ArrayList<>();
+			
+			for (Text line : tooltip) {
+				lines.add(line.asFormattedString());
+			}
+			
+			renderTooltip(lines, mouseX, mouseY + 15);
 		}
 	}
 	
@@ -195,102 +194,21 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		
 	}
 	
+	@Override
+	public boolean isVisible() {
+		return true;
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		
+	}
+	
 	protected void addContent(IElement element) {
 		content.add(element);
 	}
 	
 	protected void renderContent(int mouseX, int mouseY, float delta) {
 		IParentElement.super.render(mouseX, mouseY, delta);
-	}
-	
-	public void drawTooltip(List<List<Text>> lines, int x, int y) {
-		if (lines.isEmpty()) {
-			return;
-		}
-		
-		int width = 0;
-		
-		for (List<Text> line : lines) {
-			int lineWidth = 0;
-			
-			for (Text text : line) {
-				lineWidth += font.getStringWidth(text.asFormattedString());
-			}
-			
-			if (lineWidth > width) {
-				width = lineWidth;
-			}
-		}
-		
-		int left = x + 12;
-		int top = y - 12;
-		
-		int height = 8;
-		
-		if (lines.size() > 1) {
-			height += 2 + 10 * (lines.size() - 1);
-		}
-		
-		if (left + width > getX() + getWidth()) {
-			left -= (28 + width);
-		}
-		if (top + height + 6 > getY() + getHeight()) {
-			top = (getY() + getHeight()) - height - 6;
-		}
-		
-		int backgroundColor  = 0xF0100010;
-		int borderColorStart = 0x505000FF;
-		int borderColorEnd   = 0x5028007F;
-		
-		setBlitOffset(300);
-        itemRenderer.zOffset = 300.0F;
-		
-		MatrixStack matrices = new MatrixStack();
-		Matrix4f model = matrices.peek().getModel();
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		
-		RenderSystem.disableRescaleNormal();
-		RenderSystem.disableDepthTest();
-		
-		fillGradient(left - 3        , top - 4         , left + width + 3, top - 3         , backgroundColor, backgroundColor);
-		fillGradient(left - 3        , top + height + 3, left + width + 3, top + height + 4, backgroundColor, backgroundColor);
-		fillGradient(left - 3        , top - 3         , left + width + 3, top + height + 3, backgroundColor, backgroundColor);
-		fillGradient(left - 4        , top - 3         , left - 3        , top + height + 3, backgroundColor, backgroundColor);
-		fillGradient(left + width + 3, top - 3         , left + width + 4, top + height + 3, backgroundColor, backgroundColor);
-		fillGradient(left - 3        , top - 2         , left - 2        , top + height + 2, borderColorStart, borderColorEnd);
-		fillGradient(left + width + 2, top - 2         , left + width + 3, top + height + 2, borderColorStart, borderColorEnd);
-		fillGradient(left - 3        , top - 3         , left + width + 3, top - 2         , borderColorStart, borderColorStart);
-		fillGradient(left - 3        , top + height + 2, left + width + 3, top + height + 3, borderColorEnd, borderColorEnd);
-		
-		VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(bufferBuilder);
-		
-		matrices.translate(0.0D, 0.0D, itemRenderer.zOffset);
-		
-		int textX;
-		int textY = top;
-		
-		for (List<Text> line : lines) {
-			textX = left;
-			
-			for (Text text : line) {
-				String string = text.asFormattedString();
-				font.draw(string, textX, textY, -1, true, model, immediate, false, 0, 15728880);
-				
-				textX += font.getStringWidth(string);
-			}
-			
-			textY += 10;
-		}
-		
-		immediate.draw();
-		
-		RenderSystem.enableRescaleNormal();
-		RenderSystem.enableDepthTest();
-		
-		matrices.pop();
-		
-		setBlitOffset(0);
-        itemRenderer.zOffset = 0.0F;
 	}
 }

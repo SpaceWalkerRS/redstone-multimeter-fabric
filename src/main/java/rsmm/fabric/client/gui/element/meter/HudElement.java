@@ -12,6 +12,7 @@ import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.HudSettings;
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
+import rsmm.fabric.client.gui.widget.Button;
 import rsmm.fabric.client.gui.widget.InvisibleButton;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
@@ -38,7 +39,6 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	
 	private boolean draggingTicksTable;
 	private double mouseDragDeltaX;
-	private boolean mouseDragged;
 	
 	public HudElement(MultimeterClient client, int x, int y, int width) {
 		this.client = client;
@@ -48,13 +48,18 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		this.y = y;
 		this.width = width;
 		
+		hudRenderer.ignoreHiddenMeters(false);
+		
 		this.meterControls = new MeterControlsElement(this.client, x, y + hudRenderer.getTotalHeight(), width);
 		this.playPauseButton = new InvisibleButton(client, x, y, 9, 9, () -> new LiteralText(hudRenderer.isPaused() ? "\u23f5" : "\u23f8"), (button) -> {
 			client.getHudRenderer().pause();
 			button.updateMessage();
+			
+			return true;
 		});
 		this.fastBackwardButton = new InvisibleButton(client, x, y, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ed" : "\u23e9"), (button) -> {
 			client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
+			return true;
 		}) {
 			
 			@Override
@@ -64,6 +69,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		};
 		this.fastForwardButton = new InvisibleButton(client, x, y, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ee" : "\u23ea"), (button) -> {
 			client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
+			return true;
 		}) {
 			
 			@Override
@@ -101,14 +107,23 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean success = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success && (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) && mouseY >= y && mouseY <= (y + hudRenderer.getTableHeight())) {
+		if (!success && (button == GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
 			int hoveredTickColumn = hudRenderer.getHoveredTickColumn();
 			
 			if (hoveredTickColumn >= 0) {
 				draggingTicksTable = true;
+				success = true;
+			} else {
+				int hoveredRow = hudRenderer.getHoveredRow();
+				int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
+				
+				if (hoveredNameColumn >= 0) {
+					success = meterControls.selectMeter(hoveredRow);
+					Button.playClickSound(client);
+				} else if (mouseY < (y + hudRenderer.getTotalHeight())) {
+					success = meterControls.selectMeter(-1);
+				}
 			}
-			
-			success = true;
 		}
 		
 		return success;
@@ -121,19 +136,6 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			draggingTicksTable = false;
 			mouseDragDeltaX = 0.0D;
-			
-			if (!mouseDragged && mouseX >= x && mouseX <= (x + width) && mouseY >= y && mouseY <= (y + hudRenderer.getTotalHeight())) {
-				int hoveredRow = hudRenderer.getHoveredRow();
-				int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
-				
-				if (hoveredRow >= 0 && hoveredNameColumn >= 0) {
-					success |= meterControls.selectMeter(hoveredRow);
-				} else if (!success) {
-					meterControls.selectMeter(-1);
-				}
-			}
-			
-			mouseDragged = false;
 		}
 		
 		return success;
@@ -143,7 +145,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		boolean dragged = super.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
 		
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (isDraggingMouse() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			if (draggingTicksTable) {
 				mouseDragDeltaX += deltaX;
 				int scrollAmount = (int)Math.round(mouseDragDeltaX / (HudSettings.COLUMN_WIDTH + HudSettings.GRID_SIZE));
@@ -153,8 +155,6 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 				
 				dragged = true;
 			}
-			
-			mouseDragged = true;
 		}
 		
 		return dragged;
@@ -168,9 +168,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		MeterChangeDispatcher.removeListener(this);
 		MeterGroupChangeDispatcher.removeListener(this);
 		
-		if (hudRenderer.isPaused()) {
-			hudRenderer.pause();
-		}
+		hudRenderer.ignoreHiddenMeters(true);
 	}
 	
 	@Override
@@ -199,14 +197,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	@Override
 	public void setY(int y) {
 		this.y = y;
-		
-		int y0 = y + hudRenderer.getTotalHeight();
-		int y1 = y + hudRenderer.getTableHeight() + 2;
-		
-		meterControls.setY(y0);
-		playPauseButton.setY(y1);
-		fastForwardButton.setY(y1);
-		fastBackwardButton.setY(y1);
+		updateControlsY();
 	}
 	
 	@Override
@@ -231,8 +222,8 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	}
 	
 	@Override
-	public List<List<Text>> getTooltip(double mouseX, double mouseY) {
-		List<List<Text>> tooltip = super.getTooltip(mouseX, mouseY);
+	public List<Text> getTooltip(double mouseX, double mouseY) {
+		List<Text> tooltip = super.getTooltip(mouseX, mouseY);
 		
 		if (tooltip.isEmpty()) {
 			tooltip = hudRenderer.getTextForTooltip();
@@ -254,16 +245,19 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	@Override
 	public void cleared(MeterGroup meterGroup) {
 		updateHudControlsX();
+		updateControlsY();
 	}
 	
 	@Override
 	public void meterAdded(MeterGroup meterGroup, int index) {
 		updateHudControlsX();
+		updateControlsY();
 	}
 	
 	@Override
 	public void meterRemoved(MeterGroup meterGroup, int index) {
 		updateHudControlsX();
+		updateControlsY();
 	}
 	
 	@Override
@@ -291,6 +285,11 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		
 	}
 	
+	@Override
+	public void isHiddenChanged(Meter meter) {
+		
+	}
+	
 	private void updateHudControlsX() {
 		int x = this.x + hudRenderer.getNamesWidth() + HudSettings.TICKS_TABLE_WIDTH;
 		
@@ -302,5 +301,15 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		
 		x -= fastForwardButton.getWidth();
 		fastForwardButton.setX(x);
+	}
+	
+	private void updateControlsY() {
+		int y0 = y + hudRenderer.getTotalHeight();
+		int y1 = y + hudRenderer.getTableHeight() + 2;
+		
+		meterControls.setY(y0);
+		playPauseButton.setY(y1);
+		fastForwardButton.setY(y1);
+		fastBackwardButton.setY(y1);
 	}
 }
