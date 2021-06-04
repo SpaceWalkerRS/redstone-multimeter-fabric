@@ -6,9 +6,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ComparatorBlockEntity;
+import net.minecraft.util.math.BlockPos;
 
 import rsmm.fabric.interfaces.mixin.IServerWorld;
 import rsmm.fabric.server.Multimeter;
@@ -19,8 +21,8 @@ public class ComparatorBlockEntityMixin extends BlockEntity {
 	
 	@Shadow private int outputSignal;
 	
-	public ComparatorBlockEntityMixin(BlockEntityType<?> type) {
-		super(type);
+	public ComparatorBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 	}
 	
 	@Inject(

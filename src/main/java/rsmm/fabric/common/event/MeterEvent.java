@@ -3,7 +3,7 @@ package rsmm.fabric.common.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -118,8 +118,8 @@ public class MeterEvent {
 			append(new LiteralText(info));
 	}
 	
-	public CompoundTag toTag() {
-		CompoundTag data = new CompoundTag();
+	public NbtCompound toNBT() {
+		NbtCompound data = new NbtCompound();
 		
 		NBTUtils.putEventType(data, "type", type);
 		data.putLong("tick", tick);
@@ -130,7 +130,7 @@ public class MeterEvent {
 		return data;
 	}
 	
-	public void fromTag(CompoundTag data) {
+	public void fromNBT(NbtCompound data) {
 		type = NBTUtils.getEventType(data, "type");
 		tick = data.getLong("tick");
 		subTick = data.getInt("subTick");
@@ -138,9 +138,9 @@ public class MeterEvent {
 		metaData = data.getInt("metaData");
 	}
 	
-	public static MeterEvent createFromTag(CompoundTag tag) {
+	public static MeterEvent createFromNBT(NbtCompound nbt) {
 		MeterEvent event = new MeterEvent();
-		event.fromTag(tag);
+		event.fromNBT(nbt);
 		
 		return event;
 	}

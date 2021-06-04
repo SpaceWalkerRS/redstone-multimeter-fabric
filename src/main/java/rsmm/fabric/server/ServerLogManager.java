@@ -1,6 +1,6 @@
 package rsmm.fabric.server;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
@@ -48,8 +48,8 @@ public class ServerLogManager extends LogManager {
 		meter.markDirty();
 	}
 	
-	public CompoundTag collectMeterLogs() {
-		CompoundTag data = new CompoundTag();
+	public NbtCompound collectMeterLogs() {
+		NbtCompound data = new NbtCompound();
 		
 		int subTickCount = currentSubTick;
 		int meterCount = meterGroup.getMeterCount();
@@ -61,7 +61,7 @@ public class ServerLogManager extends LogManager {
 			
 			if (meter.hasNewLogs()) {
 				String key = String.valueOf(index);
-				CompoundTag logs = meter.getLogs().toTag();
+				NbtCompound logs = meter.getLogs().toTag();
 				
 				data.put(key, logs);
 			}

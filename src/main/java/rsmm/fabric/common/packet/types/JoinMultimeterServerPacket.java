@@ -1,6 +1,6 @@
 package rsmm.fabric.common.packet.types;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.RedstoneMultimeterMod;
@@ -23,13 +23,13 @@ public class JoinMultimeterServerPacket extends AbstractRSMMPacket {
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
+	public void encode(NbtCompound data) {
 		data.putString("modVersion", modVersion);
 		data.putLong("serverTime", currentServerTick);
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NbtCompound data) {
 		modVersion = data.getString("modVersion");
 		currentServerTick = data.getLong("serverTime");
 	}

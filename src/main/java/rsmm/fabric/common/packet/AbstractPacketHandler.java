@@ -1,10 +1,11 @@
 package rsmm.fabric.common.packet;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -18,7 +19,7 @@ public abstract class AbstractPacketHandler {
 	
 	protected Packet<?> encodePacket(AbstractRSMMPacket packet) {
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
-		CompoundTag data = new CompoundTag();
+		NbtCompound data = new NbtCompound();
 		
 		PacketType packetType = PacketType.fromPacket(packet);
 		if (packetType == PacketType.INVALID) {
@@ -27,22 +28,22 @@ public abstract class AbstractPacketHandler {
 		packet.encode(data);
 		
 		buffer.writeByte(packetType.getIndex());
-		buffer.writeCompoundTag(data);
+		buffer.writeNbt(data);
 		
 		return toCustomPayloadPacket(buffer);
 	}
 	
 	protected abstract Packet<?> toCustomPayloadPacket(PacketByteBuf buffer);
 	
-	protected AbstractRSMMPacket decodePacket(PacketByteBuf buffer) throws InstantiationException, IllegalAccessException {
+	protected AbstractRSMMPacket decodePacket(PacketByteBuf buffer) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		byte index = buffer.readByte();
-		CompoundTag data = buffer.readCompoundTag();
+		NbtCompound data = buffer.readNbt();
 		
 		PacketType type = PacketType.fromIndex(index);
 		if (type == PacketType.INVALID) {
 			throw new IllegalStateException("Unable to decode packet type: " + index);
 		}
-		AbstractRSMMPacket packet = type.getClazz().newInstance();
+		AbstractRSMMPacket packet = type.getClazz().getDeclaredConstructor().newInstance();
 		
 		packet.decode(data);
 		

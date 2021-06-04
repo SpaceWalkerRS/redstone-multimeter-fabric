@@ -37,10 +37,12 @@ public class WorldChunkMixin {
 					target = "Lnet/minecraft/block/BlockState;onStateReplaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Z)V"
 			)
 	)
-	private void onSetBlockStateInjectBeforeStateReplaced(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int chunkX, int y, int chunkZ, ChunkSection chunkSection, boolean isEmpty, BlockState oldState, Block newBlock, Block oldBlock) {
+	private void onSetBlockStateInjectBeforeStateReplaced(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int y, int chunkSectionIndex, ChunkSection chunkSection, boolean wasEmpty, int chunkX, int subChunkY, int chunkZ, BlockState oldState, Block newBlock) {
 		if (world.isClient()) {
 			return;
 		}
+		
+		Block oldBlock = oldState.getBlock();
 		
 		MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 		Multimeter multimeter = server.getMultimeter();

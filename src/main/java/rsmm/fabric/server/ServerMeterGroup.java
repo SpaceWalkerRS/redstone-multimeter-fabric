@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -184,8 +184,8 @@ public class ServerMeterGroup extends MeterGroup {
 		return false;
 	}
 	
-	public CompoundTag collectMeterChanges() {
-		CompoundTag meterChanges = new CompoundTag();
+	public NbtCompound collectMeterChanges() {
+		NbtCompound meterChanges = new NbtCompound();
 		
 		int meterCount = getMeterCount();
 		
@@ -194,7 +194,7 @@ public class ServerMeterGroup extends MeterGroup {
 			
 			if (meter.isDirty()) {
 				String key = String.valueOf(index);
-				CompoundTag meterData = meter.toTag();
+				NbtCompound meterData = meter.toNBT();
 				
 				meterChanges.put(key, meterData);
 			}

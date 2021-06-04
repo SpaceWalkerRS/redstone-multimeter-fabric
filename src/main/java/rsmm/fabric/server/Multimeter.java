@@ -17,7 +17,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ServerWorld;
@@ -118,7 +118,7 @@ public class Multimeter {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			if (meterGroup.isDirty()) {
 				if (meterGroup.hasSubscribers()) {
-					CompoundTag data = meterGroup.collectMeterChanges();
+					NbtCompound data = meterGroup.collectMeterChanges();
 					MeterChangesPacket packet = new MeterChangesPacket(data);
 					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 				}
@@ -137,7 +137,7 @@ public class Multimeter {
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
 			if (meterGroup.hasNewLogs()) {
 				if (meterGroup.hasSubscribers()) {
-					CompoundTag data = meterGroup.getLogManager().collectMeterLogs();
+					NbtCompound data = meterGroup.getLogManager().collectMeterLogs();
 					MeterLogsPacket packet = new MeterLogsPacket(data);
 					server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 				}
@@ -163,14 +163,14 @@ public class Multimeter {
 	 * Add a meter at the position the player is looking at
 	 * or remove it if there already is one.
 	 */
-	public void toggleMeter(CompoundTag properties, ServerPlayerEntity player) {
+	public void toggleMeter(NbtCompound properties, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
 		if (meterGroup == null) {
 			return;
 		}
 		
-		WorldPos pos = NBTUtils.tagToWorldPos(properties.getCompound("pos"));
+		WorldPos pos = NBTUtils.NBTToWorldPos(properties.getCompound("pos"));
 		boolean movable = properties.getBoolean("movable");
 		
 		if (meterGroup.hasMeterAt(pos)) {
@@ -312,14 +312,14 @@ public class Multimeter {
 		server.getPacketHandler().sendPacketToPlayer(packet, player);
 	}
 	
-	public void meterGroupDataReceived(String name, CompoundTag data, ServerPlayerEntity player) {
+	public void meterGroupDataReceived(String name, NbtCompound data, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = meterGroups.get(name);
 		
 		// This allows a player to carry over a meter group
 		// between different worlds and/or servers
 		if (meterGroup == null) {
 			meterGroup = new ServerMeterGroup(this, name);
-			meterGroup.fromTag(data);
+			meterGroup.fromNBT(data);
 			
 			meterGroups.put(name, meterGroup);
 		}
@@ -348,8 +348,8 @@ public class Multimeter {
 					double newX = blockPos.getX() + 0.5D;
 					double newY = blockPos.getY();
 					double newZ = blockPos.getZ() + 0.5D;
-					float yaw = player.yaw;
-					float pitch = player.pitch;
+					float yaw = player.getYaw();
+					float pitch = player.getPitch();
 					
 					player.teleport(newWorld, newX, newY, newZ, yaw, pitch);
 					sendClickableReturnMessage(oldWorld, oldX, oldY, oldZ, yaw, pitch, player);

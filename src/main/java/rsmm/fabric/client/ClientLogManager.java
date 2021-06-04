@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
@@ -50,7 +50,7 @@ public class ClientLogManager extends LogManager {
 	/**
 	 * Log all events from the past server tick
 	 */
-	public void updateMeterLogs(CompoundTag data) {
+	public void updateMeterLogs(NbtCompound data) {
 		long lastTick = getLastTick();
 		int meterCount = meterGroup.getMeterCount();
 		
@@ -62,9 +62,9 @@ public class ClientLogManager extends LogManager {
 			
 			if (data.contains(key)) {
 				Meter meter = meterGroup.getMeter(index);
-				CompoundTag logs = data.getCompound(key);
+				NbtCompound logs = data.getCompound(key);
 				
-				meter.getLogs().updateFromTag(logs);
+				meter.getLogs().updateFromNBT(logs);
 			}
 		}
 	}

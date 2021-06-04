@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
@@ -125,18 +125,18 @@ public class MeterLogs {
 		return event;
 	}
 	
-	public CompoundTag toTag() {
-		CompoundTag data = new CompoundTag();
+	public NbtCompound toTag() {
+		NbtCompound data = new NbtCompound();
 		
 		for (EventType type : eventLogs.keySet()) {
-			data.put(type.getName(), toTag(type));
+			data.put(type.getName(), toNBT(type));
 		}
 		
 		return data;
 	}
 	
-	public CompoundTag toTag(EventType type) {
-		CompoundTag data = new CompoundTag();
+	public NbtCompound toNBT(EventType type) {
+		NbtCompound data = new NbtCompound();
 		
 		List<MeterEvent> logs = eventLogs.get(type);
 		int logCount = logs.size();
@@ -145,7 +145,7 @@ public class MeterLogs {
 			MeterEvent event = logs.get(index);
 			
 			String key = String.valueOf(index);
-			CompoundTag eventData = event.toTag();
+			NbtCompound eventData = event.toNBT();
 			
 			data.put(key, eventData);
 		}
@@ -153,29 +153,29 @@ public class MeterLogs {
 		return data;
 	}
 	
-	public void updateFromTag(CompoundTag data) {
+	public void updateFromNBT(NbtCompound data) {
 		for (String key : data.getKeys()) {
 			EventType type = EventType.fromName(key);
 			
 			if (type != null) {
-				updateFromTag(data.getCompound(key), type);
+				updateFromNBT(data.getCompound(key), type);
 			}
 		}
 	}
 	
-	public void updateFromTag(CompoundTag data, EventType type) {
+	public void updateFromNBT(NbtCompound data, EventType type) {
 		Set<String> keys = data.getKeys();
 		int size = keys.size();
-		CompoundTag[] tags = new CompoundTag[size];
+		NbtCompound[] nbts = new NbtCompound[size];
 		
 		// Since the order of tags is not preserved
 		// we need to re-order them first
 		for (String key : keys) {
 			try {
 				int index = Integer.valueOf(key);
-				CompoundTag eventData = data.getCompound(key);
+				NbtCompound eventData = data.getCompound(key);
 				
-				tags[index] = eventData;
+				nbts[index] = eventData;
 			} catch (NumberFormatException e) {
 				
 			} catch (IndexOutOfBoundsException e) {
@@ -183,9 +183,9 @@ public class MeterLogs {
 			}
 		}
 		
-		for (CompoundTag tag : tags) {
-			if (tag != null) {
-				MeterEvent event = MeterEvent.createFromTag(tag);
+		for (NbtCompound nbt : nbts) {
+			if (nbt != null) {
+				MeterEvent event = MeterEvent.createFromNBT(nbt);
 				add(event);
 			}
 		}

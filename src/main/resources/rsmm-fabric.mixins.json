@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "rsmm.fabric.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
   	"meterable.AbstractButtonBlockMixin",
   	"meterable.AbstractRedstoneGateBlockMixin",
@@ -39,6 +39,7 @@
   	"server.BlockMixin",
   	"server.CommandManagerMixin",
   	"server.CustomPayloadC2SPacketMixin",
+  	"server.DirectBlockEntityTickInvokerMixin",
   	"server.FluidStateMixin",
   	"server.MinecraftServerMixin",
   	"server.PlayerManagerMixin",

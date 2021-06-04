@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -160,9 +160,9 @@ public class MultimeterClient {
 			World world = client.world;
 			BlockPos pos = ((BlockHitResult)hitResult).getBlockPos();
 			
-			CompoundTag properties = new CompoundTag();
+			NbtCompound properties = new NbtCompound();
 			
-			properties.put("pos", NBTUtils.worldPosToTag(new WorldPos(world, pos)));
+			properties.put("pos", NBTUtils.worldPosToNBT(new WorldPos(world, pos)));
 			properties.putBoolean("movable", !Screen.hasControlDown());
 			
 			ToggleMeterPacket packet = new ToggleMeterPacket(properties);
@@ -186,11 +186,11 @@ public class MultimeterClient {
 	 * the server sends all the data pertaining to
 	 * meters in that meter group to that client.
 	 */
-	public void meterGroupDataReceived(String name, CompoundTag data) {
+	public void meterGroupDataReceived(String name, NbtCompound data) {
 		if (!meterGroup.getName().equals(name)) {
 			meterGroup = new ClientMeterGroup(this, name);
 		}
 		
-		meterGroup.updateFromTag(data);
+		meterGroup.updateFromNBT(data);
 	}
 }

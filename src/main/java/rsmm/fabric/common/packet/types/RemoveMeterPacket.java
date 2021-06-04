@@ -1,6 +1,6 @@
 package rsmm.fabric.common.packet.types;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
@@ -20,12 +20,12 @@ public class RemoveMeterPacket extends AbstractRSMMPacket {
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
+	public void encode(NbtCompound data) {
 		data.putInt("meterIndex", meterIndex);
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NbtCompound data) {
 		meterIndex = data.getInt("meterIndex");
 	}
 	

@@ -67,7 +67,7 @@ public class MultimeterServer {
 	}
 	
 	public ServerWorld getWorld(Identifier worldId) {
-		RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, worldId);
+		RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, worldId);
 		return server.getWorld(key);
 	}
 	

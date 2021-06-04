@@ -1,6 +1,6 @@
 package rsmm.fabric.common.packet.types;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
@@ -11,7 +11,7 @@ import rsmm.fabric.server.MultimeterServer;
 public class MeterGroupDataPacket extends AbstractRSMMPacket {
 	
 	private String name;
-	private CompoundTag meterGroupData;
+	private NbtCompound meterGroupData;
 	
 	public MeterGroupDataPacket() {
 		
@@ -19,17 +19,17 @@ public class MeterGroupDataPacket extends AbstractRSMMPacket {
 	
 	public MeterGroupDataPacket(MeterGroup meterGroup) {
 		this.name = meterGroup.getName();
-		this.meterGroupData = meterGroup.toTag();
+		this.meterGroupData = meterGroup.toNBT();
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
+	public void encode(NbtCompound data) {
 		data.putString("name", name);
 		data.put("data", meterGroupData);
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NbtCompound data) {
 		name = data.getString("name");
 		meterGroupData = data.getCompound("data");
 	}

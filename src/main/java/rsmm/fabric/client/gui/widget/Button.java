@@ -9,6 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundManager;
@@ -53,7 +54,7 @@ public class Button extends ButtonWidget implements IElement {
 		TextureManager textureManager = minecraftClient.getTextureManager();
 		TextRenderer font = minecraftClient.textRenderer;
 		
-		textureManager.bindTexture(WIDGETS_LOCATION);
+		textureManager.bindTexture(WIDGETS_TEXTURE);
 		
 		int i = getYImage(isHovered());
 		int leftWidth = width / 2;
@@ -69,7 +70,9 @@ public class Button extends ButtonWidget implements IElement {
 		int textureY0 = 46 + i * 20;
 		int textureY1 = textureY0 + 20 - height + topBorder;
 		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
+		RenderSystem.setShader(() -> GameRenderer.getPositionTexShader());
+		RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.enableDepthTest();

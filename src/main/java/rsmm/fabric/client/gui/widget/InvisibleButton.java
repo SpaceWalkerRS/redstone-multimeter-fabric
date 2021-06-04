@@ -8,6 +8,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -41,7 +42,9 @@ public class InvisibleButton extends Button {
 			int textX = x + width - (width + textWidth) / 2;
 			int textY = y + (height - font.fontHeight) / 2 + 1;
 			
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
+			RenderSystem.setShader(() -> GameRenderer.getPositionTexShader());
+			RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
 			RenderSystem.enableDepthTest();

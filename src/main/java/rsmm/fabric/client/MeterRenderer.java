@@ -1,13 +1,12 @@
 package rsmm.fabric.client;
 
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -39,7 +38,6 @@ public class MeterRenderer {
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableTexture();
 		RenderSystem.depthMask(false);
-		RenderSystem.disableLighting();
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
@@ -50,7 +48,6 @@ public class MeterRenderer {
 			}
 		}
 		
-		RenderSystem.enableLighting();
 		RenderSystem.depthMask(true);
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
@@ -83,13 +80,13 @@ public class MeterRenderer {
 	}
 	
 	private void drawFilledBox(BufferBuilder builder, Tessellator tessellator, Matrix4f model, float r, float g, float b, float a) {
-		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+		builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		drawBox(builder, model, r, g, b, a, false);
 		tessellator.draw();
 	}
 	
 	private void drawBoxOutline(BufferBuilder builder, Tessellator tessellator, Matrix4f model, float r, float g, float b, float a) {
-		builder.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+		builder.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
 		drawBox(builder, model, r, g, b, a, true);
 		tessellator.draw();
 	}

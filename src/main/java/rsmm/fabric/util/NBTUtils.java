@@ -1,6 +1,6 @@
 package rsmm.fabric.util;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
@@ -10,50 +10,50 @@ import rsmm.fabric.common.event.EventType;
 
 public class NBTUtils {
 	
-	public static void putIdentifier(CompoundTag tag, String key, Identifier id) {
-		tag.putString(key, id.toString());
+	public static void putIdentifier(NbtCompound nbt, String key, Identifier id) {
+		nbt.putString(key, id.toString());
 	}
 	
-	public static Identifier getIdentifier(CompoundTag tag, String key) {
-		return tag.contains(key) ? new Identifier(tag.getString(key)) : null;
+	public static Identifier getIdentifier(NbtCompound nbt, String key) {
+		return nbt.contains(key) ? new Identifier(nbt.getString(key)) : null;
 	}
 	
-	public static void putEventType(CompoundTag tag, String key, EventType type) {
-		tag.putByte(key, (byte)type.getIndex());
+	public static void putEventType(NbtCompound nbt, String key, EventType type) {
+		nbt.putByte(key, (byte)type.getIndex());
 	}
 	
-	public static EventType getEventType(CompoundTag tag, String key) {
-		return tag.contains(key) ? EventType.fromIndex(tag.getByte(key)) : null;
+	public static EventType getEventType(NbtCompound nbt, String key) {
+		return nbt.contains(key) ? EventType.fromIndex(nbt.getByte(key)) : null;
 	}
 	
-	public static void putTickPhase(CompoundTag tag, String key, TickPhase tickPhase) {
-		tag.putByte(key, (byte)tickPhase.getIndex());
+	public static void putTickPhase(NbtCompound nbt, String key, TickPhase tickPhase) {
+		nbt.putByte(key, (byte)tickPhase.getIndex());
 	}
 	
-	public static TickPhase getTickPhase(CompoundTag tag, String key) {
-		return tag.contains(key) ? TickPhase.fromIndex(tag.getByte(key)) : null;
+	public static TickPhase getTickPhase(NbtCompound nbt, String key) {
+		return nbt.contains(key) ? TickPhase.fromIndex(nbt.getByte(key)) : null;
 	}
 	
-	public static CompoundTag worldPosToTag(WorldPos pos) {
-		CompoundTag tag = new CompoundTag();
+	public static NbtCompound worldPosToNBT(WorldPos pos) {
+		NbtCompound nbt = new NbtCompound();
 		
-		putIdentifier(tag, "worldId", pos.getWorldId());
-		tag.putInt("x", pos.asBlockPos().getX());
-		tag.putInt("y", pos.asBlockPos().getY());
-		tag.putInt("z", pos.asBlockPos().getZ());
+		putIdentifier(nbt, "worldId", pos.getWorldId());
+		nbt.putInt("x", pos.asBlockPos().getX());
+		nbt.putInt("y", pos.asBlockPos().getY());
+		nbt.putInt("z", pos.asBlockPos().getZ());
 		
-		return tag;
+		return nbt;
 	}
 	
-	public static WorldPos tagToWorldPos(CompoundTag tag) {
-		if (!tag.contains("worldId")) {
+	public static WorldPos NBTToWorldPos(NbtCompound nbt) {
+		if (!nbt.contains("worldId")) {
 			return null;
 		}
 		
-		Identifier worldId = getIdentifier(tag, "worldId");
-		int x = tag.getInt("x");
-		int y = tag.getInt("y");
-		int z = tag.getInt("z");
+		Identifier worldId = getIdentifier(nbt, "worldId");
+		int x = nbt.getInt("x");
+		int y = nbt.getInt("y");
+		int z = nbt.getInt("z");
 		
 		return new WorldPos(worldId, new BlockPos(x, y, z));
 	}

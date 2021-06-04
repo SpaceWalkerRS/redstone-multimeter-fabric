@@ -1,13 +1,13 @@
 package rsmm.fabric.client.gui;
 
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -258,7 +258,7 @@ public class MultimeterScreen extends RSMMScreen {
 		int barTop = scrollBarY + scrollBarHeight * (int)scrollAmount / totalHeight;
 		int barBot = scrollBarY + scrollBarHeight * ((int)scrollAmount + getHeight()) / totalHeight;
 		
-		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 		
 		bufferBuilder.vertex(bgLeft, bgBot, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 255).next();
 		bufferBuilder.vertex(bgRight, bgBot, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 255).next();

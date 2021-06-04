@@ -1,6 +1,6 @@
 package rsmm.fabric.common.packet.types;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
@@ -14,7 +14,7 @@ import rsmm.fabric.util.NBTUtils;
 public class MeterChangePacket extends AbstractRSMMPacket {
 	
 	private int meterIndex;
-	private CompoundTag properties;
+	private NbtCompound properties;
 	
 	public MeterChangePacket() {
 		
@@ -22,11 +22,11 @@ public class MeterChangePacket extends AbstractRSMMPacket {
 	
 	public MeterChangePacket(int meterIndex) {
 		this.meterIndex = meterIndex;
-		this.properties = new CompoundTag();
+		this.properties = new NbtCompound();
 	}
 	
 	public void addPos(WorldPos pos) {
-		properties.put("pos", NBTUtils.worldPosToTag(pos));
+		properties.put("pos", NBTUtils.worldPosToNBT(pos));
 	}
 	
 	public void addName(String name) {
@@ -46,13 +46,13 @@ public class MeterChangePacket extends AbstractRSMMPacket {
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
+	public void encode(NbtCompound data) {
 		data.putInt("meterIndex", meterIndex);
 		data.put("properties", properties);
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NbtCompound data) {
 		meterIndex = data.getInt("meterIndex");
 		properties = data.getCompound("properties");
 	}
@@ -62,7 +62,7 @@ public class MeterChangePacket extends AbstractRSMMPacket {
 		Multimeter multimeter = server.getMultimeter();
 		
 		if (properties.contains("pos")) {
-			WorldPos pos = NBTUtils.tagToWorldPos(properties.getCompound("pos"));
+			WorldPos pos = NBTUtils.NBTToWorldPos(properties.getCompound("pos"));
 			multimeter.moveMeter(meterIndex, pos, player);
 		}
 		if (properties.contains("name")) {

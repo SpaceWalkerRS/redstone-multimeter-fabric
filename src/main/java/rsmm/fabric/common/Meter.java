@@ -1,6 +1,6 @@
 package rsmm.fabric.common;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -217,37 +217,37 @@ public class Meter {
 		return false;
 	}
 	
-	public CompoundTag toTag() {
-		return toTag(new CompoundTag());
+	public NbtCompound toNBT() {
+		return toNBT(new NbtCompound());
 	}
 	
-	public CompoundTag toTag(CompoundTag tag) {
-		tag.put("pos", NBTUtils.worldPosToTag(pos));
-		tag.putString("name", name);
-		tag.putInt("color", color);
-		tag.putBoolean("movable", movable);
+	public NbtCompound toNBT(NbtCompound nbt) {
+		nbt.put("pos", NBTUtils.worldPosToNBT(pos));
+		nbt.putString("name", name);
+		nbt.putInt("color", color);
+		nbt.putBoolean("movable", movable);
 		
-		tag.putInt("eventTypes", eventTypes);
-		tag.putBoolean("powered", powered);
-		tag.putBoolean("active", active);
+		nbt.putInt("eventTypes", eventTypes);
+		nbt.putBoolean("powered", powered);
+		nbt.putBoolean("active", active);
 		
-		return tag;
+		return nbt;
 	}
 	
-	public Meter fromTag(CompoundTag tag) {
-		setPos(NBTUtils.tagToWorldPos(tag.getCompound("pos")));
-		setName(tag.getString("name"));
-		setColor(tag.getInt("color"));
-		setIsMovable(tag.getBoolean("movable"));
+	public Meter fromNBT(NbtCompound nbt) {
+		setPos(NBTUtils.NBTToWorldPos(nbt.getCompound("pos")));
+		setName(nbt.getString("name"));
+		setColor(nbt.getInt("color"));
+		setIsMovable(nbt.getBoolean("movable"));
 		
-		setMeteredEventTypes(tag.getInt("eventTypes"));
-		powered = tag.getBoolean("powered");
-		active = tag.getBoolean("active");
+		setMeteredEventTypes(nbt.getInt("eventTypes"));
+		powered = nbt.getBoolean("powered");
+		active = nbt.getBoolean("active");
 		
 		return this;
 	}
 	
-	public static Meter createFromTag(CompoundTag tag) {
-		return new Meter().fromTag(tag);
+	public static Meter createFromNBT(NbtCompound nbt) {
+		return new Meter().fromNBT(nbt);
 	}
 }

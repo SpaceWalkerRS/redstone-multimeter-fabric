@@ -1,6 +1,6 @@
 package rsmm.fabric.client;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
@@ -25,7 +25,7 @@ public class ClientMeterGroup extends MeterGroup {
 		return logManager;
 	}
 	
-	public void updateMeters(CompoundTag meterChanges) {
+	public void updateMeters(NbtCompound meterChanges) {
 		int meterCount = getMeterCount();
 		
 		for (int index = 0; index < meterCount; index++) {
@@ -33,9 +33,9 @@ public class ClientMeterGroup extends MeterGroup {
 			
 			if (meterChanges.contains(key)) {
 				Meter meter = getMeter(index);
-				CompoundTag meterData = meterChanges.getCompound(key);
+				NbtCompound meterData = meterChanges.getCompound(key);
 				
-				meter.fromTag(meterData);
+				meter.fromNBT(meterData);
 			}
 		}
 	}

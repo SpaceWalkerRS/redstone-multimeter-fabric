@@ -1,6 +1,6 @@
 package rsmm.fabric.common.packet.types;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
@@ -9,23 +9,23 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class ToggleMeterPacket extends AbstractRSMMPacket {
 	
-	private CompoundTag properties;
+	private NbtCompound properties;
 	
 	public ToggleMeterPacket() {
 		
 	}
 	
-	public ToggleMeterPacket(CompoundTag properties) {
+	public ToggleMeterPacket(NbtCompound properties) {
 		this.properties = properties;
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
+	public void encode(NbtCompound data) {
 		data.put("properties", properties);
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NbtCompound data) {
 		properties = data.getCompound("properties");
 	}
 	
