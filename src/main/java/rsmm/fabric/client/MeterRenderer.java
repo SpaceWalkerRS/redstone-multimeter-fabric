@@ -41,12 +41,9 @@ public class MeterRenderer {
 		RenderSystem.depthMask(false);
 		RenderSystem.disableLighting();
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
-		
 		for (Meter meter : meterGroup.getMeters()) {
 			if (meter.isIn(minecraftClient.world)) {
-				drawMeter(matrices, builder, tessellator, meter);
+				drawMeter(matrices, meter);
 			}
 		}
 		
@@ -56,7 +53,10 @@ public class MeterRenderer {
 		RenderSystem.disableBlend();
 	}
 	
-	private void drawMeter(MatrixStack matrices, BufferBuilder builder, Tessellator tessellator, Meter meter) {
+	private void drawMeter(MatrixStack matrices, Meter meter) {
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder builder = tessellator.getBuffer();
+		
 		BlockPos pos = meter.getPos().asBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();

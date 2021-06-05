@@ -24,7 +24,6 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		y += GRID_SIZE;
 		int color = meter.getColor();
-		boolean drawPulseLength = (mode == Mode.ALL);
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, firstTick);
@@ -74,7 +73,51 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				draw(matrices, columnX, y, color, (int)(end - start));
 			}
 			
-			if (drawPulseLength && event != null && nextEvent != null) {
+			do {
+				event = nextEvent;
+				nextEvent = logs.getLog(type, ++index);
+			} while (nextEvent != null && nextEvent.getTick() == currentTick);
+			
+			if (event == null) {
+				break;
+			}
+		}
+	}
+	
+	@Override
+	public void renderPulseLengths(MatrixStack matrices, int x, int y, long firstTick, long lastTick, Meter meter) {
+		if (mode != Mode.ALL) {
+			return;
+		}
+		
+		y += GRID_SIZE;
+		int color = meter.getColor();
+		
+		MeterLogs logs = meter.getLogs();
+		int index = logs.getLastLogBefore(type, firstTick);
+		MeterEvent event = logs.getLog(type, index);
+		MeterEvent nextEvent = logs.getLog(type, ++index);
+		
+		if (nextEvent == null) {
+			return;
+		}
+		
+		long lastHudTick = firstTick + COLUMN_COUNT;
+		
+		if (lastHudTick > lastTick) {
+			lastHudTick = lastTick;
+		}
+		
+		long currentTick = -1;
+		
+		while (event == null || event.isBefore(lastHudTick)) {
+			boolean eventInTable = (event != null && !event.isBefore(firstTick));
+			boolean nextEventInTable = (nextEvent != null && nextEvent.isBefore(lastHudTick));
+			
+			long start = eventInTable ? event.getTick() + 1 : firstTick;
+			long end = nextEventInTable ? nextEvent.getTick() : lastHudTick;
+			
+			if (event != null && nextEvent != null) {
 				long pulseLength = nextEvent.getTick() - event.getTick();
 				
 				if (pulseLength > 5) {
@@ -84,7 +127,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					String text = String.valueOf(pulseLength);
 					
 					int availableWidth = endX - startX;
-					int requiredWidth = font.getWidth(text);
+					int requiredWidth = font.getWidth(text) + 1;
 					
 					if (requiredWidth < availableWidth) {
 						boolean toggled = wasToggled(event);

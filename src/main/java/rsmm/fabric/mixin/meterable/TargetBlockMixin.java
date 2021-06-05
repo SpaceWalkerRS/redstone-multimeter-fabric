@@ -8,11 +8,11 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.block.MeterableBlock;
+import rsmm.fabric.block.Meterable;
 import rsmm.fabric.block.PowerSource;
 
 @Mixin(TargetBlock.class)
-public class TargetBlockMixin implements MeterableBlock, PowerSource {
+public class TargetBlockMixin implements Meterable, PowerSource {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
