@@ -24,7 +24,6 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		y += GRID_SIZE;
 		int color = meter.getColor();
-		boolean drawPulseLength = (mode == Mode.ALL);
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, firstTick);
@@ -72,30 +71,6 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 				
 				draw(matrices, columnX, y, color, (int)(end - start));
-			}
-			
-			if (drawPulseLength && event != null && nextEvent != null) {
-				long pulseLength = nextEvent.getTick() - event.getTick();
-				
-				if (pulseLength > 5) {
-					int startX = x + (int)(start - firstTick) * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
-					int endX = x + (int)(end - firstTick) * (COLUMN_WIDTH + GRID_SIZE) - GRID_SIZE;
-					
-					String text = String.valueOf(pulseLength);
-					
-					int availableWidth = endX - startX;
-					int requiredWidth = font.getWidth(text);
-					
-					if (requiredWidth < availableWidth) {
-						boolean toggled = wasToggled(event);
-						
-						int bgColor = toggled ? color : BACKGROUND_COLOR_TRANSPARENT;
-						int textColor = toggled ? POWERED_TEXT_COLOR : UNPOWERED_TEXT_COLOR;
-						
-						fill(matrices, startX, y, startX + requiredWidth, y + ROW_HEIGHT, bgColor);
-						font.draw(matrices, text, startX + 1, y + 1, textColor);
-					}
-				}
 			}
 			
 			do {
