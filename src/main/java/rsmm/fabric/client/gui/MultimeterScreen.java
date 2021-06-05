@@ -6,6 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -241,6 +242,7 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	private void renderScrollBar(MatrixStack matrices) {
 		RenderSystem.disableTexture();
+		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -258,21 +260,21 @@ public class MultimeterScreen extends RSMMScreen {
 		int barTop = scrollBarY + scrollBarHeight * (int)scrollAmount / totalHeight;
 		int barBot = scrollBarY + scrollBarHeight * ((int)scrollAmount + getHeight()) / totalHeight;
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		
-		bufferBuilder.vertex(bgLeft, bgBot, 0.0D).texture(0.0F, 1.0F).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(bgRight, bgBot, 0.0D).texture(1.0F, 1.0F).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(bgRight, bgTop, 0.0D).texture(1.0F, 0.0F).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(bgLeft, bgTop, 0.0D).texture(0.0F, 0.0F).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(bgLeft, bgBot, 0.0D).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(bgRight, bgBot, 0.0D).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(bgRight, bgTop, 0.0D).color(0, 0, 0, 255).next();
+		bufferBuilder.vertex(bgLeft, bgTop, 0.0D).color(0, 0, 0, 255).next();
 		
-		bufferBuilder.vertex(barLeft, barBot, 0.0D).texture(0.0F, 1.0F).color(128, 128, 128, 255).next();
-		bufferBuilder.vertex(barRight, barBot, 0.0D).texture(1.0F, 1.0F).color(128, 128, 128, 255).next();
-		bufferBuilder.vertex(barRight, barTop, 0.0D).texture(1.0F, 0.0F).color(128, 128, 128, 255).next();
-		bufferBuilder.vertex(barLeft, barTop, 0.0D).texture(0.0F, 0.0F).color(128, 128, 128, 255).next();
-		bufferBuilder.vertex(barLeft, barBot - 1, 0.0D).texture(0.0F, 1.0F).color(192, 192, 192, 255).next();
-		bufferBuilder.vertex(barRight - 1, barBot - 1, 0.0D).texture(1.0F, 1.0F).color(192, 192, 192, 255).next();
-		bufferBuilder.vertex(barRight - 1, barTop, 0.0D).texture(1.0F, 0.0F).color(192, 192, 192, 255).next();
-		bufferBuilder.vertex(barLeft, barTop, 0.0D).texture(0.0F, 0.0F).color(192, 192, 192, 255).next();
+		bufferBuilder.vertex(barLeft, barBot, 0.0D).color(128, 128, 128, 255).next();
+		bufferBuilder.vertex(barRight, barBot, 0.0D).color(128, 128, 128, 255).next();
+		bufferBuilder.vertex(barRight, barTop, 0.0D).color(128, 128, 128, 255).next();
+		bufferBuilder.vertex(barLeft, barTop, 0.0D).color(128, 128, 128, 255).next();
+		bufferBuilder.vertex(barLeft, barBot - 1, 0.0D).color(192, 192, 192, 255).next();
+		bufferBuilder.vertex(barRight - 1, barBot - 1, 0.0D).color(192, 192, 192, 255).next();
+		bufferBuilder.vertex(barRight - 1, barTop, 0.0D).color(192, 192, 192, 255).next();
+		bufferBuilder.vertex(barLeft, barTop, 0.0D).color(192, 192, 192, 255).next();
 		
 		tessellator.draw();
 		

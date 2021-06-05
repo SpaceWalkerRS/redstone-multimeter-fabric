@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -34,17 +35,15 @@ public class MeterRenderer {
 			return;
 		}
 		
+		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableTexture();
 		RenderSystem.depthMask(false);
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
-		
 		for (Meter meter : meterGroup.getMeters()) {
 			if (meter.isIn(minecraftClient.world)) {
-				drawMeter(matrices, builder, tessellator, meter);
+				drawMeter(matrices, meter);
 			}
 		}
 		
@@ -53,7 +52,10 @@ public class MeterRenderer {
 		RenderSystem.disableBlend();
 	}
 	
-	private void drawMeter(MatrixStack matrices, BufferBuilder builder, Tessellator tessellator, Meter meter) {
+	private void drawMeter(MatrixStack matrices, Meter meter) {
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder builder = tessellator.getBuffer();
+		
 		BlockPos pos = meter.getPos().asBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
@@ -86,7 +88,7 @@ public class MeterRenderer {
 	}
 	
 	private void drawBoxOutline(BufferBuilder builder, Tessellator tessellator, Matrix4f model, float r, float g, float b, float a) {
-		builder.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
+		builder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 		drawBox(builder, model, r, g, b, a, true);
 		tessellator.draw();
 	}

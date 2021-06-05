@@ -226,7 +226,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	public List<Text> getTooltip(double mouseX, double mouseY) {
 		List<Text> tooltip = super.getTooltip(mouseX, mouseY);
 		
-		if (tooltip.isEmpty()) {
+		if (tooltip.isEmpty() && !draggingTicksTable) {
 			tooltip = hudRenderer.getTextForTooltip();
 		}
 		

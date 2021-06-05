@@ -234,7 +234,7 @@ public class MeterCommand {
 			if (index >= 0) {
 				source.sendFeedback(new LiteralText("There is already a meter at that position!"), false);
 			} else {
-				multimeter.addMeter(pos, movable, name, color, player);
+				multimeter.addMeter(meterGroup, pos, movable, name, color);
 				source.sendFeedback(new LiteralText(String.format("Added a meter at %s!", pos.toString())), false);
 			}
 		});
@@ -242,7 +242,7 @@ public class MeterCommand {
 	
 	private static int removeMeter(ServerCommandSource source, Integer givenIndex) {
 		return meterCommand(source, givenIndex, null, CommandTarget.METER, (server, multimeter, meterGroup, player, index, pos) -> {
-			multimeter.removeMeter(index, player);
+			multimeter.removeMeter(meterGroup, index);
 			source.sendFeedback(new LiteralText(String.format("Removed meter #%d", index)), false);
 		});
 	}

@@ -155,7 +155,7 @@ public class Multimeter {
 		ServerMeterGroup meterGroup = subscriptions.remove(player);
 		
 		if (meterGroup != null) {
-			meterGroup.removeSubscriber(player);
+			removeSubscriber(meterGroup, player);
 		}
 	}
 	
@@ -174,19 +174,13 @@ public class Multimeter {
 		boolean movable = properties.getBoolean("movable");
 		
 		if (meterGroup.hasMeterAt(pos)) {
-			removeMeter(meterGroup.indexOfMeterAt(pos), player);
+			removeMeter(meterGroup, meterGroup.indexOfMeterAt(pos));
 		} else {
-			addMeter(pos, movable, null, null, player);
+			addMeter(meterGroup, pos, movable, null, null);
 		}
 	}
 	
-	public void addMeter(WorldPos pos, boolean movable, String name, Integer color, ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
-		
-		if (meterGroup == null) {
-			return;
-		}
-		
+	public void addMeter(ServerMeterGroup meterGroup, WorldPos pos, boolean movable, String name, Integer color) {
 		World world = server.getWorldOf(pos);
 		
 		if (world != null) {
@@ -219,7 +213,13 @@ public class Multimeter {
 	public void removeMeter(int index, ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
-		if (meterGroup != null && meterGroup.removeMeter(index)) {
+		if (meterGroup != null) {
+			removeMeter(meterGroup, index);
+		}
+	}
+	
+	public void removeMeter(ServerMeterGroup meterGroup, int index) {
+		if (meterGroup.removeMeter(index)) {
 			RemoveMeterPacket packet = new RemoveMeterPacket(index);
 			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 		}
@@ -296,13 +296,7 @@ public class Multimeter {
 		ServerMeterGroup prevSubscription = subscriptions.remove(player);
 		
 		if (prevSubscription != null) {
-			prevSubscription.removeSubscriber(player);
-			
-			// If a meter group is empty and no players
-			// are subscribed to it, remove it.
-			if (!prevSubscription.hasSubscribers() && prevSubscription.getMeterCount() == 0) {
-				meterGroups.remove(prevSubscription.getName(), prevSubscription);
-			}
+			removeSubscriber(prevSubscription, player);
 		}
 		
 		subscriptions.put(player, meterGroup);
@@ -310,6 +304,16 @@ public class Multimeter {
 		
 		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
 		server.getPacketHandler().sendPacketToPlayer(packet, player);
+	}
+	
+	public void removeSubscriber(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
+		meterGroup.removeSubscriber(player);
+		
+		// If a meter group is empty and no players
+		// are subscribed to it, remove it.
+		if (!meterGroup.hasSubscribers() && meterGroup.getMeterCount() == 0) {
+			meterGroups.remove(meterGroup.getName(), meterGroup);
+		}
 	}
 	
 	public void meterGroupDataReceived(String name, NbtCompound data, ServerPlayerEntity player) {

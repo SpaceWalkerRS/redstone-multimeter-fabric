@@ -2,9 +2,9 @@ package rsmm.fabric.client.gui.log;
 
 import static rsmm.fabric.client.gui.HudSettings.*;
 
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
+import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
@@ -14,12 +14,12 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	
 	protected Mode mode;
 	
-	protected ToggleEventRenderer(EventType type) {
-		super(type);
+	protected ToggleEventRenderer(MultimeterClient client, EventType type) {
+		super(client, type);
 	}
 	
 	@Override
-	public void renderTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderTickLogs(MatrixStack matrices, int x, int y, long firstTick, long lastTick, Meter meter) {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
@@ -110,7 +110,75 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubTickLogs(MatrixStack matrices, TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderPulseLengths(MatrixStack matrices, int x, int y, long firstTick, long lastTick, Meter meter) {
+		if (mode != Mode.ALL) {
+			return;
+		}
+		
+		y += GRID_SIZE;
+		int color = meter.getColor();
+		
+		MeterLogs logs = meter.getLogs();
+		int index = logs.getLastLogBefore(type, firstTick);
+		MeterEvent event = logs.getLog(type, index);
+		MeterEvent nextEvent = logs.getLog(type, ++index);
+		
+		if (nextEvent == null) {
+			return;
+		}
+		
+		long lastHudTick = firstTick + COLUMN_COUNT;
+		
+		if (lastHudTick > lastTick) {
+			lastHudTick = lastTick;
+		}
+		
+		long currentTick = -1;
+		
+		while (event == null || event.isBefore(lastHudTick)) {
+			boolean eventInTable = (event != null && !event.isBefore(firstTick));
+			boolean nextEventInTable = (nextEvent != null && nextEvent.isBefore(lastHudTick));
+			
+			long start = eventInTable ? event.getTick() + 1 : firstTick;
+			long end = nextEventInTable ? nextEvent.getTick() : lastHudTick;
+			
+			if (event != null && nextEvent != null) {
+				long pulseLength = nextEvent.getTick() - event.getTick();
+				
+				if (pulseLength > 5) {
+					int startX = x + (int)(start - firstTick) * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
+					int endX = x + (int)(end - firstTick) * (COLUMN_WIDTH + GRID_SIZE) - GRID_SIZE;
+					
+					String text = String.valueOf(pulseLength);
+					
+					int availableWidth = endX - startX;
+					int requiredWidth = font.getWidth(text) + 1;
+					
+					if (requiredWidth < availableWidth) {
+						boolean toggled = wasToggled(event);
+						
+						int bgColor = toggled ? color : BACKGROUND_COLOR_TRANSPARENT;
+						int textColor = toggled ? POWERED_TEXT_COLOR : UNPOWERED_TEXT_COLOR;
+						
+						fill(matrices, startX, y, startX + requiredWidth, y + ROW_HEIGHT, bgColor);
+						font.draw(matrices, text, startX + 1, y + 1, textColor);
+					}
+				}
+			}
+			
+			do {
+				event = nextEvent;
+				nextEvent = logs.getLog(type, ++index);
+			} while (nextEvent != null && nextEvent.getTick() == currentTick);
+			
+			if (event == null) {
+				break;
+			}
+		}
+	}
+	
+	@Override
+	public void renderSubTickLogs(MatrixStack matrices, int x, int y, long tick, int subTickCount, Meter meter) {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
