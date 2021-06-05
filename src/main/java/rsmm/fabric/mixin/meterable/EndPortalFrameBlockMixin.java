@@ -8,12 +8,12 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.block.MeterableBlock;
+import rsmm.fabric.block.Meterable;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(EndPortalFrameBlock.class)
-public class EndPortalFrameBlockMixin implements IBlock, MeterableBlock {
+public class EndPortalFrameBlockMixin implements IBlock, Meterable {
 	
 	@Override
 	public int getDefaultMeteredEvents() {

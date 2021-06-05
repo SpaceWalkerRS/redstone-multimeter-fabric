@@ -7,14 +7,14 @@ import net.minecraft.block.TrappedChestBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.block.MeterableBlock;
+import rsmm.fabric.block.Meterable;
 import rsmm.fabric.block.PowerSource;
 import rsmm.fabric.block.chest.TrappedChestHelper;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(TrappedChestBlock.class)
-public class TrappedChestBlockMixin implements IBlock, MeterableBlock, PowerSource {
+public class TrappedChestBlockMixin implements IBlock, Meterable, PowerSource {
 	
 	@Override
 	public int getDefaultMeteredEvents() {

@@ -30,6 +30,10 @@ public abstract class MeterEventRenderer extends DrawableHelper {
 	
 	public abstract void renderTickLogs(int x, int y, long firstTick, long lastTick, Meter meter);
 	
+	public void renderPulseLengths(int x, int y, long firstTick, long lastTick, Meter meter) {
+		
+	}
+	
 	public abstract void renderSubTickLogs(int x, int y, long tick, int subTickCount, Meter meter);
 	
 }

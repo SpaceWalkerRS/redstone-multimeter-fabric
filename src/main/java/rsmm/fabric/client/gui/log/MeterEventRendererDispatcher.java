@@ -44,6 +44,11 @@ public class MeterEventRendererDispatcher {
 				getEventRenderer(type).renderTickLogs(x, y, firstTick, lastTick, meter);
 			}
 		}
+		for (EventType type : EventType.TYPES) {
+			if (meter.isMetering(type)) {
+				getEventRenderer(type).renderPulseLengths(x, y, firstTick, lastTick, meter);
+			}
+		}
 	}
 	
 	public void renderSubTickLogs(int x, int y, long tick, int subTickCount, Meter meter) {

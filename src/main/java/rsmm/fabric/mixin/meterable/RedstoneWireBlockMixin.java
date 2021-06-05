@@ -55,7 +55,7 @@ public abstract class RedstoneWireBlockMixin implements IBlock, MeterableBlock, 
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return getPowerLevel(world, pos, state) > 0;
+		return state.get(Properties.POWER) > 0;
 	}
 	
 	@Override
