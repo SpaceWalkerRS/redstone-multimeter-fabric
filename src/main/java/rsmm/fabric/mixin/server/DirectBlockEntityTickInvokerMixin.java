@@ -21,7 +21,7 @@ public abstract class DirectBlockEntityTickInvokerMixin {
 	@Shadow @Final private BlockEntity blockEntity;
 	
 	@Inject(
-			method = "tick",
+			method = "tick()V",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
