@@ -10,6 +10,10 @@ public class ClientMeterGroup extends MeterGroup {
 	private final MultimeterClient client;
 	private final ClientLogManager logManager;
 	
+	public ClientMeterGroup(MultimeterClient client) {
+		this(client, client.getMinecraftClient().getSession().getUsername());
+	}
+	
 	public ClientMeterGroup(MultimeterClient client, String name) {
 		super(name);
 		

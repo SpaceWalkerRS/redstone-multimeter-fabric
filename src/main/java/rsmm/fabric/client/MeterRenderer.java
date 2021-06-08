@@ -15,7 +15,6 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.util.ColorUtils;
 
 public class MeterRenderer {
@@ -29,19 +28,13 @@ public class MeterRenderer {
 	}
 	
 	public void renderMeters(MatrixStack matrices) {
-		MeterGroup meterGroup = multimeterClient.getMeterGroup();
-		
-		if (meterGroup == null) {
-			return;
-		}
-		
 		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableTexture();
 		RenderSystem.depthMask(false);
 		
-		for (Meter meter : meterGroup.getMeters()) {
+		for (Meter meter : multimeterClient.getMeterGroup().getMeters()) {
 			if (meter.isIn(minecraftClient.world)) {
 				drawMeter(matrices, meter);
 			}
