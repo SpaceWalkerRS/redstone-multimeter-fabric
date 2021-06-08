@@ -97,7 +97,7 @@ public class MultimeterClient {
 	}
 	
 	/**
-	 * At the start of each server tick, the server sends a packet
+	 * At the end of each server tick, the server sends a packet
 	 * to clients with the current server time.
 	 */
 	public void onServerTick(long serverTick) {
@@ -111,15 +111,16 @@ public class MultimeterClient {
 	 * Called after the MinecraftClient has been initialized
 	 */
 	public void onStartup() {
-		meterGroup = new ClientMeterGroup(this, client.getSession().getUsername());
+		meterGroup = new ClientMeterGroup(this);
+		hudRenderer.onStartup();
 	}
 	
 	public void onShutdown() {
-		
+		hudRenderer.onShutdown();
 	}
 	
 	/**
-	 * Called when this client connects to a MultimeterServer
+	 * Called when this client connects to a Multimeter server
 	 */
 	public void onConnect(String modVersion, long serverTick) {
 		if (!connected) {
@@ -130,6 +131,8 @@ public class MultimeterClient {
 			
 			connected = true;
 			lastServerTick = serverTick;
+			
+			hudRenderer.reset();
 			
 			MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
 			packetHandler.sendPacket(packet);

@@ -12,6 +12,7 @@ public class HudSettings {
 	public static final int COLUMN_COUNT = 60;
 	public static final int SELECTED_COLUMN = 44;
 	public static int ROW_COUNT;
+	public static boolean IGNORE_HIDDEN_METERS = true;
 	
 	/** The width of the ticks table */
 	public static final int TICKS_TABLE_WIDTH = COLUMN_COUNT * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
@@ -21,17 +22,15 @@ public class HudSettings {
 	public static final int TICKS_SUB_TICKS_GAP = 3;
 	
 	public static final int BACKGROUND_COLOR = 0xFF202020;
-	public static final int BACKGROUND_COLOR_TRANSPARENT = 0xB0202020;
+	public static final int BACKGROUND_COLOR_TRANSPARENT = 0xDD202020;
 	public static final int MAIN_GRID_COLOR = 0xFF404040;
 	public static final int INTERVAL_GRID_COLOR = 0xFF606060;
 	public static final int MARKER_GRID_COLOR = 0xFFC0C0C0;
 	public static final int SELECTION_INDICATOR_COLOR = 0xFFFFFFFF;
-	public static final int TICK_PHASE_INDICATOR_COLOR = 0xFFEEEEEE;
 	
 	public static final int POWERED_TEXT_COLOR = 0xFF000000;
 	public static final int UNPOWERED_TEXT_COLOR = 0xFF707070;
-	public static final int METER_NAME_COLOR = 0xFFFFFFFF;
-	public static final int METER_GROUP_NAME_COLOR_DARK = 0xFF000000;
+	public static final int METER_GROUP_NAME_COLOR_DARK = 0xFF202020;
 	public static final int METER_GROUP_NAME_COLOR_LIGHT = 0xFFD0D0D0;
 	
 }

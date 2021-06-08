@@ -18,22 +18,22 @@ public class InputHandler {
 			return;
 		}
 		
-		if (KeyBindings.TOGGLE_METER.wasPressed()) {
+		while (KeyBindings.TOGGLE_METER.wasPressed()) {
 			client.toggleMeter();
 		}
-		if (KeyBindings.PAUSE_METERS.wasPressed()) {
+		while (KeyBindings.PAUSE_METERS.wasPressed()) {
 			client.getHudRenderer().pause();
 		}
-		if (KeyBindings.STEP_FORWARD.wasPressed()) {
+		while (KeyBindings.STEP_FORWARD.wasPressed()) {
 			client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
 		}
-		if (KeyBindings.STEP_BACKWARD.wasPressed()) {
+		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
 			client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
 		}
-		if (KeyBindings.TOGGLE_HUD.wasPressed()) {
+		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
 		}
-		if (KeyBindings.OPEN_MULTIMETER_SCREEN.wasPressed()) {
+		while (KeyBindings.OPEN_MULTIMETER_SCREEN.wasPressed()) {
 			MinecraftClient minecraftClient = client.getMinecraftClient();
 			
 			if (minecraftClient.currentScreen == null) {
@@ -44,44 +44,52 @@ public class InputHandler {
 	
 	
 	// Methods for handling keybindings while the client has a screen open
-
-		public boolean mouseClick(double mouseX, double mouseY, int button) {
-			if (KeyBindings.PAUSE_METERS.matchesMouse(button)) {
-				client.getHudRenderer().pause();
-			} else if (KeyBindings.STEP_FORWARD.matchesMouse(button)) {
-				client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
-			} else if (KeyBindings.STEP_BACKWARD.matchesMouse(button)) {
-				client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
-			} else if (KeyBindings.TOGGLE_HUD.matchesMouse(button)) {
-				client.toggleHud();
-			} else if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
-				if (client.hasMultimeterScreenOpen()) {
-					client.getMinecraftClient().openScreen(null);
-				}
-			} else {
-				return false;
+	
+	public boolean mouseClick(double mouseX, double mouseY, int button) {
+		if (KeyBindings.PAUSE_METERS.matchesMouse(button)) {
+			client.getHudRenderer().pause();
+		} else
+		if (KeyBindings.STEP_FORWARD.matchesMouse(button)) {
+			client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
+		} else
+		if (KeyBindings.STEP_BACKWARD.matchesMouse(button)) {
+			client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
+		} else
+		if (KeyBindings.TOGGLE_HUD.matchesMouse(button)) {
+			client.toggleHud();
+		} else
+		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
+			if (client.hasMultimeterScreenOpen()) {
+				client.getMinecraftClient().openScreen(null);
 			}
-
-			return true;
+		} else {
+			return false;
 		}
-
-		public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-			if (KeyBindings.PAUSE_METERS.matchesKey(keyCode, scanCode)) {
-				client.getHudRenderer().pause();
-			} else if (KeyBindings.STEP_FORWARD.matchesKey(keyCode, scanCode)) {
-				client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
-			} else if (KeyBindings.STEP_BACKWARD.matchesKey(keyCode, scanCode)) {
-				client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
-			} else if (KeyBindings.TOGGLE_HUD.matchesKey(keyCode, scanCode)) {
-				client.toggleHud();
-			} else if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
-				if (client.hasMultimeterScreenOpen()) {
-					client.getMinecraftClient().openScreen(null);
-				}
-			} else {
-				return false;
+		
+		return true;
+	}
+	
+	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+		if (KeyBindings.PAUSE_METERS.matchesKey(keyCode, scanCode)) {
+			client.getHudRenderer().pause();
+		} else
+		if (KeyBindings.STEP_FORWARD.matchesKey(keyCode, scanCode)) {
+			client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
+		} else
+		if (KeyBindings.STEP_BACKWARD.matchesKey(keyCode, scanCode)) {
+			client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
+		} else
+		if (KeyBindings.TOGGLE_HUD.matchesKey(keyCode, scanCode)) {
+			client.toggleHud();
+		} else
+		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
+			if (client.hasMultimeterScreenOpen()) {
+				client.getMinecraftClient().openScreen(null);
 			}
-
-			return true;
+		} else {
+			return false;
 		}
+		
+		return true;
+	}
 }

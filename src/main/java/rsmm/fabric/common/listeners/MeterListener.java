@@ -14,4 +14,6 @@ public interface MeterListener {
 	
 	public void meteredEventsChanged(Meter meter);
 	
+	public void isHiddenChanged(Meter meter);
+	
 }

@@ -8,6 +8,7 @@ public abstract class AbstractParentElement implements IParentElement {
 	private final List<IElement> children = new ArrayList<>();
 	
 	private boolean dragging;
+	private boolean visible = true;
 	private IElement focused;
 	
 	@Override
@@ -18,6 +19,16 @@ public abstract class AbstractParentElement implements IParentElement {
 	@Override
 	public void setDraggingMouse(boolean dragging) {
 		this.dragging = dragging;
+	}
+	
+	@Override
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 	
 	@Override

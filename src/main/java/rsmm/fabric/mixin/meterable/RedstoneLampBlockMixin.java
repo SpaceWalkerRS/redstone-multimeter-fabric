@@ -13,11 +13,10 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.server.MeterableBlock;
+import rsmm.fabric.block.MeterableBlock;
 
 @Mixin(RedstoneLampBlock.class)
-public class RedstoneLampBlockMixin implements IBlock, MeterableBlock {
+public class RedstoneLampBlockMixin implements MeterableBlock {
 	
 	@Inject(
 			method = "onScheduledTick",
@@ -25,7 +24,7 @@ public class RedstoneLampBlockMixin implements IBlock, MeterableBlock {
 					value = "HEAD"
 			)
 	)
-	private void onScheduledTickInjectAtHead(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
+	private void onOnScheduledTickInjectAtHead(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
 		logPowered(world, pos, world.isReceivingRedstonePower(pos));
 	}
 	

@@ -1,5 +1,7 @@
 package rsmm.fabric.client.gui.widget;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -12,6 +14,7 @@ import rsmm.fabric.client.gui.element.IElement;
 public class Slider extends SliderWidget implements IElement {
 	
 	private final Supplier<Text> textSupplier;
+	private final Supplier<List<Text>> tooltipSupplier;
 	private final Supplier<Double> valueSupplier;
 	private final SlideAction onSlide;
 	private final Consumer<Double> snap;
@@ -19,9 +22,14 @@ public class Slider extends SliderWidget implements IElement {
 	private boolean dragging;
 	
 	public Slider(int x, int y, int width, int height, Supplier<Text> textSupplier, Supplier<Double> valueSupplier, SlideAction onSlide, Function<Double, Double> snap) {
+		this(x, y, width, height, textSupplier, () -> Collections.emptyList(), valueSupplier, onSlide, snap);
+	}
+	
+	public Slider(int x, int y, int width, int height, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier, Supplier<Double> valueSupplier, SlideAction onSlide, Function<Double, Double> snap) {
 		super(x, y, width, height, valueSupplier.get());
 		
 		this.textSupplier = textSupplier;
+		this.tooltipSupplier = tooltipSupplier;
 		this.valueSupplier = valueSupplier;
 		this.onSlide = onSlide;
 		this.snap = v -> setValue(snap.apply(v));
@@ -143,6 +151,21 @@ public class Slider extends SliderWidget implements IElement {
 	@Override
 	public void setHeight(int height) {
 		this.height = height;
+	}
+	
+	@Override
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	@Override
+	public List<Text> getTooltip(double mouseX, double mouseY) {
+		return tooltipSupplier.get();
 	}
 	
 	@Override

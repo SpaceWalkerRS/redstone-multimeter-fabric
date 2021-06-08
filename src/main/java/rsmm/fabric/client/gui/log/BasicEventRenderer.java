@@ -2,21 +2,32 @@ package rsmm.fabric.client.gui.log;
 
 import static rsmm.fabric.client.gui.HudSettings.*;
 
-import net.minecraft.client.font.TextRenderer;
+import java.util.function.BiFunction;
 
+import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.log.MeterLogs;
 
-public abstract class BasicEventRenderer extends MeterEventRenderer {
+public class BasicEventRenderer extends MeterEventRenderer {
 	
-	public BasicEventRenderer(EventType type) {
-		super(type);
+	protected final BiFunction<Meter, MeterEvent, Integer> edgeColorProvider;
+	protected final BiFunction<Meter, MeterEvent, Integer> centerColorProvider;
+	
+	public BasicEventRenderer(MultimeterClient client) {
+		this(client, (m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
+	}
+	
+	public BasicEventRenderer(MultimeterClient client, BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {
+		super(client, null);
+		
+		this.edgeColorProvider = edgeColorProvider;
+		this.centerColorProvider = centerColorProvider;
 	}
 	
 	@Override
-	public void renderTickLogs(TextRenderer font, int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderTickLogs(int x, int y, long firstTick, long lastTick,  Meter meter) {
 		y += GRID_SIZE;
 		
 		MeterLogs logs = meter.getLogs();
@@ -46,7 +57,7 @@ public abstract class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubTickLogs(TextRenderer font, int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderSubTickLogs(int x, int y, long tick, int subTickCount, Meter meter) {
 		y += GRID_SIZE;
 		
 		MeterLogs logs = meter.getLogs();
@@ -69,6 +80,26 @@ public abstract class BasicEventRenderer extends MeterEventRenderer {
 		}
 	}
 	
-	protected abstract void drawEvent(int x, int y, Meter meter, MeterEvent event);
+	public void setType(EventType type) {
+		this.type = type;
+	}
 	
+	protected void drawEvent(int x, int y, Meter meter, MeterEvent event) {
+		drawEdges(x, y, meter ,event);
+		drawCenter(x, y, meter ,event);
+	}
+	
+	protected void drawEdges(int x, int y, Meter meter, MeterEvent event) {
+		int half = ROW_HEIGHT / 2;
+		int color = edgeColorProvider.apply(meter, event);
+		
+		fill(x, y + half - 1, x + COLUMN_WIDTH, y + ROW_HEIGHT - half + 1, color);
+	}
+	
+	protected void drawCenter(int x, int y, Meter meter, MeterEvent event) {
+		int half = ROW_HEIGHT / 2;
+		int color = centerColorProvider.apply(meter, event);
+		
+		fill(x, y + half, x + COLUMN_WIDTH, y + ROW_HEIGHT - half, color);
+	}
 }

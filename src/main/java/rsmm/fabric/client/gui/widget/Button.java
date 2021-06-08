@@ -1,5 +1,7 @@
 package rsmm.fabric.client.gui.widget;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -7,24 +9,35 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.texture.TextureManager;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.element.IElement;
+import rsmm.fabric.client.gui.element.action.MousePress;
 
 public class Button extends ButtonWidget implements IElement {
 	
 	protected final MultimeterClient client;
 	protected final Supplier<Text> textSupplier;
-	protected final OnPress onPress;
+	protected final Supplier<List<Text>> tooltipSupplier;
+	protected final MousePress<Button> onPress;
 	
-	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, OnPress onPress) {
+	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, MousePress<Button> onPress) {
+		this(client, x, y, width, height, textSupplier, () -> Collections.emptyList(), onPress);
+	}
+	
+	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<Button> onPress) {
 		super(x, y, width, height, textSupplier.get().asFormattedString(), button -> {});
 		
 		this.client = client;
 		this.textSupplier = textSupplier;
+		this.tooltipSupplier = tooltipSupplier;
 		this.onPress = onPress;
 	}
 	
@@ -42,15 +55,16 @@ public class Button extends ButtonWidget implements IElement {
 		textureManager.bindTexture(WIDGETS_LOCATION);
 		
 		int i = getYImage(isHovered());
-		int halfWidth = width / 2;
+		int leftWidth = width / 2;
+		int rightWidth = width - leftWidth;
 		int topBorder = 2;
 		
 		int x0 = x;
-		int x1 = x + halfWidth;
+		int x1 = x + leftWidth;
 		int y0 = y;
 		int y1 = y + topBorder;
 		int textureX0 = 0;
-		int textureX1 = 200 - halfWidth;
+		int textureX1 = 200 - rightWidth;
 		int textureY0 = 46 + i * 20;
 		int textureY1 = textureY0 + 20 - height + topBorder;
 		
@@ -67,10 +81,10 @@ public class Button extends ButtonWidget implements IElement {
 			GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
 		);
 		
-		blit(x0, y0, textureX0, textureY0, halfWidth, topBorder);
-		blit(x1, y0, textureX1, textureY0, halfWidth, topBorder);
-		blit(x0, y1, textureX0, textureY1, halfWidth, height - topBorder);
-		blit(x1, y1, textureX1, textureY1, halfWidth, height - topBorder);
+		blit(x0, y0, textureX0, textureY0, leftWidth, topBorder);
+		blit(x1, y0, textureX1, textureY0, rightWidth, topBorder);
+		blit(x0, y1, textureX0, textureY1, leftWidth, height - topBorder);
+		blit(x1, y1, textureX1, textureY1, rightWidth, height - topBorder);
 		
 		int rgb = active ? 0xFFFFFF : 0xA0A0A0;
 		int a = MathHelper.ceil(alpha * 255.0F);
@@ -78,8 +92,8 @@ public class Button extends ButtonWidget implements IElement {
 		
 		String message = getMessage();
 		int textWidth = font.getStringWidth(message);
-		int textX = x + (width - textWidth) / 2;
-		int textY = y + (height - font.fontHeight + 1) / 2;
+		int textX = x + rightWidth - textWidth / 2;
+		int textY = y + (height - font.fontHeight) / 2 + 1;
 		
 		font.drawWithShadow(message, textX, textY, color);
 	}
@@ -194,11 +208,28 @@ public class Button extends ButtonWidget implements IElement {
 		this.height = height;
 	}
 	
+	@Override
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	@Override
+	public List<Text> getTooltip(double mouseX, double mouseY) {
+		return tooltipSupplier.get();
+	}
+	
 	public void updateMessage() {
 		setMessage(textSupplier.get().asFormattedString());
 	}
 	
-	public interface OnPress {
-		public void press(Button button);
+	public static void playClickSound(MultimeterClient client) {
+		SoundManager soundManager = client.getMinecraftClient().getSoundManager();
+		SoundInstance sound = PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F);
+		soundManager.play(sound);
 	}
 }

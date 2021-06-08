@@ -15,16 +15,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
+import rsmm.fabric.block.MeterableBlock;
+import rsmm.fabric.block.PowerSource;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(RedstoneWireBlock.class)
-public abstract class RedstoneWireBlockMixin implements IBlock, MeterableBlock {
+public abstract class RedstoneWireBlockMixin implements IBlock, MeterableBlock, PowerSource {
 	
-private static final int MAX_POWER = 15;
-	
-	@Shadow private boolean wiresGivePower = true;
+	@Shadow private boolean wiresGivePower;
 	
 	@Inject(
 			method = "updateLogic",
@@ -41,7 +40,7 @@ private static final int MAX_POWER = 15;
 	
 	@Override
 	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag();
+		return EventType.ACTIVE.flag() | EventType.POWER_CHANGE.flag();
 	}
 	
 	@Override
@@ -57,6 +56,11 @@ private static final int MAX_POWER = 15;
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWER) > 0;
+	}
+	
+	@Override
+	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.POWER);
 	}
 	
 	private int getReceivedRedstonePower(World world, BlockPos pos) {

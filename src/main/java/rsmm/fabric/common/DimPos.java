@@ -11,9 +11,9 @@ public class DimPos {
 	private final Identifier dimensionId;
 	private final BlockPos pos;
 	
-	public DimPos(Identifier worldId, BlockPos pos) {
-		this.dimensionId = worldId;
-		this.pos = pos;
+	public DimPos(Identifier dimensionId, BlockPos pos) {
+		this.dimensionId = dimensionId;
+		this.pos = pos.toImmutable();
 	}
 	
 	public DimPos(World world, BlockPos pos) {
@@ -54,11 +54,19 @@ public class DimPos {
 	}
 	
 	public DimPos offset(Direction dir) {
-		return new DimPos(dimensionId, pos.offset(dir));
+		return offset(dir, 1);
+	}
+	
+	public DimPos offset(Direction dir, int distance) {
+		return new DimPos(dimensionId, pos.offset(dir, distance));
+	}
+	
+	public DimPos offset(int dx, int dy, int dz) {
+		return new DimPos(dimensionId, pos.add(dx, dy, dz));
 	}
 	
 	/**
-	 * Return a WorldPos with the same coordinates in a different dimension
+	 * Return a DimPos with the same coordinates in a different dimension
 	 */
 	public DimPos withDimension(Identifier dimensionId) {
 		return new DimPos(dimensionId, pos);

@@ -23,7 +23,7 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	private static double lastScrollAmount;
 	
-	private boolean isPauseScreen;
+	private final boolean isPauseScreen;
 	
 	private double scrollAmount = -1;
 	private int scrollSpeed = 7;

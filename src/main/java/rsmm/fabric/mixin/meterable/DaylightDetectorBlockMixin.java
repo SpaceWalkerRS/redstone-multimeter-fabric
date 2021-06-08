@@ -8,20 +8,26 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.block.Meterable;
+import rsmm.fabric.block.PowerSource;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(DaylightDetectorBlock.class)
-public class DaylightDetectorBlockMixin implements IBlock, MeterableBlock {
+public class DaylightDetectorBlockMixin implements IBlock, Meterable, PowerSource {
 	
 	@Override
 	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag();
+		return EventType.ACTIVE.flag() | EventType.POWER_CHANGE.flag();
 	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWER) > 0;
+	}
+	
+	@Override
+	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.POWER);
 	}
 }

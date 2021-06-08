@@ -8,12 +8,13 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import rsmm.fabric.block.Meterable;
+import rsmm.fabric.block.PowerSource;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
-import rsmm.fabric.server.MeterableBlock;
 
 @Mixin(LecternBlock.class)
-public class LecternBlockMixin implements IBlock, MeterableBlock {
+public class LecternBlockMixin implements IBlock, Meterable, PowerSource {
 	
 	@Override
 	public int getDefaultMeteredEvents() {
@@ -23,5 +24,10 @@ public class LecternBlockMixin implements IBlock, MeterableBlock {
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWERED);
+	}
+	
+	@Override
+	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return state.get(Properties.POWERED) ? MAX_POWER : 0;
 	}
 }

@@ -16,9 +16,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
 
+import rsmm.fabric.block.Meterable;
+import rsmm.fabric.block.PowerSource;
 import rsmm.fabric.interfaces.mixin.IBlock;
 import rsmm.fabric.interfaces.mixin.IServerWorld;
-import rsmm.fabric.server.Meterable;
 import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
 
@@ -44,7 +45,14 @@ public class WorldChunkMixin {
 		MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 		Multimeter multimeter = server.getMultimeter();
 		
-		if (oldBlock != newBlock) {
+		if (oldBlock == newBlock) {
+			if (((IBlock)newBlock).isPowerSource() && ((PowerSource)newBlock).standardLogPowerChange()) {
+				int oldPower = ((PowerSource)oldBlock).getPowerLevel(world, pos, oldState);
+				int newPower = ((PowerSource)newBlock).getPowerLevel(world, pos, newState);
+				
+				multimeter.logPowerChange(world, pos, oldPower, newPower);
+			}
+		} else {
 			multimeter.blockChanged(world, pos, oldBlock, newBlock);
 		}
 		
@@ -53,7 +61,7 @@ public class WorldChunkMixin {
 		
 		if (prevMeterable || newMeterable) {
 			boolean active = newMeterable && ((Meterable)newBlock).isActive(world, pos, newState);
-			multimeter.stateChanged(world, pos, active);
+			multimeter.logActive(world, pos, active);
 		}
 	}
 }

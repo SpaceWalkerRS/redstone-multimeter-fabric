@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.Meter;
@@ -103,22 +106,37 @@ public class ServerMeterGroup extends MeterGroup {
 		return removeMeter(index) ? index : -1;
 	}
 	
-	public void moveMeter(int index, DimPos pos) {
-		if (index < 0 || index >= meters.size() || posToIndex.containsKey(pos)) {
+	public void tryMoveMeter(int index, DimPos toPos) {
+		tryMoveMeter(index, toPos, false);
+	}
+	
+	public void tryMoveMeter(int index, DimPos toPos, boolean force) {
+		if (index < 0 || index >= meters.size() || posToIndex.containsKey(toPos)) {
 			return;
 		}
 		
 		Meter meter = meters.get(index);
 		
-		posToIndex.remove(meter.getPos());
-		posToIndex.put(pos, index);
+		if (!meter.isMovable() && !force) {
+			return;
+		}
 		
-		meter.setPos(pos);
+		posToIndex.remove(meter.getPos());
+		posToIndex.put(toPos, index);
+		
+		meter.setPos(toPos);
 		meter.markDirty();
 	}
 	
-	public String getNextMeterName() {
-		return String.format("Meter %d", totalMeterCount);
+	public String getNextMeterName(Block block) {
+		String name = "Meter";
+		
+		if (block != null && ((IBlock)block).isMeterable()) {
+			Identifier id = Registry.BLOCK.getId(block);
+			name = id.getPath();
+		}
+		
+		return String.format("%s %d", name, totalMeterCount);
 	}
 	
 	public Set<ServerPlayerEntity> getSubscribers() {
@@ -202,18 +220,10 @@ public class ServerMeterGroup extends MeterGroup {
 		}
 	}
 	
-	public void blockUpdate(DimPos pos, boolean powered) {
-		Meter meter = getMeterAt(pos);
-		
-		if (meter != null && meter.blockUpdate(powered)) {
-			logManager.logEvent(meter, EventType.POWERED, powered ? 1 : 0);
-		}
-	}
-	
 	public void blockChanged(DimPos pos, Block oldBlock , Block newBlock) {
 		Meter meter = getMeterAt(pos);
 		
-		if (meter != null && newBlock != Blocks.MOVING_PISTON) {
+		if (meter != null && oldBlock != Blocks.MOVING_PISTON && newBlock != Blocks.MOVING_PISTON) {
 			int oldBlockDefaults = ((IBlock)oldBlock).getDefaultMeteredEvents();
 			int newBlockDefaults = ((IBlock)newBlock).getDefaultMeteredEvents();
 			
@@ -224,25 +234,16 @@ public class ServerMeterGroup extends MeterGroup {
 		}
 	}
 	
-	public void stateChanged(DimPos pos, boolean active) {
-		Meter meter = getMeterAt(pos);
-		
-		if (meter != null && meter.stateChanged(active)) {
-			logManager.logEvent(meter, EventType.ACTIVE, active ? 1 : 0);
-		}
-	}
-	
-	public void blockMoved(DimPos pos, Direction dir) {
+	public void tryLogEvent(DimPos pos, EventType type, int metaData, Predicate<Meter> meterPredicate,BiConsumer<ServerMeterGroup, Integer> onLog) {
 		int index = indexOfMeterAt(pos);
 		
 		if (index >= 0) {
 			Meter meter = getMeter(index);
 			
-			if (meter.isMovable()) {
-				multimeter.moveMeter(index, pos.offset(dir), this);
+			if (meterPredicate.test(meter)) {
+				onLog.accept(this, index);
+				logManager.logEvent(meter, type, metaData);
 			}
-			
-			logManager.logEvent(meter, EventType.MOVED, dir.getId());
 		}
 	}
 }

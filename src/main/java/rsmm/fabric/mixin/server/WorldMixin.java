@@ -1,5 +1,7 @@
 package rsmm.fabric.mixin.server;
 
+import java.util.Iterator;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,7 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
 
 import rsmm.fabric.common.TickPhase;
@@ -34,6 +38,24 @@ public abstract class WorldMixin {
 	private void onTickBlockEntitiesInjectAtHead(CallbackInfo ci) {
 		if (!isClient()) {
 			((IServerWorld)this).getMultimeterServer().getMultimeter().onTickPhase(TickPhase.TICK_BLOCK_ENTITIES);
+		}
+	}
+	
+	@Inject(
+			method = "tickBlockEntities",
+			locals = LocalCapture.CAPTURE_FAILHARD,
+			at = @At(
+					value = "INVOKE",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/util/Tickable;tick()V"
+			)
+	)
+	private void onTickBlockEntitiesInjectBeforeTick(CallbackInfo ci, Profiler profiler, Iterator<BlockEntity> it, BlockEntity blockEntity) {
+		if (!isClient()) {
+			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
+			Multimeter multimeter = server.getMultimeter();
+			
+			multimeter.logBlockEntityTick((World)(Object)this, blockEntity);
 		}
 	}
 	
@@ -62,7 +84,7 @@ public abstract class WorldMixin {
 			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 			
-			multimeter.blockUpdate((World)(Object)this, pos, powered);
+			multimeter.logPowered((World)(Object)this, pos, powered);
 		}
 	}
 }

@@ -40,8 +40,8 @@ public class ServerLogManager extends LogManager {
 			TickPhase phase = meterGroup.getMultimeter().getCurrentTickPhase();
 			
 			MeterEvent event = new MeterEvent(type, tick, subTick, phase, metaData);
-			meter.getLogs().add(event);
 			
+			meter.getLogs().add(event);
 			meter.markLogged();
 		}
 		
