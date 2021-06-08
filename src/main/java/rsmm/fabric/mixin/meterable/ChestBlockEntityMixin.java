@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.TrappedChestBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ChestBlockEntity;
@@ -32,7 +32,7 @@ public class ChestBlockEntityMixin extends BlockEntity {
 			)
 	)
 	private void onOnInvOpenOrCloseInjectAtHead(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount, CallbackInfo ci) {
-		if (!world.isClient() && getCachedState().isOf(Blocks.TRAPPED_CHEST)) {
+		if (!world.isClient() && getCachedState().getBlock() instanceof TrappedChestBlock) {
 			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 			
