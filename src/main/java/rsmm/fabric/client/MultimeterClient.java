@@ -111,8 +111,8 @@ public class MultimeterClient {
 	 * Called after the MinecraftClient has been initialized
 	 */
 	public void onStartup() {
+		meterGroup = new ClientMeterGroup(this);
 		hudRenderer.onStartup();
-		meterGroup = new ClientMeterGroup(this, client.getSession().getUsername());
 	}
 	
 	public void onShutdown() {

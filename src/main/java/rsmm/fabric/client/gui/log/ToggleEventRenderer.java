@@ -255,6 +255,6 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	protected enum Mode {
-		ALL, TOP, BOTTOM
+		ALL, TOP, BOTTOM;
 	}
 }

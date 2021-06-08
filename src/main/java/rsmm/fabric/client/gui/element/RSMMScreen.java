@@ -96,7 +96,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	
 	@Override
 	protected final void init() {
-		clearChildren();
+		removeChildren();
 		initScreen();
 	}
 	

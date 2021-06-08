@@ -15,7 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.util.ColorUtils;
 
 public class MeterRenderer {
@@ -29,24 +28,15 @@ public class MeterRenderer {
 	}
 	
 	public void renderMeters(MatrixStack matrices) {
-		MeterGroup meterGroup = multimeterClient.getMeterGroup();
-		
-		if (meterGroup == null) {
-			return;
-		}
-		
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableTexture();
 		RenderSystem.depthMask(false);
 		RenderSystem.disableLighting();
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
-		
-		for (Meter meter : meterGroup.getMeters()) {
+		for (Meter meter : multimeterClient.getMeterGroup().getMeters()) {
 			if (meter.isIn(minecraftClient.world)) {
-				drawMeter(matrices, builder, tessellator, meter);
+				drawMeter(matrices, meter);
 			}
 		}
 		
@@ -56,7 +46,10 @@ public class MeterRenderer {
 		RenderSystem.disableBlend();
 	}
 	
-	private void drawMeter(MatrixStack matrices, BufferBuilder builder, Tessellator tessellator, Meter meter) {
+	private void drawMeter(MatrixStack matrices, Meter meter) {
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder builder = tessellator.getBuffer();
+		
 		BlockPos pos = meter.getPos().asBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();

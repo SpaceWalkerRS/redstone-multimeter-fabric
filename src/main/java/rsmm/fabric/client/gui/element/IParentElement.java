@@ -145,7 +145,7 @@ public interface IParentElement extends IElement {
 	
 	public List<IElement> getChildren();
 	
-	default void clearChildren() {
+	default void removeChildren() {
 		List<IElement> children = getChildren();
 		
 		for (int index = 0; index < children.size(); index++) {

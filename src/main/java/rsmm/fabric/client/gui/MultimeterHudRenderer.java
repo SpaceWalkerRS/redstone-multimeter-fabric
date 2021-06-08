@@ -223,8 +223,7 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 				name.formatted(Formatting.GRAY, Formatting.ITALIC);
 			}
 			
-			String nameString = name.asFormattedString();
-			font.draw(nameString, nameX, nameY, 0xFFFFFFFF);
+			font.draw(name.asFormattedString(), nameX, nameY, 0xFFFFFFFF);
 			
 			nameY += ROW_HEIGHT + GRID_SIZE;
 		}

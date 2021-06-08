@@ -30,10 +30,11 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+
 import rsmm.fabric.block.Meterable;
-import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.TickPhase;
+import rsmm.fabric.common.DimPos;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.packet.types.AddMeterPacket;
@@ -83,7 +84,7 @@ public class Multimeter {
 	public boolean hasSubscription(ServerPlayerEntity player) {
 		return subscriptions.containsKey(player);
 	}
-	
+
 	public TickPhase getCurrentTickPhase() {
 		return currentTickPhase;
 	}
@@ -389,7 +390,7 @@ public class Multimeter {
 			})).
 			append(new LiteralText(" to return to your previous location"));
 		
-		player.sendMessage(message);
+		player.addChatMessage(message, false);
 	}
 	
 	public void blockChanged(World world, BlockPos blockPos, Block oldBlock, Block newBlock) {
