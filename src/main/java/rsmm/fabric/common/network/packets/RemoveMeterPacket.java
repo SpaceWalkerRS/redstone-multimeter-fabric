@@ -1,41 +1,41 @@
-package rsmm.fabric.common.packet.types;
+package rsmm.fabric.common.network.packets;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.packet.AbstractRSMMPacket;
+import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
-public class MeterChangesPacket extends AbstractRSMMPacket {
+public class RemoveMeterPacket implements RSMMPacket {
 	
-	private NbtCompound meterData;
+	private int meterIndex;
 	
-	public MeterChangesPacket() {
+	public RemoveMeterPacket() {
 		
 	}
 	
-	public MeterChangesPacket(NbtCompound meterData) {
-		this.meterData = meterData;
+	public RemoveMeterPacket(int meterIndex) {
+		this.meterIndex = meterIndex;
 	}
 	
 	@Override
 	public void encode(NbtCompound data) {
-		data.put("meterData", meterData);
+		data.putInt("meterIndex", meterIndex);
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
-		meterData = data.getCompound("meterData");
+		meterIndex = data.getInt("meterIndex");
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		
+		server.getMultimeter().removeMeter(meterIndex, player);
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().updateMeters(meterData);
+		client.getMeterGroup().removeMeter(meterIndex);
 	}
 }

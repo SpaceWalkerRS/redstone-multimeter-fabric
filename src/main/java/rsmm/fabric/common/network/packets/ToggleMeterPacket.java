@@ -1,41 +1,41 @@
-package rsmm.fabric.common.packet.types;
+package rsmm.fabric.common.network.packets;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.packet.AbstractRSMMPacket;
+import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
-public class MeterLogsPacket extends AbstractRSMMPacket {
+public class ToggleMeterPacket implements RSMMPacket {
 	
-	private NbtCompound logsData;
+	private NbtCompound properties;
 	
-	public MeterLogsPacket() {
+	public ToggleMeterPacket() {
 		
 	}
 	
-	public MeterLogsPacket(NbtCompound data) {
-		this.logsData = data;
+	public ToggleMeterPacket(NbtCompound properties) {
+		this.properties = properties;
 	}
 	
 	@Override
 	public void encode(NbtCompound data) {
-		data.put("logs", logsData);
+		data.put("properties", properties);
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
-		logsData = data.getCompound("logs");
+		properties = data.getCompound("properties");
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		
+		server.getMultimeter().toggleMeter(properties, player);
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().getLogManager().updateMeterLogs(logsData);
+		
 	}
 }

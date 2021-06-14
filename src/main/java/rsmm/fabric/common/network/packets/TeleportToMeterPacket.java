@@ -1,21 +1,21 @@
-package rsmm.fabric.common.packet.types;
+package rsmm.fabric.common.network.packets;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.packet.AbstractRSMMPacket;
+import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
-public class RemoveMeterPacket extends AbstractRSMMPacket {
+public class TeleportToMeterPacket implements RSMMPacket {
 	
 	private int meterIndex;
 	
-	public RemoveMeterPacket() {
+	public TeleportToMeterPacket() {
 		
 	}
 	
-	public RemoveMeterPacket(int meterIndex) {
+	public TeleportToMeterPacket(int meterIndex) {
 		this.meterIndex = meterIndex;
 	}
 	
@@ -31,11 +31,11 @@ public class RemoveMeterPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().removeMeter(meterIndex, player);
+		server.getMultimeter().teleportToMeter(meterIndex, player);
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().removeMeter(meterIndex);
+		
 	}
 }

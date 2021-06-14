@@ -1,4 +1,4 @@
-package rsmm.fabric.common.packet.types;
+package rsmm.fabric.common.network.packets;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -6,12 +6,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.packet.AbstractRSMMPacket;
+import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.server.MultimeterServer;
 import rsmm.fabric.util.NBTUtils;
 
-public class MeterChangePacket extends AbstractRSMMPacket {
+public class MeterChangePacket implements RSMMPacket {
 	
 	private int meterIndex;
 	private NbtCompound properties;

@@ -1,26 +1,32 @@
-package rsmm.fabric.common.packet.types;
+package rsmm.fabric.common.network.packets;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.packet.AbstractRSMMPacket;
+import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
-public class RemoveAllMetersPacket extends AbstractRSMMPacket {
+public class MeterLogsPacket implements RSMMPacket {
 	
-	public RemoveAllMetersPacket() {
+	private NbtCompound logsData;
+	
+	public MeterLogsPacket() {
 		
+	}
+	
+	public MeterLogsPacket(NbtCompound data) {
+		this.logsData = data;
 	}
 	
 	@Override
 	public void encode(NbtCompound data) {
-		
+		data.put("logs", logsData);
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
-		
+		logsData = data.getCompound("logs");
 	}
 	
 	@Override
@@ -30,6 +36,6 @@ public class RemoveAllMetersPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().clear();
+		client.getMeterGroup().getLogManager().updateMeterLogs(logsData);
 	}
 }

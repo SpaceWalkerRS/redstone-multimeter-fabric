@@ -6,9 +6,10 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
-import rsmm.fabric.common.packet.AbstractPacketHandler;
-import rsmm.fabric.common.packet.AbstractRSMMPacket;
+import rsmm.fabric.common.network.AbstractPacketHandler;
+import rsmm.fabric.common.network.RSMMPacket;
 
 public class ServerPacketHandler extends AbstractPacketHandler {
 	
@@ -17,22 +18,23 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 	public ServerPacketHandler(MultimeterServer server) {
 		this.server = server;
 	}
-	
+
 	@Override
-	protected Packet<?> toCustomPayloadPacket(PacketByteBuf buffer) {
-		return new CustomPayloadS2CPacket(PACKET_IDENTIFIER, buffer);
+	protected Packet<?> toCustomPayloadPacket(Identifier id, PacketByteBuf buffer) {
+		return new CustomPayloadS2CPacket(id, buffer);
 	}
 	
 	@Override
-	public void sendPacket(AbstractRSMMPacket packet) {
-		server.getMinecraftServer().getPlayerManager().sendToAll(encodePacket(packet));
+	public <P extends RSMMPacket> void sendPacket(P packet) {
+		Packet<?> mcPacket = encodePacket(packet);
+		server.getMinecraftServer().getPlayerManager().sendToAll(mcPacket);
 	}
 	
-	public void sendPacketToPlayer(AbstractRSMMPacket packet, ServerPlayerEntity player) {
+	public <P extends RSMMPacket> void sendPacketToPlayer(P packet, ServerPlayerEntity player) {
 		player.networkHandler.sendPacket(encodePacket(packet));
 	}
 	
-	public void sendPacketToPlayers(AbstractRSMMPacket packet, Collection<ServerPlayerEntity> players) {
+	public <P extends RSMMPacket> void sendPacketToPlayers(P packet, Collection<ServerPlayerEntity> players) {
 		Packet<?> mcPacket = encodePacket(packet);
 		
 		for (ServerPlayerEntity player : players) {

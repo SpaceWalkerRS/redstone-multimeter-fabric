@@ -17,8 +17,8 @@ import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
 import rsmm.fabric.client.gui.MultimeterScreen;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.packet.types.MeterGroupDataPacket;
-import rsmm.fabric.common.packet.types.ToggleMeterPacket;
+import rsmm.fabric.common.network.packets.MeterGroupDataPacket;
+import rsmm.fabric.common.network.packets.ToggleMeterPacket;
 import rsmm.fabric.util.NBTUtils;
 
 public class MultimeterClient {

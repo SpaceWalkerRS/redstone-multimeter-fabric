@@ -25,13 +25,13 @@ import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.listeners.MeterListener;
 import rsmm.fabric.common.listeners.MeterChangeDispatcher;
 import rsmm.fabric.common.listeners.MeterGroupChangeDispatcher;
 import rsmm.fabric.common.listeners.MeterGroupListener;
-import rsmm.fabric.common.packet.types.MeterChangePacket;
-import rsmm.fabric.common.packet.types.RemoveMeterPacket;
-import rsmm.fabric.common.packet.types.TeleportToMeterPacket;
+import rsmm.fabric.common.listeners.MeterListener;
+import rsmm.fabric.common.network.packets.MeterChangePacket;
+import rsmm.fabric.common.network.packets.RemoveMeterPacket;
+import rsmm.fabric.common.network.packets.TeleportToMeterPacket;
 import rsmm.fabric.util.ColorUtils;
 
 public class MeterControlsElement extends AbstractParentElement implements MeterListener, MeterGroupListener {

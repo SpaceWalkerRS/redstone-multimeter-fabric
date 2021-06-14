@@ -13,7 +13,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import rsmm.fabric.common.packet.AbstractPacketHandler;
+import rsmm.fabric.common.network.PacketManager;
 import rsmm.fabric.interfaces.mixin.ICustomPayloadC2SPacket;
 import rsmm.fabric.interfaces.mixin.IMinecraftServer;
 
@@ -27,7 +27,7 @@ public class ServerPlayNetworkHandlerMixin {
 	private void onCustomPayload(CustomPayloadC2SPacket minecraftPacket, CallbackInfo ci) {
 		ICustomPayloadC2SPacket packet = (ICustomPayloadC2SPacket)minecraftPacket;
 		
-		if (AbstractPacketHandler.PACKET_IDENTIFIER.equals(packet.getPacketChannelRSMM())) {
+		if (PacketManager.getPacketChannelId().equals(packet.getPacketChannelRSMM())) {
 			NetworkThreadUtils.forceMainThread(minecraftPacket, (ServerPlayNetworkHandler)(Object)this, server);
 			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().onPacketReceived(packet.getPacketDataRSMM(), player);
 			

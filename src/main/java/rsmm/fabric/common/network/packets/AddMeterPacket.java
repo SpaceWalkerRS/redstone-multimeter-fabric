@@ -1,14 +1,14 @@
-package rsmm.fabric.common.packet.types;
+package rsmm.fabric.common.network.packets;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.packet.AbstractRSMMPacket;
+import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
-public class AddMeterPacket extends AbstractRSMMPacket {
+public class AddMeterPacket implements RSMMPacket {
 	
 	private NbtCompound properties;
 	

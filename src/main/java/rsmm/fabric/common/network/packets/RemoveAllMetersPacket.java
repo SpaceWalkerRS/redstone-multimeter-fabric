@@ -1,32 +1,26 @@
-package rsmm.fabric.common.packet.types;
+package rsmm.fabric.common.network.packets;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.packet.AbstractRSMMPacket;
+import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
-public class ServerTickPacket extends AbstractRSMMPacket {
+public class RemoveAllMetersPacket implements RSMMPacket {
 	
-	private long currentServerTick;
-	
-	public ServerTickPacket() {
+	public RemoveAllMetersPacket() {
 		
-	}
-	
-	public ServerTickPacket(long serverTick) {
-		currentServerTick = serverTick;
 	}
 	
 	@Override
 	public void encode(NbtCompound data) {
-		data.putLong("serverTime", currentServerTick);
+		
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
-		currentServerTick = data.getLong("serverTime");
+		
 	}
 	
 	@Override
@@ -36,6 +30,6 @@ public class ServerTickPacket extends AbstractRSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.onServerTick(currentServerTick);
+		client.getMeterGroup().clear();
 	}
 }

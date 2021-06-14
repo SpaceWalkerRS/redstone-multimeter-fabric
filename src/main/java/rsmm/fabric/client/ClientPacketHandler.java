@@ -3,9 +3,10 @@ package rsmm.fabric.client;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.util.Identifier;
 
-import rsmm.fabric.common.packet.AbstractPacketHandler;
-import rsmm.fabric.common.packet.AbstractRSMMPacket;
+import rsmm.fabric.common.network.AbstractPacketHandler;
+import rsmm.fabric.common.network.RSMMPacket;
 
 public class ClientPacketHandler extends AbstractPacketHandler {
 	
@@ -16,12 +17,12 @@ public class ClientPacketHandler extends AbstractPacketHandler {
 	}
 	
 	@Override
-	protected Packet<?> toCustomPayloadPacket(PacketByteBuf buffer) {
-		return new CustomPayloadC2SPacket(PACKET_IDENTIFIER, buffer);
+	protected Packet<?> toCustomPayloadPacket(Identifier id, PacketByteBuf buffer) {
+		return new CustomPayloadC2SPacket(id, buffer);
 	}
 	
 	@Override
-	public void sendPacket(AbstractRSMMPacket packet) {
+	public <P extends RSMMPacket> void sendPacket(P packet) {
 		client.getMinecraftClient().getNetworkHandler().sendPacket(encodePacket(packet));
 	}
 	

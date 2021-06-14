@@ -10,8 +10,8 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.packet.types.JoinMultimeterServerPacket;
-import rsmm.fabric.common.packet.types.ServerTickPacket;
+import rsmm.fabric.common.network.packets.JoinMultimeterServerPacket;
+import rsmm.fabric.common.network.packets.ServerTickPacket;
 
 public class MultimeterServer {
 	

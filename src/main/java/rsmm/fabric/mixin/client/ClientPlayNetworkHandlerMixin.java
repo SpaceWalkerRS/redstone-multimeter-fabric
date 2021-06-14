@@ -12,7 +12,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 
-import rsmm.fabric.common.packet.AbstractPacketHandler;
+import rsmm.fabric.common.network.PacketManager;
 import rsmm.fabric.interfaces.mixin.IMinecraftClient;
 
 @Mixin(ClientPlayNetworkHandler.class)
@@ -30,7 +30,7 @@ public class ClientPlayNetworkHandlerMixin {
 			)
 	)
 	private void onOnCustomPayloadInjectAfterForceMainThread(CustomPayloadS2CPacket packet, CallbackInfo ci) {
-		if (AbstractPacketHandler.PACKET_IDENTIFIER.equals(packet.getChannel())) {
+		if (PacketManager.getPacketChannelId().equals(packet.getChannel())) {
 			NetworkThreadUtils.forceMainThread(packet, (ClientPlayNetworkHandler)(Object)this, client);
 			((IMinecraftClient)client).getMultimeterClient().getPacketHandler().onPacketReceived(packet.getData());
 			
