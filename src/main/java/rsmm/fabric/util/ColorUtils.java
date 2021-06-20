@@ -6,22 +6,6 @@ public class ColorUtils {
 	
 	private static int colorIndex = 0;
 	
-	public static int getAlpha(int color) {
-		return (color >> 24) & 0xFF;
-	}
-	
-	public static int getRed(int color) {
-		return (color >> 16) & 0xFF;
-	}
-	
-	public static int getGreen(int color) {
-		return (color >> 8) & 0xFF;
-	}
-	
-	public static int getBlue(int color) {
-		return color & 0xFF;
-	}
-	
 	public static int nextColor() {
 		return nextColor(true);
 	}
@@ -33,25 +17,52 @@ public class ColorUtils {
 			colorIndex = (colorIndex + 1) % 16;
 		}
 		
-		return HSBToRGB(hue, 0.7F, 1.0F);
+		return 0xFFFFFF & Color.HSBtoRGB(hue, 0.7F, 1.0F);
 	}
 	
-	public static int HSBToRGB(float hue, float saturation, float brightness) {
-		Color hsb = Color.getHSBColor(hue, saturation, brightness);
-		
-		int r = hsb.getRed();
-		int g = hsb.getGreen();
-		int b = hsb.getBlue();
-		
-		return fromRGB(r, g, b);
+	public static int getAlpha(int argb) {
+		return (argb >> 24) & 0xFF;
+	}
+	
+	public static int getRed(int argb) {
+		return (argb >> 16) & 0xFF;
+	}
+	
+	public static int getGreen(int argb) {
+		return (argb >> 8) & 0xFF;
+	}
+	
+	public static int getBlue(int argb) {
+		return argb & 0xFF;
+	}
+	
+	public static int fromAlpha(int alpha) {
+		return (alpha & 0xFF) << 24;
+	}
+	
+	public static int fromRed(int red) {
+		return (red & 0xFF) << 16;
+	}
+	
+	public static int fromGreen(int green) {
+		return (green & 0xFF) << 8;
+	}
+	
+	public static int fromBlue(int blue) {
+		return blue & 0xFF;
 	}
 	
 	public static int fromRGB(int red, int green, int blue) {
-		return fromARGB(0xFF, red, green, blue);
+		return fromRed(red) | fromGreen(green) | fromBlue(blue);
 	}
 	
 	public static int fromARGB(int alpha, int red, int green, int blue) {
-		return (alpha << 24) | (red << 16) | (green << 8) | blue;
+		int rgb = fromRGB(red, green, blue);
+		return fromARGB(alpha, rgb);
+	}
+	
+	public static int fromARGB(int alpha, int rgb) {
+		return fromAlpha(alpha) | rgb;
 	}
 	
 	public static int fromRGBString(String string) {
@@ -59,13 +70,31 @@ public class ColorUtils {
 			throw new NumberFormatException("Too many characters!");
 		}
 		
-		return 0xFF000000 | Integer.valueOf(string, 16);
+		return Integer.valueOf(string, 16);
+	}
+	
+	public static int fromARGBString(String string) {
+		if (string.length() > 8) {
+			throw new NumberFormatException("Too many characters!");
+		}
+		
+		return Integer.valueOf(string, 16);
 	}
 	
 	public static String toRGBString(int color) {
 		String hex = Integer.toHexString(color & 0xFFFFFF);
 		
 		while (hex.length() < 6) {
+			hex = "0" + hex;
+		}
+		
+		return hex;
+	}
+	
+	public static String toARGBString(int color) {
+		String hex = Integer.toHexString(color & 0xFFFFFFFF);
+		
+		while (hex.length() < 8) {
 			hex = "0" + hex;
 		}
 		

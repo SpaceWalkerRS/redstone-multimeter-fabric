@@ -12,7 +12,7 @@ import rsmm.fabric.common.event.MeterEvent;
 public class PowerChangeEventRenderer extends BasicEventRenderer {
 	
 	public PowerChangeEventRenderer(MultimeterClient client) {
-		super(client, (m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
+		super(client);
 		
 		this.setType(EventType.POWER_CHANGE);
 	}

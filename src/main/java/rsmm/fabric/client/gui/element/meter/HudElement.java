@@ -50,6 +50,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		this.width = width;
 		
 		hudRenderer.ignoreHiddenMeters(false);
+		hudRenderer.forceFullOpacity(true);
 		
 		this.meterControls = new MeterControlsElement(this.client, x, y + hudRenderer.getTotalHeight(), width);
 		this.playPauseButton = new InvisibleButton(client, x, y, 9, 9, () -> new LiteralText(hudRenderer.isPaused() ? "\u23f5" : "\u23f8"), (button) -> {
@@ -170,6 +171,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		MeterGroupChangeDispatcher.removeListener(this);
 		
 		hudRenderer.ignoreHiddenMeters(true);
+		hudRenderer.forceFullOpacity(false);
 	}
 	
 	@Override
@@ -292,7 +294,7 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	}
 	
 	private void updateHudControlsX() {
-		int x = this.x + hudRenderer.getNamesWidth() + HudSettings.TICKS_TABLE_WIDTH;
+		int x = this.x + hudRenderer.getNamesWidth() + HudSettings.ticksOverviewWidth();
 		
 		x -= fastBackwardButton.getWidth();
 		fastBackwardButton.setX(x);

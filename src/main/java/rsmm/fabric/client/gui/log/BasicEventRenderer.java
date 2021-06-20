@@ -11,6 +11,7 @@ import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.log.MeterLogs;
+import rsmm.fabric.util.ColorUtils;
 
 public class BasicEventRenderer extends MeterEventRenderer {
 	
@@ -18,7 +19,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	protected final BiFunction<Meter, MeterEvent, Integer> centerColorProvider;
 	
 	public BasicEventRenderer(MultimeterClient client) {
-		this(client, (m, e) -> BACKGROUND_COLOR, (m, e) -> m.getColor());
+		this(client, (m, e) -> backgroundColor(), (m, e) -> ColorUtils.fromARGB(opacity(), m.getColor()));
 	}
 	
 	public BasicEventRenderer(MultimeterClient client, BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {

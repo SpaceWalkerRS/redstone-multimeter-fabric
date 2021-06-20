@@ -9,6 +9,7 @@ import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.log.MeterLogs;
+import rsmm.fabric.util.ColorUtils;
 
 public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	
@@ -23,7 +24,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
-		int color = meter.getColor();
+		int color = ColorUtils.fromARGB(opacity(), meter.getColor());
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, firstTick);
@@ -91,7 +92,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		}
 		
 		y += GRID_SIZE;
-		int color = meter.getColor();
+		int color = ColorUtils.fromARGB(opacity(), meter.getColor());
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, firstTick);
@@ -132,8 +133,8 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					if (requiredWidth < availableWidth) {
 						boolean toggled = wasToggled(event);
 						
-						int bgColor = toggled ? color : BACKGROUND_COLOR_TRANSPARENT;
-						int textColor = toggled ? POWERED_TEXT_COLOR : UNPOWERED_TEXT_COLOR;
+						int bgColor = toggled ? color : backgroundColor();
+						int textColor = toggled ? poweredTextColor() : unpoweredTextColor();
 						
 						fill(matrices, startX, y, startX + requiredWidth, y + ROW_HEIGHT, bgColor);
 						font.draw(matrices, text, startX + 1, y + 1, textColor);
@@ -157,7 +158,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		updateMode(meter);
 		
 		y += GRID_SIZE;
-		int color = meter.getColor();
+		int color = ColorUtils.fromARGB(opacity(), meter.getColor());
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, tick);
@@ -253,7 +254,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	
 	private void drawOff(MatrixStack matrices, int x, int y, int color) {
 		draw(matrices, x, y, color);
-		drawOn(matrices, x, y, BACKGROUND_COLOR);
+		drawOn(matrices, x, y, backgroundColor());
 	}
 	
 	protected enum Mode {
