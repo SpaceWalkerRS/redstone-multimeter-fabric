@@ -26,8 +26,8 @@ public class SupplierClazzRegistry<T> {
 	
 	@SuppressWarnings("unchecked")
 	public <P extends T> P get(Identifier id) {
-		Supplier<P> objSupplier = (Supplier<P>)idToSupplier.get(id);
-		return objSupplier == null ? null : objSupplier.get();
+		Supplier<? extends T> objSupplier = idToSupplier.get(id);
+		return objSupplier == null ? null : (P)objSupplier.get();
 	}
 	
 	public <P extends T> Identifier getId(P obj) {
