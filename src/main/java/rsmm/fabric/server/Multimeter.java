@@ -53,6 +53,8 @@ public class Multimeter {
 	private final Map<ServerPlayerEntity, ServerMeterGroup> subscriptions;
 	
 	private TickPhase currentTickPhase = TickPhase.UNKNOWN;
+	/** true if the OverWorld already ticked time */
+	private boolean tickedTime;
 	
 	public Multimeter(MultimeterServer server) {
 		this.server = server;
@@ -92,9 +94,27 @@ public class Multimeter {
 		currentTickPhase = tickPhase;
 	}
 	
-	public void tickStart() {
-		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			meterGroup.getLogManager().tick();
+	public void onOverworldTickTime() {
+		tickedTime = true;
+	}
+	
+	public long getCurrentTick() {
+		long tick = server.getMinecraftServer().getOverworld().getTime();
+		
+		if (!tickedTime) {
+			tick++;
+		}
+		
+		return tick;
+	}
+	
+	public void tickStart(boolean paused) {
+		if (!paused) {
+			tickedTime = false;
+			
+			for (ServerMeterGroup meterGroup : meterGroups.values()) {
+				meterGroup.getLogManager().tick();
+			}
 		}
 	}
 	

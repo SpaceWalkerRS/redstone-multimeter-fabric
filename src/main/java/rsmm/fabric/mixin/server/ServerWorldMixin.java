@@ -127,6 +127,18 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	}
 	
 	@Inject(
+			method = "tickTime",
+			at = @At(
+					value = "INVOKE",
+					shift = Shift.AFTER,
+					target = "Lnet/minecraft/world/level/ServerWorldProperties;setTime(J)V"
+			)
+	)
+	private void onTickTimeInjectAfterSetTime(CallbackInfo ci) {
+		getMultimeterServer().getMultimeter().onOverworldTickTime();
+	}
+	
+	@Inject(
 			method = "tickFluid",
 			at = @At(
 					value = "INVOKE",

@@ -36,9 +36,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onMethod_16208InjectAtHead(CallbackInfo ci) {
-		if (!isPaused()) {
-			multimeterServer.getMultimeter().onTickPhase(TickPhase.HANDLE_PACKETS);
-		}
+		multimeterServer.getMultimeter().onTickPhase(TickPhase.HANDLE_PACKETS);
 	}
 	
 	@Inject(
@@ -48,7 +46,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onMethod_16208InjectAtReturn(CallbackInfo ci) {
-		multimeterServer.tickEnd(isPaused());
+		multimeterServer.tickEnd();
 	}
 	
 	@Inject(

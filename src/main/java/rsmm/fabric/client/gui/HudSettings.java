@@ -18,7 +18,7 @@ public class HudSettings {
 	public static final int NAMES_TICKS_SPACING = 3;
 	public static final int TICKS_SUBTICKS_GAP = 3;
 	
-	public static int OPACITY = 0x6F;
+	public static int OPACITY = 0xFF;
 	public static final int BACKGROUND_COLOR = 0x202020;
 	public static final int BACKGROUND_COLOR_TRANSPARENT = 0xDD202020;
 	public static final int MAIN_GRID_COLOR = 0x404040;

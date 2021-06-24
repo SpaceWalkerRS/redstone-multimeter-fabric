@@ -26,7 +26,7 @@ public class ServerLogManager extends LogManager {
 	
 	@Override
 	protected long getLastTick() {
-		return meterGroup.getMultimeter().getMultimeterServer().getMinecraftServer().getTicks();
+		return meterGroup.getMultimeter().getMultimeterServer().getMultimeter().getCurrentTick();
 	}
 	
 	public void tick() {
