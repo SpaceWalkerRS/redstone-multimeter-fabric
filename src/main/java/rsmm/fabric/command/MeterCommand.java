@@ -123,7 +123,7 @@ public class MeterCommand {
 				literal("group").
 				then(CommandManager.
 					argument("name", StringArgumentType.greedyString()).
-					suggests((context, suggestionsBuilder) -> CommandSource.suggestMatching(((IMinecraftServer)context.getSource().getMinecraftServer()).getMultimeterServer().getMultimeter().getMeterGroupNames(), suggestionsBuilder)).
+					suggests((context, suggestionsBuilder) -> CommandSource.suggestMatching(((IMinecraftServer)context.getSource().getServer()).getMultimeterServer().getMultimeter().getMeterGroupNames(), suggestionsBuilder)).
 					executes(context -> subscribeToGroup(context.getSource(), StringArgumentType.getString(context, "name"))))).
 			then(CommandManager.
 				literal("listGroups").

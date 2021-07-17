@@ -37,7 +37,7 @@ public class InputHandler {
 			MinecraftClient minecraftClient = client.getMinecraftClient();
 			
 			if (minecraftClient.currentScreen == null) {
-				minecraftClient.openScreen(new MultimeterScreen(client));
+				minecraftClient.setScreen(new MultimeterScreen(client));
 			}
 		}
 	}
@@ -60,7 +60,7 @@ public class InputHandler {
 		} else
 		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
 			if (client.hasMultimeterScreenOpen()) {
-				client.getMinecraftClient().openScreen(null);
+				client.getMinecraftClient().setScreen(null);
 			}
 		} else {
 			return false;
@@ -84,7 +84,7 @@ public class InputHandler {
 		} else
 		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
 			if (client.hasMultimeterScreenOpen()) {
-				client.getMinecraftClient().openScreen(null);
+				client.getMinecraftClient().setScreen(null);
 			}
 		} else {
 			return false;

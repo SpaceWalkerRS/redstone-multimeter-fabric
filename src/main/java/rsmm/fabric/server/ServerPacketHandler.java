@@ -47,6 +47,8 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 			decodePacket(buffer).execute(server, player);
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			buffer.release();
 		}
 	}
 }

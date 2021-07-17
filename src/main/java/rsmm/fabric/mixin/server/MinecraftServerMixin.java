@@ -30,22 +30,22 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "method_16208",
+			method = "runTasksTillTickEnd",
 			at = @At(
 					value = "HEAD"
 			)
 	)
-	private void onMethod_16208InjectAtHead(CallbackInfo ci) {
+	private void onRunTasksTillTickEndInjectAtHead(CallbackInfo ci) {
 		multimeterServer.getMultimeter().onTickPhase(TickPhase.HANDLE_PACKETS);
 	}
 	
 	@Inject(
-			method = "method_16208",
+			method = "runTasksTillTickEnd",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void onMethod_16208InjectAtReturn(CallbackInfo ci) {
+	private void onRunTasksTillTickEndInjectAtReturn(CallbackInfo ci) {
 		multimeterServer.tickEnd();
 	}
 	
