@@ -17,7 +17,7 @@ public class PacketManager {
 		return PACKETS.getId(packet);
 	}
 	
-	public static <P extends RSMMPacket> P getPacket(Identifier id) {
+	public static <P extends RSMMPacket> P createPacket(Identifier id) {
 		return PACKETS.get(id);
 	}
 	

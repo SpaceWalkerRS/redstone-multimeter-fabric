@@ -32,7 +32,7 @@ public abstract class AbstractPacketHandler {
 	
 	protected <P extends RSMMPacket> P decodePacket(PacketByteBuf buffer) {
 		Identifier id = buffer.readIdentifier();
-		P packet = PacketManager.getPacket(id);
+		P packet = PacketManager.createPacket(id);
 		
 		if (packet == null) {
 			throw new IllegalStateException("Unable to decode packet: " + id);
