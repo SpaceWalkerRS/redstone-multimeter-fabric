@@ -5,9 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.minecraft.nbt.NbtCompound;
-
+import net.minecraft.nbt.NbtList;
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.log.LogManager;
 
 public class ClientLogManager extends LogManager {
@@ -19,15 +18,15 @@ public class ClientLogManager extends LogManager {
 	
 	private final ClientMeterGroup meterGroup;
 	/** The number of logged events in any tick */
-	private final Map<Long, Integer> subTickCount;
+	private final Map<Long, Integer> subTicks;
 	
 	public ClientLogManager(ClientMeterGroup meterGroup) {
 		this.meterGroup = meterGroup;
-		this.subTickCount = new LinkedHashMap<>();
+		this.subTicks = new LinkedHashMap<>();
 	}
 	
 	@Override
-	protected MeterGroup getMeterGroup() {
+	protected ClientMeterGroup getMeterGroup() {
 		return meterGroup;
 	}
 	
@@ -40,31 +39,36 @@ public class ClientLogManager extends LogManager {
 	public void clearLogs() {
 		super.clearLogs();
 		
-		subTickCount.clear();
+		subTicks.clear();
 	}
 	
 	public int getSubTickCount(long tick) {
-		return subTickCount.getOrDefault(tick, 0);
+		return subTicks.getOrDefault(tick, 0);
 	}
 	
 	/**
 	 * Log all events from the past server tick
 	 */
 	public void updateMeterLogs(NbtCompound data) {
-		long lastTick = getLastTick();
-		int meterCount = meterGroup.getMeterCount();
+		int subTickCount = data.getInt("subTickCount");
+		subTicks.put(getLastTick(), subTickCount);
 		
-		int subTicks = data.getInt("subTickCount");
-		subTickCount.put(lastTick, subTicks);
+		NbtList list = data.getList("logs", 10);
 		
-		for (int index = 0; index < meterCount; index++) {
-			String key = String.valueOf(index);
+		for (int index = 0; index < list.size(); index++) {
+			NbtCompound nbt = list.getCompound(index);
 			
-			if (data.contains(key)) {
-				Meter meter = meterGroup.getMeter(index);
-				NbtCompound logs = data.getCompound(key);
+			long id = nbt.getLong("id");
+			Meter meter = meterGroup.getMeter(id);
+			
+			if (meter != null) {
+				NbtCompound logs = nbt.getCompound("logs");
+				boolean powered = nbt.getBoolean("powered");
+				boolean active = nbt.getBoolean("active");
 				
 				meter.getLogs().updateFromNBT(logs);
+				meter.setPowered(powered);
+				meter.setActive(active);
 			}
 		}
 	}
@@ -77,7 +81,7 @@ public class ClientLogManager extends LogManager {
 		long serverTickCutoff = getLastTick() - MAX_LOG_AGE;
 		long cutoff = (selectedTickCutoff > serverTickCutoff) ? selectedTickCutoff : serverTickCutoff;
 		
-		Iterator<Long> it = subTickCount.keySet().iterator();
+		Iterator<Long> it = subTicks.keySet().iterator();
 		
 		while (it.hasNext()) {
 			if (it.next() > cutoff) {

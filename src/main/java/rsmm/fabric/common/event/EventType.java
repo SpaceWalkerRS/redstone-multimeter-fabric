@@ -35,7 +35,7 @@ public enum EventType {
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			int oldPower = (metaData >> 8) & 0xFF;
-			int newPower = metaData        & 0xFF;
+			int newPower =  metaData       & 0xFF;
 			
 			MeterEvent.addTextForTooltip(lines, "old power", oldPower);
 			MeterEvent.addTextForTooltip(lines, "new power", newPower);
@@ -75,17 +75,39 @@ public enum EventType {
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
+	},
+	BLOCK_UPDATE(9, "block_update") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			
+		}
+	},
+	COMPARATOR_UPDATE(10, "comparator_update") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			
+		}
+	},
+	SHAPE_UPDATE(11, "shape_update") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			MeterEvent.addTextForTooltip(lines, "direction", Direction.byId(metaData).getName());
+		}
 	};
 	
-	public static final EventType[] TYPES;
+	public static final EventType[] ALL;
 	private static final Map<String, EventType> BY_NAME;
 	
 	static {
-		TYPES = new EventType[values().length];
+		
+		ALL = new EventType[values().length];
 		BY_NAME = new HashMap<>();
 		
 		for (EventType type : values()) {
-			TYPES[type.index] = type;
+			ALL[type.index] = type;
 			BY_NAME.put(type.name, type);
 		}
 	}
@@ -103,8 +125,8 @@ public enum EventType {
 	}
 	
 	public static EventType fromIndex(int index) {
-		if (index >= 0 && index < TYPES.length) {
-			return TYPES[index];
+		if (index >= 0 && index < ALL.length) {
+			return ALL[index];
 		}
 		
 		return null;

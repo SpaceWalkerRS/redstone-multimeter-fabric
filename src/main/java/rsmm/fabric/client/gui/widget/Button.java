@@ -84,12 +84,12 @@ public class Button extends ButtonWidget implements IElement {
 		
 		int rgb = active ? 0xFFFFFF : 0xA0A0A0;
 		int a = MathHelper.ceil(alpha * 255.0F);
-		int color = rgb | (a << 24);
+		int color = (a << 24) | rgb;
 		
 		Text message = getMessage();
 		int textWidth = font.getWidth(message);
 		int textX = x + rightWidth - textWidth / 2;
-		int textY = y + (height - font.fontHeight) / 2 + 1;
+		int textY = y + height - (height + font.fontHeight) / 2;
 		
 		font.drawWithShadow(matrices, message, textX, textY, color);
 	}

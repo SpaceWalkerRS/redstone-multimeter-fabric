@@ -138,7 +138,7 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		if (multimeterClient.getMeterGroup().getMeterCount() <= 0) {
+		if (!multimeterClient.getMeterGroup().hasMeters()) {
 			String text = "Nothing to see here! Add a meter to get started.";
 			
 			int textWidth = textRenderer.getWidth(text);

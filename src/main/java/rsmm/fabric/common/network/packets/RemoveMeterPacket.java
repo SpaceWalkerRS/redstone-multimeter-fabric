@@ -9,33 +9,33 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class RemoveMeterPacket implements RSMMPacket {
 	
-	private int meterIndex;
+	private long id;
 	
 	public RemoveMeterPacket() {
 		
 	}
 	
-	public RemoveMeterPacket(int meterIndex) {
-		this.meterIndex = meterIndex;
+	public RemoveMeterPacket(long id) {
+		this.id = id;
 	}
 	
 	@Override
 	public void encode(NbtCompound data) {
-		data.putInt("meterIndex", meterIndex);
+		data.putLong("id", id);
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
-		meterIndex = data.getInt("meterIndex");
+		id = data.getLong("id");
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().removeMeter(meterIndex, player);
+		server.getMultimeter().removeMeter(player, id);
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().removeMeter(meterIndex);
+		
 	}
 }

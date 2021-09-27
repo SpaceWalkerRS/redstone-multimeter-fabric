@@ -11,7 +11,7 @@ public abstract class LogManager {
 	
 	public void clearLogs() {
 		for (Meter meter : getMeterGroup().getMeters()) {
-			meter.clearLogs();
+			meter.getLogs().clear();
 		}
 	}
 }

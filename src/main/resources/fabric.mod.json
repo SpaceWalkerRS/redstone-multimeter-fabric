@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "rsmm-fabric",
+  "id": "rsmm_fabric",
   "version": "${version}",
 
   "name": "Redstone Multimeter Fabric",
@@ -27,7 +27,7 @@
     ]
   },
   "mixins": [
-    "rsmm-fabric.mixins.json"
+    "rsmm_fabric.mixins.json"
   ],
 
   "depends": {

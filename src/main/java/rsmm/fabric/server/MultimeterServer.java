@@ -1,5 +1,6 @@
 package rsmm.fabric.server;
 
+import java.io.File;
 import java.lang.reflect.Field;
 
 import net.minecraft.block.BlockState;
@@ -7,10 +8,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
+import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.network.packets.JoinMultimeterServerPacket;
 import rsmm.fabric.common.network.packets.ServerTickPacket;
@@ -125,9 +128,14 @@ public class MultimeterServer {
 		World world = getWorldOf(pos);
 		
 		if (world != null) {
-			return world.getBlockState(pos.asBlockPos());
+			return world.getBlockState(pos.getBlockPos());
 		}
 		
 		return null;
+	}
+	
+	public File getWorldSaveDataFolder() {
+		File worldSave = server.getSavePath(WorldSavePath.ROOT).toFile();
+		return new File(worldSave, RedstoneMultimeterMod.MOD_ID);
 	}
 }

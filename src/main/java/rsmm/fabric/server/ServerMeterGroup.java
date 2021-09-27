@@ -1,150 +1,151 @@
 package rsmm.fabric.server;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
+import rsmm.fabric.common.MeterProperties;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.interfaces.mixin.IBlock;
+import rsmm.fabric.common.network.packets.MeterUpdatesPacket;
 
 public class ServerMeterGroup extends MeterGroup {
 	
 	private final Multimeter multimeter;
-	private final Map<WorldPos, Integer> posToIndex;
 	private final Set<ServerPlayerEntity> subscribers;
 	private final ServerLogManager logManager;
 	
-	private int totalMeterCount; // The total number of meters ever added to this group
+	private final List<Long> removedMeters;
+	private final Map<Long, MeterProperties> meterUpdates;
 	
 	public ServerMeterGroup(Multimeter multimeter, String name) {
 		super(name);
 		
 		this.multimeter = multimeter;
-		this.posToIndex = new HashMap<>();
 		this.subscribers = new HashSet<>();
 		this.logManager = new ServerLogManager(this);
+		
+		this.removedMeters = new ArrayList<>();
+		this.meterUpdates = new LinkedHashMap<>();
 	}
 	
 	@Override
 	public void clear() {
 		super.clear();
 		
-		posToIndex.clear();
-		totalMeterCount = 0;
+		removedMeters.clear();
+		meterUpdates.clear();
 	}
 	
 	@Override
-	public boolean addMeter(Meter meter) {
-		if (super.addMeter(meter)) {
-			posToIndex.put(meter.getPos(), meters.size() - 1);
-			totalMeterCount++;
-			
-			return true;
+	protected boolean moveMeter(Meter meter, WorldPos newPos) {
+		if (hasMeterAt(newPos)) {
+			return false;
 		}
 		
-		return false;
+		World world = multimeter.getMultimeterServer().getWorldOf(newPos);
+		
+		if (world == null) {
+			return false;
+		}
+		
+		return super.moveMeter(meter, newPos);
 	}
 	
 	@Override
-	public boolean removeMeter(int index) {
-		Meter meter = getMeter(index);
-		
-		if (meter != null && super.removeMeter(index)) {
-			int meterCount = meters.size();
-			
-			if (meterCount == 0) {
-				totalMeterCount = 0;
-			}
-			
-			posToIndex.remove(meter.getPos());
-			
-			for (;index < meterCount; index++) {
-				int newIndex = index;
-				meter = meters.get(newIndex);
-				
-				posToIndex.compute(meter.getPos(), (pos, oldIndex) -> newIndex);
-			}
-			
-			return true;
-		}
-		
-		return false;
+	protected void meterPosChanged(Meter meter) {
+		addMeterUpdate(meter.getId(), properties -> properties.setPos(meter.getPos()));
+	}
+	
+	@Override
+	protected void meterNameChanged(Meter meter) {
+		addMeterUpdate(meter.getId(), properties -> properties.setName(meter.getName()));
+	}
+	
+	@Override
+	protected void meterColorChanged(Meter meter) {
+		addMeterUpdate(meter.getId(), properties -> properties.setColor(meter.getColor()));
+	}
+	
+	@Override
+	protected void meterMovableChanged(Meter meter) {
+		addMeterUpdate(meter.getId(), properties -> properties.setMovable(meter.isMovable()));
+	}
+	
+	@Override
+	protected void meterEventTypesChanged(Meter meter) {
+		addMeterUpdate(meter.getId(), properties -> properties.setEventTypes(meter.getEventTypes()));
+	}
+	
+	@Override
+	public ServerLogManager getLogManager() {
+		return logManager;
 	}
 	
 	public Multimeter getMultimeter() {
 		return multimeter;
 	}
 	
-	public Meter getMeterAt(WorldPos pos) {
-		return getMeter(indexOfMeterAt(pos));
+	public void addMeter(MeterProperties properties) {
+		Meter meter = new Meter(properties);
+		
+		if (addMeter(meter)) {
+			meterUpdates.put(meter.getId(), properties);
+		}
 	}
 	
-	public boolean hasMeterAt(WorldPos pos) {
-		return posToIndex.containsKey(pos);
+	public void removeMeter(long id) {
+		Meter meter = getMeter(id);
+		
+		if (meter != null && removeMeter(meter)) {
+			removedMeters.add(id);
+			meterUpdates.remove(id);
+		}
 	}
 	
-	public int indexOfMeterAt(WorldPos pos) {
-		return posToIndex.getOrDefault(pos, -1);
+	public void updateMeter(long id, MeterProperties newProperties) {
+		Meter meter = getMeter(id);
+		
+		if (meter != null) {
+			updateMeter(meter, newProperties);
+		}
 	}
 	
-	public int removeMeterAt(WorldPos pos) {
-		int index = indexOfMeterAt(pos);
-		return removeMeter(index) ? index : -1;
+	private void addMeterUpdate(long id, Consumer<MeterProperties> update) {
+		update.accept(meterUpdates.computeIfAbsent(id, key -> new MeterProperties()));
 	}
 	
-	public void tryMoveMeter(int index, WorldPos toPos) {
-		tryMoveMeter(index, toPos, false);
-	}
-	
-	public void tryMoveMeter(int index, WorldPos toPos, boolean force) {
-		if (index < 0 || index >= meters.size() || posToIndex.containsKey(toPos)) {
-			return;
+	public boolean tryMoveMeter(long id, WorldPos newPos, boolean byPiston) {
+		if (!hasMeter(id)) {
+			return false;
 		}
 		
-		Meter meter = meters.get(index);
+		Meter meter = getMeter(id);
 		
-		if (!meter.isMovable() && !force) {
-			return;
+		if (byPiston && !meter.isMovable()) {
+			return false;
 		}
 		
-		posToIndex.remove(meter.getPos());
-		posToIndex.put(toPos, index);
-		
-		meter.setPos(toPos);
-		meter.markDirty();
-	}
-	
-	public String getNextMeterName(Block block) {
-		String name = "Meter";
-		
-		if (block != null && ((IBlock)block).isMeterable()) {
-			Identifier id = Registry.BLOCK.getId(block);
-			name = id.getPath();
-		}
-		
-		return String.format("%s %d", name, totalMeterCount);
-	}
-	
-	public Set<ServerPlayerEntity> getSubscribers() {
-		return Collections.unmodifiableSet(subscribers);
+		return moveMeter(meter, newPos);
 	}
 	
 	public boolean hasSubscribers() {
 		return !subscribers.isEmpty();
+	}
+	
+	public Set<ServerPlayerEntity> getSubscribers() {
+		return Collections.unmodifiableSet(subscribers);
 	}
 	
 	public void addSubscriber(ServerPlayerEntity player) {
@@ -155,93 +156,23 @@ public class ServerMeterGroup extends MeterGroup {
 		subscribers.remove(player);
 	}
 	
-	public ServerLogManager getLogManager() {
-		return logManager;
-	}
-	
-	/**
-	 * Check if this meter group has changes that need to be synced with clients
-	 */
-	public boolean isDirty() {
-		for (Meter meter : meters) {
-			if (meter.isDirty()) {
-				return true;
-			}
+	public void flushUpdates() {
+		if (removedMeters.isEmpty() && meterUpdates.isEmpty()) {
+			return;
 		}
 		
-		return false;
+		MeterUpdatesPacket packet = new MeterUpdatesPacket(removedMeters, meterUpdates);
+		multimeter.getMultimeterServer().getPacketHandler().sendPacketToPlayers(packet, subscribers);
+		
+		removedMeters.clear();
+		meterUpdates.clear();
 	}
 	
-	/**
-	 * Check if this meter group has new logs that need to be sent to clients
-	 */
-	public boolean hasNewLogs() {
-		for (Meter meter : meters) {
-			if (meter.hasNewLogs()) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	public NbtCompound collectMeterChanges() {
-		NbtCompound meterChanges = new NbtCompound();
-		
-		int meterCount = getMeterCount();
-		
-		for (int index = 0; index < meterCount; index++) {
-			Meter meter = getMeter(index);
+	public void tryLogEvent(WorldPos pos, EventType type, int metaData, BiPredicate<ServerMeterGroup, Meter> meterPredicate) {
+		if (hasMeterAt(pos)) {
+			Meter meter = getMeterAt(pos);
 			
-			if (meter.isDirty()) {
-				String key = String.valueOf(index);
-				NbtCompound meterData = meter.toNBT();
-				
-				meterChanges.put(key, meterData);
-			}
-		}
-		
-		return meterChanges;
-	}
-	
-	public void cleanUp() {
-		for (Meter meter : meters) {
-			if (meter.isDirty()) {
-				meter.cleanUp();
-			}
-		}
-	}
-	
-	public void cleanLogs() {
-		for (Meter meter : meters) {
-			if (meter.hasNewLogs()) {
-				meter.cleanLogs();
-			}
-		}
-	}
-	
-	public void blockChanged(WorldPos pos, Block oldBlock , Block newBlock) {
-		Meter meter = getMeterAt(pos);
-		
-		if (meter != null && oldBlock != Blocks.MOVING_PISTON && newBlock != Blocks.MOVING_PISTON) {
-			int oldBlockDefaults = ((IBlock)oldBlock).getDefaultMeteredEvents();
-			int newBlockDefaults = ((IBlock)newBlock).getDefaultMeteredEvents();
-			
-			if (meter.getMeteredEventTypes() == oldBlockDefaults) {
-				meter.setMeteredEventTypes(newBlockDefaults);
-				meter.markDirty();
-			}
-		}
-	}
-	
-	public void tryLogEvent(WorldPos pos, EventType type, int metaData, Predicate<Meter> meterPredicate,BiConsumer<ServerMeterGroup, Integer> onLog) {
-		int index = indexOfMeterAt(pos);
-		
-		if (index >= 0) {
-			Meter meter = getMeter(index);
-			
-			if (meterPredicate.test(meter)) {
-				onLog.accept(this, index);
+			if (meterPredicate.test(this, meter)) {
 				logManager.logEvent(meter, type, metaData);
 			}
 		}

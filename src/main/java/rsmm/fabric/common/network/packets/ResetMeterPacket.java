@@ -4,34 +4,39 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.common.MeterProperties;
 import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 
-public class ToggleMeterPacket implements RSMMPacket {
+public class ResetMeterPacket implements RSMMPacket {
 	
-	private NbtCompound properties;
+	private long id;
+	private MeterProperties newProperties;
 	
-	public ToggleMeterPacket() {
+	public ResetMeterPacket() {
 		
 	}
 	
-	public ToggleMeterPacket(NbtCompound properties) {
-		this.properties = properties;
+	public ResetMeterPacket(long id, MeterProperties newProperties) {
+		this.id = id;
+		this.newProperties = newProperties;
 	}
 	
 	@Override
 	public void encode(NbtCompound data) {
-		data.put("properties", properties);
+		data.putLong("id", id);
+		data.put("properties", newProperties.toNBT());
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
-		properties = data.getCompound("properties");
+		id = data.getLong("id");
+		newProperties = MeterProperties.fromNBT(data.getCompound("properties"));
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().toggleMeter(properties, player);
+		server.getMultimeter().resetMeter(player, id, newProperties);
 	}
 	
 	@Override

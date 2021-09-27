@@ -47,22 +47,18 @@ public class WorldChunkMixin {
 		MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 		Multimeter multimeter = server.getMultimeter();
 		
-		if (oldBlock == newBlock) {
-			if (((IBlock)newBlock).isPowerSource() && ((PowerSource)newBlock).standardLogPowerChange()) {
-				int oldPower = ((PowerSource)oldBlock).getPowerLevel(world, pos, oldState);
-				int newPower = ((PowerSource)newBlock).getPowerLevel(world, pos, newState);
-				
-				multimeter.logPowerChange(world, pos, oldPower, newPower);
-			}
-		} else {
-			multimeter.blockChanged(world, pos, oldBlock, newBlock);
+		if (oldBlock == newBlock && ((IBlock)newBlock).isPowerSource() && ((PowerSource)newBlock).standardLogPowerChange()) {
+			int oldPower = ((PowerSource)oldBlock).getPowerLevel(world, pos, oldState);
+			int newPower = ((PowerSource)newBlock).getPowerLevel(world, pos, newState);
+			
+			multimeter.logPowerChange(world, pos, oldPower, newPower);
 		}
 		
-		boolean prevMeterable = ((IBlock)oldBlock).isMeterable();
-		boolean newMeterable = ((IBlock)newBlock).isMeterable();
+		boolean wasMeterable = ((IBlock)oldBlock).isMeterable();
+		boolean isMeterable = ((IBlock)newBlock).isMeterable();
 		
-		if (prevMeterable || newMeterable) {
-			boolean active = newMeterable && ((Meterable)newBlock).isActive(world, pos, newState);
+		if (wasMeterable || isMeterable) {
+			boolean active = isMeterable && ((Meterable)newBlock).isActive(world, pos, newState);
 			multimeter.logActive(world, pos, active);
 		}
 	}

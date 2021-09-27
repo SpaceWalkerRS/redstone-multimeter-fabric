@@ -36,11 +36,11 @@ public class MeterGroupDataPacket implements RSMMPacket {
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().meterGroupDataReceived(name, meterGroupData, player);
+		server.getMultimeter().subscribeToMeterGroup(name, player);
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.meterGroupDataReceived(name, meterGroupData);
+		client.getMeterGroup().update(name, meterGroupData);
 	}
 }

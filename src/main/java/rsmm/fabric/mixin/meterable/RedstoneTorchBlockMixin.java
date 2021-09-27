@@ -14,7 +14,6 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.block.MeterableBlock;
 import rsmm.fabric.block.PowerSource;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(RedstoneTorchBlock.class)
@@ -30,11 +29,6 @@ public abstract class RedstoneTorchBlockMixin implements IBlock, MeterableBlock,
 	)
 	private void onShouldUnpowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
 		logPowered(world, pos, cir.getReturnValue()); // floor redstone torches only
-	}
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag();
 	}
 	
 	@Override

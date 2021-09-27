@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.option.KeyBinding;
-
 import rsmm.fabric.client.KeyBindings;
 
 @Mixin(KeyBinding.class)
@@ -25,6 +24,8 @@ public class KeyBindingMixin {
 			)
 	)
 	private static void onInitInjectAtReturn(CallbackInfo ci) {
-		categoryOrderMap.put(KeyBindings.CATEGORY, categoryOrderMap.size() + 1);
+		for (String category : KeyBindings.getCategories()) {
+			categoryOrderMap.put(category, categoryOrderMap.size() + 1);
+		}
 	}
 }

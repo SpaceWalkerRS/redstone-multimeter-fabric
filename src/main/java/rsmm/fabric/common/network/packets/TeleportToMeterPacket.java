@@ -9,29 +9,29 @@ import rsmm.fabric.server.MultimeterServer;
 
 public class TeleportToMeterPacket implements RSMMPacket {
 	
-	private int meterIndex;
+	private long id;
 	
 	public TeleportToMeterPacket() {
 		
 	}
 	
-	public TeleportToMeterPacket(int meterIndex) {
-		this.meterIndex = meterIndex;
+	public TeleportToMeterPacket(long id) {
+		this.id = id;
 	}
 	
 	@Override
 	public void encode(NbtCompound data) {
-		data.putInt("meterIndex", meterIndex);
+		data.putLong("id", id);
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
-		meterIndex = data.getInt("meterIndex");
+		id = data.getLong("id");
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().teleportToMeter(meterIndex, player);
+		server.getMultimeter().teleportToMeter(player, id);
 	}
 	
 	@Override

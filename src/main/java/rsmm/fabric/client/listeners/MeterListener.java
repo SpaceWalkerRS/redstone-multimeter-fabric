@@ -1,4 +1,4 @@
-package rsmm.fabric.common.listeners;
+package rsmm.fabric.client.listeners;
 
 import rsmm.fabric.common.Meter;
 
@@ -10,10 +10,10 @@ public interface MeterListener {
 	
 	public void colorChanged(Meter meter);
 	
-	public void isMovableChanged(Meter meter);
+	public void movableChanged(Meter meter);
 	
-	public void meteredEventsChanged(Meter meter);
+	public void eventTypesChanged(Meter meter);
 	
-	public void isHiddenChanged(Meter meter);
+	public void hiddenChanged(Meter meter);
 	
 }

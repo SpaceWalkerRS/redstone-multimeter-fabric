@@ -15,7 +15,6 @@ import net.minecraft.world.WorldView;
 
 import rsmm.fabric.block.MeterableBlock;
 import rsmm.fabric.block.PowerSource;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(RepeaterBlock.class)
@@ -35,11 +34,6 @@ public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlock imple
 		if (world instanceof World && !world.isClient() && cir.getReturnValue()) {
 			logPowered((World)world, pos, hasPower((World)world, pos, state));
 		}
-	}
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag();
 	}
 	
 	@Override

@@ -13,11 +13,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import rsmm.fabric.block.MeterableBlock;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(HopperBlock.class)
-public class HopperBlockMixin implements IBlock, MeterableBlock {
+public abstract class HopperBlockMixin implements IBlock, MeterableBlock {
 	
 	@Inject(
 			method = "updateEnabled",
@@ -29,11 +28,6 @@ public class HopperBlockMixin implements IBlock, MeterableBlock {
 	)
 	private void onUpdateEnabledInjectAtGet(World world, BlockPos pos, BlockState state, CallbackInfo ci, boolean shouldBeEnabled) {
 		logPowered(world, pos, !shouldBeEnabled);
-	}
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.POWERED.flag();
 	}
 	
 	@Override

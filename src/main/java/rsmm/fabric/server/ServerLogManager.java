@@ -1,26 +1,27 @@
 package rsmm.fabric.server;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.log.LogManager;
+import rsmm.fabric.common.network.packets.MeterLogsPacket;
 
 public class ServerLogManager extends LogManager {
 	
 	private final ServerMeterGroup meterGroup;
 	
-	private int currentSubTick;
+	private int nextSubTick;
 	
 	public ServerLogManager(ServerMeterGroup meterGroup) {
 		this.meterGroup = meterGroup;
 	}
 	
 	@Override
-	protected MeterGroup getMeterGroup() {
+	protected ServerMeterGroup getMeterGroup() {
 		return meterGroup;
 	}
 	
@@ -29,44 +30,64 @@ public class ServerLogManager extends LogManager {
 		return meterGroup.getMultimeter().getMultimeterServer().getMultimeter().getCurrentTick();
 	}
 	
+	@Override
+	public void clearLogs() {
+		super.clearLogs();
+		
+		nextSubTick = 0;
+	}
+	
 	public void tick() {
-		currentSubTick = 0;
+		nextSubTick = 0;
 	}
 	
 	public void logEvent(Meter meter, EventType type, int metaData) {
-		if (meter.isMetering(type)) {
-			long tick = getLastTick();
-			int subTick = currentSubTick++;
-			TickPhase phase = meterGroup.getMultimeter().getCurrentTickPhase();
-			
-			MeterEvent event = new MeterEvent(type, tick, subTick, phase, metaData);
-			
-			meter.getLogs().add(event);
-			meter.markLogged();
+		if (!meter.isMetering(type)) {
+			return;
 		}
 		
-		meter.markDirty();
+		long tick = getLastTick();
+		int subTick = nextSubTick++;
+		TickPhase phase = meterGroup.getMultimeter().getCurrentTickPhase();
+		
+		MeterEvent event = new MeterEvent(type, tick, subTick, phase, metaData);
+		meter.getLogs().add(event);
 	}
 	
-	public NbtCompound collectMeterLogs() {
-		NbtCompound data = new NbtCompound();
-		
-		int subTickCount = currentSubTick;
-		int meterCount = meterGroup.getMeterCount();
-		
-		data.putInt("subTickCount", subTickCount);
-		
-		for (int index = 0; index < meterCount; index++) {
-			Meter meter = meterGroup.getMeter(index);
-			
-			if (meter.hasNewLogs()) {
-				String key = String.valueOf(index);
-				NbtCompound logs = meter.getLogs().toTag();
-				
-				data.put(key, logs);
-			}
+	public void flushLogs() {
+		if (nextSubTick == 0) {
+			return;
 		}
 		
-		return data;
+		NbtList list = new NbtList();
+		
+		for (Meter meter : meterGroup.getMeters()) {
+			if (meter.getLogs().isEmpty()) {
+				continue;
+			}
+			
+			long id = meter.getId();
+			NbtCompound logs = meter.getLogs().toNBT();
+			
+			NbtCompound nbt = new NbtCompound();
+			nbt.putLong("id", id);
+			nbt.put("logs", logs);
+			nbt.putBoolean("powered", meter.isPowered());
+			nbt.putBoolean("active", meter.isActive());
+			list.add(nbt);
+			
+			meter.getLogs().clear();
+		}
+		
+		if (list.isEmpty()) {
+			return;
+		}
+		
+		NbtCompound nbt = new NbtCompound();
+		nbt.putInt("subTickCount", nextSubTick);
+		nbt.put("logs", list);
+		
+		MeterLogsPacket packet = new MeterLogsPacket(nbt);
+		meterGroup.getMultimeter().getMultimeterServer().getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
 	}
 }

@@ -41,12 +41,12 @@ public class MeterEventRendererDispatcher {
 	}
 	
 	public void renderTickLogs(MatrixStack matrices, int x, int y, long firstTick, long lastTick, Meter meter) {
-		for (EventType type : EventType.TYPES) {
+		for (EventType type : EventType.ALL) {
 			if (meter.isMetering(type)) {
 				getEventRenderer(type).renderTickLogs(matrices, x, y, firstTick, lastTick, meter);
 			}
 		}
-		for (EventType type : EventType.TYPES) {
+		for (EventType type : EventType.ALL) {
 			if (meter.isMetering(type)) {
 				getEventRenderer(type).renderPulseLengths(matrices, x, y, firstTick, lastTick, meter);
 			}
@@ -54,7 +54,7 @@ public class MeterEventRendererDispatcher {
 	}
 	
 	public void renderSubTickLogs(MatrixStack matrices, int x, int y, long tick, int subTickCount, Meter meter) {
-		for (EventType type : EventType.TYPES) {
+		for (EventType type : EventType.ALL) {
 			if (meter.isMetering(type)) {
 				getEventRenderer(type).renderSubTickLogs(matrices, x, y, tick, subTickCount, meter);
 			}

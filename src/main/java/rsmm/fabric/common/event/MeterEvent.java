@@ -119,28 +119,25 @@ public class MeterEvent {
 	}
 	
 	public NbtCompound toNBT() {
-		NbtCompound data = new NbtCompound();
+		NbtCompound nbt = new NbtCompound();
 		
-		NBTUtils.putEventType(data, "type", type);
-		data.putLong("tick", tick);
-		data.putInt("subTick", subTick);
-		NBTUtils.putTickPhase(data, "tickPhase", tickPhase);
-		data.putInt("metaData", metaData);
+		NBTUtils.putEventType(nbt, "type", type);
+		nbt.putLong("tick", tick);
+		nbt.putInt("subTick", subTick);
+		NBTUtils.putTickPhase(nbt, "tickPhase", tickPhase);
+		nbt.putInt("metaData", metaData);
 		
-		return data;
+		return nbt;
 	}
 	
-	public void fromNBT(NbtCompound data) {
-		type = NBTUtils.getEventType(data, "type");
-		tick = data.getLong("tick");
-		subTick = data.getInt("subTick");
-		tickPhase = NBTUtils.getTickPhase(data, "tickPhase");
-		metaData = data.getInt("metaData");
-	}
-	
-	public static MeterEvent createFromNBT(NbtCompound nbt) {
+	public static MeterEvent fromNBT(NbtCompound nbt) {
 		MeterEvent event = new MeterEvent();
-		event.fromNBT(nbt);
+		
+		event.type = NBTUtils.getEventType(nbt, "type");
+		event.tick = nbt.getLong("tick");
+		event.subTick = nbt.getInt("subTick");
+		event.tickPhase = NBTUtils.getTickPhase(nbt, "tickPhase");
+		event.metaData = nbt.getInt("metaData");
 		
 		return event;
 	}

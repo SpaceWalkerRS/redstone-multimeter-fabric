@@ -1,12 +1,10 @@
 package rsmm.fabric.common.log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
@@ -14,28 +12,35 @@ import rsmm.fabric.util.ListUtils;
 
 public class MeterLogs {
 	
-	private final Map<EventType, List<MeterEvent>> eventLogs;
+	private final List<MeterEvent>[] eventLogs;
 	
 	private long lastLoggedTick = -1;
 	
 	public MeterLogs() {
-		this.eventLogs = new HashMap<>();
+		@SuppressWarnings("unchecked")
+		List<MeterEvent>[] lists = new List[EventType.ALL.length];
+		
+		for (int index = 0; index < lists.length; index++) {
+			lists[index] = new ArrayList<>();
+		}
+		
+		this.eventLogs = lists;
 	}
 	
 	public void clear() {
-		eventLogs.clear();
+		for (List<MeterEvent> logs : eventLogs) {
+			logs.clear();
+		}
+		
 		lastLoggedTick = -1;
 	}
 	
+	public boolean isEmpty() {
+		return lastLoggedTick < 0;
+	}
+	
 	private List<MeterEvent> getLogs(EventType type) {
-		List<MeterEvent> logs = eventLogs.get(type);
-		
-		if (logs ==  null) {
-			logs = new ArrayList<>();
-			eventLogs.put(type, logs);
-		}
-		
-		return logs;
+		return eventLogs[type.getIndex()];
 	}
 	
 	public void add(MeterEvent event) {
@@ -50,7 +55,7 @@ public class MeterLogs {
 	}
 	
 	public void clearOldLogs(long cutoff) {
-		for (List<MeterEvent> logs : eventLogs.values()) {
+		for (List<MeterEvent> logs : eventLogs) {
 			while (!logs.isEmpty()) {
 				MeterEvent event = logs.get(0);
 				
@@ -68,9 +73,9 @@ public class MeterLogs {
 			return null;
 		}
 		
-		List<MeterEvent> logs = eventLogs.get(type);
+		List<MeterEvent> logs = getLogs(type);
 		
-		if (logs == null || index >= logs.size()) {
+		if (index >= logs.size()) {
 			return null;
 		}
 		
@@ -82,9 +87,9 @@ public class MeterLogs {
 	}
 	
 	public int getLastLogBefore(EventType type, long tick, int subTick) {
-		List<MeterEvent> logs = eventLogs.get(type);
+		List<MeterEvent> logs = getLogs(type);
 		
-		if (logs == null || logs.isEmpty() || !logs.get(0).isBefore(tick, subTick)) {
+		if (logs.isEmpty() || !logs.get(0).isBefore(tick, subTick)) {
 			return -1;
 		}
 		if (tick > lastLoggedTick) {
@@ -113,7 +118,7 @@ public class MeterLogs {
 	public MeterEvent getLastLogBefore(long tick, int subTick) {
 		MeterEvent event = null;
 		
-		for (EventType type : EventType.TYPES) {
+		for (EventType type : EventType.ALL) {
 			int index = getLastLogBefore(type, tick, subTick);
 			MeterEvent log = getLog(type, index);
 			
@@ -125,69 +130,46 @@ public class MeterLogs {
 		return event;
 	}
 	
-	public NbtCompound toTag() {
-		NbtCompound data = new NbtCompound();
+	public NbtCompound toNBT() {
+		NbtCompound nbt = new NbtCompound();
 		
-		for (EventType type : eventLogs.keySet()) {
-			data.put(type.getName(), toNBT(type));
+		for (EventType type : EventType.ALL) {
+			NbtList logs = toNBT(type);
+			
+			if (!logs.isEmpty()) {
+				nbt.put(type.getName(), logs);
+			}
 		}
 		
-		return data;
+		return nbt;
 	}
 	
-	public NbtCompound toNBT(EventType type) {
-		NbtCompound data = new NbtCompound();
+	private NbtList toNBT(EventType type) {
+		NbtList list = new NbtList();
 		
-		List<MeterEvent> logs = eventLogs.get(type);
-		int logCount = logs.size();
-		
-		for (int index = 0; index < logCount; index++) {
-			MeterEvent event = logs.get(index);
-			
-			String key = String.valueOf(index);
-			NbtCompound eventData = event.toNBT();
-			
-			data.put(key, eventData);
+		for (MeterEvent event : getLogs(type)) {
+			list.add(event.toNBT());
 		}
 		
-		return data;
+		return list;
 	}
 	
-	public void updateFromNBT(NbtCompound data) {
-		for (String key : data.getKeys()) {
+	public void updateFromNBT(NbtCompound nbt) {
+		for (String key : nbt.getKeys()) {
 			EventType type = EventType.fromName(key);
 			
 			if (type != null) {
-				updateFromNBT(data.getCompound(key), type);
+				updateFromNBT(type, nbt.getList(key, 10));
 			}
 		}
 	}
 	
-	public void updateFromNBT(NbtCompound data, EventType type) {
-		Set<String> keys = data.getKeys();
-		int size = keys.size();
-		NbtCompound[] nbts = new NbtCompound[size];
-		
-		// Since the order of tags is not preserved
-		// we need to re-order them first
-		for (String key : keys) {
-			try {
-				int index = Integer.valueOf(key);
-				NbtCompound eventData = data.getCompound(key);
-				
-				nbts[index] = eventData;
-			} catch (NumberFormatException e) {
-				
-			} catch (IndexOutOfBoundsException e) {
-				
-			}
-		}
-		
-		for (NbtCompound nbt : nbts) {
-			if (nbt != null) {
-				MeterEvent event = MeterEvent.createFromNBT(nbt);
-				add(event);
-			}
+	public void updateFromNBT(EventType type, NbtList logs) {
+		for (int index = 0; index < logs.size(); index++) {
+			NbtCompound nbt = logs.getCompound(index);
+			MeterEvent event = MeterEvent.fromNBT(nbt);
+			
+			add(event);
 		}
 	}
 }

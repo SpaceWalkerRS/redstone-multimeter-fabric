@@ -1,187 +1,110 @@
 package rsmm.fabric.common;
 
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
+
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.listeners.MeterChangeDispatcher;
 import rsmm.fabric.common.log.MeterLogs;
-import rsmm.fabric.util.NBTUtils;
 
 public class Meter {
 	
-	public static final Meter DUMMY = new Meter(new WorldPos(new Identifier(RedstoneMultimeterMod.MOD_ID, "dummy"), new BlockPos(0, 0, 0)), "dummy", 0, false, 0, false, false);
+	private static final AtomicLong ID_COUNTER = new AtomicLong(0);
 	
+	private final long id;
+	private final MeterProperties properties;
 	private final MeterLogs logs;
 	
-	private WorldPos pos;
-	private String name;
-	private int color;
-	private boolean movable;
-	
-	/** The event types being metered */
-	private int eventTypes;
 	/** true if the block at this position is receiving power */
 	private boolean powered;
 	/** true if the block at this position is emitting power or active in another way */
 	private boolean active;
 	
-	/** This property is used on the server to mark this meter as having changes that need to be synced with clients */
-	private boolean dirty;
-	/** This property is used on the server to mark this meter as having logged events in the past tick */
-	private boolean hasNewLogs;
-	
 	/** This property is used on the client to hide a meter in the HUD */
 	private boolean hidden;
 	
-	public Meter(WorldPos pos, String name, int color, boolean movable, int initialEventTypes, boolean initialPowered, boolean initialActive) {
+	public Meter(long id, MeterProperties properties) {
+		this.id = id;
+		this.properties = properties;
 		this.logs = new MeterLogs();
-		
-		this.pos = pos;
-		this.name = name;
-		this.color = color;
-		this.movable = movable;
-		
-		this.eventTypes = initialEventTypes;
-		this.powered = initialPowered;
-		this.active = initialActive;
 	}
 	
-	/**
-	 * Creates an empty Meter, to be populated by packet data
-	 */
-	private Meter() {
-		this.logs = new MeterLogs();
+	public Meter(MeterProperties properties) {
+		this(ID_COUNTER.getAndIncrement(), properties);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Meter) {
+			Meter meter = (Meter)obj;
+			return meter.id == id;
+		}
+		
+		return false;
+	}
+	
+	public long getId() {
+		return id;
 	}
 	
 	public MeterLogs getLogs() {
 		return logs;
 	}
 	
-	public void clearLogs() {
-		logs.clear();
+	public boolean applyUpdate(Function<MeterProperties, Boolean> update) {
+		return update.apply(properties);
 	}
 	
 	public WorldPos getPos() {
-		return pos;
+		return properties.getPos();
 	}
 	
 	public boolean isIn(World world) {
-		return pos.isOf(world);
-	}
-	
-	public void setPos(WorldPos pos) {
-		if (this.pos == null || !this.pos.equals(pos)) {
-			this.pos = pos;
-			MeterChangeDispatcher.posChanged(this);
-		}
+		return properties.getPos().isOf(world);
 	}
 	
 	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		if (this.name == null || !this.name.equals(name)) {
-			this.name = name;
-			MeterChangeDispatcher.nameChanged(this);
-		}
+		return properties.getName();
 	}
 	
 	public int getColor() {
-		return color;
-	}
-	
-	public void setColor(int color) {
-		if (this.color != color) {
-			this.color = color;
-			MeterChangeDispatcher.colorChanged(this);
-		}
+		return properties.getColor();
 	}
 	
 	public boolean isMovable() {
-		return movable;
+		return properties.getMovable();
 	}
 	
-	public void setIsMovable(boolean movable) {
-		if (this.movable != movable) {
-			this.movable = movable;
-			MeterChangeDispatcher.isMovableChanged(this);
-		}
-	}
-	
-	public int getMeteredEventTypes() {
-		return eventTypes;
+	public int getEventTypes() {
+		return properties.getEventTypes();
 	}
 	
 	public boolean isMetering(EventType type) {
-		return (eventTypes & type.flag()) != 0;
+		return properties.hasEventType(type);
 	}
 	
-	public void toggleEventType(EventType type) {
-		setMeteredEventTypes(eventTypes ^ type.flag());
-	}
-	
-	public void setMeteredEventTypes(int eventTypes) {
-		if (this.eventTypes != eventTypes) {
-			this.eventTypes = eventTypes;
-			MeterChangeDispatcher.meteredEventsChanged(this);
-		}
-	}
-	
-	/**
-	 * return true if the block at this position is receiving power
-	 */
 	public boolean isPowered() {
 		return powered;
 	}
 	
-	/**
-	 * return true if the block at this position is emitting power
-	 * or active in another way
-	 */
 	public boolean isActive() {
 		return active;
 	}
 	
-	/**
-	 * Check if this meter has changes that need to be synced with clients
-	 */
-	public boolean isDirty() {
-		return dirty;
+	public boolean setPowered(boolean powered) {
+		boolean wasPowered = this.powered;
+		this.powered = powered;
+		
+		return wasPowered != powered;
 	}
 	
-	/**
-	 * Mark this meter as having changes that need to be synced with clients
-	 */
-	public void markDirty() {
-		dirty = true;
-	}
-	
-	/**
-	 * Check if this meter has new logs that need to be sent to clients
-	 */
-	public boolean hasNewLogs() {
-		return hasNewLogs;
-	}
-	
-	/**
-	 * Mark this meter as having new logs that need to be sent to clients
-	 */
-	public void markLogged() {
-		hasNewLogs = true;
-	}
-
-	public void cleanUp() {
-		dirty = false;
-	}
-	
-	public void cleanLogs() {
-		logs.clear();
-		hasNewLogs = false;
+	public boolean setActive(boolean active) {
+		boolean wasActive = this.active;
+		this.active = active;
+		
+		return wasActive != active;
 	}
 	
 	public boolean isHidden() {
@@ -194,60 +117,29 @@ public class Meter {
 	
 	public void setHidden(boolean hidden) {
 		this.hidden = hidden;
-		MeterChangeDispatcher.isHiddenChanged(this);
-	}
-	
-	public boolean updatePowered(boolean powered) {
-		if (this.powered != powered) {
-			this.powered = powered;
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public boolean updateActive(boolean active) {
-		if (this.active != active) {
-			this.active = active;
-			
-			return true;
-		}
-		
-		return false;
 	}
 	
 	public NbtCompound toNBT() {
-		return toNBT(new NbtCompound());
-	}
-	
-	public NbtCompound toNBT(NbtCompound nbt) {
-		nbt.put("pos", NBTUtils.worldPosToNBT(pos));
-		nbt.putString("name", name);
-		nbt.putInt("color", color);
-		nbt.putBoolean("movable", movable);
+		NbtCompound nbt = new NbtCompound();
 		
-		nbt.putInt("eventTypes", eventTypes);
+		nbt.putLong("id", id);
+		nbt.put("properties", properties.toNBT());
 		nbt.putBoolean("powered", powered);
 		nbt.putBoolean("active", active);
 		
 		return nbt;
 	}
 	
-	public Meter fromNBT(NbtCompound nbt) {
-		setPos(NBTUtils.NBTToWorldPos(nbt.getCompound("pos")));
-		setName(nbt.getString("name"));
-		setColor(nbt.getInt("color"));
-		setIsMovable(nbt.getBoolean("movable"));
+	public static Meter fromNBT(NbtCompound nbt) {
+		long id = nbt.getLong("id");
+		MeterProperties properties = MeterProperties.fromNBT(nbt.getCompound("properties"));
+		boolean powered = nbt.getBoolean("powered");
+		boolean active = nbt.getBoolean("active");
 		
-		setMeteredEventTypes(nbt.getInt("eventTypes"));
-		powered = nbt.getBoolean("powered");
-		active = nbt.getBoolean("active");
+		Meter meter = new Meter(id, properties);
+		meter.setPowered(powered);
+		meter.setActive(active);
 		
-		return this;
-	}
-	
-	public static Meter createFromNBT(NbtCompound nbt) {
-		return new Meter().fromNBT(nbt);
+		return meter;
 	}
 }

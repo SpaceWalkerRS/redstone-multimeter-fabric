@@ -2,8 +2,10 @@ package rsmm.fabric.client;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.option.KeyBinding;
 
 import rsmm.fabric.client.gui.MultimeterScreen;
+import rsmm.fabric.common.event.EventType;
 
 public class InputHandler {
 	
@@ -20,6 +22,9 @@ public class InputHandler {
 		
 		while (KeyBindings.TOGGLE_METER.wasPressed()) {
 			client.toggleMeter();
+		}
+		while (KeyBindings.RESET_METER.wasPressed()) {
+			client.resetMeter();
 		}
 		while (KeyBindings.PAUSE_METERS.wasPressed()) {
 			client.getHudRenderer().pause();
@@ -38,6 +43,13 @@ public class InputHandler {
 			
 			if (minecraftClient.currentScreen == null) {
 				minecraftClient.setScreen(new MultimeterScreen(client));
+			}
+		}
+		for (int index = 0; index < KeyBindings.TOGGLE_EVENT_TYPES.length; index++) {
+			KeyBinding keyBinding = KeyBindings.TOGGLE_EVENT_TYPES[index];
+			
+			while (keyBinding.wasPressed()) {
+				client.toggleEventType(EventType.fromIndex(index));
 			}
 		}
 	}

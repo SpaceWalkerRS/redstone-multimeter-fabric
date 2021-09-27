@@ -2,8 +2,8 @@ package rsmm.fabric.mixin.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At.Shift;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -15,11 +15,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import rsmm.fabric.block.MeterableBlock;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(BellBlock.class)
-public class BellBlockMixin implements IBlock, MeterableBlock {
+public abstract class BellBlockMixin implements IBlock, MeterableBlock {
 	
 	@Inject(
 			method = "neighborUpdate",
@@ -33,11 +32,6 @@ public class BellBlockMixin implements IBlock, MeterableBlock {
 	)
 	private void onNeighborUpdateInjectBeforePowered0(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
 		logPowered(world, pos, powered);
-	}
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.POWERED.flag();
 	}
 	
 	@Override

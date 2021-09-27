@@ -8,11 +8,11 @@ import net.minecraft.world.World;
 public class WorldPos {
 	
 	private final Identifier worldId;
-	private final BlockPos pos;
+	private final BlockPos blockPos;
 	
-	public WorldPos(Identifier worldId, BlockPos pos) {
+	public WorldPos(Identifier worldId, BlockPos blockPos) {
 		this.worldId = worldId;
-		this.pos = pos.toImmutable();
+		this.blockPos = blockPos.toImmutable();
 	}
 	
 	public WorldPos(World world, BlockPos pos) {
@@ -20,11 +20,10 @@ public class WorldPos {
 	}
 	
 	@Override
-	public boolean equals(Object o) {
-		if (o instanceof WorldPos) {
-			WorldPos worldPos = (WorldPos)o;
-			
-			return worldId.equals(worldPos.worldId) && pos.equals(worldPos.pos);
+	public boolean equals(Object obj) {
+		if (obj instanceof WorldPos) {
+			WorldPos pos = (WorldPos)obj;
+			return pos.worldId.equals(worldId) && pos.blockPos.equals(blockPos);
 		}
 		
 		return false;
@@ -32,12 +31,12 @@ public class WorldPos {
 	
 	@Override
 	public int hashCode() {
-		return pos.hashCode() + 31 * worldId.hashCode();
+		return blockPos.hashCode() + 31 * worldId.hashCode();
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("%s[%d, %d, %d]", worldId.toString(), pos.getX(), pos.getY(), pos.getZ());
+		return String.format("%s[%d, %d, %d]", worldId.toString(), blockPos.getX(), blockPos.getY(), blockPos.getZ());
 	}
 	
 	public Identifier getWorldId() {
@@ -48,8 +47,8 @@ public class WorldPos {
 		return world.getRegistryKey().getValue().equals(worldId);
 	}
 	
-	public BlockPos asBlockPos() {
-		return pos;
+	public BlockPos getBlockPos() {
+		return blockPos;
 	}
 	
 	public WorldPos offset(Direction dir) {
@@ -57,17 +56,17 @@ public class WorldPos {
 	}
 	
 	public WorldPos offset(Direction dir, int distance) {
-		return new WorldPos(worldId, pos.offset(dir, distance));
+		return new WorldPos(worldId, blockPos.offset(dir, distance));
 	}
 	
 	public WorldPos offset(int dx, int dy, int dz) {
-		return new WorldPos(worldId, pos.add(dx, dy, dz));
+		return new WorldPos(worldId, blockPos.add(dx, dy, dz));
 	}
 	
 	/**
-	 * Return a WorldPos with the same coordinates in a different dimension
+	 * Return a WorldPos with the same coordinates in a different dimension.
 	 */
 	public WorldPos withWorld(Identifier worldId) {
-		return new WorldPos(worldId, pos);
+		return new WorldPos(worldId, blockPos);
 	}
 }

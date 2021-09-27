@@ -6,7 +6,6 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.block.Meterable;
 import rsmm.fabric.block.PowerSource;
-import rsmm.fabric.common.event.EventType;
 
 public interface IBlock {
 	
@@ -16,10 +15,6 @@ public interface IBlock {
 	
 	default boolean isPowerSource() {
 		return this instanceof PowerSource;
-	}
-	
-	default int getDefaultMeteredEvents() {
-		return EventType.POWERED.flag() | EventType.MOVED.flag();
 	}
 	
 	default boolean standardIsPowered() {

@@ -16,13 +16,13 @@ import net.minecraft.util.math.MathHelper;
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.element.action.MousePress;
 
-public class InvisibleButton extends Button {
+public class TransparentButton extends Button {
 	
-	public InvisibleButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, MousePress<Button> onPress) {
+	public TransparentButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, MousePress<Button> onPress) {
 		this(client, x, y, width, height, textSupplier, () -> Collections.emptyList(), onPress);
 	}
 	
-	public InvisibleButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<Button> onPress) {
+	public TransparentButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<Button> onPress) {
 		super(client, x, y, width, height, textSupplier, tooltipSupplier, onPress);
 	}
 	
@@ -36,11 +36,11 @@ public class InvisibleButton extends Button {
 			
 			int rgb = active ? (isHovered() ? 0xC0C0C0 : 0xFFFFFF) : 0x909090;
 			int a = MathHelper.ceil(alpha * 255.0F);
-			int color = rgb | (a << 24);
+			int color = (a << 24) | rgb;
 			
 			int textWidth = font.getWidth(message);
 			int textX = x + width - (width + textWidth) / 2;
-			int textY = y + (height - font.fontHeight) / 2 + 1;
+			int textY = y + height - (height + font.fontHeight) / 2;
 			
 			RenderSystem.setShader(() -> GameRenderer.getPositionTexShader());
 			RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);

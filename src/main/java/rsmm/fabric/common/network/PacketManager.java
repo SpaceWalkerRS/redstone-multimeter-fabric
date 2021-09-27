@@ -28,13 +28,14 @@ public class PacketManager {
 		PACKETS.register("join_multimeter_server", JoinMultimeterServerPacket.class, () -> new JoinMultimeterServerPacket());
 		PACKETS.register("server_tick"           , ServerTickPacket.class          , () -> new ServerTickPacket());
 		PACKETS.register("meter_group_data"      , MeterGroupDataPacket.class      , () -> new MeterGroupDataPacket());
-		PACKETS.register("meter_changes"         , MeterChangesPacket.class        , () -> new MeterChangesPacket());
+		PACKETS.register("meter_updates"         , MeterUpdatesPacket.class        , () -> new MeterUpdatesPacket());
 		PACKETS.register("meter_logs"            , MeterLogsPacket.class           , () -> new MeterLogsPacket());
-		PACKETS.register("toggle_meter"          , ToggleMeterPacket.class         , () -> new ToggleMeterPacket());
 		PACKETS.register("remove_all_meters"     , RemoveAllMetersPacket.class     , () -> new RemoveAllMetersPacket());
 		PACKETS.register("add_meter"             , AddMeterPacket.class            , () -> new AddMeterPacket());
 		PACKETS.register("remove_meter"          , RemoveMeterPacket.class         , () -> new RemoveMeterPacket());
-		PACKETS.register("meter_change"          , MeterChangePacket.class         , () -> new MeterChangePacket());
+		PACKETS.register("reset_meter"           , ResetMeterPacket.class          , () -> new ResetMeterPacket());
+		PACKETS.register("meter_update"          , MeterUpdatePacket.class         , () -> new MeterUpdatePacket());
 		PACKETS.register("teleport_to_meter"     , TeleportToMeterPacket.class     , () -> new TeleportToMeterPacket());
+		
 	}
 }

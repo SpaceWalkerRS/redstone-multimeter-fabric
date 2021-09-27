@@ -18,7 +18,7 @@ import rsmm.fabric.block.MeterableBlock;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(NoteBlock.class)
-public class NoteBlockMixin implements IBlock, MeterableBlock {
+public abstract class NoteBlockMixin implements IBlock, MeterableBlock {
 	
 	@Inject(
 			method = "neighborUpdate",

@@ -10,16 +10,10 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.block.Meterable;
 import rsmm.fabric.block.PowerSource;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(LightningRodBlock.class)
-public class LightningRodBlockMixin implements IBlock, Meterable, PowerSource {
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag() | EventType.MOVED.flag();
-	}
+public abstract class LightningRodBlockMixin implements IBlock, Meterable, PowerSource {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {

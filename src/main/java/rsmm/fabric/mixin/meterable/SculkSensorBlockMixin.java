@@ -10,16 +10,10 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.block.Meterable;
 import rsmm.fabric.block.PowerSource;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(SculkSensorBlock.class)
-public class SculkSensorBlockMixin implements IBlock, Meterable, PowerSource {
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag() | EventType.POWER_CHANGE.flag();
-	}
+public abstract class SculkSensorBlockMixin implements IBlock, Meterable, PowerSource {
 	
 	@Override
 	public int getPowerLevel(World world, BlockPos pos, BlockState state) {

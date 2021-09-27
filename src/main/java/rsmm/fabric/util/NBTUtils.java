@@ -38,9 +38,9 @@ public class NBTUtils {
 		NbtCompound nbt = new NbtCompound();
 		
 		putIdentifier(nbt, "worldId", pos.getWorldId());
-		nbt.putInt("x", pos.asBlockPos().getX());
-		nbt.putInt("y", pos.asBlockPos().getY());
-		nbt.putInt("z", pos.asBlockPos().getZ());
+		nbt.putInt("x", pos.getBlockPos().getX());
+		nbt.putInt("y", pos.getBlockPos().getY());
+		nbt.putInt("z", pos.getBlockPos().getZ());
 		
 		return nbt;
 	}

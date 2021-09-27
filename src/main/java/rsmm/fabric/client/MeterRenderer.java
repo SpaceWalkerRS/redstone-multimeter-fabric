@@ -49,7 +49,7 @@ public class MeterRenderer {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
 		
-		BlockPos pos = meter.getPos().asBlockPos();
+		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
 		

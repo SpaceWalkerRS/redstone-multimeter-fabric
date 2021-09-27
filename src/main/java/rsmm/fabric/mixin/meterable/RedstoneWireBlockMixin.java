@@ -14,7 +14,6 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.block.MeterableBlock;
 import rsmm.fabric.block.PowerSource;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(RedstoneWireBlock.class)
@@ -30,11 +29,6 @@ public abstract class RedstoneWireBlockMixin implements IBlock, MeterableBlock, 
 	)
 	private void onGetReceivedRedstonePower(World world, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
 		logPowered(world, pos, cir.getReturnValue() > 0);
-	}
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag() | EventType.POWER_CHANGE.flag();
 	}
 	
 	@Override

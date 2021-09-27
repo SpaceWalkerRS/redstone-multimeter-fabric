@@ -10,16 +10,10 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.block.Meterable;
 import rsmm.fabric.block.PowerSource;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(DaylightDetectorBlock.class)
-public class DaylightDetectorBlockMixin implements IBlock, Meterable, PowerSource {
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag() | EventType.POWER_CHANGE.flag();
-	}
+public abstract class DaylightDetectorBlockMixin implements IBlock, Meterable, PowerSource {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {

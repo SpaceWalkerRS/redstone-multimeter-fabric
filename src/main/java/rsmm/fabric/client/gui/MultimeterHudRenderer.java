@@ -2,8 +2,11 @@ package rsmm.fabric.client.gui;
 
 import static rsmm.fabric.client.gui.HudSettings.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -16,12 +19,11 @@ import net.minecraft.util.Formatting;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.log.MeterEventRendererDispatcher;
+import rsmm.fabric.client.listeners.HudListener;
+import rsmm.fabric.client.listeners.MeterGroupListener;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.event.MeterEvent;
-import rsmm.fabric.common.listeners.HudChangeDispatcher;
-import rsmm.fabric.common.listeners.MeterGroupChangeDispatcher;
-import rsmm.fabric.common.listeners.MeterGroupListener;
 import rsmm.fabric.common.log.MeterLogs;
 import rsmm.fabric.util.ColorUtils;
 
@@ -29,7 +31,9 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 	
 	private final MultimeterClient client;
 	private final TextRenderer font;
+	private final List<Long> meterIds;
 	private final MeterEventRendererDispatcher eventRenderers;
+	private final Set<HudListener> listeners;
 	
 	private boolean paused;
 	/** The offset between the last server tick and the first tick to be displayed in the ticks table */
@@ -45,30 +49,41 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		
 		this.client = client;
 		this.font = minecraftClient.textRenderer;
+		this.meterIds = new ArrayList<>();
 		this.eventRenderers = new MeterEventRendererDispatcher(this.client);
+		this.listeners = new LinkedHashSet<>();
+		
 	}
 	
 	@Override
-	public void cleared(MeterGroup meterGroup) {
+	public void meterGroupCleared(MeterGroup meterGroup) {
 		updateRowCount();
 	}
 	
 	@Override
-	public void meterAdded(MeterGroup meterGroup, int index) {
+	public void meterAdded(MeterGroup meterGroup, long id) {
 		updateRowCount();
 	}
 	
 	@Override
-	public void meterRemoved(MeterGroup meterGroup, int index) {
+	public void meterRemoved(MeterGroup meterGroup, long id) {
 		updateRowCount();
+	}
+	
+	public void addListener(HudListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removeListener(HudListener listener) {
+		listeners.remove(listener);
 	}
 	
 	public void onStartup() {
-		MeterGroupChangeDispatcher.addListener(this);
+		client.getMeterGroup().addMeterGroupListener(this);
 	}
 	
 	public void onShutdown() {
-		MeterGroupChangeDispatcher.removeListener(this);
+		client.getMeterGroup().removeMeterGroupListener(this);
 	}
 	
 	public void resetOffset() {
@@ -87,6 +102,10 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		}
 	}
 	
+	public long getIdAtRow(int index) {
+		return meterIds.get(index);
+	}
+	
 	public boolean isPaused() {
 		return paused;
 	}
@@ -102,7 +121,7 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 			resetOffset();
 		}
 		
-		HudChangeDispatcher.paused();
+		listeners.forEach(listener -> listener.hudPaused());
 	}
 	
 	public void stepForward(int amount) {
@@ -184,25 +203,24 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 	}
 	
 	private void updateRowCount() {
-		ROW_COUNT = 0;
+		meterIds.clear();
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
 			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
 				continue;
 			}
 			
-			ROW_COUNT++;
+			meterIds.add(meter.getId());
 		}
+		
+		ROW_COUNT = meterIds.size();
 	}
 	
 	public int getNamesWidth() {
 		int width = 0;
 		
-		for (Meter meter : client.getMeterGroup().getMeters()) {
-			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
-				continue;
-			}
-			
+		for (long id : meterIds) {
+			Meter meter = client.getMeterGroup().getMeter(id);
 			int nameWidth = font.getWidth(meter.getName());
 			
 			if (nameWidth > width) {
@@ -219,11 +237,8 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		int nameX;
 		int nameY = y + 2;
 		
-		for (Meter meter : client.getMeterGroup().getMeters()) {
-			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
-				continue;
-			}
-			
+		for (long id : meterIds) {
+			Meter meter = client.getMeterGroup().getMeter(id);
 			MutableText name = new LiteralText(meter.getName());
 			int nameWidth = font.getWidth(name);
 			nameX = (x + width) - (nameWidth + 1);
@@ -250,11 +265,8 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		int rowX = x;
 		int rowY = y;
 		
-		for (Meter meter : client.getMeterGroup().getMeters()) {
-			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
-				continue;
-			}
-			
+		for (long id : meterIds) {
+			Meter meter = client.getMeterGroup().getMeter(id);
 			eventRenderers.renderTickLogs(matrices, rowX, rowY, firstTick, currentTick, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;
@@ -281,11 +293,8 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		int rowX = x;
 		int rowY = y;
 		
-		for (Meter meter : client.getMeterGroup().getMeters()) {
-			if (IGNORE_HIDDEN_METERS && meter.isHidden()) {
-				continue;
-			}
-			
+		for (long id : meterIds) {
+			Meter meter = client.getMeterGroup().getMeter(id);
 			eventRenderers.renderSubTickLogs(matrices, rowX, rowY, selectedTick, subtickCount, meter);
 			
 			rowY += ROW_HEIGHT + GRID_SIZE;
@@ -333,13 +342,24 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		drawSelectionIndicator(matrices, x, y, COLUMN_WIDTH + GRID_SIZE, ROW_COUNT * (ROW_HEIGHT + GRID_SIZE));
 	}
 	
-	public void renderSelectedMeterIndicator(MatrixStack matrices, int x, int y, int selectedMeter) {
-		if (selectedMeter >= 0) {
+	public void renderSelectedMeterIndicator(MatrixStack matrices, int x, int y, long selectedMeter) {
+		int row = -1;
+		
+		for (int index = 0; index < meterIds.size(); index++) {
+			long id = meterIds.get(index);
+			
+			if (id == selectedMeter) {
+				row = index;
+				break;
+			}
+		}
+		
+		if (row >= 0) {
 			int namesWidth = getNamesWidth();
 			int namesTableWidth = namesTableWidth(namesWidth);
 			
 			int indicatorX = x;
-			int indicatorY = y + selectedMeter * (ROW_HEIGHT + GRID_SIZE);
+			int indicatorY = y + row * (ROW_HEIGHT + GRID_SIZE);
 			int indicatorHeight = ROW_HEIGHT + GRID_SIZE;
 			int indicatorWidth = namesTableWidth - GRID_SIZE;
 			
@@ -425,15 +445,19 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 	public List<Text> getTextForTooltip() {
 		if (hoveredRow >= 0) { 
 			if (hoveredSubTickColumn >= 0) {
-				long tick = getSelectedTick();
-				int subTick = hoveredSubTickColumn;
+				long id = getIdAtRow(hoveredRow);
+				Meter meter = client.getMeterGroup().getMeter(id);
 				
-				Meter meter = client.getMeterGroup().getMeter(hoveredRow);
-				MeterLogs logs = meter.getLogs();
-				MeterEvent event = logs.getLastLogBefore(tick, subTick + 1);
-				
-				if (event != null && event.isAt(tick, subTick)) {
-					return event.getTextForTooltip();
+				if (meter != null) {
+					long tick = getSelectedTick();
+					int subTick = hoveredSubTickColumn;
+					
+					MeterLogs logs = meter.getLogs();
+					MeterEvent event = logs.getLastLogBefore(tick, subTick + 1);
+					
+					if (event != null && event.isAt(tick, subTick)) {
+						return event.getTextForTooltip();
+					}
 				}
 			}
 		}

@@ -10,16 +10,10 @@ import net.minecraft.world.World;
 
 import rsmm.fabric.block.Meterable;
 import rsmm.fabric.block.PowerSource;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(LeverBlock.class)
-public class LeverBlockMixin implements IBlock, Meterable, PowerSource {
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.ACTIVE.flag();
-	}
+public abstract class LeverBlockMixin implements IBlock, Meterable, PowerSource {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {

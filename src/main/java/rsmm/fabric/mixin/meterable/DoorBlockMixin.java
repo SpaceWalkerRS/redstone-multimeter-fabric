@@ -17,11 +17,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import rsmm.fabric.block.MeterableBlock;
-import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.interfaces.mixin.IBlock;
 
 @Mixin(DoorBlock.class)
-public class DoorBlockMixin implements IBlock, MeterableBlock {
+public abstract class DoorBlockMixin implements IBlock, MeterableBlock {
 	
 	@Inject(
 			method = "neighborUpdate",
@@ -35,11 +34,6 @@ public class DoorBlockMixin implements IBlock, MeterableBlock {
 	)
 	private void onNeighborUpdateInjectBeforePowered0(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
 		logPowered(world, pos, powered);
-	}
-	
-	@Override
-	public int getDefaultMeteredEvents() {
-		return EventType.POWERED.flag();
 	}
 	
 	@Override

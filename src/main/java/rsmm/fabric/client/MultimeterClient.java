@@ -1,10 +1,10 @@
 package rsmm.fabric.client;
 
+import java.io.File;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -16,13 +16,19 @@ import net.minecraft.world.World;
 import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
 import rsmm.fabric.client.gui.MultimeterScreen;
+import rsmm.fabric.common.Meter;
+import rsmm.fabric.common.MeterProperties;
 import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.network.packets.AddMeterPacket;
 import rsmm.fabric.common.network.packets.MeterGroupDataPacket;
-import rsmm.fabric.common.network.packets.ToggleMeterPacket;
-import rsmm.fabric.util.NBTUtils;
+import rsmm.fabric.common.network.packets.MeterUpdatePacket;
+import rsmm.fabric.common.network.packets.RemoveMeterPacket;
+import rsmm.fabric.common.network.packets.ResetMeterPacket;
 
 public class MultimeterClient {
 	
+	public static final String CONFIG_PATH = "config/" + RedstoneMultimeterMod.MOD_ID;
 	private static final Function<String, String> VERSION_WARNING = (modVersion) -> {
 		String warning;
 		
@@ -40,6 +46,7 @@ public class MultimeterClient {
 	private final InputHandler inputHandler;
 	private final MeterRenderer meterRenderer;
 	private final MultimeterHudRenderer hudRenderer;
+	private final ClientMeterPropertiesManager meterPropertiesManager;
 	
 	private ClientMeterGroup meterGroup;
 	private boolean connected; // true if the client is connected to a MultimeterServer
@@ -52,6 +59,7 @@ public class MultimeterClient {
 		this.inputHandler = new InputHandler(this);
 		this.meterRenderer = new MeterRenderer(this);
 		this.hudRenderer = new MultimeterHudRenderer(this);
+		this.meterPropertiesManager = new ClientMeterPropertiesManager(this);
 		
 		this.renderHud = true;
 		this.lastServerTick = -1;
@@ -96,6 +104,10 @@ public class MultimeterClient {
 		return lastServerTick;
 	}
 	
+	public File getConfigFolder() {
+		return new File(client.runDirectory, CONFIG_PATH);
+	}
+	
 	/**
 	 * At the end of each server tick, the server sends a packet
 	 * to clients with the current server time.
@@ -133,9 +145,7 @@ public class MultimeterClient {
 			lastServerTick = serverTick;
 			
 			hudRenderer.reset();
-			
-			MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
-			packetHandler.sendPacket(packet);
+			refreshMeterGroup();
 		}
 	}
 	
@@ -144,8 +154,13 @@ public class MultimeterClient {
 			connected = false;
 			
 			hudRenderer.reset();
-			meterGroup.getLogManager().clearLogs();
+			meterGroup.reset();
 		}
+	}
+	
+	public void refreshMeterGroup() {
+		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
+		packetHandler.sendPacket(packet);
 	}
 	
 	/**
@@ -154,19 +169,69 @@ public class MultimeterClient {
 	 * already is one.
 	 */
 	public void toggleMeter() {
+		onTargetBlock(pos -> {
+			Meter meter = meterGroup.getMeterAt(pos);
+			
+			if (meter == null) {
+				addMeter(pos);
+			} else {
+				RemoveMeterPacket packet = new RemoveMeterPacket(meter.getId());
+				packetHandler.sendPacket(packet);
+			}
+		});
+	}
+	
+	private void addMeter(WorldPos pos) {
+		MeterProperties properties = new MeterProperties();
+		properties.setPos(pos);
+		
+		if (meterPropertiesManager.validate(properties)) {
+			AddMeterPacket packet = new AddMeterPacket(properties);
+			packetHandler.sendPacket(packet);
+		}
+	}
+	
+	public void resetMeter() {
+		onTargetMeter(meter -> {
+			MeterProperties newProperties = new MeterProperties();
+			newProperties.setPos(meter.getPos());
+			
+			if (meterPropertiesManager.validate(newProperties)) {
+				ResetMeterPacket packet = new ResetMeterPacket(meter.getId(), newProperties);
+				packetHandler.sendPacket(packet);
+			}
+		});
+	}
+	
+	public void toggleEventType(EventType type) {
+		onTargetMeter(meter -> {
+			MeterProperties newProperties = new MeterProperties();
+			newProperties.setEventTypes(meter.getEventTypes());
+			newProperties.toggleEventType(type);
+			
+			MeterUpdatePacket packet = new MeterUpdatePacket(meter.getId(), newProperties);
+			packetHandler.sendPacket(packet);
+		});
+	}
+	
+	private void onTargetMeter(Consumer<Meter> consumer) {
+		onTargetBlock(pos -> {
+			Meter meter = meterGroup.getMeterAt(pos);
+			
+			if (meter != null) {
+				consumer.accept(meter);
+			}
+		});
+	}
+	
+	private void onTargetBlock(Consumer<WorldPos> consumer) {
 		HitResult hitResult = client.crosshairTarget;
 		
 		if (hitResult.getType() == HitResult.Type.BLOCK) {
 			World world = client.world;
-			BlockPos pos = ((BlockHitResult)hitResult).getBlockPos();
+			BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
 			
-			NbtCompound properties = new NbtCompound();
-			
-			properties.put("pos", NBTUtils.worldPosToNBT(new WorldPos(world, pos)));
-			properties.putBoolean("movable", !Screen.hasControlDown());
-			
-			ToggleMeterPacket packet = new ToggleMeterPacket(properties);
-			packetHandler.sendPacket(packet);
+			consumer.accept(new WorldPos(world, blockPos));
 		}
 	}
 	
@@ -179,18 +244,5 @@ public class MultimeterClient {
 	
 	public boolean hasMultimeterScreenOpen() {
 		return client.currentScreen != null && client.currentScreen instanceof MultimeterScreen;
-	}
-	
-	/**
-	 * Whenever a player subscribes to a meter group,
-	 * the server sends all the data pertaining to
-	 * meters in that meter group to that client.
-	 */
-	public void meterGroupDataReceived(String name, NbtCompound data) {
-		if (!meterGroup.getName().equals(name)) {
-			meterGroup = new ClientMeterGroup(this, name);
-		}
-		
-		meterGroup.updateFromNBT(data);
 	}
 }
