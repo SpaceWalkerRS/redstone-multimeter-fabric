@@ -16,6 +16,7 @@ import rsmm.fabric.client.gui.Selector;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
 import rsmm.fabric.client.gui.widget.Button;
 import rsmm.fabric.client.gui.widget.TransparentButton;
+import rsmm.fabric.client.option.Options;
 
 public class HudElement extends AbstractParentElement {
 	
@@ -93,21 +94,29 @@ public class HudElement extends AbstractParentElement {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean success = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success && (button == GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
+		if (!success) {
 			int hoveredTickColumn = hudRenderer.getHoveredTickColumn();
 			
-			if (hoveredTickColumn >= 0) {
-				draggingTicksTable = true;
-				success = true;
-			} else {
-				int hoveredRow = hudRenderer.getHoveredRow();
-				int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
-				
-				if (hoveredNameColumn >= 0) {
-					success = selector.select(hudRenderer.getIdAtRow(hoveredRow));
+			if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+				if (hoveredTickColumn < 0) {
+					int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
+					
+					if (hoveredNameColumn < 0) {
+						success = selector.select(-1);
+					} else {
+						int hoveredRow = hudRenderer.getHoveredRow();
+						success = selector.select(hudRenderer.getIdAtRow(hoveredRow));
+						Button.playClickSound(client);
+					}
+				} else {
+					draggingTicksTable = true;
+					success = true;
+				}
+			} else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+				if (hoveredTickColumn >= 0) {
+					Options.HUD.SELECTED_COLUMN.set(hoveredTickColumn);
 					Button.playClickSound(client);
-				} else if (mouseY < (getY() + hudRenderer.getTotalHeight())) {
-					success = selector.select(-1);
+					success = true;
 				}
 			}
 		}
