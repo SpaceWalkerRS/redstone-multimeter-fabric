@@ -1,8 +1,8 @@
 package rsmm.fabric.client.gui.element.meter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+
+import org.lwjgl.glfw.GLFW;
 
 import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import net.minecraft.client.MinecraftClient;
@@ -11,21 +11,20 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction.Axis;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.gui.Selector;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
-import rsmm.fabric.client.gui.element.IElement;
+import rsmm.fabric.client.gui.element.SimpleListElement;
 import rsmm.fabric.client.gui.element.SimpleTextElement;
 import rsmm.fabric.client.gui.element.TextElement;
 import rsmm.fabric.client.gui.widget.Button;
-import rsmm.fabric.client.gui.widget.TransparentButton;
+import rsmm.fabric.client.gui.widget.IButton;
 import rsmm.fabric.client.gui.widget.Slider;
 import rsmm.fabric.client.gui.widget.TextField;
-import rsmm.fabric.client.listeners.MeterGroupListener;
-import rsmm.fabric.client.listeners.MeterListener;
+import rsmm.fabric.client.gui.widget.ToggleButton;
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.MeterProperties;
 import rsmm.fabric.common.WorldPos;
 import rsmm.fabric.common.event.EventType;
@@ -34,106 +33,77 @@ import rsmm.fabric.common.network.packets.RemoveMeterPacket;
 import rsmm.fabric.common.network.packets.TeleportToMeterPacket;
 import rsmm.fabric.util.ColorUtils;
 
-public class MeterControlsElement extends AbstractParentElement implements MeterListener, MeterGroupListener {
-	
-	private static final int SPACING = 200;
-	private static final int BUTTON_WIDTH = 150;
-	private static final int BUTTON_HEIGHT = 20;
-	private static final int ROW_HEIGHT = BUTTON_HEIGHT + 2;
-	
-	private static final Meter DUMMY = new Meter(-1, new MeterProperties(new WorldPos(new Identifier("dummy", "dummy"), BlockPos.ORIGIN), "DUMMY", 0, false, 0));
-	
-	private static long lastSelectedMeter = -1;
+public class MeterControlsElement extends AbstractParentElement {
 	
 	private final MultimeterClient client;
-	private final TextRenderer font;
+	private final Selector selector;
+	private final TextElement deleteConfirm;
+	private final SimpleListElement controls;
 	
-	private int x;
-	private int y;
-	private int width;
 	private int height;
 	
-	private long meterId = -1;
-	private Meter meter = DUMMY;
-	
-	private List<List<IElement>> grid;
+	private Meter meter;
 	
 	private TextElement title;
 	private Button hideButton;
 	private Button deleteButton;
-	private TextElement deleteConfirm;
-	
-	private TextElement pos;
-	private TextElement name;
-	private TextElement color;
-	private TextElement movable;
-	private TextElement meteredEvents;
-	
-	private TextElement dimension;
-	private TextElement posX;
-	private TextElement posY;
-	private TextElement posZ;
-	private TextElement rgb;
-	private TextElement red;
-	private TextElement green;
-	private TextElement blue;
-	private List<TextElement> eventTypeText;
-	
-	private TextField dimensionField;
-	private TextField xField;
-	private Button xPlus;
-	private Button xMinus;
-	private TextField yField;
-	private Button yPlus;
-	private Button yMinus;
-	private TextField zField;
-	private Button zPlus;
-	private Button zMinus;
-	private TextField nameField;
-	private TextField colorField;
-	private Slider redSlider;
-	private Slider greenSlider;
-	private Slider blueSlider;
-	private Button movableButton;
-	private List<Button> eventTypeButtons;
 	
 	private boolean triedDeleting;
 	
-	public MeterControlsElement(MultimeterClient client, int x, int y, int width) {
-		MinecraftClient minecraftClient = client.getMinecraftClient();
+	public MeterControlsElement(MultimeterClient client, Selector selector, int x, int y, int width) {
+		super(x, y, width, 0);
 		
 		this.client = client;
-		this.font = minecraftClient.textRenderer;
+		this.selector = selector;
 		
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = 0;
+		this.title = new SimpleTextElement(this.client, 0, 0, false, () -> new LiteralText(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).formatted(Formatting.UNDERLINE));
+		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide"))), button -> {
+			this.client.getMeterGroup().toggleHidden(meter);
+			return true;
+		});
+		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Arrays.asList(new LiteralText("Delete Meter")), button -> {
+			tryDelete();
+			
+			if (triedDeleting && Screen.hasShiftDown()) {
+				tryDelete(); // delete without asking for confirmation first
+			}
+			
+			return true;
+		});
+		this.deleteConfirm = new SimpleTextElement(this.client, 0, 0, false, () -> new LiteralText("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").formatted(Formatting.ITALIC));
+		this.controls = new SimpleListElement(this.client, getWidth());
 		
-		initControls();
-		selectMeter(lastSelectedMeter);
+		this.deleteConfirm.setVisible(false);
 		
-		this.client.getMeterGroup().addMeterListener(this);
-		this.client.getMeterGroup().addMeterGroupListener(this);
+		addChild(this.title);
+		addChild(this.hideButton);
+		addChild(this.deleteButton);
+		addChild(this.deleteConfirm);
+		addChild(this.controls);
 	}
 	
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean success = super.mouseClick(mouseX, mouseY, button);
 		
-		if (triedDeleting && (getFocusedElement() != deleteButton)) {
+		if (triedDeleting && getFocusedElement() != deleteButton) {
 			undoTryDelete();
+			success = true;
 		}
 		
 		return success;
 	}
 	
 	@Override
-	public void onRemoved() {
-		super.onRemoved();
+	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+		boolean success = super.keyPress(keyCode, scanCode, modifiers);
 		
-		client.getMeterGroup().removeMeterListener(this);
-		client.getMeterGroup().removeMeterGroupListener(this);
+		if (triedDeleting && keyCode == GLFW.GLFW_KEY_ESCAPE) {
+			undoTryDelete();
+			success = true;
+		}
+		
+		return success;
 	}
 	
 	@Override
@@ -142,555 +112,186 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 	}
 	
 	@Override
-	public int getX() {
-		return x;
-	}
-	
-	@Override
-	public void setX(int x) {
-		this.x = x;
-		updateControlsX();
-	}
-	
-	@Override
-	public int getY() {
-		return y;
-	}
-	
-	@Override
-	public void setY(int y) {
-		this.y = y;
-		updateControlsY();
-	}
-	
-	@Override
-	public int getWidth() {
-		return width;
-	}
-	
-	@Override
-	public void setWidth(int width) {
-		this.width = width;
-	}
-	
-	@Override
 	public int getHeight() {
 		return height;
 	}
 	
 	@Override
-	public void setHeight(int height) {
+	public void update() {
+		Meter prevMeter = meter;
+		meter = client.getMeterGroup().getMeter(selector.get());
 		
+		if (meter != prevMeter) {
+			createControls();
+		}
+		
+		super.update();
+		
+		updateCoords();
+		setVisible(meter != null);
 	}
 	
 	@Override
-	public void posChanged(Meter meter) {
-		if (this.meter == meter) {
-			dimensionField.updateMessage();
-			xField.updateMessage();
-			yField.updateMessage();
-			zField.updateMessage();
-		}
+	public void onChangedX(int x) {
+		updateCoords();
 	}
 	
 	@Override
-	public void nameChanged(Meter meter) {
-		if (this.meter == meter) {
-			title.update();
-			nameField.updateMessage();
-			
-			onTitleChanged();
-		}
+	public void onChangedY(int y) {
+		updateCoords();
 	}
 	
-	@Override
-	public void colorChanged(Meter meter) {
-		if (this.meter == meter) {
-			rgb.setColor(meter.getColor());
-			colorField.updateMessage();
-			redSlider.update();
-			greenSlider.update();
-			blueSlider.update();
-		}
-	}
-	
-	@Override
-	public void movableChanged(Meter meter) {
-		if (this.meter == meter) {
-			movableButton.updateMessage();
-		}
-	}
-	
-	@Override
-	public void eventTypesChanged(Meter meter) {
-		if (this.meter == meter) {
-			for (Button button : eventTypeButtons) {
-				button.updateMessage();
-			}
-		}
-	}
-	
-	@Override
-	public void hiddenChanged(Meter meter) {
-		if (this.meter == meter) {
-			hideButton.updateMessage();
-		}
-	}
-	
-	@Override
-	public void meterGroupCleared(MeterGroup meterGroup) {
-		selectMeter(-1);
-	}
-	
-	@Override
-	public void meterAdded(MeterGroup meterGroup, long id) {
+	private void createControls() {
+		controls.clear();
 		
-	}
-	
-	@Override
-	public void meterRemoved(MeterGroup meterGroup, long id) {
-		if (meterId == id) {
-			selectMeter(-1);
-		}
-	}
-
-	public long getSelectedMeterId() {
-		return meterId;
-	}
-	
-	public boolean selectMeter(long id) {
-		meterId = id;
-		lastSelectedMeter = id;
-		
-		Meter oldMeter = meter;
-		Meter newMeter = client.getMeterGroup().getMeter(meterId);
-		
-		if (newMeter == null) {
-			newMeter = DUMMY;
-		}
-		if (oldMeter == newMeter) {
-			return false;
+		if (meter == null) {
+			return;
 		}
 		
-		meter = newMeter;
+		MinecraftClient minecraftClient = client.getMinecraftClient();
+		TextRenderer font = minecraftClient.textRenderer;
 		
-		updateControls();
-		updateHeight();
-		setVisible(meter != DUMMY);
+		MeterControlsListBuilder builder = new MeterControlsListBuilder(client, getWidth());
 		
-		return true;
-	}
-	
-	private void initControls() {
-		int half = BUTTON_HEIGHT / 2 - 1;
-		
-		grid = new ArrayList<>();
-		
-		for (int column = 0; column < 3; column++) {
-			grid.add(new ArrayList<>());
-		}
-		
-		title = new SimpleTextElement(client, x, y, () -> {
-			String title = String.format("Edit Meter \'%s\'", meter.getName());
-			return new LiteralText(title).formatted(Formatting.UNDERLINE);
-		});
-		addChild(title);
-		
-		hideButton = new Button(client, x, y, 18, 18, () -> new LiteralText(meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter.isHidden() ? "Unhide" : "Hide"))), (button) -> {
-			client.getMeterGroup().toggleHidden(meter);
-			return true;
-		});
-		addChild(hideButton);
-		
-		deleteButton = new Button(client, x, y, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Arrays.asList(new LiteralText("Delete Meter")), (button) -> {
-			tryDelete();
-			
-			if (Screen.hasShiftDown()) {
-				tryDelete(); // Delete without asking for confirmation first
-			}
-			
-			return true;
-		});
-		addChild(deleteButton);
-		
-		deleteConfirm = new SimpleTextElement(client, x, y, () -> new LiteralText("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").formatted(Formatting.ITALIC));
-		addChild(deleteConfirm);
-		
-		pos = new SimpleTextElement(client, x, y, () -> new LiteralText("Pos").formatted(Formatting.ITALIC), () -> {
-			return Arrays.asList(new LiteralText("Click to teleport!"));
-		}, (t) -> {
+		builder.addCategory("Pos", () -> Arrays.asList(new LiteralText("Click to teleport!")), t -> {
 			teleport();
 			return true;
 		}, t -> false);
-		addToGrid(0, pos);
 		
-		addToGrid(0, null); // x
-		addToGrid(0, null); // y
-		addToGrid(0, null); // z
+		builder.addControl("Pos", "dimension", (client, width, height) -> new TextField(font, 0, 0, width, height, () -> meter.getPos().getWorldId().toString(), text -> changePos(meter.getPos().withWorld(new Identifier(text)))));
+		builder.addCoordinateControl("Pos", Axis.X, () -> meter.getPos(), pos -> changePos(pos));
+		builder.addCoordinateControl("Pos", Axis.Y, () -> meter.getPos(), pos -> changePos(pos));
+		builder.addCoordinateControl("Pos", Axis.Z, () -> meter.getPos(), pos -> changePos(pos));
 		
-		name = new SimpleTextElement(client, x, y, () -> new LiteralText("Name").formatted(Formatting.ITALIC));
-		addToGrid(0, name);
+		builder.addControl("Name", "", (client, width, height) -> new TextField(font, 0, 0, width, height, () -> meter.getName(), text -> changeName(text)));
 		
-		color = new SimpleTextElement(client, x, y, () -> new LiteralText("Color").formatted(Formatting.ITALIC));
-		addToGrid(0, color);
-		
-		addToGrid(0, null); // red
-		addToGrid(0, null); // green
-		addToGrid(0, null); // blue
-		
-		movable = new SimpleTextElement(client, x, y, () -> new LiteralText("Movable").formatted(Formatting.ITALIC));
-		addToGrid(0, movable);
-		
-		meteredEvents = new SimpleTextElement(client, x, y, () -> new LiteralText("Metered Events").formatted(Formatting.ITALIC));
-		addToGrid(0, meteredEvents);
-		
-		dimension = new SimpleTextElement(client, x, y, () -> new LiteralText("dimension"));
-		addToGrid(1, dimension);
-		
-		posX = new SimpleTextElement(client, x, y, () -> new LiteralText("x"));
-		addToGrid(1, posX);
-		
-		posY = new SimpleTextElement(client, x, y, () -> new LiteralText("y"));
-		addToGrid(1, posY);
-		
-		posZ = new SimpleTextElement(client, x, y, () -> new LiteralText("z"));
-		addToGrid(1, posZ);
-		
-		addToGrid(1, null); // name
-		
-		rgb = new SimpleTextElement(client, x, y, () -> new LiteralText("rgb"));
-		rgb.setColor(meter.getColor());
-		addToGrid(1, rgb);
-		
-		red = new SimpleTextElement(client, x, y, () -> new LiteralText("red").formatted(Formatting.RED));
-		addToGrid(1, red);
-		
-		green = new SimpleTextElement(client, x, y, () -> new LiteralText("green").formatted(Formatting.GREEN));
-		addToGrid(1, green);
-		
-		blue = new SimpleTextElement(client, x, y, () -> new LiteralText("blue").formatted(Formatting.BLUE));
-		addToGrid(1, blue);
-		
-		addToGrid(1, null); // movable
-		
-		eventTypeText = new ArrayList<>();
-		
-		for (EventType type : EventType.ALL) {
-			TextElement textElement = new SimpleTextElement(client, x, y, () -> new LiteralText(type.getName()));
-			
-			eventTypeText.add(textElement);
-			addToGrid(1, textElement);
-		}
-		
-		dimensionField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> meter.getPos().getWorldId().toString(), (text) -> {
-			changePos();
-		});
-		addToGrid(2, dimensionField);
-		
-		xField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().getBlockPos().getX()), (text) -> {
-			changePos();
-		});
-		addToGrid(2, xField);
-		
-		xPlus = new TransparentButton(client, x, y, half, half, () -> new LiteralText("+"), (button) -> {
-			changePos(meter.getPos().offset(Screen.hasControlDown() ? 10 : 1, 0, 0));
-			return true;
-		});
-		addChild(xPlus);
-		
-		xMinus = new TransparentButton(client, x, y, half, half, () -> new LiteralText("-"), (button) -> {
-			changePos(meter.getPos().offset(Screen.hasControlDown() ? -10 : -1, 0, 0));
-			return true;
-		});
-		addChild(xMinus);
-		
-		yField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().getBlockPos().getY()), (text) -> {
-			changePos();
-		});
-		addToGrid(2, yField);
-		
-		yPlus = new TransparentButton(client, x, y, half, half, () -> new LiteralText("+"), (button) -> {
-			changePos(meter.getPos().offset(0, Screen.hasControlDown() ? 10 : 1, 0));
-			return true;
-		});
-		addChild(yPlus);
-		
-		yMinus = new TransparentButton(client, x, y, half, half, () -> new LiteralText("-"), (button) -> {
-			changePos(meter.getPos().offset(0, Screen.hasControlDown() ? -10 : -1, 0));
-			return true;
-		});
-		addChild(yMinus);
-		
-		zField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> String.valueOf(meter.getPos().getBlockPos().getZ()), (text) -> {
-			changePos();
-		});
-		addToGrid(2, zField);
-		
-		zPlus = new TransparentButton(client, x, y, half, half, () -> new LiteralText("+"), (button) -> {
-			changePos(meter.getPos().offset(0, 0, Screen.hasControlDown() ? 10 : 1));
-			return true;
-		});
-		addChild(zPlus);
-		
-		zMinus = new TransparentButton(client, x, y, half, half, () -> new LiteralText("-"), (button) -> {
-			changePos(meter.getPos().offset(0, 0, Screen.hasControlDown() ? -10 : -1));
-			return true;
-		});
-		addChild(zMinus);
-		
-		nameField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> meter.getName(), (text) -> {
-			changeName(text);
-		});
-		addToGrid(2, nameField);
-		
-		colorField = new TextField(font, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> ColorUtils.toRGBString(meter.getColor()), (text) -> {
+		builder.addControl("Color", () -> new LiteralText("rgb").styled(style -> style.withColor(meter.getColor())), (client, width, height) -> new TextField(font, 0, 0, width, height, () -> ColorUtils.toRGBString(meter.getColor()), text -> {
 			try {
 				changeColor(ColorUtils.fromRGBString(text));
 			} catch (NumberFormatException e) {
 				
 			}
-		});
-		addToGrid(2, colorField);
-		
-		redSlider = new Slider(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
-			int red = ColorUtils.getRed(meter.getColor());
-			String text = Integer.toString(red);
+		}));
+		builder.addControl("Color", () -> new LiteralText("red").formatted(Formatting.RED), (client, width, height) -> new Slider(0, 0, width, height, () -> {
+			int color = meter.getColor();
+			int red = ColorUtils.getRed(color);
 			
-			return new LiteralText(text);
+			return new LiteralText(String.valueOf(red));
 		}, () -> {
-			int red = ColorUtils.getRed(meter.getColor());
-			return red / 255.0D;
-		}, (slider) -> {
-			changeColorFromSliders();
-		}, (value) -> {
-			int red = (int)(value * 255);
-			return red / 255.0D;
-		});
-		addToGrid(2, redSlider);
-		
-		greenSlider = new Slider(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
-			int green = ColorUtils.getGreen(meter.getColor());
-			String text = Integer.toString(green);
+			int color = meter.getColor();
+			int red = ColorUtils.getRed(color);
 			
-			return new LiteralText(text);
+			return (double)red / 0xFF;
+		}, slider -> {
+			int red = (int)(slider.getValue() * 0xFF);
+			int color = ColorUtils.setRed(meter.getColor(), red);
+			
+			changeColor(color);
+		}, value -> {
+			return (double)(int)(value * 0xFF) / 0xFF;
+		}));
+		builder.addControl("Color", () -> new LiteralText("green").formatted(Formatting.GREEN), (client, width, height) -> new Slider(0, 0, width, height, () -> {
+			int color = meter.getColor();
+			int green = ColorUtils.getGreen(color);
+			
+			return new LiteralText(String.valueOf(green));
 		}, () -> {
-			int green = ColorUtils.getGreen(meter.getColor());
-			return green / 255.0D;
-		}, (slider) -> {
-			changeColorFromSliders();
-		}, (value) -> {
-			int green = (int)(value * 255);
-			return green / 255.0D;
-		});
-		addToGrid(2, greenSlider);
-		
-		blueSlider = new Slider(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
-			int blue = ColorUtils.getBlue(meter.getColor());
-			String text = Integer.toString(blue);
+			int color = meter.getColor();
+			int green = ColorUtils.getGreen(color);
 			
-			return new LiteralText(text);
+			return (double)green / 0xFF;
+		}, slider -> {
+			int green = (int)(slider.getValue() * 0xFF);
+			int color = ColorUtils.setGreen(meter.getColor(), green);
+			
+			changeColor(color);
+		}, value -> {
+			return (double)(int)(value * 0xFF) / 0xFF;
+		}));
+		builder.addControl("Color", () -> new LiteralText("blue").formatted(Formatting.BLUE), (client, width, height) -> new Slider(0, 0, width, height, () -> {
+			int color = meter.getColor();
+			int blue = ColorUtils.getBlue(color);
+			
+			return new LiteralText(String.valueOf(blue));
 		}, () -> {
-			int blue = ColorUtils.getBlue(meter.getColor());
-			return blue / 255.0D;
-		}, (slider) -> {
-			changeColorFromSliders();
-		}, (value) -> {
-			int blue = (int)(value * 255);
-			return blue / 255.0D;
-		});
-		addToGrid(2, blueSlider);
-		
-		movableButton = new Button(client, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
-			String text = String.valueOf(meter.isMovable());
-			Formatting formatting = meter.isMovable() ? Formatting.GREEN : Formatting.RED;
+			int color = meter.getColor();
+			int blue = ColorUtils.getBlue(color);
 			
-			return new LiteralText(text).formatted(formatting);
-		}, (button) -> {
-			changeMovable(!meter.isMovable());
-			return true;
-		});
-		addToGrid(2, movableButton);
+			return (double)blue / 0xFF;
+		}, slider -> {
+			int blue = (int)(slider.getValue() * 0xFF);
+			int color = ColorUtils.setBlue(meter.getColor(), blue);
+			
+			changeColor(color);
+		}, value -> {
+			return (double)(int)(value * 0xFF) / 0xFF;
+		}));
 		
-		eventTypeButtons = new ArrayList<>();
+		
+		builder.addControl("Movable", "", (client, width, height) -> new ToggleButton(client, 0, 0, width, height, () -> meter.isMovable(), button -> toggleMovable()));
 		
 		for (EventType type : EventType.ALL) {
-			Button eventTypeButton = new Button(client, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
-				String text = String.valueOf(meter.isMetering(type));
-				Formatting formatting = meter.isMetering(type) ? Formatting.GREEN : Formatting.RED;
-				
-				return new LiteralText(text).formatted(formatting);
-			}, (button) -> {
-				toggleEventType(type);
-				return true;
-			});
+			builder.addControl("Event Types", type.getName(), (client, width, height) -> new ToggleButton(client, 0, 0, width, height, () -> meter.isMetering(type), button -> toggleEventType(type)));
+		}
+		
+		builder.setMidpoint(100);
+		builder.build(controls);
+	}
+	
+	private void updateCoords() {
+		height = 0;
+		
+		if (meter != null) {
+			int x = getX();
 			
-			eventTypeButtons.add(eventTypeButton);
-			addToGrid(2, eventTypeButton);
-		}
-		
-		updateControlsX();
-		updateControlsY();
-		updateHeight();
-		
-		setVisible(false);
-	}
-	
-	private void addToGrid(int column, IElement child) {
-		if (column >= 0 && column < grid.size()) {
-			grid.get(column).add(child);
+			title.setX(x + 2);
+			controls.setX(x);
 			
-			if (child != null) {
-				addChild(child);
-			}
-		}
-	}
-	
-	private void updateTitle() {
-		title.update();
-		onTitleChanged();
-	}
-
-	private void onTitleChanged() {
-		int x = title.getX() + title.getWidth() + 10;
-		
-		hideButton.setX(x);
-		deleteButton.setX(x + hideButton.getWidth() + 2);
-		deleteConfirm.setX(x + hideButton.getWidth() + 2 + deleteButton.getWidth() + 5);
-	}
-	
-	private void updateControls() {
-		updateTitle();
-		hideButton.updateMessage();
-		undoTryDelete();
-		
-		rgb.setColor(meter.getColor());
-		
-		dimensionField.updateMessage();
-		xField.updateMessage();
-		yField.updateMessage();
-		zField.updateMessage();
-		nameField.updateMessage();
-		colorField.updateMessage();
-		redSlider.update();
-		greenSlider.update();
-		blueSlider.update();
-		movableButton.updateMessage();
-		for (Button button : eventTypeButtons) {
-			button.updateMessage();
-		}
-	}
-	
-	private void updateControlsX() {
-		int titleX = x + 2;
-		int controlsX = x + SPACING;
-		int dx = 7;
-		
-		title.setX(titleX);
-		onTitleChanged();
-		
-		for (IElement e : grid.get(0)) {
-			if (e != null) {
-				e.setX(titleX);
-			}
-		}
-		for (IElement e : grid.get(1)) {
-			if (e != null) {
-				e.setX(controlsX - dx - e.getWidth());
-			}
-		}
-		for (IElement e : grid.get(2)) {
-			if (e != null) {
-				e.setX(controlsX);
-			}
-		}
-		
-		int plusMinusX = xField.getX() + xField.getWidth();
-		
-		xPlus.setX(plusMinusX);
-		xMinus.setX(plusMinusX);
-		yPlus.setX(plusMinusX);
-		yMinus.setX(plusMinusX);
-		zPlus.setX(plusMinusX);
-		zMinus.setX(plusMinusX);
-	}
-	
-	private void updateControlsY() {
-		int titleY = y + ROW_HEIGHT;
-		int dy = 6;
-		
-		title.setY(titleY);
-		hideButton.setY(titleY - dy);
-		deleteButton.setY(titleY - dy);
-		deleteConfirm.setY(titleY);
-		
-		for (List<IElement> column : grid) {
-			int controlY = titleY + ROW_HEIGHT;
+			x += title.getWidth() + 10;
+			hideButton.setX(x);
 			
-			for (IElement e : column) {
-				if (e != null) {
-					if (e instanceof TextElement) {
-						e.setY(controlY + dy);
-					} else {
-						e.setY(controlY);
-					}
-				}
-				
-				controlY += ROW_HEIGHT;
-			}
-		}
-		
-		xPlus.setY(xField.getY() + 1);
-		xMinus.setY(xPlus.getY() + xPlus.getHeight());
-		yPlus.setY(yField.getY() + 1);
-		yMinus.setY(yPlus.getY() + yPlus.getHeight());
-		zPlus.setY(zField.getY() + 1);
-		zMinus.setY(zPlus.getY() + zPlus.getHeight());
-	}
-	
-	private void updateHeight() {
-		if (meter == DUMMY) {
-			height = 0;
-		} else {
-			List<IElement> children = getChildren();
-			IElement bottom = children.get(children.size() - 1);
+			x += hideButton.getWidth() + 2;
+			deleteButton.setX(x);
 			
-			height = bottom.getY() + bottom.getHeight() + 2 - y;
+			x += deleteButton.getWidth() + 5;
+			deleteConfirm.setX(x);
+			
+			int y = getY() + IButton.DEFAULT_HEIGHT;
+			
+			title.setY(y);
+			deleteConfirm.setY(y);
+			
+			y -= 6;
+			hideButton.setY(y);
+			deleteButton.setY(y);
+			
+			y += IButton.DEFAULT_HEIGHT + 10;
+			controls.setY(y);
+			
+			height = (controls.getY() + controls.getHeight()) - getY();
 		}
 	}
 	
 	private void tryDelete() {
 		if (triedDeleting) {
-			RemoveMeterPacket packet = new RemoveMeterPacket(meterId);
+			RemoveMeterPacket packet = new RemoveMeterPacket(meter.getId());
 			client.getPacketHandler().sendPacket(packet);
 		}
 		
 		triedDeleting = !triedDeleting;
-		deleteButton.updateMessage();
+		deleteButton.update();
 		deleteConfirm.setVisible(triedDeleting);
 	}
 	
 	private void undoTryDelete() {
 		triedDeleting = false;
-		deleteButton.updateMessage();
+		deleteButton.update();
 		deleteConfirm.setVisible(false);
 	}
 	
 	private void teleport() {
-		TeleportToMeterPacket packet = new TeleportToMeterPacket(meterId);
+		TeleportToMeterPacket packet = new TeleportToMeterPacket(meter.getId());
 		client.getPacketHandler().sendPacket(packet);
-	}
-	
-	private void changePos() {
-		try {
-			Identifier worldId = new Identifier(dimensionField.getText());
-			int x = Integer.valueOf(xField.getText());
-			int y = Integer.valueOf(yField.getText());
-			int z = Integer.valueOf(zField.getText());
-			
-			changePos(new WorldPos(worldId, new BlockPos(x, y, z)));
-		} catch (NumberFormatException e) {
-			
-		}
 	}
 	
 	private void changePos(WorldPos pos) {
@@ -701,20 +302,12 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		changeProperty(properties -> properties.setName(name));
 	}
 	
-	private void changeColorFromSliders() {
-		int r = (int)(255 * redSlider.getValue());
-		int g = (int)(255 * greenSlider.getValue());
-		int b = (int)(255 * blueSlider.getValue());
-		
-		changeColor(ColorUtils.fromRGB(r, g, b));
-	}
-	
 	private void changeColor(int color) {
 		changeProperty(properties -> properties.setColor(color));
 	}
 	
-	private void changeMovable(boolean movable) {
-		changeProperty(properties -> properties.setMovable(movable));
+	private void toggleMovable() {
+		changeProperty(properties -> properties.setMovable(!meter.isMovable()));
 	}
 	
 	private void toggleEventType(EventType type) {
@@ -728,7 +321,7 @@ public class MeterControlsElement extends AbstractParentElement implements Meter
 		MeterProperties newProperties = new MeterProperties();
 		consumer.accept(newProperties);
 		
-		MeterUpdatePacket packet = new MeterUpdatePacket(meterId, newProperties);
+		MeterUpdatePacket packet = new MeterUpdatePacket(meter.getId(), newProperties);
 		client.getPacketHandler().sendPacket(packet);
 	}
 }

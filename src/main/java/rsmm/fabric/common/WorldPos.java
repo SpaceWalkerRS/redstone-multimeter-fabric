@@ -3,6 +3,7 @@ package rsmm.fabric.common;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 
 public class WorldPos {
@@ -59,6 +60,14 @@ public class WorldPos {
 		return new WorldPos(worldId, blockPos.offset(dir, distance));
 	}
 	
+	public WorldPos offset(Axis axis) {
+		return offset(axis, 1);
+	}
+	
+	public WorldPos offset(Axis axis, int distance) {
+		return new WorldPos(worldId, blockPos.offset(axis, distance));
+	}
+	
 	public WorldPos offset(int dx, int dy, int dz) {
 		return new WorldPos(worldId, blockPos.add(dx, dy, dz));
 	}
@@ -68,5 +77,13 @@ public class WorldPos {
 	 */
 	public WorldPos withWorld(Identifier worldId) {
 		return new WorldPos(worldId, blockPos);
+	}
+	
+	public WorldPos withCoord(Axis axis, int coord) {
+		int x = (axis == Axis.X) ? coord : blockPos.getX();
+		int y = (axis == Axis.Y) ? coord : blockPos.getY();
+		int z = (axis == Axis.Z) ? coord : blockPos.getZ();
+		
+		return new WorldPos(worldId, new BlockPos(x, y, z));
 	}
 }

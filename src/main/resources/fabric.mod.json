@@ -24,6 +24,9 @@
   "entrypoints": {
     "main": [
       "rsmm.fabric.RedstoneMultimeterMod"
+    ],
+    "modmenu": [
+      "rsmm.fabric.modmenu.RedstoneMultimeterMod"
     ]
   },
   "mixins": [

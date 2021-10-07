@@ -42,7 +42,7 @@ public class InputHandler {
 			MinecraftClient minecraftClient = client.getMinecraftClient();
 			
 			if (minecraftClient.currentScreen == null) {
-				minecraftClient.setScreen(new MultimeterScreen(client));
+				minecraftClient.setScreen(new MultimeterScreen());
 			}
 		}
 		for (int index = 0; index < KeyBindings.TOGGLE_EVENT_TYPES.length; index++) {

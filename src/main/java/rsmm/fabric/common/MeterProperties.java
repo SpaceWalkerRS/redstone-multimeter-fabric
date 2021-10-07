@@ -147,7 +147,7 @@ public class MeterProperties {
 				}
 			}
 			
-			json.add("eventTypes", types);
+			json.add("event_types", types);
 		}
 		
 		return json;
@@ -181,8 +181,8 @@ public class MeterProperties {
 				properties.movable = movableJson.getAsBoolean();
 			}
 		}
-		if (json.has("eventTypes")) {
-			JsonElement typesJson = json.get("eventTypes");
+		if (json.has("event_types")) {
+			JsonElement typesJson = json.get("event_types");
 			
 			if (typesJson.isJsonArray()) {
 				properties.eventTypes = 0;

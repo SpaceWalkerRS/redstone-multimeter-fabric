@@ -64,25 +64,25 @@ public abstract class MeterGroup {
 		return (index < 0 || index >= meters.size()) ? null : meters.get(index);
 	}
 	
-	protected boolean addMeter(Meter meter) {
+	protected void addMeter(Meter meter) {
 		// This check prevents meters from being added twice and
 		// multiple meters from being added at the same position.
 		if (idToIndex.containsKey(meter.getId()) || posToIndex.containsKey(meter.getPos())) {
-			return false;
+			return;
 		}
 		
 		idToIndex.put(meter.getId(), meters.size());
 		posToIndex.put(meter.getPos(), meters.size());
 		meters.add(meter);
 		
-		return true;
+		meterAdded(meter);
 	}
 	
-	protected boolean removeMeter(Meter meter) {
+	protected void removeMeter(Meter meter) {
 		int index = idToIndex.getOrDefault(meter.getId(), -1);
 		
 		if (index < 0 || index >= meters.size()) {
-			return false;
+			return;
 		}
 		
 		meters.remove(index);
@@ -96,35 +96,32 @@ public abstract class MeterGroup {
 			posToIndex.compute(meter.getPos(), (pos, prevIndex) -> prevIndex - 1);
 		}
 		
-		return true;
+		meterRemoved(meter);
 	}
 	
-	protected boolean updateMeter(Meter meter, MeterProperties newProperties) {
-		return meter.applyUpdate(properties -> {
+	protected void updateMeter(Meter meter, MeterProperties newProperties) {
+		meter.applyUpdate(properties -> {
 			boolean changed = false;
 			
-			if (newProperties.getPos() != null && moveMeter(meter, newProperties.getPos())) {
-				changed = true;
-				meterPosChanged(meter);
+			if (newProperties.getPos() != null) {
+				changed |= moveMeter(meter, newProperties.getPos());
 			}
-			if (newProperties.getName() != null && properties.setName(newProperties.getName())) {
-				changed = true;
-				meterNameChanged(meter);
+			if (newProperties.getName() != null) {
+				changed |= properties.setName(newProperties.getName());
 			}
-			if (newProperties.getColor() != null && properties.setColor(newProperties.getColor())) {
-				changed = true;
-				meterColorChanged(meter);
+			if (newProperties.getColor() != null) {
+				changed |= properties.setColor(newProperties.getColor());
 			}
-			if (newProperties.getMovable() != null && properties.setMovable(newProperties.getMovable())) {
-				changed = true;
-				meterMovableChanged(meter);
+			if (newProperties.getMovable() != null) {
+				changed |= properties.setMovable(newProperties.getMovable());
 			}
-			if (newProperties.getEventTypes() != null && properties.setEventTypes(newProperties.getEventTypes())) {
-				changed = true;
-				meterEventTypesChanged(meter);
+			if (newProperties.getEventTypes() != null) {
+				changed |= properties.setEventTypes(newProperties.getEventTypes());
 			}
 			
-			return changed;
+			if (changed) {
+				meterUpdated(meter);
+			}
 		});
 	}
 	
@@ -144,18 +141,16 @@ public abstract class MeterGroup {
 		posToIndex.remove(pos, index);
 		posToIndex.put(newPos, index);
 		
-		return meter.applyUpdate(properties -> properties.setPos(newPos));
+		meter.applyUpdate(properties -> properties.setPos(newPos));
+		
+		return true;
 	}
 	
-	protected abstract void meterPosChanged(Meter meter);
+	protected abstract void meterAdded(Meter meter);
 	
-	protected abstract void meterNameChanged(Meter meter);
+	protected abstract void meterRemoved(Meter meter);
 	
-	protected abstract void meterColorChanged(Meter meter);
-	
-	protected abstract void meterMovableChanged(Meter meter);
-	
-	protected abstract void meterEventTypesChanged(Meter meter);
+	protected abstract void meterUpdated(Meter meter);
 	
 	public abstract LogManager getLogManager();
 	

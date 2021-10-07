@@ -31,7 +31,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		MeterEvent event = logs.getLog(type, index);
 		MeterEvent nextEvent = logs.getLog(type, ++index);
 		
-		long lastHudTick = firstTick + COLUMN_COUNT;
+		long lastHudTick = firstTick + columnCount();
 		
 		if (lastHudTick > lastTick) {
 			lastHudTick = lastTick;
@@ -103,7 +103,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			return;
 		}
 		
-		long lastHudTick = firstTick + COLUMN_COUNT;
+		long lastHudTick = firstTick + columnCount();
 		
 		if (lastHudTick > lastTick) {
 			lastHudTick = lastTick;

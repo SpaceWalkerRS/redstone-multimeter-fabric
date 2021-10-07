@@ -52,13 +52,28 @@ public class ColorUtils {
 		return blue & 0xFF;
 	}
 	
+	public static int setAlpha(int color, int alpha) {
+		return color & (~(0xFF << 24)) | (alpha << 24);
+	}
+	
+	public static int setRed(int color, int red) {
+		return color & (~(0xFF << 16)) | (red << 16);
+	}
+	
+	public static int setGreen(int color, int green) {
+		return color & (~(0xFF << 8)) | (green << 8);
+	}
+	
+	public static int setBlue(int color, int blue) {
+		return color & ~0xFF | blue;
+	}
+	
 	public static int fromRGB(int red, int green, int blue) {
 		return fromRed(red) | fromGreen(green) | fromBlue(blue);
 	}
 	
 	public static int fromARGB(int alpha, int red, int green, int blue) {
-		int rgb = fromRGB(red, green, blue);
-		return fromARGB(alpha, rgb);
+		return fromARGB(alpha, fromRGB(red, green, blue));
 	}
 	
 	public static int fromARGB(int alpha, int rgb) {

@@ -23,7 +23,7 @@ import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.element.IElement;
 import rsmm.fabric.client.gui.element.action.MousePress;
 
-public class Button extends ButtonWidget implements IElement {
+public class Button extends ButtonWidget implements IElement, IButton {
 	
 	protected final MultimeterClient client;
 	protected final Supplier<Text> textSupplier;
@@ -190,18 +190,8 @@ public class Button extends ButtonWidget implements IElement {
 	}
 	
 	@Override
-	public void setWidth(int width) {
-		this.width = width;
-	}
-	
-	@Override
 	public int getHeight() {
 		return height;
-	}
-	
-	@Override
-	public void setHeight(int height) {
-		this.height = height;
 	}
 	
 	@Override
@@ -219,8 +209,19 @@ public class Button extends ButtonWidget implements IElement {
 		return tooltipSupplier.get();
 	}
 	
-	public void updateMessage() {
+	@Override
+	public void update() {
 		setMessage(textSupplier.get());
+	}
+	
+	@Override
+	public boolean isActive() {
+		return active;
+	}
+	
+	@Override
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 	
 	public static void playClickSound(MultimeterClient client) {

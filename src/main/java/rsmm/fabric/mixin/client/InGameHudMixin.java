@@ -28,7 +28,7 @@ public class InGameHudMixin {
 			)
 	)
 	private void onRenderInjectAfterRenderStatusEffectOverlay(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-		if (((IMinecraftClient)client).getMultimeterClient().renderHud()) {
+		if (((IMinecraftClient)client).getMultimeterClient().shouldRenderHud()) {
 			((IMinecraftClient)client).getMultimeterClient().getHudRenderer().render(matrices);
 		}
 	}

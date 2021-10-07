@@ -13,9 +13,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
-import rsmm.fabric.client.gui.element.IElement;
-
-public class TextField extends TextFieldWidget implements IElement {
+public class TextField extends TextFieldWidget implements IButton {
 	
 	private final Supplier<String> textSupplier;
 	private final Supplier<List<Text>> tooltipSupplier;
@@ -32,7 +30,7 @@ public class TextField extends TextFieldWidget implements IElement {
 		this.textSupplier = textSupplier;
 		this.tooltipSupplier = tooltipSupplier;
 		
-		this.updateMessage();
+		this.update();
 		this.setChangedListener((text) -> {
 			if (!deaf) {
 				textChangedListener.accept(text);
@@ -119,7 +117,7 @@ public class TextField extends TextFieldWidget implements IElement {
 	@Override
 	public void unfocus() {
 		setFocused(false);
-		updateMessage();
+		update();
 	}
 	
 	@Override
@@ -148,18 +146,8 @@ public class TextField extends TextFieldWidget implements IElement {
 	}
 	
 	@Override
-	public void setWidth(int width) {
-		this.width = width - 2;
-	}
-	
-	@Override
 	public int getHeight() {
 		return height + 2;
-	}
-	
-	@Override
-	public void setHeight(int height) {
-		this.height = height - 2;
 	}
 	
 	@Override
@@ -177,11 +165,22 @@ public class TextField extends TextFieldWidget implements IElement {
 		return tooltipSupplier.get();
 	}
 	
-	public void updateMessage() {
+	@Override
+	public void update() {
 		if (!isFocused()) {
 			deaf = true;
 			setText(textSupplier.get());
 			deaf = false;
 		}
+	}
+	
+	@Override
+	public boolean isActive() {
+		return active && super.isActive();
+	}
+	
+	@Override
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 }

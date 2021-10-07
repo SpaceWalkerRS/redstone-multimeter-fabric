@@ -7,24 +7,26 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.interfaces.mixin.IMinecraftClient;
 
 public abstract class RSMMScreen extends Screen implements IParentElement {
 	
-	public final MultimeterClient multimeterClient;
 	private final List<IElement> content;
+	private final boolean drawTitle;
 	
 	private IElement focused;
 	private boolean dragging;
 	
-	protected RSMMScreen(MultimeterClient multimeterClient) {
-		super(new LiteralText(""));
+	protected MultimeterClient multimeterClient;
+	
+	protected RSMMScreen(Text title, boolean drawTitle) {
+		super(title);
 		
-		this.multimeterClient = multimeterClient;
 		this.content = new ArrayList<>();
+		this.drawTitle = drawTitle;
 	}
 	
 	@Override
@@ -82,6 +84,14 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		renderBackground(matrices);
 		renderContent(matrices, mouseX, mouseY, delta);
 		
+		if (drawTitle) {
+			int width = textRenderer.getWidth(title);
+			int x = getX() + (getWidth() - width) / 2;
+			int y = getY() + 6;
+			
+			drawTextWithShadow(matrices, textRenderer, title, x, y, 0xFFFFFFFF);
+		}
+		
 		List<Text> tooltip = getTooltip(mouseX, mouseY);
 		
 		if (!tooltip.isEmpty()) {
@@ -91,8 +101,11 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	
 	@Override
 	protected final void init() {
+		multimeterClient = ((IMinecraftClient)client).getMultimeterClient();
+		
 		removeChildren();
 		initScreen();
+		update();
 	}
 	
 	protected abstract void initScreen();
@@ -112,7 +125,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		if (IParentElement.super.keyPress(keyCode, scanCode, modifiers)) {
 			return true;
 		}
-		if (shouldCloseOnEsc() && (keyCode == GLFW.GLFW_KEY_ESCAPE)) {
+		if (shouldCloseOnEsc() && keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			onClose();
 			return true;
 		}
@@ -175,18 +188,8 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	}
 	
 	@Override
-	public final void setWidth(int width) {
-		
-	}
-	
-	@Override
 	public final int getHeight() {
 		return height;
-	}
-	
-	@Override
-	public final void setHeight(int height) {
-		
 	}
 	
 	@Override

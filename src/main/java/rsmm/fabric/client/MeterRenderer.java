@@ -91,7 +91,7 @@ public class MeterRenderer {
 		float c0 = -0.002F;
 		float c1 = 1.002F;
 		
-		// Back Face
+		// West face
 		builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
 		builder.vertex(model, c0, c0, c1).color(r, g, b, a).next();
 		builder.vertex(model, c0, c1, c1).color(r, g, b, a).next();
@@ -100,7 +100,7 @@ public class MeterRenderer {
 			builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
 		}
 		
-		// Front Face
+		// East face
 		builder.vertex(model, c1, c0, c0).color(r, g, b, a).next();
 		builder.vertex(model, c1, c1, c0).color(r, g, b, a).next();
 		builder.vertex(model, c1, c1, c1).color(r, g, b, a).next();
@@ -109,7 +109,7 @@ public class MeterRenderer {
 			builder.vertex(model, c1, c0, c0).color(r, g, b, a).next();
 		}
 		
-		// Right Face
+		// North face
 		builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
 		builder.vertex(model, c0, c1, c0).color(r, g, b, a).next();
 		builder.vertex(model, c1, c1, c0).color(r, g, b, a).next();
@@ -118,7 +118,7 @@ public class MeterRenderer {
 			builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
 		}
 		
-		// Left Face
+		// South face
 		builder.vertex(model, c0, c0, c1).color(r, g, b, a).next();
 		builder.vertex(model, c1, c0, c1).color(r, g, b, a).next();
 		builder.vertex(model, c1, c1, c1).color(r, g, b, a).next();
@@ -127,7 +127,7 @@ public class MeterRenderer {
 			builder.vertex(model, c0, c0, c1).color(r, g, b, a).next();
 		}
 		
-		// Bottom Face
+		// Bottom face
 		builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
 		builder.vertex(model, c1, c0, c0).color(r, g, b, a).next();
 		builder.vertex(model, c1, c0, c1).color(r, g, b, a).next();
@@ -136,7 +136,7 @@ public class MeterRenderer {
 			builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
 		}
 		
-		// Top Face
+		// Top face
 		builder.vertex(model, c0, c1, c0).color(r, g, b, a).next();
 		builder.vertex(model, c0, c1, c1).color(r, g, b, a).next();
 		builder.vertex(model, c1, c1, c1).color(r, g, b, a).next();

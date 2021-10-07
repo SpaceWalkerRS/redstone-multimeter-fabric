@@ -29,10 +29,10 @@ public class TextElement implements IElement {
 	private int width;
 	private int height;
 	private List<Text> text;
-	private int color = 0xFFFFFFFF;
-	private boolean visible = true;
+	private boolean visible;
+	private boolean rightAligned;
 	
-	public TextElement(MultimeterClient client, int x, int y, Supplier<List<Text>> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<TextElement> mousePress, MouseRelease<TextElement> mouseRelease) {
+	public TextElement(MultimeterClient client, int x, int y, boolean rightAligned, Supplier<List<Text>> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<TextElement> mousePress, MouseRelease<TextElement> mouseRelease) {
 		MinecraftClient minecraftClient = client.getMinecraftClient();
 		
 		this.client = client;
@@ -44,17 +44,21 @@ public class TextElement implements IElement {
 		
 		this.x = x;
 		this.y = y;
+		this.visible = true;
+		this.rightAligned = rightAligned;
 		
 		this.update();
 	}
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		int textX = x;
+		int left = x;
+		int right = x + width;
 		int textY = y;
 		
 		for (Text t : text) {
-			drawText(matrices, textX, textY, t, color);
+			int textX = rightAligned ? right - font.getWidth(t) : left;
+			drawText(matrices, textX, textY, t);
 			
 			textY += font.fontHeight + SPACING;
 		}
@@ -161,18 +165,8 @@ public class TextElement implements IElement {
 	}
 	
 	@Override
-	public void setWidth(int width) {
-		
-	}
-	
-	@Override
 	public int getHeight() {
 		return height;
-	}
-	
-	@Override
-	public void setHeight(int height) {
-		
 	}
 	
 	@Override
@@ -197,10 +191,6 @@ public class TextElement implements IElement {
 		updateHeight();
 	}
 	
-	public void setColor(int color) {
-		this.color = color;
-	}
-	
 	protected void updateWidth() {
 		width = 0;
 		
@@ -217,7 +207,7 @@ public class TextElement implements IElement {
 		height = (text.size() - 1) * (font.fontHeight + SPACING) + font.fontHeight;
 	}
 	
-	protected void drawText(MatrixStack matrices, int x, int y, Text text, int color) {
-		font.draw(matrices, text, x, y, color);
+	protected void drawText(MatrixStack matrices, int x, int y, Text text) {
+		font.draw(matrices, text, x, y, 0xFFFFFFFF);
 	}
 }

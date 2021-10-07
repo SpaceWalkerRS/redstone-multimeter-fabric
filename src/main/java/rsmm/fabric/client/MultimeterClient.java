@@ -16,6 +16,8 @@ import net.minecraft.world.World;
 import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
 import rsmm.fabric.client.gui.MultimeterScreen;
+import rsmm.fabric.client.gui.element.RSMMScreen;
+import rsmm.fabric.client.option.Options;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterProperties;
 import rsmm.fabric.common.WorldPos;
@@ -50,7 +52,7 @@ public class MultimeterClient {
 	
 	private ClientMeterGroup meterGroup;
 	private boolean connected; // true if the client is connected to a MultimeterServer
-	private boolean renderHud;
+	private boolean hudEnabled;
 	private long lastServerTick;
 	
 	public MultimeterClient(MinecraftClient client) {
@@ -61,7 +63,7 @@ public class MultimeterClient {
 		this.hudRenderer = new MultimeterHudRenderer(this);
 		this.meterPropertiesManager = new ClientMeterPropertiesManager(this);
 		
-		this.renderHud = true;
+		this.hudEnabled = true;
 		this.lastServerTick = -1;
 	}
 	
@@ -96,8 +98,8 @@ public class MultimeterClient {
 		return connected;
 	}
 	
-	public boolean renderHud() {
-		return renderHud && connected && !hasMultimeterScreenOpen();
+	public boolean shouldRenderHud() {
+		return hudEnabled && connected && !hasMultimeterScreenOpen();
 	}
 	
 	public long getLastServerTick() {
@@ -124,11 +126,10 @@ public class MultimeterClient {
 	 */
 	public void onStartup() {
 		meterGroup = new ClientMeterGroup(this);
-		hudRenderer.onStartup();
 	}
 	
 	public void onShutdown() {
-		hudRenderer.onShutdown();
+		
 	}
 	
 	/**
@@ -136,7 +137,7 @@ public class MultimeterClient {
 	 */
 	public void onConnect(String modVersion, long serverTick) {
 		if (!connected) {
-			if (!RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
+			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
 				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
 				client.player.sendMessage(warning, false);
 			}
@@ -236,10 +237,14 @@ public class MultimeterClient {
 	}
 	
 	public void toggleHud() {
-		renderHud = !renderHud;
+		hudEnabled = !hudEnabled;
 		
-		Text text = new LiteralText(String.format("%s Multimeter HUD", renderHud ? "Enabled" : "Disabled"));
+		Text text = new LiteralText(String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled"));
 		client.player.sendMessage(text, true);
+	}
+	
+	public RSMMScreen getScreen() {
+		return client.currentScreen != null && client.currentScreen instanceof RSMMScreen ? (RSMMScreen)client.currentScreen : null;
 	}
 	
 	public boolean hasMultimeterScreenOpen() {

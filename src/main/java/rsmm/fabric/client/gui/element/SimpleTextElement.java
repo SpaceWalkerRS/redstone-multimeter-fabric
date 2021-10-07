@@ -13,15 +13,15 @@ import rsmm.fabric.client.gui.element.action.MouseRelease;
 
 public class SimpleTextElement extends TextElement {
 	
-	public SimpleTextElement(MultimeterClient client, int x, int y, Supplier<Text> textSupplier) {
-		this(client, x, y, textSupplier, () -> Collections.emptyList());
+	public SimpleTextElement(MultimeterClient client, int x, int y, boolean rightAligned, Supplier<Text> textSupplier) {
+		this(client, x, y, rightAligned, textSupplier, () -> Collections.emptyList());
 	}
 	
-	public SimpleTextElement(MultimeterClient client, int x, int y, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier) {
-		this(client, x, y, textSupplier, tooltipSupplier, t -> false, t -> false);
+	public SimpleTextElement(MultimeterClient client, int x, int y, boolean rightAligned, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier) {
+		this(client, x, y, rightAligned, textSupplier, tooltipSupplier, t -> false, t -> false);
 	}
 	
-	public SimpleTextElement(MultimeterClient client, int x, int y, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<TextElement> mousePress, MouseRelease<TextElement> mouseRelease) {
-		super(client, x, y, () -> Arrays.asList(textSupplier.get()), tooltipSupplier, mousePress, mouseRelease);
+	public SimpleTextElement(MultimeterClient client, int x, int y, boolean rightAligned, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<TextElement> mousePress, MouseRelease<TextElement> mouseRelease) {
+		super(client, x, y, rightAligned, () -> Arrays.asList(textSupplier.get()), tooltipSupplier, mousePress, mouseRelease);
 	}
 }

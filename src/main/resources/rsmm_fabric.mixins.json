@@ -59,6 +59,7 @@
   	"client.IntegratedServerMixin",
   	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
+  	"client.ScreenMixin",
   	"client.WorldRendererMixin"
   ],
   "injectors": {

@@ -12,25 +12,17 @@ import net.minecraft.text.Text;
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.HudSettings;
 import rsmm.fabric.client.gui.MultimeterHudRenderer;
+import rsmm.fabric.client.gui.Selector;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
 import rsmm.fabric.client.gui.widget.Button;
 import rsmm.fabric.client.gui.widget.TransparentButton;
-import rsmm.fabric.client.listeners.HudListener;
-import rsmm.fabric.client.listeners.MeterGroupListener;
-import rsmm.fabric.client.listeners.MeterListener;
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
 
-public class HudElement extends AbstractParentElement implements HudListener, MeterListener, MeterGroupListener {
+public class HudElement extends AbstractParentElement {
 	
 	private final MultimeterClient client;
+	private final Selector selector;
 	private final MultimeterHudRenderer hudRenderer;
 	
-	private int x;
-	private int y;
-	private int width;
-	
-	private MeterControlsElement meterControls;
 	private TransparentButton playPauseButton;
 	private TransparentButton fastBackwardButton;
 	private TransparentButton fastForwardButton;
@@ -38,53 +30,47 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	private boolean draggingTicksTable;
 	private double mouseDragDeltaX;
 	
-	public HudElement(MultimeterClient client, int x, int y, int width) {
+	public HudElement(MultimeterClient client, Selector selector, int x, int y, int width) {
+		super(x, y, width, 0);
+		
 		this.client = client;
+		this.selector = selector;
 		this.hudRenderer = client.getHudRenderer();
 		
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		
-		hudRenderer.ignoreHiddenMeters(false);
-		hudRenderer.forceFullOpacity(true);
-		
-		this.meterControls = new MeterControlsElement(this.client, x, y + hudRenderer.getTotalHeight(), width);
-		this.playPauseButton = new TransparentButton(client, x, y, 9, 9, () -> new LiteralText(hudRenderer.isPaused() ? "\u23f5" : "\u23f8"), (button) -> {
+		this.playPauseButton = new TransparentButton(client, 0, 0, 9, 9, () -> new LiteralText(hudRenderer.isPaused() ? "\u23f5" : "\u23f8"), (button) -> {
 			hudRenderer.pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(client, x, y, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ed" : "\u23e9"), (button) -> {
+		this.fastBackwardButton = new TransparentButton(client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ed" : "\u23e9"), (button) -> {
 			hudRenderer.stepBackward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
 			
 			@Override
 			public void tick() {
-				updateMessage();
+				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(client, x, y, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ee" : "\u23ea"), (button) -> {
+		this.fastForwardButton = new TransparentButton(client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ee" : "\u23ea"), (button) -> {
 			hudRenderer.stepForward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
 			
 			@Override
 			public void tick() {
-				updateMessage();
+				update();
 			}
 		};
 		
-		addChild(meterControls);
 		addChild(playPauseButton);
 		addChild(fastBackwardButton);
 		addChild(fastForwardButton);
 		
-		updateHudControlsX();
+		updateControlsX();
+		updateControlsY();
 		
-		hudRenderer.addListener(this);
-		this.client.getMeterGroup().addMeterListener(this);
-		this.client.getMeterGroup().addMeterGroupListener(this);
+		hudRenderer.ignoreHiddenMeters(false);
+		hudRenderer.forceFullOpacity(true);
 		
 		if (this.client.getMeterGroup().hasMeters() && !hudRenderer.isPaused()) {
 			hudRenderer.pause();
@@ -93,9 +79,12 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		int x = getX();
+		int y = getY();
+		
 		hudRenderer.render(matrices, x, y);
 		hudRenderer.updateHoveredElements(x, y, mouseX, mouseY);
-		hudRenderer.renderSelectedMeterIndicator(matrices, x, y, meterControls.getSelectedMeterId());
+		hudRenderer.renderSelectedMeterIndicator(matrices, x, y, selector.get());
 		
 		super.render(matrices, mouseX, mouseY, delta);
 	}
@@ -115,10 +104,10 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 				int hoveredNameColumn = hudRenderer.getHoveredNameColumn();
 				
 				if (hoveredNameColumn >= 0) {
-					success = meterControls.selectMeter(hudRenderer.getIdAtRow(hoveredRow));
+					success = selector.select(hudRenderer.getIdAtRow(hoveredRow));
 					Button.playClickSound(client);
-				} else if (mouseY < (y + hudRenderer.getTotalHeight())) {
-					success = meterControls.selectMeter(-1);
+				} else if (mouseY < (getY() + hudRenderer.getTotalHeight())) {
+					success = selector.select(-1);
 				}
 			}
 		}
@@ -161,10 +150,6 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	public void onRemoved() {
 		super.onRemoved();
 		
-		hudRenderer.removeListener(this);
-		client.getMeterGroup().removeMeterListener(this);
-		client.getMeterGroup().removeMeterGroupListener(this);
-		
 		hudRenderer.ignoreHiddenMeters(true);
 		hudRenderer.forceFullOpacity(false);
 	}
@@ -175,48 +160,18 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	}
 	
 	@Override
-	public int getX() {
-		return x;
+	public void onChangedX(int x) {
+		updateControlsX();
 	}
 	
 	@Override
-	public void setX(int x) {
-		this.x = x;
-		
-		meterControls.setX(x);
-		updateHudControlsX();
-	}
-	
-	@Override
-	public int getY() {
-		return y;
-	}
-	
-	@Override
-	public void setY(int y) {
-		this.y = y;
+	public void onChangedY(int y) {
 		updateControlsY();
 	}
 	
 	@Override
-	public int getWidth() {
-		return width;
-	}
-	
-	@Override
-	public void setWidth(int width) {
-		this.width = width;
-		meterControls.setWidth(width);
-	}
-	
-	@Override
 	public int getHeight() {
-		return hudRenderer.getTotalHeight() + meterControls.getHeight();
-	}
-	
-	@Override
-	public void setHeight(int height) {
-		
+		return hudRenderer.getTotalHeight();
 	}
 	
 	@Override
@@ -231,8 +186,13 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	}
 	
 	@Override
-	public void hudPaused() {
-		playPauseButton.updateMessage();
+	public void update() {
+		hudRenderer.updateRowCount();
+		
+		super.update();
+		
+		updateControlsX();
+		updateControlsY();
 		
 		boolean paused = hudRenderer.isPaused();
 		
@@ -240,56 +200,8 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 		fastBackwardButton.active = paused;
 	}
 	
-	@Override
-	public void meterGroupCleared(MeterGroup meterGroup) {
-		updateHudControlsX();
-		updateControlsY();
-	}
-	
-	@Override
-	public void meterAdded(MeterGroup meterGroup, long id) {
-		updateHudControlsX();
-		updateControlsY();
-	}
-	
-	@Override
-	public void meterRemoved(MeterGroup meterGroup, long id) {
-		updateHudControlsX();
-		updateControlsY();
-	}
-	
-	@Override
-	public void posChanged(Meter meter) {
-		
-	}
-	
-	@Override
-	public void nameChanged(Meter meter) {
-		updateHudControlsX();
-	}
-	
-	@Override
-	public void colorChanged(Meter meter) {
-		
-	}
-	
-	@Override
-	public void movableChanged(Meter meter) {
-		
-	}
-	
-	@Override
-	public void eventTypesChanged(Meter meter) {
-		
-	}
-	
-	@Override
-	public void hiddenChanged(Meter meter) {
-		
-	}
-	
-	private void updateHudControlsX() {
-		int x = this.x + hudRenderer.getNamesWidth() + HudSettings.ticksOverviewWidth();
+	private void updateControlsX() {
+		int x = getX() + hudRenderer.getNamesWidth() + HudSettings.ticksOverviewWidth();
 		
 		x -= fastBackwardButton.getWidth();
 		fastBackwardButton.setX(x);
@@ -302,12 +214,10 @@ public class HudElement extends AbstractParentElement implements HudListener, Me
 	}
 	
 	private void updateControlsY() {
-		int y0 = y + hudRenderer.getTotalHeight();
-		int y1 = y + hudRenderer.getTableHeight() + 2;
+		int y = getY() + hudRenderer.getTableHeight() + 2;
 		
-		meterControls.setY(y0);
-		playPauseButton.setY(y1);
-		fastForwardButton.setY(y1);
-		fastBackwardButton.setY(y1);
+		playPauseButton.setY(y);
+		fastForwardButton.setY(y);
+		fastBackwardButton.setY(y);
 	}
 }

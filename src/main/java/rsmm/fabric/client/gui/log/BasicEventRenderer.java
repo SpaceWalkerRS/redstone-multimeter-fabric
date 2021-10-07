@@ -41,7 +41,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 			return;
 		}
 		
-		long lastHudTick = firstTick + COLUMN_COUNT;
+		long lastHudTick = firstTick + columnCount();
 		
 		if (lastHudTick > lastTick) {
 			lastHudTick = lastTick;

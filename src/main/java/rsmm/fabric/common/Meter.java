@@ -1,7 +1,7 @@
 package rsmm.fabric.common;
 
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
@@ -49,12 +49,16 @@ public class Meter {
 		return id;
 	}
 	
+	public MeterProperties getProperties() {
+		return properties;
+	}
+	
 	public MeterLogs getLogs() {
 		return logs;
 	}
 	
-	public boolean applyUpdate(Function<MeterProperties, Boolean> update) {
-		return update.apply(properties);
+	public void applyUpdate(Consumer<MeterProperties> update) {
+		update.accept(properties);
 	}
 	
 	public WorldPos getPos() {

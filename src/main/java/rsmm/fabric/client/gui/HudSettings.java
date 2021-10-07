@@ -1,5 +1,6 @@
 package rsmm.fabric.client.gui;
 
+import rsmm.fabric.client.option.Options;
 import rsmm.fabric.util.ColorUtils;
 
 public class HudSettings {
@@ -8,8 +9,6 @@ public class HudSettings {
 	public static final int ROW_HEIGHT = 9;
 	public static final int GRID_SIZE = 1;
 	
-	public static int COLUMN_COUNT = 60;
-	public static int SELECTED_COLUMN = 44;
 	public static int ROW_COUNT;
 	
 	public static boolean IGNORE_HIDDEN_METERS = true;
@@ -18,7 +17,6 @@ public class HudSettings {
 	public static final int NAMES_TICKS_SPACING = 3;
 	public static final int TICKS_SUBTICKS_GAP = 3;
 	
-	public static int OPACITY = 0xFF;
 	public static final int BACKGROUND_COLOR = 0x202020;
 	public static final int BACKGROUND_COLOR_TRANSPARENT = 0xDD202020;
 	public static final int MAIN_GRID_COLOR = 0x404040;
@@ -32,12 +30,20 @@ public class HudSettings {
 	public static final int METER_GROUP_NAME_COLOR_LIGHT = 0xD0D0D0;
 	
 	
+	public static int columnCount() {
+		return Options.HUD.HISTORY.get();
+	}
+	
+	public static int selectedColumn() {
+		return Options.HUD.SELECTED_COLUMN.get();
+	}
+	
 	public static int namesTableWidth(int namesWidth) {
 		return namesWidth + NAMES_TICKS_SPACING;
 	}
 	
 	public static int ticksOverviewWidth() {
-		return COLUMN_COUNT * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
+		return columnCount() * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
 	}
 	
 	public static int subticksOverviewWidth(int subtickCount) {
@@ -50,7 +56,7 @@ public class HudSettings {
 	
 	
 	public static int opacity() {
-		return FORCE_FULL_OPACITY ? 0xFF : OPACITY;
+		return FORCE_FULL_OPACITY ? 0xFF : (int)(0xFF * Options.HUD.OPACITY.get() / 100.0D);
 	}
 	
 	public static int backgroundColor() {

@@ -4,9 +4,7 @@ import static rsmm.fabric.client.gui.HudSettings.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -19,21 +17,17 @@ import net.minecraft.util.Formatting;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.log.MeterEventRendererDispatcher;
-import rsmm.fabric.client.listeners.HudListener;
-import rsmm.fabric.client.listeners.MeterGroupListener;
 import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.log.MeterLogs;
 import rsmm.fabric.util.ColorUtils;
 
-public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupListener {
+public class MultimeterHudRenderer extends DrawableHelper {
 	
 	private final MultimeterClient client;
 	private final TextRenderer font;
 	private final List<Long> meterIds;
 	private final MeterEventRendererDispatcher eventRenderers;
-	private final Set<HudListener> listeners;
 	
 	private boolean paused;
 	/** The offset between the last server tick and the first tick to be displayed in the ticks table */
@@ -51,47 +45,15 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		this.font = minecraftClient.textRenderer;
 		this.meterIds = new ArrayList<>();
 		this.eventRenderers = new MeterEventRendererDispatcher(this.client);
-		this.listeners = new LinkedHashSet<>();
-		
-	}
-	
-	@Override
-	public void meterGroupCleared(MeterGroup meterGroup) {
-		updateRowCount();
-	}
-	
-	@Override
-	public void meterAdded(MeterGroup meterGroup, long id) {
-		updateRowCount();
-	}
-	
-	@Override
-	public void meterRemoved(MeterGroup meterGroup, long id) {
-		updateRowCount();
-	}
-	
-	public void addListener(HudListener listener) {
-		listeners.add(listener);
-	}
-	
-	public void removeListener(HudListener listener) {
-		listeners.remove(listener);
-	}
-	
-	public void onStartup() {
-		client.getMeterGroup().addMeterGroupListener(this);
-	}
-	
-	public void onShutdown() {
-		client.getMeterGroup().removeMeterGroupListener(this);
 	}
 	
 	public void resetOffset() {
-		offset = 1 - COLUMN_COUNT;
+		offset = 1 - columnCount();
 	}
 	
 	public void reset() {
 		paused = false;
+		meterIds.clear();
 		resetOffset();
 		resetHoveredElements();
 	}
@@ -121,7 +83,9 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 			resetOffset();
 		}
 		
-		listeners.forEach(listener -> listener.hudPaused());
+		if (client.hasMultimeterScreenOpen()) {
+			client.getScreen().update();
+		}
 	}
 	
 	public void stepForward(int amount) {
@@ -146,7 +110,7 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 	}
 	
 	public long getSelectedTick() {
-		return client.getLastServerTick() + offset + SELECTED_COLUMN;
+		return client.getLastServerTick() + offset + selectedColumn();
 	}
 	
 	public int getTableHeight() {
@@ -202,7 +166,7 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		font.draw(matrices, client.getMeterGroup().getName(), x + 2, y + height + 2, meterGroupNameColor(client.hasMultimeterScreenOpen()));
 	}
 	
-	private void updateRowCount() {
+	public void updateRowCount() {
 		meterIds.clear();
 		
 		for (Meter meter : client.getMeterGroup().getMeters()) {
@@ -254,13 +218,13 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 	}
 	
 	private void renderTicksOverview(MatrixStack matrices, int x, int y, int width, int height) {
-		long firstTick = getSelectedTick() - SELECTED_COLUMN;
+		long firstTick = getSelectedTick() - selectedColumn();
 		long currentTick = client.getLastServerTick() + 1;
 		
-		int markedColumn = (currentTick < firstTick || currentTick > (firstTick + COLUMN_COUNT)) ? -1 : (int)(currentTick - firstTick);
+		int markedColumn = (currentTick < firstTick || currentTick > (firstTick + columnCount())) ? -1 : (int)(currentTick - firstTick);
 		
 		drawBackground(matrices, x, y, width, height);
-		drawGridLines(matrices, x, y, height, COLUMN_COUNT, markedColumn);
+		drawGridLines(matrices, x, y, height, columnCount(), markedColumn);
 		
 		int rowX = x;
 		int rowY = y;
@@ -273,7 +237,7 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 		}
 		
 		if (paused) {
-			drawSelectedTickIndicator(matrices, x + SELECTED_COLUMN * (COLUMN_WIDTH + GRID_SIZE), y);
+			drawSelectedTickIndicator(matrices, x + selectedColumn() * (COLUMN_WIDTH + GRID_SIZE), y);
 		}
 	}
 	
@@ -418,8 +382,8 @@ public class MultimeterHudRenderer extends DrawableHelper implements MeterGroupL
 				if (mouseX >= x && mouseX <= (x + width)) {
 					hoveredTickColumn = (int)((mouseX - x) / (COLUMN_WIDTH + GRID_SIZE));
 					
-					if (hoveredTickColumn >= COLUMN_COUNT) {
-						hoveredTickColumn = COLUMN_COUNT - 1;
+					if (hoveredTickColumn >= columnCount()) {
+						hoveredTickColumn = columnCount() - 1;
 					}
 					
 					return;

@@ -17,6 +17,7 @@ import net.minecraft.client.option.KeyBinding;
 
 import rsmm.fabric.client.KeyBindings;
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.option.Options;
 
 @Mixin(GameOptions.class)
 public class GameOptionsMixin {
@@ -48,11 +49,14 @@ public class GameOptionsMixin {
 	@Inject(
 			method = "load",
 			at = @At(
-					value = "RETURN"
+					value = "HEAD"
 			)
 	)
 	private void loadOptions(CallbackInfo ci) {
-		KeyBindings.load(new File(client.runDirectory, MultimeterClient.CONFIG_PATH));
+		File folder = new File(client.runDirectory, MultimeterClient.CONFIG_PATH);
+		
+		KeyBindings.load(folder);
+		Options.load(folder);
 	}
 	
 	@Inject(
@@ -62,6 +66,9 @@ public class GameOptionsMixin {
 			)
 	)
 	private void saveOptions(CallbackInfo ci) {
-		KeyBindings.save(new File(client.runDirectory, MultimeterClient.CONFIG_PATH));
+		File folder = new File(client.runDirectory, MultimeterClient.CONFIG_PATH);
+		
+		KeyBindings.save(folder);
+		Options.save(folder);
 	}
 }

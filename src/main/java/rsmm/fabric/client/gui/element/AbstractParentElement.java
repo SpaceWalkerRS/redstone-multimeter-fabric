@@ -7,9 +7,21 @@ public abstract class AbstractParentElement implements IParentElement {
 	
 	private final List<IElement> children = new ArrayList<>();
 	
+	private int x;
+	private int y;
+	private int width;
+	private int height;
 	private boolean dragging;
-	private boolean visible = true;
+	private boolean visible;
 	private IElement focused;
+	
+	protected AbstractParentElement(int x, int y, int width, int height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.visible = true;
+	}
 	
 	@Override
 	public boolean isDraggingMouse() {
@@ -19,6 +31,38 @@ public abstract class AbstractParentElement implements IParentElement {
 	@Override
 	public void setDraggingMouse(boolean dragging) {
 		this.dragging = dragging;
+	}
+	
+	@Override
+	public int getX() {
+		return x;
+	}
+	
+	@Override
+	public void setX(int x) {
+		this.x = x;
+		onChangedX(x);
+	}
+	
+	@Override
+	public int getY() {
+		return y;
+	}
+	
+	@Override
+	public void setY(int y) {
+		this.y = y;
+		onChangedY(y);
+	}
+	
+	@Override
+	public int getWidth() {
+		return width;
+	}
+	
+	@Override
+	public int getHeight() {
+		return height;
 	}
 	
 	@Override
@@ -60,7 +104,11 @@ public abstract class AbstractParentElement implements IParentElement {
 		}
 	}
 	
-	protected void addChild(IElement child) {
-		children.add(child);
+	protected abstract void onChangedX(int x);
+	
+	protected abstract void onChangedY(int y);
+	
+	protected void addChild(IElement element) {
+		children.add(element);
 	}
 }

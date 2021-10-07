@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
@@ -64,28 +63,19 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	@Override
-	protected void meterPosChanged(Meter meter) {
-		addMeterUpdate(meter.getId(), properties -> properties.setPos(meter.getPos()));
+	protected void meterAdded(Meter meter) {
+		meterUpdates.putIfAbsent(meter.getId(), meter.getProperties());
 	}
 	
 	@Override
-	protected void meterNameChanged(Meter meter) {
-		addMeterUpdate(meter.getId(), properties -> properties.setName(meter.getName()));
+	protected void meterRemoved(Meter meter) {
+		removedMeters.add(meter.getId());
+		meterUpdates.remove(meter.getId());
 	}
 	
 	@Override
-	protected void meterColorChanged(Meter meter) {
-		addMeterUpdate(meter.getId(), properties -> properties.setColor(meter.getColor()));
-	}
-	
-	@Override
-	protected void meterMovableChanged(Meter meter) {
-		addMeterUpdate(meter.getId(), properties -> properties.setMovable(meter.isMovable()));
-	}
-	
-	@Override
-	protected void meterEventTypesChanged(Meter meter) {
-		addMeterUpdate(meter.getId(), properties -> properties.setEventTypes(meter.getEventTypes()));
+	protected void meterUpdated(Meter meter) {
+		meterUpdates.putIfAbsent(meter.getId(), meter.getProperties());
 	}
 	
 	@Override
@@ -98,19 +88,14 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	public void addMeter(MeterProperties properties) {
-		Meter meter = new Meter(properties);
-		
-		if (addMeter(meter)) {
-			meterUpdates.put(meter.getId(), properties);
-		}
+		addMeter(new Meter(properties));
 	}
 	
 	public void removeMeter(long id) {
 		Meter meter = getMeter(id);
 		
-		if (meter != null && removeMeter(meter)) {
-			removedMeters.add(id);
-			meterUpdates.remove(id);
+		if (meter != null) {
+			removeMeter(meter);
 		}
 	}
 	
@@ -120,10 +105,6 @@ public class ServerMeterGroup extends MeterGroup {
 		if (meter != null) {
 			updateMeter(meter, newProperties);
 		}
-	}
-	
-	private void addMeterUpdate(long id, Consumer<MeterProperties> update) {
-		update.accept(meterUpdates.computeIfAbsent(id, key -> new MeterProperties()));
 	}
 	
 	public boolean tryMoveMeter(long id, WorldPos newPos, boolean byPiston) {

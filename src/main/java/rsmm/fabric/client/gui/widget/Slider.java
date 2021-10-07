@@ -10,9 +10,7 @@ import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
-import rsmm.fabric.client.gui.element.IElement;
-
-public class Slider extends SliderWidget implements IElement {
+public class Slider extends SliderWidget implements IButton {
 	
 	private final Supplier<Text> textSupplier;
 	private final Supplier<List<Text>> tooltipSupplier;
@@ -140,18 +138,8 @@ public class Slider extends SliderWidget implements IElement {
 	}
 	
 	@Override
-	public void setWidth(int width) {
-		this.width = width;
-	}
-	
-	@Override
 	public int getHeight() {
 		return height;
-	}
-	
-	@Override
-	public void setHeight(int height) {
-		this.height = height;
 	}
 	
 	@Override
@@ -175,6 +163,22 @@ public class Slider extends SliderWidget implements IElement {
 		setMessage(textSupplier.get());
 	}
 	
+	@Override
+	public void update() {
+		setValue(valueSupplier.get());
+		updateMessage();
+	}
+	
+	@Override
+	public boolean isActive() {
+		return active;
+	}
+	
+	@Override
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+	
 	public double getValue() {
 		return value;
 	}
@@ -185,11 +189,6 @@ public class Slider extends SliderWidget implements IElement {
 	
 	public void snap() {
 		snap.accept(value);
-	}
-	
-	public void update() {
-		setValue(valueSupplier.get());
-		updateMessage();
 	}
 	
 	public interface SlideAction {

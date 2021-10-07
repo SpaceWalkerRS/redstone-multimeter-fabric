@@ -144,6 +144,15 @@ public interface IParentElement extends IElement {
 		return hoveredElement == null ? Collections.emptyList() : hoveredElement.getTooltip(mouseX, mouseY);
 	}
 	
+	@Override
+	default void update() {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).update();
+		}
+	}
+	
 	public List<IElement> getChildren();
 	
 	default void removeChildren() {
