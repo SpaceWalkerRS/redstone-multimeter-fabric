@@ -103,7 +103,7 @@ public abstract class MeterGroup {
 		return true;
 	}
 	
-	protected void updateMeter(Meter meter, MeterProperties newProperties) {
+	protected boolean updateMeter(Meter meter, MeterProperties newProperties) {
 		meter.applyUpdate(properties -> {
 			boolean changed = false;
 			
@@ -127,6 +127,8 @@ public abstract class MeterGroup {
 				meterUpdated(meter);
 			}
 		});
+		
+		return true;
 	}
 	
 	protected boolean moveMeter(Meter meter, WorldPos newPos) {

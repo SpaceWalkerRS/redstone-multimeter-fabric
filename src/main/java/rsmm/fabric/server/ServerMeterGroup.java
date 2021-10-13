@@ -95,12 +95,8 @@ public class ServerMeterGroup extends MeterGroup {
 		return hasMeter(id) && removeMeter(getMeter(id));
 	}
 	
-	public void updateMeter(long id, MeterProperties newProperties) {
-		Meter meter = getMeter(id);
-		
-		if (meter != null) {
-			updateMeter(meter, newProperties);
-		}
+	public boolean updateMeter(long id, MeterProperties newProperties) {
+		return hasMeter(id) && updateMeter(getMeter(id), newProperties);
 	}
 	
 	public boolean tryMoveMeter(long id, WorldPos newPos, boolean byPiston) {

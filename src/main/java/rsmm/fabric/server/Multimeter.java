@@ -26,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
+
 import rsmm.fabric.block.Meterable;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterProperties;
@@ -149,7 +150,7 @@ public class Multimeter {
 		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null && !addMeter(meterGroup, properties)) {
-			refreshMeterGroup(player);
+			refreshMeterGroup(meterGroup, player);
 		}
 	}
 	
@@ -181,19 +182,19 @@ public class Multimeter {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
 		if (meterGroup != null && !meterGroup.removeMeter(id)) {
-			refreshMeterGroup(player);
+			refreshMeterGroup(meterGroup, player);
 		}
 	}
 	
 	public void resetMeter(ServerPlayerEntity player, long id, MeterProperties newProperties) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
-		if (meterGroup != null) {
-			resetMeter(meterGroup, id, newProperties);
+		if (meterGroup != null && !resetMeter(meterGroup, id, newProperties)) {
+			refreshMeterGroup(meterGroup, player);
 		}
 	}
 	
-	public void resetMeter(ServerMeterGroup meterGroup, long id, MeterProperties newProperties) {
+	public boolean resetMeter(ServerMeterGroup meterGroup, long id, MeterProperties newProperties) {
 		Meter meter = meterGroup.getMeter(id);
 		
 		if (meter != null) {
@@ -202,7 +203,11 @@ public class Multimeter {
 			if (meterPropertiesManager.validate(newProperties)) {
 				meterGroup.updateMeter(id, newProperties);
 			}
+			
+			return true;
 		}
+		
+		return false;
 	}
 	
 	public void moveMeter(ServerPlayerEntity player, long id, WorldPos newPos) {
@@ -224,8 +229,8 @@ public class Multimeter {
 	public void updateMeter(ServerPlayerEntity player, long id, MeterProperties newProperties) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
-		if (meterGroup != null) {
-			meterGroup.updateMeter(id, newProperties);
+		if (meterGroup != null && !meterGroup.updateMeter(id, newProperties)) {
+			refreshMeterGroup(meterGroup, player);
 		}
 	}
 	
@@ -265,7 +270,7 @@ public class Multimeter {
 		server.getPacketHandler().sendPacketToPlayer(packet, player);
 	}
 	
-	public void removeSubscriber(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
+	private void removeSubscriber(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
 		meterGroup.removeSubscriber(player);
 		
 		if (!meterGroup.hasSubscribers() && !meterGroup.hasMeters()) {
@@ -277,9 +282,13 @@ public class Multimeter {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
 		if (meterGroup != null) {
-			MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
-			server.getPacketHandler().sendPacketToPlayer(packet, player);
+			refreshMeterGroup(meterGroup, player);
 		}
+	}
+	
+	private void refreshMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
+		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
+		server.getPacketHandler().sendPacketToPlayer(packet, player);
 	}
 	
 	public void teleportToMeter(ServerPlayerEntity player, long id) {

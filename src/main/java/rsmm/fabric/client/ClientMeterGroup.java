@@ -16,6 +16,7 @@ public class ClientMeterGroup extends MeterGroup {
 	private final ClientLogManager logManager;
 	
 	private String name;
+	private int nextIndex;
 	
 	public ClientMeterGroup(MultimeterClient client) {
 		super(client.getMinecraftClient().getSession().getUsername());
@@ -34,16 +35,22 @@ public class ClientMeterGroup extends MeterGroup {
 	@Override
 	public void clear() {
 		super.clear();
+		nextIndex = 0;
 		client.getHUD().updateMeterList();
 	}
 	
 	@Override
 	protected void meterAdded(Meter meter) {
+		nextIndex++;
 		client.getHUD().updateMeterList();
 	}
 	
 	@Override
 	protected void meterRemoved(Meter meter) {
+		if (!hasMeters()) {
+			nextIndex = 0;
+		}
+		
 		client.getHUD().updateMeterList();
 	}
 	
@@ -59,6 +66,10 @@ public class ClientMeterGroup extends MeterGroup {
 	
 	public MultimeterClient getMultimeterClient() {
 		return client;
+	}
+	
+	public int getNextMeterIndex() {
+		return nextIndex;
 	}
 	
 	public boolean hasMeter(Meter meter) {

@@ -200,8 +200,8 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 	
 	private void updateScrollBar() {
-		scrollBarY = getY() + topBorder + 4;
-		scrollBarHeight = height - 8;
+		scrollBarY = getY() + topBorder + 3;
+		scrollBarHeight = height - 6;
 		
 		if (isDrawingBackground()) {
 			scrollBarHeight += (BORDER_MARGIN_TOP + BORDER_MARGIN_BOTTOM);

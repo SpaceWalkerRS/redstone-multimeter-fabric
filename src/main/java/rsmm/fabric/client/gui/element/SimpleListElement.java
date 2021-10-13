@@ -20,7 +20,7 @@ import rsmm.fabric.client.MultimeterClient;
 public class SimpleListElement extends AbstractParentElement {
 	
 	protected static final int BORDER_MARGIN_TOP = 6;
-	protected static final int BORDER_MARGIN_BOTTOM = 4;
+	protected static final int BORDER_MARGIN_BOTTOM = 3;
 	
 	protected final MultimeterClient client;
 	protected final int topBorder;

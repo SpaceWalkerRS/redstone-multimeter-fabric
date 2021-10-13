@@ -111,7 +111,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	protected void drawHighlights(MatrixStack matrices, int mouseX, int mouseY) {
 		if (hud.isPaused()) {
 			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
-				drawHighlight(matrices, getHoveredColumn(mouseX), 0x707070);
+				drawHighlight(matrices, getHoveredColumn(mouseX), 0x808080);
 			}
 			
 			drawHighlight(matrices, Options.HUD.SELECTED_COLUMN.get(), 0xFFFFFF);

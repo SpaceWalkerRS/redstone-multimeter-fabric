@@ -95,7 +95,7 @@ public class MeterListRenderer extends AbstractElement implements HudRenderer {
 				row = max;
 			}
 			
-			drawHighlight(matrices, row, 0x707070);
+			drawHighlight(matrices, row, 0x808080);
 		}
 		if (hud.isOnScreen()) {
 			int selectedRow = hud.getSelectedRow();
