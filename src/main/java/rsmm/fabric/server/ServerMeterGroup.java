@@ -87,16 +87,12 @@ public class ServerMeterGroup extends MeterGroup {
 		return multimeter;
 	}
 	
-	public void addMeter(MeterProperties properties) {
-		addMeter(new Meter(properties));
+	public boolean addMeter(MeterProperties properties) {
+		return addMeter(new Meter(properties));
 	}
 	
-	public void removeMeter(long id) {
-		Meter meter = getMeter(id);
-		
-		if (meter != null) {
-			removeMeter(meter);
-		}
+	public boolean removeMeter(long id) {
+		return hasMeter(id) && removeMeter(getMeter(id));
 	}
 	
 	public void updateMeter(long id, MeterProperties newProperties) {

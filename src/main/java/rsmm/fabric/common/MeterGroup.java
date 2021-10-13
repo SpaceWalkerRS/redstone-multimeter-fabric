@@ -64,11 +64,11 @@ public abstract class MeterGroup {
 		return (index < 0 || index >= meters.size()) ? null : meters.get(index);
 	}
 	
-	protected void addMeter(Meter meter) {
+	protected boolean addMeter(Meter meter) {
 		// This check prevents meters from being added twice and
 		// multiple meters from being added at the same position.
 		if (idToIndex.containsKey(meter.getId()) || posToIndex.containsKey(meter.getPos())) {
-			return;
+			return false;
 		}
 		
 		idToIndex.put(meter.getId(), meters.size());
@@ -76,13 +76,15 @@ public abstract class MeterGroup {
 		meters.add(meter);
 		
 		meterAdded(meter);
+		
+		return true;
 	}
 	
-	protected void removeMeter(Meter meter) {
+	protected boolean removeMeter(Meter meter) {
 		int index = idToIndex.getOrDefault(meter.getId(), -1);
 		
 		if (index < 0 || index >= meters.size()) {
-			return;
+			return false;
 		}
 		
 		meters.remove(index);
@@ -97,6 +99,8 @@ public abstract class MeterGroup {
 		}
 		
 		meterRemoved(meter);
+		
+		return true;
 	}
 	
 	protected void updateMeter(Meter meter, MeterProperties newProperties) {

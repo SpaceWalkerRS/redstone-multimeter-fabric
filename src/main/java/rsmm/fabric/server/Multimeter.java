@@ -148,38 +148,40 @@ public class Multimeter {
 	public void addMeter(ServerPlayerEntity player, MeterProperties properties) {
 		ServerMeterGroup meterGroup = getSubscription(player);
 		
-		if (meterGroup != null) {
-			addMeter(meterGroup, properties);
+		if (meterGroup != null && !addMeter(meterGroup, properties)) {
+			refreshMeterGroup(player);
 		}
 	}
 	
-	public void addMeter(ServerMeterGroup meterGroup, MeterProperties properties) {
-		if (meterPropertiesManager.validate(properties)) {
-			meterGroup.addMeter(properties);
-			
-			WorldPos pos = properties.getPos();
-			World world = server.getWorldOf(pos);
-			BlockPos blockPos = pos.getBlockPos();
-			BlockState state = world.getBlockState(blockPos);
-			Block block = state.getBlock();
-			
-			boolean powered = ((IBlock)block).isPowered(world, blockPos, state);
-			boolean active = ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, blockPos, state);
-			
-			meterGroup.tryLogEvent(pos, EventType.POWERED, powered ? 1 : 0, (_meterGroup, meter) -> {
-				return meter.setPowered(powered);
-			});
-			meterGroup.tryLogEvent(pos, EventType.ACTIVE, active ? 1 : 0, (_meterGroup, meter) -> {
-				return meter.setActive(active);
-			});
+	public boolean addMeter(ServerMeterGroup meterGroup, MeterProperties properties) {
+		if (!meterPropertiesManager.validate(properties) || !meterGroup.addMeter(properties)) {
+			return false;
 		}
+		
+		WorldPos pos = properties.getPos();
+		World world = server.getWorldOf(pos);
+		BlockPos blockPos = pos.getBlockPos();
+		BlockState state = world.getBlockState(blockPos);
+		Block block = state.getBlock();
+		
+		boolean powered = ((IBlock)block).isPowered(world, blockPos, state);
+		boolean active = ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, blockPos, state);
+		
+		meterGroup.tryLogEvent(pos, EventType.POWERED, powered ? 1 : 0, (_meterGroup, meter) -> {
+			return meter.setPowered(powered);
+		});
+		meterGroup.tryLogEvent(pos, EventType.ACTIVE, active ? 1 : 0, (_meterGroup, meter) -> {
+			return meter.setActive(active);
+		});
+		
+		return true;
 	}
 	
 	public void removeMeter(ServerPlayerEntity player, long id) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		
-		if (meterGroup != null) {
-			meterGroup.removeMeter(id);
+		if (meterGroup != null && !meterGroup.removeMeter(id)) {
+			refreshMeterGroup(player);
 		}
 	}
 	
@@ -268,6 +270,15 @@ public class Multimeter {
 		
 		if (!meterGroup.hasSubscribers() && !meterGroup.hasMeters()) {
 			meterGroups.remove(meterGroup.getName(), meterGroup);
+		}
+	}
+	
+	public void refreshMeterGroup(ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = subscriptions.get(player);
+		
+		if (meterGroup != null) {
+			MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
+			server.getPacketHandler().sendPacketToPlayer(packet, player);
 		}
 	}
 	
