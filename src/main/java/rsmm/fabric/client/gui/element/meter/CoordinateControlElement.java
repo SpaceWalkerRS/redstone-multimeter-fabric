@@ -76,14 +76,16 @@ public class CoordinateControlElement extends ControlElement {
 		return new TextField(font, 0, 0, width, height, () -> {
 			WorldPos pos = getter.get();
 			BlockPos p = pos.getBlockPos();
-			int coordinate = axis.choose(p.getX(), p.getY(), p.getZ());
+			int coord = axis.choose(p.getX(), p.getY(), p.getZ());
 			
-			return String.valueOf(coordinate);
+			return String.valueOf(coord);
 		}, text -> {
 			try {
-				int coordinate = Integer.valueOf(text);
 				WorldPos pos = getter.get();
-				WorldPos newPos = pos.withCoord(axis, coordinate);
+				BlockPos p = pos.getBlockPos();
+				int coord = axis.choose(p.getX(), p.getY(), p.getZ());
+				int newCoord = Integer.valueOf(text);
+				WorldPos newPos = pos.offset(axis, newCoord - coord);
 				
 				setter.accept(newPos);
 			} catch (NumberFormatException e) {

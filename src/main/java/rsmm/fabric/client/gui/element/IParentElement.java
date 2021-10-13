@@ -3,8 +3,6 @@ package rsmm.fabric.client.gui.element;
 import java.util.Collections;
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
-
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
@@ -38,28 +36,24 @@ public interface IParentElement extends IElement {
 	
 	@Override
 	default boolean mouseClick(double mouseX, double mouseY, int button) {
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			setDraggingMouse(true);
-		}
+		boolean clicked = IElement.super.mouseClick(mouseX, mouseY, button);
 		
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
 		
 		if (hoveredElement != null && hoveredElement.mouseClick(mouseX, mouseY, button)) {
 			setFocusedElement(hoveredElement);
-			return true;
+			clicked = true;
 		} else {
 			setFocusedElement(null);
-			return false;
+			clicked = false;
 		}
+		
+		return clicked;
 	}
 	
 	@Override
 	default boolean mouseRelease(double mouseX, double mouseY, int button) {
-		boolean released = false;
-		
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			setDraggingMouse(false);
-		}
+		boolean released = IElement.super.mouseRelease(mouseX, mouseY, button);
 		
 		List<IElement> children = getChildren();
 		
@@ -76,7 +70,7 @@ public interface IParentElement extends IElement {
 	
 	@Override
 	default boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (isDraggingMouse() && (button == GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
+		if (isDraggingMouse()) {
 			IElement focused = getFocusedElement();
 			
 			if (focused != null) {
@@ -139,7 +133,7 @@ public interface IParentElement extends IElement {
 	}
 	
 	@Override
-	default List<Text> getTooltip(double mouseX, double mouseY) {
+	default List<Text> getTooltip(int mouseX, int mouseY) {
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
 		return hoveredElement == null ? Collections.emptyList() : hoveredElement.getTooltip(mouseX, mouseY);
 	}

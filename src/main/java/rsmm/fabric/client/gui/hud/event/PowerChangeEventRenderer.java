@@ -1,18 +1,16 @@
-package rsmm.fabric.client.gui.log;
-
-import static rsmm.fabric.client.gui.HudSettings.*;
+package rsmm.fabric.client.gui.hud.event;
 
 import net.minecraft.client.util.math.MatrixStack;
 
-import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.gui.hud.MultimeterHud;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 
 public class PowerChangeEventRenderer extends BasicEventRenderer {
 	
-	public PowerChangeEventRenderer(MultimeterClient client) {
-		super(client);
+	public PowerChangeEventRenderer(MultimeterHud hud) {
+		super(hud);
 		
 		this.setType(EventType.POWER_CHANGE);
 	}
@@ -25,13 +23,13 @@ public class PowerChangeEventRenderer extends BasicEventRenderer {
 		
 		boolean increased = (newPower > oldPower);
 		
-		int half = ROW_HEIGHT / 2;
+		int half = hud.settings.rowHeight / 2;
 		int color = centerColorProvider.apply(meter, event);
 		
 		if (increased) {
-			fill(matrices, x + 1, y + half, x + COLUMN_WIDTH, y + ROW_HEIGHT - half, color);
+			drawRect(hud, matrices, x + 1, y + half, x + hud.settings.columnWidth, y + hud.settings.rowHeight - half, color);
 		} else {
-			fill(matrices, x, y + half, x + COLUMN_WIDTH - 1, y + ROW_HEIGHT - half, color);
+			drawRect(hud, matrices, x, y + half, x + hud.settings.columnWidth - 1, y + hud.settings.rowHeight - half, color);
 		}
 	}
 }

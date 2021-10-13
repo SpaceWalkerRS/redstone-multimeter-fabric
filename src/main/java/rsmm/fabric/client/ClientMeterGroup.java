@@ -34,22 +34,22 @@ public class ClientMeterGroup extends MeterGroup {
 	@Override
 	public void clear() {
 		super.clear();
-		updateUI();
+		client.getHUD().updateMeterList();
 	}
 	
 	@Override
 	protected void meterAdded(Meter meter) {
-		updateUI();
+		client.getHUD().updateMeterList();
 	}
 	
 	@Override
 	protected void meterRemoved(Meter meter) {
-		updateUI();
+		client.getHUD().updateMeterList();
 	}
 	
 	@Override
 	protected void meterUpdated(Meter meter) {
-		updateUI();
+		client.getHUD().updateDimensions();
 	}
 	
 	@Override
@@ -59,6 +59,10 @@ public class ClientMeterGroup extends MeterGroup {
 	
 	public MultimeterClient getMultimeterClient() {
 		return client;
+	}
+	
+	public boolean hasMeter(Meter meter) {
+		return hasMeter(meter.getId());
 	}
 	
 	public void updateMeters(List<Long> removedMeters, Long2ObjectMap<MeterProperties> meterUpdates) {
@@ -85,25 +89,18 @@ public class ClientMeterGroup extends MeterGroup {
 	
 	public void toggleHidden(Meter meter) {
 		meter.toggleHidden();
-		updateUI();
+		meterUpdated(meter);
 	}
 	
 	public void update(String newName, NbtCompound nbt) {
 		name = newName;
 		updateFromNBT(nbt);
-		updateUI();
+		
+		client.getHUD().updateMeterList();
 	}
 	
 	public void reset() {
 		name = super.getName();
 		clear();
-	}
-	
-	private void updateUI() {
-		if (client.hasMultimeterScreenOpen()) {
-			client.getScreen().update();
-		} else if (client.shouldRenderHud()) {
-			client.getHudRenderer().updateRowCount();
-		}
 	}
 }

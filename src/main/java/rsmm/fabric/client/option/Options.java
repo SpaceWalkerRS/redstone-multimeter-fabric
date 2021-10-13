@@ -57,7 +57,7 @@ public class Options {
 	public static void validate() {
 		int history = HUD.HISTORY.get();
 		
-		if (history < HUD.SELECTED_COLUMN.get()) {
+		if (HUD.SELECTED_COLUMN.get() >= history) {
 			HUD.SELECTED_COLUMN.set(history - 1);
 		}
 	}

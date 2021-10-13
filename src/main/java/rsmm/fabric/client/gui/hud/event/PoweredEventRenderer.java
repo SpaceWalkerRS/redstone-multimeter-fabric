@@ -1,13 +1,13 @@
-package rsmm.fabric.client.gui.log;
+package rsmm.fabric.client.gui.hud.event;
 
-import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.gui.hud.MultimeterHud;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 
 public class PoweredEventRenderer extends ToggleEventRenderer {
 	
-	public PoweredEventRenderer(MultimeterClient client) {
-		super(client, EventType.POWERED);
+	public PoweredEventRenderer(MultimeterHud hud) {
+		super(hud, EventType.POWERED);
 	}
 	
 	@Override

@@ -161,7 +161,7 @@ public class TextField extends TextFieldWidget implements IButton {
 	}
 	
 	@Override
-	public List<Text> getTooltip(double mouseX, double mouseY) {
+	public List<Text> getTooltip(int mouseX, int mouseY) {
 		return tooltipSupplier.get();
 	}
 	

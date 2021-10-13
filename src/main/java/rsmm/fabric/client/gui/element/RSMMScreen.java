@@ -10,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.gui.CursorType;
 import rsmm.fabric.interfaces.mixin.IMinecraftClient;
 
 public abstract class RSMMScreen extends Screen implements IParentElement {
@@ -118,6 +119,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	@Override
 	public void removed() {
 		onRemoved();
+		setCursor(multimeterClient, CursorType.ARROW);
 	}
 	
 	@Override
@@ -208,5 +210,9 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	
 	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		IParentElement.super.render(matrices, mouseX, mouseY, delta);
+	}
+	
+	public static void setCursor(MultimeterClient client, CursorType type) {
+		GLFW.glfwSetCursor(client.getMinecraftClient().getWindow().getHandle(), type.getCursor());
 	}
 }

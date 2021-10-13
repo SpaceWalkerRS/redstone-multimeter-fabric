@@ -27,13 +27,13 @@ public class InputHandler {
 			client.resetMeter();
 		}
 		while (KeyBindings.PAUSE_METERS.wasPressed()) {
-			client.getHudRenderer().pause();
+			client.getHUD().pause();
 		}
 		while (KeyBindings.STEP_FORWARD.wasPressed()) {
-			client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
+			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 		}
 		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
-			client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
+			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 		}
 		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
@@ -59,16 +59,13 @@ public class InputHandler {
 	
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		if (KeyBindings.PAUSE_METERS.matchesMouse(button)) {
-			client.getHudRenderer().pause();
+			client.getHUD().pause();
 		} else
 		if (KeyBindings.STEP_FORWARD.matchesMouse(button)) {
-			client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
+			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 		} else
 		if (KeyBindings.STEP_BACKWARD.matchesMouse(button)) {
-			client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
-		} else
-		if (KeyBindings.TOGGLE_HUD.matchesMouse(button)) {
-			client.toggleHud();
+			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 		} else
 		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
 			if (client.hasMultimeterScreenOpen()) {
@@ -83,16 +80,13 @@ public class InputHandler {
 	
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
 		if (KeyBindings.PAUSE_METERS.matchesKey(keyCode, scanCode)) {
-			client.getHudRenderer().pause();
+			client.getHUD().pause();
 		} else
 		if (KeyBindings.STEP_FORWARD.matchesKey(keyCode, scanCode)) {
-			client.getHudRenderer().stepForward(Screen.hasControlDown() ? 10 : 1);
+			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 		} else
 		if (KeyBindings.STEP_BACKWARD.matchesKey(keyCode, scanCode)) {
-			client.getHudRenderer().stepBackward(Screen.hasControlDown() ? 10 : 1);
-		} else
-		if (KeyBindings.TOGGLE_HUD.matchesKey(keyCode, scanCode)) {
-			client.toggleHud();
+			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 		} else
 		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
 			if (client.hasMultimeterScreenOpen()) {

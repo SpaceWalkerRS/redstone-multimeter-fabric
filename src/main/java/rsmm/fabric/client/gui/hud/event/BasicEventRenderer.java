@@ -1,29 +1,31 @@
-package rsmm.fabric.client.gui.log;
+package rsmm.fabric.client.gui.hud.event;
 
-import static rsmm.fabric.client.gui.HudSettings.*;
+import static rsmm.fabric.client.gui.HudSettings.COLUMN_WIDTH;
+import static rsmm.fabric.client.gui.HudSettings.GRID_SIZE;
+import static rsmm.fabric.client.gui.HudSettings.ROW_HEIGHT;
+import static rsmm.fabric.client.gui.HudSettings.columnCount;
 
 import java.util.function.BiFunction;
 
 import net.minecraft.client.util.math.MatrixStack;
 
-import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.gui.hud.MultimeterHud;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
 import rsmm.fabric.common.log.MeterLogs;
-import rsmm.fabric.util.ColorUtils;
 
 public class BasicEventRenderer extends MeterEventRenderer {
 	
 	protected final BiFunction<Meter, MeterEvent, Integer> edgeColorProvider;
 	protected final BiFunction<Meter, MeterEvent, Integer> centerColorProvider;
 	
-	public BasicEventRenderer(MultimeterClient client) {
-		this(client, (m, e) -> backgroundColor(), (m, e) -> ColorUtils.fromARGB(opacity(), m.getColor()));
+	public BasicEventRenderer(MultimeterHud hud) {
+		this(hud, (m, e) -> hud.settings.colorBackground, (m, e) -> m.getColor());
 	}
 	
-	public BasicEventRenderer(MultimeterClient client, BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {
-		super(client, null);
+	public BasicEventRenderer(MultimeterHud hud, BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {
+		super(hud, null);
 		
 		this.edgeColorProvider = edgeColorProvider;
 		this.centerColorProvider = centerColorProvider;
@@ -60,7 +62,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubTickLogs(MatrixStack matrices, int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderSubtickLogs(MatrixStack matrices, int x, int y, long tick, int subTickCount, Meter meter) {
 		y += GRID_SIZE;
 		
 		MeterLogs logs = meter.getLogs();
@@ -88,21 +90,24 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	protected void drawEvent(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
-		drawEdges(matrices, x, y, meter ,event);
+		matrices.push();
 		drawCenter(matrices, x, y, meter ,event);
+		matrices.translate(0, 0, -0.01);
+		drawEdges(matrices, x, y, meter ,event);
+		matrices.pop();
 	}
 	
 	protected void drawEdges(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
 		int half = ROW_HEIGHT / 2;
 		int color = edgeColorProvider.apply(meter, event);
 		
-		fill(matrices, x, y + half - 1, x + COLUMN_WIDTH, y + ROW_HEIGHT - half + 1, color);
+		drawRect(hud, matrices, x, y + half - 1, x + COLUMN_WIDTH, y + ROW_HEIGHT - half + 1, color);
 	}
 	
 	protected void drawCenter(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
 		int half = ROW_HEIGHT / 2;
 		int color = centerColorProvider.apply(meter, event);
 		
-		fill(matrices, x, y + half, x + COLUMN_WIDTH, y + ROW_HEIGHT - half, color);
+		drawRect(hud, matrices, x, y + half, x + COLUMN_WIDTH, y + ROW_HEIGHT - half, color);
 	}
 }

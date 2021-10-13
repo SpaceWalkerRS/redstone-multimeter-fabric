@@ -3,6 +3,8 @@ package rsmm.fabric.client.gui.element;
 import java.util.Collections;
 import java.util.List;
 
+import org.lwjgl.glfw.GLFW;
+
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.text.Text;
 
@@ -10,9 +12,21 @@ public interface IElement extends Drawable {
 	
 	public void mouseMove(double mouseX, double mouseY);
 	
-	public boolean mouseClick(double mouseX, double mouseY, int button);
+	default boolean mouseClick(double mouseX, double mouseY, int button) {
+		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			setDraggingMouse(true);
+		}
+		
+		return false;
+	}
 	
-	public boolean mouseRelease(double mouseX, double mouseY, int button);
+	default boolean mouseRelease(double mouseX, double mouseY, int button) {
+		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			setDraggingMouse(false);
+		}
+		
+		return false;
+	}
 	
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY);
 	
@@ -58,7 +72,7 @@ public interface IElement extends Drawable {
 	
 	public void setVisible(boolean visible);
 	
-	default List<Text> getTooltip(double mouseX, double mouseY) {
+	default List<Text> getTooltip(int mouseX, int mouseY) {
 		return Collections.emptyList();
 	}
 	

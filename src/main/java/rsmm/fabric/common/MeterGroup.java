@@ -90,10 +90,10 @@ public abstract class MeterGroup {
 		posToIndex.remove(meter.getPos(), index);
 		
 		for (; index < meters.size(); index++) {
-			meter = meters.get(index);
+			Meter m = meters.get(index);
 			
-			idToIndex.compute(meter.getId(), (id, prevIndex) -> prevIndex - 1);
-			posToIndex.compute(meter.getPos(), (pos, prevIndex) -> prevIndex - 1);
+			idToIndex.compute(m.getId(), (id, prevIndex) -> prevIndex - 1);
+			posToIndex.compute(m.getPos(), (pos, prevIndex) -> prevIndex - 1);
 		}
 		
 		meterRemoved(meter);

@@ -14,9 +14,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import rsmm.fabric.RedstoneMultimeterMod;
-import rsmm.fabric.client.gui.MultimeterHudRenderer;
 import rsmm.fabric.client.gui.MultimeterScreen;
 import rsmm.fabric.client.gui.element.RSMMScreen;
+import rsmm.fabric.client.gui.hud.MultimeterHud;
 import rsmm.fabric.client.option.Options;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.MeterProperties;
@@ -47,7 +47,7 @@ public class MultimeterClient {
 	private final ClientPacketHandler packetHandler;
 	private final InputHandler inputHandler;
 	private final MeterRenderer meterRenderer;
-	private final MultimeterHudRenderer hudRenderer;
+	private final MultimeterHud hud;
 	private final ClientMeterPropertiesManager meterPropertiesManager;
 	
 	private ClientMeterGroup meterGroup;
@@ -60,7 +60,7 @@ public class MultimeterClient {
 		this.packetHandler = new ClientPacketHandler(this);
 		this.inputHandler = new InputHandler(this);
 		this.meterRenderer = new MeterRenderer(this);
-		this.hudRenderer = new MultimeterHudRenderer(this);
+		this.hud = new MultimeterHud(this);
 		this.meterPropertiesManager = new ClientMeterPropertiesManager(this);
 		
 		this.hudEnabled = true;
@@ -83,8 +83,8 @@ public class MultimeterClient {
 		return meterRenderer;
 	}
 	
-	public MultimeterHudRenderer getHudRenderer() {
-		return hudRenderer;
+	public MultimeterHud getHUD() {
+		return hud;
 	}
 	
 	public ClientMeterGroup getMeterGroup() {
@@ -99,7 +99,7 @@ public class MultimeterClient {
 	}
 	
 	public boolean shouldRenderHud() {
-		return hudEnabled && connected && !hasMultimeterScreenOpen();
+		return hudEnabled && connected && !hud.isOnScreen();
 	}
 	
 	public long getLastServerTick() {
@@ -118,7 +118,7 @@ public class MultimeterClient {
 		lastServerTick = serverTick;
 		
 		meterGroup.getLogManager().clearOldLogs();
-		hudRenderer.tick();
+		hud.onServerTick();
 	}
 	
 	/**
@@ -145,7 +145,7 @@ public class MultimeterClient {
 			connected = true;
 			lastServerTick = serverTick;
 			
-			hudRenderer.reset();
+			hud.reset();
 			refreshMeterGroup();
 		}
 	}
@@ -154,7 +154,7 @@ public class MultimeterClient {
 		if (connected) {
 			connected = false;
 			
-			hudRenderer.reset();
+			hud.reset();
 			meterGroup.reset();
 		}
 	}

@@ -77,7 +77,7 @@ public class ClientLogManager extends LogManager {
 	 * Remove all logged events that are too old
 	 */
 	public void clearOldLogs() {
-		long selectedTickCutoff = meterGroup.getMultimeterClient().getHudRenderer().getSelectedTick() - AGE_CUTOFF;
+		long selectedTickCutoff = meterGroup.getMultimeterClient().getHUD().getSelectedTick() - AGE_CUTOFF;
 		long serverTickCutoff = getLastTick() - MAX_LOG_AGE;
 		long cutoff = (selectedTickCutoff > serverTickCutoff) ? selectedTickCutoff : serverTickCutoff;
 		

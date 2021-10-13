@@ -6,12 +6,11 @@ import net.minecraft.text.LiteralText;
 
 import rsmm.fabric.client.gui.element.ScrollableListElement;
 import rsmm.fabric.client.gui.element.RSMMScreen;
-import rsmm.fabric.client.gui.element.meter.HudElement;
 import rsmm.fabric.client.gui.element.meter.MeterControlsElement;
+import rsmm.fabric.client.gui.hud.MultimeterHud;
 
 public class MultimeterScreen extends RSMMScreen {
 	
-	private final Selector selector;
 	private final boolean isPauseScreen;
 	
 	private ScrollableListElement list;
@@ -19,7 +18,6 @@ public class MultimeterScreen extends RSMMScreen {
 	public MultimeterScreen() {
 		super(new LiteralText("Redstone Multimeter"), false);
 		
-		this.selector = new Selector(() -> update());
 		this.isPauseScreen = !Screen.hasShiftDown();
 	}
 	
@@ -60,7 +58,6 @@ public class MultimeterScreen extends RSMMScreen {
 	public void update() {
 		super.update();
 		list.updateCoords();
-		selector.selectLast();
 	}
 	
 	@Override
@@ -71,10 +68,14 @@ public class MultimeterScreen extends RSMMScreen {
 		list.setX(getX());
 		list.setY(getY());
 		
-		list.add(new HudElement(multimeterClient, selector, 0, 0, list.getEffectiveWidth()));
-		list.add(new MeterControlsElement(multimeterClient, selector, 0, 0, list.getEffectiveWidth()));
+		MultimeterHud hud = multimeterClient.getHUD();
+		
+		list.add(hud);
+		list.add(new MeterControlsElement(multimeterClient, 0, 0, list.getEffectiveWidth()));
 		
 		addContent(list);
+		
+		hud.onInitScreen();
 	}
 	
 	@Override

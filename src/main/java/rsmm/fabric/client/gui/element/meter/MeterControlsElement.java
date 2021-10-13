@@ -14,7 +14,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction.Axis;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.client.gui.Selector;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
 import rsmm.fabric.client.gui.element.SimpleListElement;
 import rsmm.fabric.client.gui.element.SimpleTextElement;
@@ -36,7 +35,6 @@ import rsmm.fabric.util.ColorUtils;
 public class MeterControlsElement extends AbstractParentElement {
 	
 	private final MultimeterClient client;
-	private final Selector selector;
 	private final TextElement deleteConfirm;
 	private final SimpleListElement controls;
 	
@@ -50,11 +48,10 @@ public class MeterControlsElement extends AbstractParentElement {
 	
 	private boolean triedDeleting;
 	
-	public MeterControlsElement(MultimeterClient client, Selector selector, int x, int y, int width) {
+	public MeterControlsElement(MultimeterClient client, int x, int y, int width) {
 		super(x, y, width, 0);
 		
 		this.client = client;
-		this.selector = selector;
 		
 		this.title = new SimpleTextElement(this.client, 0, 0, false, () -> new LiteralText(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).formatted(Formatting.UNDERLINE));
 		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide"))), button -> {
@@ -119,7 +116,7 @@ public class MeterControlsElement extends AbstractParentElement {
 	@Override
 	public void update() {
 		Meter prevMeter = meter;
-		meter = client.getMeterGroup().getMeter(selector.get());
+		meter = client.getHUD().getSelectedMeter();
 		
 		if (meter != prevMeter) {
 			createControls();
@@ -158,14 +155,14 @@ public class MeterControlsElement extends AbstractParentElement {
 			return true;
 		}, t -> false);
 		
-		builder.addControl("Pos", "dimension", (client, width, height) -> new TextField(font, 0, 0, width, height, () -> meter.getPos().getWorldId().toString(), text -> changePos(meter.getPos().withWorld(new Identifier(text)))));
+		builder.addControl("Pos", "dimension", (client, width, height) -> new TextField(font, 0, 0, width, height, () -> meter.getPos().getWorldId().toString(), text -> changePos(meter.getPos().offset(new Identifier(text)))));
 		builder.addCoordinateControl("Pos", Axis.X, () -> meter.getPos(), pos -> changePos(pos));
 		builder.addCoordinateControl("Pos", Axis.Y, () -> meter.getPos(), pos -> changePos(pos));
 		builder.addCoordinateControl("Pos", Axis.Z, () -> meter.getPos(), pos -> changePos(pos));
 		
 		builder.addControl("Name", "", (client, width, height) -> new TextField(font, 0, 0, width, height, () -> meter.getName(), text -> changeName(text)));
 		
-		builder.addControl("Color", () -> new LiteralText("rgb").styled(style -> style.withColor(meter.getColor())), (client, width, height) -> new TextField(font, 0, 0, width, height, () -> ColorUtils.toRGBString(meter.getColor()), text -> {
+		builder.addControl("Color", () -> new LiteralText("rgb").styled(style -> style.withColor(meter.getColor())), (client, width, height) -> new TextField(font, 0, 0, width, height, () -> ColorUtils.toRGBString(meter.getColor()).toUpperCase(), text -> {
 			try {
 				changeColor(ColorUtils.fromRGBString(text));
 			} catch (NumberFormatException e) {

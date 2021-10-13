@@ -48,6 +48,10 @@ public class WorldPos {
 		return world.getRegistryKey().getValue().equals(worldId);
 	}
 	
+	public WorldPos offset(Identifier worldId) {
+		return new WorldPos(worldId, blockPos);
+	}
+	
 	public BlockPos getBlockPos() {
 		return blockPos;
 	}
@@ -70,20 +74,5 @@ public class WorldPos {
 	
 	public WorldPos offset(int dx, int dy, int dz) {
 		return new WorldPos(worldId, blockPos.add(dx, dy, dz));
-	}
-	
-	/**
-	 * Return a WorldPos with the same coordinates in a different dimension.
-	 */
-	public WorldPos withWorld(Identifier worldId) {
-		return new WorldPos(worldId, blockPos);
-	}
-	
-	public WorldPos withCoord(Axis axis, int coord) {
-		int x = (axis == Axis.X) ? coord : blockPos.getX();
-		int y = (axis == Axis.Y) ? coord : blockPos.getY();
-		int z = (axis == Axis.Z) ? coord : blockPos.getZ();
-		
-		return new WorldPos(worldId, new BlockPos(x, y, z));
 	}
 }
