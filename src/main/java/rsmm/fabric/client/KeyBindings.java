@@ -37,6 +37,7 @@ public class KeyBindings {
 	public static final KeyBinding STEP_BACKWARD;
 	public static final KeyBinding TOGGLE_HUD;
 	public static final KeyBinding OPEN_MULTIMETER_SCREEN;
+	public static final KeyBinding PRINT_LOGS;
 	
 	public static final KeyBinding[] TOGGLE_EVENT_TYPES;
 	
@@ -134,6 +135,7 @@ public class KeyBindings {
 		STEP_BACKWARD          = registerKeyBinding(new KeyBinding("Step Backward"         , GLFW.GLFW_KEY_PERIOD, MAIN));
 		TOGGLE_HUD             = registerKeyBinding(new KeyBinding("Toggle HUD"            , GLFW.GLFW_KEY_H     , MAIN));
 		OPEN_MULTIMETER_SCREEN = registerKeyBinding(new KeyBinding("Open Multimeter Screen", GLFW.GLFW_KEY_G     , MAIN));
+		PRINT_LOGS             = registerKeyBinding(new KeyBinding("Print Logs To File"    , GLFW.GLFW_KEY_P     , MAIN));
 		
 		TOGGLE_EVENT_TYPES = new KeyBinding[EventType.ALL.length];
 		

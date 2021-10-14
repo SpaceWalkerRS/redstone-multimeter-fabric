@@ -32,6 +32,26 @@ public class MeterEvent {
 		this.metaData = metaData;
 	}
 	
+	@Override
+	public String toString() {
+		String string = type.getName();
+		
+		List<Text> lines = new ArrayList<>();
+		type.addTextForTooltip(lines, metaData);
+		
+		if (!lines.isEmpty()) {
+			String[] args = new String[lines.size()];
+			
+			for (int index = 0; index < lines.size(); index++) {
+				args[index] = lines.get(index).getString();
+			}
+			
+			string += "[" + String.join(", ", args) + "]";
+		}
+		
+		return string;
+	}
+	
 	public EventType getType() {
 		return type;
 	}

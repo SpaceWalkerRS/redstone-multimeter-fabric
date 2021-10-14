@@ -8,9 +8,12 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Formatting;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
+import rsmm.fabric.client.gui.element.SimpleTextElement;
+import rsmm.fabric.client.gui.element.TextElement;
 import rsmm.fabric.client.gui.hud.event.MeterEventRenderDispatcher;
 import rsmm.fabric.client.gui.widget.TransparentButton;
 import rsmm.fabric.client.option.Options;
@@ -31,6 +34,7 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 	private final TransparentButton playPauseButton;
 	private final TransparentButton fastBackwardButton;
 	private final TransparentButton fastForwardButton;
+	private final TextElement printIndicator;
 	
 	private boolean paused;
 	/** The offset between the last server tick and the first tick to be displayed in the ticks table */
@@ -53,11 +57,11 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 		this.ticks = new PrimaryEventViewer(this);
 		this.subticks = new SecondaryEventViewer(this);
 		
-		this.playPauseButton = new TransparentButton(client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), button -> {
+		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), button -> {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ed" : "\u23e9"), button -> {
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ed" : "\u23e9"), button -> {
 			stepBackward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -67,7 +71,7 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ee" : "\u23ea"), button -> {
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ee" : "\u23ea"), button -> {
 			stepForward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -77,12 +81,14 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 				update();
 			}
 		};
+		this.printIndicator = new SimpleTextElement(this.client, 0, 0, false, () -> new LiteralText("P").formatted(Formatting.BOLD));
 		
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);
 		}
 		this.fastBackwardButton.setVisible(false);
 		this.fastForwardButton.setVisible(false);
+		this.printIndicator.setVisible(false);
 		
 		addChild(this.names);
 		addChild(this.ticks);
@@ -90,6 +96,7 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 		addChild(this.playPauseButton);
 		addChild(this.fastBackwardButton);
 		addChild(this.fastForwardButton);
+		addChild(this.printIndicator);
 	}
 	
 	@Override
@@ -167,6 +174,7 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 			playPauseButton.setX(x - 2 * w);
 			fastBackwardButton.setX(x - w);
 			fastForwardButton.setX(x - 3 * w);
+			printIndicator.setX(x - 4 * w);
 			
 			x += settings.columnWidth + settings.gridSize;
 			subticks.setX(x);
@@ -180,6 +188,7 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 			playPauseButton.setX(x - 2 * w);
 			fastBackwardButton.setX(x - w);
 			fastForwardButton.setX(x - 3 * w);
+			printIndicator.setX(x - 4 * w);
 			
 			x -= ticks.getWidth();
 			ticks.setX(x);
@@ -201,6 +210,9 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 		playPauseButton.setY(y);
 		fastBackwardButton.setY(y);
 		fastForwardButton.setY(y);
+		
+		y = fastForwardButton.getTextY();
+		printIndicator.setY(y);
 	}
 	
 	public void render(MatrixStack matrices) {
@@ -415,5 +427,9 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 	public void onOptionsChanged() {
 		playPauseButton.setVisible(onScreen || Options.HUD.PAUSE_INDICATOR.get());
 		updateDimensions();
+	}
+	
+	public void onTogglePrinter() {
+		printIndicator.setVisible(client.getMeterGroup().getLogManager().getPrinter().isPrinting());
 	}
 }

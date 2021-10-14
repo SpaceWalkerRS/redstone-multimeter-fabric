@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.log.LogManager;
 
@@ -19,10 +20,12 @@ public class ClientLogManager extends LogManager {
 	private final ClientMeterGroup meterGroup;
 	/** The number of logged events in any tick */
 	private final Map<Long, Integer> subTicks;
+	private final LogPrinter printer;
 	
 	public ClientLogManager(ClientMeterGroup meterGroup) {
 		this.meterGroup = meterGroup;
 		this.subTicks = new LinkedHashMap<>();
+		this.printer = new LogPrinter(this);
 	}
 	
 	@Override
@@ -40,6 +43,10 @@ public class ClientLogManager extends LogManager {
 		super.clearLogs();
 		
 		subTicks.clear();
+	}
+	
+	public LogPrinter getPrinter() {
+		return printer;
 	}
 	
 	public int getSubTickCount(long tick) {
@@ -71,6 +78,8 @@ public class ClientLogManager extends LogManager {
 				meter.setActive(active);
 			}
 		}
+		
+		printer.printLogs();
 	}
 	
 	/**

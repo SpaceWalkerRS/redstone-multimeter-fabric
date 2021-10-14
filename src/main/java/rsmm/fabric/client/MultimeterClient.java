@@ -122,7 +122,7 @@ public class MultimeterClient {
 	}
 	
 	public void onShutdown() {
-		
+		meterGroup.getLogManager().getPrinter().stop();
 	}
 	
 	/**
@@ -197,6 +197,20 @@ public class MultimeterClient {
 		});
 	}
 	
+	public void togglePrinter() {
+		if (!meterGroup.hasMeters()) {
+			return;
+		}
+		
+		LogPrinter printer = meterGroup.getLogManager().getPrinter();
+		
+		printer.toggle();
+		hud.onTogglePrinter();
+		
+		String message = String.format("%s printing meter logs to file...", printer.isPrinting() ? "Started" : "Stopped");
+		client.player.sendMessage(new LiteralText(message), false);
+	}
+	
 	public void toggleEventType(EventType type) {
 		onTargetMeter(meter -> {
 			MeterProperties newProperties = new MeterProperties();
@@ -232,8 +246,8 @@ public class MultimeterClient {
 	public void toggleHud() {
 		hudEnabled = !hudEnabled;
 		
-		Text text = new LiteralText(String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled"));
-		client.player.sendMessage(text, true);
+		String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
+		client.player.sendMessage(new LiteralText(message), true);
 	}
 	
 	public RSMMScreen getScreen() {

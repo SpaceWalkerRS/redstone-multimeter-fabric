@@ -26,6 +26,7 @@ import rsmm.fabric.client.gui.element.action.MousePress;
 public class Button extends ButtonWidget implements IElement, IButton {
 	
 	protected final MultimeterClient client;
+	protected final TextRenderer font;
 	protected final Supplier<Text> textSupplier;
 	protected final Supplier<List<Text>> tooltipSupplier;
 	protected final MousePress<Button> onPress;
@@ -37,7 +38,10 @@ public class Button extends ButtonWidget implements IElement, IButton {
 	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<Button> onPress) {
 		super(x, y, width, height, textSupplier.get(), button -> {});
 		
+		MinecraftClient minecraftClient = client.getMinecraftClient();
+		
 		this.client = client;
+		this.font = minecraftClient.textRenderer;
 		this.textSupplier = textSupplier;
 		this.tooltipSupplier = tooltipSupplier;
 		this.onPress = onPress;
@@ -52,7 +56,6 @@ public class Button extends ButtonWidget implements IElement, IButton {
 	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		MinecraftClient minecraftClient = client.getMinecraftClient();
 		TextureManager textureManager = minecraftClient.getTextureManager();
-		TextRenderer font = minecraftClient.textRenderer;
 		
 		textureManager.bindTexture(WIDGETS_TEXTURE);
 		
@@ -87,9 +90,8 @@ public class Button extends ButtonWidget implements IElement, IButton {
 		int color = (a << 24) | rgb;
 		
 		Text message = getMessage();
-		int textWidth = font.getWidth(message);
-		int textX = x + rightWidth - textWidth / 2;
-		int textY = y + height - (height + font.fontHeight) / 2;
+		int textX = getTextX(message);
+		int textY = getTextY();
 		
 		font.drawWithShadow(matrices, message, textX, textY, color);
 	}
@@ -222,6 +224,18 @@ public class Button extends ButtonWidget implements IElement, IButton {
 	@Override
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+	
+	public int getTextX() {
+		return getTextX(getMessage());
+	}
+	
+	protected int getTextX(Text text) {
+		return x + width - (width + font.getWidth(text)) / 2;
+	}
+	
+	public int getTextY() {
+		return y + height - (height + font.fontHeight) / 2;
 	}
 	
 	public static void playClickSound(MultimeterClient client) {

@@ -38,9 +38,8 @@ public class TransparentButton extends Button {
 			int a = MathHelper.ceil(alpha * 255.0F);
 			int color = (a << 24) | rgb;
 			
-			int textWidth = font.getWidth(message);
-			int textX = x + width - (width + textWidth) / 2;
-			int textY = y + height - (height + font.fontHeight) / 2;
+			int textX = getTextX(message);
+			int textY = getTextY();
 			
 			RenderSystem.setShader(() -> GameRenderer.getPositionTexShader());
 			RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);

@@ -45,6 +45,9 @@ public class InputHandler {
 				minecraftClient.setScreen(new MultimeterScreen());
 			}
 		}
+		while (KeyBindings.PRINT_LOGS.wasPressed()) {
+			client.togglePrinter();
+		}
 		for (int index = 0; index < KeyBindings.TOGGLE_EVENT_TYPES.length; index++) {
 			KeyBinding keyBinding = KeyBindings.TOGGLE_EVENT_TYPES[index];
 			

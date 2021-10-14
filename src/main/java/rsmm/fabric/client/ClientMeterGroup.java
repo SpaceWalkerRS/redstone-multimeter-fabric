@@ -107,11 +107,13 @@ public class ClientMeterGroup extends MeterGroup {
 		name = newName;
 		updateFromNBT(nbt);
 		
+		logManager.getPrinter().onNewMeterGroup();
 		client.getHUD().updateMeterList();
 	}
 	
 	public void reset() {
 		name = super.getName();
+		logManager.getPrinter().stop();
 		clear();
 	}
 }
