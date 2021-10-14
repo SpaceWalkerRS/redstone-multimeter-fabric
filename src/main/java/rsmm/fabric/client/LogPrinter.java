@@ -10,7 +10,10 @@ import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import net.minecraft.client.gui.screen.Screen;
+
 import rsmm.fabric.RedstoneMultimeterMod;
+import rsmm.fabric.client.option.Options;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.event.EventType;
@@ -63,16 +66,16 @@ public class LogPrinter {
 			
 			writer = new BufferedWriter(fw);
 			
-			writer.write("--------------------------------------");
-			writer.newLine();
 			writer.write("Logs for meter group \'" + logManager.getMeterGroup().getName() + "\'");
 			writer.newLine();
-			writer.write("Logs are added in chronological order.");
+			writer.write("Logs are added in chronological order");
 			writer.newLine();
-			writer.write("--------------------------------------");
+			writer.write("-------------------------------------");
 			writer.newLine();
 			
-			printLogs();
+			if (Options.LogPrinter.PRINT_OLD_LOGS.get() || Screen.hasShiftDown()) {
+				printLogs();
+			}
 		} catch (IOException e) {
 			stop();
 		}
@@ -145,6 +148,8 @@ public class LogPrinter {
 			}
 		}
 		
+		prevTick = lastTick;
+		
 		print();
 	}
 	
@@ -160,13 +165,13 @@ public class LogPrinter {
 					tick = log.event.getTick();
 					phase = null;
 					
-					writer.write("tick: " + tick);
+					writer.write("tick " + tick);
 					writer.newLine();
 				}
 				if (log.event.getTickPhase() != phase) {
 					phase = log.event.getTickPhase();
 					
-					writer.write("    tick phase: " + phase.getName());
+					writer.write("    " + phase.getName());
 					writer.newLine();
 				}
 				

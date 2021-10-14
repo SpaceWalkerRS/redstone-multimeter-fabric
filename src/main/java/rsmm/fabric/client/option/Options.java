@@ -37,6 +37,12 @@ public class Options {
 		
 	}
 	
+	public static class LogPrinter {
+		
+		public static final BooleanOption PRINT_OLD_LOGS     = new BooleanOption("Print Old Logs", "Print old logs when activating the printer.", false);
+		
+	}
+	
 	public static class Miscellaneous {
 		
 		public static final IntegerOption SCROLL_SPEED       = new IntegerOption("Scroll Speed", "The scroll speed in Redstone Multimeter related GUIs.", 7, 1, 69);
@@ -162,6 +168,9 @@ public class Options {
 			HUD.PAUSE_INDICATOR,
 			HUD.OPACITY,
 			HUD.AUTO_PAUSE
+		);
+		register("Log Printer",
+			LogPrinter.PRINT_OLD_LOGS
 		);
 		register("Miscellaneous",
 			Miscellaneous.SCROLL_SPEED,
