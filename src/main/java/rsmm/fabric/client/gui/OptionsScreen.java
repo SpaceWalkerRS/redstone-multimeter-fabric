@@ -32,7 +32,7 @@ public class OptionsScreen extends RSMMScreen {
 		super.onRemoved();
 		client.keyboard.setRepeatEvents(false);
 		Options.validate();
-		multimeterClient.getHUD().update();
+		multimeterClient.getHUD().onOptionsChanged();
 	}
 	
 	@Override

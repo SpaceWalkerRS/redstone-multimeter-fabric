@@ -26,7 +26,6 @@ import rsmm.fabric.common.network.packets.AddMeterPacket;
 import rsmm.fabric.common.network.packets.MeterGroupDataPacket;
 import rsmm.fabric.common.network.packets.MeterUpdatePacket;
 import rsmm.fabric.common.network.packets.RemoveMeterPacket;
-import rsmm.fabric.common.network.packets.ResetMeterPacket;
 
 public class MultimeterClient {
 	
@@ -63,6 +62,7 @@ public class MultimeterClient {
 		this.hud = new MultimeterHud(this);
 		this.meterPropertiesManager = new ClientMeterPropertiesManager(this);
 		
+		this.meterGroup = new ClientMeterGroup(this);
 		this.hudEnabled = true;
 		this.lastServerTick = -1;
 	}
@@ -119,13 +119,6 @@ public class MultimeterClient {
 		
 		meterGroup.getLogManager().clearOldLogs();
 		hud.onServerTick();
-	}
-	
-	/**
-	 * Called after the MinecraftClient has been initialized
-	 */
-	public void onStartup() {
-		meterGroup = new ClientMeterGroup(this);
 	}
 	
 	public void onShutdown() {
@@ -198,7 +191,7 @@ public class MultimeterClient {
 			newProperties.setPos(meter.getPos());
 			
 			if (meterPropertiesManager.validate(newProperties)) {
-				ResetMeterPacket packet = new ResetMeterPacket(meter.getId(), newProperties);
+				MeterUpdatePacket packet = new MeterUpdatePacket(meter.getId(), newProperties);
 				packetHandler.sendPacket(packet);
 			}
 		});

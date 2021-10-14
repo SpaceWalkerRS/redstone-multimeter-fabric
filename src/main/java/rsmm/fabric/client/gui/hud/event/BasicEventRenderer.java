@@ -1,15 +1,11 @@
 package rsmm.fabric.client.gui.hud.event;
 
-import static rsmm.fabric.client.gui.HudSettings.COLUMN_WIDTH;
-import static rsmm.fabric.client.gui.HudSettings.GRID_SIZE;
-import static rsmm.fabric.client.gui.HudSettings.ROW_HEIGHT;
-import static rsmm.fabric.client.gui.HudSettings.columnCount;
-
 import java.util.function.BiFunction;
 
 import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.client.gui.hud.MultimeterHud;
+import rsmm.fabric.client.option.Options;
 import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.event.EventType;
 import rsmm.fabric.common.event.MeterEvent;
@@ -33,7 +29,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	
 	@Override
 	public void renderTickLogs(MatrixStack matrices, int x, int y, long firstTick, long lastTick,  Meter meter) {
-		y += GRID_SIZE;
+		y += hud.settings.gridSize;
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, firstTick) + 1;
@@ -43,17 +39,23 @@ public class BasicEventRenderer extends MeterEventRenderer {
 			return;
 		}
 		
-		long lastHudTick = firstTick + columnCount();
+		long lastHudTick = firstTick + Options.HUD.COLUMN_COUNT.get();
 		
 		if (lastHudTick > lastTick) {
 			lastHudTick = lastTick;
 		}
 		
+		long tick = -1;
+		
 		while (event.isBefore(lastHudTick)) {
-			int column = (int)(event.getTick() - firstTick); // The event is no older than 1M ticks, so we can safely cast to int
-			int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
-			
-			drawEvent(matrices, columnX, y, meter, event);
+			if (event.isAfter(tick)) {
+				tick = event.getTick();
+				
+				int column = (int)(tick - firstTick); // The event is no older than 1M ticks, so we can safely cast to int
+				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
+				
+				drawEvent(matrices, columnX, y, meter, event);
+			}
 			
 			if ((event = logs.getLog(type, ++index)) == null) {
 				break;
@@ -63,7 +65,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	
 	@Override
 	public void renderSubtickLogs(MatrixStack matrices, int x, int y, long tick, int subTickCount, Meter meter) {
-		y += GRID_SIZE;
+		y += hud.settings.gridSize;
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, tick) + 1;
@@ -75,7 +77,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		
 		while (event.isBefore(tick, subTickCount)) {
 			int column = event.getSubTick();
-			int columnX = x + column * (COLUMN_WIDTH + GRID_SIZE) + GRID_SIZE;
+			int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 			
 			drawEvent(matrices, columnX, y, meter, event);
 			
@@ -98,16 +100,16 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	protected void drawEdges(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
-		int half = ROW_HEIGHT / 2;
+		int half = hud.settings.rowHeight / 2;
 		int color = edgeColorProvider.apply(meter, event);
 		
-		drawRect(hud, matrices, x, y + half - 1, x + COLUMN_WIDTH, y + ROW_HEIGHT - half + 1, color);
+		drawRect(hud, matrices, x, y + half - 1, x + hud.settings.columnWidth, y + hud.settings.rowHeight - half + 1, color);
 	}
 	
 	protected void drawCenter(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
-		int half = ROW_HEIGHT / 2;
+		int half = hud.settings.rowHeight / 2;
 		int color = centerColorProvider.apply(meter, event);
 		
-		drawRect(hud, matrices, x, y + half, x + COLUMN_WIDTH, y + ROW_HEIGHT - half, color);
+		drawRect(hud, matrices, x, y + half, x + hud.settings.columnWidth, y + hud.settings.rowHeight - half, color);
 	}
 }

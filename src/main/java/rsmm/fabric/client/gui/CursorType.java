@@ -11,13 +11,18 @@ public enum CursorType {
 	HRESIZE(GLFW.GLFW_HRESIZE_CURSOR),
 	VRESIZE(GLFW.GLFW_VRESIZE_CURSOR);
 	
-	private final long cursor;
+	private final int shape;
+	private Long cursor;
 	
 	private CursorType(int shape) {
-		this.cursor = GLFW.glfwCreateStandardCursor(shape);
+		this.shape = shape;
 	}
 	
 	public long getCursor() {
+		if (cursor == null) {
+			cursor = GLFW.glfwCreateStandardCursor(shape);
+		}
+		
 		return cursor;
 	}
 }

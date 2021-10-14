@@ -8,7 +8,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 
 import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.gui.element.AbstractParentElement;
@@ -54,7 +53,7 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 		this.ticks = new PrimaryEventViewer(this);
 		this.subticks = new SecondaryEventViewer(this);
 		
-		this.playPauseButton = new TransparentButton(client, 0, 0, 9, 9, () -> new LiteralText(paused ? "\u23f5" : "\u23f8"), button -> {
+		this.playPauseButton = new TransparentButton(client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), button -> {
 			pause();
 			return true;
 		});
@@ -79,7 +78,9 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 			}
 		};
 		
-		this.playPauseButton.setVisible(false);
+		if (!Options.HUD.PAUSE_INDICATOR.get()) {
+			this.playPauseButton.setVisible(false);
+		}
 		this.fastBackwardButton.setVisible(false);
 		this.fastForwardButton.setVisible(false);
 		
@@ -111,7 +112,7 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 		boolean success = super.mouseClick(mouseX, mouseY, button);
 		
 		if (!success) {
-			selectMeter(-1);
+			selectMeter(null);
 		}
 		
 		return success;
@@ -121,14 +122,17 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 	public void onRemoved() {
 		super.onRemoved();
 		
+		onScreen = false;
+		
 		settings.forceFullOpacity = false;
 		settings.ignoreHiddenMeters = true;
 		
-		playPauseButton.setVisible(false);
+		if (!Options.HUD.PAUSE_INDICATOR.get()) {
+			playPauseButton.setVisible(false);
+		}
+		playPauseButton.update();
 		fastBackwardButton.setVisible(false);
 		fastForwardButton.setVisible(false);
-		
-		onScreen = false;
 		
 		setX(0);
 		setY(0);
@@ -148,19 +152,43 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 	
 	@Override
 	protected void onChangedX(int x) {
-		names.setX(x);
+		int w;
 		
-		x += names.getWidth();
-		ticks.setX(x);
-		
-		x += ticks.getWidth();
-		int w = playPauseButton.getWidth();
-		playPauseButton.setX(x - 2 * w);
-		fastBackwardButton.setX(x - w);
-		fastForwardButton.setX(x - 3 * w);
-		
-		x += settings.columnWidth + settings.gridSize;
-		subticks.setX(x);
+		switch (getPos()) {
+		default:
+		case TOP_LEFT:
+			names.setX(x);
+			
+			x += names.getWidth();
+			ticks.setX(x);
+			
+			x += ticks.getWidth();
+			w = playPauseButton.getWidth();
+			playPauseButton.setX(x - 2 * w);
+			fastBackwardButton.setX(x - w);
+			fastForwardButton.setX(x - 3 * w);
+			
+			x += settings.columnWidth + settings.gridSize;
+			subticks.setX(x);
+			
+			break;
+		case TOP_RIGHT:
+			x += (getWidth() - names.getWidth());
+			names.setX(x);
+			
+			w = playPauseButton.getWidth();
+			playPauseButton.setX(x - 2 * w);
+			fastBackwardButton.setX(x - w);
+			fastForwardButton.setX(x - 3 * w);
+			
+			x -= ticks.getWidth();
+			ticks.setX(x);
+			
+			x -= (settings.columnWidth + settings.gridSize + subticks.getWidth());
+			subticks.setX(x);
+			
+			break;
+		}
 	}
 	
 	@Override
@@ -180,13 +208,31 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 	}
 	
 	private void drawMeterGroup(MatrixStack matrices) {
-		Text name = new LiteralText(client.getMeterGroup().getName());
+		String text = client.getMeterGroup().getName();
 		
-		int nameX = getX() + settings.gridSize;
+		if (paused && !Options.HUD.HIDE_HIGHLIGHT.get() && !Options.HUD.PAUSE_INDICATOR.get()) {
+			text += " (Paused)";
+		}
+		
+		int nameX = getMeterGroupNameX(text);
 		int nameY = getY() + settings.gridSize + getTableHeight();
 		int color = onScreen ? 0xD0D0D0 : 0x202020;
 		
-		drawText(this, matrices, name, nameX, nameY, color);
+		drawText(this, matrices, new LiteralText(text), nameX, nameY, color);
+	}
+	
+	private int getMeterGroupNameX(String name) {
+		switch (getPos()) {
+		default:
+		case TOP_LEFT:
+			return getX() + settings.gridSize;
+		case TOP_RIGHT:
+			return (getX() + getWidth()) - (font.getWidth(name) + settings.gridSize);
+		}
+	}
+	
+	public ScreenPos getPos() {
+		return onScreen ? ScreenPos.TOP_LEFT : Options.HUD.SCREEN_POS.get();
 	}
 	
 	public boolean isPaused() {
@@ -217,7 +263,7 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 	}
 	
 	public void resetOffset() {
-		setOffset(1 - Options.HUD.HISTORY.get());
+		setOffset(1 - Options.HUD.COLUMN_COUNT.get());
 	}
 	
 	public void stepForward(int amount) {
@@ -288,35 +334,30 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 	}
 	
 	public void updateWidth() {
+		setWidth(client.getMinecraftClient().getWindow().getScaledWidth());
 		names.updateWidth();
 		ticks.updateWidth();
 		subticks.updateWidth();
-		setWidth();
+		onChangedX(getX());
 	}
 	
 	public void updateMeterListWidth() {
 		names.updateWidth();
-		setWidth();
+		onChangedX(getX());
 	}
 	
 	public void updateEventViewersWidth() {
 		ticks.updateWidth();
 		subticks.updateWidth();
-		setWidth();
-	}
-	
-	private void setWidth() {
-		setWidth(names.getWidth() + ticks.getWidth() + settings.columnWidth + settings.gridSize + subticks.getWidth());
 		onChangedX(getX());
 	}
 	
 	public void updateHeight() {
 		setHeight((meters.size() + 1) * (settings.rowHeight + settings.gridSize) + settings.gridSize);
-		onChangedY(getY());
-		
 		names.updateHeight();
 		ticks.updateHeight();
 		subticks.updateHeight();
+		onChangedY(getY());
 	}
 	
 	public void updateMeterList() {
@@ -354,19 +395,25 @@ public class MultimeterHud extends AbstractParentElement implements HudRenderer 
 			return;
 		}
 		
+		onScreen = true;
+		
 		settings.forceFullOpacity = true;
 		settings.ignoreHiddenMeters = false;
 		
 		playPauseButton.setVisible(true);
+		playPauseButton.update();
 		fastBackwardButton.setVisible(true);
 		fastForwardButton.setVisible(true);
 		
-		onScreen = true;
-		
 		updateMeterList();
 		
-		if (!meters.isEmpty() && !paused) {
+		if (!meters.isEmpty() && !paused && Options.HUD.AUTO_PAUSE.get()) {
 			pause();
 		}
+	}
+	
+	public void onOptionsChanged() {
+		playPauseButton.setVisible(onScreen || Options.HUD.PAUSE_INDICATOR.get());
+		updateDimensions();
 	}
 }

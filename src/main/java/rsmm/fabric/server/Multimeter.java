@@ -186,30 +186,6 @@ public class Multimeter {
 		}
 	}
 	
-	public void resetMeter(ServerPlayerEntity player, long id, MeterProperties newProperties) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
-		
-		if (meterGroup != null && !resetMeter(meterGroup, id, newProperties)) {
-			refreshMeterGroup(meterGroup, player);
-		}
-	}
-	
-	public boolean resetMeter(ServerMeterGroup meterGroup, long id, MeterProperties newProperties) {
-		Meter meter = meterGroup.getMeter(id);
-		
-		if (meter != null) {
-			newProperties.setPos(meter.getPos());
-			
-			if (meterPropertiesManager.validate(newProperties)) {
-				meterGroup.updateMeter(id, newProperties);
-			}
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
 	public void moveMeter(ServerPlayerEntity player, long id, WorldPos newPos) {
 		ServerMeterGroup meterGroup = subscriptions.get(player);
 		

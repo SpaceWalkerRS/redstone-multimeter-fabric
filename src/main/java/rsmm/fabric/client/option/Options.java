@@ -14,26 +14,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import rsmm.fabric.client.gui.hud.ScreenPos;
+
 public class Options {
 	
 	public static class RedstoneMultimeter {
 		
-		public static final BooleanOption NUMBERED_NAMES  = new BooleanOption("Numbered Meter Names", "Add a number at the end of meter names that increments with each meter you add.", true);
+		public static final BooleanOption NUMBERED_NAMES     = new BooleanOption("Numbered Meter Names", "Add a number at the end of meter names that increments with each meter you add.", true);
+		public static final BooleanOption SHIFTY_METERS      = new BooleanOption("Shifty Meters", "Use the shift key to control whether a new meter is movable or not.", true);
 		
 	}
 	
 	public static class HUD {
 		
-		public static final IntegerOption HISTORY         = new IntegerOption("History", "The number of ticks displayed in the primary overview.", 60, 1, 10001);
-		public static final IntegerOption SELECTED_COLUMN = new IntegerOption("Selected Column", "The column of the main overview that highlights the tick that is selected for showing sub-tick events in the secondary overview.", 44, 0, 10000);
-		public static final IntegerOption OPACITY         = new IntegerOption("Opacity", "", 100, 0, 100);
+		public static final EnumOption<ScreenPos> SCREEN_POS = new EnumOption<>("Screen Position", "The position of the HUD on the screen.", ScreenPos.class, ScreenPos.TOP_LEFT);
+		public static final IntegerOption COLUMN_COUNT       = new IntegerOption("History", "The number of ticks displayed in the primary overview.", 60, 1, 10001);
+		public static final IntegerOption SELECTED_COLUMN    = new IntegerOption("Selected Column", "The column of the main overview that highlights the tick that is selected for showing sub-tick events in the secondary overview.", 44, 0, 10000);
+		public static final BooleanOption HIDE_HIGHLIGHT     = new BooleanOption("Hide Highlight", "Hide the highlight around the selected tick when the HUD is not paused.", true);
+		public static final BooleanOption PAUSE_INDICATOR    = new BooleanOption("Pause Indicator", "Display a little play/pause indicator underneath the HUD.", false);
+		public static final IntegerOption OPACITY            = new IntegerOption("Opacity", "", 100, 0, 100);
+		public static final BooleanOption AUTO_PAUSE         = new BooleanOption("Auto Pause", "Automatically pause the HUD when opening the Multimeter screen.", true);
 		
 	}
 	
 	public static class Miscellaneous {
 		
-		public static final IntegerOption SCROLL_SPEED    = new IntegerOption("Scroll Speed", "The scroll speed in Redstone Multimeter related GUIs.", 7, 1, 69);
-		public static final BooleanOption VERSION_WARNING = new BooleanOption("Version Warning", "Send a warning message in chat when you join a server that has a different version of Redstone Multimeter installed.", true);
+		public static final IntegerOption SCROLL_SPEED       = new IntegerOption("Scroll Speed", "The scroll speed in Redstone Multimeter related GUIs.", 7, 1, 69);
+		public static final BooleanOption VERSION_WARNING    = new BooleanOption("Version Warning", "Send a warning message in chat when you join a server that has a different version of Redstone Multimeter installed.", true);
 		
 	}
 	
@@ -55,7 +62,7 @@ public class Options {
 	}
 	
 	public static void validate() {
-		int history = HUD.HISTORY.get();
+		int history = HUD.COLUMN_COUNT.get();
 		
 		if (HUD.SELECTED_COLUMN.get() >= history) {
 			HUD.SELECTED_COLUMN.set(history - 1);
@@ -144,12 +151,17 @@ public class Options {
 		BY_CATEGORY = new LinkedHashMap<>();
 		
 		register("Redstone Multimeter",
-			RedstoneMultimeter.NUMBERED_NAMES
+			RedstoneMultimeter.NUMBERED_NAMES,
+			RedstoneMultimeter.SHIFTY_METERS
 		);
 		register("HUD",
-			HUD.HISTORY,
+			HUD.SCREEN_POS,
+			HUD.COLUMN_COUNT,
 			HUD.SELECTED_COLUMN,
-			HUD.OPACITY
+			HUD.HIDE_HIGHLIGHT,
+			HUD.PAUSE_INDICATOR,
+			HUD.OPACITY,
+			HUD.AUTO_PAUSE
 		);
 		register("Miscellaneous",
 			Miscellaneous.SCROLL_SPEED,

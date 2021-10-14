@@ -77,7 +77,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			
 			properties.setName(name);
 		}
-		if (properties.getMovable() == null) {
+		if (properties.getMovable() == null && Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
 			properties.setMovable(!Screen.hasShiftDown());
 		}
 		if (properties.getEventTypes() == null) {

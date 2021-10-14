@@ -3,6 +3,7 @@ package rsmm.fabric.client.gui.hud;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import rsmm.fabric.client.gui.element.AbstractElement;
@@ -124,11 +125,20 @@ public class MeterListRenderer extends AbstractElement implements HudRenderer {
 				name.formatted(Formatting.GRAY, Formatting.ITALIC);
 			}
 			
-			int nameWidth = hud.font.getWidth(name);
-			int nameX = (getX() + getWidth()) - (nameWidth + 1);
+			int nameX = getNameX(name);
 			int nameY = (getY() + hud.settings.gridSize + 1) + index * (hud.settings.rowHeight + hud.settings.gridSize);
 			
 			drawText(hud, matrices, name, nameX, nameY, 0xFFFFFF);
+		}
+	}
+	
+	private int getNameX(Text name) {
+		switch (hud.getPos()) {
+		default:
+		case TOP_LEFT:
+			return (getX() + getWidth()) - (hud.font.getWidth(name) + 1);
+		case TOP_RIGHT:
+			return getX() + 1;
 		}
 	}
 	

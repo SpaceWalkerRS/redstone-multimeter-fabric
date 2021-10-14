@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Screen;
 
 import rsmm.fabric.client.MultimeterClient;
@@ -18,15 +17,13 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	private MultimeterClient multimeterClient;
 	
 	@Inject(
-			method = "<init>",
+			method = "onResolutionChanged",
 			at = @At(
-					value = "RETURN"
+					value = "HEAD"
 			)
 	)
-	private void onInitInjectBeforeIsMultiplayerEnabled(RunArgs args, CallbackInfo ci) {
-		this.multimeterClient = new MultimeterClient((MinecraftClient)(Object)this);
-		
-		multimeterClient.onStartup();
+	private void onResolutionChanged(CallbackInfo ci) {
+		getMultimeterClient().getHUD().updateDimensions();
 	}
 	
 	@Inject(
@@ -36,7 +33,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 			)
 	)
 	private void onHandleInputEventsInjectAtHead(CallbackInfo ci) {
-		multimeterClient.getInputHandler().handleInputEvents();
+		getMultimeterClient().getInputHandler().handleInputEvents();
 	}
 	
 	@Inject(
@@ -46,7 +43,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 			)
 	)
 	private void onDisconnectInjectAtHead(Screen screen, CallbackInfo ci) {
-		multimeterClient.onDisconnect();
+		getMultimeterClient().onDisconnect();
 	}
 	
 	@Inject(
@@ -56,11 +53,15 @@ public class MinecraftClientMixin implements IMinecraftClient {
 			)
 	)
 	private void onCloseInjectAtHead(CallbackInfo ci) {
-		multimeterClient.onShutdown();
+		getMultimeterClient().onShutdown();
 	}
 	
 	@Override
 	public MultimeterClient getMultimeterClient() {
+		if (multimeterClient == null) {
+			multimeterClient = new MultimeterClient((MinecraftClient)(Object)this);
+		}
+		
 		return multimeterClient;
 	}
 }
