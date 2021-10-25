@@ -1,4 +1,4 @@
-package rsmm.fabric.client;
+package rsmm.fabric.client.meter;
 
 import java.io.File;
 import java.io.FileReader;
@@ -27,11 +27,13 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import rsmm.fabric.RedstoneMultimeterMod;
+import rsmm.fabric.client.KeyBindings;
+import rsmm.fabric.client.MultimeterClient;
 import rsmm.fabric.client.option.Options;
-import rsmm.fabric.common.MeterProperties;
-import rsmm.fabric.common.MeterPropertiesManager;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.MeterProperties;
+import rsmm.fabric.common.meter.MeterPropertiesManager;
+import rsmm.fabric.common.meter.event.EventType;
 
 public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	

@@ -34,11 +34,7 @@ public class EnumOption<T extends Enum<T> & Cyclable<T>> extends Option<T> {
 		});
 	}
 	
-	public void cycle() {
-		cycle(true);
-	}
-	
 	public void cycle(boolean forward) {
-		set(forward ? get().next() : get().prev());
+		set(forward ? Cyclable.next(type, get()) : Cyclable.prev(type, get()));
 	}
 }

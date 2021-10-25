@@ -1,4 +1,4 @@
-package rsmm.fabric.common.event;
+package rsmm.fabric.common.meter.event;
 
 import java.util.ArrayList;
 import java.util.List;

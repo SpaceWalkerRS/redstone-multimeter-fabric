@@ -15,8 +15,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.event.EventType;
 import rsmm.fabric.interfaces.mixin.IMinecraftServer;
 import rsmm.fabric.interfaces.mixin.IServerCommandSource;
 import rsmm.fabric.server.Multimeter;

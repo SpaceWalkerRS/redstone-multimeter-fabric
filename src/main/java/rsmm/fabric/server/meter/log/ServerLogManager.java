@@ -1,14 +1,14 @@
-package rsmm.fabric.server;
+package rsmm.fabric.server.meter.log;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-
-import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.TickPhase;
-import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.event.MeterEvent;
-import rsmm.fabric.common.log.LogManager;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.event.EventType;
+import rsmm.fabric.common.meter.event.MeterEvent;
+import rsmm.fabric.common.meter.log.LogManager;
 import rsmm.fabric.common.network.packets.MeterLogsPacket;
+import rsmm.fabric.server.meter.ServerMeterGroup;
 
 public class ServerLogManager extends LogManager {
 	

@@ -1,4 +1,4 @@
-package rsmm.fabric.common;
+package rsmm.fabric.common.meter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,8 +8,8 @@ import java.util.Map;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-
-import rsmm.fabric.common.log.LogManager;
+import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.meter.log.LogManager;
 
 public abstract class MeterGroup {
 	

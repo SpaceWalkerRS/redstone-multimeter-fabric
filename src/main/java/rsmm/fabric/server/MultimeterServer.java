@@ -136,6 +136,6 @@ public class MultimeterServer {
 	
 	public File getWorldSaveDataFolder() {
 		File worldSave = server.getSavePath(WorldSavePath.ROOT).toFile();
-		return new File(worldSave, RedstoneMultimeterMod.MOD_ID);
+		return new File(worldSave, RedstoneMultimeterMod.NAMESPACE);
 	}
 }

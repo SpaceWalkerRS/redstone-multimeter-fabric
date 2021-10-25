@@ -1,13 +1,14 @@
-package rsmm.fabric.client.gui.hud;
+package rsmm.fabric.client.gui.hud.element;
 
 import java.util.List;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.event.MeterEvent;
-import rsmm.fabric.common.log.MeterLogs;
+import rsmm.fabric.client.gui.hud.MultimeterHud;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.event.MeterEvent;
+import rsmm.fabric.common.meter.log.MeterLogs;
 
 public class SecondaryEventViewer extends MeterEventViewer {
 	
@@ -26,19 +27,14 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	public List<Text> getTooltip(int mouseX, int mouseY) {
 		if (isHovered(mouseX, mouseY)) {
 			int row = hud.getHoveredRow(mouseY);
-			
-			if (row >= hud.meters.size()) {
-				row = hud.meters.size() - 1;
-			}
-			
 			Meter meter = hud.meters.get(row);
 			long tick = hud.getSelectedTick();
 			int subtick = getHoveredColumn(mouseX);
 			
 			MeterLogs logs = meter.getLogs();
-			MeterEvent event = logs.getLastLogBefore(tick, subtick + 1);
+			MeterEvent event = logs.getLogAt(tick, subtick);
 			
-			if (event != null && event.isAt(tick, subtick) && meter.isMetering(event.getType())) {
+			if (event != null && meter.isMetering(event.getType())) {
 				return event.getTextForTooltip();
 			}
 		}
@@ -48,7 +44,12 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	
 	@Override
 	protected void drawHighlights(MatrixStack matrices, int mouseX, int mouseY) {
-		
+		if (isHovered(mouseX, mouseY)) {
+			int column = getHoveredColumn(mouseX);
+			int row = hud.getHoveredRow(mouseY);
+			
+			drawHighlight(matrices, column, 1, row, 1, false);
+		}
 	}
 	
 	@Override
@@ -68,6 +69,10 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	
 	@Override
 	protected int getColumnCount() {
-		return hud.client.getMeterGroup().getLogManager().getSubTickCount(hud.getSelectedTick());
+		if (hud.isPaused()) {
+			return hud.client.getMeterGroup().getLogManager().getSubTickCount(hud.getSelectedTick());
+		}
+		
+		return 0;
 	}
 }

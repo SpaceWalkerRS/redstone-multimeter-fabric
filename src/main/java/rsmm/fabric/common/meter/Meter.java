@@ -1,4 +1,4 @@
-package rsmm.fabric.common;
+package rsmm.fabric.common.meter;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -6,8 +6,9 @@ import java.util.function.Consumer;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
 
-import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.log.MeterLogs;
+import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.meter.event.EventType;
+import rsmm.fabric.common.meter.log.MeterLogs;
 
 public class Meter {
 	

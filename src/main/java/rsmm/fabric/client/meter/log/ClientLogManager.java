@@ -1,4 +1,4 @@
-package rsmm.fabric.client;
+package rsmm.fabric.client.meter.log;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -6,9 +6,9 @@ import java.util.Map;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.log.LogManager;
+import rsmm.fabric.client.meter.ClientMeterGroup;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.log.LogManager;
 
 public class ClientLogManager extends LogManager {
 	

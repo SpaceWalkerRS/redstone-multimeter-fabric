@@ -1,7 +1,8 @@
-package rsmm.fabric.common;
+package rsmm.fabric.common.meter;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import rsmm.fabric.common.WorldPos;
 
 public abstract class MeterPropertiesManager {
 	

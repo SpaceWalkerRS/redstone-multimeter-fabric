@@ -1,7 +1,7 @@
-package rsmm.fabric.common.log;
+package rsmm.fabric.common.meter.log;
 
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.MeterGroup;
 
 public abstract class LogManager {
 	

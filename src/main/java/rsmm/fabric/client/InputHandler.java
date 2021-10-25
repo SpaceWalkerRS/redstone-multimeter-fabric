@@ -5,7 +5,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 
 import rsmm.fabric.client.gui.MultimeterScreen;
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.event.EventType;
 
 public class InputHandler {
 	
@@ -29,11 +29,11 @@ public class InputHandler {
 		while (KeyBindings.PAUSE_METERS.wasPressed()) {
 			client.getHUD().pause();
 		}
-		while (KeyBindings.STEP_FORWARD.wasPressed()) {
-			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
-		}
 		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
 			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+		}
+		while (KeyBindings.STEP_FORWARD.wasPressed()) {
+			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 		}
 		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
@@ -64,11 +64,11 @@ public class InputHandler {
 		if (KeyBindings.PAUSE_METERS.matchesMouse(button)) {
 			client.getHUD().pause();
 		} else
-		if (KeyBindings.STEP_FORWARD.matchesMouse(button)) {
-			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
-		} else
 		if (KeyBindings.STEP_BACKWARD.matchesMouse(button)) {
 			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+		} else
+		if (KeyBindings.STEP_FORWARD.matchesMouse(button)) {
+			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 		} else
 		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
 			if (client.hasMultimeterScreenOpen()) {
@@ -85,11 +85,11 @@ public class InputHandler {
 		if (KeyBindings.PAUSE_METERS.matchesKey(keyCode, scanCode)) {
 			client.getHUD().pause();
 		} else
-		if (KeyBindings.STEP_FORWARD.matchesKey(keyCode, scanCode)) {
-			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
-		} else
 		if (KeyBindings.STEP_BACKWARD.matchesKey(keyCode, scanCode)) {
 			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+		} else
+		if (KeyBindings.STEP_FORWARD.matchesKey(keyCode, scanCode)) {
+			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 		} else
 		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
 			if (client.hasMultimeterScreenOpen()) {

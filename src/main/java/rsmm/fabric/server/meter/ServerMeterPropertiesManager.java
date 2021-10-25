@@ -1,12 +1,12 @@
-package rsmm.fabric.server;
+package rsmm.fabric.server.meter;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import rsmm.fabric.common.MeterProperties;
-import rsmm.fabric.common.MeterPropertiesManager;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.MeterProperties;
+import rsmm.fabric.common.meter.MeterPropertiesManager;
+import rsmm.fabric.common.meter.event.EventType;
+import rsmm.fabric.server.Multimeter;
 import rsmm.fabric.util.ColorUtils;
 
 public class ServerMeterPropertiesManager extends MeterPropertiesManager {

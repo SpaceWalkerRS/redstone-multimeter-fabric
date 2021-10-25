@@ -1,12 +1,12 @@
-package rsmm.fabric.common;
+package rsmm.fabric.common.meter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.minecraft.nbt.NbtCompound;
-
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.WorldPos;
+import rsmm.fabric.common.meter.event.EventType;
 import rsmm.fabric.util.ColorUtils;
 import rsmm.fabric.util.NBTUtils;
 

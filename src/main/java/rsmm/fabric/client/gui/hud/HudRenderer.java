@@ -9,27 +9,63 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 
+import rsmm.fabric.client.gui.element.IElement;
 import rsmm.fabric.util.ColorUtils;
 
-public interface HudRenderer {
+public class HudRenderer {
 	
-	default void drawHighlight(MultimeterHud hud, MatrixStack matrices, int x, int y, int width, int height, int color) {
+	private final MultimeterHud hud;
+	
+	private IElement target;
+	
+	public HudRenderer(MultimeterHud hud) {
+		this.hud = hud;
+		this.target = hud;
+	}
+	
+	public void render(IElement element, MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		(target = element).render(matrices, mouseX, mouseY, delta);
+	}
+	
+	private int translateX(int x, int width) {
+		switch (hud.getDirectionalityX()) {
+		default:
+		case LEFT_TO_RIGHT:
+			return target.getX() + x;
+		case RIGHT_TO_LEFT:
+			return (target.getX() + target.getWidth()) - (x + width);
+		}
+	}
+	
+	private int translateY(int y, int height) {
+		switch (hud.getDirectionalityY()) {
+		default:
+		case TOP_TO_BOTTOM:
+			return target.getY() + y;
+		case BOTTOM_TO_TOP:
+			return (target.getY() + target.getHeight()) - (y + height);
+		}
+	}
+	
+	public void drawHighlight(MatrixStack matrices, int x, int y, int width, int height, boolean selected) {
 		int left   = x;
 		int right  = x + width;
 		int top    = y;
 		int bottom = y + height;
 		int d      = hud.settings.gridSize;
+		int color  = selected ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
 		
-		drawRect(hud, matrices, left     , top       , left  + d, bottom    , color); // left
-		drawRect(hud, matrices, left  + d, top       , right + d, top    + d, color); // top
-		drawRect(hud, matrices, right    , top    + d, right + d, bottom + d, color); // right
-		drawRect(hud, matrices, left     , bottom    , right    , bottom + d, color); // bottom
+		drawRect(matrices, left     , top       , d     , height, color); // left
+		drawRect(matrices, left  + d, top       , width , d     , color); // top
+		drawRect(matrices, right    , top    + d, d     , height, color); // right
+		drawRect(matrices, left     , bottom    , width , d     , color); // bottom
 	}
 	
-	default void drawRect(MultimeterHud hud, MatrixStack matrices, int x1, int y1, int x2, int y2, int color) {
+	public void drawRect(MatrixStack matrices, int x, int y, int width, int height, int color) {
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.enableDepthTest();
@@ -40,6 +76,11 @@ public interface HudRenderer {
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		Matrix4f model = matrices.peek().getModel();
+		
+		int x1 = translateX(x, width);
+		int x2 = x1 + width;
+		int y1 = translateY(y, height);
+		int y2 = y1 + height;
 		
 		float r = (float)ColorUtils.getRed(color)   / 0xFF;
 		float g = (float)ColorUtils.getGreen(color) / 0xFF;
@@ -61,7 +102,13 @@ public interface HudRenderer {
 		RenderSystem.disableBlend();
 	}
 	
-	default void drawText(MultimeterHud hud, MatrixStack matrices, Text text, int x, int y, int color) {
+	public void drawText(MatrixStack matrices, String text, int x, int y, int color) {
+		drawText(matrices, new LiteralText(text), x, y, color);
+	}
+	
+	public void drawText(MatrixStack matrices, Text text, int x, int y, int color) {
+		x = translateX(x, hud.font.getWidth(text) - 1);
+		y = translateY(y, hud.font.fontHeight - 2);
 		int alpha = Math.round(0xFF * hud.settings.opacity() / 100.0F);
 		color = ColorUtils.setAlpha(color, alpha);
 		

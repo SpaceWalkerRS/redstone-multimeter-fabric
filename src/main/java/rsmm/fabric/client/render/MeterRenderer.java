@@ -1,4 +1,4 @@
-package rsmm.fabric.client;
+package rsmm.fabric.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -13,8 +13,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-
-import rsmm.fabric.common.Meter;
+import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.common.meter.Meter;
 import rsmm.fabric.util.ColorUtils;
 
 public class MeterRenderer {

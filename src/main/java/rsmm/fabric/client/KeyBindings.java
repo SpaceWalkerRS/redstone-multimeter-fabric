@@ -18,7 +18,8 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.RedstoneMultimeterMod;
+import rsmm.fabric.common.meter.event.EventType;
 
 public class KeyBindings {
 	
@@ -33,8 +34,8 @@ public class KeyBindings {
 	public static final KeyBinding TOGGLE_METER;
 	public static final KeyBinding RESET_METER;
 	public static final KeyBinding PAUSE_METERS;
-	public static final KeyBinding STEP_FORWARD;
 	public static final KeyBinding STEP_BACKWARD;
+	public static final KeyBinding STEP_FORWARD;
 	public static final KeyBinding TOGGLE_HUD;
 	public static final KeyBinding OPEN_MULTIMETER_SCREEN;
 	public static final KeyBinding PRINT_LOGS;
@@ -125,14 +126,14 @@ public class KeyBindings {
 	
 	static {
 		
-		MAIN        = registerCategory("Redstone Multimeter");
+		MAIN        = registerCategory(RedstoneMultimeterMod.MOD_NAME);
 		EVENT_TYPES = registerCategory("Event Types");
 		
 		TOGGLE_METER           = registerKeyBinding(new KeyBinding("Toggle Meter"          , GLFW.GLFW_KEY_M     , MAIN));
 		RESET_METER            = registerKeyBinding(new KeyBinding("Reset Meter"           , GLFW.GLFW_KEY_B     , MAIN));
 		PAUSE_METERS           = registerKeyBinding(new KeyBinding("Pause Meters"          , GLFW.GLFW_KEY_N     , MAIN));
-		STEP_FORWARD           = registerKeyBinding(new KeyBinding("Step Forward"          , GLFW.GLFW_KEY_COMMA , MAIN));
-		STEP_BACKWARD          = registerKeyBinding(new KeyBinding("Step Backward"         , GLFW.GLFW_KEY_PERIOD, MAIN));
+		STEP_BACKWARD          = registerKeyBinding(new KeyBinding("Step Backward"         , GLFW.GLFW_KEY_COMMA , MAIN));
+		STEP_FORWARD           = registerKeyBinding(new KeyBinding("Step Forward"          , GLFW.GLFW_KEY_PERIOD, MAIN));
 		TOGGLE_HUD             = registerKeyBinding(new KeyBinding("Toggle HUD"            , GLFW.GLFW_KEY_H     , MAIN));
 		OPEN_MULTIMETER_SCREEN = registerKeyBinding(new KeyBinding("Open Multimeter Screen", GLFW.GLFW_KEY_G     , MAIN));
 		PRINT_LOGS             = registerKeyBinding(new KeyBinding("Print Logs To File"    , GLFW.GLFW_KEY_P     , MAIN));

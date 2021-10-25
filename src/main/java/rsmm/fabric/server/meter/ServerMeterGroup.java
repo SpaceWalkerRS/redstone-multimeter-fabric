@@ -1,4 +1,4 @@
-package rsmm.fabric.server;
+package rsmm.fabric.server.meter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,13 +11,14 @@ import java.util.function.BiPredicate;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
-
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
-import rsmm.fabric.common.MeterProperties;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.MeterGroup;
+import rsmm.fabric.common.meter.MeterProperties;
+import rsmm.fabric.common.meter.event.EventType;
 import rsmm.fabric.common.network.packets.MeterUpdatesPacket;
+import rsmm.fabric.server.Multimeter;
+import rsmm.fabric.server.meter.log.ServerLogManager;
 
 public class ServerMeterGroup extends MeterGroup {
 	

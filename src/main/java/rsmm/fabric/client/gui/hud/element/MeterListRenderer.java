@@ -1,15 +1,15 @@
-package rsmm.fabric.client.gui.hud;
+package rsmm.fabric.client.gui.hud.element;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import rsmm.fabric.client.gui.element.AbstractElement;
-import rsmm.fabric.common.Meter;
+import rsmm.fabric.client.gui.hud.MultimeterHud;
+import rsmm.fabric.common.meter.Meter;
 
-public class MeterListRenderer extends AbstractElement implements HudRenderer {
+public class MeterListRenderer extends AbstractElement {
 	
 	private static final int MARGIN = 3;
 	
@@ -28,7 +28,7 @@ public class MeterListRenderer extends AbstractElement implements HudRenderer {
 		matrices.translate(0, 0, -1);
 		drawNames(matrices);
 		matrices.translate(0, 0, -1);
-		drawRect(hud, matrices, getX(), getY(), getX() + getWidth(), getY() + getHeight(), hud.settings.colorBackground);
+		hud.renderer.drawRect(matrices, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
 		matrices.pop();
 	}
 	
@@ -88,35 +88,33 @@ public class MeterListRenderer extends AbstractElement implements HudRenderer {
 	}
 	
 	private void drawHighlights(MatrixStack matrices, int mouseX, int mouseY) {
-		if (isHovered(mouseX, mouseY)) {
-			int row = hud.getHoveredRow(mouseY);
-			int max = hud.meters.size() - 1;
-			
-			if (row > max) {
-				row = max;
+		if (hud.isOnScreen()) {
+			if (isHovered(mouseX, mouseY)) {
+				drawHighlight(matrices, hud.getHoveredRow(mouseY), false);
 			}
 			
-			drawHighlight(matrices, row, 0x808080);
-		}
-		if (hud.isOnScreen()) {
 			int selectedRow = hud.getSelectedRow();
 			
 			if (selectedRow >= 0) {
-				drawHighlight(matrices, selectedRow, 0xFFFFFF);
+				drawHighlight(matrices, selectedRow, true);
 			}
 		}
 	}
 	
-	private void drawHighlight(MatrixStack matrices, int row, int color) {
-		int x = getX();
-		int y = getY() + row * (hud.settings.rowHeight + hud.settings.gridSize);
+	private void drawHighlight(MatrixStack matrices, int row, boolean selected) {
+		int h = hud.settings.rowHeight + hud.settings.gridSize;
+		int x = 0;
+		int y = row * h;
 		int width = getWidth() - hud.settings.gridSize;
-		int height = hud.settings.rowHeight + hud.settings.gridSize;
+		int height = h;
 		
-		drawHighlight(hud, matrices, x, y, width, height, color);
+		hud.renderer.drawHighlight(matrices, x, y, width, height, selected);
 	}
 	
 	private void drawNames(MatrixStack matrices) {
+		int x = hud.settings.gridSize + 1;
+		int y = hud.settings.gridSize + 1;
+		
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);
 			MutableText name = new LiteralText(meter.getName());
@@ -125,20 +123,9 @@ public class MeterListRenderer extends AbstractElement implements HudRenderer {
 				name.formatted(Formatting.GRAY, Formatting.ITALIC);
 			}
 			
-			int nameX = getNameX(name);
-			int nameY = (getY() + hud.settings.gridSize + 1) + index * (hud.settings.rowHeight + hud.settings.gridSize);
+			hud.renderer.drawText(matrices, name, x, y, 0xFFFFFF);
 			
-			drawText(hud, matrices, name, nameX, nameY, 0xFFFFFF);
-		}
-	}
-	
-	private int getNameX(Text name) {
-		switch (hud.getPos()) {
-		default:
-		case TOP_LEFT:
-			return (getX() + getWidth()) - (hud.font.getWidth(name) + 1);
-		case TOP_RIGHT:
-			return getX() + 1;
+			y += hud.settings.rowHeight + hud.settings.gridSize;
 		}
 	}
 	
@@ -157,6 +144,6 @@ public class MeterListRenderer extends AbstractElement implements HudRenderer {
 	}
 	
 	public void updateHeight() {
-		setHeight(hud.getTableHeight());
+		setHeight(hud.meters.size() * (hud.settings.rowHeight + hud.settings.gridSize) + hud.settings.gridSize);
 	}
 }

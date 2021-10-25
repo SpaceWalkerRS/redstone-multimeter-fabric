@@ -17,11 +17,15 @@ import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.client.gui.MultimeterScreen;
 import rsmm.fabric.client.gui.element.RSMMScreen;
 import rsmm.fabric.client.gui.hud.MultimeterHud;
+import rsmm.fabric.client.meter.ClientMeterGroup;
+import rsmm.fabric.client.meter.ClientMeterPropertiesManager;
+import rsmm.fabric.client.meter.log.LogPrinter;
 import rsmm.fabric.client.option.Options;
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterProperties;
+import rsmm.fabric.client.render.MeterRenderer;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.MeterProperties;
+import rsmm.fabric.common.meter.event.EventType;
 import rsmm.fabric.common.network.packets.AddMeterPacket;
 import rsmm.fabric.common.network.packets.MeterGroupDataPacket;
 import rsmm.fabric.common.network.packets.MeterUpdatePacket;
@@ -29,7 +33,7 @@ import rsmm.fabric.common.network.packets.RemoveMeterPacket;
 
 public class MultimeterClient {
 	
-	public static final String CONFIG_PATH = "config/" + RedstoneMultimeterMod.MOD_ID;
+	public static final String CONFIG_PATH = "config/" + RedstoneMultimeterMod.NAMESPACE;
 	private static final Function<String, String> VERSION_WARNING = (modVersion) -> {
 		String warning;
 		
@@ -63,8 +67,11 @@ public class MultimeterClient {
 		this.meterPropertiesManager = new ClientMeterPropertiesManager(this);
 		
 		this.meterGroup = new ClientMeterGroup(this);
+		this.connected = false;
 		this.hudEnabled = true;
 		this.lastServerTick = -1;
+		
+		this.hud.init();
 	}
 	
 	public MinecraftClient getMinecraftClient() {

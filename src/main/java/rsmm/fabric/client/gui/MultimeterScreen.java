@@ -5,6 +5,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 
 import rsmm.fabric.client.gui.element.ScrollableListElement;
+import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.client.gui.element.RSMMScreen;
 import rsmm.fabric.client.gui.element.meter.MeterControlsElement;
 import rsmm.fabric.client.gui.hud.MultimeterHud;
@@ -16,7 +17,7 @@ public class MultimeterScreen extends RSMMScreen {
 	private ScrollableListElement list;
 	
 	public MultimeterScreen() {
-		super(new LiteralText("Redstone Multimeter"), false);
+		super(new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
 		
 		this.isPauseScreen = !Screen.hasShiftDown();
 	}
@@ -75,7 +76,7 @@ public class MultimeterScreen extends RSMMScreen {
 		
 		addContent(list);
 		
-		hud.onInitScreen();
+		hud.onInitScreen(list.getEffectiveWidth(), list.getHeight());
 	}
 	
 	@Override

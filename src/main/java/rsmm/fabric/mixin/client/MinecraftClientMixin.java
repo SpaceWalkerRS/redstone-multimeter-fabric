@@ -23,7 +23,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 			)
 	)
 	private void onResolutionChanged(CallbackInfo ci) {
-		getMultimeterClient().getHUD().updateDimensions();
+		getMultimeterClient().getHUD().resetSize();
 	}
 	
 	@Inject(

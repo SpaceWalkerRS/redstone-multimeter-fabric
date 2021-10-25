@@ -28,15 +28,17 @@ import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 
 import rsmm.fabric.block.Meterable;
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterProperties;
 import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.event.MeterEvent;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.MeterProperties;
+import rsmm.fabric.common.meter.event.EventType;
+import rsmm.fabric.common.meter.event.MeterEvent;
 import rsmm.fabric.common.network.packets.MeterGroupDataPacket;
 import rsmm.fabric.common.network.packets.RemoveAllMetersPacket;
 import rsmm.fabric.interfaces.mixin.IBlock;
+import rsmm.fabric.server.meter.ServerMeterGroup;
+import rsmm.fabric.server.meter.ServerMeterPropertiesManager;
 
 public class Multimeter {
 	

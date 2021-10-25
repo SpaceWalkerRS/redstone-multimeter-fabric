@@ -1,14 +1,15 @@
-package rsmm.fabric.client;
+package rsmm.fabric.client.meter;
 
 import java.util.List;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 import net.minecraft.nbt.NbtCompound;
-
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.MeterGroup;
-import rsmm.fabric.common.MeterProperties;
+import rsmm.fabric.client.MultimeterClient;
+import rsmm.fabric.client.meter.log.ClientLogManager;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.MeterGroup;
+import rsmm.fabric.common.meter.MeterProperties;
 
 public class ClientMeterGroup extends MeterGroup {
 	
@@ -56,7 +57,7 @@ public class ClientMeterGroup extends MeterGroup {
 	
 	@Override
 	protected void meterUpdated(Meter meter) {
-		client.getHUD().updateDimensions();
+		client.getHUD().updateMeterList();
 	}
 	
 	@Override

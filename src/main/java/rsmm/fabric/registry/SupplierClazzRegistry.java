@@ -15,7 +15,7 @@ public class SupplierClazzRegistry<T> {
 	private final Map<Identifier, Supplier<? extends T>> idToSupplier;
 	
 	public SupplierClazzRegistry(String name) {
-		this.id = new Identifier(RedstoneMultimeterMod.MOD_ID, name);
+		this.id = new Identifier(RedstoneMultimeterMod.NAMESPACE, name);
 		this.clazzToId = new HashMap<>();
 		this.idToSupplier = new HashMap<>();
 	}

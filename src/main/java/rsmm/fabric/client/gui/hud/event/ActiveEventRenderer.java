@@ -1,8 +1,8 @@
 package rsmm.fabric.client.gui.hud.event;
 
 import rsmm.fabric.client.gui.hud.MultimeterHud;
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.event.EventType;
 
 public class ActiveEventRenderer extends ToggleEventRenderer {
 	

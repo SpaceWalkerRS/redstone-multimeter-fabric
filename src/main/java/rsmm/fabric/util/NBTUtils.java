@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 
 import rsmm.fabric.common.TickPhase;
 import rsmm.fabric.common.WorldPos;
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.event.EventType;
 
 public class NBTUtils {
 	

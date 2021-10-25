@@ -7,8 +7,8 @@ import java.util.function.Consumer;
 import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.client.gui.hud.MultimeterHud;
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.event.EventType;
 
 public class MeterEventRenderDispatcher {
 	

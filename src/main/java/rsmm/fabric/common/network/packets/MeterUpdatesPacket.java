@@ -12,7 +12,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.MeterProperties;
+import rsmm.fabric.common.meter.MeterProperties;
 import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 

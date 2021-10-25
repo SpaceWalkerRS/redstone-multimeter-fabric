@@ -1,4 +1,4 @@
-package rsmm.fabric.client;
+package rsmm.fabric.client.meter.log;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,11 +14,11 @@ import net.minecraft.client.gui.screen.Screen;
 
 import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.client.option.Options;
-import rsmm.fabric.common.Meter;
 import rsmm.fabric.common.TickPhase;
-import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.event.MeterEvent;
-import rsmm.fabric.common.log.MeterLogs;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.event.EventType;
+import rsmm.fabric.common.meter.event.MeterEvent;
+import rsmm.fabric.common.meter.log.MeterLogs;
 
 public class LogPrinter {
 	
@@ -33,9 +33,10 @@ public class LogPrinter {
 	
 	public LogPrinter(ClientLogManager logManager) {
 		this.logManager = logManager;
-		this.folder = new File(RedstoneMultimeterMod.MOD_ID +  "/logs/");
+		this.folder = new File(RedstoneMultimeterMod.NAMESPACE +  "/logs/");
 		this.printQueue = new PriorityQueue<>();
 		
+		this.writer = null;
 		this.prevTick = -1;
 	}
 	

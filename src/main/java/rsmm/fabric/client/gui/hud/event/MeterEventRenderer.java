@@ -2,12 +2,11 @@ package rsmm.fabric.client.gui.hud.event;
 
 import net.minecraft.client.util.math.MatrixStack;
 
-import rsmm.fabric.client.gui.hud.HudRenderer;
 import rsmm.fabric.client.gui.hud.MultimeterHud;
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.event.EventType;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.event.EventType;
 
-public abstract class MeterEventRenderer implements HudRenderer {
+public abstract class MeterEventRenderer {
 	
 	protected final MultimeterHud hud;
 	

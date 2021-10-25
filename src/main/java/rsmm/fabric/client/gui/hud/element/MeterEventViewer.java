@@ -1,11 +1,13 @@
-package rsmm.fabric.client.gui.hud;
+package rsmm.fabric.client.gui.hud.element;
 
 import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.client.gui.element.AbstractElement;
-import rsmm.fabric.common.Meter;
+import rsmm.fabric.client.gui.hud.Directionality;
+import rsmm.fabric.client.gui.hud.MultimeterHud;
+import rsmm.fabric.common.meter.Meter;
 
-public abstract class MeterEventViewer extends AbstractElement implements HudRenderer {
+public abstract class MeterEventViewer extends AbstractElement {
 	
 	protected final MultimeterHud hud;
 	
@@ -26,7 +28,7 @@ public abstract class MeterEventViewer extends AbstractElement implements HudRen
 		matrices.translate(0, 0, -1);
 		drawGridLines(matrices);
 		matrices.translate(0, 0, -1);
-		drawRect(hud, matrices, getX(), getY(), getX() + getWidth(), getY() + getHeight(), hud.settings.colorBackground);
+		hud.renderer.drawRect(matrices, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
 		matrices.pop();
 	}
 	
@@ -81,8 +83,8 @@ public abstract class MeterEventViewer extends AbstractElement implements HudRen
 	}
 	
 	protected void drawMeterLogs(MeterEventRenderEvent event) {
-		int x = getX();
-		int y = getY();
+		int x = 0;
+		int y = 0;
 		
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);
@@ -94,13 +96,15 @@ public abstract class MeterEventViewer extends AbstractElement implements HudRen
 	
 	protected abstract void drawHighlights(MatrixStack matrices, int mouseX, int mouseY);
 	
-	protected void drawHighlight(MatrixStack matrices, int column, int color) {
-		int x = getX() + column * (hud.settings.columnWidth + hud.settings.gridSize);
-		int y = getY();
-		int width = hud.settings.columnWidth + hud.settings.gridSize;
-		int height = getHeight() - hud.settings.gridSize;
+	protected void drawHighlight(MatrixStack matrices, int column, int columnCount, int row, int rowCount, boolean selected) {
+		int w = hud.settings.columnWidth + hud.settings.gridSize;
+		int h = hud.settings.rowHeight + hud.settings.gridSize;
+		int x = column * w;
+		int y = row * h;
+		int width = columnCount * w;
+		int height = rowCount * h;
 		
-		drawHighlight(hud, matrices, x, y, width, height, color);
+		hud.renderer.drawHighlight(matrices, x, y, width, height, selected);
 	}
 	
 	protected abstract void drawDecorators(MatrixStack matrices);
@@ -116,35 +120,45 @@ public abstract class MeterEventViewer extends AbstractElement implements HudRen
 		
 		int lineX;
 		int lineY;
+		int lineWidth;
+		int lineHeight;
 		int color;
 		
 		// marker
 		if (marker >= 0 && marker <= columns) {
-			lineX = getX() + marker * (hud.settings.columnWidth + hud.settings.gridSize);
-			lineY = getY() + hud.settings.gridSize;
+			lineX = marker * (hud.settings.columnWidth + hud.settings.gridSize);
+			lineY = hud.settings.gridSize;
+			lineWidth = hud.settings.gridSize;
+			lineHeight = getHeight() - 2 * hud.settings.gridSize;
 			color = hud.settings.colorGridMarker;
 			
-			drawRect(hud, matrices, lineX, lineY, lineX + hud.settings.gridSize, getY() + getHeight() - hud.settings.gridSize, color);
+			hud.renderer.drawRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
 		matrices.translate(0, 0, -0.1);
 		
 		// horizonal lines
 		for (int i = 0; i <= rows; i++) {
-			lineY = getY() + i * (hud.settings.rowHeight + hud.settings.gridSize);
+			lineX = 0;
+			lineY = i * (hud.settings.rowHeight + hud.settings.gridSize);
+			lineWidth = getWidth();
+			lineHeight = hud.settings.gridSize;
 			color = hud.settings.colorGridMain;
 			
-			drawRect(hud, matrices, getX(), lineY, getX() + getWidth(), lineY + hud.settings.gridSize, color);
+			hud.renderer.drawRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
 		matrices.translate(0, 0, -0.1);
 		
 		// vertical lines
 		for (int i = 0; i <= columns; i++) {
-			lineX = getX() + i * (hud.settings.columnWidth + hud.settings.gridSize);
+			lineX = i * (hud.settings.columnWidth + hud.settings.gridSize);
+			lineY = 0;
+			lineWidth = hud.settings.gridSize;
+			lineHeight = getHeight();
 			color = (i > 0 && i < columns && i % 5 == 0) ? hud.settings.colorGridInterval : hud.settings.colorGridMain;
 			
-			drawRect(hud, matrices, lineX, getY(), lineX + hud.settings.gridSize, getY() + getHeight(), color);
+			hud.renderer.drawRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
 		matrices.pop();
@@ -157,15 +171,28 @@ public abstract class MeterEventViewer extends AbstractElement implements HudRen
 	}
 	
 	public int getHoveredColumn(double mouseX) {
-		return (int)((mouseX - getX()) / (hud.settings.columnWidth + hud.settings.gridSize));
+		int max = getColumnCount() - 1;
+		int column = Math.min(max, (int)((mouseX - getX()) / (hud.settings.columnWidth + hud.settings.gridSize)));
+		
+		if (hud.getDirectionalityX() == Directionality.X.RIGHT_TO_LEFT) {
+			column = max - column;
+		}
+		
+		return column;
 	}
 	
 	public void updateWidth() {
-		setWidth(getColumnCount() * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize);
+		int columns = getColumnCount();
+		
+		if (columns == 0) {
+			setWidth(0);
+		} else {
+			setWidth(columns * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize);
+		}
 	}
 	
 	public void updateHeight() {
-		setHeight(hud.getTableHeight());
+		setHeight(hud.meters.size() * (hud.settings.rowHeight + hud.settings.gridSize) + hud.settings.gridSize);
 	}
 	
 	protected interface MeterEventRenderEvent {

@@ -6,10 +6,10 @@ import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.client.gui.hud.MultimeterHud;
 import rsmm.fabric.client.option.Options;
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.event.MeterEvent;
-import rsmm.fabric.common.log.MeterLogs;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.event.EventType;
+import rsmm.fabric.common.meter.event.MeterEvent;
+import rsmm.fabric.common.meter.log.MeterLogs;
 
 public class BasicEventRenderer extends MeterEventRenderer {
 	
@@ -100,16 +100,20 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	protected void drawEdges(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
+		int width = hud.settings.columnWidth;
 		int half = hud.settings.rowHeight / 2;
+		int height = (2 * half < hud.settings.rowHeight) ? 3 : 4;
 		int color = edgeColorProvider.apply(meter, event);
 		
-		drawRect(hud, matrices, x, y + half - 1, x + hud.settings.columnWidth, y + hud.settings.rowHeight - half + 1, color);
+		hud.renderer.drawRect(matrices, x, y + half - 1, width, height, color);
 	}
 	
 	protected void drawCenter(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
+		int width = hud.settings.columnWidth;
 		int half = hud.settings.rowHeight / 2;
+		int height = (2 * half < hud.settings.rowHeight) ? 1 : 2;
 		int color = centerColorProvider.apply(meter, event);
 		
-		drawRect(hud, matrices, x, y + half, x + hud.settings.columnWidth, y + hud.settings.rowHeight - half, color);
+		hud.renderer.drawRect(matrices, x, y + half, width, height, color);
 	}
 }

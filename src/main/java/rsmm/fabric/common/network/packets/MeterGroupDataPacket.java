@@ -4,7 +4,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import rsmm.fabric.client.MultimeterClient;
-import rsmm.fabric.common.MeterGroup;
+import rsmm.fabric.common.meter.MeterGroup;
 import rsmm.fabric.common.network.RSMMPacket;
 import rsmm.fabric.server.MultimeterServer;
 

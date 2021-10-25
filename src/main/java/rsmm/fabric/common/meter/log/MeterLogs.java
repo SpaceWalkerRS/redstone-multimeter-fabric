@@ -1,13 +1,12 @@
-package rsmm.fabric.common.log;
+package rsmm.fabric.common.meter.log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-
-import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.event.MeterEvent;
+import rsmm.fabric.common.meter.event.EventType;
+import rsmm.fabric.common.meter.event.MeterEvent;
 import rsmm.fabric.util.ListUtils;
 
 public class MeterLogs {
@@ -86,20 +85,20 @@ public class MeterLogs {
 		return getLastLogBefore(type, tick, 0);
 	}
 	
-	public int getLastLogBefore(EventType type, long tick, int subTick) {
+	public int getLastLogBefore(EventType type, long tick, int subick) {
 		List<MeterEvent> logs = getLogs(type);
 		
-		if (logs.isEmpty() || !logs.get(0).isBefore(tick, subTick)) {
+		if (logs.isEmpty() || !logs.get(0).isBefore(tick, subick)) {
 			return -1;
 		}
 		if (tick > lastLoggedTick) {
 			return logs.size() - 1;
 		}
 		
-		int index = ListUtils.binarySearch(logs, event -> event.isBefore(tick, subTick));
+		int index = ListUtils.binarySearch(logs, event -> event.isBefore(tick, subick));
 		MeterEvent event = logs.get(index);
 		
-		while (!event.isBefore(tick, subTick)) {
+		while (!event.isBefore(tick, subick)) {
 			if (index == 0) {
 				return -1;
 			}
@@ -115,11 +114,11 @@ public class MeterLogs {
 		return getLastLogBefore(tick, 0);
 	}
 	
-	public MeterEvent getLastLogBefore(long tick, int subTick) {
+	public MeterEvent getLastLogBefore(long tick, int subtick) {
 		MeterEvent event = null;
 		
 		for (EventType type : EventType.ALL) {
-			int index = getLastLogBefore(type, tick, subTick);
+			int index = getLastLogBefore(type, tick, subtick);
 			MeterEvent log = getLog(type, index);
 			
 			if (event == null || (log != null && log.isAfter(event))) {
@@ -128,6 +127,11 @@ public class MeterLogs {
 		}
 		
 		return event;
+	}
+	
+	public MeterEvent getLogAt(long tick, int subtick) {
+		MeterEvent event = getLastLogBefore(tick, subtick + 1);
+		return event != null && event.isAt(tick, subtick) ? event : null;
 	}
 	
 	public NbtCompound toNBT() {

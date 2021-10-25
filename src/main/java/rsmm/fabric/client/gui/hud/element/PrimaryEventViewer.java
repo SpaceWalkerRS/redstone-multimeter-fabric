@@ -1,4 +1,4 @@
-package rsmm.fabric.client.gui.hud;
+package rsmm.fabric.client.gui.hud.element;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -6,6 +6,8 @@ import net.minecraft.client.util.math.MatrixStack;
 
 import rsmm.fabric.client.gui.CursorType;
 import rsmm.fabric.client.gui.element.RSMMScreen;
+import rsmm.fabric.client.gui.hud.Directionality;
+import rsmm.fabric.client.gui.hud.MultimeterHud;
 import rsmm.fabric.client.gui.widget.Button;
 import rsmm.fabric.client.option.Options;
 
@@ -21,12 +23,14 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
 		if (!isDraggingMouse()) {
-			CursorType cursor;
+			CursorType cursor = CursorType.ARROW;
 			
 			if (isHovered(mouseX, mouseY)) {
-				cursor = isBorderHovered(mouseX) ? CursorType.HRESIZE : CursorType.HAND;
-			} else {
-				cursor = CursorType.ARROW;
+				if (isBorderHovered(mouseX)) {
+					cursor = CursorType.HRESIZE;
+				} else if (hud.isPaused()) {
+					cursor = CursorType.HAND;
+				}
 			}
 			
 			RSMMScreen.setCursor(hud.client, cursor);
@@ -58,7 +62,6 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				Button.playClickSound(hud.client);
 				
 				success = true;
-				
 			}
 		}
 		
@@ -82,26 +85,31 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		}
 		
 		dX += deltaX;
-		int d = hud.settings.columnWidth + hud.settings.gridSize;
+		int width = hud.settings.columnWidth + hud.settings.gridSize;
+		double d = width / 2.0D;
 		int c = 0;
 		
-		while (dX >= d) {
-			dX -= d;
+		while (dX > d) {
+			dX -= width;
 			c++;
 		}
-		while (dX <= -d) {
-			dX += d;
+		while (dX < -d) {
+			dX += width;
 			c--;
 		}
 		
 		if (c != 0) {
+			if (hud.getDirectionalityX() == Directionality.X.RIGHT_TO_LEFT) {
+				c *= -1;
+			}
+			
 			if (resizing) {
 				int columns = Options.HUD.COLUMN_COUNT.get();
 				Options.HUD.COLUMN_COUNT.set(columns + c);
 				Options.validate();
 				hud.updateWidth();
 			} else {
-				hud.stepForward(c);
+				hud.stepBackward(c);
 			}
 		}
 		
@@ -112,10 +120,10 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	protected void drawHighlights(MatrixStack matrices, int mouseX, int mouseY) {
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
 			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
-				drawHighlight(matrices, getHoveredColumn(mouseX), 0x808080);
+				drawHighlight(matrices, getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
 			}
 			
-			drawHighlight(matrices, Options.HUD.SELECTED_COLUMN.get(), 0xFFFFFF);
+			drawHighlight(matrices, Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
 		}
 	}
 	
@@ -154,6 +162,14 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 	
 	private boolean isBorderHovered(double mouseX) {
-		return Math.round(mouseX) >= (getX() + getWidth() - 1);
+		long x = Math.round(mouseX);
+		
+		switch (hud.getDirectionalityX()) {
+		default:
+		case LEFT_TO_RIGHT:
+			return x >= (getX() + getWidth() - 1);
+		case RIGHT_TO_LEFT:
+			return x <= getX() + 1;
+		}
 	}
 }

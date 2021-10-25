@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 
+import rsmm.fabric.RedstoneMultimeterMod;
 import rsmm.fabric.client.gui.element.RSMMScreen;
 import rsmm.fabric.client.gui.element.ScrollableListElement;
 import rsmm.fabric.client.gui.element.option.OptionsListBuilder;
@@ -22,7 +23,7 @@ public class OptionsScreen extends RSMMScreen {
 	private final Screen parent;
 	
 	public OptionsScreen(Screen parent) {
-		super(new LiteralText("Redstone Multimeter Options"), true);
+		super(new LiteralText(String.format("%s Options", RedstoneMultimeterMod.MOD_NAME)), true);
 		
 		this.parent = parent;
 	}

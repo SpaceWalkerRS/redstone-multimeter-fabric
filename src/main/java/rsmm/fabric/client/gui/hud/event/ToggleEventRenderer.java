@@ -6,10 +6,10 @@ import net.minecraft.text.Text;
 
 import rsmm.fabric.client.gui.hud.MultimeterHud;
 import rsmm.fabric.client.option.Options;
-import rsmm.fabric.common.Meter;
-import rsmm.fabric.common.event.EventType;
-import rsmm.fabric.common.event.MeterEvent;
-import rsmm.fabric.common.log.MeterLogs;
+import rsmm.fabric.common.meter.Meter;
+import rsmm.fabric.common.meter.event.EventType;
+import rsmm.fabric.common.meter.event.MeterEvent;
+import rsmm.fabric.common.meter.log.MeterLogs;
 
 public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	
@@ -139,9 +139,9 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 						int textColor = toggled ? hud.settings.colorTextOn : hud.settings.colorTextOff;
 						
 						matrices.push();
-						drawText(hud, matrices, text, startX + 1, y + 1, textColor);
+						hud.renderer.drawText(matrices, text, startX + 1, y + 1, textColor);
 						matrices.translate(0, 0, -0.01);
-						drawRect(hud, matrices, startX, y, startX + requiredWidth, y + hud.settings.rowHeight, bgColor);
+						hud.renderer.drawRect(matrices, startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
 						matrices.pop();
 					}
 				}
@@ -220,19 +220,18 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	protected abstract boolean isToggled(Meter meter);
 	
 	private void draw(MatrixStack matrices, int x, int y, int color) {
-		switch (mode) {
-		case ALL:
-			drawRect(hud, matrices, x, y, x + hud.settings.columnWidth, y + hud.settings.rowHeight, color);
-			break;
-		case TOP:
-			drawRect(hud, matrices, x, y, x + hud.settings.columnWidth, y + hud.settings.rowHeight - (hud.settings.rowHeight / 2), color);
-			break;
-		case BOTTOM:
-			drawRect(hud, matrices, x, y + hud.settings.rowHeight / 2, x + hud.settings.columnWidth, y + hud.settings.rowHeight, color);
-			break;
-		default:
-			break;
+		int width = hud.settings.columnWidth;
+		int height = hud.settings.rowHeight;
+		
+		if (mode != Mode.ALL) {
+			height = height - (height / 2); // round up
+			
+			if (mode == Mode.BOTTOM) {
+				y += (hud.settings.rowHeight - height);
+			}
 		}
+		
+		hud.renderer.drawRect(matrices, x, y, width, height, color);
 	}
 	
 	private void draw(MatrixStack matrices, int x, int y, int color, int count) {
@@ -242,19 +241,20 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	private void drawOn(MatrixStack matrices, int x, int y, int color) {
-		switch (mode) {
-		case ALL:
-			drawRect(hud, matrices, x + 1, y + 1, x + hud.settings.columnWidth - 1, y + hud.settings.rowHeight - 1, color);
-			break;
-		case TOP:
-			drawRect(hud, matrices, x + 1, y + 1, x + hud.settings.columnWidth - 1, y + hud.settings.rowHeight / 2, color);
-			break;
-		case BOTTOM:
-			drawRect(hud, matrices, x + 1, y + hud.settings.rowHeight - (hud.settings.rowHeight / 2), x + hud.settings.columnWidth - 1, y + hud.settings.rowHeight - 1, color);
-			break;
-		default:
-			break;
+		x += 1;
+		y += 1;
+		int width = hud.settings.columnWidth - 2;
+		int height = hud.settings.rowHeight - 2;
+		
+		if (mode != Mode.ALL) {
+			height /= 2;
+			
+			if (mode == Mode.BOTTOM) {
+				y += (hud.settings.rowHeight - (height + 2));
+			}
 		}
+		
+		hud.renderer.drawRect(matrices, x, y, width, height, color);
 	}
 	
 	private void drawOff(MatrixStack matrices, int x, int y, int color) {

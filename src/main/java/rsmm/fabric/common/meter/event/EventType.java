@@ -1,4 +1,4 @@
-package rsmm.fabric.common.event;
+package rsmm.fabric.common.meter.event;
 
 import java.util.HashMap;
 import java.util.List;
