@@ -18,15 +18,15 @@
   },
 
   "license": "MIT Licence",
-  "icon": "assets/rsmm/fabric/icon.png",
+  "icon": "assets/redstone/multimeter/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "rsmm.fabric.RedstoneMultimeterMod"
+      "redstone.multimeter.RedstoneMultimeterMod"
     ],
     "modmenu": [
-      "rsmm.fabric.modmenu.RedstoneMultimeterMod"
+      "redstone.multimeter.modmenu.RedstoneMultimeterMod"
     ]
   },
   "mixins": [
