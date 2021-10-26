@@ -1,0 +1,7 @@
+{
+  "name": "trapped_chest",
+  "event_types": [
+    "active",
+    "power_change"
+  ]
+}

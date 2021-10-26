@@ -72,6 +72,8 @@ public class MultimeterClient {
 		this.lastServerTick = -1;
 		
 		this.hud.init();
+		
+		reloadResources();
 	}
 	
 	public MinecraftClient getMinecraftClient() {
@@ -115,6 +117,10 @@ public class MultimeterClient {
 	
 	public File getConfigFolder() {
 		return new File(client.runDirectory, CONFIG_PATH);
+	}
+	
+	public void reloadResources() {
+		meterPropertiesManager.reload();
 	}
 	
 	/**

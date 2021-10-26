@@ -107,6 +107,10 @@ public class MeterProperties {
 		return new MeterProperties().fill(this);
 	}
 	
+	/**
+	 * If a property does not yet have a value, copy the value
+	 * from the given properties.
+	 */
 	public MeterProperties fill(MeterProperties properties) {
 		if (pos == null) {
 			pos = properties.pos;

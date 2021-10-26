@@ -2,14 +2,13 @@ package redstone.multimeter.client.meter;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
@@ -17,7 +16,6 @@ import com.google.gson.JsonSyntaxException;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
@@ -37,23 +35,20 @@ import redstone.multimeter.common.meter.event.EventType;
 
 public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	
-	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final String RESOURCES_PATH = "meter/default_properties";
+	private static final String FILE_EXTENSION = ".json";
+	private static final Gson GSON = new Gson();
 	
 	private final MultimeterClient client;
 	private final File folder;
-	private final Map<Identifier, MeterProperties> blockDefaults;
 	private final Map<String, MeterProperties> namespaceDefaults;
+	private final Map<Identifier, MeterProperties> blockDefaults;
 	
 	public ClientMeterPropertiesManager(MultimeterClient multimeterClient) {
 		this.client = multimeterClient;
-		this.folder = new File(this.client.getConfigFolder(), "default_meter_properties");
-		this.blockDefaults = new HashMap<>();
+		this.folder = new File(this.client.getConfigFolder(), RESOURCES_PATH);
 		this.namespaceDefaults = new HashMap<>();
-		
-		if (!load()) {
-			createDefaults();
-			save();
-		}
+		this.blockDefaults = new HashMap<>();
 	}
 	
 	@Override
@@ -120,10 +115,42 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		return properties;
 	}
 	
-	private boolean load() {
+	public void reload() {
+		namespaceDefaults.clear();
+		blockDefaults.clear();
+		
+		loadDefaultProperties();
+		loadUserProperties();
+	}
+	
+	private void loadDefaultProperties() {
+		String namespace = RedstoneMultimeterMod.NAMESPACE;
+		String path = String.format("/assets/%s/%s", namespace, RESOURCES_PATH);
+		URL resource = getClass().getResource(path);
+		
+		if (resource == null) {
+			return;
+		}
+		
+		try {
+			load(new File(resource.toURI()), false);
+		} catch (URISyntaxException e) {
+			
+		}
+		
+	}
+	
+	private void loadUserProperties() {
+		load(folder, true);
+	}
+	
+	private void load(File folder, boolean createFolder) {
 		if (!folder.exists()) {
-			folder.mkdirs();
-			return false;
+			if (createFolder) {
+				folder.mkdirs();
+			}
+			
+			return;
 		}
 		
 		for (File subFolder : folder.listFiles()) {
@@ -133,8 +160,6 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 				}
 			}
 		}
-		
-		return true;
 	}
 	
 	private void loadProperties(File file, String namespace) {
@@ -144,11 +169,11 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		
 		String fileName = file.getName();
 		
-		if (!fileName.endsWith(".json")) {
+		if (!fileName.endsWith(FILE_EXTENSION)) {
 			return;
 		}
 		
-		String id = fileName.substring(0, fileName.length() - 5);
+		String id = fileName.substring(0, fileName.length() - FILE_EXTENSION.length());
 		
 		try (FileReader fr = new FileReader(file)) {
 			JsonElement rawJson = GSON.fromJson(fr, JsonElement.class);
@@ -168,143 +193,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	
 	private void register(String namespace, String path, MeterProperties properties) {
 		if (path.equals("*")) {
-			if (namespaceDefaults.putIfAbsent(namespace, properties) != null) {
-				RedstoneMultimeterMod.LOGGER.warn("Tried to register multiple default meter properties for namespace " + namespace);
-			}
+			namespaceDefaults.put(namespace, properties);
 		} else {
 			Identifier blockId = new Identifier(namespace, path);
 			
 			if (Registry.BLOCK.containsId(blockId)) {
-				if (blockDefaults.putIfAbsent(blockId, properties) != null) {
-					RedstoneMultimeterMod.LOGGER.warn("Tried to register multiple default meter properties for block " + blockId.toString());
-				}
+				blockDefaults.put(blockId, properties);
 			}
-		}
-	}
-	
-	private void createDefaults() {
-		MeterProperties properties = new MeterProperties();
-		properties.setName("Meter");
-		properties.setMovable(true);
-		properties.setEventTypes(EventType.POWERED.flag() | EventType.MOVED.flag());
-		register(Identifier.DEFAULT_NAMESPACE, "*", properties);
-		
-		properties = new MeterProperties();
-		properties.setEventTypes(EventType.ACTIVE.flag());
-		register(properties, Blocks.END_PORTAL_FRAME);
-		register(properties, Blocks.LECTERN);
-		register(properties, Blocks.LEVER);
-		register(properties, Blocks.REPEATER);
-		register(properties, Blocks.TRIPWIRE);
-		register(properties, Blocks.TRIPWIRE_HOOK);
-		
-		properties.setName("button");
-		register(properties, Blocks.ACACIA_BUTTON);
-		register(properties, Blocks.BIRCH_BUTTON);
-		register(properties, Blocks.CRIMSON_BUTTON);
-		register(properties, Blocks.DARK_OAK_BUTTON);
-		register(properties, Blocks.JUNGLE_BUTTON);
-		register(properties, Blocks.OAK_BUTTON);
-		register(properties, Blocks.POLISHED_BLACKSTONE_BUTTON);
-		register(properties, Blocks.SPRUCE_BUTTON);
-		register(properties, Blocks.STONE_BUTTON);
-		register(properties, Blocks.WARPED_BUTTON);
-		
-		properties.setName("pressure_plate");
-		register(properties, Blocks.ACACIA_PRESSURE_PLATE);
-		register(properties, Blocks.BIRCH_PRESSURE_PLATE);
-		register(properties, Blocks.CRIMSON_PRESSURE_PLATE);
-		register(properties, Blocks.DARK_OAK_PRESSURE_PLATE);
-		register(properties, Blocks.JUNGLE_PRESSURE_PLATE);
-		register(properties, Blocks.OAK_PRESSURE_PLATE);
-		register(properties, Blocks.POLISHED_BLACKSTONE_PRESSURE_PLATE);
-		register(properties, Blocks.SPRUCE_PRESSURE_PLATE);
-		register(properties, Blocks.STONE_PRESSURE_PLATE);
-		register(properties, Blocks.WARPED_PRESSURE_PLATE);
-		
-		properties.setName("redstone_torch");
-		register(properties, Blocks.REDSTONE_TORCH);
-		register(properties, Blocks.REDSTONE_WALL_TORCH);
-		
-		
-		properties = new MeterProperties();
-		properties.setEventTypes(EventType.POWERED.flag());
-		register(properties, Blocks.BELL);
-		register(properties, Blocks.DISPENSER);
-		register(properties, Blocks.DROPPER);
-		register(properties, Blocks.HOPPER);
-		
-		properties = new MeterProperties();
-		properties.setEventTypes(EventType.ACTIVE.flag() | EventType.MOVED.flag());
-		register(properties, Blocks.DETECTOR_RAIL);
-		register(properties, Blocks.LIGHTNING_ROD);
-		register(properties, Blocks.OBSERVER);
-		register(properties, Blocks.PISTON);
-		register(properties, Blocks.STICKY_PISTON);
-		
-		
-		properties = new MeterProperties();
-		properties.setEventTypes(EventType.ACTIVE.flag() | EventType.POWER_CHANGE.flag());
-		register(properties, Blocks.COMPARATOR);
-		register(properties, Blocks.DAYLIGHT_DETECTOR);
-		register(properties, Blocks.REDSTONE_WIRE);
-		register(properties, Blocks.SCULK_SENSOR);
-		register(properties, Blocks.TRAPPED_CHEST);
-		
-		properties.setName("weighted_pressure_plate");
-		register(properties, Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE);
-		register(properties, Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE);
-	}
-	
-	private void register(MeterProperties properties, Block block) {
-		properties = properties.copy();
-		Identifier blockId = Registry.BLOCK.getId(block);
-		
-		if (properties.getName() == null) {
-			properties.setName(blockId.getPath());
-		}
-		
-		register(blockId.getNamespace(), blockId.getPath(), properties);
-	}
-	
-	private void save() {
-		for (Entry<Identifier, MeterProperties> entry : blockDefaults.entrySet()) {
-			Identifier blockId = entry.getKey();
-			MeterProperties properties = entry.getValue();
-			
-			save(blockId.getNamespace(), blockId.getPath(), properties);
-		}
-		for (Entry<String, MeterProperties> entry : namespaceDefaults.entrySet()) {
-			String namespace = entry.getKey();
-			MeterProperties properties = entry.getValue();
-			
-			save(namespace, "*", properties);
-		}
-	}
-	
-	private void save(String namespace, String path, MeterProperties properties) {
-		File dir = new File(folder, namespace);
-		
-		if (!dir.exists()) {
-			dir.mkdirs();
-		}
-		
-		File file = new File(dir, path + ".json");
-		
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				
-			}
-		}
-		
-		JsonObject json = properties.toJson();
-		
-		try (FileWriter fw = new FileWriter(file)) {
-			fw.write(GSON.toJson(json));
-		} catch (IOException | JsonSyntaxException | JsonIOException e) {
-			
 		}
 	}
 }

@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -26,12 +27,14 @@ public class GameOptionsMixin {
 	@Shadow private MinecraftClient client;
 	
 	@Inject(
-			method = "load",
+			method = "<init>",
 			at = @At(
-					value = "HEAD"
+					value = "INVOKE",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/client/option/GameOptions;load()V"
 			)
 	)
-	private void onLoadInjectAtHead(CallbackInfo ci) {
+	private void initOptions(MinecraftClient client, File optionsFile, CallbackInfo ci) {
 		Collection<KeyBinding> rsmmKeyBindings = KeyBindings.getKeyBindings();
 		KeyBinding[] mcKeyBindings = keysAll;
 		
@@ -53,7 +56,7 @@ public class GameOptionsMixin {
 			)
 	)
 	private void loadOptions(CallbackInfo ci) {
-		File folder = new File(client.runDirectory, MultimeterClient.CONFIG_PATH);
+		File folder = getConfigFolder();
 		
 		KeyBindings.load(folder);
 		Options.load(folder);
@@ -66,9 +69,13 @@ public class GameOptionsMixin {
 			)
 	)
 	private void saveOptions(CallbackInfo ci) {
-		File folder = new File(client.runDirectory, MultimeterClient.CONFIG_PATH);
+		File folder = getConfigFolder();
 		
 		KeyBindings.save(folder);
 		Options.save(folder);
+	}
+	
+	private File getConfigFolder() {
+		return new File(client.runDirectory, MultimeterClient.CONFIG_PATH);
 	}
 }

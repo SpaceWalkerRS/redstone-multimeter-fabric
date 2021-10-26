@@ -29,7 +29,7 @@ public class ClientPlayNetworkHandlerMixin {
 					target = "Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;getChannel()Lnet/minecraft/util/Identifier;"
 			)
 	)
-	private void onOnCustomPayloadInjectAfterForceMainThread(CustomPayloadS2CPacket packet, CallbackInfo ci) {
+	private void handleCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (PacketManager.getPacketChannelId().equals(packet.getChannel())) {
 			NetworkThreadUtils.forceMainThread(packet, (ClientPlayNetworkHandler)(Object)this, client);
 			((IMinecraftClient)client).getMultimeterClient().getPacketHandler().onPacketReceived(packet.getData());

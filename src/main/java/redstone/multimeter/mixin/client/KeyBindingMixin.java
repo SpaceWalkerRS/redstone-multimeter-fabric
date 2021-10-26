@@ -24,7 +24,7 @@ public class KeyBindingMixin {
 					value = "RETURN"
 			)
 	)
-	private static void onInitInjectAtReturn(CallbackInfo ci) {
+	private static void initKeybinds(CallbackInfo ci) {
 		for (String category : KeyBindings.getCategories()) {
 			categoryOrderMap.put(category, categoryOrderMap.size() + 1);
 		}

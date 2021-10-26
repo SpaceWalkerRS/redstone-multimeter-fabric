@@ -27,7 +27,7 @@ public class InGameHudMixin {
 					target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/util/math/MatrixStack;)V"
 			)
 	)
-	private void onRenderInjectAfterRenderStatusEffectOverlay(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+	private void renderHUD(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
 		if (((IMinecraftClient)client).getMultimeterClient().shouldRenderHud()) {
 			((IMinecraftClient)client).getMultimeterClient().getHUD().render(matrices);
 		}

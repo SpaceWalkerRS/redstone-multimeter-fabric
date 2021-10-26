@@ -1,0 +1,6 @@
+{
+  "name": "tripwire",
+  "event_types": [
+    "active"
+  ]
+}

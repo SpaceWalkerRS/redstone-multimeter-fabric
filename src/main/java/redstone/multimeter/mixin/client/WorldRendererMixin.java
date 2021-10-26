@@ -31,7 +31,7 @@ public class WorldRendererMixin {
 					target = "Lnet/minecraft/client/render/BackgroundRenderer;method_23792()V"
 			)
 	)
-	private void onRenderInjectBeforeRenderParticles(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
+	private void renderMeterHighlights(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
 		((IMinecraftClient)client).getMultimeterClient().getMeterRenderer().renderMeters(matrices);
 	}
 }

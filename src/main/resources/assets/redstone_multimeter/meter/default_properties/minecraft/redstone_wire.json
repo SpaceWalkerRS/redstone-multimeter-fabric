@@ -1,0 +1,7 @@
+{
+  "name": "redstone_wire",
+  "event_types": [
+    "active",
+    "power_change"
+  ]
+}

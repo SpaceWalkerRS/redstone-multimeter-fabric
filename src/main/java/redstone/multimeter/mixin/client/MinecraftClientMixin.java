@@ -1,9 +1,12 @@
 package redstone.multimeter.mixin.client;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,6 +18,16 @@ import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 public class MinecraftClientMixin implements IMinecraftClient {
 	
 	private MultimeterClient multimeterClient;
+	
+	@Inject(
+			method = "reloadResources(Z)Ljava/util/concurrent/CompletableFuture;",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void reloadResources(boolean force, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+		getMultimeterClient().reloadResources();
+	}
 	
 	@Inject(
 			method = "onResolutionChanged",
@@ -32,7 +45,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 					value = "HEAD"
 			)
 	)
-	private void onHandleInputEventsInjectAtHead(CallbackInfo ci) {
+	private void handleInputEvents(CallbackInfo ci) {
 		getMultimeterClient().getInputHandler().handleInputEvents();
 	}
 	
@@ -42,7 +55,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 					value = "HEAD"
 			)
 	)
-	private void onDisconnectInjectAtHead(Screen screen, CallbackInfo ci) {
+	private void onDisconnect(Screen screen, CallbackInfo ci) {
 		getMultimeterClient().onDisconnect();
 	}
 	
@@ -52,7 +65,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 					value = "HEAD"
 			)
 	)
-	private void onCloseInjectAtHead(CallbackInfo ci) {
+	private void onClose(CallbackInfo ci) {
 		getMultimeterClient().onShutdown();
 	}
 	
