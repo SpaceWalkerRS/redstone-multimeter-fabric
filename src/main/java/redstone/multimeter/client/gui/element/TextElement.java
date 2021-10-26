@@ -7,10 +7,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.action.MousePress;
 import redstone.multimeter.client.gui.element.action.MouseRelease;
-import redstone.multimeter.client.gui.widget.Button;
+import redstone.multimeter.client.gui.widget.IButton;
 
 public class TextElement implements IElement {
 	
@@ -71,7 +72,7 @@ public class TextElement implements IElement {
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		if (mousePress.press(this)) {
-			Button.playClickSound(client);
+			IButton.playClickSound(client);
 			return true;
 		}
 		
@@ -81,7 +82,7 @@ public class TextElement implements IElement {
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		if (mouseRelease.release(this)) {
-			Button.playClickSound(client);
+			IButton.playClickSound(client);
 			return true;
 		}
 		
@@ -94,7 +95,7 @@ public class TextElement implements IElement {
 	}
 	
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double amount) {
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
 		return false;
 	}
 	

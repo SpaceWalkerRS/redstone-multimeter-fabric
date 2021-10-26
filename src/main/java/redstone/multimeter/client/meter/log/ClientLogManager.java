@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.log.LogManager;
@@ -19,12 +20,12 @@ public class ClientLogManager extends LogManager {
 	
 	private final ClientMeterGroup meterGroup;
 	/** The number of logged events in any tick */
-	private final Map<Long, Integer> subTicks;
+	private final Map<Long, Integer> subticks;
 	private final LogPrinter printer;
 	
 	public ClientLogManager(ClientMeterGroup meterGroup) {
 		this.meterGroup = meterGroup;
-		this.subTicks = new LinkedHashMap<>();
+		this.subticks = new LinkedHashMap<>();
 		this.printer = new LogPrinter(this);
 	}
 	
@@ -41,8 +42,7 @@ public class ClientLogManager extends LogManager {
 	@Override
 	public void clearLogs() {
 		super.clearLogs();
-		
-		subTicks.clear();
+		subticks.clear();
 	}
 	
 	public LogPrinter getPrinter() {
@@ -50,15 +50,15 @@ public class ClientLogManager extends LogManager {
 	}
 	
 	public int getSubTickCount(long tick) {
-		return subTicks.getOrDefault(tick, 0);
+		return subticks.getOrDefault(tick, 0);
 	}
 	
 	/**
 	 * Log all events from the past server tick
 	 */
 	public void updateMeterLogs(NbtCompound data) {
-		int subTickCount = data.getInt("subTickCount");
-		subTicks.put(getLastTick(), subTickCount);
+		int subTickCount = data.getInt("subtickCount");
+		subticks.put(getLastTick(), subTickCount);
 		
 		NbtList list = data.getList("logs", 10);
 		
@@ -82,15 +82,12 @@ public class ClientLogManager extends LogManager {
 		printer.printLogs();
 	}
 	
-	/**
-	 * Remove all logged events that are too old
-	 */
 	public void clearOldLogs() {
 		long selectedTickCutoff = meterGroup.getMultimeterClient().getHUD().getSelectedTick() - AGE_CUTOFF;
 		long serverTickCutoff = getLastTick() - MAX_LOG_AGE;
 		long cutoff = (selectedTickCutoff > serverTickCutoff) ? selectedTickCutoff : serverTickCutoff;
 		
-		Iterator<Long> it = subTicks.keySet().iterator();
+		Iterator<Long> it = subticks.keySet().iterator();
 		
 		while (it.hasNext()) {
 			if (it.next() > cutoff) {

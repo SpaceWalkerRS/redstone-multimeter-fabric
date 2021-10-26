@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
+
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.log.MeterLogs;

@@ -2,6 +2,7 @@ package redstone.multimeter.common.network.packets;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.network.RSMMPacket;

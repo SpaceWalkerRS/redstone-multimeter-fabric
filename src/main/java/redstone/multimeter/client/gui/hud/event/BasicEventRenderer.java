@@ -3,6 +3,7 @@ package redstone.multimeter.client.gui.hud.event;
 import java.util.function.BiFunction;
 
 import net.minecraft.client.util.math.MatrixStack;
+
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
@@ -75,7 +76,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		}
 		
 		while (event.isBefore(tick, subTickCount)) {
-			int column = event.getSubTick();
+			int column = event.getSubtick();
 			int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 			
 			drawEvent(matrices, columnX, y, meter, event);

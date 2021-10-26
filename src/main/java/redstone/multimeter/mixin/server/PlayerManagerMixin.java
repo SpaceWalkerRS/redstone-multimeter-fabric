@@ -12,6 +12,7 @@ import net.minecraft.network.ClientConnection;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 
 @Mixin(PlayerManager.class)

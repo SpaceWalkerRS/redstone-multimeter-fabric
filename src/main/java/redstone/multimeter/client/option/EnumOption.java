@@ -2,6 +2,7 @@ package redstone.multimeter.client.option;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.widget.Button;
 import redstone.multimeter.client.gui.widget.IButton;

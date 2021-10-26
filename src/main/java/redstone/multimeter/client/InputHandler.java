@@ -3,6 +3,7 @@ package redstone.multimeter.client;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
+
 import redstone.multimeter.client.gui.MultimeterScreen;
 import redstone.multimeter.common.meter.event.EventType;
 

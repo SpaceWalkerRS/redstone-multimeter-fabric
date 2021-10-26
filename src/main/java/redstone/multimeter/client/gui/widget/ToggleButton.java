@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
+
 import redstone.multimeter.client.MultimeterClient;
 
 public class ToggleButton extends Button {

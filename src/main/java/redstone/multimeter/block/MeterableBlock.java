@@ -2,6 +2,7 @@ package redstone.multimeter.block;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 
 public interface MeterableBlock extends Meterable {

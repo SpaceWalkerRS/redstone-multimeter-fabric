@@ -12,6 +12,7 @@ import net.minecraft.block.PoweredRailBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import redstone.multimeter.block.MeterableBlock;
 
 @Mixin(PoweredRailBlock.class)

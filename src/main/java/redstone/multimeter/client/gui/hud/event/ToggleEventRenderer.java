@@ -3,6 +3,7 @@ package redstone.multimeter.client.gui.hud.event;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
@@ -182,7 +183,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			boolean nextEventInTable = (nextEvent != null && nextEvent.isAt(tick));
 			
 			if (eventInTable) {
-				int column = event.getSubTick();
+				int column = event.getSubtick();
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
 				if (wasToggled(event)) {
@@ -192,8 +193,8 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				}
 			}
 			
-			int start = eventInTable ? event.getSubTick() + 1 : 0;
-			int end = nextEventInTable ? nextEvent.getSubTick() : subTickCount;
+			int start = eventInTable ? event.getSubtick() + 1 : 0;
+			int end = nextEventInTable ? nextEvent.getSubtick() : subTickCount;
 			
 			if (event == null ? !wasToggled(nextEvent) : wasToggled(event)) {
 				int columnX = x + start * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;

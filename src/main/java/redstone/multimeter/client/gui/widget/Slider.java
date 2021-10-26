@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 
 public class Slider extends SliderWidget implements IButton {
 	
@@ -68,8 +69,19 @@ public class Slider extends SliderWidget implements IButton {
 	}
 	
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double amount) {
-		return super.mouseScrolled(mouseX, mouseY, amount);
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (isDraggingMouse() || Math.abs(scrollX) < 1.0D) {
+			return false;
+		}
+		
+		double newValue = value - (scrollX / 100.0D);
+		newValue = MathHelper.clamp(newValue, 0.0D, 1.0D);
+		
+		setValue(newValue);
+		applyValue();
+		updateMessage();
+		
+		return true;
 	}
 	
 	@Override

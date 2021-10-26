@@ -26,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
+
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.WorldPos;

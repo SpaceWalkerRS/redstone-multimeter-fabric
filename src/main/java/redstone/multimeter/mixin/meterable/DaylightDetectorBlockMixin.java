@@ -7,6 +7,7 @@ import net.minecraft.block.DaylightDetectorBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
 

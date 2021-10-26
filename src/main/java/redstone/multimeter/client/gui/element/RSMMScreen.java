@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
@@ -51,7 +52,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	
 	@Override
 	public final boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		return mouseScroll(mouseX, mouseY, amount);
+		return false;
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
+
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
@@ -47,7 +48,7 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double amount) {
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
 		return false;
 	}
 	

@@ -5,6 +5,7 @@ import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+
 import redstone.multimeter.block.PowerSource;
 
 public class TrappedChestHelper {

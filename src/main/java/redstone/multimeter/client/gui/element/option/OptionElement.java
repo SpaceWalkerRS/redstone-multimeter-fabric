@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.Text;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.controls.ControlElement;
 import redstone.multimeter.client.option.IOption;

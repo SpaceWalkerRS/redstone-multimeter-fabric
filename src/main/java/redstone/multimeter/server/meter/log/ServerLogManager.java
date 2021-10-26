@@ -2,6 +2,7 @@ package redstone.multimeter.server.meter.log;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
@@ -14,7 +15,7 @@ public class ServerLogManager extends LogManager {
 	
 	private final ServerMeterGroup meterGroup;
 	
-	private int nextSubTick;
+	private int nextSubtick;
 	
 	public ServerLogManager(ServerMeterGroup meterGroup) {
 		this.meterGroup = meterGroup;
@@ -34,11 +35,11 @@ public class ServerLogManager extends LogManager {
 	public void clearLogs() {
 		super.clearLogs();
 		
-		nextSubTick = 0;
+		nextSubtick = 0;
 	}
 	
 	public void tick() {
-		nextSubTick = 0;
+		nextSubtick = 0;
 	}
 	
 	public void logEvent(Meter meter, EventType type, int metaData) {
@@ -47,15 +48,15 @@ public class ServerLogManager extends LogManager {
 		}
 		
 		long tick = getLastTick();
-		int subTick = nextSubTick++;
+		int subtick = nextSubtick++;
 		TickPhase phase = meterGroup.getMultimeter().getCurrentTickPhase();
 		
-		MeterEvent event = new MeterEvent(type, tick, subTick, phase, metaData);
+		MeterEvent event = new MeterEvent(type, tick, subtick, phase, metaData);
 		meter.getLogs().add(event);
 	}
 	
 	public void flushLogs() {
-		if (nextSubTick == 0) {
+		if (nextSubtick == 0) {
 			return;
 		}
 		
@@ -84,7 +85,7 @@ public class ServerLogManager extends LogManager {
 		}
 		
 		NbtCompound nbt = new NbtCompound();
-		nbt.putInt("subTickCount", nextSubTick);
+		nbt.putInt("subtickCount", nextSubtick);
 		nbt.put("logs", list);
 		
 		MeterLogsPacket packet = new MeterLogsPacket(nbt);

@@ -14,6 +14,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.SimpleListElement;
 import redstone.multimeter.client.gui.element.SimpleTextElement;

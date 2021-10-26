@@ -10,14 +10,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.IElement;
 import redstone.multimeter.client.gui.element.action.MousePress;
@@ -121,8 +118,8 @@ public class Button extends ButtonWidget implements IElement, IButton {
 	}
 	
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double amount) {
-		return super.mouseScrolled(mouseX, mouseY, amount);
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+		return super.mouseScrolled(mouseX, mouseY, scrollY);
 	}
 	
 	@Override
@@ -235,11 +232,5 @@ public class Button extends ButtonWidget implements IElement, IButton {
 	
 	public int getTextY() {
 		return y + height - (height + font.fontHeight) / 2;
-	}
-	
-	public static void playClickSound(MultimeterClient client) {
-		SoundManager soundManager = client.getMinecraftClient().getSoundManager();
-		SoundInstance sound = PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F);
-		soundManager.play(sound);
 	}
 }

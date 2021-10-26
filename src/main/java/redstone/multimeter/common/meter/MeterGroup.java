@@ -8,6 +8,7 @@ import java.util.Map;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.log.LogManager;
 

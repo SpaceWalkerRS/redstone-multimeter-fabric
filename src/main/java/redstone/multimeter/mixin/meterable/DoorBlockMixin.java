@@ -15,6 +15,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
 import redstone.multimeter.block.MeterableBlock;
 
 @Mixin(DoorBlock.class)

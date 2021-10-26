@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.WallRedstoneTorchBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import redstone.multimeter.block.MeterableBlock;
 
 @Mixin(WallRedstoneTorchBlock.class)

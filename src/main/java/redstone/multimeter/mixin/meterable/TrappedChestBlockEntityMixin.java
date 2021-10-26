@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.TrappedChestBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import redstone.multimeter.block.chest.TrappedChestHelper;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.server.Multimeter;

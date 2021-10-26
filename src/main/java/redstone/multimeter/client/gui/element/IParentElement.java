@@ -82,9 +82,9 @@ public interface IParentElement extends IElement {
 	}
 	
 	@Override
-	default boolean mouseScroll(double mouseX, double mouseY, double amount) {
+	default boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
-		return hoveredElement != null && hoveredElement.mouseScroll(mouseX, mouseY, amount);
+		return hoveredElement != null && hoveredElement.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 	}
 	
 	@Override

@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ComparatorBlockEntity;
 import net.minecraft.util.math.BlockPos;
+
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 
 @Mixin(ComparatorBlockEntity.class)

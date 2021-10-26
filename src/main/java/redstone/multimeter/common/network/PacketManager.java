@@ -1,6 +1,7 @@
 package redstone.multimeter.common.network;
 
 import net.minecraft.util.Identifier;
+
 import redstone.multimeter.common.network.packets.*;
 import redstone.multimeter.registry.SupplierClazzRegistry;
 

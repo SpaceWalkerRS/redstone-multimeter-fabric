@@ -3,6 +3,7 @@ package redstone.multimeter.client.gui.element.option;
 import java.util.Collection;
 
 import net.minecraft.text.Text;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.controls.ControlsListBuilder;
 import redstone.multimeter.client.option.IOption;

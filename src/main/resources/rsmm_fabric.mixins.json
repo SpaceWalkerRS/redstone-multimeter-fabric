@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "rsmm.fabric.mixin",
+  "package": "redstone.multimeter.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
   	"meterable.AbstractButtonBlockMixin",
@@ -59,6 +59,7 @@
   	"client.IntegratedServerMixin",
   	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
+  	"client.MouseMixin",
   	"client.ScreenMixin",
   	"client.WorldRendererMixin"
   ],

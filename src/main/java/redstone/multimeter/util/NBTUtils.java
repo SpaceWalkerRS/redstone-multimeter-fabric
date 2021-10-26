@@ -3,6 +3,7 @@ package redstone.multimeter.util;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.event.EventType;

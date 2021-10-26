@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.text.Text;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.action.MousePress;
 import redstone.multimeter.client.gui.element.action.MouseRelease;

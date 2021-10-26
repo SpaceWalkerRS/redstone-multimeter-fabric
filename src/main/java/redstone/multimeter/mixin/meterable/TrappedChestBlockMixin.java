@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.TrappedChestBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
 import redstone.multimeter.block.chest.TrappedChestHelper;

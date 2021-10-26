@@ -2,6 +2,7 @@ package redstone.multimeter.client.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+
 import redstone.multimeter.client.option.Options;
 
 public class HudSettings {

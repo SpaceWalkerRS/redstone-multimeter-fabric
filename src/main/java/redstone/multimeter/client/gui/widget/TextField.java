@@ -64,8 +64,8 @@ public class TextField extends TextFieldWidget implements IButton {
 	}
 	
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double amount) {
-		return super.mouseScrolled(mouseX, mouseY, amount);
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+		return super.mouseScrolled(mouseX, mouseY, scrollY);
 	}
 	
 	@Override

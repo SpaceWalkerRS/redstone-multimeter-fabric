@@ -2,6 +2,7 @@ package redstone.multimeter.server.meter;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.MeterPropertiesManager;

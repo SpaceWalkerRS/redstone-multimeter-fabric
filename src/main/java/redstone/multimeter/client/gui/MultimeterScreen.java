@@ -3,7 +3,9 @@ package redstone.multimeter.client.gui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.KeyBindings;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.ScrollableListElement;
 import redstone.multimeter.client.gui.element.meter.MeterControlsElement;
@@ -14,6 +16,7 @@ public class MultimeterScreen extends RSMMScreen {
 	private final boolean isPauseScreen;
 	
 	private ScrollableListElement list;
+	private boolean lockScrolling;
 	
 	public MultimeterScreen() {
 		super(new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
@@ -38,9 +41,32 @@ public class MultimeterScreen extends RSMMScreen {
 		
 		if (!success) {
 			success = multimeterClient.getInputHandler().keyPress(keyCode, scanCode, modifiers);
+			
+			if (!lockScrolling && KeyBindings.SCROLL_HUD.matchesKey(keyCode, scanCode)) {
+				lockScrolling = true;
+			}
 		}
 		
 		return success;
+	}
+	
+	@Override
+	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+		if (lockScrolling && KeyBindings.SCROLL_HUD.matchesKey(keyCode, scanCode)) {
+			lockScrolling = false;
+		}
+		
+		return super.keyRelease(keyCode, scanCode, modifiers);
+	}
+	
+	@Override
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (lockScrolling && multimeterClient.getMeterGroup().hasMeters()) {
+			multimeterClient.getHUD().stepBackward(Math.round((float)scrollY));
+			return true;
+		}
+		
+		return super.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 	}
 	
 	@Override

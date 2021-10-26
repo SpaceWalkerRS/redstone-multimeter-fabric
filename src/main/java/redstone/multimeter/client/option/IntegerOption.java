@@ -3,6 +3,7 @@ package redstone.multimeter.client.option;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.LiteralText;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.widget.IButton;
 import redstone.multimeter.client.gui.widget.Slider;
@@ -56,9 +57,9 @@ public class IntegerOption extends Option<Integer> {
 		}, () -> {
 			return (double)(get() - min) / range;
 		}, slider -> {
-			set(min + (int)(range * slider.getValue()));
+			set(min + (int)Math.round(range * slider.getValue()));
 		}, fraction -> {
-			return (double)(int)(range * fraction) / range;
+			return (double)Math.round(range * fraction) / range;
 		});
 	}
 }

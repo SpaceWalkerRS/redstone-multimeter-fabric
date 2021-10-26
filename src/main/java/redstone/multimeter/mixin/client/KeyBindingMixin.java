@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.option.KeyBinding;
+
 import redstone.multimeter.client.KeyBindings;
 
 @Mixin(KeyBinding.class)

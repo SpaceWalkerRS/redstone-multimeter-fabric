@@ -1,6 +1,7 @@
 package redstone.multimeter.client.gui.hud.event;
 
 import net.minecraft.client.util.math.MatrixStack;
+
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;

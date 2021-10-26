@@ -1,6 +1,7 @@
 package redstone.multimeter.client.gui.hud.element;
 
 import net.minecraft.client.util.math.MatrixStack;
+
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -42,7 +43,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 	}
 	
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double amount) {
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
 		return false;
 	}
 	

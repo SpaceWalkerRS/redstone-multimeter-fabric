@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import net.minecraft.client.gui.screen.Screen;
+
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.TickPhase;
@@ -202,7 +203,7 @@ public class LogPrinter {
 		
 		@Override
 		public String toString() {
-			return String.format("%d - (%s) %s", event.getSubTick(), meter.getName(), event.toString());
+			return String.format("%d - (%s) %s", event.getSubtick(), meter.getName(), event.toString());
 		}
 		
 		@Override

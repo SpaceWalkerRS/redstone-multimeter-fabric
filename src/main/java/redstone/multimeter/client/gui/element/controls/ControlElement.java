@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.SimpleTextElement;

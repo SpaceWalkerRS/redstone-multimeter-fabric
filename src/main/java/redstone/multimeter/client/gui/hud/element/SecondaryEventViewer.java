@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.MeterEvent;

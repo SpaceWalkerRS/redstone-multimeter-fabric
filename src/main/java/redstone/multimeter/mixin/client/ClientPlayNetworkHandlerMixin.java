@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+
 import redstone.multimeter.common.network.PacketManager;
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 

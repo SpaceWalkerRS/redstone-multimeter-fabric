@@ -2,6 +2,7 @@ package redstone.multimeter.client.option;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.widget.IButton;
 import redstone.multimeter.client.gui.widget.TextField;

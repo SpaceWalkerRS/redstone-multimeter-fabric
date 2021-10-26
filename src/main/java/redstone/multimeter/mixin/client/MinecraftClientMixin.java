@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 

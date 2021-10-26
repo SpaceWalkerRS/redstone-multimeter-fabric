@@ -13,6 +13,7 @@ import net.minecraft.block.FenceGateBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import redstone.multimeter.block.MeterableBlock;
 
 @Mixin(FenceGateBlock.class)

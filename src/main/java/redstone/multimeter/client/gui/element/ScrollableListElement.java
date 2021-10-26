@@ -10,6 +10,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;
 
@@ -100,11 +101,11 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 	
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double amount) {
-		boolean success = super.mouseScroll(mouseX, mouseY, amount);
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+		boolean success = super.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 		
 		if (!success && scrollMode == ScrollMode.NONE) {
-			setScrollAmount(scrollAmount - Options.Miscellaneous.SCROLL_SPEED.get() * amount);
+			setScrollAmount(scrollAmount - Options.Miscellaneous.SCROLL_SPEED.get() * scrollY);
 			success = true;
 		}
 		

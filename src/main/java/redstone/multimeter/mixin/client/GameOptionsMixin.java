@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+
 import redstone.multimeter.client.KeyBindings;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;

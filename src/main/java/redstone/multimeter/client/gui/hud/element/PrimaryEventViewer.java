@@ -3,16 +3,17 @@ package redstone.multimeter.client.gui.hud.element;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.util.math.MatrixStack;
+
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
-import redstone.multimeter.client.gui.widget.Button;
+import redstone.multimeter.client.gui.widget.IButton;
 import redstone.multimeter.client.option.Options;
 
 public class PrimaryEventViewer extends MeterEventViewer {
 	
-	private double dX;
+	private double dx;
 	private boolean resizing;
 	
 	public PrimaryEventViewer(MultimeterHud hud) {
@@ -43,6 +44,8 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		
 		if (!success && !wasDragging) {
 			if (isDraggingMouse()) {
+				dx = 0.0D;
+				
 				if (isBorderHovered(mouseX)) {
 					resizing = true;
 				}
@@ -58,7 +61,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				}
 				
 				Options.HUD.SELECTED_COLUMN.set(column);
-				Button.playClickSound(hud.client);
+				IButton.playClickSound(hud.client);
 				
 				success = true;
 			}
@@ -70,7 +73,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			dX = 0.0D;
+			dx = 0.0D;
 			resizing = false;
 		}
 		
@@ -83,36 +86,16 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			return false;
 		}
 		
-		dX += deltaX;
-		int width = hud.settings.columnWidth + hud.settings.gridSize;
-		double d = width / 2.0D;
-		int c = 0;
-		
-		while (dX > d) {
-			dX -= width;
-			c++;
-		}
-		while (dX < -d) {
-			dX += width;
-			c--;
+		return drag(deltaX);
+	}
+	
+	@Override
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (isDraggingMouse() || Math.abs(scrollX) < 1.0D) {
+			return false;
 		}
 		
-		if (c != 0) {
-			if (hud.getDirectionalityX() == Directionality.X.RIGHT_TO_LEFT) {
-				c *= -1;
-			}
-			
-			if (resizing) {
-				int columns = Options.HUD.COLUMN_COUNT.get();
-				Options.HUD.COLUMN_COUNT.set(columns + c);
-				Options.validate();
-				hud.updateWidth();
-			} else {
-				hud.stepBackward(c);
-			}
-		}
-		
-		return true;
+		return drag(scrollX);
 	}
 	
 	@Override
@@ -170,5 +153,39 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		case RIGHT_TO_LEFT:
 			return x <= getX() + 1;
 		}
+	}
+	
+	private boolean drag(double deltaX) {
+		dx += deltaX;
+		
+		int width = hud.settings.columnWidth + hud.settings.gridSize;
+		double d = width / 2.0D;
+		int c = 0;
+		
+		while (dx > d) {
+			dx -= width;
+			c++;
+		}
+		while (dx < -d) {
+			dx += width;
+			c--;
+		}
+		
+		if (c != 0) {
+			if (hud.getDirectionalityX() == Directionality.X.RIGHT_TO_LEFT) {
+				c *= -1;
+			}
+			
+			if (resizing) {
+				int columns = Options.HUD.COLUMN_COUNT.get();
+				Options.HUD.COLUMN_COUNT.set(columns + c);
+				Options.validate();
+				hud.updateWidth();
+			} else {
+				hud.stepBackward(c);
+			}
+		}
+		
+		return true;
 	}
 }

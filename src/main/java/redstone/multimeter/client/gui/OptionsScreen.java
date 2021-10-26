@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.ScrollableListElement;

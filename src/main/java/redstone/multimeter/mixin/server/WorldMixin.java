@@ -15,6 +15,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.interfaces.mixin.IBlock;
 import redstone.multimeter.interfaces.mixin.IServerWorld;

@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.util.NBTUtils;
 
@@ -14,7 +15,7 @@ public class MeterEvent {
 	
 	private EventType type;
 	private long tick;
-	private int subTick;
+	private int subtick;
 	private TickPhase tickPhase;
 	private int metaData;
 	
@@ -26,7 +27,7 @@ public class MeterEvent {
 		this.type = type;
 		
 		this.tick = tick;
-		this.subTick = subTick;
+		this.subtick = subTick;
 		this.tickPhase = tickPhase;
 		this.metaData = metaData;
 	}
@@ -59,48 +60,48 @@ public class MeterEvent {
 		return tick;
 	}
 	
-	public int getSubTick() {
-		return subTick;
+	public int getSubtick() {
+		return subtick;
 	}
 	
 	public boolean isAt(long tick) {
 		return this.tick == tick;
 	}
 	
-	public boolean isAt(long tick, int subTick) {
-		return this.tick == tick && this.subTick == subTick;
+	public boolean isAt(long tick, int subtick) {
+		return this.tick == tick && this.subtick == subtick;
 	}
 	
 	public boolean isBefore(long tick) {
 		return this.tick < tick;
 	}
 	
-	public boolean isBefore(long tick, int subTick) {
+	public boolean isBefore(long tick, int subtick) {
 		if (this.tick == tick) {
-			return this.subTick < subTick;
+			return this.subtick < subtick;
 		}
 		
 		return this.tick < tick;
 	}
 	
 	public boolean isBefore(MeterEvent event) {
-		return isBefore(event.getTick(), event.getSubTick());
+		return isBefore(event.getTick(), event.getSubtick());
 	}
 	
 	public boolean isAfter(long tick) {
 		return this.tick > tick;
 	}
 	
-	public boolean isAfter(long tick, int subTick) {
+	public boolean isAfter(long tick, int subtick) {
 		if (this.tick == tick) {
-			return this.subTick > subTick;
+			return this.subtick > subtick;
 		}
 		
 		return this.tick > tick;
 	}
 	
 	public boolean isAfter(MeterEvent event) {
-		return isAfter(event.getTick(), event.getSubTick());
+		return isAfter(event.getTick(), event.getSubtick());
 	}
 	
 	public TickPhase getTickPhase() {
@@ -117,7 +118,7 @@ public class MeterEvent {
 		addTextForTooltip(lines, "event type", type.getName());
 		type.addTextForTooltip(lines, metaData);
 		addTextForTooltip(lines, "tick", tick);
-		addTextForTooltip(lines, "subtick", subTick);
+		addTextForTooltip(lines, "subtick", subtick);
 		addTextForTooltip(lines, "tick phase", tickPhase.getName());
 		
 		return lines;
@@ -142,7 +143,7 @@ public class MeterEvent {
 		
 		NBTUtils.putEventType(nbt, "type", type);
 		nbt.putLong("tick", tick);
-		nbt.putInt("subTick", subTick);
+		nbt.putInt("subtick", subtick);
 		NBTUtils.putTickPhase(nbt, "tickPhase", tickPhase);
 		nbt.putInt("metaData", metaData);
 		
@@ -154,7 +155,7 @@ public class MeterEvent {
 		
 		event.type = NBTUtils.getEventType(nbt, "type");
 		event.tick = nbt.getLong("tick");
-		event.subTick = nbt.getInt("subTick");
+		event.subtick = nbt.getInt("subtick");
 		event.tickPhase = NBTUtils.getTickPhase(nbt, "tickPhase");
 		event.metaData = nbt.getInt("metaData");
 		
