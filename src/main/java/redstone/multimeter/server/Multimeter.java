@@ -288,8 +288,15 @@ public class Multimeter {
 		
 		meterGroup.addMember(playerUUID);
 		
-		// TO-DO: send a message to the player, letting them know they've been invited to this meter group
-		int i = 0;
+		Text message = new LiteralText("").
+			append(new LiteralText(String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()))).
+			append(new LiteralText("[here]").styled(style -> {
+				return style.
+					withColor(Formatting.GREEN).
+					withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
+			})).
+			append(new LiteralText(" to subscribe to it."));
+		player.sendMessage(message, false);
 	}
 	
 	public void removeMemberFromMeterGroup(ServerMeterGroup meterGroup, UUID playerUUID) {
@@ -304,8 +311,9 @@ public class Multimeter {
 			
 			if (player != null && meterGroup.hasSubscriber(playerUUID)) {
 				removeSubscriberFromMeterGroup(meterGroup, player);
-				// TO-DO: send a message to the player notifying them why they were unsubscribed
-				int i = 0;
+				
+				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has made it private, but you are not a member!", meterGroup.getName()));
+				player.sendMessage(message, false);
 			}
 		}
 	}

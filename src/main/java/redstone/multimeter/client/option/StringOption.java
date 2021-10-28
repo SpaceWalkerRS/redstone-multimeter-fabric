@@ -19,9 +19,7 @@ public class StringOption extends Option<String> {
 	
 	@Override
 	public void setFromString(String value) {
-		if (value.length() <= maxLength) {
-			set(value);
-		}
+		set(value);
 	}
 	
 	@Override
@@ -33,6 +31,13 @@ public class StringOption extends Option<String> {
 		textField.setMaxLength(maxLength);
 		
 		return textField;
+	}
+	
+	@Override
+	public void set(String value) {
+		if (value.length() <= maxLength) {
+			super.set(value);
+		}
 	}
 	
 	public int getMaxLength() {
