@@ -36,7 +36,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onRunTasksTillTickEndInjectAtHead(CallbackInfo ci) {
-		multimeterServer.getMultimeter().onTickPhase(TickPhase.HANDLE_PACKETS);
+		multimeterServer.onTickPhase(TickPhase.HANDLE_PACKETS);
 	}
 	
 	@Inject(

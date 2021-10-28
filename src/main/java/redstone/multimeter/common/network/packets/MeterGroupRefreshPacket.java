@@ -4,20 +4,22 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.network.RSMMPacket;
+import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.MultimeterServer;
 
-public class MeterGroupDataPacket implements RSMMPacket {
+public class MeterGroupRefreshPacket implements RSMMPacket {
 	
 	private String name;
 	private NbtCompound meterGroupData;
 	
-	public MeterGroupDataPacket() {
+	public MeterGroupRefreshPacket() {
 		
 	}
 	
-	public MeterGroupDataPacket(MeterGroup meterGroup) {
+	public MeterGroupRefreshPacket(MeterGroup meterGroup) {
 		this.name = meterGroup.getName();
 		this.meterGroupData = meterGroup.toNBT();
 	}
@@ -36,11 +38,21 @@ public class MeterGroupDataPacket implements RSMMPacket {
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		server.getMultimeter().subscribeToMeterGroup(name, player);
+		Multimeter multimeter = server.getMultimeter();
+		
+		if (multimeter.hasSubscription(player)) {
+			multimeter.refreshMeterGroup(player);
+		}
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().update(name, meterGroupData);
+		ClientMeterGroup meterGroup = client.getMeterGroup();
+		
+		if (meterGroup.getName().equals(name)) {
+			meterGroup.refresh(meterGroupData);
+		} else {
+			meterGroup.subscribe(name);
+		}
 	}
 }

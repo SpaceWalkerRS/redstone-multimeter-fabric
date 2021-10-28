@@ -12,7 +12,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
-import redstone.multimeter.command.MeterCommand;
+import redstone.multimeter.command.MeterGroupCommand;
 
 @Mixin(CommandManager.class)
 public class CommandManagerMixin {
@@ -26,6 +26,6 @@ public class CommandManagerMixin {
 			)
 	)
 	private void registerCommands(CommandManager.RegistrationEnvironment environment, CallbackInfo ci) {
-		MeterCommand.registerCommand(dispatcher);
+		MeterGroupCommand.registerCommand(dispatcher);
 	}
 }

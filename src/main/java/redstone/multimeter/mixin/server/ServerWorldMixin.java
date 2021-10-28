@@ -135,7 +135,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			)
 	)
 	private void onTickTimeInjectAfterSetTime(CallbackInfo ci) {
-		getMultimeter().onOverworldTickTime();
+		getMultimeterServer().onOverworldTickTime();
 	}
 	
 	@Inject(

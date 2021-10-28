@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiPredicate;
 
 import net.minecraft.block.Block;
@@ -28,14 +28,16 @@ import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
-import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
+import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.event.MeterEvent;
-import redstone.multimeter.common.network.packets.MeterGroupDataPacket;
-import redstone.multimeter.common.network.packets.RemoveAllMetersPacket;
+import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
+import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
+import redstone.multimeter.common.network.packets.ClearMeterGroupPacket;
+import redstone.multimeter.common.network.packets.MeterGroupDefaultPacket;
 import redstone.multimeter.interfaces.mixin.IBlock;
 import redstone.multimeter.server.meter.ServerMeterGroup;
 import redstone.multimeter.server.meter.ServerMeterPropertiesManager;
@@ -44,12 +46,8 @@ public class Multimeter {
 	
 	private final MultimeterServer server;
 	private final Map<String, ServerMeterGroup> meterGroups;
-	private final Map<ServerPlayerEntity, ServerMeterGroup> subscriptions;
+	private final Map<UUID, ServerMeterGroup> subscriptions;
 	private final ServerMeterPropertiesManager meterPropertiesManager;
-	
-	private TickPhase currentTickPhase = TickPhase.UNKNOWN;
-	/** true if the OverWorld already ticked time */
-	private boolean tickedTime;
 	
 	public Multimeter(MultimeterServer server) {
 		this.server = server;
@@ -66,50 +64,35 @@ public class Multimeter {
 		return Collections.unmodifiableCollection(meterGroups.values());
 	}
 	
-	public Set<String> getMeterGroupNames() {
-		return Collections.unmodifiableSet(meterGroups.keySet());
-	}
-	
 	public ServerMeterGroup getMeterGroup(String name) {
 		return meterGroups.get(name);
 	}
 	
+	public boolean hasMeterGroup(String name) {
+		return meterGroups.containsKey(name);
+	}
+	
 	public ServerMeterGroup getSubscription(ServerPlayerEntity player) {
-		return subscriptions.get(player);
+		return subscriptions.get(player.getUuid());
 	}
 	
 	public boolean hasSubscription(ServerPlayerEntity player) {
-		return subscriptions.containsKey(player);
-	}
-
-	public TickPhase getCurrentTickPhase() {
-		return currentTickPhase;
+		return subscriptions.containsKey(player.getUuid());
 	}
 	
-	public void onTickPhase(TickPhase tickPhase) {
-		currentTickPhase = tickPhase;
-	}
-	
-	public void onOverworldTickTime() {
-		tickedTime = true;
-	}
-	
-	public long getCurrentTick() {
-		long tick = server.getMinecraftServer().getOverworld().getTime();
-		
-		if (!tickedTime) {
-			tick++;
-		}
-		
-		return tick;
+	public boolean isOwnerOfSubscription(ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = getSubscription(player);
+		return meterGroup != null && meterGroup.isOwnedBy(player);
 	}
 	
 	public void tickStart(boolean paused) {
 		if (!paused) {
-			tickedTime = false;
+			meterGroups.values().removeIf(meterGroup -> {
+				return meterGroup.isIdle() && (!meterGroup.hasMembers() || meterGroup.getIdleTime() > 72000);
+			});
 			
 			for (ServerMeterGroup meterGroup : meterGroups.values()) {
-				meterGroup.getLogManager().tick();
+				meterGroup.tick();
 			}
 		}
 	}
@@ -120,8 +103,6 @@ public class Multimeter {
 		if (!paused) {
 			broadcastMeterLogs();
 		}
-		
-		onTickPhase(TickPhase.UNKNOWN);
 	}
 	
 	private void broadcastMeterUpdates() {
@@ -141,10 +122,10 @@ public class Multimeter {
 	}
 	
 	public void onPlayerLeave(ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.remove(player);
+		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
-			removeSubscriber(meterGroup, player);
+			removeSubscriberFromMeterGroup(meterGroup, player);
 		}
 	}
 	
@@ -181,7 +162,7 @@ public class Multimeter {
 	}
 	
 	public void removeMeter(ServerPlayerEntity player, long id) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
+		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null && !meterGroup.removeMeter(id)) {
 			refreshMeterGroup(meterGroup, player);
@@ -189,7 +170,7 @@ public class Multimeter {
 	}
 	
 	public void moveMeter(ServerPlayerEntity player, long id, WorldPos newPos) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
+		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
 			moveMeter(meterGroup, id, newPos);
@@ -205,59 +186,132 @@ public class Multimeter {
 	}
 	
 	public void updateMeter(ServerPlayerEntity player, long id, MeterProperties newProperties) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
+		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null && !meterGroup.updateMeter(id, newProperties)) {
 			refreshMeterGroup(meterGroup, player);
 		}
 	}
 	
-	public void removeAllMeters(ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
+	public void clearMeterGroup(ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
 			meterGroup.clear();
 			
-			RemoveAllMetersPacket packet = new RemoveAllMetersPacket();
-			server.getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+			ClearMeterGroupPacket packet = new ClearMeterGroupPacket();
+			server.getPacketHandler().sendToSubscribers(packet, meterGroup);
 		}
 	}
 	
-	public void subscribeToMeterGroup(String name, ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = meterGroups.get(name);
-		
-		if (meterGroup == null) {
-			meterGroup = new ServerMeterGroup(this, name);
-			meterGroups.put(name, meterGroup);
+	public void createMeterGroup(ServerPlayerEntity player, String name) {
+		if (!MeterGroup.isValidName(name) || meterGroups.containsKey(name)) {
+			return;
 		}
+		
+		ServerMeterGroup meterGroup = new ServerMeterGroup(this, name, player);
+		meterGroups.put(name, meterGroup);
 		
 		subscribeToMeterGroup(meterGroup, player);
 	}
 	
 	public void subscribeToMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
-		ServerMeterGroup prevSubscription = subscriptions.remove(player);
+		ServerMeterGroup prevSubscription = getSubscription(player);
 		
-		if (prevSubscription != null && meterGroup != prevSubscription) {
-			removeSubscriber(prevSubscription, player);
+		if (prevSubscription != meterGroup) {
+			if (prevSubscription != null) {
+				removeSubscriberFromMeterGroup(prevSubscription, player);
+			}
+			
+			addSubscriberToMeterGroup(meterGroup, player);
+			onSubscriptionChanged(player, prevSubscription, meterGroup);
 		}
-		
-		subscriptions.put(player, meterGroup);
-		meterGroup.addSubscriber(player);
-		
-		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
-		server.getPacketHandler().sendPacketToPlayer(packet, player);
 	}
 	
-	private void removeSubscriber(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
-		meterGroup.removeSubscriber(player);
+	public void subscribeToDefaultMeterGroup(ServerPlayerEntity player) {
+		MeterGroupDefaultPacket packet = new MeterGroupDefaultPacket();
+		server.getPacketHandler().sendToPlayer(packet, player);
+	}
+	
+	private void addSubscriberToMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
+		UUID playerUUID = player.getUuid();
 		
-		if (!meterGroup.hasSubscribers() && !meterGroup.hasMeters()) {
-			meterGroups.remove(meterGroup.getName(), meterGroup);
+		subscriptions.put(playerUUID, meterGroup);
+		meterGroup.addSubscriber(playerUUID);
+		meterGroup.updateIdleState();
+	}
+	
+	public void unsubscribeFromMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
+		if (meterGroup.hasSubscriber(player)) {
+			removeSubscriberFromMeterGroup(meterGroup, player);
+			onSubscriptionChanged(player, meterGroup, null);
+		}
+	}
+	
+	private void removeSubscriberFromMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
+		UUID playerUUID = player.getUuid();
+		
+		subscriptions.remove(playerUUID, meterGroup);
+		meterGroup.removeSubscriber(playerUUID);
+		meterGroup.updateIdleState();
+	}
+	
+	private void onSubscriptionChanged(ServerPlayerEntity player, ServerMeterGroup prevSubscription, ServerMeterGroup newSubscription) {
+		MeterGroupSubscriptionPacket packet;
+		
+		if (newSubscription == null) {
+			packet = new MeterGroupSubscriptionPacket(prevSubscription.getName(), false);
+		} else {
+			packet = new MeterGroupSubscriptionPacket(newSubscription.getName(), true);
+		}
+		
+		server.getPacketHandler().sendToPlayer(packet, player);
+		server.getMinecraftServer().getPlayerManager().sendCommandTree(player);
+	}
+	
+	public void clearMembersOfMeterGroup(ServerMeterGroup meterGroup) {
+		for (UUID playerUUID : meterGroup.getMembers()) {
+			removeMemberFromMeterGroup(meterGroup, playerUUID);
+		}
+	}
+	
+	public void addMemberToMeterGroup(ServerMeterGroup meterGroup, UUID playerUUID) {
+		if (meterGroup.hasMember(playerUUID)) {
+			return;
+		}
+		
+		ServerPlayerEntity player = server.getPlayer(playerUUID);
+		
+		if (player == null || meterGroup.isOwnedBy(player)) {
+			return;
+		}
+		
+		meterGroup.addMember(playerUUID);
+		
+		// TO-DO: send a message to the player, letting them know they've been invited to this meter group
+		int i = 0;
+	}
+	
+	public void removeMemberFromMeterGroup(ServerMeterGroup meterGroup, UUID playerUUID) {
+		if (!meterGroup.hasMember(playerUUID)) {
+			return;
+		}
+		
+		meterGroup.removeMember(playerUUID);
+		
+		if (meterGroup.isPrivate()) {
+			ServerPlayerEntity player = server.getPlayer(playerUUID);
+			
+			if (player != null && meterGroup.hasSubscriber(playerUUID)) {
+				removeSubscriberFromMeterGroup(meterGroup, player);
+				// TO-DO: send a message to the player notifying them why they were unsubscribed
+				int i = 0;
+			}
 		}
 	}
 	
 	public void refreshMeterGroup(ServerPlayerEntity player) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
+		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
 			refreshMeterGroup(meterGroup, player);
@@ -265,12 +319,12 @@ public class Multimeter {
 	}
 	
 	private void refreshMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
-		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
-		server.getPacketHandler().sendPacketToPlayer(packet, player);
+		MeterGroupRefreshPacket packet = new MeterGroupRefreshPacket(meterGroup);
+		server.getPacketHandler().sendToPlayer(packet, player);
 	}
 	
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
-		ServerMeterGroup meterGroup = subscriptions.get(player);
+		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
 			Meter meter = meterGroup.getMeter(id);
@@ -392,7 +446,7 @@ public class Multimeter {
 		WorldPos pos = new WorldPos(world, blockPos);
 		
 		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			if (!meterGroup.hasSubscribers() || !meterGroup.hasMeters()) {
+			if (meterGroup.isIdle()) {
 				continue;
 			}
 			

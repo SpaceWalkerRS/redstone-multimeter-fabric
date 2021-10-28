@@ -24,10 +24,12 @@ import redstone.multimeter.client.option.Options;
 import redstone.multimeter.client.render.MeterRenderer;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
+import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.packets.AddMeterPacket;
-import redstone.multimeter.common.network.packets.MeterGroupDataPacket;
+import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
+import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
 import redstone.multimeter.common.network.packets.MeterUpdatePacket;
 import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 
@@ -100,6 +102,10 @@ public class MultimeterClient {
 		return meterGroup;
 	}
 	
+	public boolean hasSubscription() {
+		return meterGroup.isSubscribed();
+	}
+	
 	/**
 	 * Check if this client is connected to a Multimeter server
 	 */
@@ -108,7 +114,7 @@ public class MultimeterClient {
 	}
 	
 	public boolean shouldRenderHud() {
-		return hudEnabled && connected && !hud.isOnScreen();
+		return hudEnabled && connected && !hud.isOnScreen() && hasSubscription();
 	}
 	
 	public long getLastServerTick() {
@@ -152,7 +158,10 @@ public class MultimeterClient {
 			lastServerTick = serverTick;
 			
 			hud.reset();
-			refreshMeterGroup();
+			
+			if (Options.RedstoneMultimeter.CREATE_GROUP_ON_JOIN.get()) {
+				createDefaultMeterGroup();
+			}
 		}
 	}
 	
@@ -161,13 +170,33 @@ public class MultimeterClient {
 			connected = false;
 			
 			hud.reset();
-			meterGroup.reset();
+			meterGroup.unsubscribe();
 		}
 	}
 	
+	public void createDefaultMeterGroup() {
+		String name = Options.RedstoneMultimeter.DEFAULT_METER_GROUP.get();
+		
+		if (!MeterGroup.isValidName(name)) {
+			name = client.getSession().getUsername();
+		}
+		
+		subscribeToMeterGroup(name);
+	}
+	
+	public void subscribeToMeterGroup(String name) {
+		MeterGroupSubscriptionPacket packet = new MeterGroupSubscriptionPacket(name, true);
+		packetHandler.send(packet);
+	}
+	
+	public void unsubscribeFromMeterGroup() {
+		MeterGroupSubscriptionPacket packet = new MeterGroupSubscriptionPacket(meterGroup.getName(), false);
+		packetHandler.send(packet);
+	}
+	
 	public void refreshMeterGroup() {
-		MeterGroupDataPacket packet = new MeterGroupDataPacket(meterGroup);
-		packetHandler.sendPacket(packet);
+		MeterGroupRefreshPacket packet = new MeterGroupRefreshPacket(meterGroup);
+		packetHandler.send(packet);
 	}
 	
 	/**
@@ -183,7 +212,7 @@ public class MultimeterClient {
 				addMeter(pos);
 			} else {
 				RemoveMeterPacket packet = new RemoveMeterPacket(meter.getId());
-				packetHandler.sendPacket(packet);
+				packetHandler.send(packet);
 			}
 		});
 	}
@@ -194,7 +223,7 @@ public class MultimeterClient {
 		
 		if (meterPropertiesManager.validate(properties)) {
 			AddMeterPacket packet = new AddMeterPacket(properties);
-			packetHandler.sendPacket(packet);
+			packetHandler.send(packet);
 		}
 	}
 	
@@ -205,7 +234,7 @@ public class MultimeterClient {
 			
 			if (meterPropertiesManager.validate(newProperties)) {
 				MeterUpdatePacket packet = new MeterUpdatePacket(meter.getId(), newProperties);
-				packetHandler.sendPacket(packet);
+				packetHandler.send(packet);
 			}
 		});
 	}
@@ -231,7 +260,7 @@ public class MultimeterClient {
 			newProperties.toggleEventType(type);
 			
 			MeterUpdatePacket packet = new MeterUpdatePacket(meter.getId(), newProperties);
-			packetHandler.sendPacket(packet);
+			packetHandler.send(packet);
 		});
 	}
 	

@@ -2,14 +2,13 @@ package redstone.multimeter.common.network.packets;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
-
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.MultimeterServer;
 
-public class RemoveAllMetersPacket implements RSMMPacket {
+public class MeterGroupDefaultPacket implements RSMMPacket {
 	
-	public RemoveAllMetersPacket() {
+	public MeterGroupDefaultPacket() {
 		
 	}
 	
@@ -30,6 +29,6 @@ public class RemoveAllMetersPacket implements RSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().clear();
+		client.createDefaultMeterGroup();
 	}
 }

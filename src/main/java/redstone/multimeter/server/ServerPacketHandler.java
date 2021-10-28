@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 
 import redstone.multimeter.common.network.AbstractPacketHandler;
 import redstone.multimeter.common.network.RSMMPacket;
+import redstone.multimeter.server.meter.ServerMeterGroup;
 
 public class ServerPacketHandler extends AbstractPacketHandler {
 	
@@ -20,31 +21,35 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 	}
 
 	@Override
-	protected Packet<?> toCustomPayloadPacket(Identifier id, PacketByteBuf buffer) {
+	protected Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer) {
 		return new CustomPayloadS2CPacket(id, buffer);
 	}
 	
 	@Override
-	public <P extends RSMMPacket> void sendPacket(P packet) {
-		Packet<?> mcPacket = encodePacket(packet);
+	public <P extends RSMMPacket> void send(P packet) {
+		Packet<?> mcPacket = encode(packet);
 		server.getMinecraftServer().getPlayerManager().sendToAll(mcPacket);
 	}
 	
-	public <P extends RSMMPacket> void sendPacketToPlayer(P packet, ServerPlayerEntity player) {
-		player.networkHandler.sendPacket(encodePacket(packet));
+	public <P extends RSMMPacket> void sendToPlayer(P packet, ServerPlayerEntity player) {
+		player.networkHandler.sendPacket(encode(packet));
 	}
 	
-	public <P extends RSMMPacket> void sendPacketToPlayers(P packet, Collection<ServerPlayerEntity> players) {
-		Packet<?> mcPacket = encodePacket(packet);
+	public <P extends RSMMPacket> void sendToPlayers(P packet, Collection<ServerPlayerEntity> players) {
+		Packet<?> mcPacket = encode(packet);
 		
 		for (ServerPlayerEntity player : players) {
 			player.networkHandler.sendPacket(mcPacket);
 		}
 	}
 	
+	public <P extends RSMMPacket> void sendToSubscribers(P packet, ServerMeterGroup meterGroup) {
+		sendToPlayers(packet, server.collectPlayers(meterGroup.getSubscribers()));
+	}
+	
 	public void onPacketReceived(PacketByteBuf buffer, ServerPlayerEntity player) {
 		try {
-			decodePacket(buffer).execute(server, player);
+			decode(buffer).execute(server, player);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

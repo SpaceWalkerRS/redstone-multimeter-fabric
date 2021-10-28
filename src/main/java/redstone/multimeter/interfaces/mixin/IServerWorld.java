@@ -8,7 +8,7 @@ public interface IServerWorld extends IWorld {
 	
 	@Override
 	default void onTickPhase(TickPhase tickPhase) {
-		getMultimeterServer().getMultimeter().onTickPhase(tickPhase);
+		getMultimeterServer().onTickPhase(tickPhase);
 	}
 	
 	public MultimeterServer getMultimeterServer();

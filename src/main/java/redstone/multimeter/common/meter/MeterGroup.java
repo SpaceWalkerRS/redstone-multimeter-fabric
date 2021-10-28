@@ -26,6 +26,14 @@ public abstract class MeterGroup {
 		this.posToIndex = new HashMap<>();
 	}
 	
+	public static boolean isValidName(String name) {
+		return !name.isBlank() && name.length() <= getMaxNameLength();
+	}
+	
+	public static int getMaxNameLength() {
+		return 64;
+	}
+	
 	public String getName() {
 		return name;
 	}

@@ -20,6 +20,18 @@ public class InputHandler {
 			return;
 		}
 		
+		while (KeyBindings.OPEN_MULTIMETER_SCREEN.wasPressed()) {
+			MinecraftClient minecraftClient = client.getMinecraftClient();
+			
+			if (minecraftClient.currentScreen == null) {
+				minecraftClient.setScreen(new MultimeterScreen());
+			}
+		}
+		
+		if (!client.hasSubscription()) {
+			return;
+		}
+		
 		while (KeyBindings.TOGGLE_METER.wasPressed()) {
 			client.toggleMeter();
 		}
@@ -37,13 +49,6 @@ public class InputHandler {
 		}
 		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
-		}
-		while (KeyBindings.OPEN_MULTIMETER_SCREEN.wasPressed()) {
-			MinecraftClient minecraftClient = client.getMinecraftClient();
-			
-			if (minecraftClient.currentScreen == null) {
-				minecraftClient.setScreen(new MultimeterScreen());
-			}
 		}
 		while (KeyBindings.PRINT_LOGS.wasPressed()) {
 			client.togglePrinter();

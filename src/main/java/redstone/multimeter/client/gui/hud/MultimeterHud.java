@@ -506,6 +506,7 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}
 		
+		meterGroupName.update();
 		onResized();
 		
 		if (selectedMeter != null && !client.getMeterGroup().hasMeter(selectedMeter)) {

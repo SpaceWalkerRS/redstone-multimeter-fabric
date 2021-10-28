@@ -9,13 +9,19 @@ import redstone.multimeter.client.gui.widget.TextField;
 
 public class StringOption extends Option<String> {
 	
-	public StringOption(String name, String description, String defaultValue) {
+	protected final int maxLength;
+	
+	public StringOption(String name, String description, String defaultValue, int maxLength) {
 		super(name, description, defaultValue);
+		
+		this.maxLength = maxLength;
 	}
 	
 	@Override
 	public void setFromString(String value) {
-		set(value);
+		if (value.length() <= maxLength) {
+			set(value);
+		}
 	}
 	
 	@Override
@@ -23,6 +29,13 @@ public class StringOption extends Option<String> {
 		MinecraftClient minecraftClient = client.getMinecraftClient();
 		TextRenderer font = minecraftClient.textRenderer;
 		
-		return new TextField(font, 0, 0, width, height, () -> get(), text -> set(text));
+		TextField textField = new TextField(font, 0, 0, width, height, () -> get(), text -> set(text));
+		textField.setMaxLength(maxLength);
+		
+		return textField;
+	}
+	
+	public int getMaxLength() {
+		return maxLength;
 	}
 }

@@ -17,11 +17,12 @@ public class ClientMeterGroup extends MeterGroup {
 	private final MultimeterClient client;
 	private final ClientLogManager logManager;
 	
+	private boolean subscribed;
 	private String name;
 	private int nextIndex;
 	
 	public ClientMeterGroup(MultimeterClient client) {
-		super(client.getMinecraftClient().getSession().getUsername());
+		super("If you see this something has gone wrong...");
 		
 		this.client = client;
 		this.logManager = new ClientLogManager(this);
@@ -70,6 +71,10 @@ public class ClientMeterGroup extends MeterGroup {
 		return client;
 	}
 	
+	public boolean isSubscribed() {
+		return subscribed;
+	}
+	
 	public int getNextMeterIndex() {
 		return nextIndex;
 	}
@@ -105,17 +110,24 @@ public class ClientMeterGroup extends MeterGroup {
 		meterUpdated(meter);
 	}
 	
-	public void update(String newName, NbtCompound nbt) {
+	public void subscribe(String newName) {
+		subscribed = true;
 		name = newName;
-		updateFromNBT(nbt);
-		
 		logManager.getPrinter().onNewMeterGroup();
-		client.getHUD().updateMeterList();
+		clear();
+		
+		client.refreshMeterGroup();
 	}
 	
-	public void reset() {
+	public void unsubscribe() {
+		subscribed = false;
 		name = super.getName();
 		logManager.getPrinter().stop();
 		clear();
+	}
+	
+	public void refresh(NbtCompound nbt) {
+		updateFromNBT(nbt);
+		client.getHUD().updateMeterList();
 	}
 }

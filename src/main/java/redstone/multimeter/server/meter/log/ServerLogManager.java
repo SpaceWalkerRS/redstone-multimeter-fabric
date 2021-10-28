@@ -28,7 +28,7 @@ public class ServerLogManager extends LogManager {
 	
 	@Override
 	protected long getLastTick() {
-		return meterGroup.getMultimeter().getMultimeterServer().getMultimeter().getCurrentTick();
+		return meterGroup.getMultimeter().getMultimeterServer().getCurrentTick();
 	}
 	
 	@Override
@@ -49,7 +49,7 @@ public class ServerLogManager extends LogManager {
 		
 		long tick = getLastTick();
 		int subtick = nextSubtick++;
-		TickPhase phase = meterGroup.getMultimeter().getCurrentTickPhase();
+		TickPhase phase = meterGroup.getMultimeter().getMultimeterServer().getCurrentTickPhase();
 		
 		MeterEvent event = new MeterEvent(type, tick, subtick, phase, metaData);
 		meter.getLogs().add(event);
@@ -89,6 +89,6 @@ public class ServerLogManager extends LogManager {
 		nbt.put("logs", list);
 		
 		MeterLogsPacket packet = new MeterLogsPacket(nbt);
-		meterGroup.getMultimeter().getMultimeterServer().getPacketHandler().sendPacketToPlayers(packet, meterGroup.getSubscribers());
+		meterGroup.getMultimeter().getMultimeterServer().getPacketHandler().sendToSubscribers(packet, meterGroup);
 	}
 }

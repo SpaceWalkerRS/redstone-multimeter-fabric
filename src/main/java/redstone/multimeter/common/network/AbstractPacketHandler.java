@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 
 public abstract class AbstractPacketHandler {
 	
-	protected <P extends RSMMPacket> Packet<?> encodePacket(P packet) {
+	protected <P extends RSMMPacket> Packet<?> encode(P packet) {
 		Identifier id = PacketManager.getId(packet);
 		
 		if (id == null) {
@@ -23,14 +23,14 @@ public abstract class AbstractPacketHandler {
 		buffer.writeIdentifier(id);
 		buffer.writeNbt(data);
 		
-		return toCustomPayloadPacket(PacketManager.getPacketChannelId(), buffer);
+		return toCustomPayload(PacketManager.getPacketChannelId(), buffer);
 	}
 	
-	protected abstract Packet<?> toCustomPayloadPacket(Identifier id, PacketByteBuf buffer);
+	protected abstract Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer);
 	
-	public abstract <P extends RSMMPacket> void sendPacket(P packet);
+	public abstract <P extends RSMMPacket> void send(P packet);
 	
-	protected <P extends RSMMPacket> P decodePacket(PacketByteBuf buffer) {
+	protected <P extends RSMMPacket> P decode(PacketByteBuf buffer) {
 		Identifier id = buffer.readIdentifier();
 		P packet = PacketManager.createPacket(id);
 		

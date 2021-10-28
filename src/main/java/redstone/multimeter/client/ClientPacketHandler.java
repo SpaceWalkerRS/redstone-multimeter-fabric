@@ -17,18 +17,18 @@ public class ClientPacketHandler extends AbstractPacketHandler {
 	}
 	
 	@Override
-	protected Packet<?> toCustomPayloadPacket(Identifier id, PacketByteBuf buffer) {
+	protected Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer) {
 		return new CustomPayloadC2SPacket(id, buffer);
 	}
 	
 	@Override
-	public <P extends RSMMPacket> void sendPacket(P packet) {
-		client.getMinecraftClient().getNetworkHandler().sendPacket(encodePacket(packet));
+	public <P extends RSMMPacket> void send(P packet) {
+		client.getMinecraftClient().getNetworkHandler().sendPacket(encode(packet));
 	}
 	
 	public void onPacketReceived(PacketByteBuf buffer) {
 		try {
-			decodePacket(buffer).execute(client);
+			decode(buffer).execute(client);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

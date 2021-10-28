@@ -114,7 +114,13 @@ public class MultimeterScreen extends RSMMScreen {
 		if (multimeterClient.getMeterGroup().hasMeters()) {
 			super.renderContent(matrices, mouseX, mouseY, delta);
 		} else {
-			String text = "Nothing to see here! Add a meter to get started.";
+			String text;
+			
+			if (multimeterClient.hasSubscription()) {
+				text = "Nothing to see here! Add a meter to get started.";
+			} else {
+				text = "Nothing to see here! Subscribe to a meter group to get started.";
+			}
 			
 			int textWidth = textRenderer.getWidth(text);
 			int textHeight = textRenderer.fontHeight;

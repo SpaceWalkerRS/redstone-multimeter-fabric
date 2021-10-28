@@ -272,7 +272,7 @@ public class MeterControlsElement extends AbstractParentElement {
 	private void tryDelete() {
 		if (triedDeleting) {
 			RemoveMeterPacket packet = new RemoveMeterPacket(meter.getId());
-			client.getPacketHandler().sendPacket(packet);
+			client.getPacketHandler().send(packet);
 		}
 		
 		triedDeleting = !triedDeleting;
@@ -288,7 +288,7 @@ public class MeterControlsElement extends AbstractParentElement {
 	
 	private void teleport() {
 		TeleportToMeterPacket packet = new TeleportToMeterPacket(meter.getId());
-		client.getPacketHandler().sendPacket(packet);
+		client.getPacketHandler().send(packet);
 	}
 	
 	private void changePos(WorldPos pos) {
@@ -319,6 +319,6 @@ public class MeterControlsElement extends AbstractParentElement {
 		consumer.accept(newProperties);
 		
 		MeterUpdatePacket packet = new MeterUpdatePacket(meter.getId(), newProperties);
-		client.getPacketHandler().sendPacket(packet);
+		client.getPacketHandler().send(packet);
 	}
 }
