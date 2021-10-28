@@ -293,6 +293,7 @@ public class Multimeter {
 			append(new LiteralText("[here]").styled(style -> {
 				return style.
 					withColor(Formatting.GREEN).
+					withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName())))).
 					withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
 			})).
 			append(new LiteralText(" to subscribe to it."));
@@ -310,9 +311,9 @@ public class Multimeter {
 			ServerPlayerEntity player = server.getPlayer(playerUUID);
 			
 			if (player != null && meterGroup.hasSubscriber(playerUUID)) {
-				removeSubscriberFromMeterGroup(meterGroup, player);
+				unsubscribeFromMeterGroup(meterGroup, player);
 				
-				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has made it private, but you are not a member!", meterGroup.getName()));
+				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
 				player.sendMessage(message, false);
 			}
 		}

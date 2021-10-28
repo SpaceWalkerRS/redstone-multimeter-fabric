@@ -195,7 +195,9 @@ public class ServerMeterGroup extends MeterGroup {
 		
 		if (isPrivate) {
 			for (UUID playerUUID : subscribers) {
-				addMember(playerUUID);
+				if (playerUUID != owner) {
+					addMember(playerUUID);
+				}
 			}
 		}
 	}
