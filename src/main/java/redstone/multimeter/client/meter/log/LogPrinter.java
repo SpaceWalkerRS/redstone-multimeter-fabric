@@ -76,6 +76,8 @@ public class LogPrinter {
 			
 			if (Options.LogPrinter.PRINT_OLD_LOGS.get() || Screen.hasShiftDown()) {
 				printLogs();
+			} else {
+				prevTick = logManager.getLastTick();
 			}
 		} catch (IOException e) {
 			stop();
@@ -166,7 +168,7 @@ public class LogPrinter {
 					tick = log.event.getTick();
 					phase = null;
 					
-					writer.write("tick " + tick);
+					writer.write("" + tick);
 					writer.newLine();
 				}
 				if (log.event.getTickPhase() != phase) {

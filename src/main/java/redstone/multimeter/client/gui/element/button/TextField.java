@@ -171,48 +171,48 @@ public class TextField extends AbstractButton {
 			break;
 		case GLFW.GLFW_KEY_LEFT:
 			moveCursorFromKeyboard(-1);
-			return true;
+			break;
 		case GLFW.GLFW_KEY_RIGHT:
 			moveCursorFromKeyboard(1);
-			return true;
+			break;
 		case GLFW.GLFW_KEY_UP:
 		case GLFW.GLFW_KEY_PAGE_UP:
 			setCursorFromKeyboard(0);
-			return true;
+			break;
 		case GLFW.GLFW_KEY_DOWN:
 		case GLFW.GLFW_KEY_PAGE_DOWN:
 			setCursorFromKeyboard(fullText.length());
-			return true;
+			break;
 		case GLFW.GLFW_KEY_BACKSPACE:
 			erase(false);
-			return true;
+			break;
 		case GLFW.GLFW_KEY_DELETE:
 			erase(true);
-			return true;
+			break;
 		default:
-		}
-		
-		if (RSMMScreen.isControlPressed()) {
+			if (!RSMMScreen.isControlPressed()) {
+				break;
+			}
 			switch (keyCode) {
 			case GLFW.GLFW_KEY_A:
 				if (selection != SelectType.MOUSE) {
 					selectAll();
 				}
-				return true;
+				break;
 			case GLFW.GLFW_KEY_C:
 				copyTextToClipboard(false);
-				return true;
+				break;
 			case GLFW.GLFW_KEY_X:
 				copyTextToClipboard(true);
-				return true;
+				break;
 			case GLFW.GLFW_KEY_V:
 				pasteClipboard();
-				return true;
+				break;
 			default:
 			}
 		}
 		
-		return false;
+		return true;
 	}
 	
 	@Override
