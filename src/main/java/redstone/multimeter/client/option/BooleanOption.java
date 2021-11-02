@@ -1,8 +1,8 @@
 package redstone.multimeter.client.option;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.widget.IButton;
-import redstone.multimeter.client.gui.widget.ToggleButton;
+import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.ToggleButton;
 
 public class BooleanOption extends Option<Boolean> {
 	

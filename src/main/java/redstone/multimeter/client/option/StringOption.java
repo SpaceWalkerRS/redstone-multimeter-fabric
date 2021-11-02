@@ -1,11 +1,8 @@
 package redstone.multimeter.client.option;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.widget.IButton;
-import redstone.multimeter.client.gui.widget.TextField;
+import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.TextField;
 
 public class StringOption extends Option<String> {
 	
@@ -24,10 +21,7 @@ public class StringOption extends Option<String> {
 	
 	@Override
 	public IButton createControl(MultimeterClient client, int width, int height) {
-		MinecraftClient minecraftClient = client.getMinecraftClient();
-		TextRenderer font = minecraftClient.textRenderer;
-		
-		TextField textField = new TextField(font, 0, 0, width, height, () -> get(), text -> set(text));
+		TextField textField = new TextField(client, 0, 0, width, height, () -> null, text -> set(text), () -> get());
 		textField.setMaxLength(maxLength);
 		
 		return textField;

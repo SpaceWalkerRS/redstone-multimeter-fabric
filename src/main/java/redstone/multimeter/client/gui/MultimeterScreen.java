@@ -76,11 +76,6 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 	
 	@Override
-	public void focus() {
-		
-	}
-	
-	@Override
 	public void update() {
 		super.update();
 		list.updateCoords();

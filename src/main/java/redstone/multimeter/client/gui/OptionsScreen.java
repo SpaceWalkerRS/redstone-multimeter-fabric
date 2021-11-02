@@ -12,9 +12,9 @@ import net.minecraft.text.TranslatableText;
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.ScrollableListElement;
+import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.element.option.OptionsListBuilder;
-import redstone.multimeter.client.gui.widget.Button;
-import redstone.multimeter.client.gui.widget.IButton;
 import redstone.multimeter.client.option.IOption;
 import redstone.multimeter.client.option.Options;
 
@@ -34,11 +34,6 @@ public class OptionsScreen extends RSMMScreen {
 		client.keyboard.setRepeatEvents(false);
 		Options.validate();
 		multimeterClient.getHUD().onOptionsChanged();
-	}
-	
-	@Override
-	public void focus() {
-		
 	}
 	
 	@Override
@@ -73,14 +68,14 @@ public class OptionsScreen extends RSMMScreen {
 		int x = getX() + getWidth() / 2;
 		int y = getY() + 22;
 		
-		IButton controls = new Button(multimeterClient, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("options.controls"), button -> {
+		IButton controls = new Button(multimeterClient, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("options.controls"), () -> null, button -> {
 			client.setScreen(new ControlsOptionsScreen(this, client.options));
 			return true;
 		});
 		
 		y = getY() + getHeight() - (IButton.DEFAULT_HEIGHT + 8);
 		
-		IButton reset = new Button(multimeterClient, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), button -> {
+		IButton reset = new Button(multimeterClient, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), () -> null, button -> {
 			for (IOption option : Options.all()) {
 				option.reset();
 			}
@@ -88,7 +83,7 @@ public class OptionsScreen extends RSMMScreen {
 			
 			return true;
 		});
-		IButton done = new Button(multimeterClient, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> ScreenTexts.DONE, button -> {
+		IButton done = new Button(multimeterClient, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> ScreenTexts.DONE, () -> null, button -> {
 			client.setScreen(parent);
 			client.options.write();
 			

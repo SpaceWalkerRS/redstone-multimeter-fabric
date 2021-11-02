@@ -11,11 +11,6 @@ public class MeterControlsCategory extends ControlsSectionElement {
 	}
 	
 	@Override
-	public void focus() {
-		
-	}
-	
-	@Override
 	protected void onChangedX(int x) {
 		category.setX(x + 2);
 		controls.setX(x + margin);

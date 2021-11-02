@@ -1,11 +1,12 @@
 package redstone.multimeter.client.gui.element;
 
-public abstract class AbstractElement implements IElement {
+public abstract class AbstractElement extends DrawableElement implements IElement {
 	
 	private int x;
 	private int y;
 	private int width;
 	private int height;
+	private boolean focused;
 	private boolean dragging;
 	private boolean visible;
 	
@@ -26,6 +27,16 @@ public abstract class AbstractElement implements IElement {
 	@Override
 	public void setDraggingMouse(boolean dragging) {
 		this.dragging = dragging;
+	}
+	
+	@Override
+	public boolean isFocused() {
+		return focused;
+	}
+	
+	@Override
+	public void setFocused(boolean focused) {
+		this.focused = focused;
 	}
 	
 	@Override

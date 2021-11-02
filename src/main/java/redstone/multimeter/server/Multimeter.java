@@ -276,13 +276,13 @@ public class Multimeter {
 	}
 	
 	public void addMemberToMeterGroup(ServerMeterGroup meterGroup, UUID playerUUID) {
-		if (meterGroup.hasMember(playerUUID)) {
+		if (meterGroup.hasMember(playerUUID) || meterGroup.isOwnedBy(playerUUID)) {
 			return;
 		}
 		
 		ServerPlayerEntity player = server.getPlayer(playerUUID);
 		
-		if (player == null || meterGroup.isOwnedBy(player)) {
+		if (player == null) {
 			return;
 		}
 		

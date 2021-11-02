@@ -4,8 +4,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.widget.Button;
-import redstone.multimeter.client.gui.widget.IButton;
+import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.Button;
 
 public class EnumOption<T extends Enum<T> & Cyclable<T>> extends Option<T> {
 	
@@ -28,7 +28,7 @@ public class EnumOption<T extends Enum<T> & Cyclable<T>> extends Option<T> {
 	
 	@Override
 	public IButton createControl(MultimeterClient client, int width, int height) {
-		return new Button(client, 0, 0, width, height, () -> new LiteralText(get().getName()), button -> {
+		return new Button(client, 0, 0, width, height, () -> new LiteralText(get().getName()), () -> null, button -> {
 			cycle(!Screen.hasShiftDown());
 			return true;
 		});

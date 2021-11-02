@@ -1,4 +1,4 @@
-package redstone.multimeter.client.gui.widget;
+package redstone.multimeter.client.gui.element.button;
 
 import redstone.multimeter.client.MultimeterClient;
 

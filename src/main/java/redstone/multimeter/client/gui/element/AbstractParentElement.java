@@ -7,10 +7,25 @@ public abstract class AbstractParentElement extends AbstractElement implements I
 	
 	private final List<IElement> children = new ArrayList<>();
 	
-	private IElement focused;
+	private boolean focused;
+	private IElement focusedElement;
 	
 	protected AbstractParentElement(int x, int y, int width, int height) {
 		super(x, y, width, height);
+	}
+	
+	@Override
+	public boolean isFocused() {
+		return focused;
+	}
+	
+	@Override
+	public void setFocused(boolean focused) {
+		this.focused = focused;
+		
+		if (!isFocused()) {
+			setFocusedElement(null);
+		}
 	}
 	
 	@Override
@@ -32,25 +47,25 @@ public abstract class AbstractParentElement extends AbstractElement implements I
 	
 	@Override
 	public IElement getFocusedElement() {
-		return focused;
+		return focusedElement != null && focusedElement.isFocused() ? focusedElement : null;
 	}
 	
 	@Override
 	public void setFocusedElement(IElement element) {
-		IElement focused = getFocusedElement();
+		IElement focused = this.focusedElement;
 		
 		if (element == focused) {
 			return;
 		}
 		
 		if (focused != null) {
-			focused.unfocus();
+			focused.setFocused(false);
 		}
 		
-		this.focused = element;
+		this.focusedElement = element;
 		
 		if (element != null) {
-			element.focus();
+			element.setFocused(true);
 		}
 	}
 	

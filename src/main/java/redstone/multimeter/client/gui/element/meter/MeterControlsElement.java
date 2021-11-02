@@ -5,8 +5,6 @@ import java.util.Arrays;
 import org.lwjgl.glfw.GLFW;
 
 import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
@@ -18,11 +16,11 @@ import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.SimpleListElement;
 import redstone.multimeter.client.gui.element.SimpleTextElement;
 import redstone.multimeter.client.gui.element.TextElement;
-import redstone.multimeter.client.gui.widget.Button;
-import redstone.multimeter.client.gui.widget.IButton;
-import redstone.multimeter.client.gui.widget.Slider;
-import redstone.multimeter.client.gui.widget.TextField;
-import redstone.multimeter.client.gui.widget.ToggleButton;
+import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.Slider;
+import redstone.multimeter.client.gui.element.button.TextField;
+import redstone.multimeter.client.gui.element.button.ToggleButton;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterProperties;
@@ -104,11 +102,6 @@ public class MeterControlsElement extends AbstractParentElement {
 	}
 	
 	@Override
-	public void focus() {
-		
-	}
-	
-	@Override
 	public int getHeight() {
 		return height;
 	}
@@ -145,84 +138,75 @@ public class MeterControlsElement extends AbstractParentElement {
 			return;
 		}
 		
-		MinecraftClient minecraftClient = client.getMinecraftClient();
-		TextRenderer font = minecraftClient.textRenderer;
-		
 		MeterControlsListBuilder builder = new MeterControlsListBuilder(client, getWidth());
 		
 		builder.addCategory("Pos", () -> Arrays.asList(new LiteralText("Click to teleport!")), t -> {
 			teleport();
 			return true;
-		}, t -> false);
+		});
 		
-		builder.addControl("Pos", "dimension", (client, width, height) -> new TextField(font, 0, 0, width, height, () -> meter.getPos().getWorldId().toString(), text -> changePos(meter.getPos().offset(new Identifier(text)))));
+		builder.addControl("Pos", "dimension", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> null, text -> changePos(meter.getPos().offset(new Identifier(text))), () -> meter.getPos().getWorldId().toString()));
 		builder.addCoordinateControl("Pos", Axis.X, () -> meter.getPos(), pos -> changePos(pos));
 		builder.addCoordinateControl("Pos", Axis.Y, () -> meter.getPos(), pos -> changePos(pos));
 		builder.addCoordinateControl("Pos", Axis.Z, () -> meter.getPos(), pos -> changePos(pos));
 		
-		builder.addControl("Name", "", (client, width, height) -> new TextField(font, 0, 0, width, height, () -> meter.getName(), text -> changeName(text)));
+		builder.addControl("Name", "", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> null, text -> changeName(text), () -> meter.getName()));
 		
-		builder.addControl("Color", () -> new LiteralText("rgb").styled(style -> style.withColor(meter.getColor())), (client, width, height) -> new TextField(font, 0, 0, width, height, () -> ColorUtils.toRGBString(meter.getColor()).toUpperCase(), text -> {
+		builder.addControl("Color", () -> new LiteralText("rgb").styled(style -> style.withColor(meter.getColor())), (client, width, height) -> new TextField(client, 0, 0, width, height, () -> null, text -> {
 			try {
 				changeColor(ColorUtils.fromRGBString(text));
 			} catch (NumberFormatException e) {
 				
 			}
-		}));
-		builder.addControl("Color", () -> new LiteralText("red").formatted(Formatting.RED), (client, width, height) -> new Slider(0, 0, width, height, () -> {
+		}, () -> ColorUtils.toRGBString(meter.getColor()).toUpperCase()));
+		builder.addControl("Color", () -> new LiteralText("red").formatted(Formatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int color = meter.getColor();
 			int red = ColorUtils.getRed(color);
 			
 			return new LiteralText(String.valueOf(red));
+		}, () -> null, value -> {
+			int red = (int)Math.round(value * 0xFF);
+			int color = ColorUtils.setRed(meter.getColor(), red);
+			
+			changeColor(color);
 		}, () -> {
 			int color = meter.getColor();
 			int red = ColorUtils.getRed(color);
 			
 			return (double)red / 0xFF;
-		}, slider -> {
-			int red = (int)(slider.getValue() * 0xFF);
-			int color = ColorUtils.setRed(meter.getColor(), red);
-			
-			changeColor(color);
-		}, value -> {
-			return (double)(int)(value * 0xFF) / 0xFF;
-		}));
-		builder.addControl("Color", () -> new LiteralText("green").formatted(Formatting.GREEN), (client, width, height) -> new Slider(0, 0, width, height, () -> {
+		}, 0xFF));
+		builder.addControl("Color", () -> new LiteralText("green").formatted(Formatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int color = meter.getColor();
 			int green = ColorUtils.getGreen(color);
 			
 			return new LiteralText(String.valueOf(green));
+		}, () -> null, value -> {
+			int green = (int)Math.round(value * 0xFF);
+			int color = ColorUtils.setGreen(meter.getColor(), green);
+			
+			changeColor(color);
 		}, () -> {
 			int color = meter.getColor();
 			int green = ColorUtils.getGreen(color);
 			
 			return (double)green / 0xFF;
-		}, slider -> {
-			int green = (int)(slider.getValue() * 0xFF);
-			int color = ColorUtils.setGreen(meter.getColor(), green);
-			
-			changeColor(color);
-		}, value -> {
-			return (double)(int)(value * 0xFF) / 0xFF;
-		}));
-		builder.addControl("Color", () -> new LiteralText("blue").formatted(Formatting.BLUE), (client, width, height) -> new Slider(0, 0, width, height, () -> {
+		}, 0xFF));
+		builder.addControl("Color", () -> new LiteralText("blue").formatted(Formatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int color = meter.getColor();
 			int blue = ColorUtils.getBlue(color);
 			
 			return new LiteralText(String.valueOf(blue));
+		}, () -> null, value -> {
+			int blue = (int)Math.round(value * 0xFF);
+			int color = ColorUtils.setBlue(meter.getColor(), blue);
+			
+			changeColor(color);
 		}, () -> {
 			int color = meter.getColor();
 			int blue = ColorUtils.getBlue(color);
 			
 			return (double)blue / 0xFF;
-		}, slider -> {
-			int blue = (int)(slider.getValue() * 0xFF);
-			int color = ColorUtils.setBlue(meter.getColor(), blue);
-			
-			changeColor(color);
-		}, value -> {
-			return (double)(int)(value * 0xFF) / 0xFF;
-		}));
+		}, 0xFF));
 		
 		
 		builder.addControl("Movable", "", (client, width, height) -> new ToggleButton(client, 0, 0, width, height, () -> meter.isMovable(), button -> toggleMovable()));

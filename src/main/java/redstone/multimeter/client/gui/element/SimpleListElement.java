@@ -7,7 +7,6 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -76,11 +75,6 @@ public class SimpleListElement extends AbstractParentElement {
 	}
 	
 	@Override
-	public void focus() {
-		
-	}
-	
-	@Override
 	public int getHeight() {
 		return height;
 	}
@@ -96,72 +90,53 @@ public class SimpleListElement extends AbstractParentElement {
 	}
 	
 	protected void drawBackground(MatrixStack matrices) {
-		int width = getWidth();
-		int height = getTotalHeight();
-		int left = getX();
-		int right = left + width;
-		int top = getY() + topBorder;
-		int bottom = getY() + height - bottomBorder;
+		int x0 = getX();
+		int y0 = getY() + topBorder;
+		int x1 = getX() + getWidth();
+		int y1 = getY() + getTotalHeight() - bottomBorder;
+		
 		int offsetY = getOffsetY();
-		int z = 0;
 		
-		RenderSystem.setShader(() -> GameRenderer.getPositionTexColorShader());
-		RenderSystem.setShaderTexture(0, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		int tx0 = x0 / 2;
+		int ty0 = (y0 - offsetY) / 2;
+		int tx1 = x1 / 2;
+		int ty1 = (y1 - offsetY) / 2;
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-		
-		bufferBuilder.vertex(left , bottom, z).texture(left  / 32.0F, (bottom - offsetY) / 32.0F).color(32, 32, 32, 255).next();
-		bufferBuilder.vertex(right, bottom, z).texture(right / 32.0F, (bottom - offsetY) / 32.0F).color(32, 32, 32, 255).next();
-		bufferBuilder.vertex(right, top   , z).texture(right / 32.0F, (top    - offsetY) / 32.0F).color(32, 32, 32, 255).next();
-		bufferBuilder.vertex(left , top   , z).texture(left  / 32.0F, (top    - offsetY) / 32.0F).color(32, 32, 32, 255).next();
-		
-		tessellator.draw();
+		drawTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x20, 0x20, 0x20);
 	}
 	
 	protected void drawBorders(MatrixStack matrices) {
 		boolean renderTop = topBorder > 0;
 		boolean renderBottom = bottomBorder > 0;
 		
-		if (!renderTop && !renderBottom) {
-			return;
-		}
+		int x0 = getX();
+		int y0;
+		int x1 = getX() + getWidth();
+		int y1;
 		
-		int width = getWidth();
-		int height = getTotalHeight();
-		int left = getX();
-		int right = getX() + width;
-		int top = minY;
-		int bottom = maxY;
-		int z = -100;
-		
-		RenderSystem.setShader(() -> GameRenderer.getPositionTexColorShader());
-		RenderSystem.setShaderTexture(0, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(GL11.GL_ALWAYS);
-		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+		int tx0 = x0 / 2;
+		int ty0;
+		int tx1 = x1 / 2;
+		int ty1;
 		
 		if (renderTop) {
-			bufferBuilder.vertex(left , top, z            ).texture(0.0F         , top / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(right, top, z            ).texture(width / 32.0F, top / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(right, top - topBorder, z).texture(width / 32.0F, 0.0F       ).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(left , top - topBorder, z).texture(0.0F         , 0.0F       ).color(64, 64, 64, 255).next();
+			y0 = minY - topBorder;
+			y1 = minY;
+			
+			ty0 = y0 / 2;
+			ty1 = y1 / 2;
+			
+			drawTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
 		}
 		if (renderBottom) {
-			bufferBuilder.vertex(left , bottom + bottomBorder, z).texture(0.0F         , height / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(right, bottom + bottomBorder, z).texture(width / 32.0F, height / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(right, bottom               , z).texture(width / 32.0F, bottom / 32.0F).color(64, 64, 64, 255).next();
-			bufferBuilder.vertex(left , bottom               , z).texture(0.0F         , bottom / 32.0F).color(64, 64, 64, 255).next();
+			y0 = maxY;
+			y1 = maxY + bottomBorder;
+			
+			ty0 = y0 / 2;
+			ty1 = y1 / 2;
+			
+			drawTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
 		}
-		
-		tessellator.draw();
 		
 		RenderSystem.depthFunc(GL11.GL_LEQUAL);
 		RenderSystem.disableDepthTest();
@@ -170,22 +145,24 @@ public class SimpleListElement extends AbstractParentElement {
 		RenderSystem.disableTexture();
 		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
 		
-		z = 0;
+		y0 = minY;
+		y1 = maxY;
+		int z = 0;
+		
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		
-		if (renderTop) {
-			bufferBuilder.vertex(left , top + 4, z).color(0, 0, 0, 0  ).next();
-			bufferBuilder.vertex(right, top + 4, z).color(0, 0, 0, 0  ).next();
-			bufferBuilder.vertex(right, top    , z).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(left , top    , z).color(0, 0, 0, 255).next();
-		}
-		if (renderBottom) {
-			bufferBuilder.vertex(left , bottom    , z).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(right, bottom    , z).color(0, 0, 0, 255).next();
-			bufferBuilder.vertex(right, bottom - 4, z).color(0, 0, 0, 0  ).next();
-			bufferBuilder.vertex(left , bottom - 4, z).color(0, 0, 0, 0  ).next();
-		}
+		bufferBuilder.vertex(x0, y0 + 4, z).color(0x0, 0x0, 0x0, 0x0 ).next();
+		bufferBuilder.vertex(x1, y0 + 4, z).color(0x0, 0x0, 0x0, 0x0 ).next();
+		bufferBuilder.vertex(x1, y0    , z).color(0x0, 0x0, 0x0, 0xFF).next();
+		bufferBuilder.vertex(x0, y0    , z).color(0x0, 0x0, 0x0, 0xFF).next();
+		
+		bufferBuilder.vertex(x0, y1    , z).color(0x0, 0x0, 0x0, 0xFF).next();
+		bufferBuilder.vertex(x1, y1    , z).color(0x0, 0x0, 0x0, 0xFF).next();
+		bufferBuilder.vertex(x1, y1 - 4, z).color(0x0, 0x0, 0x0, 0x0 ).next();
+		bufferBuilder.vertex(x0, y1 - 4, z).color(0x0, 0x0, 0x0, 0x0 ).next();
 		
 		tessellator.draw();
 	}

@@ -10,9 +10,9 @@ import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.SimpleTextElement;
 import redstone.multimeter.client.gui.element.TextElement;
-import redstone.multimeter.client.gui.widget.Button;
-import redstone.multimeter.client.gui.widget.ButtonFactory;
-import redstone.multimeter.client.gui.widget.IButton;
+import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.element.button.ButtonFactory;
+import redstone.multimeter.client.gui.element.button.IButton;
 
 public class ControlElement extends AbstractParentElement {
 	
@@ -35,7 +35,7 @@ public class ControlElement extends AbstractParentElement {
 		this.client = client;
 		this.midpoint = midpoint;
 		
-		this.name = new SimpleTextElement(this.client, 0, 0, true, name, tooltip, t -> false, t -> false);
+		this.name = new SimpleTextElement(this.client, 0, 0, true, name, tooltip, t -> false);
 		this.control = control.create(this.client, controlWidth, IButton.DEFAULT_HEIGHT);
 		this.reset = resetter == null ? null : createReset(isReset, resetter);
 		
@@ -44,11 +44,6 @@ public class ControlElement extends AbstractParentElement {
 		if (this.reset != null) {
 			addChild(this.reset);
 		}
-	}
-	
-	@Override
-	public void focus() {
-		
 	}
 	
 	@Override
@@ -72,7 +67,7 @@ public class ControlElement extends AbstractParentElement {
 	}
 	
 	private IButton createReset(Supplier<Boolean> isReset, Runnable resetter) {
-		return new Button(client, 0, 0, RESET_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), button -> {
+		return new Button(client, 0, 0, RESET_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), () -> null, button -> {
 			resetter.run();
 			return true;
 		}) {

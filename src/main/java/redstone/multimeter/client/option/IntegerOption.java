@@ -1,13 +1,11 @@
 package redstone.multimeter.client.option;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.widget.IButton;
-import redstone.multimeter.client.gui.widget.Slider;
-import redstone.multimeter.client.gui.widget.TextField;
+import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.Slider;
+import redstone.multimeter.client.gui.element.button.TextField;
 
 public class IntegerOption extends Option<Integer> {
 	
@@ -42,24 +40,19 @@ public class IntegerOption extends Option<Integer> {
 	@Override
 	public IButton createControl(MultimeterClient client, int width, int height) {
 		if (range > 1000) {
-			MinecraftClient minecraftClient = client.getMinecraftClient();
-			TextRenderer font = minecraftClient.textRenderer;
-			
-			return new TextField(font, 0, 0, width, height, () -> {
-				return get().toString();
-			}, text -> {
+			return new TextField(client, 0, 0, width, height, () -> null, text -> {
 				setFromString(text);
+			}, () -> {
+				return get().toString();
 			});
 		}
 		
-		return new Slider(0, 0, width, height, () -> {
+		return new Slider(client, 0, 0, width, height, () -> {
 			return new LiteralText(get().toString());
+		}, () -> null, value -> {
+			set(min + (int)Math.round(range * value));
 		}, () -> {
 			return (double)(get() - min) / range;
-		}, slider -> {
-			set(min + (int)Math.round(range * slider.getValue()));
-		}, fraction -> {
-			return (double)Math.round(range * fraction) / range;
-		});
+		}, range);
 	}
 }

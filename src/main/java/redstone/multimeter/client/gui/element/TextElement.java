@@ -10,10 +10,9 @@ import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.action.MousePress;
-import redstone.multimeter.client.gui.element.action.MouseRelease;
-import redstone.multimeter.client.gui.widget.IButton;
+import redstone.multimeter.client.gui.element.button.IButton;
 
-public class TextElement implements IElement {
+public class TextElement extends AbstractElement {
 	
 	private static final int SPACING = 2;
 	
@@ -22,17 +21,13 @@ public class TextElement implements IElement {
 	private final Supplier<List<Text>> textSupplier;
 	private final Supplier<List<Text>> tooltipSupplier;
 	private final MousePress<TextElement> mousePress;
-	private final MouseRelease<TextElement> mouseRelease;
 	
-	private int x;
-	private int y;
-	private int width;
-	private int height;
 	private List<Text> text;
-	private boolean visible;
 	private boolean rightAligned;
 	
-	public TextElement(MultimeterClient client, int x, int y, boolean rightAligned, Supplier<List<Text>> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<TextElement> mousePress, MouseRelease<TextElement> mouseRelease) {
+	public TextElement(MultimeterClient client, int x, int y, boolean rightAligned, Supplier<List<Text>> textSupplier, Supplier<List<Text>> tooltipSupplier, MousePress<TextElement> mousePress) {
+		super(x, y, 0, 0);
+		
 		MinecraftClient minecraftClient = client.getMinecraftClient();
 		
 		this.client = client;
@@ -40,11 +35,7 @@ public class TextElement implements IElement {
 		this.textSupplier = textSupplier;
 		this.tooltipSupplier = tooltipSupplier;
 		this.mousePress = mousePress;
-		this.mouseRelease = mouseRelease;
 		
-		this.x = x;
-		this.y = y;
-		this.visible = true;
 		this.rightAligned = rightAligned;
 		
 		this.update();
@@ -52,9 +43,9 @@ public class TextElement implements IElement {
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		int left = x;
-		int right = x + width;
-		int textY = y;
+		int left = getX();
+		int right = getX() + getWidth();
+		int textY = getY();
 		
 		for (Text t : text) {
 			int textX = rightAligned ? right - font.getWidth(t) : left;
@@ -71,22 +62,14 @@ public class TextElement implements IElement {
 	
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		if (mousePress.press(this)) {
+		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+		
+		if (!consumed && mousePress.accept(this)) {
 			IButton.playClickSound(client);
-			return true;
+			consumed = true;
 		}
 		
-		return false;
-	}
-	
-	@Override
-	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		if (mouseRelease.release(this)) {
-			IButton.playClickSound(client);
-			return true;
-		}
-		
-		return false;
+		return consumed;
 	}
 	
 	@Override
@@ -115,68 +98,13 @@ public class TextElement implements IElement {
 	}
 	
 	@Override
-	public boolean isDraggingMouse() {
-		return false;
-	}
-	
-	@Override
-	public void setDraggingMouse(boolean dragging) {
-		
-	}
-	
-	@Override
 	public void onRemoved() {
 		
 	}
 	
 	@Override
-	public void focus() {
-
-	}
-	
-	@Override
-	public void unfocus() {
+	public void tick() {
 		
-	}
-	
-	@Override
-	public int getX() {
-		return x;
-	}
-	
-	@Override
-	public void setX(int x) {
-		this.x = x;
-	}
-	
-	@Override
-	public int getY() {
-		return y;
-	}
-	
-	@Override
-	public void setY(int y) {
-		this.y = y;
-	}
-	
-	@Override
-	public int getWidth() {
-		return width;
-	}
-	
-	@Override
-	public int getHeight() {
-		return height;
-	}
-	
-	@Override
-	public boolean isVisible() {
-		return visible;
-	}
-
-	@Override
-	public void setVisible(boolean visible) {
-		this.visible = visible;
 	}
 	
 	@Override
@@ -184,6 +112,7 @@ public class TextElement implements IElement {
 		return tooltipSupplier.get();
 	}
 	
+	@Override
 	public void update() {
 		text = textSupplier.get();
 		
@@ -192,7 +121,7 @@ public class TextElement implements IElement {
 	}
 	
 	protected void updateWidth() {
-		width = 0;
+		int width = 0;
 		
 		for (Text t : text) {
 			int textWidth = font.getWidth(t);
@@ -201,10 +130,12 @@ public class TextElement implements IElement {
 				width = textWidth;
 			}
 		}
+		
+		setWidth(width);
 	}
 	
 	protected void updateHeight() {
-		height = (text.size() - 1) * (font.fontHeight + SPACING) + font.fontHeight;
+		setHeight((text.size() - 1) * (font.fontHeight + SPACING) + font.fontHeight);
 	}
 	
 	protected void drawText(MatrixStack matrices, int x, int y, Text text) {

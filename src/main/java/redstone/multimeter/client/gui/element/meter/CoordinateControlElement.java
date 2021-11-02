@@ -4,19 +4,17 @@ import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction.Axis;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.TextField;
+import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.element.controls.ControlElement;
-import redstone.multimeter.client.gui.widget.Button;
-import redstone.multimeter.client.gui.widget.IButton;
-import redstone.multimeter.client.gui.widget.TextField;
-import redstone.multimeter.client.gui.widget.TransparentButton;
 import redstone.multimeter.common.WorldPos;
 
 public class CoordinateControlElement extends ControlElement {
@@ -29,7 +27,7 @@ public class CoordinateControlElement extends ControlElement {
 		
 		int size = getHeight() / 2 - 1;
 		
-		this.increase = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("+"), button -> {
+		this.increase = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("+"), () -> null, button -> {
 			int distance = Screen.hasShiftDown() ? 10 : 1;
 			WorldPos pos = getter.get();
 			WorldPos newPos = pos.offset(axis, distance);
@@ -38,7 +36,7 @@ public class CoordinateControlElement extends ControlElement {
 			
 			return true;
 		});
-		this.decrease = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("-"), button -> {
+		this.decrease = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("-"), () -> null, button -> {
 			int distance = Screen.hasShiftDown() ? 10 : 1;
 			WorldPos pos = getter.get();
 			WorldPos newPos = pos.offset(axis, -distance);
@@ -70,16 +68,7 @@ public class CoordinateControlElement extends ControlElement {
 	}
 	
 	private static IButton createControl(MultimeterClient client, int width, int height, Axis axis, Supplier<WorldPos> getter, Consumer<WorldPos> setter) {
-		MinecraftClient minecraftClient = client.getMinecraftClient();
-		TextRenderer font = minecraftClient.textRenderer;
-		
-		return new TextField(font, 0, 0, width, height, () -> {
-			WorldPos pos = getter.get();
-			BlockPos p = pos.getBlockPos();
-			int coord = axis.choose(p.getX(), p.getY(), p.getZ());
-			
-			return String.valueOf(coord);
-		}, text -> {
+		return new TextField(client, 0, 0, width, height, () -> null, text -> {
 			try {
 				WorldPos pos = getter.get();
 				BlockPos p = pos.getBlockPos();
@@ -91,6 +80,12 @@ public class CoordinateControlElement extends ControlElement {
 			} catch (NumberFormatException e) {
 				
 			}
+		}, () -> {
+			WorldPos pos = getter.get();
+			BlockPos p = pos.getBlockPos();
+			int coord = axis.choose(p.getX(), p.getY(), p.getZ());
+			
+			return String.valueOf(coord);
 		});
 	}
 }

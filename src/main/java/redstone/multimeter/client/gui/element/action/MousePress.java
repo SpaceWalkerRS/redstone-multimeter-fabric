@@ -4,6 +4,6 @@ import redstone.multimeter.client.gui.element.IElement;
 
 public interface MousePress<T extends IElement> {
 	
-	public boolean press(T element);
+	public boolean accept(T element);
 	
 }

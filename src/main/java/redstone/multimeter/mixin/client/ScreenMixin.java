@@ -18,7 +18,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.client.gui.OptionsScreen;
-import redstone.multimeter.client.gui.widget.IButton;
+import redstone.multimeter.client.gui.element.button.IButton;
 
 @Mixin(Screen.class)
 public class ScreenMixin {

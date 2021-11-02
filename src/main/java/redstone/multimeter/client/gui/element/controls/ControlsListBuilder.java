@@ -20,8 +20,7 @@ import redstone.multimeter.client.gui.element.SimpleListElement;
 import redstone.multimeter.client.gui.element.SimpleTextElement;
 import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.action.MousePress;
-import redstone.multimeter.client.gui.element.action.MouseRelease;
-import redstone.multimeter.client.gui.widget.IButton;
+import redstone.multimeter.client.gui.element.button.IButton;
 
 public class ControlsListBuilder {
 	
@@ -50,15 +49,15 @@ public class ControlsListBuilder {
 	}
 	
 	public void addCategory(String name) {
-		addCategory(name, () -> Collections.emptyList(), t -> false, t -> false);
+		addCategory(name, () -> Collections.emptyList(), t -> false);
 	}
 	
-	public void addCategory(String name, Supplier<List<Text>> tooltip, MousePress<TextElement> onPress, MouseRelease<TextElement> onRelease) {
+	public void addCategory(String name, Supplier<List<Text>> tooltip, MousePress<TextElement> onPress) {
 		if (categories.containsKey(name)) {
 			throw new IllegalStateException("This options list already contains a \'" + name + "\' category!");
 		}
 		
-		categories.put(name, new SimpleTextElement(client, 0, 0, false, () -> new LiteralText(name).formatted(Formatting.ITALIC), tooltip, onPress, onRelease));
+		categories.put(name, new SimpleTextElement(client, 0, 0, false, () -> new LiteralText(name).formatted(Formatting.ITALIC), tooltip, onPress));
 		factories.put(name, new ArrayList<>());
 	}
 	

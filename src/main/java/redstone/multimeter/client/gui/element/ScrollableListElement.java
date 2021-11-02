@@ -64,28 +64,28 @@ public class ScrollableListElement extends SimpleListElement {
 	
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean success = super.mouseClick(mouseX, mouseY, button);
+		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			scrollMode = getScrollMode(mouseX, mouseY);
 			
 			if (scrollMode != ScrollMode.NONE) {
-				success = true;
+				consumed = true;
 			}
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		boolean success = super.mouseRelease(mouseX, mouseY, button);
+		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 		
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			scrollMode = ScrollMode.NONE;
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override

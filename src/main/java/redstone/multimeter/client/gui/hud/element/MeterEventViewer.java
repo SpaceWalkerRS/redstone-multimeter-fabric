@@ -68,12 +68,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 	}
 	
 	@Override
-	public void focus() {
-		
-	}
-	
-	@Override
-	public void unfocus() {
+	public void tick() {
 		
 	}
 	

@@ -1,6 +1,5 @@
 package redstone.multimeter.client.gui.element;
 
-import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.client.util.math.MatrixStack;
@@ -36,19 +35,19 @@ public interface IParentElement extends IElement {
 	
 	@Override
 	default boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean clicked = IElement.super.mouseClick(mouseX, mouseY, button);
+		boolean consumed = IElement.super.mouseClick(mouseX, mouseY, button);
 		
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
 		
 		if (hoveredElement != null && hoveredElement.mouseClick(mouseX, mouseY, button)) {
 			setFocusedElement(hoveredElement);
-			clicked = true;
+			consumed = true;
 		} else {
 			setFocusedElement(null);
-			clicked = false;
+			consumed = false;
 		}
 		
-		return clicked;
+		return consumed;
 	}
 	
 	@Override
@@ -115,11 +114,6 @@ public interface IParentElement extends IElement {
 	}
 	
 	@Override
-	default void unfocus() {
-		setFocusedElement(null);
-	}
-	
-	@Override
 	default void tick() {
 		List<IElement> children = getChildren();
 		
@@ -135,7 +129,7 @@ public interface IParentElement extends IElement {
 	@Override
 	default List<Text> getTooltip(int mouseX, int mouseY) {
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
-		return hoveredElement == null ? Collections.emptyList() : hoveredElement.getTooltip(mouseX, mouseY);
+		return hoveredElement != null ? hoveredElement.getTooltip(mouseX, mouseY) : null;
 	}
 	
 	@Override

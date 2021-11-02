@@ -39,7 +39,7 @@ public class SecondaryEventViewer extends MeterEventViewer {
 			}
 		}
 		
-		return super.getTooltip(mouseX, mouseY);
+		return null;
 	}
 	
 	@Override

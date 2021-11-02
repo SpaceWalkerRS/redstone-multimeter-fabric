@@ -16,11 +16,11 @@ import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.IElement;
 import redstone.multimeter.client.gui.element.SimpleTextElement;
 import redstone.multimeter.client.gui.element.TextElement;
+import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.hud.element.MeterListRenderer;
 import redstone.multimeter.client.gui.hud.element.PrimaryEventViewer;
 import redstone.multimeter.client.gui.hud.element.SecondaryEventViewer;
 import redstone.multimeter.client.gui.hud.event.MeterEventRenderDispatcher;
-import redstone.multimeter.client.gui.widget.TransparentButton;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
 
@@ -131,11 +131,6 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 	
 	@Override
-	public void focus() {
-		
-	}
-	
-	@Override
 	public int getWidth() {
 		return hudWidth;
 	}
@@ -237,7 +232,7 @@ public class MultimeterHud extends AbstractParentElement {
 			break;
 		}
 		
-		y = fastBackwardButton.getTextY();
+		y = fastBackwardButton.getMessageY();
 		printIndicator.setY(y);
 	}
 	
@@ -256,11 +251,11 @@ public class MultimeterHud extends AbstractParentElement {
 			return new LiteralText(text).styled(style -> style.withColor(color));
 		});
 		
-		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), button -> {
+		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> null, button -> {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ee" : "\u23ea"), button -> {
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ee" : "\u23ea"), () -> null, button -> {
 			stepBackward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -270,7 +265,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ed" : "\u23e9"), button -> {
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ed" : "\u23e9"), () -> null, button -> {
 			stepForward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {

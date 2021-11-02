@@ -1,8 +1,8 @@
-package redstone.multimeter.client.gui.widget;
+package redstone.multimeter.client.gui.element.button;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
@@ -16,6 +16,6 @@ public class ToggleButton extends Button {
 			Formatting color = value ? Formatting.GREEN : Formatting.RED;
 			
 			return new LiteralText(value.toString()).formatted(color);
-		}, button -> { toggle.accept(button); return true; });
+		}, () -> null, button -> { toggle.accept(button); return true; });
 	}
 }

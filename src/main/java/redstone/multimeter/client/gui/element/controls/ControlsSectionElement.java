@@ -27,11 +27,6 @@ public class ControlsSectionElement extends AbstractParentElement {
 	}
 	
 	@Override
-	public void focus() {
-		
-	}
-	
-	@Override
 	public int getHeight() {
 		return controls.getY() + controls.getHeight() - getY();
 	}

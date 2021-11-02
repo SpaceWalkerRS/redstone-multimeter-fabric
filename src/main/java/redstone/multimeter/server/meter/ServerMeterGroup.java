@@ -131,7 +131,11 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	public boolean isOwnedBy(ServerPlayerEntity player) {
-		return owner.equals(player.getUuid());
+		return isOwnedBy(player.getUuid());
+	}
+	
+	public boolean isOwnedBy(UUID playerUUID) {
+		return owner.equals(playerUUID);
 	}
 	
 	public boolean hasMembers() {

@@ -12,11 +12,10 @@ import net.minecraft.util.math.Direction.Axis;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.action.MousePress;
-import redstone.multimeter.client.gui.element.action.MouseRelease;
+import redstone.multimeter.client.gui.element.button.ButtonFactory;
 import redstone.multimeter.client.gui.element.controls.ControlElement;
 import redstone.multimeter.client.gui.element.controls.ControlsListBuilder;
 import redstone.multimeter.client.gui.element.controls.ControlsSectionElement;
-import redstone.multimeter.client.gui.widget.ButtonFactory;
 import redstone.multimeter.common.WorldPos;
 
 public class MeterControlsListBuilder extends ControlsListBuilder {
@@ -26,8 +25,8 @@ public class MeterControlsListBuilder extends ControlsListBuilder {
 	}
 	
 	@Override
-	public void addCategory(String name, Supplier<List<Text>> tooltip, MousePress<TextElement> onPress, MouseRelease<TextElement> onRelease) {
-		super.addCategory(name, tooltip, onPress, onRelease);
+	public void addCategory(String name, Supplier<List<Text>> tooltip, MousePress<TextElement> onPress) {
+		super.addCategory(name, tooltip, onPress);
 		updateMargin(name);
 	}
 	

@@ -1,6 +1,5 @@
 package redstone.multimeter.client.gui.element;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
@@ -48,13 +47,11 @@ public interface IElement extends Drawable {
 	
 	public void onRemoved();
 	
-	public void focus();
+	public boolean isFocused();
 	
-	public void unfocus();
+	public void setFocused(boolean focused);
 	
-	default void tick() {
-		
-	}
+	public void tick();
 	
 	public int getX();
 	
@@ -72,9 +69,7 @@ public interface IElement extends Drawable {
 	
 	public void setVisible(boolean visible);
 	
-	default List<Text> getTooltip(int mouseX, int mouseY) {
-		return Collections.emptyList();
-	}
+	public List<Text> getTooltip(int mouseX, int mouseY);
 	
 	public void update();
 	

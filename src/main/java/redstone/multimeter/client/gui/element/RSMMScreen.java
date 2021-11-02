@@ -18,7 +18,8 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	private final List<IElement> content;
 	private final boolean drawTitle;
 	
-	private IElement focused;
+	private boolean focused;
+	private IElement focusedElement;
 	private boolean dragging;
 	
 	protected MultimeterClient multimeterClient;
@@ -95,7 +96,7 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 		
 		List<Text> tooltip = getTooltip(mouseX, mouseY);
 		
-		if (!tooltip.isEmpty()) {
+		if (tooltip != null && !tooltip.isEmpty()) {
 			renderTooltip(matrices, tooltip, mouseX, mouseY + 15);
 		}
 	}
@@ -136,31 +137,45 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	}
 	
 	@Override
+	public boolean isFocused() {
+		return focused;
+	}
+	
+	@Override
+	public void setFocused(boolean focused) {
+		this.focused = focused;
+		
+		if (!isFocused()) {
+			setFocusedElement(null);
+		}
+	}
+	
+	@Override
 	public List<IElement> getChildren() {
 		return content;
 	}
 	
 	@Override
 	public IElement getFocusedElement() {
-		return focused;
+		return focusedElement != null && focusedElement.isFocused() ? focusedElement : null;
 	}
 	
 	@Override
 	public void setFocusedElement(IElement element) {
-		IElement focused = getFocusedElement();
+		IElement focused = focusedElement;
 		
 		if (element == focused) {
 			return;
 		}
 		
 		if (focused != null) {
-			focused.unfocus();
+			focused.setFocused(false);
 		}
 		
-		this.focused = element;
+		this.focusedElement = element;
 		
 		if (element != null) {
-			element.focus();
+			element.setFocused(true);
 		}
 	}
 	
@@ -214,5 +229,9 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	
 	public static void setCursor(MultimeterClient client, CursorType type) {
 		GLFW.glfwSetCursor(client.getMinecraftClient().getWindow().getHandle(), type.getCursor());
+	}
+	
+	public static boolean isControlPressed() {
+		return hasControlDown() && !hasShiftDown() && !hasAltDown();
 	}
 }
