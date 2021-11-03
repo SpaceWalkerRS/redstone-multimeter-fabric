@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
+import redstone.multimeter.server.Multimeter;
 
 @Mixin(PistonBlock.class)
 public abstract class PistonBlockMixin implements MeterableBlock {
@@ -49,7 +50,10 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 	)
 	private void onMoveInjectBeforeOffset1(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonHandler pistonHandler, Map<BlockPos, BlockState> movedPosToState, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, BlockState[] removedStates, Direction moveDir, int removedIndex, int brokenIndex, BlockPos movedPos, BlockState movedState) {
 		if (!world.isClient()) {
-			((IServerWorld)world).getMultimeter().logMoved(world, movedPos, moveDir);
+			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
+			
+			multimeter.logMoved(world, movedPos, moveDir);
+			multimeter.moveMeters(world, movedPos, moveDir);
 		}
 	}
 	

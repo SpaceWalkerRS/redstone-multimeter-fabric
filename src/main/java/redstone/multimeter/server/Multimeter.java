@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiPredicate;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -28,19 +27,24 @@ import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
+import redstone.multimeter.block.PowerSource;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
-import redstone.multimeter.common.meter.event.MeterEvent;
-import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
-import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
 import redstone.multimeter.common.network.packets.ClearMeterGroupPacket;
 import redstone.multimeter.common.network.packets.MeterGroupDefaultPacket;
+import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
+import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
 import redstone.multimeter.interfaces.mixin.IBlock;
 import redstone.multimeter.server.meter.ServerMeterGroup;
 import redstone.multimeter.server.meter.ServerMeterPropertiesManager;
+import redstone.multimeter.server.meter.event.MeterEventPredicate;
+import redstone.multimeter.server.meter.event.MeterEventSupplier;
+import redstone.multimeter.server.option.Options;
+import redstone.multimeter.server.option.OptionsManager;
+import redstone.multimeter.util.TextUtils;
 
 public class Multimeter {
 	
@@ -49,11 +53,15 @@ public class Multimeter {
 	private final Map<UUID, ServerMeterGroup> subscriptions;
 	private final ServerMeterPropertiesManager meterPropertiesManager;
 	
+	public Options options;
+	
 	public Multimeter(MultimeterServer server) {
 		this.server = server;
 		this.meterGroups = new LinkedHashMap<>();
 		this.subscriptions = new HashMap<>();
 		this.meterPropertiesManager = new ServerMeterPropertiesManager(this);
+		
+		reloadOptions();
 	}
 	
 	public MultimeterServer getMultimeterServer() {
@@ -85,11 +93,21 @@ public class Multimeter {
 		return meterGroup != null && meterGroup.isOwnedBy(player);
 	}
 	
+	public void reloadOptions() {
+		if (server.isDedicated()) {
+			options = OptionsManager.load(server.getConfigFolder());
+		} else {
+			options = new Options();
+		}
+	}
+	
 	public void tickStart(boolean paused) {
 		if (!paused) {
-			meterGroups.values().removeIf(meterGroup -> {
-				return meterGroup.isIdle() && (!meterGroup.hasMembers() || meterGroup.getIdleTime() > 72000);
-			});
+			if (options.meter_group.max_idle_time >= 0) {
+				meterGroups.values().removeIf(meterGroup -> {
+					return meterGroup.isIdle() && (!meterGroup.hasMeters() || meterGroup.getIdleTime() > options.meter_group.max_idle_time);
+				});
+			}
 			
 			for (ServerMeterGroup meterGroup : meterGroups.values()) {
 				meterGroup.tick();
@@ -129,11 +147,20 @@ public class Multimeter {
 		}
 	}
 	
+	public boolean isPastMeterLimit(ServerMeterGroup meterGroup) {
+		return options.meter_group.meter_limit >= 0 && meterGroup.getMeters().size() >= options.meter_group.meter_limit;
+	}
+	
 	public void addMeter(ServerPlayerEntity player, MeterProperties properties) {
 		ServerMeterGroup meterGroup = getSubscription(player);
 		
-		if (meterGroup != null && !addMeter(meterGroup, properties)) {
-			refreshMeterGroup(meterGroup, player);
+		if (meterGroup != null) {
+			if (isPastMeterLimit(meterGroup)) {
+				Text message = new LiteralText(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
+				player.sendMessage(message, true);
+			} else if (!addMeter(meterGroup, properties)) {
+				refreshMeterGroup(meterGroup, player);
+			}
 		}
 	}
 	
@@ -146,17 +173,9 @@ public class Multimeter {
 		World world = server.getWorldOf(pos);
 		BlockPos blockPos = pos.getBlockPos();
 		BlockState state = world.getBlockState(blockPos);
-		Block block = state.getBlock();
 		
-		boolean powered = ((IBlock)block).isPowered(world, blockPos, state);
-		boolean active = ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, blockPos, state);
-		
-		meterGroup.tryLogEvent(pos, EventType.POWERED, powered ? 1 : 0, (_meterGroup, meter) -> {
-			return meter.setPowered(powered);
-		});
-		meterGroup.tryLogEvent(pos, EventType.ACTIVE, active ? 1 : 0, (_meterGroup, meter) -> {
-			return meter.setActive(active);
-		});
+		logPowered(world, blockPos, state);
+		logActive(world, blockPos, state);
 		
 		return true;
 	}
@@ -166,22 +185,6 @@ public class Multimeter {
 		
 		if (meterGroup != null && !meterGroup.removeMeter(id)) {
 			refreshMeterGroup(meterGroup, player);
-		}
-	}
-	
-	public void moveMeter(ServerPlayerEntity player, long id, WorldPos newPos) {
-		ServerMeterGroup meterGroup = getSubscription(player);
-		
-		if (meterGroup != null) {
-			moveMeter(meterGroup, id, newPos);
-		}
-	}
-	
-	public void moveMeter(ServerMeterGroup meterGroup, long id, WorldPos newPos) {
-		World world = server.getWorldOf(newPos);
-		
-		if (world != null) {
-			meterGroup.tryMoveMeter(id, newPos, false);
 		}
 	}
 	
@@ -333,6 +336,13 @@ public class Multimeter {
 	}
 	
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
+		if (!options.meter.allow_teleports) {
+			Text message = new LiteralText("This server does not allow meter teleporting!");
+			player.sendMessage(message, false);
+			
+			return;
+		}
+		
 		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
@@ -382,10 +392,10 @@ public class Multimeter {
 			append(new LiteralText("[here]").styled((style) -> {
 				return style.
 					withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Teleport to").
-						append(MeterEvent.formatTextForTooltip("\n  dimension", worldId)).
-						append(MeterEvent.formatTextForTooltip("\n  x", x)).
-						append(MeterEvent.formatTextForTooltip("\n  y", y)).
-						append(MeterEvent.formatTextForTooltip("\n  z", z)))).
+						append(TextUtils.formatFancyText("\n  dimension", worldId)).
+						append(TextUtils.formatFancyText("\n  x", x)).
+						append(TextUtils.formatFancyText("\n  y", y)).
+						append(TextUtils.formatFancyText("\n  z", z)))).
 					withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/execute in %s run tp @s %s %s %s %s %s", worldId, x, y, z, yaw, pitch))).
 					withColor(Formatting.GREEN);
 			})).
@@ -395,24 +405,52 @@ public class Multimeter {
 	}
 	
 	public void logPowered(World world, BlockPos pos, boolean powered) {
-		tryLogEvent(world, pos, EventType.POWERED, powered ? 1 : 0, (meterGroup, meter) -> meter.setPowered(powered));
+		tryLogEvent(world, pos, EventType.POWERED, powered ? 1 : 0, (meterGroup, meter, event) -> meter.setPowered(powered));
+	}
+	
+	public void logPowered(World world, BlockPos pos, BlockState state) {
+		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setPowered(event.getMetaData() != 0), new MeterEventSupplier(EventType.POWERED, () -> {
+			return ((IBlock)state.getBlock()).isPowered(world, pos, state) ? 1 : 0;
+		}));
 	}
 	
 	public void logActive(World world, BlockPos pos, boolean active) {
-		tryLogEvent(world, pos, EventType.ACTIVE, active ? 1 : 0, (meterGroup, meter) -> meter.setActive(active));
+		tryLogEvent(world, pos, EventType.ACTIVE, active ? 1 : 0, (meterGroup, meter, event) -> meter.setActive(active));
 	}
 	
-	public void logMoved(World world, BlockPos pos, Direction dir) {
-		tryLogEvent(world, pos, EventType.MOVED, dir.getId(), (meterGroup, meter) -> {
-			meterGroup.tryMoveMeter(meter.getId(), new WorldPos(world, pos.offset(dir)), true);
-			return true;
-		});
+	public void logActive(World world, BlockPos pos, BlockState state) {
+		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setActive(event.getMetaData() != 0), new MeterEventSupplier(EventType.ACTIVE, () -> {
+			Block block = state.getBlock();
+			return ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, pos, state) ? 1 : 0;
+		}));
+	}
+	
+	public void logMoved(World world, BlockPos blockPos, Direction dir) {
+		tryLogEvent(world, blockPos, EventType.MOVED, dir.getId());
+	}
+	
+	public void moveMeters(World world, BlockPos blockPos, Direction dir) {
+		WorldPos pos = new WorldPos(world, blockPos);
+		
+		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+			meterGroup.tryMoveMeter(pos, dir);
+		}
 	}
 	
 	public void logPowerChange(World world, BlockPos pos, int oldPower, int newPower) {
 		if (oldPower != newPower) {
 			tryLogEvent(world, pos, EventType.POWER_CHANGE, (oldPower << 8) | newPower);
 		}
+	}
+	
+	public void logPowerChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
+		tryLogEvent(world, pos, (meterGroup, meter, event) -> true, new MeterEventSupplier(EventType.POWER_CHANGE, () -> {
+			Block block = newState.getBlock();
+			int oldPower = ((PowerSource)block).getPowerLevel(world, pos, oldState);
+			int newPower = ((PowerSource)block).getPowerLevel(world, pos, newState);
+			
+			return (oldPower << 8) | newPower;
+		}));
 	}
 	
 	public void logRandomTick(World world, BlockPos pos) {
@@ -447,19 +485,23 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.SHAPE_UPDATE, dir.getId());
 	}
 	
-	private void tryLogEvent(World world, BlockPos pos, EventType type, int metaData) {
-		tryLogEvent(world, pos, type, metaData, (meterGroup, meter) -> true);
+	private void tryLogEvent(World world, BlockPos pos, EventType type, int data) {
+		tryLogEvent(world, pos, type, data, (meterGroup, meter, event) -> true);
 	}
 	
-	private void tryLogEvent(World world, BlockPos blockPos, EventType type, int metaData, BiPredicate<ServerMeterGroup, Meter> meterPredicate) {
-		WorldPos pos = new WorldPos(world, blockPos);
-		
-		for (ServerMeterGroup meterGroup : meterGroups.values()) {
-			if (meterGroup.isIdle()) {
-				continue;
-			}
+	private void tryLogEvent(World world, BlockPos pos, EventType type, int data, MeterEventPredicate predicate) {
+		tryLogEvent(world, pos, predicate, new MeterEventSupplier(type, () -> data));
+	}
+	
+	private void tryLogEvent(World world, BlockPos blockPos, MeterEventPredicate predicate, MeterEventSupplier supplier) {
+		if (options.hasEventType(supplier.type())) {
+			WorldPos pos = new WorldPos(world, blockPos);
 			
-			meterGroup.tryLogEvent(pos, type, metaData, meterPredicate);
+			for (ServerMeterGroup meterGroup : meterGroups.values()) {
+				if (!meterGroup.isIdle()) {
+					meterGroup.tryLogEvent(pos, predicate, supplier);
+				}
+			}
 		}
 	}
 }

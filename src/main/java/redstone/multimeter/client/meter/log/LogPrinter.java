@@ -17,7 +17,7 @@ import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
-import redstone.multimeter.common.meter.event.MeterEvent;
+import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.common.meter.log.MeterLogs;
 
 public class LogPrinter {
@@ -132,19 +132,17 @@ public class LogPrinter {
 			
 			for (EventType type : EventType.ALL) {
 				int index = logs.getLastLogBefore(type, prevTick + 1) + 1;
-				MeterEvent event = logs.getLog(type, index);
+				EventLog log = logs.getLog(type, index);
 				
-				if (event == null) {
+				if (log == null) {
 					continue;
 				}
 				
-				while (!event.isAfter(lastTick)) {
-					MeterEventLog log = new MeterEventLog(meter, event);
-					printQueue.add(log);
+				while (!log.isAfter(lastTick)) {
+					printQueue.add(new MeterEventLog(meter, log));
+					log = logs.getLog(type, ++index);
 					
-					event = logs.getLog(type, ++index);
-					
-					if (event == null) {
+					if (log == null) {
 						break;
 					}
 				}
@@ -161,24 +159,24 @@ public class LogPrinter {
 		TickPhase phase = null;
 		
 		while (!printQueue.isEmpty()) {
-			MeterEventLog log = printQueue.poll();
+			MeterEventLog meterEventLog = printQueue.poll();
 			
 			try {
-				if (log.event.getTick() != tick) {
-					tick = log.event.getTick();
+				if (meterEventLog.log.getTick() != tick) {
+					tick = meterEventLog.log.getTick();
 					phase = null;
 					
 					writer.write("" + tick);
 					writer.newLine();
 				}
-				if (log.event.getTickPhase() != phase) {
-					phase = log.event.getTickPhase();
+				if (meterEventLog.log.getTickPhase() != phase) {
+					phase = meterEventLog.log.getTickPhase();
 					
 					writer.write("    " + phase.getName());
 					writer.newLine();
 				}
 				
-				writer.write("        " + log.toString());
+				writer.write("        " + meterEventLog.toString());
 				writer.newLine();
 			} catch (IOException e) {
 				
@@ -196,24 +194,24 @@ public class LogPrinter {
 	private class MeterEventLog implements Comparable<MeterEventLog> {
 		
 		private final Meter meter;
-		private final MeterEvent event;
+		private final EventLog log;
 		
-		public MeterEventLog(Meter meter, MeterEvent event) {
+		public MeterEventLog(Meter meter, EventLog log) {
 			this.meter = meter;
-			this.event = event;
+			this.log = log;
 		}
 		
 		@Override
 		public String toString() {
-			return String.format("%d - (%s) %s", event.getSubtick(), meter.getName(), event.toString());
+			return String.format("%d - (%s) %s", log.getSubtick(), meter.getName(), log.getEvent().toString());
 		}
 		
 		@Override
 		public int compareTo(MeterEventLog o) {
-			if (event.isBefore(o.event)) {
+			if (log.isBefore(o.log)) {
 				return -1;
 			}
-			if (event.isAfter(o.event)) {
+			if (log.isAfter(o.log)) {
 				return 1;
 			}
 			

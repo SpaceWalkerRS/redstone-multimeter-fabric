@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 public class TextUtils {
 	
@@ -57,5 +58,19 @@ public class TextUtils {
 		}
 		
 		return lines;
+	}
+	
+	public static void addFancyText(List<Text> lines, String title, Object info) {
+		addFancyText(lines, title, info.toString());
+	}
+	
+	public static void addFancyText(List<Text> lines, String title, String info) {
+		lines.add(formatFancyText(title, info));
+	}
+	
+	public static Text formatFancyText(String title, String info) {
+		return new LiteralText("").
+			append(new LiteralText(title + ": ").formatted(Formatting.GOLD)).
+			append(new LiteralText(info));
 	}
 }

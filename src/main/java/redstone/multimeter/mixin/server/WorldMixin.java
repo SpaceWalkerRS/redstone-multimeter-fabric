@@ -53,8 +53,6 @@ public abstract class WorldMixin implements IWorld {
 			return;
 		}
 		
-		Block block = state.getBlock();
-		
 		MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
 		Multimeter multimeter = server.getMultimeter();
 		
@@ -63,9 +61,8 @@ public abstract class WorldMixin implements IWorld {
 		// 'powered' changes for most meterable blocks are handled in those classes
 		// to reduce expensive calls to 
 		// World.isReceivingRedstonePower and World.getReceivedRedstonePower
-		if (((IBlock)block).logPoweredOnBlockUpdate()) {
-			boolean powered = ((IBlock)block).isPowered((World)(Object)this, pos, state);
-			multimeter.logPowered((World)(Object)this, pos, powered);
+		if (((IBlock)state.getBlock()).logPoweredOnBlockUpdate()) {
+			multimeter.logPowered((World)(Object)this, pos, state);
 		}
 	}
 	

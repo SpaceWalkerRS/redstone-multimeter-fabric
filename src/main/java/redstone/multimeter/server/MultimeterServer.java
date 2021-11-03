@@ -83,6 +83,14 @@ public class MultimeterServer {
 		}
 	}
 	
+	public boolean isDedicated() {
+		return server.isDedicated();
+	}
+	
+	public File getConfigFolder() {
+		return new File(server.getRunDirectory(), RedstoneMultimeterMod.CONFIG_PATH);
+	}
+	
 	public TickPhase getCurrentTickPhase() {
 		return currentTickPhase;
 	}

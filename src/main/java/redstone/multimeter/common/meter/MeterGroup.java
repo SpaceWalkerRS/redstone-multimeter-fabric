@@ -117,7 +117,7 @@ public abstract class MeterGroup {
 			boolean changed = false;
 			
 			if (newProperties.getPos() != null) {
-				changed |= moveMeter(meter, newProperties.getPos());
+				moveMeter(meter, newProperties.getPos());
 			}
 			if (newProperties.getName() != null) {
 				changed |= properties.setName(newProperties.getName());
@@ -140,25 +140,27 @@ public abstract class MeterGroup {
 		return true;
 	}
 	
-	protected boolean moveMeter(Meter meter, WorldPos newPos) {
+	protected void moveMeter(Meter meter, WorldPos newPos) {
 		WorldPos pos = meter.getPos();
 		
 		if (pos.equals(newPos)) {
-			return false;
+			return;
 		}
 		
 		int index = posToIndex.getOrDefault(pos, -1);
 		
 		if (index < 0 || index >= meters.size()) {
-			return false;
+			return;
 		}
 		
 		posToIndex.remove(pos, index);
 		posToIndex.put(newPos, index);
 		
-		meter.applyUpdate(properties -> properties.setPos(newPos));
-		
-		return true;
+		meter.applyUpdate(properties -> {
+			if (properties.setPos(newPos)) {
+				meterUpdated(meter);
+			}
+		});
 	}
 	
 	protected abstract void meterAdded(Meter meter);

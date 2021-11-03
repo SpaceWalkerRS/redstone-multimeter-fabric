@@ -45,6 +45,9 @@ public class CoordinateControlElement extends ControlElement {
 			
 			return true;
 		});
+		
+		addChild(this.increase);
+		addChild(this.decrease);
 	}
 	
 	@Override

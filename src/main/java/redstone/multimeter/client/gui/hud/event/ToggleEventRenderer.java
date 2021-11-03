@@ -8,7 +8,7 @@ import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
-import redstone.multimeter.common.meter.event.MeterEvent;
+import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.common.meter.log.MeterLogs;
 
 public abstract class ToggleEventRenderer extends MeterEventRenderer {
@@ -28,8 +28,8 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, firstTick);
-		MeterEvent event = logs.getLog(type, index);
-		MeterEvent nextEvent = logs.getLog(type, ++index);
+		EventLog log = logs.getLog(type, index);
+		EventLog nextLog = logs.getLog(type, ++index);
 		
 		long lastHudTick = firstTick + Options.HUD.COLUMN_COUNT.get();
 		
@@ -37,7 +37,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			lastHudTick = lastTick;
 		}
 		
-		if (nextEvent == null) {
+		if (nextLog == null) {
 			if (isToggled(meter)) {
 				draw(matrices, x + hud.settings.gridSize, y, color, (int)(lastHudTick - firstTick));
 			}
@@ -47,27 +47,27 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		long currentTick = -1;
 		
-		while (event == null || event.isBefore(lastHudTick)) {
-			boolean eventInTable = (event != null && !event.isBefore(firstTick));
-			boolean nextEventInTable = (nextEvent != null && nextEvent.isBefore(lastHudTick));
+		while (log == null || log.isBefore(lastHudTick)) {
+			boolean isLogInTable = (log != null && !log.isBefore(firstTick));
+			boolean isNextLogInTable = (nextLog != null && nextLog.isBefore(lastHudTick));
 			
-			if (eventInTable && event.getTick() != currentTick) {
-				currentTick = event.getTick();
+			if (isLogInTable && log.getTick() != currentTick) {
+				currentTick = log.getTick();
 				
-				int column = (int)(event.getTick() - firstTick);
+				int column = (int)(log.getTick() - firstTick);
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
-				if (wasToggled(event)) {
+				if (wasToggled(log)) {
 					drawOn(matrices, columnX, y, color);
 				} else {
 					drawOff(matrices, columnX, y, color);
 				}
 			}
 			
-			long start = eventInTable ? event.getTick() + 1 : firstTick;
-			long end = nextEventInTable ? nextEvent.getTick() : lastHudTick;
+			long start = isLogInTable ? log.getTick() + 1 : firstTick;
+			long end = isNextLogInTable ? nextLog.getTick() : lastHudTick;
 			
-			if (event == null ? !wasToggled(nextEvent) : wasToggled(event)) {
+			if (log == null ? !wasToggled(nextLog) : wasToggled(log)) {
 				int column = (int)(start - firstTick);
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
@@ -75,11 +75,11 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			}
 			
 			do {
-				event = nextEvent;
-				nextEvent = logs.getLog(type, ++index);
-			} while (nextEvent != null && nextEvent.getTick() == currentTick);
+				log = nextLog;
+				nextLog = logs.getLog(type, ++index);
+			} while (nextLog != null && nextLog.getTick() == currentTick);
 			
-			if (event == null) {
+			if (log == null) {
 				break;
 			}
 		}
@@ -98,10 +98,10 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, firstTick);
-		MeterEvent event = logs.getLog(type, index);
-		MeterEvent nextEvent = logs.getLog(type, ++index);
+		EventLog log = logs.getLog(type, index);
+		EventLog nextLog = logs.getLog(type, ++index);
 		
-		if (nextEvent == null) {
+		if (nextLog == null) {
 			return;
 		}
 		
@@ -113,15 +113,15 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		long currentTick = -1;
 		
-		while (event == null || event.isBefore(lastHudTick)) {
-			boolean eventInTable = (event != null && !event.isBefore(firstTick));
-			boolean nextEventInTable = (nextEvent != null && nextEvent.isBefore(lastHudTick));
+		while (log == null || log.isBefore(lastHudTick)) {
+			boolean isLogInTable = (log != null && !log.isBefore(firstTick));
+			boolean isNextLogInTable = (nextLog != null && nextLog.isBefore(lastHudTick));
 			
-			long start = eventInTable ? event.getTick() + 1 : firstTick;
-			long end = nextEventInTable ? nextEvent.getTick() : lastHudTick;
+			long start = isLogInTable ? log.getTick() + 1 : firstTick;
+			long end = isNextLogInTable ? nextLog.getTick() : lastHudTick;
 			
-			if (event != null && nextEvent != null) {
-				long pulseLength = nextEvent.getTick() - event.getTick();
+			if (log != null && nextLog != null) {
+				long pulseLength = nextLog.getTick() - log.getTick();
 				
 				if (pulseLength > 5) {
 					int startX = x + (int)(start - firstTick) * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
@@ -133,7 +133,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					int requiredWidth = hud.font.getWidth(text) + 1;
 					
 					if (requiredWidth < availableWidth) {
-						boolean toggled = wasToggled(event);
+						boolean toggled = wasToggled(log);
 						
 						int bgColor = toggled ? color : hud.settings.colorBackground;
 						int textColor = toggled ? hud.settings.colorTextOn : hud.settings.colorTextOff;
@@ -148,11 +148,11 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			}
 			
 			do {
-				event = nextEvent;
-				nextEvent = logs.getLog(type, ++index);
-			} while (nextEvent != null && nextEvent.getTick() == currentTick);
+				log = nextLog;
+				nextLog = logs.getLog(type, ++index);
+			} while (nextLog != null && nextLog.getTick() == currentTick);
 			
-			if (event == null) {
+			if (log == null) {
 				break;
 			}
 		}
@@ -167,10 +167,10 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, tick);
-		MeterEvent event = logs.getLog(type, index);
-		MeterEvent nextEvent = logs.getLog(type, ++index);
+		EventLog log = logs.getLog(type, index);
+		EventLog nextLog = logs.getLog(type, ++index);
 		
-		if (nextEvent == null) {
+		if (nextLog == null) {
 			if (isToggled(meter)) {
 				draw(matrices, x + hud.settings.gridSize, y, color, subTickCount);
 			}
@@ -178,34 +178,34 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			return;
 		}
 		
-		while (event == null || event.isBefore(tick, subTickCount)) {
-			boolean eventInTable = (event != null && event.isAt(tick));
-			boolean nextEventInTable = (nextEvent != null && nextEvent.isAt(tick));
+		while (log == null || log.isBefore(tick, subTickCount)) {
+			boolean isLogInTable = (log != null && log.isAt(tick));
+			boolean isNextLogInTable = (nextLog != null && nextLog.isAt(tick));
 			
-			if (eventInTable) {
-				int column = event.getSubtick();
+			if (isLogInTable) {
+				int column = log.getSubtick();
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
-				if (wasToggled(event)) {
+				if (wasToggled(log)) {
 					drawOn(matrices, columnX, y, color);
 				} else {
 					drawOff(matrices, columnX, y, color);
 				}
 			}
 			
-			int start = eventInTable ? event.getSubtick() + 1 : 0;
-			int end = nextEventInTable ? nextEvent.getSubtick() : subTickCount;
+			int start = isLogInTable ? log.getSubtick() + 1 : 0;
+			int end = isNextLogInTable ? nextLog.getSubtick() : subTickCount;
 			
-			if (event == null ? !wasToggled(nextEvent) : wasToggled(event)) {
+			if (log == null ? !wasToggled(nextLog) : wasToggled(log)) {
 				int columnX = x + start * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
 				draw(matrices, columnX, y, color, end - start);
 			}
 			
-			event = nextEvent;
-			nextEvent = logs.getLog(type, ++index);
+			log = nextLog;
+			nextLog = logs.getLog(type, ++index);
 			
-			if (event == null) {
+			if (log == null) {
 				break;
 			}
 		}
@@ -213,8 +213,8 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	
 	protected abstract void updateMode(Meter meter);
 	
-	private boolean wasToggled(MeterEvent event) {
-		return (event.getMetaData() & 1) != 0;
+	private boolean wasToggled(EventLog log) {
+		return (log.getEvent().getMetaData() & 1) != 0;
 	}
 	
 	protected abstract boolean isToggled(Meter meter);

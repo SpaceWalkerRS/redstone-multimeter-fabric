@@ -23,4 +23,9 @@ public class TransparentButton extends Button {
 	protected TextureRegion getBackgroundTexture() {
 		return null;
 	}
+	
+	@Override
+	protected int getMessageColor() {
+		return isActive() ? (isHovered() ? 0xFFC0C0C0 : 0xFFFFFFFF) : 0xFF909090;
+	}
 }

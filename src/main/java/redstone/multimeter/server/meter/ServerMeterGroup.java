@@ -8,18 +8,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiPredicate;
 
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
-import redstone.multimeter.common.meter.event.EventType;
+import redstone.multimeter.common.meter.event.MeterEvent;
 import redstone.multimeter.common.network.packets.MeterUpdatesPacket;
 import redstone.multimeter.server.Multimeter;
+import redstone.multimeter.server.meter.event.MeterEventPredicate;
+import redstone.multimeter.server.meter.event.MeterEventSupplier;
 import redstone.multimeter.server.meter.log.ServerLogManager;
 
 public class ServerMeterGroup extends MeterGroup {
@@ -65,18 +67,18 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	@Override
-	protected boolean moveMeter(Meter meter, WorldPos newPos) {
+	protected void moveMeter(Meter meter, WorldPos newPos) {
 		if (hasMeterAt(newPos)) {
-			return false;
+			return;
 		}
 		
 		World world = multimeter.getMultimeterServer().getWorldOf(newPos);
 		
 		if (world == null) {
-			return false;
+			return;
 		}
 		
-		return super.moveMeter(meter, newPos);
+		super.moveMeter(meter, newPos);
 	}
 	
 	@Override
@@ -116,18 +118,18 @@ public class ServerMeterGroup extends MeterGroup {
 		return hasMeter(id) && updateMeter(getMeter(id), newProperties);
 	}
 	
-	public boolean tryMoveMeter(long id, WorldPos newPos, boolean byPiston) {
-		if (!hasMeter(id)) {
-			return false;
+	public void tryMoveMeter(WorldPos pos, Direction dir) {
+		if (!hasMeterAt(pos)) {
+			return;
 		}
 		
-		Meter meter = getMeter(id);
+		Meter meter = getMeterAt(pos);
 		
-		if (byPiston && !meter.isMovable()) {
-			return false;
+		if (!meter.isMovable()) {
+			return;
 		}
 		
-		return moveMeter(meter, newPos);
+		moveMeter(meter, pos.offset(dir));
 	}
 	
 	public boolean isOwnedBy(ServerPlayerEntity player) {
@@ -216,7 +218,7 @@ public class ServerMeterGroup extends MeterGroup {
 	
 	public void updateIdleState() {
 		boolean wasIdle = idle;
-		idle = !hasMeters() && !hasSubscribers();
+		idle = !hasSubscribers();
 		
 		if (wasIdle && !idle) {
 			idleTime = 0L;
@@ -243,12 +245,16 @@ public class ServerMeterGroup extends MeterGroup {
 		meterUpdates.clear();
 	}
 	
-	public void tryLogEvent(WorldPos pos, EventType type, int metaData, BiPredicate<ServerMeterGroup, Meter> meterPredicate) {
+	public void tryLogEvent(WorldPos pos, MeterEventPredicate predicate, MeterEventSupplier supplier) {
 		if (hasMeterAt(pos)) {
 			Meter meter = getMeterAt(pos);
 			
-			if (meterPredicate.test(this, meter)) {
-				logManager.logEvent(meter, type, metaData);
+			if (meter.isMetering(supplier.type())) {
+				MeterEvent event = supplier.get();
+				
+				if (predicate.test(this, meter, event)) {
+					logManager.logEvent(meter, supplier.get());
+				}
 			}
 		}
 	}

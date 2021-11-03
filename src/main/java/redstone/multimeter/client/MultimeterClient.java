@@ -35,7 +35,6 @@ import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 
 public class MultimeterClient {
 	
-	public static final String CONFIG_PATH = "config/" + RedstoneMultimeterMod.NAMESPACE;
 	private static final Function<String, String> VERSION_WARNING = (modVersion) -> {
 		String warning;
 		
@@ -122,7 +121,11 @@ public class MultimeterClient {
 	}
 	
 	public File getConfigFolder() {
-		return new File(client.runDirectory, CONFIG_PATH);
+		return getConfigFolder(client);
+	}
+	
+	public static File getConfigFolder(MinecraftClient client) {
+		return new File(client.runDirectory, RedstoneMultimeterMod.CONFIG_PATH);
 	}
 	
 	public void reloadResources() {

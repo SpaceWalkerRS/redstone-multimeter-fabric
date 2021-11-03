@@ -1,5 +1,7 @@
 package redstone.multimeter.mixin.server;
 
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BooleanSupplier;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -7,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.server.MinecraftServer;
 
@@ -59,6 +62,16 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void onTickInjectAtHead(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		multimeterServer.tickStart();
+	}
+	
+	@Inject(
+			method = "reloadResources",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onReloadResources(Collection<String> datapacks, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+		multimeterServer.getMultimeter().reloadOptions();
 	}
 	
 	@Override

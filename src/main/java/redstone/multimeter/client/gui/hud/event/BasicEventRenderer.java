@@ -9,6 +9,7 @@ import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.event.MeterEvent;
+import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.common.meter.log.MeterLogs;
 
 public class BasicEventRenderer extends MeterEventRenderer {
@@ -33,9 +34,9 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, firstTick) + 1;
-		MeterEvent event = logs.getLog(type, index);
+		EventLog log = logs.getLog(type, index);
 		
-		if (event == null) {
+		if (log == null) {
 			return;
 		}
 		
@@ -47,17 +48,17 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		
 		long tick = -1;
 		
-		while (event.isBefore(lastHudTick)) {
-			if (event.isAfter(tick)) {
-				tick = event.getTick();
+		while (log.isBefore(lastHudTick)) {
+			if (log.isAfter(tick)) {
+				tick = log.getTick();
 				
 				int column = (int)(tick - firstTick); // The event is no older than 1M ticks, so we can safely cast to int
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
-				drawEvent(matrices, columnX, y, meter, event);
+				drawEvent(matrices, columnX, y, meter, log.getEvent());
 			}
 			
-			if ((event = logs.getLog(type, ++index)) == null) {
+			if ((log = logs.getLog(type, ++index)) == null) {
 				break;
 			}
 		}
@@ -69,19 +70,19 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		
 		MeterLogs logs = meter.getLogs();
 		int index = logs.getLastLogBefore(type, tick) + 1;
-		MeterEvent event = logs.getLog(type, index);
+		EventLog log = logs.getLog(type, index);
 		
-		if (event == null) {
+		if (log == null) {
 			return;
 		}
 		
-		while (event.isBefore(tick, subTickCount)) {
-			int column = event.getSubtick();
+		while (log.isBefore(tick, subTickCount)) {
+			int column = log.getSubtick();
 			int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 			
-			drawEvent(matrices, columnX, y, meter, event);
+			drawEvent(matrices, columnX, y, meter, log.getEvent());
 			
-			if ((event = logs.getLog(type, ++index)) == null) {
+			if ((log = logs.getLog(type, ++index)) == null) {
 				break;
 			}
 		}

@@ -7,18 +7,17 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 
 import redstone.multimeter.common.meter.event.EventType;
-import redstone.multimeter.common.meter.event.MeterEvent;
 import redstone.multimeter.util.ListUtils;
 
 public class MeterLogs {
 	
-	private final List<MeterEvent>[] eventLogs;
+	private final List<EventLog>[] eventLogs;
 	
 	private long lastLoggedTick = -1;
 	
 	public MeterLogs() {
 		@SuppressWarnings("unchecked")
-		List<MeterEvent>[] lists = new List[EventType.ALL.length];
+		List<EventLog>[] lists = new List[EventType.ALL.length];
 		
 		for (int index = 0; index < lists.length; index++) {
 			lists[index] = new ArrayList<>();
@@ -28,7 +27,7 @@ public class MeterLogs {
 	}
 	
 	public void clear() {
-		for (List<MeterEvent> logs : eventLogs) {
+		for (List<EventLog> logs : eventLogs) {
 			logs.clear();
 		}
 		
@@ -39,27 +38,27 @@ public class MeterLogs {
 		return lastLoggedTick < 0;
 	}
 	
-	private List<MeterEvent> getLogs(EventType type) {
+	private List<EventLog> getLogs(EventType type) {
 		return eventLogs[type.getIndex()];
 	}
 	
-	public void add(MeterEvent event) {
-		EventType type = event.getType();
-		List<MeterEvent> logs = getLogs(type);
+	public void add(EventLog log) {
+		EventType type = log.getEvent().getType();
+		List<EventLog> logs = getLogs(type);
 		
-		logs.add(event);
+		logs.add(log);
 		
-		if (event.getTick() > lastLoggedTick) {
-			lastLoggedTick = event.getTick();
+		if (log.getTick() > lastLoggedTick) {
+			lastLoggedTick = log.getTick();
 		}
 	}
 	
 	public void clearOldLogs(long cutoff) {
-		for (List<MeterEvent> logs : eventLogs) {
+		for (List<EventLog> logs : eventLogs) {
 			while (!logs.isEmpty()) {
-				MeterEvent event = logs.get(0);
+				EventLog log = logs.get(0);
 				
-				if (event.getTick() > cutoff) {
+				if (log.getTick() > cutoff) {
 					break;
 				}
 				
@@ -68,12 +67,12 @@ public class MeterLogs {
 		}
 	}
 	
-	public MeterEvent getLog(EventType type, int index) {
+	public EventLog getLog(EventType type, int index) {
 		if (index < 0) {
 			return null;
 		}
 		
-		List<MeterEvent> logs = getLogs(type);
+		List<EventLog> logs = getLogs(type);
 		
 		if (index >= logs.size()) {
 			return null;
@@ -87,7 +86,7 @@ public class MeterLogs {
 	}
 	
 	public int getLastLogBefore(EventType type, long tick, int subick) {
-		List<MeterEvent> logs = getLogs(type);
+		List<EventLog> logs = getLogs(type);
 		
 		if (logs.isEmpty() || !logs.get(0).isBefore(tick, subick)) {
 			return -1;
@@ -97,42 +96,42 @@ public class MeterLogs {
 		}
 		
 		int index = ListUtils.binarySearch(logs, event -> event.isBefore(tick, subick));
-		MeterEvent event = logs.get(index);
+		EventLog log = logs.get(index);
 		
-		while (!event.isBefore(tick, subick)) {
+		while (!log.isBefore(tick, subick)) {
 			if (index == 0) {
 				return -1;
 			}
 			
-			event = logs.get(--index);
+			log = logs.get(--index);
 		}
 		
 		return index;
 		
 	}
 	
-	public MeterEvent getLastLogBefore(long tick) {
+	public EventLog getLastLogBefore(long tick) {
 		return getLastLogBefore(tick, 0);
 	}
 	
-	public MeterEvent getLastLogBefore(long tick, int subtick) {
-		MeterEvent event = null;
+	public EventLog getLastLogBefore(long tick, int subtick) {
+		EventLog lastLog = null;
 		
 		for (EventType type : EventType.ALL) {
 			int index = getLastLogBefore(type, tick, subtick);
-			MeterEvent log = getLog(type, index);
+			EventLog log = getLog(type, index);
 			
-			if (event == null || (log != null && log.isAfter(event))) {
-				event = log;
+			if (lastLog == null || (log != null && log.isAfter(lastLog))) {
+				lastLog = log;
 			}
 		}
 		
-		return event;
+		return lastLog;
 	}
 	
-	public MeterEvent getLogAt(long tick, int subtick) {
-		MeterEvent event = getLastLogBefore(tick, subtick + 1);
-		return event != null && event.isAt(tick, subtick) ? event : null;
+	public EventLog getLogAt(long tick, int subtick) {
+		EventLog log = getLastLogBefore(tick, subtick + 1);
+		return log != null && log.isAt(tick, subtick) ? log : null;
 	}
 	
 	public NbtCompound toNBT() {
@@ -152,8 +151,8 @@ public class MeterLogs {
 	private NbtList toNBT(EventType type) {
 		NbtList list = new NbtList();
 		
-		for (MeterEvent event : getLogs(type)) {
-			list.add(event.toNBT());
+		for (EventLog log : getLogs(type)) {
+			list.add(log.toNBT());
 		}
 		
 		return list;
@@ -172,9 +171,9 @@ public class MeterLogs {
 	public void updateFromNBT(EventType type, NbtList logs) {
 		for (int index = 0; index < logs.size(); index++) {
 			NbtCompound nbt = logs.getCompound(index);
-			MeterEvent event = MeterEvent.fromNBT(nbt);
+			EventLog log = EventLog.fromNBT(nbt);
 			
-			add(event);
+			add(log);
 		}
 	}
 }

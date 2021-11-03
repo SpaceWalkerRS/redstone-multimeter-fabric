@@ -7,7 +7,7 @@ import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
-import redstone.multimeter.common.meter.event.MeterEvent;
+import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.common.meter.log.MeterLogs;
 
 public class SecondaryEventViewer extends MeterEventViewer {
@@ -32,10 +32,10 @@ public class SecondaryEventViewer extends MeterEventViewer {
 			int subtick = getHoveredColumn(mouseX);
 			
 			MeterLogs logs = meter.getLogs();
-			MeterEvent event = logs.getLogAt(tick, subtick);
+			EventLog log = logs.getLogAt(tick, subtick);
 			
-			if (event != null && meter.isMetering(event.getType())) {
-				return event.getTextForTooltip();
+			if (log != null && meter.isMetering(log.getEvent().getType())) {
+				return log.getTextForTooltip();
 			}
 		}
 		

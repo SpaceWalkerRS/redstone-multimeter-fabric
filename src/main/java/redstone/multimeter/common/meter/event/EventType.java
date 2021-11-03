@@ -7,27 +7,29 @@ import java.util.Map;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 
+import redstone.multimeter.util.TextUtils;
+
 public enum EventType {
 	
 	POWERED(0, "powered") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
-			MeterEvent.addTextForTooltip(lines, "became powered", metaData == 1);
+			TextUtils.addFancyText(lines, "became powered", metaData == 1);
 		}
 	},
 	ACTIVE(1, "active") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
-			MeterEvent.addTextForTooltip(lines, "became active", metaData == 1);
+			TextUtils.addFancyText(lines, "became active", metaData == 1);
 		}
 	},
 	MOVED(2, "moved") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
-			MeterEvent.addTextForTooltip(lines, "direction", Direction.byId(metaData).getName());
+			TextUtils.addFancyText(lines, "direction", Direction.byId(metaData).getName());
 		}
 	},
 	POWER_CHANGE(3, "power_change") {
@@ -37,8 +39,8 @@ public enum EventType {
 			int oldPower = (metaData >> 8) & 0xFF;
 			int newPower =  metaData       & 0xFF;
 			
-			MeterEvent.addTextForTooltip(lines, "old power", oldPower);
-			MeterEvent.addTextForTooltip(lines, "new power", newPower);
+			TextUtils.addFancyText(lines, "old power", oldPower);
+			TextUtils.addFancyText(lines, "new power", newPower);
 		}
 	},
 	RANDOM_TICK(4, "random_tick") {
@@ -52,14 +54,14 @@ public enum EventType {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
-			MeterEvent.addTextForTooltip(lines, "priority", metaData);
+			TextUtils.addFancyText(lines, "priority", metaData);
 		}
 	},
 	BLOCK_EVENT(6, "block_event") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
-			MeterEvent.addTextForTooltip(lines, "type", metaData);
+			TextUtils.addFancyText(lines, "type", metaData);
 		}
 	},
 	ENTITY_TICK(7, "entity_tick") {
@@ -94,7 +96,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
-			MeterEvent.addTextForTooltip(lines, "direction", Direction.byId(metaData).getName());
+			TextUtils.addFancyText(lines, "direction", Direction.byId(metaData).getName());
 		}
 	};
 	

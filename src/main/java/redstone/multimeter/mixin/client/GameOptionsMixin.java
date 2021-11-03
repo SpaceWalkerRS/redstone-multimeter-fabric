@@ -52,11 +52,11 @@ public class GameOptionsMixin {
 	@Inject(
 			method = "load",
 			at = @At(
-					value = "HEAD"
+					value = "RETURN"
 			)
 	)
 	private void loadOptions(CallbackInfo ci) {
-		File folder = getConfigFolder();
+		File folder = MultimeterClient.getConfigFolder(client);
 		
 		KeyBindings.load(folder);
 		Options.load(folder);
@@ -69,13 +69,9 @@ public class GameOptionsMixin {
 			)
 	)
 	private void saveOptions(CallbackInfo ci) {
-		File folder = getConfigFolder();
+		File folder = MultimeterClient.getConfigFolder(client);
 		
 		KeyBindings.save(folder);
 		Options.save(folder);
-	}
-	
-	private File getConfigFolder() {
-		return new File(client.runDirectory, MultimeterClient.CONFIG_PATH);
 	}
 }

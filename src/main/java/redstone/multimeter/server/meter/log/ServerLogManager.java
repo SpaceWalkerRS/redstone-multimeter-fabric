@@ -5,8 +5,8 @@ import net.minecraft.nbt.NbtList;
 
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.Meter;
-import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.event.MeterEvent;
+import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.common.meter.log.LogManager;
 import redstone.multimeter.common.network.packets.MeterLogsPacket;
 import redstone.multimeter.server.meter.ServerMeterGroup;
@@ -42,17 +42,13 @@ public class ServerLogManager extends LogManager {
 		nextSubtick = 0;
 	}
 	
-	public void logEvent(Meter meter, EventType type, int metaData) {
-		if (!meter.isMetering(type)) {
-			return;
-		}
-		
+	public void logEvent(Meter meter, MeterEvent event) {
 		long tick = getLastTick();
 		int subtick = nextSubtick++;
 		TickPhase phase = meterGroup.getMultimeter().getMultimeterServer().getCurrentTickPhase();
 		
-		MeterEvent event = new MeterEvent(type, tick, subtick, phase, metaData);
-		meter.getLogs().add(event);
+		EventLog log = new EventLog(tick, subtick, phase, event);
+		meter.getLogs().add(log);
 	}
 	
 	public void flushLogs() {

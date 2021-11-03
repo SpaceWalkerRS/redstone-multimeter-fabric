@@ -16,7 +16,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
 
-import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
 import redstone.multimeter.interfaces.mixin.IBlock;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
@@ -48,18 +47,14 @@ public class WorldChunkMixin {
 		Multimeter multimeter = server.getMultimeter();
 		
 		if (oldBlock == newBlock && ((IBlock)newBlock).isPowerSource() && ((PowerSource)newBlock).logPowerChangeOnStateChange()) {
-			int oldPower = ((PowerSource)oldBlock).getPowerLevel(world, pos, oldState);
-			int newPower = ((PowerSource)newBlock).getPowerLevel(world, pos, newState);
-			
-			multimeter.logPowerChange(world, pos, oldPower, newPower);
+			multimeter.logPowerChange(world, pos, oldState, newState);
 		}
 		
 		boolean wasMeterable = ((IBlock)oldBlock).isMeterable();
 		boolean isMeterable = ((IBlock)newBlock).isMeterable();
 		
 		if (wasMeterable || isMeterable) {
-			boolean active = isMeterable && ((Meterable)newBlock).isActive(world, pos, newState);
-			multimeter.logActive(world, pos, active);
+			multimeter.logActive(world, pos, newState);
 		}
 	}
 }
