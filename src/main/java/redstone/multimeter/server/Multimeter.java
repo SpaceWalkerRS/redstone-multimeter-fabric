@@ -444,10 +444,16 @@ public class Multimeter {
 	}
 	
 	public void logPowerChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		tryLogEvent(world, pos, (meterGroup, meter, event) -> true, new MeterEventSupplier(EventType.POWER_CHANGE, () -> {
-			Block block = newState.getBlock();
-			int oldPower = ((PowerSource)block).getPowerLevel(world, pos, oldState);
-			int newPower = ((PowerSource)block).getPowerLevel(world, pos, newState);
+		tryLogEvent(world, pos, (meterGroup, meter, event) -> {
+			int data = event.getMetaData();
+			int oldPower = (data >> 8) & 0xFF;
+			int newPower =  data       & 0xFF;
+			
+			return oldPower != newPower;
+		}, new MeterEventSupplier(EventType.POWER_CHANGE, () -> {
+			PowerSource block = (PowerSource)newState.getBlock();
+			int oldPower = block.getPowerLevel(world, pos, oldState);
+			int newPower = block.getPowerLevel(world, pos, newState);
 			
 			return (oldPower << 8) | newPower;
 		}));
@@ -457,7 +463,7 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.RANDOM_TICK, 0);
 	}
 	
-	public <T> void logScheduledTick(World world, ScheduledTick<T> scheduledTick) {
+	public void logScheduledTick(World world, ScheduledTick<?> scheduledTick) {
 		tryLogEvent(world, scheduledTick.pos, EventType.SCHEDULED_TICK, scheduledTick.priority.getIndex());
 	}
 	
