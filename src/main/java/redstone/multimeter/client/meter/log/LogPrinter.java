@@ -158,10 +158,10 @@ public class LogPrinter {
 		long tick = -1;
 		TickPhase phase = null;
 		
-		while (!printQueue.isEmpty()) {
-			MeterEventLog meterEventLog = printQueue.poll();
-			
-			try {
+		try {
+			while (!printQueue.isEmpty()) {
+				MeterEventLog meterEventLog = printQueue.poll();
+				
 				if (meterEventLog.log.getTick() != tick) {
 					tick = meterEventLog.log.getTick();
 					phase = null;
@@ -178,9 +178,9 @@ public class LogPrinter {
 				
 				writer.write("        " + meterEventLog.toString());
 				writer.newLine();
-			} catch (IOException e) {
-				
 			}
+		} catch (IOException e) {
+			stop();
 		}
 	}
 	
