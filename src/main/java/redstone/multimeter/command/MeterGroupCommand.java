@@ -60,6 +60,7 @@ public class MeterGroupCommand {
 			then(CommandManager.
 				literal("private").
 				requires(source -> isOwnerOfSubscription(source)).
+				executes(context -> queryPrivate(context.getSource())).
 				then(CommandManager.
 					argument("private", BoolArgumentType.bool()).
 					executes(context -> setPrivate(context.getSource(), BoolArgumentType.getBool(context, "private"))))).
@@ -164,6 +165,13 @@ public class MeterGroupCommand {
 		return command(source, (multimeter, meterGroup, player) -> {
 			multimeter.unsubscribeFromMeterGroup(meterGroup, player);
 			source.sendFeedback(new LiteralText(String.format("Unsubscribed from meter group \'%s\'", meterGroup.getName())), false);
+		});
+	}
+	
+	private static int queryPrivate(ServerCommandSource source) {
+		return command(source, (multimeter, meterGroup, player) -> {
+			String status = meterGroup.isPrivate() ? "private" : "public";
+			source.sendFeedback(new LiteralText(String.format("Meter group \'%s\' is %s", meterGroup.getName(), status)), false);
 		});
 	}
 	

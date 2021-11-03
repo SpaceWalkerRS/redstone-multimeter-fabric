@@ -548,6 +548,7 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 	
 	public void onOptionsChanged() {
+		meterGroupName.update();
 		playPauseButton.setVisible(onScreen || Options.HUD.PAUSE_INDICATOR.get());
 		onResized();
 	}
