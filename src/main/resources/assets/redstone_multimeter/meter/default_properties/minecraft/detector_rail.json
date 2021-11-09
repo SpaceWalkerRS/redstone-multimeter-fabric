@@ -1,0 +1,7 @@
+{
+  "name": "detector_rail",
+  "event_types": [
+    "active",
+    "moved"
+  ]
+}
