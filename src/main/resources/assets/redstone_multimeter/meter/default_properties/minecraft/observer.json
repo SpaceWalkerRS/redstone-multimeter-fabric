@@ -1,0 +1,7 @@
+{
+  "name": "observer",
+  "event_types": [
+    "active",
+    "moved"
+  ]
+}

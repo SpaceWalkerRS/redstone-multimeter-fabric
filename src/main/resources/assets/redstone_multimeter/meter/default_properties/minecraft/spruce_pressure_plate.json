@@ -1,0 +1,6 @@
+{
+  "name": "pressure_plate",
+  "event_types": [
+    "active"
+  ]
+}

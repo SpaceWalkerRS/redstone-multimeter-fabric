@@ -1,0 +1,7 @@
+{
+  "name": "sticky_piston",
+  "event_types": [
+    "active",
+    "moved"
+  ]
+}
