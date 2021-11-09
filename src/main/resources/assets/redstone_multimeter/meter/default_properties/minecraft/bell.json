@@ -1,0 +1,6 @@
+{
+  "name": "bell",
+  "event_types": [
+    "powered"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "weighted_pressure_plate",
+  "event_types": [
+    "active",
+    "power_change"
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "rsmm-fabric",
+  "id": "rsmm_fabric",
   "version": "${version}",
 
   "name": "Redstone Multimeter Fabric",
@@ -18,16 +18,19 @@
   },
 
   "license": "MIT Licence",
-  "icon": "assets/rsmm/fabric/icon.png",
+  "icon": "assets/redstone_multimeter/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "rsmm.fabric.RedstoneMultimeterMod"
+      "redstone.multimeter.RedstoneMultimeterMod"
+    ],
+    "modmenu": [
+      "redstone.multimeter.modmenu.RedstoneMultimeterMod"
     ]
   },
   "mixins": [
-    "rsmm-fabric.mixins.json"
+    "rsmm_fabric.mixins.json"
   ],
 
   "depends": {

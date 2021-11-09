@@ -1,0 +1,6 @@
+{
+  "name": "button",
+  "event_types": [
+    "active"
+  ]
+}
