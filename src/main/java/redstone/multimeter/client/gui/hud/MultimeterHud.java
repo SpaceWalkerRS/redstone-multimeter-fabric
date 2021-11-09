@@ -14,7 +14,6 @@ import net.minecraft.util.Formatting;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.IElement;
-import redstone.multimeter.client.gui.element.SimpleTextElement;
 import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.hud.element.MeterListRenderer;
@@ -23,6 +22,7 @@ import redstone.multimeter.client.gui.hud.element.SecondaryEventViewer;
 import redstone.multimeter.client.gui.hud.event.MeterEventRenderDispatcher;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
+import redstone.multimeter.util.ColorUtils;
 
 public class MultimeterHud extends AbstractParentElement {
 	
@@ -55,8 +55,6 @@ public class MultimeterHud extends AbstractParentElement {
 	private Meter selectedMeter;
 	
 	public MultimeterHud(MultimeterClient client) {
-		super(0, 0, 0, 0);
-		
 		MinecraftClient minecraftClient = client.getMinecraftClient();
 		
 		this.client = client;
@@ -68,7 +66,7 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		if (meters.isEmpty()) {
 			return;
 		}
@@ -82,7 +80,7 @@ public class MultimeterHud extends AbstractParentElement {
 			IElement child = children.get(index);
 			
 			if (child.isVisible()) {
-				renderer.render(child, matrices, mouseX, mouseY, delta);
+				renderer.render(child, matrices, mouseX, mouseY);
 			}
 		}
 		
@@ -91,18 +89,23 @@ public class MultimeterHud extends AbstractParentElement {
 	
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean success = super.mouseClick(mouseX, mouseY, button);
+		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success) {
+		if (!consumed) {
 			selectMeter(null);
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override
 	public boolean isHovered(double mouseX, double mouseY) {
-		return mouseX >= hudX && mouseX <= (hudX + hudWidth) && mouseY >= hudY && mouseY <= (hudY + hudHeight);
+		int minX = Math.max(getX(), hudX);
+		int maxX = Math.min(getX() + getAvailableWidth(), hudX + hudWidth);
+		int minY = Math.max(getY(), hudY);
+		int maxY = Math.max(getY() + getAvailableHeight(), hudY + hudHeight);
+		
+		return mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY;
 	}
 	
 	@Override
@@ -147,14 +150,19 @@ public class MultimeterHud extends AbstractParentElement {
 	
 	@Override
 	protected void onChangedX(int x) {
-		int range = getAvailableWidth() - getWidth();
-		float position = getScreenPosX();
-		hudX = x + Math.round(position * range);
+		int effectiveWidth = names.getWidth() + ticks.getWidth();
+		int range = getAvailableWidth() - effectiveWidth;
+		float rawPos = getScreenPosX();
+		int pos = Math.round(range * rawPos);
 		int w;
+		//hudX = x + Math.round(position * range);
+		//int w;
 		
 		switch (getDirectionalityX()) {
 		default:
 		case LEFT_TO_RIGHT:
+			hudX = x + pos;
+			
 			x = hudX;
 			names.setX(x);
 			meterGroupName.setX(x + settings.gridSize + 1);
@@ -174,18 +182,20 @@ public class MultimeterHud extends AbstractParentElement {
 			
 			break;
 		case RIGHT_TO_LEFT:
+			hudX = x + pos + effectiveWidth - getWidth();
+			
 			x = hudX + (getWidth() - names.getWidth());
 			names.setX(x);
 			meterGroupName.setX(x + names.getWidth() - (meterGroupName.getWidth() + settings.gridSize + 1));
 			
-			w = playPauseButton.getWidth();
-			playPauseButton.setX(x - 2 * w);
-			fastForwardButton.setX(x - 3 * w);
-			fastBackwardButton.setX(x - w);
-			printIndicator.setX(x - 4 * w);
-			
 			x -= ticks.getWidth();
 			ticks.setX(x);
+			
+			w = playPauseButton.getWidth();
+			playPauseButton.setX(x + w);
+			fastBackwardButton.setX(x + 2 * w);
+			fastForwardButton.setX(x);
+			printIndicator.setX(x + 3 * w);
 			
 			x -= (settings.columnWidth + settings.gridSize + subticks.getWidth());
 			subticks.setX(x);
@@ -224,7 +234,7 @@ public class MultimeterHud extends AbstractParentElement {
 			subticks.setY(y);
 			meterGroupName.setY(y - meterGroupName.getHeight());
 			
-			y -= (playPauseButton.getHeight() + 1);
+			y -= playPauseButton.getHeight();
 			playPauseButton.setY(y);
 			fastBackwardButton.setY(y);
 			fastForwardButton.setY(y);
@@ -240,22 +250,25 @@ public class MultimeterHud extends AbstractParentElement {
 		this.names = new MeterListRenderer(this);
 		this.ticks = new PrimaryEventViewer(this);
 		this.subticks = new SecondaryEventViewer(this);
-		this.meterGroupName = new SimpleTextElement(this.client, 0, 0, false, () -> {
+		this.meterGroupName = new TextElement(this.client, 0, 0, t -> {
 			String text = this.client.getMeterGroup().getName();
-			int color = onScreen ? 0xD0D0D0 : 0x202020;
+			
+			int a = Math.round(0xFF * settings.opacity() / 100.0F);
+			int rgb = onScreen ? 0xD0D0D0 : 0x202020;
+			int color = ColorUtils.setAlpha(rgb, a);
 			
 			if (paused && !Options.HUD.HIDE_HIGHLIGHT.get() && !Options.HUD.PAUSE_INDICATOR.get()) {
 				text += " (Paused)";
 			}
 			
-			return new LiteralText(text).styled(style -> style.withColor(color));
+			t.add(text).setColor(color);
 		});
 		
 		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> null, button -> {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ee" : "\u23ea"), () -> null, button -> {
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> null, button -> {
 			stepBackward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -265,7 +278,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(Screen.hasControlDown() ? "\u23ed" : "\u23e9"), () -> null, button -> {
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> null, button -> {
 			stepForward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -275,7 +288,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new SimpleTextElement(this.client, 0, 0, false, () -> new LiteralText("P").formatted(Formatting.BOLD));
+		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").formatted(Formatting.BOLD)).setWithShadow(true));
 		
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);
@@ -296,8 +309,18 @@ public class MultimeterHud extends AbstractParentElement {
 		resetSize();
 	}
 	
+	private String getStepSymbol(boolean forward, boolean fast) {
+		boolean leftToRight = (getDirectionalityX() == Directionality.X.LEFT_TO_RIGHT);
+		
+		if (forward == leftToRight) {
+			return fast ? "\u23ed" : "\u23e9";
+		} else {
+			return fast ? "\u23ee" : "\u23ea";
+		}
+	}
+	
 	public void render(MatrixStack matrices) {
-		render(matrices, -1, -1, 0);
+		render(matrices, -1, -1);
 	}
 	
 	public float getScreenPosX() {

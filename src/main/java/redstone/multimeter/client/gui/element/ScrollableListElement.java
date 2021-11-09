@@ -2,13 +2,6 @@ package redstone.multimeter.client.gui.element;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -40,8 +33,8 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		super.render(matrices, mouseX, mouseY, delta);
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
+		super.render(matrices, mouseX, mouseY);
 		
 		if (getMaxScrollAmount() > 0.0D) {
 			if (scrollMode == ScrollMode.PULL) {
@@ -90,26 +83,26 @@ public class ScrollableListElement extends SimpleListElement {
 	
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		boolean success = super.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
+		boolean consumed = super.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
 		
-		if (!success && scrollMode == ScrollMode.DRAG) {
+		if (!consumed && scrollMode == ScrollMode.DRAG) {
 			double scroll = deltaY * (getMaxScrollAmount() + getHeight()) / scrollBarHeight;
 			setScrollAmount(scrollAmount + scroll);
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override
 	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		boolean success = super.mouseScroll(mouseX, mouseY, scrollX, scrollY);
+		boolean consumed = super.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 		
-		if (!success && scrollMode == ScrollMode.NONE) {
+		if (!consumed && scrollMode == ScrollMode.NONE) {
 			setScrollAmount(scrollAmount - Options.Miscellaneous.SCROLL_SPEED.get() * scrollY);
-			success = true;
+			consumed = true;
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override
@@ -211,49 +204,21 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 	
 	protected void renderScrollBar(MatrixStack matrices, boolean dark) {
-		RenderSystem.disableTexture();
-		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
+		renderRect(matrices, scrollBarX, scrollBarY, scrollBarWidth, scrollBarHeight, 0xFF000000); // background
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		int visibleHeight = getHeight();
+		int totalHeight = visibleHeight + (int)getMaxScrollAmount();
 		
-		int screenHeight = getHeight();
-		int totalHeight = screenHeight + (int)getMaxScrollAmount();
+		int x = scrollBarX;
+		int y = scrollBarY + (int)Math.round(scrollBarHeight * scrollAmount / totalHeight);
+		int width = scrollBarWidth;
+		int height = Math.round((float)scrollBarHeight * visibleHeight / totalHeight);
 		
-		int bgLeft = scrollBarX;
-		int bgRight = scrollBarX + scrollBarWidth;
-		int bgTop = scrollBarY;
-		int bgBot = scrollBarY + scrollBarHeight;
+		int color0 = dark ? 0xFF555555 : 0xFF777777;
+		int color1 = dark ? 0xFF999999 : 0xFFBBBBBB;
 		
-		int barLeft = bgLeft;
-		int barRight = bgRight;
-		int barTop = scrollBarY + scrollBarHeight * (int)scrollAmount / totalHeight;
-		int barBot = scrollBarY + scrollBarHeight * ((int)scrollAmount + getHeight()) / totalHeight;
-		
-		int z = 0;
-		
-		int color1 = dark ? 0x55 : 0x77;
-		int color2 = dark ? 0x99 : 0xBB;
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-		
-		bufferBuilder.vertex(bgLeft , bgBot, z).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(bgRight, bgBot, z).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(bgRight, bgTop, z).color(0, 0, 0, 255).next();
-		bufferBuilder.vertex(bgLeft , bgTop, z).color(0, 0, 0, 255).next();
-		
-		bufferBuilder.vertex(barLeft     , barBot    , z).color(color1, color1, color1, 255).next();
-		bufferBuilder.vertex(barRight    , barBot    , z).color(color1, color1, color1, 255).next();
-		bufferBuilder.vertex(barRight    , barTop    , z).color(color1, color1, color1, 255).next();
-		bufferBuilder.vertex(barLeft     , barTop    , z).color(color1, color1, color1, 255).next();
-		bufferBuilder.vertex(barLeft     , barBot - 1, z).color(color2, color2, color2, 255).next();
-		bufferBuilder.vertex(barRight - 1, barBot - 1, z).color(color2, color2, color2, 255).next();
-		bufferBuilder.vertex(barRight - 1, barTop    , z).color(color2, color2, color2, 255).next();
-		bufferBuilder.vertex(barLeft     , barTop    , z).color(color2, color2, color2, 255).next();
-		
-		tessellator.draw();
-		
-		RenderSystem.enableTexture();
+		renderRect(matrices, x, y, width    , height    , color0);
+		renderRect(matrices, x, y, width - 1, height - 1, color1);
 	}
 	
 	protected enum ScrollMode {

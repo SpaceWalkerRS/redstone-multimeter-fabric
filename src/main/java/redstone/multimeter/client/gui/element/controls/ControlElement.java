@@ -8,7 +8,6 @@ import net.minecraft.text.TranslatableText;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
-import redstone.multimeter.client.gui.element.SimpleTextElement;
 import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.element.button.ButtonFactory;
@@ -30,12 +29,10 @@ public class ControlElement extends AbstractParentElement {
 	}
 	
 	public ControlElement(MultimeterClient client, int midpoint, int controlWidth, Supplier<Text> name, Supplier<List<Text>> tooltip, ButtonFactory control, Supplier<Boolean> isReset, Runnable resetter) {
-		super(0, 0, midpoint + 4 + controlWidth + 10 + (resetter == null ? 0 : RESET_WIDTH), IButton.DEFAULT_HEIGHT);
-		
 		this.client = client;
 		this.midpoint = midpoint;
 		
-		this.name = new SimpleTextElement(this.client, 0, 0, true, name, tooltip, t -> false);
+		this.name = new TextElement(this.client, 0, 0, t -> t.add(name.get()).setWithShadow(true), tooltip, t -> false);
 		this.control = control.create(this.client, controlWidth, IButton.DEFAULT_HEIGHT);
 		this.reset = resetter == null ? null : createReset(isReset, resetter);
 		
@@ -44,6 +41,15 @@ public class ControlElement extends AbstractParentElement {
 		if (this.reset != null) {
 			addChild(this.reset);
 		}
+		
+		int width = midpoint + 4 + controlWidth + 10;
+		
+		if (resetter != null) {
+			width += RESET_WIDTH;
+		}
+		
+		setWidth(width);
+		setHeight(IButton.DEFAULT_HEIGHT);
 	}
 	
 	@Override

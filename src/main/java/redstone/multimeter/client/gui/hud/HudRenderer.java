@@ -2,21 +2,18 @@ package redstone.multimeter.client.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 
+import redstone.multimeter.client.gui.element.RenderHelper2D;
 import redstone.multimeter.client.gui.element.IElement;
 import redstone.multimeter.util.ColorUtils;
 
-public class HudRenderer {
+public class HudRenderer extends RenderHelper2D {
 	
 	private final MultimeterHud hud;
 	
@@ -27,8 +24,8 @@ public class HudRenderer {
 		this.target = hud;
 	}
 	
-	public void render(IElement element, MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		(target = element).render(matrices, mouseX, mouseY, delta);
+	public void render(IElement element, MatrixStack matrices, int mouseX, int mouseY) {
+		(target = element).render(matrices, mouseX, mouseY);
 	}
 	
 	private int translateX(int x, int width) {
@@ -51,67 +48,70 @@ public class HudRenderer {
 		}
 	}
 	
-	public void drawHighlight(MatrixStack matrices, int x, int y, int width, int height, boolean selected) {
+	public void renderHighlight(MatrixStack matrices, int x, int y, int width, int height, boolean selection) {
 		int left   = x;
 		int right  = x + width;
 		int top    = y;
 		int bottom = y + height;
 		int d      = hud.settings.gridSize;
-		int color  = selected ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
+		int color  = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
 		
-		drawRect(matrices, left     , top       , d     , height, color); // left
-		drawRect(matrices, left  + d, top       , width , d     , color); // top
-		drawRect(matrices, right    , top    + d, d     , height, color); // right
-		drawRect(matrices, left     , bottom    , width , d     , color); // bottom
+		renderRect(matrices, (bufferBuilder, model) -> {
+			drawRect(bufferBuilder, model, left     , top       , d     , height, color); // left
+			drawRect(bufferBuilder, model, left     , bottom    , width , d     , color); // bottom
+			drawRect(bufferBuilder, model, right    , top    + d, d     , height, color); // right
+			drawRect(bufferBuilder, model, left  + d, top       , width , d     , color); // top
+		});
 	}
 	
-	public void drawRect(MatrixStack matrices, int x, int y, int width, int height, int color) {
-		RenderSystem.enableBlend();
-		RenderSystem.disableTexture();
+	public void renderRect(MatrixStack matrices, int x, int y, int width, int height, int color) {
+		super.renderRect(matrices, x, y, width, height, color);
+	}
+	
+	public void renderText(MatrixStack matrices, String text, int x, int y, int color) {
+		super.renderText(hud.font, matrices, text, x, y, false, color);
+	}
+	
+	public void renderText(MatrixStack matrices, Text text, int x, int y, int color) {
+		super.renderText(hud.font, matrices, text, x, y, false, color);
+	}
+	
+	@Override
+	protected void drawRect(BufferBuilder bufferBuilder, Matrix4f model, int x, int y, int width, int height, int color) {
 		RenderSystem.enableDepthTest();
-		RenderSystem.defaultBlendFunc();
-		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		int x0 = translateX(x, width);
+		int y0 = translateY(y, height);
+		int x1 = x0 + width;
+		int y1 = y0 + height;
 		
-		Matrix4f model = matrices.peek().getModel();
+		int a = Math.round(0xFF * hud.settings.opacity() / 100.0F);
+		int r = ColorUtils.getRed(color);
+		int g = ColorUtils.getGreen(color);
+		int b = ColorUtils.getBlue(color);
 		
-		int x1 = translateX(x, width);
-		int x2 = x1 + width;
-		int y1 = translateY(y, height);
-		int y2 = y1 + height;
-		
-		float r = (float)ColorUtils.getRed(color)   / 0xFF;
-		float g = (float)ColorUtils.getGreen(color) / 0xFF;
-		float b = (float)ColorUtils.getBlue(color)  / 0xFF;
-		float a = hud.settings.opacity() / 100.0F;
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-		
-		bufferBuilder.vertex(model, x1, y2, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(model, x2, y2, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(model, x2, y1, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(model, x1, y1, 0.0F).color(r, g, b, a).next();
-		
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
-		
-		RenderSystem.disableDepthTest();
-		RenderSystem.enableTexture();
-		RenderSystem.disableBlend();
+		drawRect(bufferBuilder, model, x0, y0, x1, y1, a, r, g, b);
 	}
 	
-	public void drawText(MatrixStack matrices, String text, int x, int y, int color) {
-		drawText(matrices, new LiteralText(text), x, y, color);
-	}
-	
-	public void drawText(MatrixStack matrices, Text text, int x, int y, int color) {
-		x = translateX(x, hud.font.getWidth(text) - 1);
-		y = translateY(y, hud.font.fontHeight - 2);
+	@Override
+	protected void drawText(Immediate immediate, Matrix4f model, TextRenderer font, String text, int x, int y, boolean shadow, int color) {
+		x = translateX(x, font.getWidth(text) - 1);
+		y = translateY(y, font.fontHeight - 2);
+		
 		int alpha = Math.round(0xFF * hud.settings.opacity() / 100.0F);
 		color = ColorUtils.setAlpha(color, alpha);
 		
-		hud.font.draw(matrices, text, x, y, color);
+		super.drawText(immediate, model, font, text, x, y, shadow, color);
+	}
+	
+	@Override
+	protected void drawText(Immediate immediate, Matrix4f model, TextRenderer font, Text text, int x, int y, boolean shadow, int color) {
+		x = translateX(x, font.getWidth(text) - 1);
+		y = translateY(y, font.fontHeight - 2);
+		
+		int alpha = Math.round(0xFF * hud.settings.opacity() / 100.0F);
+		color = ColorUtils.setAlpha(color, alpha);
+		
+		super.drawText(immediate, model, font, text, x, y, shadow, color);
 	}
 }

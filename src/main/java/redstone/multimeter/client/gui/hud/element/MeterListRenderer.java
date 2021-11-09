@@ -25,13 +25,13 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		matrices.push();
 		drawHighlights(matrices, mouseX, mouseY);
 		matrices.translate(0, 0, -1);
 		drawNames(matrices);
 		matrices.translate(0, 0, -1);
-		hud.renderer.drawRect(matrices, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
+		hud.renderer.renderRect(matrices, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
 		matrices.pop();
 	}
 	
@@ -104,14 +104,14 @@ public class MeterListRenderer extends AbstractElement {
 		}
 	}
 	
-	private void drawHighlight(MatrixStack matrices, int row, boolean selected) {
+	private void drawHighlight(MatrixStack matrices, int row, boolean selection) {
 		int h = hud.settings.rowHeight + hud.settings.gridSize;
 		int x = 0;
 		int y = row * h;
 		int width = getWidth() - hud.settings.gridSize;
 		int height = h;
 		
-		hud.renderer.drawHighlight(matrices, x, y, width, height, selected);
+		hud.renderer.renderHighlight(matrices, x, y, width, height, selection);
 	}
 	
 	private void drawNames(MatrixStack matrices) {
@@ -126,7 +126,7 @@ public class MeterListRenderer extends AbstractElement {
 				name.formatted(Formatting.GRAY, Formatting.ITALIC);
 			}
 			
-			hud.renderer.drawText(matrices, name, x, y, 0xFFFFFF);
+			hud.renderer.renderText(matrices, name, x, y, 0xFFFFFF);
 			
 			y += hud.settings.rowHeight + hud.settings.gridSize;
 		}

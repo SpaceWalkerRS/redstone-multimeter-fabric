@@ -1,4 +1,4 @@
-package redstone.multimeter.client.gui.element;
+package redstone.multimeter.client.gui;
 
 public class TextureRegion {
 	

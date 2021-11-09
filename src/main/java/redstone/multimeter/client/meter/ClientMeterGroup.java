@@ -119,15 +119,19 @@ public class ClientMeterGroup extends MeterGroup {
 		client.refreshMeterGroup();
 	}
 	
-	public void unsubscribe() {
+	public void unsubscribe(boolean disconnect) {
 		subscribed = false;
 		name = super.getName();
-		logManager.getPrinter().stop();
+		logManager.getPrinter().stop(!disconnect);
 		clear();
 	}
 	
 	public void refresh(NbtCompound nbt) {
 		updateFromNBT(nbt);
 		client.getHUD().updateMeterList();
+	}
+	
+	public void tick() {
+		logManager.tick();
 	}
 }

@@ -41,7 +41,7 @@ public class MeterGroupCommand {
 		}
 	}
 	
-	public static void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
+	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralArgumentBuilder<ServerCommandSource> builder = CommandManager.
 			literal("metergroup").
 			then(CommandManager.

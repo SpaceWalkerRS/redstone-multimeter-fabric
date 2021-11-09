@@ -10,8 +10,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.Texture;
+import redstone.multimeter.client.gui.TextureRegion;
 import redstone.multimeter.client.gui.element.AbstractElement;
-import redstone.multimeter.client.gui.element.TextureRegion;
 
 public abstract class AbstractButton extends AbstractElement implements IButton {
 	
@@ -48,7 +49,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		if (moved) {
 			moved = false;
 			updateHovered(mouseX, mouseY);
@@ -152,8 +153,10 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 		boolean matchHeight = (height == region.height);
 		
 		if (matchWidth && matchHeight) {
-			drawTexture(matrices, region, x, y, width, height);
+			renderTextureRegion(matrices, region, x, y, width, height);
 		} else {
+			Texture texture = region.texture;
+			
 			int border = 3;
 			
 			int leftWidth = Math.min(region.width, width) - border;
@@ -179,10 +182,12 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 			int ty2 = region.y + region.height - bottomHeight;
 			int ty3 = region.y + region.height;
 			
-			drawTexture(matrices, region.texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
-			drawTexture(matrices, region.texture, x0, y2, x1, y3, tx0, ty2, tx1, ty3);
-			drawTexture(matrices, region.texture, x2, y2, x3, y3, tx2, ty2, tx3, ty3);
-			drawTexture(matrices, region.texture, x2, y0, x3, y1, tx2, ty0, tx3, ty1);
+			renderTexture(matrices, texture, (bufferBuilder, model) -> {
+				drawTexture(bufferBuilder, model, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
+				drawTexture(bufferBuilder, model, texture, x0, y2, x1, y3, tx0, ty2, tx1, ty3);
+				drawTexture(bufferBuilder, model, texture, x2, y2, x3, y3, tx2, ty2, tx3, ty3);
+				drawTexture(bufferBuilder, model, texture, x2, y0, x3, y1, tx2, ty0, tx3, ty1);
+			});
 		}
 	}
 	
@@ -194,7 +199,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 			int y = getMessageY();
 			int color = getMessageColor();
 			
-			font.drawWithShadow(matrices, message, x, y, color);
+			renderText(font, matrices, message, x, y, true, color);
 		}
 	}
 	

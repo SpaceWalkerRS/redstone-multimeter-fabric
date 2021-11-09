@@ -11,7 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.element.TextureRegion;
+import redstone.multimeter.client.gui.TextureRegion;
 
 public class Slider extends AbstractButton {
 	

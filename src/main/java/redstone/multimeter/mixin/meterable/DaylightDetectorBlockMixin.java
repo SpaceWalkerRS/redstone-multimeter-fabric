@@ -16,7 +16,7 @@ public abstract class DaylightDetectorBlockMixin implements Meterable, PowerSour
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWER) > 0;
+		return state.get(Properties.POWER) > MIN_POWER;
 	}
 	
 	@Override

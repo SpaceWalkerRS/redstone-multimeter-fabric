@@ -34,7 +34,7 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 					value = "RETURN"
 			)
 	)
-	private void onShouldExtendInjectAtReturn(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
+	private void onShouldExtend(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
 		logPowered(world, pos, cir.getReturnValue());
 	}
 	
@@ -48,7 +48,7 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 					target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
 			)
 	)
-	private void onMoveInjectBeforeOffset1(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonHandler pistonHandler, Map<BlockPos, BlockState> movedPosToState, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, BlockState[] removedStates, Direction moveDir, int removedIndex, int brokenIndex, BlockPos movedPos, BlockState movedState) {
+	private void onBlockMoved(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonHandler pistonHandler, Map<BlockPos, BlockState> movedPosToState, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, BlockState[] removedStates, Direction moveDir, int removedIndex, int brokenIndex, BlockPos movedPos, BlockState movedState) {
 		if (!world.isClient()) {
 			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 			

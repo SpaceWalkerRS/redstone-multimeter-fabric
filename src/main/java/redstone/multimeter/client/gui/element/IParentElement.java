@@ -8,14 +8,14 @@ import net.minecraft.text.Text;
 public interface IParentElement extends IElement {
 	
 	@Override
-	default void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	default void render(MatrixStack matrices, int mouseX, int mouseY) {
 		List<IElement> children = getChildren();
 		
 		for (int index = 0; index < children.size(); index++) {
 			IElement child = children.get(index);
 			
 			if (child.isVisible()) {
-				child.render(matrices, mouseX, mouseY, delta);
+				child.render(matrices, mouseX, mouseY);
 			}
 		}
 	}
@@ -52,7 +52,7 @@ public interface IParentElement extends IElement {
 	
 	@Override
 	default boolean mouseRelease(double mouseX, double mouseY, int button) {
-		boolean released = IElement.super.mouseRelease(mouseX, mouseY, button);
+		boolean consumed = IElement.super.mouseRelease(mouseX, mouseY, button);
 		
 		List<IElement> children = getChildren();
 		
@@ -60,11 +60,11 @@ public interface IParentElement extends IElement {
 			IElement child = children.get(index);
 			
 			if (child.isVisible() && child.mouseRelease(mouseX, mouseY, button)) {
-				released = true;
+				consumed = true;
 			}
 		}
 		
-		return released;
+		return consumed;
 	}
 	
 	@Override

@@ -20,6 +20,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
@@ -40,6 +41,8 @@ public class TextField extends AbstractButton {
 	private int textY;
 	private int textWidth;
 	private int textHeight;
+	private int selectionY;
+	private int selectionHeight;
 	
 	private int maxLength;
 	private int maxScroll;
@@ -65,9 +68,11 @@ public class TextField extends AbstractButton {
 		this.fullText = "";
 		this.visibleText = "";
 		this.textX = getX() + 4;
-		this.textY = getY() + (getHeight() - font.fontHeight) / 2;
+		this.textY = getY() + (getHeight() - this.font.fontHeight) / 2;
 		this.textWidth = getWidth() - 8;
-		this.textHeight = font.fontHeight;
+		this.textHeight = this.font.fontHeight;
+		this.selectionY = this.textY - 1;
+		this.selectionHeight = this.textHeight + 2;
 		
 		this.maxLength = 32;
 		this.maxScroll = 0;
@@ -79,7 +84,7 @@ public class TextField extends AbstractButton {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		if (selection == SelectType.MOUSE) {
 			if (mouseX < textX) {
 				moveCursor(-1);
@@ -89,7 +94,7 @@ public class TextField extends AbstractButton {
 			}
 		}
 		
-		super.render(matrices, mouseX, mouseY, delta);
+		super.render(matrices, mouseX, mouseY);
 	}
 	
 	@Override
@@ -98,9 +103,9 @@ public class TextField extends AbstractButton {
 		super.mouseMove(mouseX, mouseY);
 		
 		if (isHovered()) {
-			RSMMScreen.setCursor(client, CursorType.IBEAM);
+			setCursor(client.getMinecraftClient(), CursorType.IBEAM);
 		} else if (wasHovered) {
-			RSMMScreen.setCursor(client, CursorType.ARROW);
+			setCursor(client.getMinecraftClient(), CursorType.ARROW);
 		}
 	}
 	
@@ -159,7 +164,7 @@ public class TextField extends AbstractButton {
 	
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+		if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_ENTER) {
 			setFocused(false);
 			return true;
 		}
@@ -268,6 +273,7 @@ public class TextField extends AbstractButton {
 	public void setY(int y) {
 		super.setY(y);
 		textY = y + getHeight() - (getHeight() + font.fontHeight) / 2;
+		selectionY = textY - 1;
 	}
 	
 	@Override
@@ -297,36 +303,39 @@ public class TextField extends AbstractButton {
 	public void setHeight(int height) {
 		super.setHeight(height);
 		textHeight = font.fontHeight;
+		selectionHeight = textHeight + 2;
 	}
 	
 	@Override
 	protected void renderButton(MatrixStack matrices) {
-		int x0 = getX();
-		int y0 = getY();
-		int x1 = x0 + getWidth();
-		int y1 = y0 + getHeight();
+		int x = getX();
+		int y = getY();
+		int width = getWidth();
+		int height = getHeight();
 		int borderColor = getBorderColor();
 		int backgroundColor = 0xFF000000;
 		
-		fill(matrices, x0, y0, x1, y1, borderColor);
-		fill(matrices, x0 + 1, y0 + 1, x1 - 1, y1 - 1, backgroundColor);
+		renderRect(matrices, (bufferBuilder, model) -> {
+			drawRect(bufferBuilder, model, x    , y    , width    , height    , borderColor);
+			drawRect(bufferBuilder, model, x + 1, y + 1, width - 2, height - 2, backgroundColor);
+		});
 	}
 	
 	@Override
 	protected void renderButtonMessage(MatrixStack matrices) {
 		int color = getTextColor();
-		font.drawWithShadow(matrices, visibleText, textX, textY, color);
+		renderText(font, matrices, visibleText, textX, textY, true, color);
 		
 		if (isFocused()) {
 			if ((cursorTicks / 6) % 2 == 0) {
 				if (cursorIndex == fullText.length()) {
 					int x = textX + font.getWidth(visibleText);
-					font.drawWithShadow(matrices, "_", x, textY, color);
+					renderText(font, matrices, "_", x, textY, true, color);
 				} else {
 					int width = font.getWidth(fullText.substring(scrollIndex, cursorIndex));
 					int x = textX + width;
 					
-					fill(matrices, x, textY, x + 1, textY + textHeight, color);
+					renderRect(matrices, x, selectionY, 1, selectionHeight, color);
 				}
 			}
 			if (hasSelection()) {
@@ -355,8 +364,9 @@ public class TextField extends AbstractButton {
 			return;
 		}
 		
-		int y0 = textY;
-		int y1 = y0 + textHeight;
+		int y0 = selectionY;
+		int y1 = selectionY + selectionHeight;
+		int z = 0;
 		
 		RenderSystem.setShader(() -> GameRenderer.getPositionShader());
 		RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
@@ -366,18 +376,20 @@ public class TextField extends AbstractButton {
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		Matrix4f model = matrices.peek().getModel();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(x0, y0, 0.0D).next();
-		bufferBuilder.vertex(x0, y1, 0.0D).next();
-		bufferBuilder.vertex(x1, y1, 0.0D).next();
-		bufferBuilder.vertex(x1, y0, 0.0D).next();
+		
+		bufferBuilder.vertex(model, x0, y0, z).next();
+		bufferBuilder.vertex(model, x0, y1, z).next();
+		bufferBuilder.vertex(model, x1, y1, z).next();
+		bufferBuilder.vertex(model, x1, y0, z).next();
 		
 		tessellator.draw();
 		
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableColorLogicOp();
 		RenderSystem.enableTexture();
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	
 	private int getBorderColor() {

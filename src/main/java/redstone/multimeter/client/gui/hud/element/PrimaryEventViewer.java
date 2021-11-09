@@ -6,8 +6,8 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+
 import redstone.multimeter.client.gui.CursorType;
-import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -35,16 +35,16 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				}
 			}
 			
-			RSMMScreen.setCursor(hud.client, cursor);
+			setCursor(hud.client.getMinecraftClient(), cursor);
 		}
 	}
 	
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean wasDragging = isDraggingMouse();
-		boolean success = super.mouseClick(mouseX, mouseY, button);
+		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success && !wasDragging) {
+		if (!consumed && !wasDragging) {
 			if (isDraggingMouse()) {
 				dx = 0.0D;
 				
@@ -52,7 +52,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 					resizing = true;
 				}
 				
-				success = true;
+				consumed = true;
 			}
 			if (hud.isPaused() && button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
 				int column = getHoveredColumn(mouseX);
@@ -65,11 +65,11 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				Options.HUD.SELECTED_COLUMN.set(column);
 				IButton.playClickSound(hud.client);
 				
-				success = true;
+				consumed = true;
 			}
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override

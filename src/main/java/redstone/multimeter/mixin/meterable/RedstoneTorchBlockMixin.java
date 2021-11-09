@@ -26,7 +26,7 @@ public abstract class RedstoneTorchBlockMixin implements MeterableBlock, PowerSo
 					value = "RETURN"
 			)
 	)
-	private void onShouldUnpowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+	private void onPowerCheck(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
 		logPowered(world, pos, cir.getReturnValue()); // floor redstone torches only
 	}
 	

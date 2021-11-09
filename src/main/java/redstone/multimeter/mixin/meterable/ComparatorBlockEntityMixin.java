@@ -29,7 +29,7 @@ public class ComparatorBlockEntityMixin extends BlockEntity {
 					value = "HEAD"
 			)
 	)
-	public void onSetOutputSignalInjectAtHead(int newPower, CallbackInfo ci) {
+	public void onPowerChange(int newPower, CallbackInfo ci) {
 		if (!world.isClient()) {
 			((IServerWorld)world).getMultimeter().logPowerChange(world, pos, outputSignal, newPower);
 		}

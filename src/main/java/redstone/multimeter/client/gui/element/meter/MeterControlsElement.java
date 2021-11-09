@@ -14,7 +14,6 @@ import net.minecraft.util.math.Direction.Axis;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.SimpleListElement;
-import redstone.multimeter.client.gui.element.SimpleTextElement;
 import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.element.button.IButton;
@@ -51,7 +50,7 @@ public class MeterControlsElement extends AbstractParentElement {
 		
 		this.client = client;
 		
-		this.title = new SimpleTextElement(this.client, 0, 0, false, () -> new LiteralText(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).formatted(Formatting.UNDERLINE));
+		this.title = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).formatted(Formatting.UNDERLINE)).setWithShadow(true));
 		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide"))), button -> {
 			this.client.getMeterGroup().toggleHidden(meter);
 			return true;
@@ -65,7 +64,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			
 			return true;
 		});
-		this.deleteConfirm = new SimpleTextElement(this.client, 0, 0, false, () -> new LiteralText("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").formatted(Formatting.ITALIC));
+		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").formatted(Formatting.ITALIC)).setWithShadow(true));
 		this.controls = new SimpleListElement(this.client, getWidth());
 		
 		this.deleteConfirm.setVisible(false);
@@ -79,26 +78,26 @@ public class MeterControlsElement extends AbstractParentElement {
 	
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean success = super.mouseClick(mouseX, mouseY, button);
+		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
 		if (triedDeleting && getFocusedElement() != deleteButton) {
 			undoTryDelete();
-			success = true;
+			consumed = true;
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean success = super.keyPress(keyCode, scanCode, modifiers);
+		boolean consumed = super.keyPress(keyCode, scanCode, modifiers);
 		
 		if (triedDeleting && keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			undoTryDelete();
-			success = true;
+			consumed = true;
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override

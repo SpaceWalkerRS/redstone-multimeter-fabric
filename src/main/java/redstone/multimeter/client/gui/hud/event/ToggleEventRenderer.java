@@ -1,8 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
@@ -127,7 +125,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					int startX = x + (int)(start - firstTick) * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 					int endX = x + (int)(end - firstTick) * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 					
-					Text text = new LiteralText(String.valueOf(pulseLength));
+					String text = String.valueOf(pulseLength);
 					
 					int availableWidth = endX - startX;
 					int requiredWidth = hud.font.getWidth(text) + 1;
@@ -139,9 +137,9 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 						int textColor = toggled ? hud.settings.colorTextOn : hud.settings.colorTextOff;
 						
 						matrices.push();
-						hud.renderer.drawText(matrices, text, startX + 1, y + 1, textColor);
+						hud.renderer.renderText(matrices, text, startX + 1, y + 1, textColor);
 						matrices.translate(0, 0, -0.01);
-						hud.renderer.drawRect(matrices, startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
+						hud.renderer.renderRect(matrices, startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
 						matrices.pop();
 					}
 				}
@@ -231,7 +229,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			}
 		}
 		
-		hud.renderer.drawRect(matrices, x, y, width, height, color);
+		hud.renderer.renderRect(matrices, x, y, width, height, color);
 	}
 	
 	private void draw(MatrixStack matrices, int x, int y, int color, int count) {
@@ -254,7 +252,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			}
 		}
 		
-		hud.renderer.drawRect(matrices, x, y, width, height, color);
+		hud.renderer.renderRect(matrices, x, y, width, height, color);
 	}
 	
 	private void drawOff(MatrixStack matrices, int x, int y, int color) {

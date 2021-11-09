@@ -1,187 +1,54 @@
 package redstone.multimeter.client.gui.element;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
-
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.CursorType;
-import redstone.multimeter.interfaces.mixin.IMinecraftClient;
+import redstone.multimeter.client.gui.TextureRegion;
 
-public abstract class RSMMScreen extends Screen implements IParentElement {
+public abstract class RSMMScreen extends AbstractParentElement {
 	
-	private final List<IElement> content;
+	protected final MultimeterClient client;
+	protected final MinecraftClient minecraftClient;
+	protected final TextRenderer font;
+	
+	private final Text title;
 	private final boolean drawTitle;
 	
-	private boolean focused;
-	private IElement focusedElement;
-	private boolean dragging;
+	protected ScreenWrapper wrapper;
 	
-	protected MultimeterClient multimeterClient;
-	
-	protected RSMMScreen(Text title, boolean drawTitle) {
-		super(title);
+	protected RSMMScreen(MultimeterClient client, Text title, boolean drawTitle) {
+		this.client = client;
+		this.minecraftClient = client.getMinecraftClient();
+		this.font = this.minecraftClient.textRenderer;
 		
-		this.content = new ArrayList<>();
+		this.title = title;
 		this.drawTitle = drawTitle;
 	}
 	
 	@Override
-	public final void mouseMoved(double mouseX, double mouseY) {
-		mouseMove(mouseX, mouseY);
-	}
-	
-	@Override
-	public final boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return isHovered(mouseX, mouseY) && mouseClick(mouseX, mouseY, button);
-	}
-	
-	@Override
-	public final boolean mouseReleased(double mouseX, double mouseY, int button) {
-		return mouseRelease(mouseX, mouseY, button);
-	}
-	
-	@Override
-	public final boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		return mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
-	}
-	
-	@Override
-	public final boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		return false;
-	}
-	
-	@Override
-	public final boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		return keyPress(keyCode, scanCode, modifiers);
-	}
-	
-	@Override
-	public final boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-		return keyRelease(keyCode, scanCode, modifiers);
-	}
-	
-	@Override
-	public final boolean charTyped(char chr, int modifiers) {
-		return typeChar(chr, modifiers);
-	}
-
-	@Override
-	public boolean isDraggingMouse() {
-		return dragging;
-	}
-	
-	@Override
-	public void setDraggingMouse(boolean dragging) {
-		this.dragging = dragging;
-	}
-	
-	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		renderBackground(matrices);
-		renderContent(matrices, mouseX, mouseY, delta);
+		renderContent(matrices, mouseX, mouseY);
 		
 		if (drawTitle) {
-			int width = textRenderer.getWidth(title);
+			int width = font.getWidth(title);
 			int x = getX() + (getWidth() - width) / 2;
 			int y = getY() + 6;
 			
-			drawTextWithShadow(matrices, textRenderer, title, x, y, 0xFFFFFFFF);
+			renderText(font, matrices, title, x, y, true, 0xFFFFFFFF);
 		}
 		
 		List<Text> tooltip = getTooltip(mouseX, mouseY);
 		
 		if (tooltip != null && !tooltip.isEmpty()) {
-			renderTooltip(matrices, tooltip, mouseX, mouseY + 15);
+			drawTooltip(matrices, tooltip, mouseX, mouseY);
 		}
-	}
-	
-	@Override
-	protected final void init() {
-		multimeterClient = ((IMinecraftClient)client).getMultimeterClient();
-		
-		removeChildren();
-		initScreen();
-		update();
-	}
-	
-	protected abstract void initScreen();
-	
-	@Override
-	public void tick() {
-		IParentElement.super.tick();
-	}
-	
-	@Override
-	public void removed() {
-		onRemoved();
-		setCursor(multimeterClient, CursorType.ARROW);
-	}
-	
-	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		if (IParentElement.super.keyPress(keyCode, scanCode, modifiers)) {
-			return true;
-		}
-		if (shouldCloseOnEsc() && keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			onClose();
-			return true;
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public boolean isFocused() {
-		return focused;
-	}
-	
-	@Override
-	public void setFocused(boolean focused) {
-		this.focused = focused;
-		
-		if (!isFocused()) {
-			setFocusedElement(null);
-		}
-	}
-	
-	@Override
-	public List<IElement> getChildren() {
-		return content;
-	}
-	
-	@Override
-	public IElement getFocusedElement() {
-		return focusedElement != null && focusedElement.isFocused() ? focusedElement : null;
-	}
-	
-	@Override
-	public void setFocusedElement(IElement element) {
-		IElement focused = focusedElement;
-		
-		if (element == focused) {
-			return;
-		}
-		
-		if (focused != null) {
-			focused.setFocused(false);
-		}
-		
-		this.focusedElement = element;
-		
-		if (element != null) {
-			element.setFocused(true);
-		}
-	}
-	
-	@Override
-	public final int getX() {
-		return 0;
 	}
 	
 	@Override
@@ -190,48 +57,125 @@ public abstract class RSMMScreen extends Screen implements IParentElement {
 	}
 	
 	@Override
-	public final int getY() {
-		return 0;
-	}
-	
-	@Override
 	public final void setY(int y) {
 		
 	}
 	
 	@Override
-	public final int getWidth() {
-		return width;
-	}
-	
-	@Override
-	public final int getHeight() {
-		return height;
-	}
-	
-	@Override
-	public boolean isVisible() {
-		return true;
-	}
-	
-	@Override
-	public void setVisible(boolean visible) {
+	protected final void onChangedX(int x) {
 		
 	}
 	
-	protected void addContent(IElement element) {
-		content.add(element);
+	@Override
+	protected final void onChangedY(int y) {
+		
 	}
 	
-	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		IParentElement.super.render(matrices, mouseX, mouseY, delta);
+	protected abstract void initScreen();
+	
+	protected boolean shouldCloseOnEsc() {
+		return true;
 	}
 	
-	public static void setCursor(MultimeterClient client, CursorType type) {
-		GLFW.glfwSetCursor(client.getMinecraftClient().getWindow().getHandle(), type.getCursor());
+	public void close() {
+		minecraftClient.setScreen(wrapper.getParent());
+	}
+	
+	protected void renderBackground(MatrixStack matrices) {
+		MinecraftClient minecraftClient = client.getMinecraftClient();
+		
+		if (minecraftClient.world == null) {
+			renderBackgroundTexture(matrices);
+		} else {
+			renderGradient(matrices, getX(), getY(), getWidth(), getHeight(), 0xC0101010, 0xD0101010);
+		}
+	}
+	
+	protected void renderBackgroundTexture(MatrixStack matrices) {
+		renderTextureRegion(matrices, TextureRegion.OPTIONS_BACKGROUND, getX(), getY(), getWidth(), getHeight());
+	}
+	
+	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY) {
+		super.render(matrices, mouseX, mouseY);
+	}
+	
+	protected void drawTooltip(MatrixStack matrices, List<Text> lines, int mouseX, int mouseY) {
+		int lineHeight = font.fontHeight;
+		int lineSpacing = 1;
+		
+		int width = 0;
+		int height = (lines.size() - 1) * (lineHeight + lineSpacing) + lineHeight;
+		
+		for (int index = 0; index < lines.size(); index++) {
+			Text text = lines.get(index);
+			int lineWidth = font.getWidth(text);
+			
+			if (lineWidth > width) {
+				width = lineWidth;
+			}
+		}
+		
+		width += 8;
+		height += 8;
+		
+		int x = mouseX + 15;
+		int y = mouseY;
+		
+		if (x + width > getX() + getWidth()) {
+			x = mouseX - 15 - width;
+		}
+		if (y + height > getY() + getHeight()) {
+			y = mouseY - height;
+		}
+		
+		drawTooltip(matrices, lines, x, y, width, height);
+	}
+	
+	private void drawTooltip(MatrixStack matrices, List<Text> lines, int x, int y, int width, int height) {
+		int backgroundColor = 0xF0100010;
+		int borderColor0    = 0x505000FF;
+		int borderColor1    = 0x5028007F;
+		
+		matrices.push();
+		matrices.translate(0, 0, 400);
+		
+		renderRect(matrices, (bufferBuilder, model) -> {
+			// background
+			drawRect(bufferBuilder, model, x    , y + 1         , width    , height - 2, backgroundColor); // center, left/right outer borders
+			drawRect(bufferBuilder, model, x + 1, y             , width - 2, 1         , backgroundColor); // top outer border
+			drawRect(bufferBuilder, model, x + 1, y + height - 1, width - 2, 1         , backgroundColor); // bottom outer border
+			
+			// inner border
+			drawGradient(bufferBuilder, model, x + 1        , y + 2         , 1        , height - 4, borderColor0, borderColor1); // left
+			drawRect    (bufferBuilder, model, x + 1        , y + height - 2, width - 2, 1         , borderColor1);               // bottom
+			drawGradient(bufferBuilder, model, x + width - 2, y + 2         , 1        , height - 4, borderColor0, borderColor1); // right
+			drawRect    (bufferBuilder, model, x + 1        , y + 1         , width - 2, 1         , borderColor0);               // top
+		});
+		
+		renderText(matrices, (immediate, model) -> {
+			int textX = x + 4;
+			int textY = y + 4;
+			
+			for (int index = 0; index < lines.size(); index++) {
+				Text line = lines.get(index);
+				drawText(immediate, model, font, line, textX, textY, true);
+				
+				textY += font.fontHeight + 1;
+			}
+		});
+		
+		matrices.pop();
+	}
+	
+	public Text getTitle() {
+		return title;
+	}
+	
+	public boolean isPauseScreen() {
+		return true;
 	}
 	
 	public static boolean isControlPressed() {
-		return hasControlDown() && !hasShiftDown() && !hasAltDown();
+		return Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
 	}
 }

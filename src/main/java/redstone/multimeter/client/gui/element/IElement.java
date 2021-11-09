@@ -4,10 +4,15 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
-public interface IElement extends Drawable {
+import redstone.multimeter.client.gui.CursorType;
+
+public interface IElement {
+	
+	public void render(MatrixStack matrices, int mouseX, int mouseY);
 	
 	public void mouseMove(double mouseX, double mouseY);
 	
@@ -73,4 +78,7 @@ public interface IElement extends Drawable {
 	
 	public void update();
 	
+	default void setCursor(MinecraftClient client, CursorType type) {
+		GLFW.glfwSetCursor(client.getWindow().getHandle(), type.getCursor());
+	}
 }

@@ -10,6 +10,10 @@ public abstract class AbstractParentElement extends AbstractElement implements I
 	private boolean focused;
 	private IElement focusedElement;
 	
+	protected AbstractParentElement() {
+		this(0, 0, 0, 0);
+	}
+	
 	protected AbstractParentElement(int x, int y, int width, int height) {
 		super(x, y, width, height);
 	}

@@ -6,6 +6,7 @@ import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.KeyBindings;
+import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.ScrollableListElement;
 import redstone.multimeter.client.gui.element.meter.MeterControlsElement;
@@ -16,20 +17,20 @@ public class MultimeterScreen extends RSMMScreen {
 	private final boolean isPauseScreen;
 	
 	private ScrollableListElement list;
-	private boolean lockScrolling;
+	private boolean scrollHud;
 	
-	public MultimeterScreen() {
-		super(new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
+	public MultimeterScreen(MultimeterClient client) {
+		super(client, new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
 		
 		this.isPauseScreen = !Screen.hasShiftDown();
 	}
 	
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean success = super.mouseClick(mouseX, mouseY, button);
+		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success) {
-			success = multimeterClient.getInputHandler().mouseClick(mouseX, mouseY, button);
+		if (!consumed) {
+			consumed = client.getInputHandler().mouseClick(mouseX, mouseY, button);
 		}
 		
 		return true;
@@ -37,23 +38,23 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean success = super.keyPress(keyCode, scanCode, modifiers);
+		boolean consumed = super.keyPress(keyCode, scanCode, modifiers);
 		
-		if (!success) {
-			success = multimeterClient.getInputHandler().keyPress(keyCode, scanCode, modifiers);
+		if (!consumed) {
+			consumed = client.getInputHandler().keyPress(keyCode, scanCode, modifiers);
 			
-			if (!lockScrolling && KeyBindings.SCROLL_HUD.matchesKey(keyCode, scanCode)) {
-				lockScrolling = true;
+			if (!scrollHud && KeyBindings.SCROLL_HUD.matchesKey(keyCode, scanCode)) {
+				scrollHud = true;
 			}
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override
 	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
-		if (lockScrolling && KeyBindings.SCROLL_HUD.matchesKey(keyCode, scanCode)) {
-			lockScrolling = false;
+		if (scrollHud && KeyBindings.SCROLL_HUD.matchesKey(keyCode, scanCode)) {
+			scrollHud = false;
 		}
 		
 		return super.keyRelease(keyCode, scanCode, modifiers);
@@ -61,8 +62,8 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (lockScrolling && multimeterClient.getMeterGroup().hasMeters()) {
-			multimeterClient.getHUD().stepBackward(Math.round((float)scrollY));
+		if (scrollHud && client.getMeterGroup().hasMeters()) {
+			client.getHUD().stepBackward(Math.round((float)scrollY));
 			return true;
 		}
 		
@@ -72,7 +73,7 @@ public class MultimeterScreen extends RSMMScreen {
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
-		client.keyboard.setRepeatEvents(false);
+		minecraftClient.keyboard.setRepeatEvents(false);
 	}
 	
 	@Override
@@ -83,18 +84,18 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	protected void initScreen() {
-		client.keyboard.setRepeatEvents(true);
+		minecraftClient.keyboard.setRepeatEvents(true);
 		
-		list = new ScrollableListElement(multimeterClient, getWidth(), getHeight());
+		list = new ScrollableListElement(client, getWidth(), getHeight());
 		list.setX(getX());
 		list.setY(getY());
 		
-		MultimeterHud hud = multimeterClient.getHUD();
+		MultimeterHud hud = client.getHUD();
 		
 		list.add(hud);
-		list.add(new MeterControlsElement(multimeterClient, 0, 0, list.getEffectiveWidth()));
+		list.add(new MeterControlsElement(client, 0, 0, list.getEffectiveWidth()));
 		
-		addContent(list);
+		addChild(list);
 		
 		hud.onInitScreen(list.getEffectiveWidth(), list.getHeight());
 	}
@@ -105,24 +106,24 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 	
 	@Override
-	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		if (multimeterClient.getMeterGroup().hasMeters()) {
-			super.renderContent(matrices, mouseX, mouseY, delta);
+	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY) {
+		if (client.getMeterGroup().hasMeters()) {
+			super.renderContent(matrices, mouseX, mouseY);
 		} else {
 			String text;
 			
-			if (multimeterClient.hasSubscription()) {
+			if (client.hasSubscription()) {
 				text = "Nothing to see here! Add a meter to get started.";
 			} else {
 				text = "Nothing to see here! Subscribe to a meter group to get started.";
 			}
 			
-			int textWidth = textRenderer.getWidth(text);
-			int textHeight = textRenderer.fontHeight;
+			int textWidth = font.getWidth(text);
+			int textHeight = font.fontHeight;
 			int x = getX() + (getWidth() - textWidth) / 2;
 			int y = getY() + (getHeight() - textHeight) / 2;
 			
-			textRenderer.drawWithShadow(matrices, text, x, y, 0xFFFFFF);
+			renderText(font, matrices, text, x, y, true, 0xFFFFFFFF);
 		}
 	}
 }

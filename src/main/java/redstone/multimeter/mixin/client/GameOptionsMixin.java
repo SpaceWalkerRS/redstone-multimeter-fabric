@@ -35,16 +35,16 @@ public class GameOptionsMixin {
 			)
 	)
 	private void initOptions(MinecraftClient client, File optionsFile, CallbackInfo ci) {
-		Collection<KeyBinding> rsmmKeyBindings = KeyBindings.getKeyBindings();
-		KeyBinding[] mcKeyBindings = keysAll;
+		Collection<KeyBinding> rsmmKeys = KeyBindings.getKeyBindings();
 		
-		keysAll = new KeyBinding[mcKeyBindings.length + rsmmKeyBindings.size()];
+		KeyBinding[] mcKeys = keysAll;
+		keysAll = new KeyBinding[mcKeys.length + rsmmKeys.size()];
+		
 		int index = 0;
-		
-		for (int i = 0; i < mcKeyBindings.length; i++) {
-			keysAll[index++] = mcKeyBindings[i];
+		for (int i = 0; i < mcKeys.length; i++) {
+			keysAll[index++] = mcKeys[i];
 		}
-		for (KeyBinding key : rsmmKeyBindings) {
+		for (KeyBinding key : rsmmKeys) {
 			keysAll[index++] = key;
 		}
 	}

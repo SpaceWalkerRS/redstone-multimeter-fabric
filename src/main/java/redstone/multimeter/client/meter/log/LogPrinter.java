@@ -11,8 +11,11 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.Meter;
@@ -25,18 +28,22 @@ public class LogPrinter {
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 	
 	private final ClientLogManager logManager;
+	private final MultimeterClient client;
 	private final File folder;
 	private final Queue<MeterEventLog> printQueue;
 	
 	private BufferedWriter writer;
+	private long firstTick;
 	private long prevTick;
 	
 	public LogPrinter(ClientLogManager logManager) {
 		this.logManager = logManager;
-		this.folder = new File(RedstoneMultimeterMod.NAMESPACE +  "/logs/");
+		this.client = this.logManager.getMeterGroup().getMultimeterClient();
+		this.folder = new File(RedstoneMultimeterMod.NAMESPACE + "/logs/");
 		this.printQueue = new PriorityQueue<>();
 		
 		this.writer = null;
+		this.firstTick = -1;
 		this.prevTick = -1;
 	}
 	
@@ -50,13 +57,13 @@ public class LogPrinter {
 	
 	public void toggle() {
 		if (isPrinting()) {
-			stop();
+			stop(true);
 		} else {
-			start();
+			start(true);
 		}
 	}
 	
-	public void start() {
+	public void start(boolean notifyPlayer) {
 		if (isPrinting()) {
 			return;
 		}
@@ -66,6 +73,7 @@ public class LogPrinter {
 			FileWriter fw = new FileWriter(file);
 			
 			writer = new BufferedWriter(fw);
+			firstTick = logManager.getLastTick();
 			
 			writer.write("Logs for meter group \'" + logManager.getMeterGroup().getName() + "\'");
 			writer.newLine();
@@ -77,14 +85,22 @@ public class LogPrinter {
 			if (Options.LogPrinter.PRINT_OLD_LOGS.get() || Screen.hasShiftDown()) {
 				printLogs();
 			} else {
-				prevTick = logManager.getLastTick();
+				prevTick = firstTick;
 			}
+			
+			if (notifyPlayer) {
+				Text message = new LiteralText("Started printing logs to file...");
+				client.sendMessage(message, false);
+			}
+			
+			client.getHUD().onTogglePrinter();
 		} catch (IOException e) {
-			stop();
+			stop(notifyPlayer);
 		}
 	}
 	
-	public void stop() {
+	public void stop(boolean notifyPlayer) {
+		firstTick = -1;
 		prevTick = -1;
 		
 		if (!isPrinting()) {
@@ -97,6 +113,13 @@ public class LogPrinter {
 			
 		} finally {
 			writer = null;
+			
+			if (notifyPlayer) {
+				Text message = new LiteralText("Stopped printing logs to file");
+				client.sendMessage(message, false);
+			}
+			
+			client.getHUD().onTogglePrinter();
 		}
 	}
 	
@@ -118,6 +141,20 @@ public class LogPrinter {
 		file.createNewFile();
 		
 		return file;
+	}
+	
+	public void tick() {
+		if (isPrinting()) {
+			int limit = Options.LogPrinter.MAX_RUNTIME.get();
+			long runtime = logManager.getLastTick() - firstTick;
+			
+			if (limit >= 0 && runtime > limit) {
+				Text message = new LiteralText("Printer exceeded maximum runtime!");
+				client.sendMessage(message, false);
+				
+				stop(true);
+			}
+		}
 	}
 	
 	public void printLogs() {
@@ -180,14 +217,17 @@ public class LogPrinter {
 				writer.newLine();
 			}
 		} catch (IOException e) {
-			stop();
+			Text message = new LiteralText("Printer encountered issues!");
+			client.sendMessage(message, false);
+			
+			stop(true);
 		}
 	}
 	
 	public void onNewMeterGroup() {
 		if (isPrinting()) {
-			stop();
-			start();
+			stop(false);
+			start(false);
 		}
 	}
 	

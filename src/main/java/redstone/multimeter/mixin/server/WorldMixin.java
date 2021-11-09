@@ -16,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.interfaces.mixin.IBlock;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.interfaces.mixin.IWorld;
@@ -30,16 +29,6 @@ public abstract class WorldMixin implements IWorld {
 	@Shadow public abstract boolean isReceivingRedstonePower(BlockPos pos);
 	
 	@Inject(
-			method = "tickBlockEntities",
-			at = @At(
-					value = "HEAD"
-			)
-	)
-	private void onTickBlockEntitiesInjectAtHead(CallbackInfo ci) {
-		onTickPhase(TickPhase.TICK_BLOCK_ENTITIES);
-	}
-	
-	@Inject(
 			method = "updateNeighbor",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
@@ -48,7 +37,7 @@ public abstract class WorldMixin implements IWorld {
 					target = "Lnet/minecraft/block/BlockState;neighborUpdate(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;Z)V"
 			)
 	)
-	private void onUpdateNeighborInjectBeforeNeighborUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
+	private void onBlockUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
 		if (isClient()) {
 			return;
 		}
@@ -75,14 +64,9 @@ public abstract class WorldMixin implements IWorld {
 					target = "Lnet/minecraft/block/BlockState;neighborUpdate(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;Z)V"
 			)
 	)
-	private void onUpdateComparatorsInjectBeforeNeighborUpdate(BlockPos fromPos, Block fromBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {
-		if (isClient()) {
-			return;
+	private void onComparatorUpdate(BlockPos fromPos, Block fromBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {
+		if (!isClient()) {
+			((IServerWorld)this).getMultimeter().logComparatorUpdate((World)(Object)this, pos);
 		}
-		
-		MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
-		Multimeter multimeter = server.getMultimeter();
-		
-		multimeter.logComparatorUpdate((World)(Object)this, pos);
 	}
 }

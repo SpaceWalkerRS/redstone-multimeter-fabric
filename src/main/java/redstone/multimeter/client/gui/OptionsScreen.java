@@ -3,13 +3,13 @@ package redstone.multimeter.client.gui;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.ScrollableListElement;
 import redstone.multimeter.client.gui.element.button.Button;
@@ -20,34 +20,25 @@ import redstone.multimeter.client.option.Options;
 
 public class OptionsScreen extends RSMMScreen {
 	
-	private final Screen parent;
-	
-	public OptionsScreen(Screen parent) {
-		super(new LiteralText(String.format("%s Options", RedstoneMultimeterMod.MOD_NAME)), true);
-		
-		this.parent = parent;
+	public OptionsScreen(MultimeterClient client) {
+		super(client, new LiteralText(String.format("%s Options", RedstoneMultimeterMod.MOD_NAME)), true);
 	}
 	
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
-		client.keyboard.setRepeatEvents(false);
 		Options.validate();
-		multimeterClient.getHUD().onOptionsChanged();
-	}
-	
-	@Override
-	public void onClose() {
-		client.setScreen(parent);
-		client.options.write();
+		minecraftClient.options.write();
+		minecraftClient.keyboard.setRepeatEvents(false);
+		client.getHUD().onOptionsChanged();
 	}
 	
 	@Override
 	protected void initScreen() {
-		client.keyboard.setRepeatEvents(true);
+		minecraftClient.keyboard.setRepeatEvents(true);
 		
-		ScrollableListElement list = new ScrollableListElement(multimeterClient, getWidth(), getHeight(), 52, 36);
-		OptionsListBuilder builder = new OptionsListBuilder(multimeterClient, getWidth());
+		ScrollableListElement list = new ScrollableListElement(client, getWidth(), getHeight(), 52, 36);
+		OptionsListBuilder builder = new OptionsListBuilder(client, getWidth());
 		
 		for (Entry<String, List<IOption>> entry : Options.byCategory().entrySet()) {
 			String category = entry.getKey();
@@ -68,14 +59,14 @@ public class OptionsScreen extends RSMMScreen {
 		int x = getX() + getWidth() / 2;
 		int y = getY() + 22;
 		
-		IButton controls = new Button(multimeterClient, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("options.controls"), () -> null, button -> {
-			client.setScreen(new ControlsOptionsScreen(this, client.options));
+		IButton controls = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("options.controls"), () -> null, button -> {
+			minecraftClient.setScreen(new ControlsOptionsScreen(wrapper, minecraftClient.options));
 			return true;
 		});
 		
 		y = getY() + getHeight() - (IButton.DEFAULT_HEIGHT + 8);
 		
-		IButton reset = new Button(multimeterClient, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), () -> null, button -> {
+		IButton reset = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), () -> null, button -> {
 			for (IOption option : Options.all()) {
 				option.reset();
 			}
@@ -83,16 +74,14 @@ public class OptionsScreen extends RSMMScreen {
 			
 			return true;
 		});
-		IButton done = new Button(multimeterClient, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> ScreenTexts.DONE, () -> null, button -> {
-			client.setScreen(parent);
-			client.options.write();
-			
+		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> ScreenTexts.DONE, () -> null, button -> {
+			close();
 			return true;
 		});
 		
-		addContent(list);
-		addContent(controls);
-		addContent(reset);
-		addContent(done);
+		addChild(list);
+		addChild(controls);
+		addChild(reset);
+		addChild(done);
 	}
 }

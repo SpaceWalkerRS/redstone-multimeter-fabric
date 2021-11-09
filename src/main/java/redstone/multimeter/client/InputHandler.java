@@ -1,6 +1,5 @@
 package redstone.multimeter.client;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 
@@ -21,11 +20,7 @@ public class InputHandler {
 		}
 		
 		while (KeyBindings.OPEN_MULTIMETER_SCREEN.wasPressed()) {
-			MinecraftClient minecraftClient = client.getMinecraftClient();
-			
-			if (minecraftClient.currentScreen == null) {
-				minecraftClient.setScreen(new MultimeterScreen());
-			}
+			client.openScreen(new MultimeterScreen(client));
 		}
 		
 		if (!client.hasSubscription()) {
@@ -77,7 +72,7 @@ public class InputHandler {
 		} else
 		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
 			if (client.hasMultimeterScreenOpen()) {
-				client.getMinecraftClient().setScreen(null);
+				client.getScreen().close();
 			}
 		} else {
 			return false;
@@ -98,7 +93,7 @@ public class InputHandler {
 		} else
 		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
 			if (client.hasMultimeterScreenOpen()) {
-				client.getMinecraftClient().setScreen(null);
+				client.getScreen().close();
 			}
 		} else {
 			return false;

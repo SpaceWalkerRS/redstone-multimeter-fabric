@@ -14,7 +14,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -227,10 +226,5 @@ public class MultimeterServer {
 		}
 		
 		return players;
-	}
-	
-	public File getWorldSaveDataFolder() {
-		File worldSave = server.getSavePath(WorldSavePath.ROOT).toFile();
-		return new File(worldSave, RedstoneMultimeterMod.NAMESPACE);
 	}
 }

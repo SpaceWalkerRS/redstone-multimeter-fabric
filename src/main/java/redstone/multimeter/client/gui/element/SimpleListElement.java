@@ -1,20 +1,12 @@
 package redstone.multimeter.client.gui.element;
 
 import java.util.Collection;
+import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.Texture;
 
 public class SimpleListElement extends AbstractParentElement {
 	
@@ -36,22 +28,26 @@ public class SimpleListElement extends AbstractParentElement {
 	}
 	
 	public SimpleListElement(MultimeterClient client, int width, int topBorder, int bottomBorder) {
-		super(0, 0, width, 0);
-		
 		this.client = client;
 		this.topBorder = topBorder - BORDER_MARGIN_TOP;
 		this.bottomBorder = bottomBorder - BORDER_MARGIN_BOTTOM;
 		
 		this.spacing = 2;
+		
+		setWidth(width);
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		if (drawBackground) {
 			drawBackground(matrices);
 		}
 		
-		for (IElement element : getChildren()) {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			IElement element = children.get(index);
+			
 			if (element.getY() + element.getHeight() < minY) {
 				continue;
 			}
@@ -60,7 +56,7 @@ public class SimpleListElement extends AbstractParentElement {
 			}
 			
 			if (element.isVisible()) {
-				element.render(matrices, mouseX, mouseY, delta);
+				element.render(matrices, mouseX, mouseY);
 			}
 		}
 		
@@ -102,16 +98,19 @@ public class SimpleListElement extends AbstractParentElement {
 		int tx1 = x1 / 2;
 		int ty1 = (y1 - offsetY) / 2;
 		
-		drawTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x20, 0x20, 0x20);
+		renderTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x20, 0x20, 0x20);
 	}
 	
 	protected void drawBorders(MatrixStack matrices) {
 		boolean renderTop = topBorder > 0;
 		boolean renderBottom = bottomBorder > 0;
 		
-		int x0 = getX();
+		int x = getX();
+		int width = getWidth();
+		
+		int x0 = x;
 		int y0;
-		int x1 = getX() + getWidth();
+		int x1 = x + width;
 		int y1;
 		
 		int tx0 = x0 / 2;
@@ -126,7 +125,8 @@ public class SimpleListElement extends AbstractParentElement {
 			ty0 = y0 / 2;
 			ty1 = y1 / 2;
 			
-			drawTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
+			renderTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
+			renderGradient(matrices, x0, y1, width, 4, 0xFF000000, 0x00000000);
 		}
 		if (renderBottom) {
 			y0 = maxY;
@@ -135,36 +135,9 @@ public class SimpleListElement extends AbstractParentElement {
 			ty0 = y0 / 2;
 			ty1 = y1 / 2;
 			
-			drawTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
+			renderTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
+			renderGradient(matrices, x0, y0 - 4, width, 4, 0x00000000, 0xFF000000);
 		}
-		
-		RenderSystem.depthFunc(GL11.GL_LEQUAL);
-		RenderSystem.disableDepthTest();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-		RenderSystem.disableTexture();
-		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
-		
-		y0 = minY;
-		y1 = maxY;
-		int z = 0;
-		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-		
-		bufferBuilder.vertex(x0, y0 + 4, z).color(0x0, 0x0, 0x0, 0x0 ).next();
-		bufferBuilder.vertex(x1, y0 + 4, z).color(0x0, 0x0, 0x0, 0x0 ).next();
-		bufferBuilder.vertex(x1, y0    , z).color(0x0, 0x0, 0x0, 0xFF).next();
-		bufferBuilder.vertex(x0, y0    , z).color(0x0, 0x0, 0x0, 0xFF).next();
-		
-		bufferBuilder.vertex(x0, y1    , z).color(0x0, 0x0, 0x0, 0xFF).next();
-		bufferBuilder.vertex(x1, y1    , z).color(0x0, 0x0, 0x0, 0xFF).next();
-		bufferBuilder.vertex(x1, y1 - 4, z).color(0x0, 0x0, 0x0, 0x0 ).next();
-		bufferBuilder.vertex(x0, y1 - 4, z).color(0x0, 0x0, 0x0, 0x0 ).next();
-		
-		tessellator.draw();
 	}
 	
 	protected int getTotalHeight() {
@@ -187,7 +160,10 @@ public class SimpleListElement extends AbstractParentElement {
 		int yStart = getY() + topBorder + BORDER_MARGIN_TOP + getOffsetY();
 		int y = yStart;
 		
-		for (IElement element : getChildren()) {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			IElement element = children.get(index);
 			element.setY(y);
 			y += element.getHeight() + spacing;
 		}

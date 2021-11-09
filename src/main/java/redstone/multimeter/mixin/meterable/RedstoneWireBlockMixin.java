@@ -26,8 +26,8 @@ public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSou
 					value = "RETURN"
 			)
 	)
-	private void onGetReceivedRedstonePower(World world, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
-		logPowered(world, pos, cir.getReturnValue() > 0);
+	private void onPowerCheck(World world, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
+		logPowered(world, pos, cir.getReturnValue() > MIN_POWER);
 	}
 	
 	@Override
@@ -37,12 +37,12 @@ public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSou
 	
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return getReceivedRedstonePower(world, pos) > 0;
+		return getReceivedRedstonePower(world, pos) > MIN_POWER;
 	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWER) > 0;
+		return state.get(Properties.POWER) > MIN_POWER;
 	}
 	
 	@Override

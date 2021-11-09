@@ -106,7 +106,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		int height = (2 * half < hud.settings.rowHeight) ? 3 : 4;
 		int color = edgeColorProvider.apply(meter, event);
 		
-		hud.renderer.drawRect(matrices, x, y + half - 1, width, height, color);
+		hud.renderer.renderRect(matrices, x, y + half - 1, width, height, color);
 	}
 	
 	protected void drawCenter(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
@@ -115,6 +115,6 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		int height = (2 * half < hud.settings.rowHeight) ? 1 : 2;
 		int color = centerColorProvider.apply(meter, event);
 		
-		hud.renderer.drawRect(matrices, x, y + half, width, height, color);
+		hud.renderer.renderRect(matrices, x, y + half, width, height, color);
 	}
 }

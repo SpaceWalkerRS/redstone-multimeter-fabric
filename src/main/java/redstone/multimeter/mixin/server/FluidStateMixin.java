@@ -22,7 +22,7 @@ public class FluidStateMixin {
 					value = "HEAD"
 			)
 	)
-	private void onOnRandomTickInjectAtHead(World world, BlockPos pos, Random random, CallbackInfo ci) {
+	private void onRandomTick(World world, BlockPos pos, Random random, CallbackInfo ci) {
 		((IServerWorld)world).getMultimeter().logRandomTick(world, pos);
 	}
 }

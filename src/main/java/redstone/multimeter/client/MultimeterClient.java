@@ -16,10 +16,10 @@ import net.minecraft.world.World;
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.MultimeterScreen;
 import redstone.multimeter.client.gui.element.RSMMScreen;
+import redstone.multimeter.client.gui.element.ScreenWrapper;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
-import redstone.multimeter.client.meter.log.LogPrinter;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.client.render.MeterRenderer;
 import redstone.multimeter.common.WorldPos;
@@ -139,12 +139,12 @@ public class MultimeterClient {
 	public void onServerTick(long serverTick) {
 		lastServerTick = serverTick;
 		
-		meterGroup.getLogManager().clearOldLogs();
+		meterGroup.tick();
 		hud.onServerTick();
 	}
 	
 	public void onShutdown() {
-		meterGroup.getLogManager().getPrinter().stop();
+		meterGroup.getLogManager().getPrinter().stop(false);
 	}
 	
 	/**
@@ -154,7 +154,7 @@ public class MultimeterClient {
 		if (!connected) {
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
 				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
-				client.player.sendMessage(warning, false);
+				sendMessage(warning, false);
 			}
 			
 			connected = true;
@@ -173,7 +173,7 @@ public class MultimeterClient {
 			connected = false;
 			
 			hud.reset();
-			meterGroup.unsubscribe();
+			meterGroup.unsubscribe(true);
 		}
 	}
 	
@@ -243,17 +243,9 @@ public class MultimeterClient {
 	}
 	
 	public void togglePrinter() {
-		if (!meterGroup.hasMeters()) {
-			return;
+		if (meterGroup.hasMeters()) {
+			meterGroup.getLogManager().getPrinter().toggle();
 		}
-		
-		LogPrinter printer = meterGroup.getLogManager().getPrinter();
-		
-		printer.toggle();
-		hud.onTogglePrinter();
-		
-		String message = String.format("%s printing meter logs to file...", printer.isPrinting() ? "Started" : "Stopped");
-		client.player.sendMessage(new LiteralText(message), false);
 	}
 	
 	public void toggleEventType(EventType type) {
@@ -289,17 +281,35 @@ public class MultimeterClient {
 	}
 	
 	public void toggleHud() {
+		if (!meterGroup.hasMeters()) {
+			return;
+		}
+		
 		hudEnabled = !hudEnabled;
 		
 		String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-		client.player.sendMessage(new LiteralText(message), true);
+		sendMessage(new LiteralText(message), true);
 	}
 	
 	public RSMMScreen getScreen() {
-		return client.currentScreen != null && client.currentScreen instanceof RSMMScreen ? (RSMMScreen)client.currentScreen : null;
+		if (client.currentScreen != null && client.currentScreen instanceof ScreenWrapper) {
+			ScreenWrapper screenWrapper = (ScreenWrapper)client.currentScreen;
+			return screenWrapper.getScreen();
+		}
+		
+		return null;
+	}
+	
+	public void openScreen(RSMMScreen screen) {
+		client.setScreen(new ScreenWrapper(client.currentScreen, screen));
 	}
 	
 	public boolean hasMultimeterScreenOpen() {
-		return client.currentScreen != null && client.currentScreen instanceof MultimeterScreen;
+		RSMMScreen screen = getScreen();
+		return screen != null && screen instanceof MultimeterScreen;
+	}
+	
+	public void sendMessage(Text message, boolean actionBar) {
+		client.player.sendMessage(message, actionBar);
 	}
 }

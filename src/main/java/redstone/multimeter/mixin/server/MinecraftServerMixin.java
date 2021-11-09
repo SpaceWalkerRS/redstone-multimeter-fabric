@@ -28,7 +28,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "RETURN"
 			)
 	)
-	private void onInitInjectAtReturn(CallbackInfo ci) {
+	private void onInit(CallbackInfo ci) {
 		this.multimeterServer = new MultimeterServer((MinecraftServer)(Object)this);
 	}
 	
@@ -38,7 +38,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "HEAD"
 			)
 	)
-	private void onRunTasksTillTickEndInjectAtHead(CallbackInfo ci) {
+	private void onTickPhaseHandlePackets(CallbackInfo ci) {
 		multimeterServer.onTickPhase(TickPhase.HANDLE_PACKETS);
 	}
 	
@@ -48,7 +48,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "RETURN"
 			)
 	)
-	private void onRunTasksTillTickEndInjectAtReturn(CallbackInfo ci) {
+	private void onTickEnd(CallbackInfo ci) {
 		multimeterServer.tickEnd();
 	}
 	
@@ -60,7 +60,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					target = "Lnet/minecraft/server/MinecraftServer;tickWorlds(Ljava/util/function/BooleanSupplier;)V"
 			)
 	)
-	private void onTickInjectAtHead(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickStart(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		multimeterServer.tickStart();
 	}
 	

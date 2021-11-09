@@ -1,7 +1,6 @@
 package redstone.multimeter.client.gui.element.controls;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,7 +16,6 @@ import net.minecraft.util.Formatting;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.SimpleListElement;
-import redstone.multimeter.client.gui.element.SimpleTextElement;
 import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.action.MousePress;
 import redstone.multimeter.client.gui.element.button.IButton;
@@ -49,7 +47,7 @@ public class ControlsListBuilder {
 	}
 	
 	public void addCategory(String name) {
-		addCategory(name, () -> Collections.emptyList(), t -> false);
+		addCategory(name, () -> null, t -> false);
 	}
 	
 	public void addCategory(String name, Supplier<List<Text>> tooltip, MousePress<TextElement> onPress) {
@@ -57,7 +55,7 @@ public class ControlsListBuilder {
 			throw new IllegalStateException("This options list already contains a \'" + name + "\' category!");
 		}
 		
-		categories.put(name, new SimpleTextElement(client, 0, 0, false, () -> new LiteralText(name).formatted(Formatting.ITALIC), tooltip, onPress));
+		categories.put(name, new TextElement(client, 0, 0, t -> t.add(new LiteralText(name).formatted(Formatting.ITALIC)).setWithShadow(true), tooltip, onPress));
 		factories.put(name, new ArrayList<>());
 	}
 	

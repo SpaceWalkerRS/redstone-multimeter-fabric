@@ -16,7 +16,7 @@ public abstract class TrappedChestBlockMixin implements Meterable, PowerSource {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return TrappedChestHelper.getPower(world, pos, state) > 0;
+		return TrappedChestHelper.getPower(world, pos, state) > MIN_POWER;
 	}
 	
 	@Override

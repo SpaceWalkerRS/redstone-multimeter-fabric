@@ -2,11 +2,7 @@ package redstone.multimeter.mixin.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.PoweredRailBlock;
 import net.minecraft.state.property.Properties;
@@ -19,21 +15,6 @@ import redstone.multimeter.block.MeterableBlock;
 public abstract class PoweredRailBlockMixin implements MeterableBlock {
 	
 	@Shadow protected abstract boolean isPoweredByOtherRails(World world, BlockPos pos, BlockState state, boolean boolean4, int distance);
-	
-	@Inject(
-			method = "updateBlockState",
-			at = @At(
-					value = "HEAD"
-			)
-	)
-	private void onUpdateBlockStateInjectAtHead(BlockState state, World world, BlockPos pos, Block neighbor, CallbackInfo ci) {
-		logPowered(world, pos, isPowered(world, pos, state));
-	}
-	
-	@Override
-	public boolean logPoweredOnBlockUpdate() {
-		return false;
-	}
 	
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {

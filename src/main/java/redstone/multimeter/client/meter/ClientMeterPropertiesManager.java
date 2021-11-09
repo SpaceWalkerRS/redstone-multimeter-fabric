@@ -199,6 +199,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			
 			if (Registry.BLOCK.containsId(blockId)) {
 				blockDefaults.put(blockId, properties);
+			} else {
+				RedstoneMultimeterMod.LOGGER.info(String.format("Unable to load default meter properties for %s: that block does not exist!", blockId.toString()));
 			}
 		}
 	}

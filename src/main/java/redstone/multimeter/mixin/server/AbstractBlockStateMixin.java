@@ -27,7 +27,7 @@ public class AbstractBlockStateMixin {
 					value = "HEAD"
 			)
 	)
-	private void onRandomTickInjectAtHead(ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
+	private void onRandomTick(ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
 		((IServerWorld)world).getMultimeter().logRandomTick(world, pos);
 	}
 	
@@ -37,7 +37,7 @@ public class AbstractBlockStateMixin {
 					value = "HEAD"
 			)
 	)
-	private void onGetStateForNeighborUpdateInjectAtHead(Direction direction, BlockState neighborState, WorldAccess worldAccess, BlockPos pos, BlockPos neighborPos, CallbackInfoReturnable<BlockState> ci) {
+	private void onShapeUpdate(Direction direction, BlockState neighborState, WorldAccess worldAccess, BlockPos pos, BlockPos neighborPos, CallbackInfoReturnable<BlockState> ci) {
 		if (worldAccess instanceof World) {
 			World world = (World)worldAccess;
 			

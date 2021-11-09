@@ -53,6 +53,31 @@ public class ClientLogManager extends LogManager {
 		return subticks.getOrDefault(tick, 0);
 	}
 	
+	public void tick() {
+		clearOldLogs();
+		printer.tick();
+	}
+	
+	private void clearOldLogs() {
+		long selectedTickCutoff = meterGroup.getMultimeterClient().getHUD().getSelectedTick() - AGE_CUTOFF;
+		long serverTickCutoff = getLastTick() - MAX_LOG_AGE;
+		long cutoff = (selectedTickCutoff > serverTickCutoff) ? selectedTickCutoff : serverTickCutoff;
+		
+		Iterator<Long> it = subticks.keySet().iterator();
+		
+		while (it.hasNext()) {
+			if (it.next() > cutoff) {
+				break;
+			}
+			
+			it.remove();
+		}
+		
+		for (Meter meter : meterGroup.getMeters()) {
+			meter.getLogs().clearOldLogs(cutoff);
+		}
+	}
+	
 	/**
 	 * Log all events from the past server tick
 	 */
@@ -80,25 +105,5 @@ public class ClientLogManager extends LogManager {
 		}
 		
 		printer.printLogs();
-	}
-	
-	public void clearOldLogs() {
-		long selectedTickCutoff = meterGroup.getMultimeterClient().getHUD().getSelectedTick() - AGE_CUTOFF;
-		long serverTickCutoff = getLastTick() - MAX_LOG_AGE;
-		long cutoff = (selectedTickCutoff > serverTickCutoff) ? selectedTickCutoff : serverTickCutoff;
-		
-		Iterator<Long> it = subticks.keySet().iterator();
-		
-		while (it.hasNext()) {
-			if (it.next() > cutoff) {
-				break;
-			}
-			
-			it.remove();
-		}
-		
-		for (Meter meter : meterGroup.getMeters()) {
-			meter.getLogs().clearOldLogs(cutoff);
-		}
 	}
 }

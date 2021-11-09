@@ -23,7 +23,13 @@ public class ServerPlayNetworkHandlerMixin {
 	@Shadow @Final private MinecraftServer server;
 	@Shadow private ServerPlayerEntity player;
 	
-	@Inject(method = "onCustomPayload", cancellable = true, at = @At(value = "HEAD"))
+	@Inject(
+			method = "onCustomPayload",
+			cancellable = true,
+			at = @At(
+					value = "HEAD"
+			)
+	)
 	private void onCustomPayload(CustomPayloadC2SPacket minecraftPacket, CallbackInfo ci) {
 		ICustomPayloadC2SPacket packet = (ICustomPayloadC2SPacket)minecraftPacket;
 		

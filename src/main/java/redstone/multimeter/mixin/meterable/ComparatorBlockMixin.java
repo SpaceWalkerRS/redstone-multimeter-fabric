@@ -24,8 +24,8 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 					value = "RETURN"
 			)
 	)
-	private void onHasPowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
-		logPowered(world, pos, cir.getReturnValue() > 0);
+	private void onPowerCheck(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
+		logPowered(world, pos, cir.getReturnValue() > MIN_POWER);
 	}
 	
 	@Override
@@ -41,6 +41,6 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 			return ((ComparatorBlockEntity)blockEntity).getOutputSignal();
 		}
 		
-		return 0;
+		return MIN_POWER;
 	}
 }

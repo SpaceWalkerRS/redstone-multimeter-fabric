@@ -3,6 +3,7 @@ package redstone.multimeter.mixin.meterable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -21,11 +22,13 @@ public abstract class HopperBlockMixin implements MeterableBlock {
 			method = "updateEnabled",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/block/BlockState;get(Lnet/minecraft/state/property/Property;)Ljava/lang/Comparable;"
+					value = "FIELD",
+					ordinal = 0,
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/block/HopperBlock;ENABLED:Lnet/minecraft/state/property/BooleanProperty;"
 			)
 	)
-	private void onUpdateEnabledInjectAtGet(World world, BlockPos pos, BlockState state, CallbackInfo ci, boolean shouldBeEnabled) {
+	private void onUpdateEnabled(World world, BlockPos pos, BlockState state, CallbackInfo ci, boolean shouldBeEnabled) {
 		logPowered(world, pos, !shouldBeEnabled);
 	}
 	

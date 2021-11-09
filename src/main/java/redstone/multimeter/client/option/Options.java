@@ -47,6 +47,7 @@ public class Options {
 	public static class LogPrinter {
 		
 		public static final BooleanOption                PRINT_OLD_LOGS       = new BooleanOption("Print Old Logs", "Print old logs when activating the printer.", false);
+		public static final IntegerOption                MAX_RUNTIME          = new IntegerOption("Maximum Runtime", "The limit of how long the printer can run, in ticks. The printer will automatically stop when reaching this number. Entering a value of -1 will remove the limit entirely.", -1, -1, Integer.MAX_VALUE);
 		
 	}
 	
@@ -182,7 +183,8 @@ public class Options {
 			HUD.AUTO_PAUSE
 		);
 		register("Log Printer",
-			LogPrinter.PRINT_OLD_LOGS
+			LogPrinter.PRINT_OLD_LOGS,
+			LogPrinter.MAX_RUNTIME
 		);
 		register("Miscellaneous",
 			Miscellaneous.SCROLL_SPEED,

@@ -17,9 +17,9 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		if (hud.isPaused() && getColumnCount() > 0) {
-			super.render(matrices, mouseX, mouseY, delta);
+			super.render(matrices, mouseX, mouseY);
 		}
 	}
 	

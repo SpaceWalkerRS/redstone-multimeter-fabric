@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -22,10 +23,12 @@ public class CommandManagerMixin {
 	@Inject(
 			method="<init>",
 			at = @At(
-					"RETURN"
+					value = "RETURN",
+					shift = Shift.BEFORE,
+					target = "Lcom/mojang/brigadier/CommandDispatcher;findAmbiguities(Lcom/mojang/brigadier/AmbiguityConsumer;)V"
 			)
 	)
 	private void registerCommands(CommandManager.RegistrationEnvironment environment, CallbackInfo ci) {
-		MeterGroupCommand.registerCommand(dispatcher);
+		MeterGroupCommand.register(dispatcher);
 	}
 }

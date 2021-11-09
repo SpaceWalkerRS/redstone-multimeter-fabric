@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.element;
 
-public abstract class AbstractElement extends DrawableElement implements IElement {
+public abstract class AbstractElement extends RenderHelper2D implements IElement {
 	
 	private int x;
 	private int y;

@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.element.TextureRegion;
+import redstone.multimeter.client.gui.TextureRegion;
 import redstone.multimeter.client.gui.element.action.MousePress;
 
 public class TransparentButton extends Button {

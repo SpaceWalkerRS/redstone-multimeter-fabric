@@ -24,16 +24,16 @@ public class Button extends AbstractButton {
 	
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean success = super.mouseClick(mouseX, mouseY, button);
+		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!success && isActive()) {
+		if (!consumed && isActive()) {
 			onPress.accept(this);
 			playClickSound();
 			
-			success = true;
+			consumed = true;
 		}
 		
-		return success;
+		return consumed;
 	}
 	
 	@Override

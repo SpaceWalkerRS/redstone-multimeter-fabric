@@ -63,7 +63,7 @@ public class MeterGroupSubscriptionPacket implements RSMMPacket {
 		if (subscribed) {
 			meterGroup.subscribe(name);
 		} else {
-			meterGroup.unsubscribe();
+			meterGroup.unsubscribe(false);
 		}
 	}
 }

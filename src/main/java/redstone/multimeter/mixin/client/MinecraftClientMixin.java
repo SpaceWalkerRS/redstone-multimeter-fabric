@@ -5,10 +5,12 @@ import java.util.concurrent.CompletableFuture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -20,23 +22,37 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	private MultimeterClient multimeterClient;
 	
 	@Inject(
+			method = "<init>",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void onInit(RunArgs args, CallbackInfo ci) {
+		this.multimeterClient = new MultimeterClient((MinecraftClient)(Object)this);
+	}
+	
+	@Inject(
 			method = "reloadResources(Z)Ljava/util/concurrent/CompletableFuture;",
 			at = @At(
 					value = "HEAD"
 			)
 	)
 	private void reloadResources(boolean force, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-		getMultimeterClient().reloadResources();
+		multimeterClient.reloadResources();
 	}
 	
 	@Inject(
 			method = "onResolutionChanged",
 			at = @At(
-					value = "HEAD"
+					value = "INVOKE",
+					shift = Shift.AFTER,
+					target = "Lnet/minecraft/client/util/Window;setScaleFactor(D)V"
 			)
 	)
 	private void onResolutionChanged(CallbackInfo ci) {
-		getMultimeterClient().getHUD().resetSize();
+		if (multimeterClient != null) {
+			multimeterClient.getHUD().resetSize();
+		}
 	}
 	
 	@Inject(
@@ -46,7 +62,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 			)
 	)
 	private void handleInputEvents(CallbackInfo ci) {
-		getMultimeterClient().getInputHandler().handleInputEvents();
+		multimeterClient.getInputHandler().handleInputEvents();
 	}
 	
 	@Inject(
@@ -56,7 +72,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 			)
 	)
 	private void onDisconnect(Screen screen, CallbackInfo ci) {
-		getMultimeterClient().onDisconnect();
+		multimeterClient.onDisconnect();
 	}
 	
 	@Inject(
@@ -66,15 +82,11 @@ public class MinecraftClientMixin implements IMinecraftClient {
 			)
 	)
 	private void onClose(CallbackInfo ci) {
-		getMultimeterClient().onShutdown();
+		multimeterClient.onShutdown();
 	}
 	
 	@Override
 	public MultimeterClient getMultimeterClient() {
-		if (multimeterClient == null) {
-			multimeterClient = new MultimeterClient((MinecraftClient)(Object)this);
-		}
-		
 		return multimeterClient;
 	}
 }

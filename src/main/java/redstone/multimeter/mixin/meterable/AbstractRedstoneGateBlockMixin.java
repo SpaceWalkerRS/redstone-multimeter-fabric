@@ -25,7 +25,7 @@ public abstract class AbstractRedstoneGateBlockMixin implements MeterableBlock {
 					value = "RETURN"
 			)
 	)
-	private void onHasPowerInjectAtReturn(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+	private void onPowerCheck(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
 		logPowered(world, pos, cir.getReturnValue()); // repeaters
 	}
 	

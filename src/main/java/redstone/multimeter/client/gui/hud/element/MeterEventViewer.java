@@ -18,7 +18,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		matrices.push();
 		drawHighlights(matrices, mouseX, mouseY);
 		matrices.translate(0, 0, -1);
@@ -28,7 +28,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 		matrices.translate(0, 0, -1);
 		drawGridLines(matrices);
 		matrices.translate(0, 0, -1);
-		hud.renderer.drawRect(matrices, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
+		hud.renderer.renderRect(matrices, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
 		matrices.pop();
 	}
 	
@@ -91,7 +91,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 	
 	protected abstract void drawHighlights(MatrixStack matrices, int mouseX, int mouseY);
 	
-	protected void drawHighlight(MatrixStack matrices, int column, int columnCount, int row, int rowCount, boolean selected) {
+	protected void drawHighlight(MatrixStack matrices, int column, int columnCount, int row, int rowCount, boolean selection) {
 		int w = hud.settings.columnWidth + hud.settings.gridSize;
 		int h = hud.settings.rowHeight + hud.settings.gridSize;
 		int x = column * w;
@@ -99,7 +99,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 		int width = columnCount * w;
 		int height = rowCount * h;
 		
-		hud.renderer.drawHighlight(matrices, x, y, width, height, selected);
+		hud.renderer.renderHighlight(matrices, x, y, width, height, selection);
 	}
 	
 	protected abstract void drawDecorators(MatrixStack matrices);
@@ -127,7 +127,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			lineHeight = getHeight() - 2 * hud.settings.gridSize;
 			color = hud.settings.colorGridMarker;
 			
-			hud.renderer.drawRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
+			hud.renderer.renderRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
 		matrices.translate(0, 0, -0.1);
@@ -140,7 +140,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			lineHeight = hud.settings.gridSize;
 			color = hud.settings.colorGridMain;
 			
-			hud.renderer.drawRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
+			hud.renderer.renderRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
 		matrices.translate(0, 0, -0.1);
@@ -153,7 +153,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			lineHeight = getHeight();
 			color = (i > 0 && i < columns && i % 5 == 0) ? hud.settings.colorGridInterval : hud.settings.colorGridMain;
 			
-			hud.renderer.drawRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
+			hud.renderer.renderRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
 		matrices.pop();

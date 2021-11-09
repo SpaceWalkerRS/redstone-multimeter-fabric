@@ -21,6 +21,6 @@ public abstract class SculkSensorBlockMixin implements Meterable, PowerSource {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWER) > 0;
+		return state.get(Properties.POWER) > MIN_POWER;
 	}
 }

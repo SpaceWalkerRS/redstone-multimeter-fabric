@@ -26,7 +26,7 @@ public class DirectBlockEntityTickInvokerMixin {
 					target = "Lnet/minecraft/block/entity/BlockEntityTicker;tick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/entity/BlockEntity;)V"
 			)
 	)
-	private void onTickInjectBeforeTick(CallbackInfo ci) {
+	private void onBlockEntityTick(CallbackInfo ci) {
 		World world = blockEntity.getWorld();
 		
 		if (!world.isClient()) {

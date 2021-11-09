@@ -2,8 +2,6 @@ package redstone.multimeter.client.gui.element.option;
 
 import java.util.Collection;
 
-import net.minecraft.text.Text;
-
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.controls.ControlsListBuilder;
 import redstone.multimeter.client.option.IOption;
@@ -26,8 +24,7 @@ public class OptionsListBuilder extends ControlsListBuilder {
 	}
 	
 	private void updateMidPoint(IOption option) {
-		Text name = option.getDisplayName();
-		int width = font.getWidth(name);
+		int width = font.getWidth(option.getDisplayName());
 		
 		if (width > midpoint) {
 			midpoint = width;

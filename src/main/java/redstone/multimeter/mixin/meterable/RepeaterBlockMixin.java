@@ -29,7 +29,7 @@ public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlock imple
 					value = "RETURN"
 			)
 	)
-	private void onIsLockedInjectAtReturn(WorldView worldView, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+	private void onIsLocked(WorldView worldView, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
 		if (cir.getReturnValue() && worldView instanceof World) {
 			World world = (World)worldView;
 			

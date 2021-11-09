@@ -25,13 +25,8 @@ public class RedstoneLampBlockMixin implements MeterableBlock {
 					value = "HEAD"
 			)
 	)
-	private void onScheduledTickInjectAtHead(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
+	private void onScheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
 		logPowered(world, pos, world.isReceivingRedstonePower(pos));
-	}
-	
-	@Override
-	public boolean logPoweredOnBlockUpdate() {
-		return false;
 	}
 	
 	@Override

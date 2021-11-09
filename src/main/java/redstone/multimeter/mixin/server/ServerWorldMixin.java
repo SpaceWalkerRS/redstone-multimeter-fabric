@@ -38,7 +38,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					args = "ldc=weather"
 			)
 	)
-	private void onTickInjectAtStringWeather(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickPhaseTickWeather(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		onTickPhase(TickPhase.TICK_WEATHER);
 	}
 	
@@ -50,7 +50,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					args = "ldc=chunkSource"
 			)
 	)
-	private void onTickInjectAtStringChunkSource(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickPhaseTickChunks(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		onTickPhase(TickPhase.TICK_CHUNKS);
 	}
 	
@@ -62,7 +62,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/server/world/ServerWorld;blockTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
 			)
 	)
-	private void onTickInjectBeforeBlockTickScheduler(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickPhaseTickBlocks(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		onTickPhase(TickPhase.TICK_BLOCKS);
 	}
 	
@@ -74,7 +74,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/server/world/ServerWorld;fluidTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
 			)
 	)
-	private void onTickInjectBeforeFluidTickScheduler(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickPhaseTickFluids(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		onTickPhase(TickPhase.TICK_FLUIDS);
 	}
 	
@@ -86,7 +86,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					args = "ldc=raid"
 			)
 	)
-	private void onTickInjectAtStringRaid(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickPhaseTickRaids(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		onTickPhase(TickPhase.TICK_RAIDS);
 	}
 	
@@ -98,7 +98,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					args = "ldc=blockEvents"
 			)
 	)
-	private void onTickInjectAtStringBlockEvents(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickPhaseBlockEvents(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		onTickPhase(TickPhase.PROCESS_BLOCK_EVENTS);
 	}
 	
@@ -110,7 +110,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					args = "ldc=entities"
 			)
 	)
-	private void onTickInjectAtStringEntities(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickPhaseTickEntities(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		onTickPhase(TickPhase.TICK_ENTITIES);
 	}
 	
@@ -122,7 +122,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/server/world/ServerWorld;tickBlockEntities()V"
 			)
 	)
-	private void onTickInjectBeforeTickBlockEntities(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickPhaseTickBlockEntities(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		onTickPhase(TickPhase.TICK_BLOCK_ENTITIES);
 	}
 	
@@ -134,7 +134,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/world/level/ServerWorldProperties;setTime(J)V"
 			)
 	)
-	private void onTickTimeInjectAfterSetTime(CallbackInfo ci) {
+	private void onTickTime(CallbackInfo ci) {
 		getMultimeterServer().onOverworldTickTime();
 	}
 	
@@ -146,7 +146,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/fluid/FluidState;onScheduledTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
-	private void onTickFluidInjectBeforeOnScheduledTick(ScheduledTick<Fluid> scheduledTick, CallbackInfo ci) {
+	private void onTickFluid(ScheduledTick<Fluid> scheduledTick, CallbackInfo ci) {
 		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
 	}
 	
@@ -158,7 +158,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/block/BlockState;scheduledTick(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V"
 			)
 	)
-	private void onTickBlockInjectBeforeScheduledTick(ScheduledTick<Block> scheduledTick, CallbackInfo ci) {
+	private void onTickBlock(ScheduledTick<Block> scheduledTick, CallbackInfo ci) {
 		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
 	}
 	
@@ -170,7 +170,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/entity/Entity;tick()V"
 			)
 	)
-	private void onTickEntityInjectBeforeTick(Entity entity, CallbackInfo ci) {
+	private void onTickEntity(Entity entity, CallbackInfo ci) {
 		getMultimeter().logEntityTick((World)(Object)this, entity);
 	}
 	
@@ -182,7 +182,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/block/BlockState;onSyncedBlockEvent(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;II)Z"
 			)
 	)
-	private void onProcessBlockEventInjectBeforeOnSyncedBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
+	private void onProcessBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
 		getMultimeter().logBlockEvent((World)(Object)this, blockEvent);
 	}
 	

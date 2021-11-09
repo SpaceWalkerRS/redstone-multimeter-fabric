@@ -29,7 +29,7 @@ public class TrapdoorBlockMixin implements MeterableBlock {
 					target = "Lnet/minecraft/block/TrapdoorBlock;POWERED:Lnet/minecraft/state/property/BooleanProperty;"
 			)
 	)
-	private void onNeighborUpdateInjectBeforePowered0(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
+	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
 		logPowered(world, pos, powered);
 	}
 	

@@ -14,8 +14,6 @@ public class ControlsSectionElement extends AbstractParentElement {
 	protected final int midPoint;
 	
 	public ControlsSectionElement(MultimeterClient client, int width, int margin, int midpoint, TextElement category) {
-		super(0, 0, width, 0);
-		
 		this.client = client;
 		this.category = category;
 		this.controls = new SimpleListElement(client, width - margin);
@@ -24,6 +22,8 @@ public class ControlsSectionElement extends AbstractParentElement {
 		
 		addChild(this.category);
 		addChild(this.controls);
+		
+		setWidth(width);
 	}
 	
 	@Override
