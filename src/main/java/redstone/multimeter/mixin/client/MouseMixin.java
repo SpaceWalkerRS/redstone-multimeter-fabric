@@ -32,14 +32,14 @@ public class MouseMixin {
 					target = "Lnet/minecraft/client/gui/screen/Screen;mouseScrolled(DDD)Z"
 			)
 	)
-	private void scrollOnScreen(long windowHandle, double horizontal, double vertical, CallbackInfo ci, double scrollX, double mouseX, double mouseY) {
+	private void scrollOnScreen(long windowHandle, double horizontal, double vertical, CallbackInfo ci, double scrollY, double mouseX, double mouseY) {
 		MultimeterClient multimeterClient = ((IMinecraftClient)client).getMultimeterClient();
 		RSMMScreen screen = multimeterClient.getScreen();
 		
 		if (screen != null) {
 			boolean discrete = client.options.discreteMouseScroll;
 			double sensitivity = client.options.mouseWheelSensitivity;
-			double scrollY = sensitivity * (discrete ? Math.signum(vertical) : vertical);
+			double scrollX = sensitivity * (discrete ? Math.signum(horizontal) : horizontal);
 			
 			screen.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 		}
@@ -55,7 +55,7 @@ public class MouseMixin {
 					target = "Lnet/minecraft/client/network/ClientPlayerEntity;isSpectator()Z"
 			)
 	)
-	private void scrollInGame(long windowHandle, double horizontal, double vertical, CallbackInfo ci, double scrollX, float scrollDeltaX) {
+	private void scrollInGame(long windowHandle, double horizontal, double vertical, CallbackInfo ci, double scrollY, float scrollDeltaY) {
 		if (!KeyBindings.SCROLL_HUD.isPressed()) {
 			return;
 		}
@@ -69,7 +69,7 @@ public class MouseMixin {
 		MultimeterHud hud = multimeterClient.getHUD();
 		
 		if (hud.isPaused()) {
-			hud.stepBackward(Math.round(scrollDeltaX));
+			hud.stepBackward(Math.round(scrollDeltaY));
 			ci.cancel();
 		}
 	}
