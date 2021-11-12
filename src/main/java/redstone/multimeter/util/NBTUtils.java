@@ -2,59 +2,22 @@ package redstone.multimeter.util;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-
-import redstone.multimeter.common.TickPhase;
-import redstone.multimeter.common.WorldPos;
-import redstone.multimeter.common.meter.event.EventType;
 
 public class NBTUtils {
 	
-	public static void putIdentifier(NbtCompound nbt, String key, Identifier id) {
-		nbt.putString(key, id.toString());
-	}
-	
-	public static Identifier getIdentifier(NbtCompound nbt, String key) {
-		return nbt.contains(key) ? new Identifier(nbt.getString(key)) : null;
-	}
-	
-	public static void putEventType(NbtCompound nbt, String key, EventType type) {
-		nbt.putByte(key, (byte)type.getIndex());
-	}
-	
-	public static EventType getEventType(NbtCompound nbt, String key) {
-		return nbt.contains(key) ? EventType.fromIndex(nbt.getByte(key)) : null;
-	}
-	
-	public static void putTickPhase(NbtCompound nbt, String key, TickPhase tickPhase) {
-		nbt.putByte(key, (byte)tickPhase.getIndex());
-	}
-	
-	public static TickPhase getTickPhase(NbtCompound nbt, String key) {
-		return nbt.contains(key) ? TickPhase.fromIndex(nbt.getByte(key)) : null;
-	}
-	
-	public static NbtCompound worldPosToNBT(WorldPos pos) {
+	public static NbtCompound identifierToNBT(Identifier id) {
 		NbtCompound nbt = new NbtCompound();
 		
-		putIdentifier(nbt, "worldId", pos.getWorldId());
-		nbt.putInt("x", pos.getBlockPos().getX());
-		nbt.putInt("y", pos.getBlockPos().getY());
-		nbt.putInt("z", pos.getBlockPos().getZ());
+		nbt.putString("namespace", id.getNamespace());
+		nbt.putString("path", id.getPath());
 		
 		return nbt;
 	}
 	
-	public static WorldPos NBTToWorldPos(NbtCompound nbt) {
-		if (!nbt.contains("worldId")) {
-			return null;
-		}
+	public static Identifier NBTToIdentifier(NbtCompound nbt) {
+		String namespace = nbt.getString("namespace");
+		String path = nbt.getString("path");
 		
-		Identifier worldId = getIdentifier(nbt, "worldId");
-		int x = nbt.getInt("x");
-		int y = nbt.getInt("y");
-		int z = nbt.getInt("z");
-		
-		return new WorldPos(worldId, new BlockPos(x, y, z));
+		return new Identifier(namespace, path);
 	}
 }

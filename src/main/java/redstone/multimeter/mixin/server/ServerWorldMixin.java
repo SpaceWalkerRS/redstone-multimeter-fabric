@@ -19,8 +19,9 @@ import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 
-import redstone.multimeter.common.TickPhase;
+import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.server.MultimeterServer;
@@ -34,12 +35,12 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			method = "tick",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=weather"
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+					args = "ldc=world border"
 			)
 	)
-	private void onTickPhaseTickWeather(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		onTickPhase(TickPhase.TICK_WEATHER);
+	private void startTickPhaseWorldBorder(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		startTickTask(TickTask.WORLD_BORDER);
 	}
 	
 	@Inject(
@@ -47,11 +48,23 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=chunkSource"
+					args = "ldc=weather"
 			)
 	)
-	private void onTickPhaseTickChunks(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		onTickPhase(TickPhase.TICK_CHUNKS);
+	private void swapTickPhaseWeather(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.WEATHER);
+	}
+	
+	@Inject(
+			method = "tick",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=tickPending"
+			)
+	)
+	private void swapTickPhaseScheduledTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.SCHEDULED_TICKS);
 	}
 	
 	@Inject(
@@ -62,8 +75,8 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/server/world/ServerWorld;blockTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
 			)
 	)
-	private void onTickPhaseTickBlocks(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		onTickPhase(TickPhase.TICK_BLOCKS);
+	private void onTickPhaseScheduledBlockTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		startTickTask(TickTask.BLOCK_TICKS);
 	}
 	
 	@Inject(
@@ -74,8 +87,20 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/server/world/ServerWorld;fluidTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
 			)
 	)
-	private void onTickPhaseTickFluids(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		onTickPhase(TickPhase.TICK_FLUIDS);
+	private void swapTickPhaseScheduledFluidTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.FLUID_TICKS);
+	}
+	
+	@Inject(
+			method = "tick",
+			at = @At(
+					value = "FIELD",
+					shift = Shift.AFTER,
+					target = "Lnet/minecraft/server/world/ServerWorld;fluidTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
+			)
+	)
+	private void endTickPhaseScheduledFluidTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		endTickTask();
 	}
 	
 	@Inject(
@@ -86,8 +111,20 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					args = "ldc=raid"
 			)
 	)
-	private void onTickPhaseTickRaids(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		onTickPhase(TickPhase.TICK_RAIDS);
+	private void swapTickPhaseRaids(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.RAIDS);
+	}
+	
+	@Inject(
+			method = "tick",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=chunkSource"
+			)
+	)
+	private void swapTickPhaseChunkSource(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.CHUNK_SOURCE);
 	}
 	
 	@Inject(
@@ -98,8 +135,8 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					args = "ldc=blockEvents"
 			)
 	)
-	private void onTickPhaseBlockEvents(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		onTickPhase(TickPhase.PROCESS_BLOCK_EVENTS);
+	private void swapTickPhaseBlockEvents(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.BLOCK_EVENTS);
 	}
 	
 	@Inject(
@@ -110,8 +147,8 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					args = "ldc=entities"
 			)
 	)
-	private void onTickPhaseTickEntities(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		onTickPhase(TickPhase.TICK_ENTITIES);
+	private void swapTickPhaseEntities(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.ENTITIES);
 	}
 	
 	@Inject(
@@ -122,8 +159,8 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/server/world/ServerWorld;tickBlockEntities()V"
 			)
 	)
-	private void onTickPhaseTickBlockEntities(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		onTickPhase(TickPhase.TICK_BLOCK_ENTITIES);
+	private void endTickPhaseEntities(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		endTickTask();
 	}
 	
 	@Inject(
@@ -136,6 +173,103 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	)
 	private void onTickTime(CallbackInfo ci) {
 		getMultimeterServer().onOverworldTickTime();
+	}
+	
+	@Inject(
+			method = "tickSpawners",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void startTickPhaseCustomMobSpawning(boolean spawnMonsters, boolean spawnAnimals, CallbackInfo ci) {
+		startTickTask(TickTask.CUSTOM_MOB_SPAWNING);
+	}
+	
+	@Inject(
+			method = "tickSpawners",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void endTickPhaseCustomMobSpawning(boolean spawnMonsters, boolean spawnAnimals, CallbackInfo ci) {
+		endTickTask();
+	}
+	
+	@Inject(
+			method = "wakeSleepingPlayers",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void startTickPhaseWakeSleepingPlayers(CallbackInfo ci) {
+		startTickTask(TickTask.WAKE_SLEEPING_PLAYERS);
+	}
+	
+	@Inject(
+			method = "wakeSleepingPlayers",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void endTickPhaseWakeSleepingPlayers(CallbackInfo ci) {
+		endTickTask();
+	}
+	
+	@Inject(
+			method = "tickChunk",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void startTickPhaseTickChunk(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
+		startTickTask(TickTask.TICK_CHUNK);
+	}
+	
+	@Inject(
+			method = "tickChunk",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+					args = "ldc=thunder"
+			)
+	)
+	private void startTickPhaseThunder(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
+		startTickTask(TickTask.THUNDER);
+	}
+	
+	@Inject(
+			method = "tickChunk",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=iceandsnow"
+			)
+	)
+	private void swapTickPhasePrecipitation(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
+		swapTickTask(TickTask.PRECIPITATION);
+	}
+	
+	@Inject(
+			method = "tickChunk",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=tickBlocks"
+			)
+	)
+	private void swapTickPhaseRandomTicks(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
+		swapTickTask(TickTask.RANDOM_TICKS);
+	}
+	
+	@Inject(
+			method = "tickChunk",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void endTickPhaseRandomTicksAndTickChunk(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
+		endTickTask();
+		endTickTask();
 	}
 	
 	@Inject(

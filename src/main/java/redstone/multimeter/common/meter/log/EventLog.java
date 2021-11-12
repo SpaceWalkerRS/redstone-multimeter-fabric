@@ -9,7 +9,6 @@ import net.minecraft.text.Text;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.event.MeterEvent;
-import redstone.multimeter.util.NBTUtils;
 import redstone.multimeter.util.TextUtils;
 
 public class EventLog {
@@ -96,7 +95,7 @@ public class EventLog {
 		type.addTextForTooltip(lines, data);
 		TextUtils.addFancyText(lines, "tick", tick);
 		TextUtils.addFancyText(lines, "subtick", subtick);
-		TextUtils.addFancyText(lines, "tick phase", tickPhase.getName());
+		tickPhase.addTextForTooltip(lines);
 		
 		return lines;
 	}
@@ -107,7 +106,7 @@ public class EventLog {
 		nbt.put("meter event", event.toNBT());
 		nbt.putLong("tick", tick);
 		nbt.putInt("subtick", subtick);
-		NBTUtils.putTickPhase(nbt, "tickPhase", tickPhase);
+		nbt.put("tickPhase", tickPhase.toNBT());
 		
 		return nbt;
 	}
@@ -118,7 +117,7 @@ public class EventLog {
 		log.event = MeterEvent.fromNBT(nbt.getCompound("meter event"));
 		log.tick = nbt.getLong("tick");
 		log.subtick = nbt.getInt("subtick");
-		log.tickPhase = NBTUtils.getTickPhase(nbt, "tickPhase");
+		log.tickPhase = TickPhase.fromNBT(nbt.get("tickPhase"));
 		
 		return log;
 	}

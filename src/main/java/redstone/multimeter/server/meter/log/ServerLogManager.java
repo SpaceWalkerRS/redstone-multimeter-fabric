@@ -45,7 +45,7 @@ public class ServerLogManager extends LogManager {
 	public void logEvent(Meter meter, MeterEvent event) {
 		long tick = getLastTick();
 		int subtick = nextSubtick++;
-		TickPhase phase = meterGroup.getMultimeter().getMultimeterServer().getCurrentTickPhase();
+		TickPhase phase = meterGroup.getMultimeter().getMultimeterServer().getTickPhase();
 		
 		EventLog log = new EventLog(tick, subtick, phase, event);
 		meter.getLogs().add(log);

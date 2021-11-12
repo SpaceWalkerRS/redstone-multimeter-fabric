@@ -9,7 +9,6 @@ import net.minecraft.nbt.NbtCompound;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ColorUtils;
-import redstone.multimeter.util.NBTUtils;
 
 public class MeterProperties {
 	
@@ -215,7 +214,7 @@ public class MeterProperties {
 		NbtCompound nbt = new NbtCompound();
 		
 		if (pos != null) {
-			nbt.put("pos", NBTUtils.worldPosToNBT(pos));
+			nbt.put("pos", pos.toNBT());
 		}
 		if (name != null) {
 			nbt.putString("name", name);
@@ -237,7 +236,7 @@ public class MeterProperties {
 		MeterProperties properties = new MeterProperties();
 		
 		if (nbt.contains("pos")) {
-			properties.pos = NBTUtils.NBTToWorldPos(nbt.getCompound("pos"));
+			properties.pos = WorldPos.fromNBT(nbt.getCompound("pos"));
 		}
 		if (nbt.contains("name")) {
 			properties.name = nbt.getString("name");

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.nbt.NbtByte;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 
@@ -11,28 +13,35 @@ import redstone.multimeter.util.TextUtils;
 
 public enum EventType {
 	
-	POWERED(0, "powered") {
+	UNKNOWN(0, "unknown") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			
+		}
+	},
+	POWERED(1, "powered") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "became powered", metaData == 1);
 		}
 	},
-	ACTIVE(1, "active") {
+	ACTIVE(2, "active") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "became active", metaData == 1);
 		}
 	},
-	MOVED(2, "moved") {
+	MOVED(3, "moved") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "direction", Direction.byId(metaData).getName());
 		}
 	},
-	POWER_CHANGE(3, "power_change") {
+	POWER_CHANGE(4, "power_change") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
@@ -43,56 +52,56 @@ public enum EventType {
 			TextUtils.addFancyText(lines, "new power", newPower);
 		}
 	},
-	RANDOM_TICK(4, "random_tick") {
+	RANDOM_TICK(5, "random_tick") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	SCHEDULED_TICK(5, "scheduled_tick") {
+	SCHEDULED_TICK(6, "scheduled_tick") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "priority", metaData);
 		}
 	},
-	BLOCK_EVENT(6, "block_event") {
+	BLOCK_EVENT(7, "block_event") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "type", metaData);
 		}
 	},
-	ENTITY_TICK(7, "entity_tick") {
+	ENTITY_TICK(8, "entity_tick") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	BLOCK_ENTITY_TICK(8, "block_entity_tick") {
+	BLOCK_ENTITY_TICK(9, "block_entity_tick") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	BLOCK_UPDATE(9, "block_update") {
+	BLOCK_UPDATE(10, "block_update") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	COMPARATOR_UPDATE(10, "comparator_update") {
+	COMPARATOR_UPDATE(11, "comparator_update") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	SHAPE_UPDATE(11, "shape_update") {
+	SHAPE_UPDATE(12, "shape_update") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
@@ -104,7 +113,6 @@ public enum EventType {
 	private static final Map<String, EventType> BY_NAME;
 	
 	static {
-		
 		ALL = new EventType[values().length];
 		BY_NAME = new HashMap<>();
 		
@@ -127,11 +135,11 @@ public enum EventType {
 	}
 	
 	public static EventType fromIndex(int index) {
-		if (index >= 0 && index < ALL.length) {
+		if (index > 0 && index < ALL.length) {
 			return ALL[index];
 		}
 		
-		return null;
+		return UNKNOWN;
 	}
 	
 	public String getName() {
@@ -139,7 +147,7 @@ public enum EventType {
 	}
 	
 	public static EventType fromName(String name) {
-		return BY_NAME.get(name);
+		return BY_NAME.getOrDefault(name, UNKNOWN);
 	}
 	
 	public int flag() {
@@ -148,4 +156,18 @@ public enum EventType {
 	
 	public abstract void addTextForTooltip(List<Text> lines, int metaData);
 	
+	public NbtElement toNBT() {
+		return NbtByte.of((byte)index);
+	}
+	
+	public static EventType fromNBT(NbtElement nbt) {
+		if (nbt.getType() != NbtElement.BYTE_TYPE) {
+			return UNKNOWN;
+		}
+		
+		NbtByte nbtByte = (NbtByte)nbt;
+		int index = nbtByte.byteValue();
+		
+		return fromIndex(index);
+	}
 }

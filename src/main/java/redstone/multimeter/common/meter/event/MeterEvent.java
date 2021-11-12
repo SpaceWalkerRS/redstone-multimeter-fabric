@@ -6,8 +6,6 @@ import java.util.List;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 
-import redstone.multimeter.util.NBTUtils;
-
 public class MeterEvent {
 	
 	private EventType type;
@@ -53,7 +51,7 @@ public class MeterEvent {
 	public NbtCompound toNBT() {
 		NbtCompound nbt = new NbtCompound();
 		
-		NBTUtils.putEventType(nbt, "type", type);
+		nbt.put("type", type.toNBT());
 		nbt.putInt("metaData", metaData);
 		
 		return nbt;
@@ -62,7 +60,7 @@ public class MeterEvent {
 	public static MeterEvent fromNBT(NbtCompound nbt) {
 		MeterEvent event = new MeterEvent();
 		
-		event.type = NBTUtils.getEventType(nbt, "type");
+		event.type = EventType.fromNBT(nbt.get("type"));
 		event.metaData = nbt.getInt("metaData");
 		
 		return event;

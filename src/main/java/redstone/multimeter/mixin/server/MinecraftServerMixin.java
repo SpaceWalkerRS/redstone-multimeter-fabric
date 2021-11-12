@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.server.MinecraftServer;
 
-import redstone.multimeter.common.TickPhase;
+import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.MultimeterServer;
 
@@ -38,8 +38,8 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "HEAD"
 			)
 	)
-	private void onTickPhaseHandlePackets(CallbackInfo ci) {
-		multimeterServer.onTickPhase(TickPhase.HANDLE_PACKETS);
+	private void startTickTaskPackets(CallbackInfo ci) {
+		multimeterServer.startTickTask(TickTask.PACKETS);
 	}
 	
 	@Inject(
@@ -48,8 +48,8 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "RETURN"
 			)
 	)
-	private void onTickEnd(CallbackInfo ci) {
-		multimeterServer.tickEnd();
+	private void endTickTaskPackets(CallbackInfo ci) {
+		multimeterServer.endTickTask();
 	}
 	
 	@Inject(
@@ -72,6 +72,26 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void onReloadResources(Collection<String> datapacks, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
 		multimeterServer.getMultimeter().reloadOptions();
+	}
+	
+	@Inject(
+			method = "startTickMetrics",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onTickStart() {
+		multimeterServer.tickStart();
+	}
+	
+	@Inject(
+			method = "endTickMetrics",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void onTickEnd() {
+		multimeterServer.tickEnd();
 	}
 	
 	@Override
