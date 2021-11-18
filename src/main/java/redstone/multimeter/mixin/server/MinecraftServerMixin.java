@@ -2,18 +2,17 @@ package redstone.multimeter.mixin.server;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BooleanSupplier;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.TickDurationMonitor;
 
-import redstone.multimeter.common.TickPhase;
+import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.MultimeterServer;
 
@@ -38,8 +37,8 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "HEAD"
 			)
 	)
-	private void onTickPhaseHandlePackets(CallbackInfo ci) {
-		multimeterServer.onTickPhase(TickPhase.HANDLE_PACKETS);
+	private void startTickTaskPackets(CallbackInfo ci) {
+		multimeterServer.startTickTask(TickTask.PACKETS);
 	}
 	
 	@Inject(
@@ -48,20 +47,8 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "RETURN"
 			)
 	)
-	private void onTickEnd(CallbackInfo ci) {
-		multimeterServer.tickEnd();
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/MinecraftServer;tickWorlds(Ljava/util/function/BooleanSupplier;)V"
-			)
-	)
-	private void onTickStart(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		multimeterServer.tickStart();
+	private void endTickTaskPackets(CallbackInfo ci) {
+		multimeterServer.endTickTask();
 	}
 	
 	@Inject(
@@ -72,6 +59,26 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void onReloadResources(Collection<String> datapacks, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
 		multimeterServer.getMultimeter().reloadOptions();
+	}
+	
+	@Inject(
+			method = "startMonitor",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onTickStart(TickDurationMonitor minitor, CallbackInfo ci) {
+		multimeterServer.tickStart();
+	}
+	
+	@Inject(
+			method = "endMonitor",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void onTickEnd(TickDurationMonitor monitor, CallbackInfo ci) {
+		multimeterServer.tickEnd();
 	}
 	
 	@Override

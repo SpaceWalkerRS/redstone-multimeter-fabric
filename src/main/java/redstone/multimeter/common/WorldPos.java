@@ -1,10 +1,13 @@
 package redstone.multimeter.common;
 
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
+
+import redstone.multimeter.util.NBTUtils;
 
 public class WorldPos {
 	
@@ -14,6 +17,10 @@ public class WorldPos {
 	public WorldPos(Identifier worldId, BlockPos blockPos) {
 		this.worldId = worldId;
 		this.blockPos = blockPos.toImmutable();
+	}
+	
+	public WorldPos(Identifier worldId, int x, int y, int z) {
+		this(worldId, new BlockPos(x, y, z));
 	}
 	
 	public WorldPos(World world, BlockPos pos) {
@@ -74,5 +81,25 @@ public class WorldPos {
 	
 	public WorldPos offset(int dx, int dy, int dz) {
 		return new WorldPos(worldId, blockPos.add(dx, dy, dz));
+	}
+	
+	public NbtCompound toNBT() {
+		NbtCompound nbt = new NbtCompound();
+		
+		nbt.put("world id", NBTUtils.identifierToNBT(worldId));
+		nbt.putInt("x", blockPos.getX());
+		nbt.putInt("y", blockPos.getY());
+		nbt.putInt("z", blockPos.getZ());
+		
+		return nbt;
+	}
+	
+	public static WorldPos fromNBT(NbtCompound nbt) {
+		Identifier worldId = NBTUtils.NBTToIdentifier(nbt.getCompound("world id"));
+		int x = nbt.getInt("x");
+		int y = nbt.getInt("y");
+		int z = nbt.getInt("z");
+		
+		return new WorldPos(worldId, x, y, z);
 	}
 }

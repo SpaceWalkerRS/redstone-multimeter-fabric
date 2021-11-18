@@ -18,6 +18,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
 
+import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IBlock;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.interfaces.mixin.IWorld;
@@ -29,6 +30,26 @@ public abstract class WorldMixin implements IWorld {
 	
 	@Shadow public abstract boolean isClient();
 	@Shadow public abstract boolean isReceivingRedstonePower(BlockPos pos);
+	
+	@Inject(
+			method = "tickBlockEntities",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void startTickTaskBlockEntities(CallbackInfo ci) {
+		startTickTask(TickTask.BLOCK_ENTITIES);
+	}
+	
+	@Inject(
+			method = "tickBlockEntities",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void endTickTaskBlockEntities(CallbackInfo ci) {
+		endTickTask();
+	}
 	
 	@Inject(
 			method = "tickBlockEntities",
