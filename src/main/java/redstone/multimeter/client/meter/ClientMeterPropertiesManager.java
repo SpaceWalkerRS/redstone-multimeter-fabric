@@ -70,21 +70,24 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		
 		if (properties.getName() != null && Options.RedstoneMultimeter.NUMBERED_NAMES.get()) {
 			String name = properties.getName();
-			name = String.format("%s %d", name, client.getMeterGroup().getNextMeterIndex());
+			int number = client.getMeterGroup().getNextMeterIndex();
 			
-			properties.setName(name);
+			properties.setName(String.format("%s %d", name, number));
 		}
-		if (properties.getMovable() == null && Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
+		if (Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
 			properties.setMovable(!Screen.hasShiftDown());
 		}
-		if (properties.getEventTypes() == null) {
-			for (int index = 0; index < EventType.ALL.length; index++) {
-				KeyBinding keyBind = KeyBindings.TOGGLE_EVENT_TYPES[index];
-				
-				if (keyBind.isPressed()) {
-					EventType type = EventType.ALL[index];
-					properties.toggleEventType(type);
-				}
+		for (int index = 0; index < EventType.ALL.length; index++) {
+			KeyBinding keyBind = KeyBindings.TOGGLE_EVENT_TYPES[index];
+			
+			if (keyBind.isPressed()) {
+				EventType type = EventType.ALL[index];
+				properties.toggleEventType(type);
+			}
+		}
+		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.hasRandomTicks()) {
+			if (!properties.hasEventType(EventType.RANDOM_TICK)) {
+				properties.toggleEventType(EventType.RANDOM_TICK);
 			}
 		}
 	}

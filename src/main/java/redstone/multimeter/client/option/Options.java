@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.common.meter.MeterGroup;
+import redstone.multimeter.common.meter.event.EventType;
 
 public class Options {
 	
@@ -24,6 +25,7 @@ public class Options {
 		
 		public static final BooleanOption                NUMBERED_NAMES       = new BooleanOption("Numbered Meter Names", "Add a number at the end of meter names that increments with each meter you add.", true);
 		public static final BooleanOption                SHIFTY_METERS        = new BooleanOption("Shifty Meters", "Use the shift key to control whether a new meter is movable or not.", true);
+		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("Auto Random Ticks", String.format("Automatically enable the \'%s\' event type when placing a meter on a block that accepts random ticks.", EventType.RANDOM_TICK.getName()), true);
 		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("Create Group On Join", "Automatically create a new meter group upon joining a world or server.", true);
 		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption("Default Meter Group", "The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used.", "", MeterGroup.getMaxNameLength());
 		
@@ -168,6 +170,7 @@ public class Options {
 		register(RedstoneMultimeterMod.MOD_NAME,
 			RedstoneMultimeter.NUMBERED_NAMES,
 			RedstoneMultimeter.SHIFTY_METERS,
+			RedstoneMultimeter.AUTO_RANDOM_TICKS,
 			RedstoneMultimeter.CREATE_GROUP_ON_JOIN,
 			RedstoneMultimeter.DEFAULT_METER_GROUP
 		);
