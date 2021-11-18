@@ -13,35 +13,35 @@ import redstone.multimeter.util.TextUtils;
 
 public enum EventType {
 	
-	UNKNOWN(0, "unknown") {
+	UNKNOWN(-1, "unknown") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	POWERED(1, "powered") {
+	POWERED(0, "powered") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "became powered", metaData == 1);
 		}
 	},
-	ACTIVE(2, "active") {
+	ACTIVE(1, "active") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "became active", metaData == 1);
 		}
 	},
-	MOVED(3, "moved") {
+	MOVED(2, "moved") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "direction", Direction.byId(metaData).getName());
 		}
 	},
-	POWER_CHANGE(4, "power_change") {
+	POWER_CHANGE(3, "power_change") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
@@ -52,56 +52,56 @@ public enum EventType {
 			TextUtils.addFancyText(lines, "new power", newPower);
 		}
 	},
-	RANDOM_TICK(5, "random_tick") {
+	RANDOM_TICK(4, "random_tick") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	SCHEDULED_TICK(6, "scheduled_tick") {
+	SCHEDULED_TICK(5, "scheduled_tick") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "priority", metaData);
 		}
 	},
-	BLOCK_EVENT(7, "block_event") {
+	BLOCK_EVENT(6, "block_event") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "type", metaData);
 		}
 	},
-	ENTITY_TICK(8, "entity_tick") {
+	ENTITY_TICK(7, "entity_tick") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	BLOCK_ENTITY_TICK(9, "block_entity_tick") {
+	BLOCK_ENTITY_TICK(8, "block_entity_tick") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	BLOCK_UPDATE(10, "block_update") {
+	BLOCK_UPDATE(9, "block_update") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	COMPARATOR_UPDATE(11, "comparator_update") {
+	COMPARATOR_UPDATE(10, "comparator_update") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			
 		}
 	},
-	SHAPE_UPDATE(12, "shape_update") {
+	SHAPE_UPDATE(11, "shape_update") {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metaData) {
@@ -113,10 +113,14 @@ public enum EventType {
 	private static final Map<String, EventType> BY_NAME;
 	
 	static {
-		ALL = new EventType[values().length];
+		EventType[] types = values();
+		
+		ALL = new EventType[types.length - 1];
 		BY_NAME = new HashMap<>();
 		
-		for (EventType type : values()) {
+		for (int index = 1; index < types.length; index++) {
+			EventType type = types[index];
+			
 			ALL[type.index] = type;
 			BY_NAME.put(type.name, type);
 		}
@@ -135,7 +139,7 @@ public enum EventType {
 	}
 	
 	public static EventType fromIndex(int index) {
-		if (index > 0 && index < ALL.length) {
+		if (index >= 0 && index < ALL.length) {
 			return ALL[index];
 		}
 		
