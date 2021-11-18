@@ -248,10 +248,10 @@ public class TextField extends AbstractButton {
 	public void setFocused(boolean focused) {
 		super.setFocused(focused);
 		update();
-		cursorTicks = -1;
-		selectionIndex = -1;
 		
 		if (!focused) {
+			selectionIndex = -1;
+			cursorTicks = -1;
 			setCursor(fullText.length());
 		}
 	}
