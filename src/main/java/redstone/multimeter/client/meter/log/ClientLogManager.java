@@ -82,7 +82,7 @@ public class ClientLogManager extends LogManager {
 	 * Log all events from the past server tick
 	 */
 	public void updateMeterLogs(CompoundTag data) {
-		int subTickCount = data.getInt("subtickCount");
+		int subTickCount = data.getInt("subticks");
 		subticks.put(getLastTick(), subTickCount);
 		
 		ListTag list = data.getList("logs", 10);

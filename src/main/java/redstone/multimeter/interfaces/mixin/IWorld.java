@@ -1,10 +1,18 @@
 package redstone.multimeter.interfaces.mixin;
 
-import redstone.multimeter.common.TickPhase;
+import redstone.multimeter.common.TickTask;
 
 public interface IWorld {
 	
-	default void onTickPhase(TickPhase tickPhase) {
+	default void startTickTask(TickTask task) {
+		
+	}
+	
+	default void endTickTask() {
+		
+	}
+	
+	default void swapTickTask(TickTask task) {
 		
 	}
 }

@@ -212,7 +212,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	protected abstract void updateMode(Meter meter);
 	
 	private boolean wasToggled(EventLog log) {
-		return (log.getEvent().getMetaData() & 1) != 0;
+		return (log.getEvent().getMetadata() & 1) != 0;
 	}
 	
 	protected abstract boolean isToggled(Meter meter);

@@ -6,20 +6,18 @@ import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.Text;
 
-import redstone.multimeter.util.NBTUtils;
-
 public class MeterEvent {
 	
 	private EventType type;
-	private int metaData;
+	private int metadata;
 	
 	private MeterEvent() {
 		
 	}
 	
-	public MeterEvent(EventType type, int metaData) {
+	public MeterEvent(EventType type, int metadata) {
 		this.type = type;
-		this.metaData = metaData;
+		this.metadata = metadata;
 	}
 	
 	@Override
@@ -27,7 +25,7 @@ public class MeterEvent {
 		String string = type.getName();
 		
 		List<Text> lines = new ArrayList<>();
-		type.addTextForTooltip(lines, metaData);
+		type.addTextForTooltip(lines, metadata);
 		
 		if (!lines.isEmpty()) {
 			String[] args = new String[lines.size()];
@@ -46,15 +44,15 @@ public class MeterEvent {
 		return type;
 	}
 	
-	public int getMetaData() {
-		return metaData;
+	public int getMetadata() {
+		return metadata;
 	}
 	
 	public CompoundTag toNBT() {
 		CompoundTag nbt = new CompoundTag();
 		
-		NBTUtils.putEventType(nbt, "type", type);
-		nbt.putInt("metaData", metaData);
+		nbt.put("type", type.toNBT());
+		nbt.putInt("metadata", metadata);
 		
 		return nbt;
 	}
@@ -62,8 +60,8 @@ public class MeterEvent {
 	public static MeterEvent fromNBT(CompoundTag nbt) {
 		MeterEvent event = new MeterEvent();
 		
-		event.type = NBTUtils.getEventType(nbt, "type");
-		event.metaData = nbt.getInt("metaData");
+		event.type = EventType.fromNBT(nbt.get("type"));
+		event.metadata = nbt.getInt("metadata");
 		
 		return event;
 	}

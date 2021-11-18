@@ -4,13 +4,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.nbt.ByteTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 
+import redstone.multimeter.util.NBTUtils;
 import redstone.multimeter.util.TextUtils;
 
 public enum EventType {
 	
+	UNKNOWN(-1, "unknown") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			
+		}
+	},
 	POWERED(0, "powered") {
 		
 		@Override
@@ -104,11 +114,14 @@ public enum EventType {
 	private static final Map<String, EventType> BY_NAME;
 	
 	static {
+		EventType[] types = values();
 		
-		ALL = new EventType[values().length];
+		ALL = new EventType[types.length - 1];
 		BY_NAME = new HashMap<>();
 		
-		for (EventType type : values()) {
+		for (int index = 1; index < types.length; index++) {
+			EventType type = types[index];
+			
 			ALL[type.index] = type;
 			BY_NAME.put(type.name, type);
 		}
@@ -131,7 +144,7 @@ public enum EventType {
 			return ALL[index];
 		}
 		
-		return null;
+		return UNKNOWN;
 	}
 	
 	public String getName() {
@@ -139,7 +152,7 @@ public enum EventType {
 	}
 	
 	public static EventType fromName(String name) {
-		return BY_NAME.get(name);
+		return BY_NAME.getOrDefault(name, UNKNOWN);
 	}
 	
 	public int flag() {
@@ -148,4 +161,18 @@ public enum EventType {
 	
 	public abstract void addTextForTooltip(List<Text> lines, int metaData);
 	
+	public Tag toNBT() {
+		return ByteTag.of((byte)index);
+	}
+	
+	public static EventType fromNBT(Tag nbt) {
+		if (nbt.getType() != NBTUtils.TYPE_BYTE) {
+			return UNKNOWN;
+		}
+		
+		ByteTag ByteTag = (ByteTag)nbt;
+		int index = ByteTag.getByte();
+		
+		return fromIndex(index);
+	}
 }

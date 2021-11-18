@@ -206,10 +206,10 @@ public class LogPrinter {
 					writer.write("" + tick);
 					writer.newLine();
 				}
-				if (meterEventLog.log.getTickPhase() != phase) {
+				if (meterEventLog.log.getTickPhase().equals(phase)) {
 					phase = meterEventLog.log.getTickPhase();
 					
-					writer.write("    " + phase.getName());
+					writer.write("    " + phase.toString());
 					writer.newLine();
 				}
 				

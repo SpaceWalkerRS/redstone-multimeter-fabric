@@ -9,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ColorUtils;
-import redstone.multimeter.util.NBTUtils;
 
 public class MeterProperties {
 	
@@ -215,7 +214,7 @@ public class MeterProperties {
 		CompoundTag nbt = new CompoundTag();
 		
 		if (pos != null) {
-			nbt.put("pos", NBTUtils.dimPosToNBT(pos));
+			nbt.put("pos", pos.toNBT());
 		}
 		if (name != null) {
 			nbt.putString("name", name);
@@ -227,7 +226,7 @@ public class MeterProperties {
 			nbt.putBoolean("movable", movable);
 		}
 		if (eventTypes != null) {
-			nbt.putInt("eventTypes", eventTypes);
+			nbt.putInt("event types", eventTypes);
 		}
 		
 		return nbt;
@@ -237,7 +236,7 @@ public class MeterProperties {
 		MeterProperties properties = new MeterProperties();
 		
 		if (nbt.contains("pos")) {
-			properties.pos = NBTUtils.NBTToDimPos(nbt.getCompound("pos"));
+			properties.pos = DimPos.fromNBT(nbt.getCompound("pos"));
 		}
 		if (nbt.contains("name")) {
 			properties.name = nbt.getString("name");
@@ -248,8 +247,8 @@ public class MeterProperties {
 		if (nbt.contains("movable")) {
 			properties.movable = nbt.getBoolean("movable");
 		}
-		if (nbt.contains("eventTypes")) {
-			properties.eventTypes = nbt.getInt("eventTypes");
+		if (nbt.contains("event types")) {
+			properties.eventTypes = nbt.getInt("event types");
 		}
 		
 		return properties;

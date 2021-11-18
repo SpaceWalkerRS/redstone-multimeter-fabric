@@ -16,9 +16,11 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+
 import redstone.multimeter.RedstoneMultimeterMod;
-import redstone.multimeter.common.TickPhase;
+import redstone.multimeter.common.TickTask;
 import redstone.multimeter.common.DimPos;
+import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.network.packets.JoinMultimeterServerPacket;
 import redstone.multimeter.common.network.packets.ServerTickPacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -32,7 +34,7 @@ public class MultimeterServer {
 	private final Map<UUID, String> playerNameCache;
 	
 	private Field carpetTickSpeedProccessEntities;
-	private TickPhase currentTickPhase = TickPhase.UNKNOWN;
+	private TickPhase tickPhase;
 	/** true if the OverWorld already ticked time */
 	private boolean tickedTime;
 	
@@ -41,6 +43,9 @@ public class MultimeterServer {
 		this.packetHandler = new ServerPacketHandler(this);
 		this.multimeter = new Multimeter(this);
 		this.playerNameCache = new HashMap<>();
+		
+		this.tickPhase = TickPhase.UNKNOWN;
+		this.tickedTime = false;
 		
 		this.detectCarpetTickSpeed();
 	}
@@ -88,12 +93,20 @@ public class MultimeterServer {
 		return new File(server.getRunDirectory(), RedstoneMultimeterMod.CONFIG_PATH);
 	}
 	
-	public TickPhase getCurrentTickPhase() {
-		return currentTickPhase;
+	public TickPhase getTickPhase() {
+		return tickPhase;
 	}
 	
-	public void onTickPhase(TickPhase tickPhase) {
-		currentTickPhase = tickPhase;
+	public void startTickTask(TickTask task) {
+		tickPhase = tickPhase.startTask(task);
+	}
+	
+	public void endTickTask() {
+		tickPhase = tickPhase.endTask();
+	}
+	
+	public void swapTickTask(TickTask task) {
+		tickPhase = tickPhase.swapTask(task);
 	}
 	
 	public void onOverworldTickTime() {
@@ -135,6 +148,7 @@ public class MultimeterServer {
 			}
 		}
 		
+		tickPhase = TickPhase.UNKNOWN;
 		multimeter.tickStart(paused);
 	}
 	
@@ -163,8 +177,8 @@ public class MultimeterServer {
 			}
 		}
 		
+		tickPhase = TickPhase.UNKNOWN;
 		multimeter.tickEnd(paused);
-		onTickPhase(TickPhase.UNKNOWN);
 	}
 	
 	public void onPlayerJoin(ServerPlayerEntity player) {
