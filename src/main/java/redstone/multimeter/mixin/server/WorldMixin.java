@@ -35,7 +35,7 @@ public abstract class WorldMixin implements IWorld {
 					value = "HEAD"
 			)
 	)
-	private void startTickPhaseBlockEntities(CallbackInfo ci) {
+	private void startTickTaskBlockEntities(CallbackInfo ci) {
 		startTickTask(TickTask.BLOCK_ENTITIES);
 	}
 	
@@ -45,7 +45,7 @@ public abstract class WorldMixin implements IWorld {
 					value = "RETURN"
 			)
 	)
-	private void endTickPhaseBlockEntities(CallbackInfo ci) {
+	private void endTickTaskBlockEntities(CallbackInfo ci) {
 		endTickTask();
 	}
 	

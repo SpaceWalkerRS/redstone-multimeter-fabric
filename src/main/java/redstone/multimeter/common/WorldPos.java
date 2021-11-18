@@ -86,7 +86,7 @@ public class WorldPos {
 	public NbtCompound toNBT() {
 		NbtCompound nbt = new NbtCompound();
 		
-		nbt.put("worldId", NBTUtils.identifierToNBT(worldId));
+		nbt.put("world id", NBTUtils.identifierToNBT(worldId));
 		nbt.putInt("x", blockPos.getX());
 		nbt.putInt("y", blockPos.getY());
 		nbt.putInt("z", blockPos.getZ());
@@ -95,7 +95,7 @@ public class WorldPos {
 	}
 	
 	public static WorldPos fromNBT(NbtCompound nbt) {
-		Identifier worldId = NBTUtils.NBTToIdentifier(nbt.getCompound("worldId"));
+		Identifier worldId = NBTUtils.NBTToIdentifier(nbt.getCompound("world id"));
 		int x = nbt.getInt("x");
 		int y = nbt.getInt("y");
 		int z = nbt.getInt("z");

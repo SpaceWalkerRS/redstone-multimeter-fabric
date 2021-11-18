@@ -87,7 +87,7 @@ public class EventLog {
 	
 	public List<Text> getTextForTooltip() {
 		EventType type = event.getType();
-		int data = event.getMetaData();
+		int data = event.getMetadata();
 		
 		List<Text> lines = new ArrayList<>();
 		
@@ -106,7 +106,7 @@ public class EventLog {
 		nbt.put("meter event", event.toNBT());
 		nbt.putLong("tick", tick);
 		nbt.putInt("subtick", subtick);
-		nbt.put("tickPhase", tickPhase.toNBT());
+		nbt.put("tick phase", tickPhase.toNBT());
 		
 		return nbt;
 	}
@@ -117,7 +117,7 @@ public class EventLog {
 		log.event = MeterEvent.fromNBT(nbt.getCompound("meter event"));
 		log.tick = nbt.getLong("tick");
 		log.subtick = nbt.getInt("subtick");
-		log.tickPhase = TickPhase.fromNBT(nbt.get("tickPhase"));
+		log.tickPhase = TickPhase.fromNBT(nbt.get("tick phase"));
 		
 		return log;
 	}

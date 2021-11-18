@@ -81,7 +81,7 @@ public class ServerLogManager extends LogManager {
 		}
 		
 		NbtCompound nbt = new NbtCompound();
-		nbt.putInt("subtickCount", nextSubtick);
+		nbt.putInt("subticks", nextSubtick);
 		nbt.put("logs", list);
 		
 		MeterLogsPacket packet = new MeterLogsPacket(nbt);

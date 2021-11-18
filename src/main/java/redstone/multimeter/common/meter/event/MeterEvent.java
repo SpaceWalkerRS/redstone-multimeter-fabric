@@ -9,15 +9,15 @@ import net.minecraft.text.Text;
 public class MeterEvent {
 	
 	private EventType type;
-	private int metaData;
+	private int metadata;
 	
 	private MeterEvent() {
 		
 	}
 	
-	public MeterEvent(EventType type, int metaData) {
+	public MeterEvent(EventType type, int metadata) {
 		this.type = type;
-		this.metaData = metaData;
+		this.metadata = metadata;
 	}
 	
 	@Override
@@ -25,7 +25,7 @@ public class MeterEvent {
 		String string = type.getName();
 		
 		List<Text> lines = new ArrayList<>();
-		type.addTextForTooltip(lines, metaData);
+		type.addTextForTooltip(lines, metadata);
 		
 		if (!lines.isEmpty()) {
 			String[] args = new String[lines.size()];
@@ -44,15 +44,15 @@ public class MeterEvent {
 		return type;
 	}
 	
-	public int getMetaData() {
-		return metaData;
+	public int getMetadata() {
+		return metadata;
 	}
 	
 	public NbtCompound toNBT() {
 		NbtCompound nbt = new NbtCompound();
 		
 		nbt.put("type", type.toNBT());
-		nbt.putInt("metaData", metaData);
+		nbt.putInt("metadata", metadata);
 		
 		return nbt;
 	}
@@ -61,7 +61,7 @@ public class MeterEvent {
 		MeterEvent event = new MeterEvent();
 		
 		event.type = EventType.fromNBT(nbt.get("type"));
-		event.metaData = nbt.getInt("metaData");
+		event.metadata = nbt.getInt("metadata");
 		
 		return event;
 	}

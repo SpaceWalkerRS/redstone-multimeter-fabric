@@ -409,7 +409,7 @@ public class Multimeter {
 	}
 	
 	public void logPowered(World world, BlockPos pos, BlockState state) {
-		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setPowered(event.getMetaData() != 0), new MeterEventSupplier(EventType.POWERED, () -> {
+		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setPowered(event.getMetadata() != 0), new MeterEventSupplier(EventType.POWERED, () -> {
 			return ((IBlock)state.getBlock()).isPowered(world, pos, state) ? 1 : 0;
 		}));
 	}
@@ -419,7 +419,7 @@ public class Multimeter {
 	}
 	
 	public void logActive(World world, BlockPos pos, BlockState state) {
-		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setActive(event.getMetaData() != 0), new MeterEventSupplier(EventType.ACTIVE, () -> {
+		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setActive(event.getMetadata() != 0), new MeterEventSupplier(EventType.ACTIVE, () -> {
 			Block block = state.getBlock();
 			return ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, pos, state) ? 1 : 0;
 		}));
@@ -445,7 +445,7 @@ public class Multimeter {
 	
 	public void logPowerChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
 		tryLogEvent(world, pos, (meterGroup, meter, event) -> {
-			int data = event.getMetaData();
+			int data = event.getMetadata();
 			int oldPower = (data >> 8) & 0xFF;
 			int newPower =  data       & 0xFF;
 			

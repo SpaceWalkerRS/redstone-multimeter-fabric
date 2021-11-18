@@ -21,7 +21,7 @@ public class SpawnHelperMixin {
 					value = "HEAD"
 			)
 	)
-	private static void startTickPhaseMobSpawning(ServerWorld world, WorldChunk chunk, SpawnHelper.Info info, boolean spawnAnimals, boolean spawnMonsters, boolean rareSpawn, CallbackInfo ci) {
+	private static void startTickTaskMobSpawning(ServerWorld world, WorldChunk chunk, SpawnHelper.Info info, boolean spawnAnimals, boolean spawnMonsters, boolean rareSpawn, CallbackInfo ci) {
 		((IServerWorld)world).startTickTask(TickTask.MOB_SPAWNING);
 	}
 	
@@ -31,7 +31,7 @@ public class SpawnHelperMixin {
 					value = "RETURN"
 			)
 	)
-	private static void endTickPhaseMobSpawning(ServerWorld world, WorldChunk chunk, SpawnHelper.Info info, boolean spawnAnimals, boolean spawnMonsters, boolean rareSpawn, CallbackInfo ci) {
+	private static void endTickTaskMobSpawning(ServerWorld world, WorldChunk chunk, SpawnHelper.Info info, boolean spawnAnimals, boolean spawnMonsters, boolean rareSpawn, CallbackInfo ci) {
 		((IServerWorld)world).endTickTask();
 	}
 }

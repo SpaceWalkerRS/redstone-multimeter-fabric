@@ -2,11 +2,9 @@ package redstone.multimeter.mixin.server;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BooleanSupplier;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -53,18 +51,6 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/MinecraftServer;tickWorlds(Ljava/util/function/BooleanSupplier;)V"
-			)
-	)
-	private void onTickStart(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		multimeterServer.tickStart();
-	}
-	
-	@Inject(
 			method = "reloadResources",
 			at = @At(
 					value = "HEAD"
@@ -80,7 +66,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "HEAD"
 			)
 	)
-	private void onTickStart() {
+	private void onTickStart(CallbackInfo ci) {
 		multimeterServer.tickStart();
 	}
 	
@@ -90,7 +76,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "RETURN"
 			)
 	)
-	private void onTickEnd() {
+	private void onTickEnd(CallbackInfo ci) {
 		multimeterServer.tickEnd();
 	}
 	

@@ -24,7 +24,7 @@ public class EnderDragonFightMixin {
 					value = "HEAD"
 			)
 	)
-	private void startTickPhaseDragonFight(CallbackInfo ci) {
+	private void startTickTaskDragonFight(CallbackInfo ci) {
 		((IServerWorld)world).startTickTask(TickTask.DRAGON_FIGHT);
 	}
 	
@@ -34,7 +34,7 @@ public class EnderDragonFightMixin {
 					value = "RETURN"
 			)
 	)
-	private void endTickPhaseDragonFight(CallbackInfo ci) {
+	private void endTickTaskDragonFight(CallbackInfo ci) {
 		((IServerWorld)world).endTickTask();
 	}
 }

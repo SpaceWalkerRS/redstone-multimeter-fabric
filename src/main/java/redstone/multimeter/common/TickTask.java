@@ -21,11 +21,13 @@ public enum TickTask {
 	PORTALS              (16, "portals"),
 	BLOCK_EVENTS         (17, "block events"),
 	ENTITIES             (18, "entities"),
-	PLAYERS              (19, "players"),
-	DRAGON_FIGHT         (20, "dragon fight"),
-	BLOCK_ENTITIES       (21, "block entities"),
-	PACKETS              (22, "packets"),
-	COMMAND_FUNCTIONS    (23, "command functions");
+	REGULAR_ENTITIES     (19, "regular entities"),
+	GLOBAL_ENTITIES      (20, "global entities"),
+	PLAYERS              (21, "players"),
+	DRAGON_FIGHT         (22, "dragon fight"),
+	BLOCK_ENTITIES       (23, "block entities"),
+	PACKETS              (24, "packets"),
+	COMMAND_FUNCTIONS    (25, "command functions");
 	
 	public static final TickTask[] ALL;
 	

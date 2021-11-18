@@ -226,7 +226,7 @@ public class MeterProperties {
 			nbt.putBoolean("movable", movable);
 		}
 		if (eventTypes != null) {
-			nbt.putInt("eventTypes", eventTypes);
+			nbt.putInt("event types", eventTypes);
 		}
 		
 		return nbt;
@@ -247,8 +247,8 @@ public class MeterProperties {
 		if (nbt.contains("movable")) {
 			properties.movable = nbt.getBoolean("movable");
 		}
-		if (nbt.contains("eventTypes")) {
-			properties.eventTypes = nbt.getInt("eventTypes");
+		if (nbt.contains("event types")) {
+			properties.eventTypes = nbt.getInt("event types");
 		}
 		
 		return properties;
