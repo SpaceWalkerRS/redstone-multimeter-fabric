@@ -131,6 +131,10 @@ public class MultimeterHud extends AbstractParentElement {
 		resetSize();
 		
 		updateMeterList();
+		
+		if (!meters.isEmpty() && paused && Options.HUD.AUTO_UNPAUSE.get()) {
+			pause();
+		}
 	}
 	
 	@Override

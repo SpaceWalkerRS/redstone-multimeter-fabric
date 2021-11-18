@@ -41,6 +41,7 @@ public class Options {
 		public static final BooleanOption                PAUSE_INDICATOR      = new BooleanOption("Pause Indicator", "Display a little play/pause indicator underneath the HUD.", false);
 		public static final IntegerOption                OPACITY              = new IntegerOption("Opacity", "", 100, 0, 100);
 		public static final BooleanOption                AUTO_PAUSE           = new BooleanOption("Auto Pause", "Automatically pause the HUD when opening the Multimeter screen.", true);
+		public static final BooleanOption                AUTO_UNPAUSE         = new BooleanOption("Auto Unpause", "Automatically unpause the HUD when closing the Multimeter screen.", true);
 		
 	}
 	
@@ -180,7 +181,8 @@ public class Options {
 			HUD.HIDE_HIGHLIGHT,
 			HUD.PAUSE_INDICATOR,
 			HUD.OPACITY,
-			HUD.AUTO_PAUSE
+			HUD.AUTO_PAUSE,
+			HUD.AUTO_UNPAUSE
 		);
 		register("Log Printer",
 			LogPrinter.PRINT_OLD_LOGS,
