@@ -25,6 +25,7 @@
   	"meterable.PoweredRailBlockMixin",
   	"meterable.PressurePlateBlockMixin",
   	"meterable.RedstoneLampBlockMixin",
+  	"meterable.RedstoneOreBlockMixin",
   	"meterable.RedstoneTorchBlockMixin",
   	"meterable.RedstoneWireBlockMixin",
   	"meterable.RepeaterBlockMixin",
