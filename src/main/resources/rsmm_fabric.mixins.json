@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "redstone.multimeter.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
   	"meterable.AbstractButtonBlockMixin",
   	"meterable.AbstractRedstoneGateBlockMixin",
@@ -52,7 +52,8 @@
   	"server.ServerWorldMixin",
   	"server.SpawnHelperMixin",
   	"server.WorldChunkMixin",
-  	"server.WorldMixin"
+  	"server.WorldMixin",
+  	"server.WorldTickSchedulerMixin"
   ],
   "client": [
   	"client.ClientCommandSourceMixin",

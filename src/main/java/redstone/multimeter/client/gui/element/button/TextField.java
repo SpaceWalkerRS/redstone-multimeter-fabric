@@ -376,7 +376,7 @@ public class TextField extends AbstractButton {
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		Matrix4f model = matrices.peek().getModel();
+		Matrix4f model = matrices.peek().getPositionMatrix();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		

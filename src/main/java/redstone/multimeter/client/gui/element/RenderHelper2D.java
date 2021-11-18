@@ -28,7 +28,7 @@ public class RenderHelper2D {
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		Matrix4f model = matrices.peek().getModel();
+		Matrix4f model = matrices.peek().getPositionMatrix();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		drawer.draw(bufferBuilder, model);
@@ -111,7 +111,7 @@ public class RenderHelper2D {
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		Matrix4f model = matrices.peek().getModel();
+		Matrix4f model = matrices.peek().getPositionMatrix();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 		drawer.draw(bufferBuilder, model);
@@ -163,7 +163,7 @@ public class RenderHelper2D {
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		Matrix4f model = matrices.peek().getModel();
+		Matrix4f model = matrices.peek().getPositionMatrix();
 		
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 		drawer.draw(bufferBuilder, model);
@@ -215,7 +215,7 @@ public class RenderHelper2D {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		Immediate immediate = VertexConsumerProvider.immediate(bufferBuilder);
-		Matrix4f model = matrices.peek().getModel();
+		Matrix4f model = matrices.peek().getPositionMatrix();
 		
 		drawer.draw(immediate, model);
 		immediate.draw();

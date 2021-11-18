@@ -17,19 +17,41 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.ScheduledTick;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.tick.OrderedTick;
+import net.minecraft.world.tick.WorldTickScheduler;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
+import redstone.multimeter.interfaces.mixin.IWorldTickScheduler;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin implements IServerWorld {
 	
 	@Shadow @Final private MinecraftServer server;
+	@Shadow @Final private WorldTickScheduler<Block> blockTickScheduler;
+	@Shadow @Final private WorldTickScheduler<Fluid> fluidTickScheduler;
+	
+	private OrderedTick<?> scheduledTick;
+	
+	@Inject(
+			method = "<init>",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void setTickLoggers(CallbackInfo ci) {
+		((IWorldTickScheduler)blockTickScheduler).setTickLogger(scheduledTick -> {
+			this.scheduledTick = scheduledTick;
+		});
+		((IWorldTickScheduler)fluidTickScheduler).setTickLogger(scheduledTick -> {
+			this.scheduledTick = scheduledTick;
+		});
+	}
 	
 	@Inject(
 			method = "tick",
@@ -70,9 +92,9 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	@Inject(
 			method = "tick",
 			at = @At(
-					value = "FIELD",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/world/ServerWorld;blockTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+					args = "ldc=blockTicks"
 			)
 	)
 	private void startTickTaskBlockTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
@@ -82,26 +104,13 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	@Inject(
 			method = "tick",
 			at = @At(
-					value = "INVOKE",
-					ordinal = 0,
-					shift = Shift.AFTER,
-					target = "Lnet/minecraft/server/world/ServerTickScheduler;tick()V"
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=fluidTicks"
 			)
 	)
-	private void endTickTaskBlockTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		endTickTask();
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "FIELD",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/world/ServerWorld;fluidTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
-			)
-	)
-	private void startTickTaskFluidTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		startTickTask(TickTask.FLUID_TICKS);
+	private void swapTickTaskFluidTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.FLUID_TICKS);
 	}
 	
 	@Inject(
@@ -110,7 +119,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					value = "INVOKE",
 					ordinal = 1,
 					shift = Shift.AFTER,
-					target = "Lnet/minecraft/server/world/ServerTickScheduler;tick()V"
+					target = "Lnet/minecraft/world/tick/WorldTickScheduler;tick(JILjava/util/function/BiConsumer;)V"
 			)
 	)
 	private void endTickTaskFluidTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
@@ -306,8 +315,10 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/fluid/FluidState;onScheduledTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
-	private void onTickFluid(ScheduledTick<Fluid> scheduledTick, CallbackInfo ci) {
-		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
+	private void onTickFluid(BlockPos pos, Fluid fluid, CallbackInfo ci) {
+		if (scheduledTick != null) {
+			getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
+		}
 	}
 	
 	@Inject(
@@ -318,8 +329,10 @@ public abstract class ServerWorldMixin implements IServerWorld {
 					target = "Lnet/minecraft/block/BlockState;scheduledTick(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V"
 			)
 	)
-	private void onTickBlock(ScheduledTick<Block> scheduledTick, CallbackInfo ci) {
-		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
+	private void onTickBlock(BlockPos pos, Block block, CallbackInfo ci) {
+		if (scheduledTick != null) {
+			getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
+		}
 	}
 	
 	@Inject(

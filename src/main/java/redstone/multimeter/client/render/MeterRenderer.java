@@ -60,7 +60,7 @@ public class MeterRenderer {
 		matrices.push();
 		matrices.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
 		
-		Matrix4f model = matrices.peek().getModel();
+		Matrix4f model = matrices.peek().getPositionMatrix();
 		
 		float r = ColorUtils.getRed(color) / 255.0F;
 		float g = ColorUtils.getGreen(color) / 255.0F;

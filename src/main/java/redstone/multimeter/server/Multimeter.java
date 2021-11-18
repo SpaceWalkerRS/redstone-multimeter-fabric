@@ -23,8 +23,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
+import net.minecraft.world.tick.OrderedTick;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
@@ -353,7 +353,7 @@ public class Multimeter {
 				ServerWorld newWorld = server.getWorldOf(pos);
 				
 				if (newWorld != null) {
-					ServerWorld oldWorld = player.getServerWorld();
+					ServerWorld oldWorld = player.getWorld();
 					double oldX = player.getX();
 					double oldY = player.getY();
 					double oldZ = player.getZ();
@@ -463,12 +463,12 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.RANDOM_TICK, 0);
 	}
 	
-	public void logScheduledTick(World world, ScheduledTick<?> scheduledTick) {
-		tryLogEvent(world, scheduledTick.pos, EventType.SCHEDULED_TICK, scheduledTick.priority.getIndex());
+	public void logScheduledTick(World world, OrderedTick<?> scheduledTick) {
+		tryLogEvent(world, scheduledTick.pos(), EventType.SCHEDULED_TICK, scheduledTick.priority().getIndex());
 	}
 	
 	public void logBlockEvent(World world, BlockEvent blockEvent) {
-		tryLogEvent(world, blockEvent.getPos(), EventType.BLOCK_EVENT, blockEvent.getType());
+		tryLogEvent(world, blockEvent.pos(), EventType.BLOCK_EVENT, blockEvent.type());
 	}
 	
 	public void logEntityTick(World world, Entity entity) {
