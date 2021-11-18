@@ -4,13 +4,12 @@ import java.util.function.BooleanSupplier;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.server.MinecraftServer;
 
-import redstone.multimeter.common.TickPhase;
+import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.MultimeterServer;
 
@@ -35,8 +34,8 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "HEAD"
 			)
 	)
-	private void onTickPhaseHandlePackets(CallbackInfo ci) {
-		multimeterServer.onTickPhase(TickPhase.HANDLE_PACKETS);
+	private void startTickTaskPackets(CallbackInfo ci) {
+		multimeterServer.startTickTask(TickTask.PACKETS);
 	}
 	
 	@Inject(
@@ -45,19 +44,21 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "RETURN"
 			)
 	)
-	private void onTickEnd(CallbackInfo ci) {
+	private void endTickTaskPacketsAndEndTick(CallbackInfo ci) {
+		multimeterServer.endTickTask();
+		// Ending the tick here is not ideal, but for the
+		// sake of Carpet mod compatibility injecting into
+		// the run loop is not an option.
 		multimeterServer.tickEnd();
 	}
 	
 	@Inject(
 			method = "tick",
 			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/MinecraftServer;tickWorlds(Ljava/util/function/BooleanSupplier;)V"
+					value = "HEAD"
 			)
 	)
-	private void onTickStart(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+	private void onTickStart(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
 		multimeterServer.tickStart();
 	}
 	
@@ -67,7 +68,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "HEAD"
 			)
 	)
-	private void onReload(CallbackInfo ci) {
+	private void onReloadResources(CallbackInfo ci) {
 		multimeterServer.getMultimeter().reloadOptions();
 	}
 	

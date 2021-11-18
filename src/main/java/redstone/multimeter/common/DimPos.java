@@ -1,11 +1,14 @@
 package redstone.multimeter.common;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+
+import redstone.multimeter.util.NBTUtils;
 
 public class DimPos {
 	
@@ -15,6 +18,10 @@ public class DimPos {
 	public DimPos(Identifier dimensionId, BlockPos blockPos) {
 		this.dimensionId = dimensionId;
 		this.blockPos = blockPos.toImmutable();
+	}
+	
+	public DimPos(Identifier dimensionId, int x, int y, int z) {
+		this(dimensionId, new BlockPos(x, y, z));
 	}
 	
 	public DimPos(World world, BlockPos pos) {
@@ -79,5 +86,30 @@ public class DimPos {
 	
 	public DimPos offset(int dx, int dy, int dz) {
 		return new DimPos(dimensionId, blockPos.add(dx, dy, dz));
+	}
+	
+	public CompoundTag toNBT() {
+		CompoundTag nbt = new CompoundTag();
+		
+		// The key is "world id" to match RSMM for 1.16+
+		// Keeping this key consistent between versions
+		// allows clients and servers of different versions
+		// to communicate effectively through the use of
+		// mods like ViaVersion or multiconnect
+		nbt.put("world id", NBTUtils.identifierToNBT(dimensionId));
+		nbt.putInt("x", blockPos.getX());
+		nbt.putInt("y", blockPos.getY());
+		nbt.putInt("z", blockPos.getZ());
+		
+		return nbt;
+	}
+	
+	public static DimPos fromNBT(CompoundTag nbt) {
+		Identifier dimensionId = NBTUtils.NBTToIdentifier(nbt.getCompound("world id"));
+		int x = nbt.getInt("x");
+		int y = nbt.getInt("y");
+		int z = nbt.getInt("z");
+		
+		return new DimPos(dimensionId, x, y, z);
 	}
 }

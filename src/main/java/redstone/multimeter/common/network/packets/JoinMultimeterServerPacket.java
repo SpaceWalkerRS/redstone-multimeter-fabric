@@ -24,14 +24,14 @@ public class JoinMultimeterServerPacket implements RSMMPacket {
 	
 	@Override
 	public void encode(CompoundTag data) {
-		data.putString("modVersion", modVersion);
-		data.putLong("serverTime", currentServerTick);
+		data.putString("mod version", modVersion);
+		data.putLong("server time", currentServerTick);
 	}
 	
 	@Override
 	public void decode(CompoundTag data) {
-		modVersion = data.getString("modVersion");
-		currentServerTick = data.getLong("serverTime");
+		modVersion = data.getString("mod version");
+		currentServerTick = data.getLong("server time");
 	}
 	
 	@Override

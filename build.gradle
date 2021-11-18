@@ -11,11 +11,6 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	mavenCentral()
-	maven {
-		name = "TerraformersMC"
-		url = "https://maven.terraformersmc.com/releases/"
-	}
 }
 
 dependencies {

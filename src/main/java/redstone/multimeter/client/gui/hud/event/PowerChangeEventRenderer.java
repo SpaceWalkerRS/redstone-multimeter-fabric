@@ -15,7 +15,7 @@ public class PowerChangeEventRenderer extends BasicEventRenderer {
 	
 	@Override
 	protected void drawCenter(int x, int y, Meter meter, MeterEvent event) {
-		int metaData = event.getMetaData();
+		int metaData = event.getMetadata();
 		int oldPower = (metaData >> 8) & 0xFF;
 		int newPower = metaData        & 0xFF;
 		
