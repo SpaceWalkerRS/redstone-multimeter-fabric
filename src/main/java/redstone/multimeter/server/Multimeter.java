@@ -491,6 +491,10 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.SHAPE_UPDATE, dir.getId());
 	}
 	
+	public void logInteractBlock(World world, BlockPos pos) {
+		tryLogEvent(world, pos, EventType.INTERACT_BLOCK, 0);
+	}
+	
 	private void tryLogEvent(World world, BlockPos pos, EventType type, int data) {
 		tryLogEvent(world, pos, type, data, (meterGroup, meter, event) -> true);
 	}

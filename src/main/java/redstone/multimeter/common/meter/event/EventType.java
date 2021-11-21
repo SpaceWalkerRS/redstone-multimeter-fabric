@@ -107,6 +107,13 @@ public enum EventType {
 		public void addTextForTooltip(List<Text> lines, int metaData) {
 			TextUtils.addFancyText(lines, "direction", Direction.byId(metaData).getName());
 		}
+	},
+	INTERACT_BLOCK(12, "interact_block") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metaData) {
+			
+		}
 	};
 	
 	public static final EventType[] ALL;
