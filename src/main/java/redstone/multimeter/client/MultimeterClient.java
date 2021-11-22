@@ -28,6 +28,7 @@ import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.packets.AddMeterPacket;
+import redstone.multimeter.common.network.packets.HandShakePacket;
 import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
 import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
 import redstone.multimeter.common.network.packets.MeterUpdatePacket;
@@ -147,24 +148,10 @@ public class MultimeterClient {
 		meterGroup.getLogManager().getPrinter().stop(false);
 	}
 	
-	/**
-	 * Called when this client connects to a Multimeter server
-	 */
-	public void onConnect(String modVersion, long serverTick) {
+	public void onConnect() {
 		if (!connected) {
-			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
-				sendMessage(warning, false);
-			}
-			
-			connected = true;
-			lastServerTick = serverTick;
-			
-			hud.reset();
-			
-			if (Options.RedstoneMultimeter.CREATE_GROUP_ON_JOIN.get()) {
-				createDefaultMeterGroup();
-			}
+			HandShakePacket packet = new HandShakePacket();
+			packetHandler.send(packet);
 		}
 	}
 	
@@ -174,6 +161,21 @@ public class MultimeterClient {
 			
 			hud.reset();
 			meterGroup.unsubscribe(true);
+		}
+	}
+	
+	public void onHandshake(String modVersion) {
+		connected = true;
+		
+		if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
+			Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
+			sendMessage(warning, false);
+		}
+		
+		hud.reset();
+		
+		if (Options.RedstoneMultimeter.CREATE_GROUP_ON_JOIN.get()) {
+			createDefaultMeterGroup();
 		}
 	}
 	

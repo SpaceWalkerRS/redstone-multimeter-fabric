@@ -8,39 +8,31 @@ import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.MultimeterServer;
 
-public class JoinMultimeterServerPacket implements RSMMPacket {
+public class HandShakePacket implements RSMMPacket {
 	
 	private String modVersion;
-	private long currentServerTick;
 	
-	public JoinMultimeterServerPacket() {
-		
-	}
-	
-	public JoinMultimeterServerPacket(long serverTick) {
+	public HandShakePacket() {
 		modVersion = RedstoneMultimeterMod.MOD_VERSION;
-		currentServerTick = serverTick;
 	}
 	
 	@Override
 	public void encode(NbtCompound data) {
 		data.putString("mod version", modVersion);
-		data.putLong("server time", currentServerTick);
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
 		modVersion = data.getString("mod version");
-		currentServerTick = data.getLong("server time");
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		
+		server.onHandshake(player, modVersion);
 	}
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.onConnect(modVersion, currentServerTick);
+		client.onHandshake(modVersion);
 	}
 }
