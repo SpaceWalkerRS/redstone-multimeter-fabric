@@ -4,6 +4,7 @@
   "package": "redstone.multimeter.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+  	"compat.alternate_current.WorldAccessMixin",
   	"meterable.AbstractButtonBlockMixin",
   	"meterable.AbstractRedstoneGateBlockMixin",
   	"meterable.BellBlockMixin",

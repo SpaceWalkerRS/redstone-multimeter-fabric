@@ -404,6 +404,22 @@ public class Multimeter {
 		player.sendMessage(message, false);
 	}
 	
+	public void onBlockChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
+		Block oldBlock = oldState.getBlock();
+		Block newBlock = newState.getBlock();
+		
+		if (oldBlock == newBlock && ((IBlock)newBlock).isPowerSource() && ((PowerSource)newBlock).logPowerChangeOnStateChange()) {
+			logPowerChange(world, pos, oldState, newState);
+		}
+		
+		boolean wasMeterable = ((IBlock)oldBlock).isMeterable();
+		boolean isMeterable = ((IBlock)newBlock).isMeterable();
+		
+		if (wasMeterable || isMeterable) {
+			logActive(world, pos, newState);
+		}
+	}
+	
 	public void logPowered(World world, BlockPos pos, boolean powered) {
 		tryLogEvent(world, pos, EventType.POWERED, powered ? 1 : 0, (meterGroup, meter, event) -> meter.setPowered(powered));
 	}

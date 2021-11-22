@@ -16,11 +16,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
 
-import redstone.multimeter.block.PowerSource;
-import redstone.multimeter.interfaces.mixin.IBlock;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
-import redstone.multimeter.server.Multimeter;
-import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(WorldChunk.class)
 public class WorldChunkMixin {
@@ -37,24 +33,8 @@ public class WorldChunkMixin {
 			)
 	)
 	private void onBlockStateChanged(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int y, ChunkSection section, boolean wasEmpty, int sectionX, int sectionY, int sectionZ, BlockState oldState, Block newBlock) {
-		if (world.isClient()) {
-			return;
-		}
-		
-		Block oldBlock = oldState.getBlock();
-		
-		MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
-		Multimeter multimeter = server.getMultimeter();
-		
-		if (oldBlock == newBlock && ((IBlock)newBlock).isPowerSource() && ((PowerSource)newBlock).logPowerChangeOnStateChange()) {
-			multimeter.logPowerChange(world, pos, oldState, newState);
-		}
-		
-		boolean wasMeterable = ((IBlock)oldBlock).isMeterable();
-		boolean isMeterable = ((IBlock)newBlock).isMeterable();
-		
-		if (wasMeterable || isMeterable) {
-			multimeter.logActive(world, pos, newState);
+		if (!world.isClient()) {
+			((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, newState);
 		}
 	}
 }
