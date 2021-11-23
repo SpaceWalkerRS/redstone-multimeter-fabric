@@ -159,8 +159,6 @@ public class MultimeterHud extends AbstractParentElement {
 		float rawPos = getScreenPosX();
 		int pos = Math.round(range * rawPos);
 		int w;
-		//hudX = x + Math.round(position * range);
-		//int w;
 		
 		switch (getDirectionalityX()) {
 		default:

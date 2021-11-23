@@ -27,7 +27,6 @@ import redstone.multimeter.server.MultimeterServer;
 public abstract class WorldMixin implements IWorld {
 	
 	@Shadow public abstract boolean isClient();
-	@Shadow public abstract boolean isReceivingRedstonePower(BlockPos pos);
 	
 	@Inject(
 			method = "tickBlockEntities",

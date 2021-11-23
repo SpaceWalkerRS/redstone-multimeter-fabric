@@ -31,7 +31,7 @@ public class WorldChunkMixin {
 					target = "Lnet/minecraft/block/BlockState;onStateReplaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Z)V"
 			)
 	)
-	private void onBlockStateChanged(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int y, int chunkSectionIndex, ChunkSection chunkSection, boolean wasEmpty, int chunkX, int subChunkY, int chunkZ, BlockState oldState) {
+	private void onBlockStateChanged(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int y, int chunkSectionIndex, ChunkSection chunkSection, boolean wasEmpty, int sectionX, int sectionY, int sectionZ, BlockState oldState) {
 		if (!world.isClient()) {
 			((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, newState);
 		}
