@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -32,7 +31,7 @@ public class WorldChunkMixin {
 					target = "Lnet/minecraft/block/BlockState;onStateReplaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Z)V"
 			)
 	)
-	private void onBlockStateChanged(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int y, ChunkSection section, boolean wasEmpty, int sectionX, int sectionY, int sectionZ, BlockState oldState, Block newBlock) {
+	private void onBlockStateChanged(BlockPos pos, BlockState newState, boolean moved, CallbackInfoReturnable<BlockState> cir, int y, ChunkSection section, boolean wasEmpty, int sectionX, int sectionY, int sectionZ, BlockState oldState) {
 		if (!world.isClient()) {
 			((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, newState);
 		}
