@@ -245,12 +245,14 @@ public class RenderHelper2D {
 		font.draw(text, x, y, color, shadow, model, immediate, false, 0x00000000, 0x00F000F0);
 	}
 	
+	@FunctionalInterface
 	protected interface Drawer {
 		
 		public void draw(BufferBuilder bufferBuilder, Matrix4f model);
 		
 	}
 	
+	@FunctionalInterface
 	protected interface TextDrawer {
 		
 		public void draw(Immediate immediate, Matrix4f model);
