@@ -17,37 +17,37 @@ public enum EventType {
 	UNKNOWN(-1, "unknown") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
+		public void addTextForTooltip(List<Text> lines, int metadata) {
 			
 		}
 	},
 	POWERED(0, "powered") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
-			TextUtils.addFancyText(lines, "became powered", metaData == 1);
+		public void addTextForTooltip(List<Text> lines, int metadata) {
+			TextUtils.addFancyText(lines, "became powered", metadata == 1);
 		}
 	},
 	ACTIVE(1, "active") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
-			TextUtils.addFancyText(lines, "became active", metaData == 1);
+		public void addTextForTooltip(List<Text> lines, int metadata) {
+			TextUtils.addFancyText(lines, "became active", metadata == 1);
 		}
 	},
 	MOVED(2, "moved") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
-			TextUtils.addFancyText(lines, "direction", Direction.byId(metaData).getName());
+		public void addTextForTooltip(List<Text> lines, int metadata) {
+			TextUtils.addFancyText(lines, "direction", Direction.byId(metadata).getName());
 		}
 	},
 	POWER_CHANGE(3, "power_change") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
-			int oldPower = (metaData >> 8) & 0xFF;
-			int newPower =  metaData       & 0xFF;
+		public void addTextForTooltip(List<Text> lines, int metadata) {
+			int oldPower = (metadata >> 8) & 0xFF;
+			int newPower =  metadata       & 0xFF;
 			
 			TextUtils.addFancyText(lines, "old power", oldPower);
 			TextUtils.addFancyText(lines, "new power", newPower);
@@ -56,57 +56,64 @@ public enum EventType {
 	RANDOM_TICK(4, "random_tick") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
+		public void addTextForTooltip(List<Text> lines, int metadata) {
 			
 		}
 	},
 	SCHEDULED_TICK(5, "scheduled_tick") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
-			TextUtils.addFancyText(lines, "priority", metaData);
+		public void addTextForTooltip(List<Text> lines, int metadata) {
+			TextUtils.addFancyText(lines, "priority", metadata);
 		}
 	},
 	BLOCK_EVENT(6, "block_event") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
-			TextUtils.addFancyText(lines, "type", metaData);
+		public void addTextForTooltip(List<Text> lines, int metadata) {
+			TextUtils.addFancyText(lines, "type", metadata);
 		}
 	},
 	ENTITY_TICK(7, "entity_tick") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
+		public void addTextForTooltip(List<Text> lines, int metadata) {
 			
 		}
 	},
 	BLOCK_ENTITY_TICK(8, "block_entity_tick") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
+		public void addTextForTooltip(List<Text> lines, int metadata) {
 			
 		}
 	},
 	BLOCK_UPDATE(9, "block_update") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
+		public void addTextForTooltip(List<Text> lines, int metadata) {
 			
 		}
 	},
 	COMPARATOR_UPDATE(10, "comparator_update") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
+		public void addTextForTooltip(List<Text> lines, int metadata) {
 			
 		}
 	},
 	SHAPE_UPDATE(11, "shape_update") {
 		
 		@Override
-		public void addTextForTooltip(List<Text> lines, int metaData) {
-			TextUtils.addFancyText(lines, "direction", Direction.byId(metaData).getName());
+		public void addTextForTooltip(List<Text> lines, int metadata) {
+			TextUtils.addFancyText(lines, "direction", Direction.byId(metadata).getName());
+		}
+	},
+	INTERACT_BLOCK(12, "interact_block") {
+		
+		@Override
+		public void addTextForTooltip(List<Text> lines, int metadata) {
+			
 		}
 	};
 	
@@ -159,7 +166,7 @@ public enum EventType {
 		return 1 << index;
 	}
 	
-	public abstract void addTextForTooltip(List<Text> lines, int metaData);
+	public abstract void addTextForTooltip(List<Text> lines, int metadata);
 	
 	public Tag toNBT() {
 		return ByteTag.of((byte)index);
@@ -170,8 +177,8 @@ public enum EventType {
 			return UNKNOWN;
 		}
 		
-		ByteTag ByteTag = (ByteTag)nbt;
-		int index = ByteTag.getByte();
+		ByteTag byteTag = (ByteTag)nbt;
+		int index = byteTag.getByte();
 		
 		return fromIndex(index);
 	}

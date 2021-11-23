@@ -15,11 +15,14 @@ import java.util.Set;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.InputUtil.KeyCode;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.event.EventType;
+import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
 public class KeyBindings {
 	
@@ -39,6 +42,7 @@ public class KeyBindings {
 	public static final KeyBinding SCROLL_HUD;
 	public static final KeyBinding TOGGLE_HUD;
 	public static final KeyBinding OPEN_MULTIMETER_SCREEN;
+	public static final KeyBinding OPEN_OPTIONS_MENU;
 	public static final KeyBinding PRINT_LOGS;
 	
 	public static final KeyBinding[] TOGGLE_EVENT_TYPES;
@@ -125,6 +129,11 @@ public class KeyBindings {
 		}
 	}
 	
+	public static boolean isPressed(MinecraftClient client, KeyBinding keyBinding) {
+		KeyCode key = ((IKeyBinding)keyBinding).getBoundKey();
+		return key != null && GLFW.glfwGetKey(client.getWindow().getHandle(), key.getKeyCode()) == GLFW.GLFW_PRESS;
+	}
+	
 	static {
 		
 		MAIN        = registerCategory(RedstoneMultimeterMod.MOD_NAME);
@@ -138,6 +147,7 @@ public class KeyBindings {
 		SCROLL_HUD             = registerKeyBinding(new KeyBinding("Scroll HUD"            , GLFW.GLFW_KEY_LEFT_ALT, MAIN));
 		TOGGLE_HUD             = registerKeyBinding(new KeyBinding("Toggle HUD"            , GLFW.GLFW_KEY_H       , MAIN));
 		OPEN_MULTIMETER_SCREEN = registerKeyBinding(new KeyBinding("Open Multimeter Screen", GLFW.GLFW_KEY_G       , MAIN));
+		OPEN_OPTIONS_MENU      = registerKeyBinding(new KeyBinding("Open Options Menu"     , GLFW.GLFW_KEY_O       , MAIN));
 		PRINT_LOGS             = registerKeyBinding(new KeyBinding("Print Logs To File"    , GLFW.GLFW_KEY_P       , MAIN));
 		
 		TOGGLE_EVENT_TYPES = new KeyBinding[EventType.ALL.length];

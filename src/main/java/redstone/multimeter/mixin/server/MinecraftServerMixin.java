@@ -68,7 +68,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "HEAD"
 			)
 	)
-	private void onReloadResources(CallbackInfo ci) {
+	private void onReload(CallbackInfo ci) {
 		multimeterServer.getMultimeter().reloadOptions();
 	}
 	

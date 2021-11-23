@@ -67,7 +67,7 @@ public class MultimeterHud extends AbstractParentElement {
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY) {
-		if (meters.isEmpty()) {
+		if (!hasContent()) {
 			return;
 		}
 		
@@ -131,6 +131,10 @@ public class MultimeterHud extends AbstractParentElement {
 		resetSize();
 		
 		updateMeterList();
+		
+		if (paused && Options.HUD.AUTO_UNPAUSE.get()) {
+			pause();
+		}
 	}
 	
 	@Override
@@ -155,8 +159,6 @@ public class MultimeterHud extends AbstractParentElement {
 		float rawPos = getScreenPosX();
 		int pos = Math.round(range * rawPos);
 		int w;
-		//hudX = x + Math.round(position * range);
-		//int w;
 		
 		switch (getDirectionalityX()) {
 		default:
@@ -344,7 +346,7 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 	
 	public void pause() {
-		if (meters.isEmpty()) {
+		if (!hasContent()) {
 			return;
 		}
 		
@@ -381,6 +383,10 @@ public class MultimeterHud extends AbstractParentElement {
 		if (paused) {
 			setOffset(offset + amount);
 		}
+	}
+	
+	public boolean hasContent() {
+		return !meters.isEmpty();
 	}
 	
 	public boolean isOnScreen() {
@@ -530,6 +536,10 @@ public class MultimeterHud extends AbstractParentElement {
 		if (selectedMeter != null && !client.getMeterGroup().hasMeter(selectedMeter)) {
 			selectMeter(null);
 		}
+		
+		if (paused && !hasContent()) {
+			pause();
+		}
 	}
 	
 	public void reset() {
@@ -542,7 +552,7 @@ public class MultimeterHud extends AbstractParentElement {
 	
 	public void onServerTick() {
 		if (paused) {
-			offset--;
+			setOffset(offset - 1);
 		}
 	}
 	
@@ -565,7 +575,7 @@ public class MultimeterHud extends AbstractParentElement {
 		resize(width - 2, height);
 		updateMeterList();
 		
-		if (!meters.isEmpty() && !paused && Options.HUD.AUTO_PAUSE.get()) {
+		if (hasContent() && !paused && Options.HUD.AUTO_PAUSE.get()) {
 			pause();
 		}
 	}
