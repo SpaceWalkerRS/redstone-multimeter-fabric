@@ -44,7 +44,7 @@ public class MeterGroupCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralArgumentBuilder<ServerCommandSource> builder = CommandManager.
 			literal("metergroup").
-			requires(source -> isConnected(source)).
+			requires(source -> isMultimeterClient(source)).
 			then(CommandManager.
 				literal("clear").
 				executes(context -> clear(context.getSource()))).
@@ -92,8 +92,8 @@ public class MeterGroupCommand {
 		dispatcher.register(builder);
 	}
 	
-	private static boolean isConnected(ServerCommandSource source) {
-		return execute(source, (multimeter, player) -> multimeter.getMultimeterServer().isConnected(player));
+	private static boolean isMultimeterClient(ServerCommandSource source) {
+		return execute(source, (multimeter, player) -> multimeter.getMultimeterServer().isMultimeterClient(player));
 	}
 	
 	private static boolean isOwnerOfSubscription(ServerCommandSource source) {
@@ -309,12 +309,14 @@ public class MeterGroupCommand {
 		}
 	}
 	
+	@FunctionalInterface
 	private static interface MultimeterCommandExecutor {
 		
 		public void execute(Multimeter multimeter, ServerPlayerEntity player);
 		
 	}
 	
+	@FunctionalInterface
 	private static interface MeterGroupCommandExecutor {
 		
 		public void execute(Multimeter multimeter, ServerMeterGroup meterGroup, ServerPlayerEntity player);

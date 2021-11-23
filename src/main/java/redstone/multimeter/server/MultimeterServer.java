@@ -238,7 +238,7 @@ public class MultimeterServer {
 		return connectedPlayers.containsKey(playerUUID);
 	}
 	
-	public boolean isConnected(ServerPlayerEntity player) {
+	public boolean isMultimeterClient(ServerPlayerEntity player) {
 		return connectedPlayers.containsKey(player.getUuid());
 	}
 	
