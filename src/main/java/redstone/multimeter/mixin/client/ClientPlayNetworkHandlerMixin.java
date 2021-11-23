@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 
 import redstone.multimeter.common.network.PacketManager;
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
@@ -19,6 +20,17 @@ import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 public class ClientPlayNetworkHandlerMixin {
 	
 	@Shadow private MinecraftClient client;
+	
+	@Inject(
+			method = "onGameJoin",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void onGameJoin(GameJoinS2CPacket gameJoinPacket, CallbackInfo ci) {
+		((IMinecraftClient)client).getMultimeterClient().onConnect();
+		
+	}
 	
 	@Inject(
 			method = "onCustomPayload",

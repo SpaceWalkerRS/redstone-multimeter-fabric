@@ -67,7 +67,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 					value = "HEAD"
 			)
 	)
-	private void onTickStart(TickDurationMonitor minitor, CallbackInfo ci) {
+	private void onTickStart(TickDurationMonitor monitor, CallbackInfo ci) {
 		multimeterServer.tickStart();
 	}
 	

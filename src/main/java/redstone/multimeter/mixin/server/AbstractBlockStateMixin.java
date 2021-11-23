@@ -10,7 +10,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.AbstractBlock.AbstractBlockState;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -29,6 +33,18 @@ public class AbstractBlockStateMixin {
 	)
 	private void onRandomTick(ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
 		((IServerWorld)world).getMultimeter().logRandomTick(world, pos);
+	}
+	
+	@Inject(
+			method = "onUse",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onInteractBlock(World world, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
+		if (!world.isClient()) {
+			((IServerWorld)world).getMultimeter().logInteractBlock(world, hit.getBlockPos());
+		}
 	}
 	
 	@Inject(

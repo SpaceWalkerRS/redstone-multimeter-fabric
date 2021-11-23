@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.MultimeterScreen;
+import redstone.multimeter.client.gui.OptionsScreen;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.ScreenWrapper;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -28,6 +29,7 @@ import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.packets.AddMeterPacket;
+import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
 import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
 import redstone.multimeter.common.network.packets.MeterUpdatePacket;
@@ -112,8 +114,12 @@ public class MultimeterClient {
 		return connected;
 	}
 	
-	public boolean shouldRenderHud() {
-		return hudEnabled && connected && !hud.isOnScreen() && hasSubscription();
+	public boolean isHudEnabled() {
+		return hudEnabled;
+	}
+	
+	public boolean isHudActive() {
+		return hud.hasContent() && (hudEnabled || hud.isOnScreen());
 	}
 	
 	public long getLastServerTick() {
@@ -147,24 +153,10 @@ public class MultimeterClient {
 		meterGroup.getLogManager().getPrinter().stop(false);
 	}
 	
-	/**
-	 * Called when this client connects to a Multimeter server
-	 */
-	public void onConnect(String modVersion, long serverTick) {
+	public void onConnect() {
 		if (!connected) {
-			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
-				sendMessage(warning, false);
-			}
-			
-			connected = true;
-			lastServerTick = serverTick;
-			
-			hud.reset();
-			
-			if (Options.RedstoneMultimeter.CREATE_GROUP_ON_JOIN.get()) {
-				createDefaultMeterGroup();
-			}
+			HandshakePacket packet = new HandshakePacket();
+			packetHandler.send(packet);
 		}
 	}
 	
@@ -174,6 +166,21 @@ public class MultimeterClient {
 			
 			hud.reset();
 			meterGroup.unsubscribe(true);
+		}
+	}
+	
+	public void onHandshake(String modVersion) {
+		connected = true;
+		
+		if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
+			Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
+			sendMessage(warning, false);
+		}
+		
+		hud.reset();
+		
+		if (Options.RedstoneMultimeter.CREATE_GROUP_ON_JOIN.get()) {
+			createDefaultMeterGroup();
 		}
 	}
 	
@@ -243,7 +250,7 @@ public class MultimeterClient {
 	}
 	
 	public void togglePrinter() {
-		if (meterGroup.hasMeters()) {
+		if (hud.hasContent()) {
 			meterGroup.getLogManager().getPrinter().toggle();
 		}
 	}
@@ -281,14 +288,12 @@ public class MultimeterClient {
 	}
 	
 	public void toggleHud() {
-		if (!meterGroup.hasMeters()) {
-			return;
+		if (hud.hasContent()) {
+			hudEnabled = !hudEnabled;
+			
+			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
+			sendMessage(new LiteralText(message), true);
 		}
-		
-		hudEnabled = !hudEnabled;
-		
-		String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-		sendMessage(new LiteralText(message), true);
 	}
 	
 	public RSMMScreen getScreen() {
@@ -304,9 +309,22 @@ public class MultimeterClient {
 		client.openScreen(new ScreenWrapper(client.currentScreen, screen));
 	}
 	
+	public boolean hasScreenOpen() {
+		return client.currentScreen != null;
+	}
+	
+	public boolean hasRSMMScreenOpen() {
+		return client.currentScreen != null && client.currentScreen instanceof ScreenWrapper;
+	}
+	
 	public boolean hasMultimeterScreenOpen() {
 		RSMMScreen screen = getScreen();
 		return screen != null && screen instanceof MultimeterScreen;
+	}
+	
+	public boolean hasOptionsScreenOpen() {
+		RSMMScreen screen = getScreen();
+		return screen != null && screen instanceof OptionsScreen;
 	}
 	
 	public void sendMessage(Text message, boolean actionBar) {

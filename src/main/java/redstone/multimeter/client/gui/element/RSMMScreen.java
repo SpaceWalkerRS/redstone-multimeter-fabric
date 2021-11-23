@@ -52,6 +52,21 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	@Override
+	public boolean mouseClick(double mouseX, double mouseY, int button) {
+		return super.mouseClick(mouseX, mouseY, button) || client.getInputHandler().mouseClick(this, mouseX, mouseY, button);
+	}
+	
+	@Override
+	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+		return super.keyPress(keyCode, scanCode, modifiers) || client.getInputHandler().keyPress(this, keyCode, scanCode, modifiers);
+	}
+	
+	@Override
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+		return super.mouseScroll(mouseX, mouseY, scrollX, scrollY) || client.getInputHandler().mouseScroll(this, scrollX, scrollY);
+	}
+	
+	@Override
 	public final void setX(int x) {
 		
 	}

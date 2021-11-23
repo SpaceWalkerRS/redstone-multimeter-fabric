@@ -4,6 +4,7 @@
   "package": "redstone.multimeter.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+  	"compat.alternate_current.WorldAccessMixin",
   	"meterable.AbstractButtonBlockMixin",
   	"meterable.AbstractRedstoneGateBlockMixin",
   	"meterable.BellBlockMixin",
@@ -25,6 +26,7 @@
   	"meterable.PoweredRailBlockMixin",
   	"meterable.PressurePlateBlockMixin",
   	"meterable.RedstoneLampBlockMixin",
+  	"meterable.RedstoneOreBlockMixin",
   	"meterable.RedstoneTorchBlockMixin",
   	"meterable.RedstoneWireBlockMixin",
   	"meterable.RepeaterBlockMixin",
@@ -60,7 +62,6 @@
   	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
   	"client.MouseMixin",
-  	"client.OptionsScreenMixin",
   	"client.WorldRendererMixin"
   ],
   "injectors": {

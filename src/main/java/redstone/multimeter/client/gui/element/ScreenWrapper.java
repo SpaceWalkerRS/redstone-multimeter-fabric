@@ -54,7 +54,7 @@ public class ScreenWrapper extends Screen {
 	
 	@Override
 	public final boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		return false;
+		return false; // scrolling is handled in MouseMixin and InputHandler
 	}
 	
 	@Override
