@@ -12,6 +12,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 
 @Mixin(InGameHud.class)
@@ -29,9 +30,10 @@ public class InGameHudMixin {
 	)
 	private void renderHUD(float tickDelta, CallbackInfo ci) {
 		MultimeterClient multimeterClient = ((IMinecraftClient)client).getMultimeterClient();
+		MultimeterHud hud = multimeterClient.getHUD();
 		
-		if (multimeterClient.shouldRenderHud()) {
-			multimeterClient.getHUD().render();
+		if (multimeterClient.isHudActive() && !hud.isOnScreen()) {
+			hud.render();
 		}
 	}
 }

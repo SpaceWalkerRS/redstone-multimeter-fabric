@@ -48,7 +48,7 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 					target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
 			)
 	)
-	private void onBlockMoved(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonHandler pistonHandler, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, int removedIndex, BlockState[] removedStates, Direction moveDir, Set<BlockPos> removedPositions, int brokenIndex, BlockPos movedPos, BlockState movedState) {
+	private void onBlockMoved(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonHandler pistonHandler, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, int removedIndex, BlockState[] removedStates, Direction moveDir, Set<BlockPos> leftOverPositions, int brokenIndex, BlockPos movedPos, BlockState movedState) {
 		if (!world.isClient()) {
 			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 			

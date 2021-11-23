@@ -3,10 +3,13 @@ package redstone.multimeter.client.meter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -35,8 +38,10 @@ import redstone.multimeter.common.meter.event.EventType;
 
 public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	
-	private static final String RESOURCES_PATH = "meter/default_properties";
-	private static final String FILE_EXTENSION = ".json";
+	private static final String PROPERTIES_PATH = "meter/default_properties";
+	private static final String RESOURCES_PATH = String.format("/assets/%s/%s", RedstoneMultimeterMod.NAMESPACE, PROPERTIES_PATH);
+	private static final String FILE_EXTENSION = "json";
+	private static final String DEFAULT_ID = "block";
 	private static final Gson GSON = new Gson();
 	
 	private final MultimeterClient client;
@@ -46,9 +51,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	
 	public ClientMeterPropertiesManager(MultimeterClient multimeterClient) {
 		this.client = multimeterClient;
-		this.folder = new File(this.client.getConfigFolder(), RESOURCES_PATH);
+		this.folder = new File(this.client.getConfigFolder(), PROPERTIES_PATH);
 		this.namespaceDefaults = new HashMap<>();
 		this.blockDefaults = new HashMap<>();
+		
+		if (!this.folder.exists()) {
+			this.folder.mkdirs();
+		}
 	}
 	
 	@Override
@@ -62,34 +71,37 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 		
-		MeterProperties defaults = getDefaults(block);
+		MeterProperties defaultProperties = getPropertiesForBlock(block);
 		
-		if (defaults != null) {
-			properties.fill(defaults);
+		if (defaultProperties != null) {
+			properties.fill(defaultProperties);
 		}
 		
 		if (properties.getName() != null && Options.RedstoneMultimeter.NUMBERED_NAMES.get()) {
 			String name = properties.getName();
-			name = String.format("%s %d", name, client.getMeterGroup().getNextMeterIndex());
+			int number = client.getMeterGroup().getNextMeterIndex();
 			
-			properties.setName(name);
+			properties.setName(String.format("%s %d", name, number));
 		}
-		if (properties.getMovable() == null && Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
+		if (Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
 			properties.setMovable(!Screen.hasShiftDown());
 		}
-		if (properties.getEventTypes() == null) {
-			for (int index = 0; index < EventType.ALL.length; index++) {
-				KeyBinding keyBind = KeyBindings.TOGGLE_EVENT_TYPES[index];
-				
-				if (keyBind.isPressed()) {
-					EventType type = EventType.ALL[index];
-					properties.toggleEventType(type);
-				}
+		for (int index = 0; index < EventType.ALL.length; index++) {
+			KeyBinding keyBind = KeyBindings.TOGGLE_EVENT_TYPES[index];
+			
+			if (keyBind.isPressed()) {
+				EventType type = EventType.ALL[index];
+				properties.toggleEventType(type);
+			}
+		}
+		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.hasRandomTicks()) {
+			if (!properties.hasEventType(EventType.RANDOM_TICK)) {
+				properties.toggleEventType(EventType.RANDOM_TICK);
 			}
 		}
 	}
 	
-	private MeterProperties getDefaults(Block block) {
+	private MeterProperties getPropertiesForBlock(Block block) {
 		Identifier blockId = Registry.BLOCK.getId(block);
 		
 		if (blockId == null) {
@@ -99,13 +111,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		MeterProperties properties = blockDefaults.get(blockId);
 		
 		if (properties == null) {
-			properties = getDefaults(blockId.getNamespace());
+			properties = getPropertiesForNamespace(blockId.getNamespace());
 		}
 		
 		return properties;
 	}
 	
-	private MeterProperties getDefaults(String namespace) {
+	private MeterProperties getPropertiesForNamespace(String namespace) {
 		MeterProperties properties = namespaceDefaults.get(namespace);
 		
 		if (properties == null) {
@@ -119,89 +131,69 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		namespaceDefaults.clear();
 		blockDefaults.clear();
 		
-		loadDefaultProperties();
-		loadUserProperties();
+		Set<String> namespaces = new HashSet<>();
+		
+		for (Identifier blockId : Registry.BLOCK.getIds()) {
+			String namespace = blockId.getNamespace();
+			String id = blockId.getPath();
+			
+			loadDefaultProperties(namespace, id);
+			loadUserOverrides(namespace, id);
+			
+			namespaces.add(namespace);
+		}
+		for (String namespace : namespaces) {
+			loadDefaultProperties(namespace, DEFAULT_ID);
+			loadUserOverrides(namespace, DEFAULT_ID);
+		}
 	}
 	
-	private void loadDefaultProperties() {
-		String namespace = RedstoneMultimeterMod.NAMESPACE;
-		String path = String.format("/assets/%s/%s", namespace, RESOURCES_PATH);
-		URL resource = getClass().getResource(path);
+	private void loadDefaultProperties(String namespace, String id) {
+		String path = String.format("%s/%s/%s.%s", RESOURCES_PATH, namespace, id, FILE_EXTENSION);
+		InputStream resource = getClass().getResourceAsStream(path);
 		
 		if (resource == null) {
 			return;
 		}
 		
-		try {
-			load(new File(resource.toURI()), false);
-		} catch (URISyntaxException e) {
-			
-		}
-		
-	}
-	
-	private void loadUserProperties() {
-		load(folder, true);
-	}
-	
-	private void load(File folder, boolean createFolder) {
-		if (!folder.exists()) {
-			if (createFolder) {
-				folder.mkdirs();
-			}
-			
-			return;
-		}
-		
-		for (File subFolder : folder.listFiles()) {
-			if (subFolder.isDirectory()) {
-				for (File file : subFolder.listFiles()) {
-					loadProperties(file, subFolder.getName());
-				}
-			}
-		}
-	}
-	
-	private void loadProperties(File file, String namespace) {
-		if (!file.isFile()) {
-			return;
-		}
-		
-		String fileName = file.getName();
-		
-		if (!fileName.endsWith(FILE_EXTENSION)) {
-			return;
-		}
-		
-		String id = fileName.substring(0, fileName.length() - FILE_EXTENSION.length());
-		
-		try (FileReader fr = new FileReader(file)) {
-			JsonElement rawJson = GSON.fromJson(fr, JsonElement.class);
-			
-			if (!rawJson.isJsonObject()) {
-				return;
-			}
-			
-			JsonObject json = rawJson.getAsJsonObject();
-			MeterProperties properties = MeterProperties.fromJson(json);
-			
-			register(namespace, id, properties);
+		try (InputStreamReader isr = new InputStreamReader(resource)) {
+			loadProperties(namespace, id, isr);
 		} catch (IOException | JsonSyntaxException | JsonIOException e) {
 			
 		}
 	}
 	
+	private void loadUserOverrides(String namespace, String id) {
+		String path = String.format("%s/%s.%s", namespace, id, FILE_EXTENSION);
+		File file = new File(folder, path);
+		
+		if (!file.exists() || !file.isFile()) {
+			return;
+		}
+		
+		try (FileReader fr = new FileReader(file)) {
+			loadProperties(namespace, id, fr);
+		} catch (IOException | JsonSyntaxException | JsonIOException e) {
+			
+		}
+	}
+	
+	private void loadProperties(String namespace, String id, Reader reader) {
+		JsonElement rawJson = GSON.fromJson(reader, JsonElement.class);
+		
+		if (rawJson.isJsonObject()) {
+			JsonObject json = rawJson.getAsJsonObject();
+			MeterProperties properties = MeterProperties.fromJson(json);
+			
+			register(namespace, id, properties);
+		}
+	}
+	
 	private void register(String namespace, String path, MeterProperties properties) {
-		if (path.equals("*")) {
+		if (path.equals(DEFAULT_ID)) {
 			namespaceDefaults.put(namespace, properties);
 		} else {
-			Identifier blockId = new Identifier(namespace, path);
-			
-			if (Registry.BLOCK.containsId(blockId)) {
-				blockDefaults.put(blockId, properties);
-			} else {
-				RedstoneMultimeterMod.LOGGER.info(String.format("Unable to load default meter properties for %s: that block does not exist!", blockId.toString()));
-			}
+			blockDefaults.put(new Identifier(namespace, path), properties);
 		}
 	}
 }

@@ -259,7 +259,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		GlStateManager.pushMatrix();
 		drawOn(x, y, hud.settings.colorBackground);
 		GlStateManager.translated(0, 0, -0.01);
-		draw( x, y, color);
+		draw(x, y, color);
 		GlStateManager.popMatrix();
 	}
 	

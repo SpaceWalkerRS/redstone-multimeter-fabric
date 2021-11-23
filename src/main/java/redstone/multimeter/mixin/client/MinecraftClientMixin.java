@@ -61,7 +61,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 			)
 	)
 	private void handleInputEvents(CallbackInfo ci) {
-		multimeterClient.getInputHandler().handleInputEvents();
+		multimeterClient.getInputHandler().handleKeyBindings();
 	}
 	
 	@Inject(
