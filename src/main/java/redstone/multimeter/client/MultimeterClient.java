@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.MultimeterScreen;
+import redstone.multimeter.client.gui.OptionsScreen;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.ScreenWrapper;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -113,8 +114,12 @@ public class MultimeterClient {
 		return connected;
 	}
 	
-	public boolean shouldRenderHud() {
-		return hudEnabled && connected && !hud.isOnScreen() && hasSubscription();
+	public boolean isHudEnabled() {
+		return hudEnabled;
+	}
+	
+	public boolean isHudActive() {
+		return hud.hasContent() && (hudEnabled || hud.isOnScreen());
 	}
 	
 	public long getLastServerTick() {
@@ -245,7 +250,7 @@ public class MultimeterClient {
 	}
 	
 	public void togglePrinter() {
-		if (meterGroup.hasMeters()) {
+		if (hud.hasContent()) {
 			meterGroup.getLogManager().getPrinter().toggle();
 		}
 	}
@@ -283,14 +288,12 @@ public class MultimeterClient {
 	}
 	
 	public void toggleHud() {
-		if (!meterGroup.hasMeters()) {
-			return;
+		if (hud.hasContent()) {
+			hudEnabled = !hudEnabled;
+			
+			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
+			sendMessage(new LiteralText(message), true);
 		}
-		
-		hudEnabled = !hudEnabled;
-		
-		String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-		sendMessage(new LiteralText(message), true);
 	}
 	
 	public RSMMScreen getScreen() {
@@ -306,9 +309,22 @@ public class MultimeterClient {
 		client.setScreen(new ScreenWrapper(client.currentScreen, screen));
 	}
 	
+	public boolean hasScreenOpen() {
+		return client.currentScreen != null;
+	}
+	
+	public boolean hasRSMMScreenOpen() {
+		return client.currentScreen != null && client.currentScreen instanceof ScreenWrapper;
+	}
+	
 	public boolean hasMultimeterScreenOpen() {
 		RSMMScreen screen = getScreen();
 		return screen != null && screen instanceof MultimeterScreen;
+	}
+	
+	public boolean hasOptionsScreenOpen() {
+		RSMMScreen screen = getScreen();
+		return screen != null && screen instanceof OptionsScreen;
 	}
 	
 	public void sendMessage(Text message, boolean actionBar) {

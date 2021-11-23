@@ -87,7 +87,7 @@ public class ScrollableListElement extends SimpleListElement {
 		
 		if (!consumed && scrollMode == ScrollMode.DRAG) {
 			double scroll = deltaY * (getMaxScrollAmount() + getHeight()) / scrollBarHeight;
-			setScrollAmount(scrollAmount + scroll);
+			consumed = setScrollAmount(scrollAmount + scroll);
 		}
 		
 		return consumed;
@@ -98,8 +98,7 @@ public class ScrollableListElement extends SimpleListElement {
 		boolean consumed = super.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 		
 		if (!consumed && scrollMode == ScrollMode.NONE) {
-			setScrollAmount(scrollAmount - Options.Miscellaneous.SCROLL_SPEED.get() * scrollY);
-			consumed = true;
+			consumed = setScrollAmount(scrollAmount - Options.Miscellaneous.SCROLL_SPEED.get() * scrollY);
 		}
 		
 		return consumed;
@@ -150,7 +149,7 @@ public class ScrollableListElement extends SimpleListElement {
 		return amount;
 	}
 	
-	protected void setScrollAmount(double amount) {
+	protected boolean setScrollAmount(double amount) {
 		double prevScrollAmount = scrollAmount;
 		scrollAmount = amount;
 		
@@ -167,6 +166,8 @@ public class ScrollableListElement extends SimpleListElement {
 		if (scrollAmount != prevScrollAmount) {
 			updateContentY();
 		}
+		
+		return scrollAmount != prevScrollAmount;
 	}
 	
 	protected ScrollMode getScrollMode(double mouseX, double mouseY) {

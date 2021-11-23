@@ -12,10 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 
-import redstone.multimeter.client.KeyBindings;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.RSMMScreen;
-import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 
 @Mixin(Mouse.class)
@@ -56,20 +54,11 @@ public class MouseMixin {
 			)
 	)
 	private void scrollInGame(long windowHandle, double horizontal, double vertical, CallbackInfo ci, double scrollY, float scrollDeltaY) {
-		if (!KeyBindings.SCROLL_HUD.isPressed()) {
-			return;
-		}
+		boolean discrete = client.options.discreteMouseScroll;
+		double sensitivity = client.options.mouseWheelSensitivity;
+		double scrollX = sensitivity * (discrete ? Math.signum(horizontal) : horizontal);
 		
-		MultimeterClient multimeterClient = ((IMinecraftClient)client).getMultimeterClient();
-		
-		if (!multimeterClient.getMeterGroup().hasMeters()) {
-			return;
-		}
-		
-		MultimeterHud hud = multimeterClient.getHUD();
-		
-		if (hud.isPaused()) {
-			hud.stepBackward(Math.round(scrollDeltaY));
+		if (((IMinecraftClient)client).getMultimeterClient().getInputHandler().handleMouseScroll(scrollX, scrollY)) {
 			ci.cancel();
 		}
 	}

@@ -13,6 +13,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 
 @Mixin(InGameHud.class)
@@ -30,9 +31,10 @@ public class InGameHudMixin {
 	)
 	private void renderHUD(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
 		MultimeterClient multimeterClient = ((IMinecraftClient)client).getMultimeterClient();
+		MultimeterHud hud = multimeterClient.getHUD();
 		
-		if (multimeterClient.shouldRenderHud()) {
-			multimeterClient.getHUD().render(matrices);
+		if (multimeterClient.isHudActive() && !hud.isOnScreen()) {
+			hud.render(matrices);
 		}
 	}
 }

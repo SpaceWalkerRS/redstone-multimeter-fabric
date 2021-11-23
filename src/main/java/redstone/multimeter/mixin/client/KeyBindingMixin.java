@@ -10,13 +10,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil.Key;
 
 import redstone.multimeter.client.KeyBindings;
+import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
 @Mixin(KeyBinding.class)
-public class KeyBindingMixin {
+public class KeyBindingMixin implements IKeyBinding {
 	
 	@Shadow @Final private static Map<String, Integer> CATEGORY_ORDER_MAP;
+	@Shadow private Key boundKey;
 	
 	@Inject(
 			method = "<clinit>",
@@ -28,5 +31,10 @@ public class KeyBindingMixin {
 		for (String category : KeyBindings.getCategories()) {
 			CATEGORY_ORDER_MAP.put(category, CATEGORY_ORDER_MAP.size() + 1);
 		}
+	}
+	
+	@Override
+	public Key getBoundKey() {
+		return boundKey;
 	}
 }
