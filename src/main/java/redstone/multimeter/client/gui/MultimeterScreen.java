@@ -5,7 +5,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.RedstoneMultimeterMod;
-import redstone.multimeter.client.KeyBindings;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.ScrollableListElement;
@@ -17,57 +16,11 @@ public class MultimeterScreen extends RSMMScreen {
 	private final boolean isPauseScreen;
 	
 	private ScrollableListElement list;
-	private boolean scrollHud;
 	
 	public MultimeterScreen(MultimeterClient client) {
 		super(client, new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
 		
 		this.isPauseScreen = !Screen.hasShiftDown();
-	}
-	
-	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
-		
-		if (!consumed) {
-			consumed = client.getInputHandler().mouseClick(mouseX, mouseY, button);
-		}
-		
-		return true;
-	}
-	
-	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = super.keyPress(keyCode, scanCode, modifiers);
-		
-		if (!consumed) {
-			consumed = client.getInputHandler().keyPress(keyCode, scanCode, modifiers);
-			
-			if (!scrollHud && KeyBindings.SCROLL_HUD.matchesKey(keyCode, scanCode)) {
-				scrollHud = true;
-			}
-		}
-		
-		return consumed;
-	}
-	
-	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
-		if (scrollHud && KeyBindings.SCROLL_HUD.matchesKey(keyCode, scanCode)) {
-			scrollHud = false;
-		}
-		
-		return super.keyRelease(keyCode, scanCode, modifiers);
-	}
-	
-	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (scrollHud && client.getMeterGroup().hasMeters()) {
-			client.getHUD().stepBackward(Math.round((float)scrollY));
-			return true;
-		}
-		
-		return super.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 	}
 	
 	@Override
@@ -107,7 +60,7 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY) {
-		if (client.getMeterGroup().hasMeters()) {
+		if (client.getHUD().hasContent()) {
 			super.renderContent(matrices, mouseX, mouseY);
 		} else {
 			String text;

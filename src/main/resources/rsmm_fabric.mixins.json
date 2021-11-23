@@ -4,6 +4,7 @@
   "package": "redstone.multimeter.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+  	"compat.alternate_current.WorldAccessMixin",
   	"meterable.AbstractButtonBlockMixin",
   	"meterable.AbstractRedstoneGateBlockMixin",
   	"meterable.BellBlockMixin",
@@ -63,7 +64,6 @@
   	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
   	"client.MouseMixin",
-  	"client.ScreenMixin",
   	"client.WorldRendererMixin"
   ],
   "injectors": {
