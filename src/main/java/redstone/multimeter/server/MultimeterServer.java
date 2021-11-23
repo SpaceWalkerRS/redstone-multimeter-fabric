@@ -22,7 +22,7 @@ import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.common.WorldPos;
-import redstone.multimeter.common.network.packets.HandShakePacket;
+import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.ServerTickPacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.meter.ServerMeterGroup;
@@ -197,7 +197,7 @@ public class MultimeterServer {
 	
 	public void onHandshake(ServerPlayerEntity player, String modVersion) {
 		if (connectedPlayers.put(player.getUuid(), modVersion) == null) {
-			HandShakePacket packet = new HandShakePacket();
+			HandshakePacket packet = new HandshakePacket();
 			packetHandler.send(packet);
 		}
 	}

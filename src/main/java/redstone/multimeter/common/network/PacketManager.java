@@ -25,7 +25,7 @@ public class PacketManager {
 		
 		PACKETS = new SupplierClazzRegistry<>("network");
 		
-		PACKETS.register("handshake"               , HandShakePacket.class             , () -> new HandShakePacket());
+		PACKETS.register("handshake"               , HandshakePacket.class             , () -> new HandshakePacket());
 		PACKETS.register("server_tick"             , ServerTickPacket.class            , () -> new ServerTickPacket());
 		PACKETS.register("meter_group_subscription", MeterGroupSubscriptionPacket.class, () -> new MeterGroupSubscriptionPacket());
 		PACKETS.register("meter_group_default"     , MeterGroupDefaultPacket.class     , () -> new MeterGroupDefaultPacket());

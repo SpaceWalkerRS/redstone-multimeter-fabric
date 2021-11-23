@@ -8,11 +8,11 @@ import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.MultimeterServer;
 
-public class HandShakePacket implements RSMMPacket {
+public class HandshakePacket implements RSMMPacket {
 	
 	private String modVersion;
 	
-	public HandShakePacket() {
+	public HandshakePacket() {
 		modVersion = RedstoneMultimeterMod.MOD_VERSION;
 	}
 	

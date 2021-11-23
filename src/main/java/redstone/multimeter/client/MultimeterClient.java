@@ -29,7 +29,7 @@ import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.packets.AddMeterPacket;
-import redstone.multimeter.common.network.packets.HandShakePacket;
+import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
 import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
 import redstone.multimeter.common.network.packets.MeterUpdatePacket;
@@ -155,7 +155,7 @@ public class MultimeterClient {
 	
 	public void onConnect() {
 		if (!connected) {
-			HandShakePacket packet = new HandShakePacket();
+			HandshakePacket packet = new HandshakePacket();
 			packetHandler.send(packet);
 		}
 	}
