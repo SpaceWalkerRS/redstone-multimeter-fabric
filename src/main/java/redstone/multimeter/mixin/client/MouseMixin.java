@@ -20,7 +20,6 @@ import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 public class MouseMixin {
 	
 	@Shadow @Final private MinecraftClient client;
-	@Shadow private double eventDeltaWheel;
 	
 	@Inject(
 			method = "onMouseScroll",
