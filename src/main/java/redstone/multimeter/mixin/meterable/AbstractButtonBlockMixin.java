@@ -2,8 +2,8 @@ package redstone.multimeter.mixin.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 
+import net.minecraft.BlockState;
 import net.minecraft.block.AbstractButtonBlock;
-import net.minecraft.block.BlockState;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

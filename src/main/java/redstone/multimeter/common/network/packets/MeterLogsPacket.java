@@ -21,7 +21,7 @@ public class MeterLogsPacket implements RSMMPacket {
 	
 	@Override
 	public void encode(CompoundTag data) {
-		data.put("logs", logsData);
+		data.method_10566("logs", logsData);
 	}
 	
 	@Override

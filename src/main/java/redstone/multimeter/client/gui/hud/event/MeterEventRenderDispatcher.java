@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.class_1015;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
@@ -52,7 +52,7 @@ public class MeterEventRenderDispatcher {
 	}
 	
 	private void renderMeterEvents(Meter meter, Consumer<MeterEventRenderer> consumer) {
-		GlStateManager.pushMatrix();
+		class_1015.method_4461();
 		
 		for (int index = EventType.ALL.length - 1; index >= 0; index--) {
 			EventType type = EventType.ALL[index];
@@ -61,9 +61,9 @@ public class MeterEventRenderDispatcher {
 				consumer.accept(getEventRenderer(type));
 			}
 			
-			GlStateManager.translated(0, 0, -0.1);
+			class_1015.method_4412(0, 0, -0.1);
 		}
 		
-		GlStateManager.popMatrix();
+		class_1015.method_4350();
 	}
 }

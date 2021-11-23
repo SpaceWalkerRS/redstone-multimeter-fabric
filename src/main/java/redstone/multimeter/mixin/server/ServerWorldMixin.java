@@ -11,15 +11,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.class_30;
+import net.minecraft.class_37;
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockAction;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.profiler.ProfilerSystem;
 import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.level.LevelProperties;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -27,39 +31,31 @@ import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(ServerWorld.class)
-public abstract class ServerWorldMixin implements IServerWorld {
+public abstract class ServerWorldMixin extends World implements IServerWorld {
 	
 	@Shadow @Final private MinecraftServer server;
 	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
-					args = "ldc=world border"
-			)
-	)
-	private void startTickTaskWorldBorder(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		startTickTask(TickTask.WORLD_BORDER);
+	protected ServerWorldMixin(class_30 arg, class_37 arg2, LevelProperties levelProperties, Dimension dimension, ProfilerSystem profilerSystem, boolean bl) {
+		super(arg, arg2, levelProperties, dimension, profilerSystem, bl);
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "method_8441",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=weather"
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15396(Ljava/lang/String;)V",
+					args = "ldc=spawner"
 			)
 	)
-	private void swapTickTaskWeather(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		swapTickTask(TickTask.WEATHER);
+	private void startTickTaskMobSpawning(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		startTickTask(TickTask.MOB_SPAWNING);
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "method_8441",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
 					args = "ldc=chunkSource"
 			)
 	)
@@ -68,10 +64,24 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "method_8441",
+			at = @At(
+					value = "INVOKE",
+					shift = Shift.AFTER,
+					target = "Lnet/minecraft/world/level/LevelProperties;setTime(J)V"
+			)
+	)
+	private void onTickTime(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		if (dimension.getType() == DimensionType.OVERWORLD) {
+			getMultimeterServer().onOverworldTickTime();
+		}
+	}
+	
+	@Inject(
+			method = "method_8441",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
 					args = "ldc=tickPending"
 			)
 	)
@@ -80,60 +90,46 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "FIELD",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/world/ServerWorld;blockTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
-			)
-	)
-	private void startTickTaskBlockTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		startTickTask(TickTask.BLOCK_TICKS);
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE",
-					ordinal = 0,
-					shift = Shift.AFTER,
-					target = "Lnet/minecraft/server/world/ServerTickScheduler;tick()V"
-			)
-	)
-	private void endTickTaskBlockTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		endTickTask();
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "FIELD",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/world/ServerWorld;fluidTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
-			)
-	)
-	private void startTickTaskFluidTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		startTickTask(TickTask.FLUID_TICKS);
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE",
-					ordinal = 1,
-					shift = Shift.AFTER,
-					target = "Lnet/minecraft/server/world/ServerTickScheduler;tick()V"
-			)
-	)
-	private void endTickTaskFluidTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		endTickTask();
-	}
-	
-	@Inject(
-			method = "tick",
+			method = "method_8441",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					args = "ldc=tickBlocks"
+			)
+	)
+	private void swapTickTaskTickChunks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.TICK_CHUNKS);
+	}
+	
+	@Inject(
+			method = "method_8441",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					args = "ldc=chunkMap"
+			)
+	)
+	private void swapTickTaskChunkMap(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.CHUNK_MAP);
+	}
+	
+	@Inject(
+			method = "method_8441",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					args = "ldc=village"
+			)
+	)
+	private void swapTickTaskVillages(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		swapTickTask(TickTask.VILLAGES);
+	}
+	
+	@Inject(
+			method = "method_8441",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
 					args = "ldc=portalForcer"
 			)
 	)
@@ -142,23 +138,11 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "method_8441",
 			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=raid"
-			)
-	)
-	private void swapTickTaskRaids(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		swapTickTask(TickTask.RAIDS);
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=blockEvents"
+					value = "INVOKE",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/server/world/ServerWorld;sendBlockActions()V"
 			)
 	)
 	private void swapTickTaskBlockEvents(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
@@ -166,117 +150,173 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=entities"
-			)
-	)
-	private void swapTickTaskEntities(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		swapTickTask(TickTask.ENTITIES);
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
-					args = "ldc=global"
-			)
-	)
-	private void startTickTaskGlobalEntities(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		startTickTask(TickTask.GLOBAL_ENTITIES);
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=regular"
-			)
-	)
-	private void swapTickTaskRegularEntities(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		swapTickTask(TickTask.REGULAR_ENTITIES);
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/world/ServerWorld;tickBlockEntities()V"
-			)
-	)
-	private void endTickTaskRegularEntities(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		endTickTask();
-	}
-	
-	@Inject(
-			method = "tick",
+			method = "method_8441",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void endTickTaskEntities(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+	private void endTickTaskBlockEvents(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
 		endTickTask();
 	}
 	
 	@Inject(
-			method = "tickChunk",
+			method = "method_14200",
 			at = @At(
 					value = "HEAD"
 			)
 	)
-	private void startTickTaskTickChunk(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-		startTickTask(TickTask.TICK_CHUNK);
+	private void startTickTaskWakeSleepingPlayers(CallbackInfo ci) {
+		startTickTask(TickTask.WAKE_SLEEPING_PLAYERS);
 	}
 	
 	@Inject(
-			method = "tickChunk",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
-					args = "ldc=thunder"
-			)
-	)
-	private void startTickTaskThunder(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-		startTickTask(TickTask.THUNDER);
-	}
-	
-	@Inject(
-			method = "tickChunk",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=iceandsnow"
-			)
-	)
-	private void swapTickTaskPrecipitation(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-		swapTickTask(TickTask.PRECIPITATION);
-	}
-	
-	@Inject(
-			method = "tickChunk",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=tickBlocks"
-			)
-	)
-	private void swapTickTaskRandomTicks(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-		swapTickTask(TickTask.RANDOM_TICKS);
-	}
-	
-	@Inject(
-			method = "tickChunk",
+			method = "method_14200",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void endTickTaskRandomTicksAndTickChunk(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
+	private void endTickTaskWakeSleepingPlayers(CallbackInfo ci) {
 		endTickTask();
+	}
+	
+	@Inject(
+			method = "method_73212",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15396(Ljava/lang/String;)V",
+					args = "ldc=pollingChunks"
+			)
+	)
+	private void startDummyTask(CallbackInfo ci) {
+		startTickTask(TickTask.UNKNOWN);
+	}
+	
+	@Inject(
+			method = "method_73212",
+			at = @At(
+					value = "INVOKE",
+					target = "Ljava/util/Iterator;hasNext()Z"
+			)
+	)
+	private void endTickTaskRandomTicks(CallbackInfo ci) {
+		endTickTask();
+	}
+	
+	@Inject(
+			method = "method_73212",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					args = "ldc=tickChunk"
+			)
+	)
+	private void startTickTaskTickChunk(CallbackInfo ci) {
+		startTickTask(TickTask.TICK_CHUNK);
+	}
+	
+	@Inject(
+			method = "method_73212",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					args = "ldc=thunder"
+					)
+			)
+	private void swapTickTaskThunder(CallbackInfo ci) {
+		swapTickTask(TickTask.THUNDER);
+	}
+	
+	@Inject(
+			method = "method_73212",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					args = "ldc=iceandsnow"
+			)
+	)
+	private void swapTickTaskPrecipitation(CallbackInfo ci) {
+		swapTickTask(TickTask.PRECIPITATION);
+	}
+	
+	@Inject(
+			method = "method_73212",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					args = "ldc=tickBlocks"
+			)
+	)
+	private void swapTickTaskRandomTicks(CallbackInfo ci) {
+		swapTickTask(TickTask.RANDOM_TICKS);
+	}
+	
+	@Inject(
+			method = "method_8541",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void startTickTaskPlayers(CallbackInfo ci) {
+		startTickTask(TickTask.PLAYERS);
+	}
+	
+	@Inject(
+			method = "method_8541",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void endTickTaskPlayers(CallbackInfo ci) {
+		endTickTask();
+	}
+	
+	@Inject(
+			method = "method_14181",
+			at = @At(
+					value = "FIELD",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/server/world/ServerWorld;blockTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
+			)
+	)
+	private void startTickTaskBlockTicks(CallbackInfo ci) {
+		startTickTask(TickTask.BLOCK_TICKS);
+	}
+	
+	@Inject(
+			method = "method_14181",
+			at = @At(
+					value = "INVOKE",
+					ordinal = 0,
+					shift = Shift.AFTER,
+					target = "Lnet/minecraft/server/world/ServerTickScheduler;tick()V"
+			)
+	)
+	private void endTickTaskBlockTicks(CallbackInfo ci) {
+		endTickTask();
+	}
+	
+	@Inject(
+			method = "method_14181",
+			at = @At(
+					value = "FIELD",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/server/world/ServerWorld;fluidTickScheduler:Lnet/minecraft/server/world/ServerTickScheduler;"
+			)
+	)
+	private void startTickTaskFluidTicks(CallbackInfo ci) {
+		startTickTask(TickTask.FLUID_TICKS);
+	}
+	
+	@Inject(
+			method = "method_14181",
+			at = @At(
+					value = "INVOKE",
+					ordinal = 1,
+					shift = Shift.AFTER,
+					target = "Lnet/minecraft/server/world/ServerTickScheduler;tick()V"
+			)
+	)
+	private void endTickTaskFluidTicks(CallbackInfo ci) {
 		endTickTask();
 	}
 	
@@ -297,7 +337,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BlockState;scheduledTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V"
+					target = "Lnet/minecraft/BlockState;method_73270(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V"
 			)
 	)
 	private void onTickBlock(ScheduledTick<Block> scheduledTick, CallbackInfo ci) {
@@ -305,23 +345,11 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickEntity",
-			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/entity/Entity;tick()V"
-			)
-	)
-	private void onTickEntity(Entity entity, CallbackInfo ci) {
-		getMultimeter().logEntityTick((World)(Object)this, entity);
-	}
-	
-	@Inject(
 			method = "method_14174",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BlockState;onBlockAction(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;II)Z"
+					target = "Lnet/minecraft/BlockState;method_73263(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;II)Z"
 			)
 	)
 	private void onProcessBlockEvent(BlockAction blockEvent, CallbackInfoReturnable<Boolean> cir) {

@@ -17,8 +17,8 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
+import net.minecraft.BlockState;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
@@ -84,7 +84,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			properties.setName(String.format("%s %d", name, number));
 		}
 		if (Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
-			properties.setMovable(!Screen.hasShiftDown());
+			properties.setMovable(!Screen.method_2223());
 		}
 		for (int index = 0; index < EventType.ALL.length; index++) {
 			KeyBinding keyBind = KeyBindings.TOGGLE_EVENT_TYPES[index];
@@ -94,7 +94,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 				properties.toggleEventType(type);
 			}
 		}
-		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.hasRandomTicks()) {
+		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.method_73312()) {
 			if (!properties.hasEventType(EventType.RANDOM_TICK)) {
 				properties.toggleEventType(EventType.RANDOM_TICK);
 			}
@@ -102,7 +102,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	private MeterProperties getPropertiesForBlock(Block block) {
-		Identifier blockId = Registry.BLOCK.getId(block);
+		Identifier blockId = Registry.Registry.getId(block);
 		
 		if (blockId == null) {
 			return null; // we should never get here
@@ -133,7 +133,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		
 		Set<String> namespaces = new HashSet<>();
 		
-		for (Identifier blockId : Registry.BLOCK.getIds()) {
+		for (Identifier blockId : Registry.Registry.getIds()) {
 			String namespace = blockId.getNamespace();
 			String id = blockId.getPath();
 			

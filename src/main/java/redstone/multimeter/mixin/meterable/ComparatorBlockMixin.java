@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.BlockState;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ComparatorBlockEntity;
@@ -19,7 +19,7 @@ import redstone.multimeter.block.PowerSource;
 public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSource {
 	
 	@Inject(
-			method = "getPower",
+			method = "method_9991",
 			at = @At(
 					value = "RETURN"
 			)

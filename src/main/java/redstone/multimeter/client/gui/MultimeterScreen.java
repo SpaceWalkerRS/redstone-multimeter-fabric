@@ -19,7 +19,7 @@ public class MultimeterScreen extends RSMMScreen {
 	public MultimeterScreen(MultimeterClient client) {
 		super(client, new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
 		
-		this.isPauseScreen = !Screen.hasShiftDown();
+		this.isPauseScreen = !Screen.method_2223();
 	}
 	
 	@Override

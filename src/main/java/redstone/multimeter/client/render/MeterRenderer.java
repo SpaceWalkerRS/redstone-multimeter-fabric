@@ -2,13 +2,12 @@ package redstone.multimeter.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-
+import net.minecraft.class_1015;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -27,10 +26,10 @@ public class MeterRenderer {
 	}
 	
 	public void renderMeters() {
-		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-		GlStateManager.disableTexture();
-		GlStateManager.depthMask(false);
+		class_1015.method_4454();
+		class_1015.method_4343(class_1015.class_1033.field_5138, class_1015.class_1027.field_5088, class_1015.class_1033.field_5140, class_1015.class_1027.field_5084);
+		class_1015.method_4407();
+		class_1015.method_4413(false);
 		
 		for (Meter meter : multimeterClient.getMeterGroup().getMeters()) {
 			if (meter.isIn(minecraftClient.world)) {
@@ -38,9 +37,9 @@ public class MeterRenderer {
 			}
 		}
 		
-		GlStateManager.depthMask(true);
-		GlStateManager.enableTexture();
-		GlStateManager.disableBlend();
+		class_1015.method_4413(true);
+		class_1015.method_4397();
+		class_1015.method_4439();
 	}
 	
 	private void drawMeter(Meter meter) {
@@ -51,11 +50,11 @@ public class MeterRenderer {
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
 		
-		Camera camera = minecraftClient.gameRenderer.getCamera();
-		Vec3d cameraPos = camera.getPos();
+		Entity camera = minecraftClient.getCameraEntity();
+		Vec3d cameraPos = camera.getPosVector();
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
+		class_1015.method_4461();
+		class_1015.method_4412(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
 		
 		float r = ColorUtils.getRed(color) / 255.0F;
 		float g = ColorUtils.getGreen(color) / 255.0F;
@@ -67,7 +66,7 @@ public class MeterRenderer {
 			drawBoxOutline(builder, tessellator, r, g, b, 1.0F);
 		}
 		
-		GlStateManager.popMatrix();
+		class_1015.method_4350();
 	}
 	
 	private void drawFilledBox(BufferBuilder builder, Tessellator tessellator, float r, float g, float b, float a) {

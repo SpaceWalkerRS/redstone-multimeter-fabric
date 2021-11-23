@@ -96,7 +96,7 @@ public class DimPos {
 		// allows clients and servers of different versions
 		// to communicate effectively through the use of
 		// mods like ViaVersion or multiconnect
-		nbt.put("world id", NBTUtils.identifierToNBT(dimensionId));
+		nbt.method_10566("world id", NBTUtils.identifierToNBT(dimensionId));
 		nbt.putInt("x", blockPos.getX());
 		nbt.putInt("y", blockPos.getY());
 		nbt.putInt("z", blockPos.getZ());

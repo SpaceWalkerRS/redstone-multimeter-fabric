@@ -58,7 +58,7 @@ public class MeterControlsElement extends AbstractParentElement {
 		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Arrays.asList(new LiteralText("Delete Meter")), button -> {
 			tryDelete();
 			
-			if (triedDeleting && Screen.hasShiftDown()) {
+			if (triedDeleting && Screen.method_2223()) {
 				tryDelete(); // delete without asking for confirmation first
 			}
 			

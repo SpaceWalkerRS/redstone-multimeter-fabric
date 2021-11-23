@@ -29,7 +29,7 @@ public class EnumOption<T extends Enum<T> & Cyclable<T>> extends Option<T> {
 	@Override
 	public IButton createControl(MultimeterClient client, int width, int height) {
 		return new Button(client, 0, 0, width, height, () -> new LiteralText(get().getName()), () -> null, button -> {
-			cycle(!Screen.hasShiftDown());
+			cycle(!Screen.method_2223());
 			return true;
 		});
 	}

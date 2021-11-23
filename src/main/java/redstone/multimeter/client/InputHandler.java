@@ -46,10 +46,10 @@ public class InputHandler {
 			client.getHUD().pause();
 		}
 		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
-			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+			client.getHUD().stepBackward(Screen.method_2238() ? 10 : 1);
 		}
 		while (KeyBindings.STEP_FORWARD.wasPressed()) {
-			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
+			client.getHUD().stepForward(Screen.method_2238() ? 10 : 1);
 		}
 		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
@@ -103,10 +103,10 @@ public class InputHandler {
 				client.getHUD().pause();
 			} else
 			if (KeyBindings.STEP_BACKWARD.matchesMouse(button)) {
-				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+				client.getHUD().stepBackward(Screen.method_2238() ? 10 : 1);
 			} else
 			if (KeyBindings.STEP_FORWARD.matchesMouse(button)) {
-				client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
+				client.getHUD().stepForward(Screen.method_2238() ? 10 : 1);
 			} else {
 				return false;
 			}
@@ -141,10 +141,10 @@ public class InputHandler {
 				client.getHUD().pause();
 			} else
 			if (KeyBindings.STEP_BACKWARD.matchesKey(keyCode, scanCode)) {
-				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+				client.getHUD().stepBackward(Screen.method_2238() ? 10 : 1);
 			} else
 			if (KeyBindings.STEP_FORWARD.matchesKey(keyCode, scanCode)) {
-				client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
+				client.getHUD().stepForward(Screen.method_2238() ? 10 : 1);
 			} else {
 				return false;
 			}

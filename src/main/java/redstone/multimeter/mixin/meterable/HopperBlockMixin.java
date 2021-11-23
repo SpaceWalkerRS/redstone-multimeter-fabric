@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +19,7 @@ import redstone.multimeter.block.MeterableBlock;
 public abstract class HopperBlockMixin implements MeterableBlock {
 	
 	@Inject(
-			method = "updateEnabled",
+			method = "method_10217",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "FIELD",

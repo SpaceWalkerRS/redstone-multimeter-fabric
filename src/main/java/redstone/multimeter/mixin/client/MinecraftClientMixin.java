@@ -1,16 +1,13 @@
 package redstone.multimeter.mixin.client;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.world.ClientWorld;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
@@ -31,26 +28,14 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
-			method = "reloadResources",
+			method = "method_1521",
 			at = @At(
 					value = "HEAD"
 			)
 	)
-	private void reloadResources(CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-		multimeterClient.reloadResources();
-	}
-	
-	@Inject(
-			method = "onResolutionChanged",
-			at = @At(
-					value = "INVOKE",
-					shift = Shift.AFTER,
-					target = "Lnet/minecraft/client/util/Window;setScaleFactor(D)V"
-			)
-	)
-	private void onResolutionChanged(CallbackInfo ci) {
+	private void reloadResources(CallbackInfo ci) {
 		if (multimeterClient != null) {
-			multimeterClient.getHUD().resetSize();
+			multimeterClient.reloadResources();
 		}
 	}
 	
@@ -65,22 +50,24 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
-			method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V",
+			method = "method_1550",
 			at = @At(
 					value = "HEAD"
 			)
 	)
-	private void onDisconnect(Screen screen, CallbackInfo ci) {
-		multimeterClient.onDisconnect();
+	private void onDisconnect(ClientWorld world, Screen screen, CallbackInfo ci) {
+		if (world == null) {
+			multimeterClient.onDisconnect();
+		}
 	}
 	
 	@Inject(
-			method = "close",
+			method = "stop",
 			at = @At(
 					value = "HEAD"
 			)
 	)
-	private void onClose(CallbackInfo ci) {
+	private void onStop(CallbackInfo ci) {
 		multimeterClient.onShutdown();
 	}
 	

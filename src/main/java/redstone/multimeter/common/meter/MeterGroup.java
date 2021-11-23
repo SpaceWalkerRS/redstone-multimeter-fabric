@@ -179,7 +179,7 @@ public abstract class MeterGroup {
 		}
 		
 		CompoundTag nbt = new CompoundTag();
-		nbt.put("meters", list);
+		nbt.method_10566("meters", list);
 		
 		return nbt;
 	}

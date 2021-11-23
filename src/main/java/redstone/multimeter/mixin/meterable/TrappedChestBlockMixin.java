@@ -2,7 +2,7 @@ package redstone.multimeter.mixin.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.BlockState;
 import net.minecraft.block.TrappedChestBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

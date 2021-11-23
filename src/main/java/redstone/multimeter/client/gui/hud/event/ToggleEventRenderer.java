@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.class_1015;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
@@ -136,11 +136,11 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 						int bgColor = toggled ? color : hud.settings.colorBackground;
 						int textColor = toggled ? hud.settings.colorTextOn : hud.settings.colorTextOff;
 						
-						GlStateManager.pushMatrix();
+						class_1015.method_4461();
 						hud.renderer.renderText(text, startX + 1, y + 1, textColor);
-						GlStateManager.translated(0, 0, -0.01);
+						class_1015.method_4412(0, 0, -0.01);
 						hud.renderer.renderRect(startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
-						GlStateManager.popMatrix();
+						class_1015.method_4350();
 					}
 				}
 			}
@@ -256,11 +256,11 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	private void drawOff(int x, int y, int color) {
-		GlStateManager.pushMatrix();
+		class_1015.method_4461();
 		drawOn(x, y, hud.settings.colorBackground);
-		GlStateManager.translated(0, 0, -0.01);
+		class_1015.method_4412(0, 0, -0.01);
 		draw(x, y, color);
-		GlStateManager.popMatrix();
+		class_1015.method_4350();
 	}
 	
 	protected enum Mode {

@@ -9,8 +9,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import net.minecraft.BlockState;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;

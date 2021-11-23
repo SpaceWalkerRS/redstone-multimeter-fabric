@@ -82,7 +82,7 @@ public class LogPrinter {
 			writer.write("-------------------------------------");
 			writer.newLine();
 			
-			if (Options.LogPrinter.PRINT_OLD_LOGS.get() || Screen.hasShiftDown()) {
+			if (Options.LogPrinter.PRINT_OLD_LOGS.get() || Screen.method_2223()) {
 				printLogs();
 			} else {
 				prevTick = firstTick;

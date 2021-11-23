@@ -1,9 +1,9 @@
 package redstone.multimeter.interfaces.mixin;
 
-import net.minecraft.client.util.InputUtil.KeyCode;
+import net.minecraft.class_305.class_306;
 
 public interface IKeyBinding {
 	
-	public KeyCode getBoundKey();
+	public class_306 getBoundKey();
 	
 }

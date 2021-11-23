@@ -3,7 +3,6 @@ package redstone.multimeter.client.gui.element;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.CursorType;
 
@@ -13,8 +12,6 @@ public class ScreenWrapper extends Screen {
 	private final RSMMScreen screen;
 	
 	public ScreenWrapper(Screen parent, RSMMScreen screen) {
-		super(screen.getTitle());
-		
 		this.parent = parent;
 		this.screen = screen;
 		
@@ -22,18 +19,8 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public Text getTitle() {
-		return screen.getTitle();
-	}
-	
-	@Override
-	public void render(int mouseX, int mouseY, float delta) {
+	public void method_2214(int mouseX, int mouseY, float delta) {
 		screen.render(mouseX, mouseY);
-	}
-	
-	@Override
-	public final void mouseMoved(double mouseX, double mouseY) {
-		screen.mouseMove(mouseX, mouseY);
 	}
 	
 	@Override
@@ -52,7 +39,7 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public final boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public final boolean mouseScrolled(double amount) {
 		return false; // scrolling is handled in MouseMixin and InputHandler
 	}
 	
@@ -80,14 +67,14 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public boolean shouldCloseOnEsc() {
+	public boolean method_15913() {
 		return screen.shouldCloseOnEsc();
 	}
 	
 	@Override
-	protected final void init() {
-		screen.setWidth(width);
-		screen.setHeight(height);
+	protected final void method_2224() {
+		screen.setWidth(field_2561);
+		screen.setHeight(field_2559);
 		
 		screen.removeChildren();
 		screen.initScreen();
@@ -95,14 +82,14 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public void tick() {
+	public void method_2225() {
 		screen.tick();
 	}
 	
 	@Override
-	public void removed() {
+	public void method_2234() {
 		screen.onRemoved();
-		screen.setCursor(minecraft, CursorType.ARROW);
+		screen.setCursor(field_2563, CursorType.ARROW);
 	}
 	
 	public Screen getParent() {

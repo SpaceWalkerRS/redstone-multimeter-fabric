@@ -3,8 +3,7 @@ package redstone.multimeter.client.gui.hud;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-
+import net.minecraft.class_1015;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -72,8 +71,8 @@ public class MultimeterHud extends AbstractParentElement {
 			return;
 		}
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(0, 0, 100);
+		class_1015.method_4461();
+		class_1015.method_4412(0, 0, 100);
 		
 		List<IElement> children = getChildren();
 		
@@ -85,7 +84,7 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}
 		
-		GlStateManager.popMatrix();
+		class_1015.method_4350();
 	}
 	
 	@Override
@@ -271,8 +270,8 @@ public class MultimeterHud extends AbstractParentElement {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> null, button -> {
-			stepBackward(Screen.hasControlDown() ? 10 : 1);
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.method_2238())), () -> null, button -> {
+			stepBackward(Screen.method_2238() ? 10 : 1);
 			return true;
 		}) {
 			
@@ -281,8 +280,8 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> null, button -> {
-			stepForward(Screen.hasControlDown() ? 10 : 1);
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.method_2238())), () -> null, button -> {
+			stepForward(Screen.method_2238() ? 10 : 1);
 			return true;
 		}) {
 			

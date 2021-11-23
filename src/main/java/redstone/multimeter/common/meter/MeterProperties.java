@@ -214,7 +214,7 @@ public class MeterProperties {
 		CompoundTag nbt = new CompoundTag();
 		
 		if (pos != null) {
-			nbt.put("pos", pos.toNBT());
+			nbt.method_10566("pos", pos.toNBT());
 		}
 		if (name != null) {
 			nbt.putString("name", name);

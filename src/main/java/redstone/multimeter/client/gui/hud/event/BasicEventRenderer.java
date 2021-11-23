@@ -2,7 +2,7 @@ package redstone.multimeter.client.gui.hud.event;
 
 import java.util.function.BiFunction;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.class_1015;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
@@ -93,11 +93,11 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	protected void drawEvent(int x, int y, Meter meter, MeterEvent event) {
-		GlStateManager.pushMatrix();
+		class_1015.method_4461();
 		drawCenter(x, y, meter ,event);
-		GlStateManager.translated(0, 0, -0.01);
+		class_1015.method_4412(0, 0, -0.01);
 		drawEdges(x, y, meter ,event);
-		GlStateManager.popMatrix();
+		class_1015.method_4350();
 	}
 	
 	protected void drawEdges(int x, int y, Meter meter, MeterEvent event) {

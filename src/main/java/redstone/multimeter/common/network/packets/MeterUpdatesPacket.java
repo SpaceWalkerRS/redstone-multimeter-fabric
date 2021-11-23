@@ -45,7 +45,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 		}
 		
 		data.putLongArray("removed meters", removedMeters);
-		data.put("meter updates", list);
+		data.method_10566("meter updates", list);
 	}
 	
 	@Override

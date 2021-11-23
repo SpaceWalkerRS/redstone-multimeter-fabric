@@ -8,7 +8,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -279,9 +278,9 @@ public class MultimeterClient {
 	private void onTargetBlock(Consumer<DimPos> consumer) {
 		HitResult hitResult = client.crosshairTarget;
 		
-		if (hitResult.getType() == HitResult.Type.BLOCK) {
+		if (hitResult.field_1330 == HitResult.Type.BLOCK) {
 			World world = client.world;
-			BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
+			BlockPos blockPos = hitResult.method_1015();
 			
 			consumer.accept(new DimPos(world, blockPos));
 		}

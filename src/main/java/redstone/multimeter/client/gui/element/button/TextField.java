@@ -7,9 +7,8 @@ import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-
 import net.minecraft.SharedConstants;
+import net.minecraft.class_1015;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
@@ -364,10 +363,10 @@ public class TextField extends AbstractButton {
 		int y1 = selectionY + selectionHeight;
 		int z = 0;
 		
-		GlStateManager.color4f(0.0F, 0.0F, 0xFF, 0xFF);
-		GlStateManager.disableTexture();
-		GlStateManager.enableColorLogicOp();
-		GlStateManager.logicOp(GlStateManager.LogicOp.OR_REVERSE);
+		class_1015.method_4381(0.0F, 0.0F, 0xFF, 0xFF);
+		class_1015.method_4397();
+		class_1015.method_4430();
+		class_1015.method_4452(class_1015.class_1030.field_5110);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -381,9 +380,9 @@ public class TextField extends AbstractButton {
 		
 		tessellator.draw();
 		
-		GlStateManager.disableColorLogicOp();
-		GlStateManager.enableTexture();
-		GlStateManager.color4f(0xFF, 0xFF, 0xFF, 0xFF);
+		class_1015.method_4446();
+		class_1015.method_4397();
+		class_1015.method_4381(0xFF, 0xFF, 0xFF, 0xFF);
 	}
 	
 	private int getBorderColor() {

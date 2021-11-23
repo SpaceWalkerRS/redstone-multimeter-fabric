@@ -15,10 +15,10 @@ import java.util.Set;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_305;
+import net.minecraft.class_305.class_306;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.InputUtil.KeyCode;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.event.EventType;
@@ -95,7 +95,7 @@ public class KeyBindings {
 				KeyBinding keyBinding = KEY_BINDINGS.get(name);
 				
 				if (keyBinding != null) {
-					keyBinding.setKeyCode(InputUtil.fromName(key));
+					keyBinding.method_1422(class_305.method_1440(key));
 				}
 			}
 		} catch (IOException e) {
@@ -130,8 +130,8 @@ public class KeyBindings {
 	}
 	
 	public static boolean isPressed(MinecraftClient client, KeyBinding keyBinding) {
-		KeyCode key = ((IKeyBinding)keyBinding).getBoundKey();
-		return key != null && GLFW.glfwGetKey(client.window.getHandle(), key.getKeyCode()) == GLFW.GLFW_PRESS;
+		class_306 key = ((IKeyBinding)keyBinding).getBoundKey();
+		return key != null && GLFW.glfwGetKey(client.window.getHandle(), key.method_1444()) == GLFW.GLFW_PRESS;
 	}
 	
 	static {

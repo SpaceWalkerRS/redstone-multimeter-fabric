@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.BlockState;
 import net.minecraft.block.AbstractRedstoneGateBlock;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.RepeaterBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
@@ -24,7 +24,7 @@ public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlock imple
 	}
 	
 	@Inject(
-			method = "isLocked",
+			method = "method_9996",
 			at = @At(
 					value = "RETURN"
 			)
@@ -34,7 +34,7 @@ public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlock imple
 			World world = (World)collisionView;
 			
 			if (!world.isClient()) {
-				logPowered(world, pos, hasPower(world, pos, state));
+				logPowered(world, pos, method_9990(world, pos, state));
 			}
 		}
 	}

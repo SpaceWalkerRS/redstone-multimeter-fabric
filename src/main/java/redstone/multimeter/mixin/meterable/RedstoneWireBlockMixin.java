@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.BlockState;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +19,7 @@ import redstone.multimeter.block.PowerSource;
 public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSource {
 	
 	@Inject(
-			method = "updateLogic",
+			method = "method_10481",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "FIELD",
@@ -27,7 +27,7 @@ public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSou
 					target = "Lnet/minecraft/block/RedstoneWireBlock;POWER:Lnet/minecraft/state/property/IntProperty;"
 			)
 	)
-	private void onUpdateLogic(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<BlockState> cir, BlockState oldState, int oldPower, int nonWirePower, int wirePower, int receivedPower) {
+	private void onUpdateLogic(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<BlockState> cir, BlockState oldState, int oldPower, int receivedPower) {
 		logPowered(world, pos, receivedPower > MIN_POWER);
 	}
 	

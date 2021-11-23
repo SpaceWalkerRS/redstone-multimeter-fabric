@@ -28,7 +28,7 @@ public class CoordinateControlElement extends ControlElement {
 		int size = getHeight() / 2 - 1;
 		
 		this.increase = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("+"), () -> null, button -> {
-			int distance = Screen.hasShiftDown() ? 10 : 1;
+			int distance = Screen.method_2223() ? 10 : 1;
 			DimPos pos = getter.get();
 			DimPos newPos = pos.offset(axis, distance);
 			
@@ -37,7 +37,7 @@ public class CoordinateControlElement extends ControlElement {
 			return true;
 		});
 		this.decrease = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("-"), () -> null, button -> {
-			int distance = Screen.hasShiftDown() ? 10 : 1;
+			int distance = Screen.method_2223() ? 10 : 1;
 			DimPos pos = getter.get();
 			DimPos newPos = pos.offset(axis, -distance);
 			

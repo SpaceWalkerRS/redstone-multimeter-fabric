@@ -17,7 +17,6 @@
   	"meterable.EndPortalFrameBlockMixin",
   	"meterable.FenceGateBlockMixin",
   	"meterable.HopperBlockMixin",
-  	"meterable.LecternBlockMixin",
   	"meterable.LeverBlockMixin",
   	"meterable.NoteBlockMixin",
   	"meterable.ObserverBlockMixin",
@@ -45,11 +44,9 @@
   	"server.FluidStateImplMixin",
   	"server.MinecraftServerMixin",
   	"server.PlayerManagerMixin",
-  	"server.ServerChunkManagerMixin",
   	"server.ServerCommandSourceMixin",
   	"server.ServerPlayNetworkHandlerMixin",
   	"server.ServerWorldMixin",
-  	"server.SpawnHelperMixin",
   	"server.WorldChunkMixin",
   	"server.WorldMixin"
   ],
@@ -62,6 +59,7 @@
   	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
   	"client.MouseMixin",
+  	"client.WindowMixin",
   	"client.WorldRendererMixin"
   ],
   "injectors": {

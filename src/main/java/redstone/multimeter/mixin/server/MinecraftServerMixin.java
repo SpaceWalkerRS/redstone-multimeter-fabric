@@ -29,30 +29,6 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "method_16208",
-			at = @At(
-					value = "HEAD"
-			)
-	)
-	private void startTickTaskPackets(CallbackInfo ci) {
-		multimeterServer.startTickTask(TickTask.PACKETS);
-	}
-	
-	@Inject(
-			method = "method_16208",
-			at = @At(
-					value = "RETURN"
-			)
-	)
-	private void endTickTaskPacketsAndEndTick(CallbackInfo ci) {
-		multimeterServer.endTickTask();
-		// Ending the tick here is not ideal, but for the
-		// sake of Carpet mod compatibility injecting into
-		// the run loop is not an option.
-		multimeterServer.tickEnd();
-	}
-	
-	@Inject(
 			method = "tick",
 			at = @At(
 					value = "HEAD"
@@ -60,6 +36,62 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void onTickStart(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
 		multimeterServer.tickStart();
+	}
+	
+	@Inject(
+			method = "tickWorlds",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15396(Ljava/lang/String;)V",
+					args = "ldc=jobs"
+			)
+	)
+	private void startTickTaskPackets(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		multimeterServer.startTickTask(TickTask.PACKETS);
+	}
+	
+	@Inject(
+			method = "tickWorlds",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					args = "ldc=commandFunctions"
+			)
+	)
+	private void swapTickTaskCommandFunctions(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		multimeterServer.swapTickTask(TickTask.COMMAND_FUNCTIONS);
+	}
+	
+	@Inject(
+			method = "tickWorlds",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					args = "ldc=levels"
+			)
+	)
+	private void endTickTaskCommandFunctions(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		multimeterServer.endTickTask();
+	}
+	
+	@Inject(
+			method = "tick",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void endTickTaskPacketsAndEndTick(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		multimeterServer.endTickTask();
+	}
+	
+	@Inject(
+			method = "tick",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void onTickEnd(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		multimeterServer.tickEnd();
 	}
 	
 	@Inject(

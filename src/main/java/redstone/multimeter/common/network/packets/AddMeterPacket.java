@@ -22,7 +22,7 @@ public class AddMeterPacket implements RSMMPacket {
 	
 	@Override
 	public void encode(CompoundTag data) {
-		data.put("properties", properties.toNBT());
+		data.method_10566("properties", properties.toNBT());
 	}
 	
 	@Override
