@@ -263,7 +263,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	@Inject(
 			method = "method_8541",
 			at = @At(
-					value = "HEAD"
+					value = "RETURN"
 			)
 	)
 	private void endTickTaskPlayers(CallbackInfo ci) {

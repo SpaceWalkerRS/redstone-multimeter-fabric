@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.minecraft.BlockState;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -81,6 +82,21 @@ public abstract class WorldMixin implements IWorld {
 	
 	@Inject(
 			method = "method_8429",
+			locals = LocalCapture.CAPTURE_FAILHARD,
+			at = @At(
+					value = "INVOKE",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/entity/Entity;tick()V"
+			)
+	)
+	private void onGlobalEntityTick(CallbackInfo ci, int index, Entity entity) {
+		if (!isClient()) {
+			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
+		}
+	}
+	
+	@Inject(
+			method = "method_8429",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
@@ -127,6 +143,20 @@ public abstract class WorldMixin implements IWorld {
 	private void endTickTaskBlockEntitiesAndEntities(CallbackInfo ci) {
 		endTickTask();
 		endTickTask();
+	}
+	
+	@Inject(
+			method = "method_8553",
+			at = @At(
+					value = "INVOKE",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/entity/Entity;tick()V"
+			)
+	)
+	private void onEntityTick(Entity entity, boolean bl, CallbackInfo ci) {
+		if (!isClient()) {
+			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
+		}
 	}
 	
 	@Inject(
