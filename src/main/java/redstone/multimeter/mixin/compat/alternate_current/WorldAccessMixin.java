@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.minecraft.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.WorldChunk;
 
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 
@@ -31,7 +31,7 @@ public class WorldAccessMixin {
 					target = "Lnet/minecraft/class_16513;method_73551(Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
-	private void onSetWireState(BlockPos pos, BlockState newState, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, Chunk chunk, ChunkSection section, BlockState oldState) {
+	private void onSetWireState(BlockPos pos, BlockState newState, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, WorldChunk chunk, ChunkSection section, BlockState oldState) {
 		((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, newState);
 	}
 }
