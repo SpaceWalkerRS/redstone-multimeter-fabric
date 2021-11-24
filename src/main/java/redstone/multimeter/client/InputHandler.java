@@ -57,6 +57,9 @@ public class InputHandler {
 		while (KeyBindings.PRINT_LOGS.wasPressed()) {
 			client.togglePrinter();
 		}
+		while (KeyBindings.OPEN_METER_CONTROLS.wasPressed()) {
+			client.openMeterControls();
+		}
 		for (int index = 0; index < KeyBindings.TOGGLE_EVENT_TYPES.length; index++) {
 			KeyBinding keyBinding = KeyBindings.TOGGLE_EVENT_TYPES[index];
 			
