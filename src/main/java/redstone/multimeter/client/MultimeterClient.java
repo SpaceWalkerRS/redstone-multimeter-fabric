@@ -254,6 +254,13 @@ public class MultimeterClient {
 		}
 	}
 	
+	public void openMeterControls() {
+		onTargetMeter(meter -> {
+			openScreen(new MultimeterScreen(this));
+			hud.selectMeter(meter);
+		});
+	}
+	
 	public void toggleEventType(EventType type) {
 		onTargetMeter(meter -> {
 			MeterProperties newProperties = new MeterProperties();

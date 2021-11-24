@@ -42,6 +42,7 @@ public class KeyBindings {
 	public static final KeyBinding SCROLL_HUD;
 	public static final KeyBinding TOGGLE_HUD;
 	public static final KeyBinding OPEN_MULTIMETER_SCREEN;
+	public static final KeyBinding OPEN_METER_CONTROLS;
 	public static final KeyBinding OPEN_OPTIONS_MENU;
 	public static final KeyBinding PRINT_LOGS;
 	
@@ -147,6 +148,7 @@ public class KeyBindings {
 		SCROLL_HUD             = registerKeyBinding(new KeyBinding("Scroll HUD"            , GLFW.GLFW_KEY_LEFT_ALT, MAIN));
 		TOGGLE_HUD             = registerKeyBinding(new KeyBinding("Toggle HUD"            , GLFW.GLFW_KEY_H       , MAIN));
 		OPEN_MULTIMETER_SCREEN = registerKeyBinding(new KeyBinding("Open Multimeter Screen", GLFW.GLFW_KEY_G       , MAIN));
+		OPEN_METER_CONTROLS    = registerKeyBinding(new KeyBinding("Open Meter Controls"   , GLFW.GLFW_KEY_I       , MAIN));
 		OPEN_OPTIONS_MENU      = registerKeyBinding(new KeyBinding("Open Options Menu"     , GLFW.GLFW_KEY_O       , MAIN));
 		PRINT_LOGS             = registerKeyBinding(new KeyBinding("Print Logs To File"    , GLFW.GLFW_KEY_P       , MAIN));
 		

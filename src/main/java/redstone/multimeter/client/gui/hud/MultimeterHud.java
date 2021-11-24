@@ -405,7 +405,7 @@ public class MultimeterHud extends AbstractParentElement {
 		return selectMeter(null);
 	}
 	
-	private boolean selectMeter(Meter meter) {
+	public boolean selectMeter(Meter meter) {
 		if (meter == selectedMeter) {
 			return false;
 		}
