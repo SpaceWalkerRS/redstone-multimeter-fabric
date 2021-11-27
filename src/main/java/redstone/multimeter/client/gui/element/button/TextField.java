@@ -364,7 +364,7 @@ public class TextField extends AbstractButton {
 		int z = 0;
 		
 		class_1015.method_4381(0.0F, 0.0F, 0xFF, 0xFF);
-		class_1015.method_4397();
+		class_1015.method_4407();
 		class_1015.method_4430();
 		class_1015.method_4452(class_1015.class_1030.field_5110);
 		
