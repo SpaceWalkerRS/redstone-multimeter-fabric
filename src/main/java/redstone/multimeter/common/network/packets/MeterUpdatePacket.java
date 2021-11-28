@@ -25,13 +25,13 @@ public class MeterUpdatePacket implements RSMMPacket {
 	@Override
 	public void encode(NbtCompound data) {
 		data.putLong("id", id);
-		data.put("properties", properties.toNBT());
+		data.put("properties", properties.toNbt());
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
 		id = data.getLong("id");
-		properties = MeterProperties.fromNBT(data.getCompound("properties"));
+		properties = MeterProperties.fromNbt(data.getCompound("properties"));
 	}
 	
 	@Override

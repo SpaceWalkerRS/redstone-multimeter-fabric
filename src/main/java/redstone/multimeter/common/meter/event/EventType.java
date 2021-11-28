@@ -13,13 +13,7 @@ import redstone.multimeter.util.TextUtils;
 
 public enum EventType {
 	
-	UNKNOWN(-1, "unknown") {
-		
-		@Override
-		public void addTextForTooltip(List<Text> lines, int metadata) {
-			
-		}
-	},
+	UNKNOWN(-1, "unknown"),
 	POWERED(0, "powered") {
 		
 		@Override
@@ -52,13 +46,7 @@ public enum EventType {
 			TextUtils.addFancyText(lines, "new power", newPower);
 		}
 	},
-	RANDOM_TICK(4, "random_tick") {
-		
-		@Override
-		public void addTextForTooltip(List<Text> lines, int metadata) {
-			
-		}
-	},
+	RANDOM_TICK(4, "random_tick"),
 	SCHEDULED_TICK(5, "scheduled_tick") {
 		
 		@Override
@@ -73,34 +61,10 @@ public enum EventType {
 			TextUtils.addFancyText(lines, "type", metadata);
 		}
 	},
-	ENTITY_TICK(7, "entity_tick") {
-		
-		@Override
-		public void addTextForTooltip(List<Text> lines, int metadata) {
-			
-		}
-	},
-	BLOCK_ENTITY_TICK(8, "block_entity_tick") {
-		
-		@Override
-		public void addTextForTooltip(List<Text> lines, int metadata) {
-			
-		}
-	},
-	BLOCK_UPDATE(9, "block_update") {
-		
-		@Override
-		public void addTextForTooltip(List<Text> lines, int metadata) {
-			
-		}
-	},
-	COMPARATOR_UPDATE(10, "comparator_update") {
-		
-		@Override
-		public void addTextForTooltip(List<Text> lines, int metadata) {
-			
-		}
-	},
+	ENTITY_TICK(7, "entity_tick"),
+	BLOCK_ENTITY_TICK(8, "block_entity_tick"),
+	BLOCK_UPDATE(9, "block_update"),
+	COMPARATOR_UPDATE(10, "comparator_update"),
 	SHAPE_UPDATE(11, "shape_update") {
 		
 		@Override
@@ -108,13 +72,7 @@ public enum EventType {
 			TextUtils.addFancyText(lines, "direction", Direction.byId(metadata).getName());
 		}
 	},
-	INTERACT_BLOCK(12, "interact_block") {
-		
-		@Override
-		public void addTextForTooltip(List<Text> lines, int metadata) {
-			
-		}
-	};
+	INTERACT_BLOCK(12, "interact_block");
 	
 	public static final EventType[] ALL;
 	private static final Map<String, EventType> BY_NAME;
@@ -165,13 +123,15 @@ public enum EventType {
 		return 1 << index;
 	}
 	
-	public abstract void addTextForTooltip(List<Text> lines, int metadata);
+	public void addTextForTooltip(List<Text> lines, int metadata) {
+		
+	}
 	
-	public NbtElement toNBT() {
+	public NbtElement toNbt() {
 		return NbtByte.of((byte)index);
 	}
 	
-	public static EventType fromNBT(NbtElement nbt) {
+	public static EventType fromNbt(NbtElement nbt) {
 		if (nbt.getType() != NbtElement.BYTE_TYPE) {
 			return UNKNOWN;
 		}

@@ -127,7 +127,7 @@ public class ClientMeterGroup extends MeterGroup {
 	}
 	
 	public void refresh(NbtCompound nbt) {
-		updateFromNBT(nbt);
+		updateFromNbt(nbt);
 		client.getHUD().updateMeterList();
 	}
 	

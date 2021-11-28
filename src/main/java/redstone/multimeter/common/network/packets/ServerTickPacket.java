@@ -9,24 +9,24 @@ import redstone.multimeter.server.MultimeterServer;
 
 public class ServerTickPacket implements RSMMPacket {
 	
-	private long currentServerTick;
+	private long serverTime;
 	
 	public ServerTickPacket() {
 		
 	}
 	
-	public ServerTickPacket(long serverTick) {
-		currentServerTick = serverTick;
+	public ServerTickPacket(long serverTime) {
+		this.serverTime = serverTime;
 	}
 	
 	@Override
 	public void encode(NbtCompound data) {
-		data.putLong("serverTime", currentServerTick);
+		data.putLong("server time", serverTime);
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
-		currentServerTick = data.getLong("serverTime");
+		serverTime = data.getLong("server time");
 	}
 	
 	@Override
@@ -36,6 +36,6 @@ public class ServerTickPacket implements RSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.onServerTick(currentServerTick);
+		client.onServerTick(serverTime);
 	}
 }

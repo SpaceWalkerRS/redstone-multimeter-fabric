@@ -99,7 +99,7 @@ public class TickPhase {
 		return new TickPhase(array);
 	}
 	
-	public NbtElement toNBT() {
+	public NbtElement toNbt() {
 		if (this == UNKNOWN) {
 			return NbtNull.INSTANCE;
 		}
@@ -113,7 +113,7 @@ public class TickPhase {
 		return new NbtByteArray(array);
 	}
 	
-	public static TickPhase fromNBT(NbtElement nbt) {
+	public static TickPhase fromNbt(NbtElement nbt) {
 		if (nbt.getType() != NbtElement.BYTE_ARRAY_TYPE) {
 			return UNKNOWN;
 		}

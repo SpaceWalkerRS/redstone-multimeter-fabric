@@ -132,6 +132,11 @@ public class ServerMeterGroup extends MeterGroup {
 		moveMeter(meter, pos.offset(dir));
 	}
 	
+	public boolean isPastMeterLimit() {
+		int limit = multimeter.options.meter_group.meter_limit;
+		return limit >= 0 && getMeters().size() >= limit;
+	}
+	
 	public boolean isOwnedBy(ServerPlayerEntity player) {
 		return isOwnedBy(player.getUuid());
 	}

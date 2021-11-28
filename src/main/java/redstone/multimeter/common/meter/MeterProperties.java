@@ -210,11 +210,11 @@ public class MeterProperties {
 		return properties;
 	}
 	
-	public NbtCompound toNBT() {
+	public NbtCompound toNbt() {
 		NbtCompound nbt = new NbtCompound();
 		
 		if (pos != null) {
-			nbt.put("pos", pos.toNBT());
+			nbt.put("pos", pos.toNbt());
 		}
 		if (name != null) {
 			nbt.putString("name", name);
@@ -232,11 +232,11 @@ public class MeterProperties {
 		return nbt;
 	}
 	
-	public static MeterProperties fromNBT(NbtCompound nbt) {
+	public static MeterProperties fromNbt(NbtCompound nbt) {
 		MeterProperties properties = new MeterProperties();
 		
 		if (nbt.contains("pos")) {
-			properties.pos = WorldPos.fromNBT(nbt.getCompound("pos"));
+			properties.pos = WorldPos.fromNbt(nbt.getCompound("pos"));
 		}
 		if (nbt.contains("name")) {
 			properties.name = nbt.getString("name");
