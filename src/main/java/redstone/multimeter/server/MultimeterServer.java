@@ -13,14 +13,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickTask;
-import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.ServerTickPacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -253,5 +254,9 @@ public class MultimeterServer {
 		}
 		
 		return players;
+	}
+	
+	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
+		player.addChatMessage(message, actionBar);
 	}
 }

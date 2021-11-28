@@ -22,12 +22,12 @@ public class AddMeterPacket implements RSMMPacket {
 	
 	@Override
 	public void encode(CompoundTag data) {
-		data.put("properties", properties.toNBT());
+		data.put("properties", properties.toNbt());
 	}
 	
 	@Override
 	public void decode(CompoundTag data) {
-		properties = MeterProperties.fromNBT(data.getCompound("properties"));
+		properties = MeterProperties.fromNbt(data.getCompound("properties"));
 	}
 	
 	@Override

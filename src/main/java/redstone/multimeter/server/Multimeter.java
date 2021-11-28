@@ -148,17 +148,13 @@ public class Multimeter {
 		}
 	}
 	
-	public boolean isPastMeterLimit(ServerMeterGroup meterGroup) {
-		return options.meter_group.meter_limit >= 0 && meterGroup.getMeters().size() >= options.meter_group.meter_limit;
-	}
-	
 	public void addMeter(ServerPlayerEntity player, MeterProperties properties) {
 		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
-			if (isPastMeterLimit(meterGroup)) {
+			if (meterGroup.isPastMeterLimit()) {
 				Text message = new LiteralText(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
-				player.addChatMessage(message, true);
+				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
 			}
@@ -301,7 +297,7 @@ public class Multimeter {
 					setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
 			})).
 			append(new LiteralText(" to subscribe to it."));
-		player.addChatMessage(message, false);
+		server.sendMessage(player, message, false);
 	}
 	
 	public void removeMemberFromMeterGroup(ServerMeterGroup meterGroup, UUID playerUUID) {
@@ -318,7 +314,7 @@ public class Multimeter {
 				unsubscribeFromMeterGroup(meterGroup, player);
 				
 				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
-				player.addChatMessage(message, false);
+				server.sendMessage(player, message, false);
 			}
 		}
 	}
@@ -339,7 +335,7 @@ public class Multimeter {
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
 			Text message = new LiteralText("This server does not allow meter teleporting!");
-			player.addChatMessage(message, false);
+			server.sendMessage(player, message, false);
 			
 			return;
 		}
@@ -402,7 +398,7 @@ public class Multimeter {
 			})).
 			append(new LiteralText(" to return to your previous location"));
 		
-		player.addChatMessage(message, false);
+		server.sendMessage(player, message, false);
 	}
 	
 	public void onBlockChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
