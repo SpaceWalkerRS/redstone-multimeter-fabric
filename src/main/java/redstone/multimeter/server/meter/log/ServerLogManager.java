@@ -64,7 +64,7 @@ public class ServerLogManager extends LogManager {
 			}
 			
 			long id = meter.getId();
-			CompoundTag logs = meter.getLogs().toNBT();
+			CompoundTag logs = meter.getLogs().toNbt();
 			
 			CompoundTag nbt = new CompoundTag();
 			nbt.putLong("id", id);

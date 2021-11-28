@@ -9,7 +9,7 @@ import net.minecraft.nbt.EndTag;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
-import redstone.multimeter.util.NBTUtils;
+import redstone.multimeter.util.NbtUtils;
 import redstone.multimeter.util.TextUtils;
 
 public class TickPhase {
@@ -100,7 +100,7 @@ public class TickPhase {
 		return new TickPhase(array);
 	}
 	
-	public Tag toNBT() {
+	public Tag toNbt() {
 		if (this == UNKNOWN) {
 			return new EndTag();
 		}
@@ -114,8 +114,8 @@ public class TickPhase {
 		return new ByteArrayTag(array);
 	}
 	
-	public static TickPhase fromNBT(Tag nbt) {
-		if (nbt.getType() != NBTUtils.TYPE_BYTE_ARRAY) {
+	public static TickPhase fromNbt(Tag nbt) {
+		if (nbt.getType() != NbtUtils.TYPE_BYTE_ARRAY) {
 			return UNKNOWN;
 		}
 		

@@ -21,7 +21,7 @@ public class MeterGroupRefreshPacket implements RSMMPacket {
 	
 	public MeterGroupRefreshPacket(MeterGroup meterGroup) {
 		this.name = meterGroup.getName();
-		this.meterGroupData = meterGroup.toNBT();
+		this.meterGroupData = meterGroup.toNbt();
 	}
 	
 	@Override

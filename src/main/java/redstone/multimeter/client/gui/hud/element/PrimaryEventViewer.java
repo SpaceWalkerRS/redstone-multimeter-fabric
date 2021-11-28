@@ -118,7 +118,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	@Override
 	protected void drawDecorators() {
 		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
-		long currentTick = hud.client.getLastServerTick() + 1;
+		long currentTick = hud.client.getPrevServerTime() + 1;
 		
 		drawMeterLogs((x, y, meter) -> {
 			hud.eventRenderers.renderPulseLengths(x, y, firstTick, currentTick, meter);
@@ -128,7 +128,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	@Override
 	protected void drawMeterEvents() {
 		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
-		long lastTick = hud.client.getLastServerTick() + 1;
+		long lastTick = hud.client.getPrevServerTime() + 1;
 		
 		drawMeterLogs((x, y, meter) -> {
 			hud.eventRenderers.renderTickLogs(x, y, firstTick, lastTick, meter);
@@ -144,7 +144,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	protected int getMarkerColumn() {
 		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
 		long lastTick = firstTick + Options.HUD.COLUMN_COUNT.get();
-		long currentTick = hud.client.getLastServerTick() + 1;
+		long currentTick = hud.client.getPrevServerTime() + 1;
 		
 		return (currentTick < firstTick || currentTick > lastTick) ? -1 : (int)(currentTick - firstTick);
 	}

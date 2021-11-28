@@ -435,7 +435,7 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 	
 	public long getSelectedTick() {
-		return client.getLastServerTick() + offset + Options.HUD.SELECTED_COLUMN.get();
+		return client.getPrevServerTime() + offset + Options.HUD.SELECTED_COLUMN.get();
 	}
 	
 	public int getAvailableWidth() {

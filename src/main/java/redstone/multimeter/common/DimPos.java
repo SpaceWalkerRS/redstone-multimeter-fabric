@@ -8,7 +8,7 @@ import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
-import redstone.multimeter.util.NBTUtils;
+import redstone.multimeter.util.NbtUtils;
 
 public class DimPos {
 	
@@ -88,7 +88,7 @@ public class DimPos {
 		return new DimPos(dimensionId, blockPos.add(dx, dy, dz));
 	}
 	
-	public CompoundTag toNBT() {
+	public CompoundTag toNbt() {
 		CompoundTag nbt = new CompoundTag();
 		
 		// The key is "world id" to match RSMM for 1.16+
@@ -96,7 +96,7 @@ public class DimPos {
 		// allows clients and servers of different versions
 		// to communicate effectively through the use of
 		// mods like ViaVersion or multiconnect
-		nbt.method_10566("world id", NBTUtils.identifierToNBT(dimensionId));
+		nbt.method_10566("world id", NbtUtils.identifierToNbt(dimensionId));
 		nbt.putInt("x", blockPos.getX());
 		nbt.putInt("y", blockPos.getY());
 		nbt.putInt("z", blockPos.getZ());
@@ -104,8 +104,8 @@ public class DimPos {
 		return nbt;
 	}
 	
-	public static DimPos fromNBT(CompoundTag nbt) {
-		Identifier dimensionId = NBTUtils.NBTToIdentifier(nbt.getCompound("world id"));
+	public static DimPos fromNbt(CompoundTag nbt) {
+		Identifier dimensionId = NbtUtils.nbtToIdentifier(nbt.getCompound("world id"));
 		int x = nbt.getInt("x");
 		int y = nbt.getInt("y");
 		int z = nbt.getInt("z");

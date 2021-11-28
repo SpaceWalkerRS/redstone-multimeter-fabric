@@ -13,6 +13,7 @@ import net.minecraft.BlockState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -253,5 +254,9 @@ public class MultimeterServer {
 		}
 		
 		return players;
+	}
+	
+	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
+		player.addChatMessage(message, actionBar);
 	}
 }
