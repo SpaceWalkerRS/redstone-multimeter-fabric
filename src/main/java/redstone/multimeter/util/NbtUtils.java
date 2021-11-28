@@ -3,7 +3,7 @@ package redstone.multimeter.util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 
-public class NBTUtils {
+public class NbtUtils {
 	
 	public static final byte TYPE_NULL       =  0;
 	public static final byte TYPE_BYTE       =  1;
@@ -19,7 +19,7 @@ public class NBTUtils {
 	public static final byte TYPE_INT_ARRAY  = 11;
 	public static final byte TYPE_LONG_ARRAY = 12;
 	
-	public static CompoundTag identifierToNBT(Identifier id) {
+	public static CompoundTag identifierToNbt(Identifier id) {
 		CompoundTag nbt = new CompoundTag();
 		
 		nbt.putString("namespace", id.getNamespace());
@@ -28,7 +28,7 @@ public class NBTUtils {
 		return nbt;
 	}
 	
-	public static Identifier NBTToIdentifier(CompoundTag nbt) {
+	public static Identifier nbtToIdentifier(CompoundTag nbt) {
 		String namespace = nbt.getString("namespace");
 		String path = nbt.getString("path");
 		

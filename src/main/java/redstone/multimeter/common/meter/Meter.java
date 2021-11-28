@@ -124,20 +124,20 @@ public class Meter {
 		this.hidden = hidden;
 	}
 	
-	public CompoundTag toNBT() {
+	public CompoundTag toNbt() {
 		CompoundTag nbt = new CompoundTag();
 		
 		nbt.putLong("id", id);
-		nbt.put("properties", properties.toNBT());
+		nbt.put("properties", properties.toNbt());
 		nbt.putBoolean("powered", powered);
 		nbt.putBoolean("active", active);
 		
 		return nbt;
 	}
 	
-	public static Meter fromNBT(CompoundTag nbt) {
+	public static Meter fromNbt(CompoundTag nbt) {
 		long id = nbt.getLong("id");
-		MeterProperties properties = MeterProperties.fromNBT(nbt.getCompound("properties"));
+		MeterProperties properties = MeterProperties.fromNbt(nbt.getCompound("properties"));
 		boolean powered = nbt.getBoolean("powered");
 		boolean active = nbt.getBoolean("active");
 		
