@@ -11,6 +11,7 @@ import net.minecraft.nbt.NbtList;
 
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.log.LogManager;
+import redstone.multimeter.util.NbtUtils;
 
 public abstract class MeterGroup {
 	
@@ -171,11 +172,11 @@ public abstract class MeterGroup {
 	
 	public abstract LogManager getLogManager();
 	
-	public NbtCompound toNBT() {
+	public NbtCompound toNbt() {
 		NbtList list = new NbtList();
 		
 		for (Meter meter : meters) {
-			list.add(meter.toNBT());
+			list.add(meter.toNbt());
 		}
 		
 		NbtCompound nbt = new NbtCompound();
@@ -184,14 +185,14 @@ public abstract class MeterGroup {
 		return nbt;
 	}
 	
-	public void updateFromNBT(NbtCompound nbt) {
+	public void updateFromNbt(NbtCompound nbt) {
 		clear();
 		
-		NbtList list = nbt.getList("meters", 10);
+		NbtList list = nbt.getList("meters", NbtUtils.TYPE_COMPOUND);
 		
 		for (int index = 0; index < list.size(); index++) {
 			NbtCompound meterNbt = list.getCompound(index);
-			Meter meter = Meter.fromNBT(meterNbt);
+			Meter meter = Meter.fromNbt(meterNbt);
 			
 			addMeter(meter);
 		}

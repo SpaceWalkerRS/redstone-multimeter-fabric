@@ -64,7 +64,7 @@ public class ServerLogManager extends LogManager {
 			}
 			
 			long id = meter.getId();
-			NbtCompound logs = meter.getLogs().toNBT();
+			NbtCompound logs = meter.getLogs().toNbt();
 			
 			NbtCompound nbt = new NbtCompound();
 			nbt.putLong("id", id);

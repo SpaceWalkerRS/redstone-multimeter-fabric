@@ -10,6 +10,7 @@ import net.minecraft.nbt.NbtList;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.log.LogManager;
+import redstone.multimeter.util.NbtUtils;
 
 public class ClientLogManager extends LogManager {
 	
@@ -36,7 +37,7 @@ public class ClientLogManager extends LogManager {
 	
 	@Override
 	protected long getLastTick() {
-		return meterGroup.getMultimeterClient().getLastServerTick();
+		return meterGroup.getMultimeterClient().getPrevServerTime();
 	}
 	
 	@Override
@@ -82,10 +83,10 @@ public class ClientLogManager extends LogManager {
 	 * Log all events from the past server tick
 	 */
 	public void updateMeterLogs(NbtCompound data) {
-		int subTickCount = data.getInt("subticks");
-		subticks.put(getLastTick(), subTickCount);
+		int subtickCount = data.getInt("subticks");
+		subticks.put(getLastTick(), subtickCount);
 		
-		NbtList list = data.getList("logs", 10);
+		NbtList list = data.getList("logs", NbtUtils.TYPE_COMPOUND);
 		
 		for (int index = 0; index < list.size(); index++) {
 			NbtCompound nbt = list.getCompound(index);
@@ -98,7 +99,7 @@ public class ClientLogManager extends LogManager {
 				boolean powered = nbt.getBoolean("powered");
 				boolean active = nbt.getBoolean("active");
 				
-				meter.getLogs().updateFromNBT(logs);
+				meter.getLogs().updateFromNbt(logs);
 				meter.setPowered(powered);
 				meter.setActive(active);
 			}

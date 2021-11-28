@@ -59,7 +59,7 @@ public class MultimeterClient {
 	private ClientMeterGroup meterGroup;
 	private boolean connected; // true if the client is connected to a MultimeterServer
 	private boolean hudEnabled;
-	private long lastServerTick;
+	private long prevServerTime;
 	
 	public MultimeterClient(MinecraftClient client) {
 		this.client = client;
@@ -72,7 +72,7 @@ public class MultimeterClient {
 		this.meterGroup = new ClientMeterGroup(this);
 		this.connected = false;
 		this.hudEnabled = true;
-		this.lastServerTick = -1;
+		this.prevServerTime = -1;
 		
 		this.hud.init();
 		
@@ -122,8 +122,8 @@ public class MultimeterClient {
 		return hud.hasContent() && (hudEnabled || hud.isOnScreen());
 	}
 	
-	public long getLastServerTick() {
-		return lastServerTick;
+	public long getPrevServerTime() {
+		return prevServerTime;
 	}
 	
 	public File getConfigFolder() {
@@ -142,8 +142,8 @@ public class MultimeterClient {
 	 * At the end of each server tick, the server sends a packet
 	 * to clients with the current server time.
 	 */
-	public void onServerTick(long serverTick) {
-		lastServerTick = serverTick;
+	public void onServerTick(long serverTime) {
+		prevServerTime = serverTime;
 		
 		meterGroup.tick();
 		hud.onServerTick();

@@ -7,7 +7,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 
-import redstone.multimeter.util.NBTUtils;
+import redstone.multimeter.util.NbtUtils;
 
 public class WorldPos {
 	
@@ -83,10 +83,10 @@ public class WorldPos {
 		return new WorldPos(worldId, blockPos.add(dx, dy, dz));
 	}
 	
-	public NbtCompound toNBT() {
+	public NbtCompound toNbt() {
 		NbtCompound nbt = new NbtCompound();
 		
-		nbt.put("world id", NBTUtils.identifierToNBT(worldId));
+		nbt.put("world id", NbtUtils.identifierToNbt(worldId));
 		nbt.putInt("x", blockPos.getX());
 		nbt.putInt("y", blockPos.getY());
 		nbt.putInt("z", blockPos.getZ());
@@ -94,8 +94,8 @@ public class WorldPos {
 		return nbt;
 	}
 	
-	public static WorldPos fromNBT(NbtCompound nbt) {
-		Identifier worldId = NBTUtils.NBTToIdentifier(nbt.getCompound("world id"));
+	public static WorldPos fromNbt(NbtCompound nbt) {
+		Identifier worldId = NbtUtils.nbtToIdentifier(nbt.getCompound("world id"));
 		int x = nbt.getInt("x");
 		int y = nbt.getInt("y");
 		int z = nbt.getInt("z");

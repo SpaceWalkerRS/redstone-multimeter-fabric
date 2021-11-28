@@ -9,7 +9,7 @@ import net.minecraft.nbt.NbtNull;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
-import redstone.multimeter.util.NBTUtils;
+import redstone.multimeter.util.NbtUtils;
 import redstone.multimeter.util.TextUtils;
 
 public class TickPhase {
@@ -100,7 +100,7 @@ public class TickPhase {
 		return new TickPhase(array);
 	}
 	
-	public NbtElement toNBT() {
+	public NbtElement toNbt() {
 		if (this == UNKNOWN) {
 			return NbtNull.INSTANCE;
 		}
@@ -114,8 +114,8 @@ public class TickPhase {
 		return new NbtByteArray(array);
 	}
 	
-	public static TickPhase fromNBT(NbtElement nbt) {
-		if (nbt.getType() != NBTUtils.TYPE_BYTE_ARRAY) {
+	public static TickPhase fromNbt(NbtElement nbt) {
+		if (nbt.getType() != NbtUtils.TYPE_BYTE_ARRAY) {
 			return UNKNOWN;
 		}
 		
