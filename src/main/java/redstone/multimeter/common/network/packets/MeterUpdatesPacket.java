@@ -7,7 +7,9 @@ import java.util.Map;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -39,7 +41,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			long id = entry.getLongKey();
 			MeterProperties update = entry.getValue();
 			
-			NbtCompound nbt = update.toNBT();
+			NbtCompound nbt = update.toNbt();
 			nbt.putLong("id", id);
 			list.add(nbt);
 		}
@@ -51,7 +53,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	@Override
 	public void decode(NbtCompound data) {
 		long[] ids = data.getLongArray("removed meters");
-		NbtList list = data.getList("meter updates", 10);
+		NbtList list = data.getList("meter updates", NbtElement.COMPOUND_TYPE);
 		
 		for (long id : ids) {
 			removedMeters.add(id);
@@ -60,7 +62,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			NbtCompound nbt = list.getCompound(index);
 			
 			long id = nbt.getLong("id");
-			MeterProperties update = MeterProperties.fromNBT(nbt);
+			MeterProperties update = MeterProperties.fromNbt(nbt);
 			meterUpdates.put(id, update);
 		}
 	}

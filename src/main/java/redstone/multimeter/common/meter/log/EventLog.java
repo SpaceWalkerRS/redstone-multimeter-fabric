@@ -100,24 +100,24 @@ public class EventLog {
 		return lines;
 	}
 	
-	public NbtCompound toNBT() {
+	public NbtCompound toNbt() {
 		NbtCompound nbt = new NbtCompound();
 		
-		nbt.put("meter event", event.toNBT());
+		nbt.put("meter event", event.toNbt());
 		nbt.putLong("tick", tick);
 		nbt.putInt("subtick", subtick);
-		nbt.put("tick phase", tickPhase.toNBT());
+		nbt.put("tick phase", tickPhase.toNbt());
 		
 		return nbt;
 	}
 	
-	public static EventLog fromNBT(NbtCompound nbt) {
+	public static EventLog fromNbt(NbtCompound nbt) {
 		EventLog log = new EventLog();
 		
-		log.event = MeterEvent.fromNBT(nbt.getCompound("meter event"));
+		log.event = MeterEvent.fromNbt(nbt.getCompound("meter event"));
 		log.tick = nbt.getLong("tick");
 		log.subtick = nbt.getInt("subtick");
-		log.tickPhase = TickPhase.fromNBT(nbt.get("tick phase"));
+		log.tickPhase = TickPhase.fromNbt(nbt.get("tick phase"));
 		
 		return log;
 	}

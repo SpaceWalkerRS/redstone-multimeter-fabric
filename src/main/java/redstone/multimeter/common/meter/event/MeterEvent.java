@@ -48,19 +48,19 @@ public class MeterEvent {
 		return metadata;
 	}
 	
-	public NbtCompound toNBT() {
+	public NbtCompound toNbt() {
 		NbtCompound nbt = new NbtCompound();
 		
-		nbt.put("type", type.toNBT());
+		nbt.put("type", type.toNbt());
 		nbt.putInt("metadata", metadata);
 		
 		return nbt;
 	}
 	
-	public static MeterEvent fromNBT(NbtCompound nbt) {
+	public static MeterEvent fromNbt(NbtCompound nbt) {
 		MeterEvent event = new MeterEvent();
 		
-		event.type = EventType.fromNBT(nbt.get("type"));
+		event.type = EventType.fromNbt(nbt.get("type"));
 		event.metadata = nbt.getInt("metadata");
 		
 		return event;
