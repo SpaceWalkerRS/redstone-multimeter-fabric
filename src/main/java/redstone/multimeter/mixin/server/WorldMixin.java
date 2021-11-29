@@ -29,7 +29,7 @@ import redstone.multimeter.server.MultimeterServer;
 @Mixin(World.class)
 public abstract class WorldMixin implements IWorld {
 	
-	@Shadow public abstract boolean isClient();
+	@Shadow protected abstract boolean isClient();
 	
 	@Inject(
 			method = "updateNeighbor",
