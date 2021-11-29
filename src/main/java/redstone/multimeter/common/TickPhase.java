@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.EndTag;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
@@ -102,7 +101,7 @@ public class TickPhase {
 	
 	public Tag toNbt() {
 		if (this == UNKNOWN) {
-			return EndTag.INSTANCE;
+			return NbtUtils.NULL;
 		}
 		
 		byte[] array = new byte[tasks.length];

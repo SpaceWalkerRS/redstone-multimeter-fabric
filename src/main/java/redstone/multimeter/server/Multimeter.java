@@ -504,6 +504,10 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.SHAPE_UPDATE, dir.getId());
 	}
 	
+	public void logObserverUpdate(World world, BlockPos pos) {
+		tryLogEvent(world, pos, EventType.OBSERVER_UPDATE, 0);
+	}
+	
 	public void logInteractBlock(World world, BlockPos pos) {
 		tryLogEvent(world, pos, EventType.INTERACT_BLOCK, 0);
 	}
