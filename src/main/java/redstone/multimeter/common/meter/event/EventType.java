@@ -73,7 +73,8 @@ public enum EventType {
 			TextUtils.addFancyText(lines, "direction", Direction.byId(metadata).getName());
 		}
 	},
-	INTERACT_BLOCK(12, "interact_block");
+	OBSERVER_UPDATE(12, "observer_update"),
+	INTERACT_BLOCK(13, "interact_block");
 	
 	public static final EventType[] ALL;
 	private static final Map<String, EventType> BY_NAME;
