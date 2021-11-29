@@ -1,6 +1,8 @@
 package redstone.multimeter.util;
 
+import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
 
 public class NbtUtils {
@@ -18,6 +20,8 @@ public class NbtUtils {
 	public static final byte TYPE_COMPOUND   = 10;
 	public static final byte TYPE_INT_ARRAY  = 11;
 	public static final byte TYPE_LONG_ARRAY = 12;
+	
+	public static final NbtElement NULL = NbtByte.ZERO;
 	
 	public static NbtCompound identifierToNbt(Identifier id) {
 		NbtCompound nbt = new NbtCompound();
