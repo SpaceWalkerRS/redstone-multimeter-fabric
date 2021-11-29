@@ -5,10 +5,10 @@ import java.util.List;
 
 import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtNull;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
+import redstone.multimeter.util.NbtUtils;
 import redstone.multimeter.util.TextUtils;
 
 public class TickPhase {
@@ -101,7 +101,7 @@ public class TickPhase {
 	
 	public NbtElement toNbt() {
 		if (this == UNKNOWN) {
-			return NbtNull.INSTANCE;
+			return NbtUtils.NULL;
 		}
 		
 		byte[] array = new byte[tasks.length];
