@@ -24,6 +24,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 
+import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.Multimeter;
@@ -194,6 +195,10 @@ public class MeterGroupCommand {
 			for (ServerPlayerEntity player : players) {
 				if (player == owner) {
 					source.sendFeedback(new LiteralText("You cannot add yourself as a member!"), false);
+				} else if (meterGroup.hasMember(player)) {
+					source.sendFeedback(new LiteralText(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getEntityName(), meterGroup.getName())), false);
+				} else if (!multimeter.getMultimeterServer().isMultimeterClient(player)) {
+					source.sendFeedback(new LiteralText(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getEntityName(), RedstoneMultimeterMod.MOD_NAME)), false);
 				} else {
 					multimeter.addMemberToMeterGroup(meterGroup, player.getUuid());
 					source.sendFeedback(new LiteralText(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getEntityName(), meterGroup.getName())), false);
@@ -212,7 +217,7 @@ public class MeterGroupCommand {
 				if (player == owner) {
 					source.sendFeedback(new LiteralText("You cannot remove yourself as a member!"), false);
 				} else {
-					source.sendFeedback(new LiteralText(String.format("Meter group \'%s\' has no member with that name!", meterGroup.getName())), false);
+					source.sendFeedback(new LiteralText(String.format("Meter group \'%s\' has no member with the name \'%s\'!", meterGroup.getName(), playerName)), false);
 				}
 			} else {
 				multimeter.removeMemberFromMeterGroup(meterGroup, member.getValue());

@@ -217,7 +217,9 @@ public class Multimeter {
 	public void subscribeToMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
 		ServerMeterGroup prevSubscription = getSubscription(player);
 		
-		if (prevSubscription != meterGroup) {
+		if (prevSubscription == meterGroup) {
+			refreshMeterGroup(meterGroup, player);
+		} else {
 			if (prevSubscription != null) {
 				removeSubscriberFromMeterGroup(prevSubscription, player);
 			}
