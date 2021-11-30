@@ -198,7 +198,7 @@ public class MultimeterServer {
 	public void onHandshake(ServerPlayerEntity player, String modVersion) {
 		if (connectedPlayers.put(player.getUuid(), modVersion) == null) {
 			HandshakePacket packet = new HandshakePacket();
-			packetHandler.send(packet);
+			packetHandler.sendToPlayer(packet, player);
 		}
 	}
 	
@@ -234,7 +234,7 @@ public class MultimeterServer {
 		return server.getPlayerManager().getPlayer(playerName);
 	}
 	
-	public boolean isConnected(UUID playerUUID) {
+	public boolean isMultimeterClient(UUID playerUUID) {
 		return connectedPlayers.containsKey(playerUUID);
 	}
 	
