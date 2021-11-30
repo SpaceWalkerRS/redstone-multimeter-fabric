@@ -170,17 +170,19 @@ public class MultimeterClient {
 	}
 	
 	public void onHandshake(String modVersion) {
-		connected = true;
-		
-		if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-			Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
-			sendMessage(warning, false);
-		}
-		
-		hud.reset();
-		
-		if (Options.RedstoneMultimeter.CREATE_GROUP_ON_JOIN.get()) {
-			createDefaultMeterGroup();
+		if (!connected) {
+			connected = true;
+			
+			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
+				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
+				sendMessage(warning, false);
+			}
+			
+			hud.reset();
+			
+			if (Options.RedstoneMultimeter.CREATE_GROUP_ON_JOIN.get()) {
+				createDefaultMeterGroup();
+			}
 		}
 	}
 	
