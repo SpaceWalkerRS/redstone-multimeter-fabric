@@ -4,9 +4,12 @@ import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import net.minecraft.block.Block;
@@ -51,6 +54,7 @@ public class Multimeter {
 	private final MultimeterServer server;
 	private final Map<String, ServerMeterGroup> meterGroups;
 	private final Map<UUID, ServerMeterGroup> subscriptions;
+	private final Set<ServerMeterGroup> activeMeterGroups;
 	private final ServerMeterPropertiesManager meterPropertiesManager;
 	
 	public Options options;
@@ -59,6 +63,7 @@ public class Multimeter {
 		this.server = server;
 		this.meterGroups = new LinkedHashMap<>();
 		this.subscriptions = new HashMap<>();
+		this.activeMeterGroups = new HashSet<>();
 		this.meterPropertiesManager = new ServerMeterPropertiesManager(this);
 		
 		reloadOptions();
@@ -103,14 +108,24 @@ public class Multimeter {
 	
 	public void tickStart(boolean paused) {
 		if (!paused) {
-			if (options.meter_group.max_idle_time >= 0) {
-				meterGroups.values().removeIf(meterGroup -> {
-					return meterGroup.isIdle() && (!meterGroup.hasMeters() || meterGroup.getIdleTime() > options.meter_group.max_idle_time);
-				});
-			}
+			removeIdleMeterGroups();
 			
 			for (ServerMeterGroup meterGroup : meterGroups.values()) {
 				meterGroup.tick();
+			}
+		}
+	}
+	
+	private void removeIdleMeterGroups() {
+		if (options.meter_group.max_idle_time >= 0) {
+			Iterator<ServerMeterGroup> it = meterGroups.values().iterator();
+			
+			while (it.hasNext()) {
+				ServerMeterGroup meterGroup = it.next();
+				
+				if (meterGroup.isIdle() && (!meterGroup.hasMeters() || meterGroup.getIdleTime() > options.meter_group.max_idle_time)) {
+					it.remove();
+				}
 			}
 		}
 	}
@@ -239,7 +254,10 @@ public class Multimeter {
 		
 		subscriptions.put(playerUUID, meterGroup);
 		meterGroup.addSubscriber(playerUUID);
-		meterGroup.updateIdleState();
+		
+		if (meterGroup.updateIdleState()) {
+			activeMeterGroups.add(meterGroup);
+		}
 	}
 	
 	public void unsubscribeFromMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
@@ -254,7 +272,10 @@ public class Multimeter {
 		
 		subscriptions.remove(playerUUID, meterGroup);
 		meterGroup.removeSubscriber(playerUUID);
-		meterGroup.updateIdleState();
+		
+		if (meterGroup.updateIdleState()) {
+			activeMeterGroups.remove(meterGroup);
+		}
 	}
 	
 	private void onSubscriptionChanged(ServerPlayerEntity player, ServerMeterGroup prevSubscription, ServerMeterGroup newSubscription) {
@@ -525,10 +546,8 @@ public class Multimeter {
 		if (options.hasEventType(supplier.type())) {
 			WorldPos pos = new WorldPos(world, blockPos);
 			
-			for (ServerMeterGroup meterGroup : meterGroups.values()) {
-				if (!meterGroup.isIdle()) {
-					meterGroup.tryLogEvent(pos, predicate, supplier);
-				}
+			for (ServerMeterGroup meterGroup : activeMeterGroups) {
+				meterGroup.tryLogEvent(pos, predicate, supplier);
 			}
 		}
 	}

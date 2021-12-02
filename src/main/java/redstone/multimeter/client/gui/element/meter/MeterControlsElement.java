@@ -1,10 +1,10 @@
 package redstone.multimeter.client.gui.element.meter;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import org.lwjgl.glfw.GLFW;
 
-import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;

@@ -54,7 +54,7 @@ public class ServerMeterGroup extends MeterGroup {
 		this.meterUpdates = new LinkedHashMap<>();
 		
 		this.isPrivate = false;
-		this.idle = false;
+		this.idle = true;
 		this.idleTime = 0L;
 	}
 	
@@ -221,13 +221,15 @@ public class ServerMeterGroup extends MeterGroup {
 		return idleTime;
 	}
 	
-	public void updateIdleState() {
+	public boolean updateIdleState() {
 		boolean wasIdle = idle;
 		idle = !hasSubscribers();
 		
 		if (wasIdle && !idle) {
 			idleTime = 0L;
 		}
+		
+		return wasIdle != idle;
 	}
 	
 	public void tick() {
