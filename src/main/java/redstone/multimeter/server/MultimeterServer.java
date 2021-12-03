@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -220,6 +221,10 @@ public class MultimeterServer {
 		}
 		
 		return null;
+	}
+	
+	public PlayerManager getPlayerManager() {
+		return server.getPlayerManager();
 	}
 	
 	public ServerPlayerEntity getPlayer(UUID playerUUID) {

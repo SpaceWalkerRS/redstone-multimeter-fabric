@@ -1,6 +1,6 @@
 {
-  "name": "repeater",
-  "event_types": [
-    "active"
-  ]
+	"name": "repeater",
+	"event_types": [
+		"active"
+	]
 }

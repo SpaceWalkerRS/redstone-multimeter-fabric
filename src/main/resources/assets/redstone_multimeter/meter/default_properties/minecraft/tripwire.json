@@ -1,6 +1,6 @@
 {
-  "name": "tripwire",
-  "event_types": [
-    "active"
-  ]
+	"name": "tripwire",
+	"event_types": [
+		"active"
+	]
 }

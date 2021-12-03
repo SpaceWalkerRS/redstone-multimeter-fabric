@@ -1,6 +1,6 @@
 {
-  "name": "button",
-  "event_types": [
-    "active"
-  ]
+ 	"name": "button",
+	"event_types": [
+		"active"
+	]
 }

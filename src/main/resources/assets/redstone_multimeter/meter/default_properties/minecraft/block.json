@@ -1,8 +1,8 @@
 {
-  "name": "Meter",
-  "movable": true,
-  "event_types": [
-    "powered",
-    "moved"
-  ]
+	"name": "Meter",
+	"movable": true,
+	"event_types": [
+		"powered",
+		"moved"
+	]
 }

@@ -13,11 +13,11 @@ import redstone.multimeter.util.TextUtils;
 
 public class TickPhase {
 	
-	public static final TickPhase UNKNOWN = new TickPhase(new TickTask[] { TickTask.UNKNOWN });
+	public static final TickPhase UNKNOWN = new TickPhase(TickTask.UNKNOWN);
 	
 	private final TickTask[] tasks;
 	
-	public TickPhase(TickTask[] tasks) {
+	public TickPhase(TickTask... tasks) {
 		this.tasks = tasks;
 	}
 	

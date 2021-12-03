@@ -318,7 +318,7 @@ public class Multimeter {
 		}
 		
 		server.getPacketHandler().sendToPlayer(packet, player);
-		server.getMinecraftServer().getPlayerManager().sendCommandTree(player);
+		server.getPlayerManager().sendCommandTree(player);
 	}
 	
 	public void clearMembersOfMeterGroup(ServerMeterGroup meterGroup) {
