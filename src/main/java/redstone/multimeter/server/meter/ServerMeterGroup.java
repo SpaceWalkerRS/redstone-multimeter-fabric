@@ -1,6 +1,7 @@
 package redstone.multimeter.server.meter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -137,6 +138,10 @@ public class ServerMeterGroup extends MeterGroup {
 		return limit >= 0 && getMeters().size() >= limit;
 	}
 	
+	public UUID getOwner() {
+		return owner;
+	}
+	
 	public boolean isOwnedBy(ServerPlayerEntity player) {
 		return isOwnedBy(player.getUuid());
 	}
@@ -149,8 +154,8 @@ public class ServerMeterGroup extends MeterGroup {
 		return !members.isEmpty();
 	}
 	
-	public Set<UUID> getMembers() {
-		return Collections.unmodifiableSet(members);
+	public Collection<UUID> getMembers() {
+		return Collections.unmodifiableCollection(members);
 	}
 	
 	public boolean hasMember(ServerPlayerEntity player) {
@@ -177,8 +182,8 @@ public class ServerMeterGroup extends MeterGroup {
 		return !subscribers.isEmpty();
 	}
 	
-	public Set<UUID> getSubscribers() {
-		return Collections.unmodifiableSet(subscribers);
+	public Collection<UUID> getSubscribers() {
+		return Collections.unmodifiableCollection(subscribers);
 	}
 	
 	public boolean hasSubscriber(ServerPlayerEntity player) {
@@ -230,6 +235,10 @@ public class ServerMeterGroup extends MeterGroup {
 		}
 		
 		return wasIdle != idle;
+	}
+	
+	public boolean isPastIdleTimeLimit() {
+		return idle && multimeter.options.meter_group.max_idle_time >= 0 && idleTime > multimeter.options.meter_group.max_idle_time;
 	}
 	
 	public void tick() {

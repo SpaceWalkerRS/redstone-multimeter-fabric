@@ -55,6 +55,7 @@ public class Multimeter {
 	private final Map<String, ServerMeterGroup> meterGroups;
 	private final Map<UUID, ServerMeterGroup> subscriptions;
 	private final Set<ServerMeterGroup> activeMeterGroups;
+	private final Set<ServerMeterGroup> idleMeterGroups;
 	private final ServerMeterPropertiesManager meterPropertiesManager;
 	
 	public Options options;
@@ -64,6 +65,7 @@ public class Multimeter {
 		this.meterGroups = new LinkedHashMap<>();
 		this.subscriptions = new HashMap<>();
 		this.activeMeterGroups = new HashSet<>();
+		this.idleMeterGroups = new HashSet<>();
 		this.meterPropertiesManager = new ServerMeterPropertiesManager(this);
 		
 		reloadOptions();
@@ -116,25 +118,47 @@ public class Multimeter {
 		}
 	}
 	
-	private void removeIdleMeterGroups() {
-		if (options.meter_group.max_idle_time >= 0) {
-			Iterator<ServerMeterGroup> it = meterGroups.values().iterator();
-			
-			while (it.hasNext()) {
-				ServerMeterGroup meterGroup = it.next();
-				
-				if (meterGroup.isIdle() && (!meterGroup.hasMeters() || meterGroup.getIdleTime() > options.meter_group.max_idle_time)) {
-					it.remove();
-				}
-			}
-		}
-	}
-	
 	public void tickEnd(boolean paused) {
 		broadcastMeterUpdates();
 		
 		if (!paused) {
 			broadcastMeterLogs();
+		}
+	}
+	
+	private void removeIdleMeterGroups() {
+		Iterator<ServerMeterGroup> it = idleMeterGroups.iterator();
+		
+		while (it.hasNext()) {
+			ServerMeterGroup meterGroup = it.next();
+			
+			if (tryRemoveMeterGroup(meterGroup)) {
+				it.remove();
+			}
+		}
+	}
+	
+	private boolean tryRemoveMeterGroup(ServerMeterGroup meterGroup) {
+		if (meterGroup.hasMeters() && !meterGroup.isPastIdleTimeLimit()) {
+			return false;
+		}
+		
+		meterGroups.remove(meterGroup.getName(), meterGroup);
+		
+		if (meterGroup.hasMeters()) {
+			notifyOwnerOfRemoval(meterGroup);
+		}
+		
+		return true;
+	}
+	
+	private void notifyOwnerOfRemoval(ServerMeterGroup meterGroup) {
+		UUID ownerUUID = meterGroup.getOwner();
+		ServerPlayerEntity owner = server.getPlayer(ownerUUID);
+		
+		if (owner != null) {
+			Text message = new LiteralText(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
+			server.sendMessage(owner, message, false);
 		}
 	}
 	
@@ -257,6 +281,7 @@ public class Multimeter {
 		
 		if (meterGroup.updateIdleState()) {
 			activeMeterGroups.add(meterGroup);
+			idleMeterGroups.remove(meterGroup);
 		}
 	}
 	
@@ -275,6 +300,7 @@ public class Multimeter {
 		
 		if (meterGroup.updateIdleState()) {
 			activeMeterGroups.remove(meterGroup);
+			idleMeterGroups.add(meterGroup);
 		}
 	}
 	
@@ -467,7 +493,7 @@ public class Multimeter {
 	public void moveMeters(World world, BlockPos blockPos, Direction dir) {
 		WorldPos pos = new WorldPos(world, blockPos);
 		
-		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+		for (ServerMeterGroup meterGroup : activeMeterGroups) {
 			meterGroup.tryMoveMeter(pos, dir);
 		}
 	}
