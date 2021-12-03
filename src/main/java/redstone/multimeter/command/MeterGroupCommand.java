@@ -128,8 +128,8 @@ public class MeterGroupCommand {
 	
 	private static int clear(ServerCommandSource source) {
 		return command(source, (multimeter, meterGroup, player) -> {
-			multimeter.clearMeterGroup(player);
-			source.sendFeedback(new LiteralText(String.format("Removed all meters in meter group \'%s\'", multimeter.getSubscription(player).getName())), false);
+			multimeter.clearMeterGroup(meterGroup);
+			source.sendFeedback(new LiteralText(String.format("Removed all meters in meter group \'%s\'", meterGroup.getName())), false);
 		});
 	}
 	

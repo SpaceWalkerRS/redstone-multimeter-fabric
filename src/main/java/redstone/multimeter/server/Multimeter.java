@@ -235,11 +235,15 @@ public class Multimeter {
 		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
-			meterGroup.clear();
-			
-			ClearMeterGroupPacket packet = new ClearMeterGroupPacket();
-			server.getPacketHandler().sendToSubscribers(packet, meterGroup);
+			clearMeterGroup(meterGroup);
 		}
+	}
+	
+	public void clearMeterGroup(ServerMeterGroup meterGroup) {
+		meterGroup.clear();
+		
+		ClearMeterGroupPacket packet = new ClearMeterGroupPacket();
+		server.getPacketHandler().sendToSubscribers(packet, meterGroup);
 	}
 	
 	public void createMeterGroup(ServerPlayerEntity player, String name) {
