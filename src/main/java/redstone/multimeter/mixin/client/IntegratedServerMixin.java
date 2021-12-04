@@ -2,7 +2,6 @@ package redstone.multimeter.mixin.client;
 
 import java.io.File;
 import java.net.Proxy;
-import java.util.function.BooleanSupplier;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,7 +36,7 @@ public abstract class IntegratedServerMixin extends MinecraftServer implements I
 					target = "Lnet/minecraft/server/integrated/IntegratedServer;tasks:Ljava/util/Queue;"
 			)
 	)
-	private void onTickStart(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+	private void onTickStart(CallbackInfo ci) {
 		// When the server is paused, the tick method is not called
 		if (tasks.isEmpty()) {
 			getMultimeterServer().tickStart();
@@ -50,7 +49,7 @@ public abstract class IntegratedServerMixin extends MinecraftServer implements I
 					value = "RETURN"
 			)
 	)
-	private void onTickEnd(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+	private void onTickEnd(CallbackInfo ci) {
 		// When the server is paused, the tick method is not called
 		if (paused) {
 			getMultimeterServer().tickEnd();

@@ -102,6 +102,7 @@ public class RenderHelper2D {
 		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
 		GlStateManager.enableBlend();
 		GlStateManager.enableTexture();
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		GlStateManager.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
 		
 		Tessellator tessellator = Tessellator.getInstance();
@@ -152,6 +153,7 @@ public class RenderHelper2D {
 		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
 		GlStateManager.enableBlend();
 		GlStateManager.enableTexture();
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		GlStateManager.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
 		
 		Tessellator tessellator = Tessellator.getInstance();

@@ -53,6 +53,11 @@ public class ScreenWrapper extends Screen {
 		if (key != Keyboard.CHAR_NONE) {
 			if (Keyboard.getEventKeyState()) {
 				consumed = screen.keyPress(key);
+				
+				if (!consumed && key == Keyboard.KEY_ESCAPE) {
+					screen.close();
+					consumed = true;
+				}
 			} else {
 				consumed = screen.keyRelease(key);
 			}
