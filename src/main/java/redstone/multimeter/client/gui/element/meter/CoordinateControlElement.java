@@ -16,6 +16,7 @@ import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.element.controls.ControlElement;
 import redstone.multimeter.common.DimPos;
+import redstone.multimeter.util.AxisUtils;
 
 public class CoordinateControlElement extends ControlElement {
 	
@@ -28,7 +29,7 @@ public class CoordinateControlElement extends ControlElement {
 		int size = getHeight() / 2 - 1;
 		
 		this.increase = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("+"), () -> null, button -> {
-			int distance = Screen.method_2223() ? 10 : 1;
+			int distance = Screen.hasShiftDown() ? 10 : 1;
 			DimPos pos = getter.get();
 			DimPos newPos = pos.offset(axis, distance);
 			
@@ -37,7 +38,7 @@ public class CoordinateControlElement extends ControlElement {
 			return true;
 		});
 		this.decrease = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("-"), () -> null, button -> {
-			int distance = Screen.method_2223() ? 10 : 1;
+			int distance = Screen.hasShiftDown() ? 10 : 1;
 			DimPos pos = getter.get();
 			DimPos newPos = pos.offset(axis, -distance);
 			
@@ -75,7 +76,7 @@ public class CoordinateControlElement extends ControlElement {
 			try {
 				DimPos pos = getter.get();
 				BlockPos p = pos.getBlockPos();
-				int coord = axis.choose(p.getX(), p.getY(), p.getZ());
+				int coord = AxisUtils.choose(axis, p.getX(), p.getY(), p.getZ());
 				int newCoord = Integer.valueOf(text);
 				DimPos newPos = pos.offset(axis, newCoord - coord);
 				
@@ -86,7 +87,7 @@ public class CoordinateControlElement extends ControlElement {
 		}, () -> {
 			DimPos pos = getter.get();
 			BlockPos p = pos.getBlockPos();
-			int coord = axis.choose(p.getX(), p.getY(), p.getZ());
+			int coord = AxisUtils.choose(axis, p.getX(), p.getY(), p.getZ());
 			
 			return String.valueOf(coord);
 		});

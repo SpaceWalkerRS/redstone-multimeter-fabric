@@ -13,20 +13,17 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
-import net.minecraft.class_305;
-import net.minecraft.class_305.class_306;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.event.EventType;
-import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
 public class KeyBindings {
 	
-	private static final String FILE_NAME = "hotkeys.txt";
+	private static final String FILE_NAME = "legacy-hotkeys.txt";
 	
 	private static final Set<String> CATEGORIES = new LinkedHashSet<>();
 	private static final Map<String, KeyBinding> KEY_BINDINGS = new LinkedHashMap<>();
@@ -47,6 +44,8 @@ public class KeyBindings {
 	public static final KeyBinding PRINT_LOGS;
 	
 	public static final KeyBinding[] TOGGLE_EVENT_TYPES;
+	
+	private static final int MOUSE_BUTTON_OFFSET = 100;
 	
 	private static String registerCategory(String category) {
 		if (!CATEGORIES.add(category)) {
@@ -96,7 +95,11 @@ public class KeyBindings {
 				KeyBinding keyBinding = KEY_BINDINGS.get(name);
 				
 				if (keyBinding != null) {
-					keyBinding.method_1422(class_305.method_1440(key));
+					try {
+						keyBinding.setKeyCode(Integer.parseInt(key));
+					} catch (NumberFormatException e) {
+						
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -120,7 +123,7 @@ public class KeyBindings {
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
 			for (KeyBinding keyBinding : KEY_BINDINGS.values()) {
 				String name = keyBinding.getId();
-				String key = keyBinding.getName();
+				int key = keyBinding.getKeyCode();
 				
 				bw.write(name + "=" + key);
 				bw.newLine();
@@ -130,9 +133,22 @@ public class KeyBindings {
 		}
 	}
 	
-	public static boolean isPressed(MinecraftClient client, KeyBinding keyBinding) {
-		class_306 key = ((IKeyBinding)keyBinding).getBoundKey();
-		return key != null && GLFW.glfwGetKey(client.window.getHandle(), key.method_1444()) == GLFW.GLFW_PRESS;
+	public static boolean isBoundToButton(KeyBinding keyBinding, int button) {
+		return keyBinding.getKeyCode() + MOUSE_BUTTON_OFFSET == button;
+	}
+	
+	public static boolean isBoundToKey(KeyBinding keyBinding, int key) {
+		return keyBinding.getKeyCode() == key;
+	}
+	
+	public static boolean isPressed(KeyBinding keyBinding) {
+		int keyCode = keyBinding.getKeyCode();
+		
+		if (keyCode < 0) {
+			return Mouse.isButtonDown(keyCode + MOUSE_BUTTON_OFFSET);
+		} else {
+			return Keyboard.isKeyDown(keyCode);
+		}
 	}
 	
 	static {
@@ -140,22 +156,22 @@ public class KeyBindings {
 		MAIN        = registerCategory(RedstoneMultimeterMod.MOD_NAME);
 		EVENT_TYPES = registerCategory("Event Types");
 		
-		TOGGLE_METER           = registerKeyBinding(new KeyBinding("Toggle Meter"          , GLFW.GLFW_KEY_M       , MAIN));
-		RESET_METER            = registerKeyBinding(new KeyBinding("Reset Meter"           , GLFW.GLFW_KEY_B       , MAIN));
-		PAUSE_METERS           = registerKeyBinding(new KeyBinding("Pause Meters"          , GLFW.GLFW_KEY_N       , MAIN));
-		STEP_BACKWARD          = registerKeyBinding(new KeyBinding("Step Backward"         , GLFW.GLFW_KEY_COMMA   , MAIN));
-		STEP_FORWARD           = registerKeyBinding(new KeyBinding("Step Forward"          , GLFW.GLFW_KEY_PERIOD  , MAIN));
-		SCROLL_HUD             = registerKeyBinding(new KeyBinding("Scroll HUD"            , GLFW.GLFW_KEY_LEFT_ALT, MAIN));
-		TOGGLE_HUD             = registerKeyBinding(new KeyBinding("Toggle HUD"            , GLFW.GLFW_KEY_H       , MAIN));
-		OPEN_MULTIMETER_SCREEN = registerKeyBinding(new KeyBinding("Open Multimeter Screen", GLFW.GLFW_KEY_G       , MAIN));
-		OPEN_METER_CONTROLS    = registerKeyBinding(new KeyBinding("Open Meter Controls"   , GLFW.GLFW_KEY_I       , MAIN));
-		OPEN_OPTIONS_MENU      = registerKeyBinding(new KeyBinding("Open Options Menu"     , GLFW.GLFW_KEY_O       , MAIN));
-		PRINT_LOGS             = registerKeyBinding(new KeyBinding("Print Logs To File"    , GLFW.GLFW_KEY_P       , MAIN));
+		TOGGLE_METER           = registerKeyBinding(new KeyBinding("Toggle Meter"          , Keyboard.KEY_M     , MAIN));
+		RESET_METER            = registerKeyBinding(new KeyBinding("Reset Meter"           , Keyboard.KEY_B     , MAIN));
+		PAUSE_METERS           = registerKeyBinding(new KeyBinding("Pause Meters"          , Keyboard.KEY_N     , MAIN));
+		STEP_BACKWARD          = registerKeyBinding(new KeyBinding("Step Backward"         , Keyboard.KEY_COMMA , MAIN));
+		STEP_FORWARD           = registerKeyBinding(new KeyBinding("Step Forward"          , Keyboard.KEY_PERIOD, MAIN));
+		SCROLL_HUD             = registerKeyBinding(new KeyBinding("Scroll HUD"            , Keyboard.KEY_LMENU , MAIN));
+		TOGGLE_HUD             = registerKeyBinding(new KeyBinding("Toggle HUD"            , Keyboard.KEY_H     , MAIN));
+		OPEN_MULTIMETER_SCREEN = registerKeyBinding(new KeyBinding("Open Multimeter Screen", Keyboard.KEY_G     , MAIN));
+		OPEN_METER_CONTROLS    = registerKeyBinding(new KeyBinding("Open Meter Controls"   , Keyboard.KEY_I     , MAIN));
+		OPEN_OPTIONS_MENU      = registerKeyBinding(new KeyBinding("Open Options Menu"     , Keyboard.KEY_O     , MAIN));
+		PRINT_LOGS             = registerKeyBinding(new KeyBinding("Print Logs To File"    , Keyboard.KEY_P     , MAIN));
 		
 		TOGGLE_EVENT_TYPES = new KeyBinding[EventType.ALL.length];
 		
 		for (int index = 0; index < EventType.ALL.length; index++) {
-			TOGGLE_EVENT_TYPES[index] = registerKeyBinding(new KeyBinding(String.format("Toggle \'%s\'", EventType.fromIndex(index).getName()), GLFW.GLFW_KEY_UNKNOWN, EVENT_TYPES));
+			TOGGLE_EVENT_TYPES[index] = registerKeyBinding(new KeyBinding(String.format("Toggle \'%s\'", EventType.fromIndex(index).getName()), Keyboard.KEY_NONE, EVENT_TYPES));
 		}
 	}
 }

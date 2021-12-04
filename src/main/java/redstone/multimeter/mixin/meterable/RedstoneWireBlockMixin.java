@@ -6,9 +6,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -19,7 +18,7 @@ import redstone.multimeter.block.PowerSource;
 public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSource {
 	
 	@Inject(
-			method = "method_10481",
+			method = "method_26762",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "FIELD",
@@ -27,7 +26,7 @@ public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSou
 					target = "Lnet/minecraft/block/RedstoneWireBlock;POWER:Lnet/minecraft/state/property/IntProperty;"
 			)
 	)
-	private void onUpdateLogic(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<BlockState> cir, BlockState oldState, int oldPower, int receivedPower) {
+	private void onUpdateLogic(World world, BlockPos pos, BlockPos otherPos, BlockState state, CallbackInfoReturnable<BlockState> cir, BlockState oldState, int oldPower, int receivedPower) {
 		logPowered(world, pos, receivedPower > MIN_POWER);
 	}
 	
@@ -46,11 +45,11 @@ public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSou
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWER) > MIN_POWER;
+		return state.get(RedstoneWireBlock.POWER) > MIN_POWER;
 	}
 	
 	@Override
 	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWER);
+		return state.get(RedstoneWireBlock.POWER);
 	}
 }

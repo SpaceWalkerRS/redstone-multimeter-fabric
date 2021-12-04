@@ -2,7 +2,8 @@ package redstone.multimeter.client.gui.element;
 
 import java.util.List;
 
-import net.minecraft.class_1015;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -57,8 +58,8 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		return super.keyPress(keyCode, scanCode, modifiers) || client.getInputHandler().keyPress(this, keyCode, scanCode, modifiers);
+	public boolean keyPress(int key) {
+		return super.keyPress(key) || client.getInputHandler().keyPress(this, key);
 	}
 	
 	@Override
@@ -115,7 +116,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	protected void drawTooltip(List<Text> lines, int mouseX, int mouseY) {
-		int lineHeight = font.fontHeight;
+		int lineHeight = font.lineHeight;
 		int lineSpacing = 1;
 		
 		int width = 0;
@@ -151,8 +152,8 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		int borderColor0    = 0x505000FF;
 		int borderColor1    = 0x5028007F;
 		
-		class_1015.method_4461();
-		class_1015.method_4412(0, 0, 400);
+		GlStateManager.pushMatrix();
+		GlStateManager.translated(0, 0, 400);
 		
 		renderRect(bufferBuilder -> {
 			// background
@@ -174,10 +175,10 @@ public abstract class RSMMScreen extends AbstractParentElement {
 			Text line = lines.get(index);
 			renderText(font, line, textX, textY, true, 0xFFFFFFFF);
 			
-			textY += font.fontHeight + 1;
+			textY += font.lineHeight + 1;
 		}
 		
-		class_1015.method_4350();
+		GlStateManager.popMatrix();
 	}
 	
 	public Text getTitle() {
@@ -189,6 +190,6 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	public static boolean isControlPressed() {
-		return Screen.method_2238() && !Screen.method_2223() && !Screen.method_2232();
+		return Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
 	}
 }

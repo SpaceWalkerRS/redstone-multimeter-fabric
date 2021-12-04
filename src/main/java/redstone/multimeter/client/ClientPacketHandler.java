@@ -18,7 +18,7 @@ public class ClientPacketHandler extends AbstractPacketHandler {
 	
 	@Override
 	protected Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer) {
-		return new CustomPayloadC2SPacket(id, buffer);
+		return new CustomPayloadC2SPacket(id.toString(), buffer);
 	}
 	
 	@Override

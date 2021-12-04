@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ComparatorBlockEntity;
 
 import redstone.multimeter.interfaces.mixin.IServerWorld;
@@ -17,10 +16,6 @@ public class ComparatorBlockEntityMixin extends BlockEntity {
 	
 	@Shadow private int outputSignal;
 	
-	public ComparatorBlockEntityMixin(BlockEntityType<?> type) {
-		super(type);
-	}
-	
 	@Inject(
 			method = "setOutputSignal",
 			at = @At(
@@ -28,7 +23,7 @@ public class ComparatorBlockEntityMixin extends BlockEntity {
 			)
 	)
 	public void onPowerChange(int newPower, CallbackInfo ci) {
-		if (!world.isClient()) {
+		if (!world.isClient) {
 			((IServerWorld)world).getMultimeter().logPowerChange(world, pos, outputSignal, newPower);
 		}
 	}

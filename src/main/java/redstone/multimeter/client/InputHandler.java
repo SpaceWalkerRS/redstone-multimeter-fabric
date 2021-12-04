@@ -46,10 +46,10 @@ public class InputHandler {
 			client.getHUD().pause();
 		}
 		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
-			client.getHUD().stepBackward(Screen.method_2238() ? 10 : 1);
+			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 		}
 		while (KeyBindings.STEP_FORWARD.wasPressed()) {
-			client.getHUD().stepForward(Screen.method_2238() ? 10 : 1);
+			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 		}
 		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
@@ -83,7 +83,7 @@ public class InputHandler {
 	// Methods for handling keybindings while the client has a screen open
 	
 	public boolean mouseClick(RSMMScreen screen, double mouseX, double mouseY, int button) {
-		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
+		if (KeyBindings.isBoundToButton(KeyBindings.OPEN_MULTIMETER_SCREEN, button)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
@@ -94,7 +94,7 @@ public class InputHandler {
 				}
 			}
 		} else
-		if (KeyBindings.OPEN_OPTIONS_MENU.matchesMouse(button)) {
+		if (KeyBindings.isBoundToButton(KeyBindings.OPEN_OPTIONS_MENU, button)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
@@ -102,14 +102,14 @@ public class InputHandler {
 			}
 		} else
 		if (screen instanceof MultimeterScreen) {
-			if (KeyBindings.PAUSE_METERS.matchesMouse(button)) {
+			if (KeyBindings.isBoundToButton(KeyBindings.PAUSE_METERS, button)) {
 				client.getHUD().pause();
 			} else
-			if (KeyBindings.STEP_BACKWARD.matchesMouse(button)) {
-				client.getHUD().stepBackward(Screen.method_2238() ? 10 : 1);
+			if (KeyBindings.isBoundToButton(KeyBindings.STEP_BACKWARD, button)) {
+				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 			} else
-			if (KeyBindings.STEP_FORWARD.matchesMouse(button)) {
-				client.getHUD().stepForward(Screen.method_2238() ? 10 : 1);
+			if (KeyBindings.isBoundToButton(KeyBindings.STEP_FORWARD, button)) {
+				client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 			} else {
 				return false;
 			}
@@ -120,8 +120,8 @@ public class InputHandler {
 		return true;
 	}
 	
-	public boolean keyPress(RSMMScreen screen, int keyCode, int scanCode, int modifiers) {
-		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
+	public boolean keyPress(RSMMScreen screen, int key) {
+		if (KeyBindings.isBoundToKey(KeyBindings.OPEN_MULTIMETER_SCREEN, key)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
@@ -132,7 +132,7 @@ public class InputHandler {
 				}
 			}
 		} else
-		if (KeyBindings.OPEN_OPTIONS_MENU.matchesKey(keyCode, scanCode)) {
+		if (KeyBindings.isBoundToKey(KeyBindings.OPEN_OPTIONS_MENU, key)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
@@ -140,14 +140,14 @@ public class InputHandler {
 			}
 		} else
 		if (screen instanceof MultimeterScreen) {
-			if (KeyBindings.PAUSE_METERS.matchesKey(keyCode, scanCode)) {
+			if (KeyBindings.isBoundToKey(KeyBindings.PAUSE_METERS, key)) {
 				client.getHUD().pause();
 			} else
-			if (KeyBindings.STEP_BACKWARD.matchesKey(keyCode, scanCode)) {
-				client.getHUD().stepBackward(Screen.method_2238() ? 10 : 1);
+			if (KeyBindings.isBoundToKey(KeyBindings.STEP_BACKWARD, key)) {
+				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 			} else
-			if (KeyBindings.STEP_FORWARD.matchesKey(keyCode, scanCode)) {
-				client.getHUD().stepForward(Screen.method_2238() ? 10 : 1);
+			if (KeyBindings.isBoundToKey(KeyBindings.STEP_FORWARD, key)) {
+				client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 			} else {
 				return false;
 			}
@@ -160,7 +160,7 @@ public class InputHandler {
 	
 	public boolean mouseScroll(RSMMScreen screen, double scrollX, double scrollY) {
 		if (screen instanceof MultimeterScreen) {
-			if (isPressed(KeyBindings.SCROLL_HUD)) {
+			if (KeyBindings.isPressed(KeyBindings.SCROLL_HUD)) {
 				client.getHUD().stepBackward((int)Math.round(scrollY));
 			} else {
 				return false;
@@ -170,9 +170,5 @@ public class InputHandler {
 		}
 		
 		return true;
-	}
-	
-	private boolean isPressed(KeyBinding keyBinding) {
-		return KeyBindings.isPressed(client.getMinecraftClient(), keyBinding);
 	}
 }

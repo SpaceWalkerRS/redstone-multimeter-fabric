@@ -25,7 +25,7 @@ public class InGameHudMixin {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.AFTER,
-					target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay()V"
+					target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectIcons(Lnet/minecraft/client/util/Window;)V"
 			)
 	)
 	private void renderHUD(float tickDelta, CallbackInfo ci) {

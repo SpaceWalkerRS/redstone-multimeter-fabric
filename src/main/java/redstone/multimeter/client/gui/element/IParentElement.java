@@ -86,21 +86,21 @@ public interface IParentElement extends IElement {
 	}
 	
 	@Override
-	default boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	default boolean keyPress(int key) {
 		IElement focused = getFocusedElement();
-		return focused != null && focused.keyPress(keyCode, scanCode, modifiers);
+		return focused != null && focused.keyPress(key);
 	}
 	
 	@Override
-	default boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	default boolean keyRelease(int key) {
 		IElement focused = getFocusedElement();
-		return focused != null && focused.keyRelease(keyCode, scanCode, modifiers);
+		return focused != null && focused.keyRelease(key);
 	}
 	
 	@Override
-	default boolean typeChar(char chr, int modifiers) {
+	default boolean typeChar(char chr) {
 		IElement focused = getFocusedElement();
-		return focused != null && focused.typeChar(chr, modifiers);
+		return focused != null && focused.typeChar(chr);
 	}
 	
 	@Override

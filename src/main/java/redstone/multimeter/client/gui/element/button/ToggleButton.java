@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -15,7 +16,7 @@ public class ToggleButton extends Button {
 			Boolean value = getter.get();
 			Formatting color = value ? Formatting.GREEN : Formatting.RED;
 			
-			return new LiteralText(value.toString()).formatted(color);
+			return new LiteralText(value.toString()).setStyle(new Style().setColor(color));
 		}, () -> null, button -> { toggle.accept(button); return true; });
 	}
 }

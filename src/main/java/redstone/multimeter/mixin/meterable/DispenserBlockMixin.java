@@ -7,10 +7,9 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.DispenserBlock;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -45,6 +44,6 @@ public abstract class DispenserBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.TRIGGERED);
+		return state.get(DispenserBlock.TRIGGERED);
 	}
 }

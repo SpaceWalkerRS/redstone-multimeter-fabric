@@ -1,10 +1,8 @@
 package redstone.multimeter.client.gui.element;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.screen.Screen;
-
-import redstone.multimeter.client.gui.CursorType;
 
 public class ScreenWrapper extends Screen {
 	
@@ -19,62 +17,57 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public void method_2214(int mouseX, int mouseY, float delta) {
+	public void render(int mouseX, int mouseY, float delta) {
 		screen.render(mouseX, mouseY);
 	}
 	
 	@Override
-	public final boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return screen.mouseClick(mouseX, mouseY, button);
-	}
-	
-	@Override
-	public final boolean mouseReleased(double mouseX, double mouseY, int button) {
-		return screen.mouseRelease(mouseX, mouseY, button);
-	}
-	
-	@Override
-	public final boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		return screen.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
-	}
-	
-	@Override
-	public final boolean mouseScrolled(double amount) {
-		return false; // scrolling is handled in MouseMixin and InputHandler
-	}
-	
-	@Override
-	public final boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (screen.keyPress(keyCode, scanCode, modifiers)) {
-			return true;
+	protected void mouseClicked(int mouseX, int mouseY, int button) {
+		System.out.println("check scroll");
+		if (button == IElement.MOUSE_SCROLL_UP) {
+			screen.mouseScroll(mouseX, mouseY, 0, -5);
+		} else if (button == IElement.MOUSE_SCROLL_DOWN) {
+			screen.mouseScroll(mouseX, mouseY, 0, 5);
+		} else {
+			screen.mouseClick(mouseX, mouseY, button);
 		}
-		if (screen.shouldCloseOnEsc() && keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			screen.close();
-			return true;
+	}
+	
+	@Override
+	protected void mouseReleased(int mouseX, int mouseY, int button) {
+		screen.mouseRelease(mouseX, mouseY, button);
+	}
+	
+	@Override
+	protected void mouseDragged(int mouseX, int mouseY, int button, long duration) {
+		screen.mouseDrag(mouseX, mouseY, button, 0, 0);
+	}
+	
+	@Override
+	public void handleKeyboardEvents() {
+		char chr = Keyboard.getEventCharacter();
+		int key = Keyboard.getEventKey();
+		
+		boolean consumed = false;
+		
+		if (key != Keyboard.CHAR_NONE) {
+			if (Keyboard.getEventKeyState()) {
+				consumed = screen.keyPress(key);
+			} else {
+				consumed = screen.keyRelease(key);
+			}
+		}
+		if (!consumed && chr >= ' ') {
+			screen.typeChar(chr);
 		}
 		
-		return false;
+		client.handleKeyboardEvents();
 	}
 	
 	@Override
-	public final boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-		return screen.keyRelease(keyCode, scanCode, modifiers);
-	}
-	
-	@Override
-	public final boolean charTyped(char chr, int modifiers) {
-		return screen.typeChar(chr, modifiers);
-	}
-	
-	@Override
-	public boolean method_15913() {
-		return screen.shouldCloseOnEsc();
-	}
-	
-	@Override
-	protected final void method_2224() {
-		screen.setWidth(field_2561);
-		screen.setHeight(field_2559);
+	public final void init() {
+		screen.setWidth(width);
+		screen.setHeight(height);
 		
 		screen.removeChildren();
 		screen.initScreen();
@@ -82,14 +75,13 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public void method_2225() {
+	public void tick() {
 		screen.tick();
 	}
 	
 	@Override
-	public void method_2234() {
+	public void removed() {
 		screen.onRemoved();
-		screen.setCursor(field_2563, CursorType.ARROW);
 	}
 	
 	public Screen getParent() {

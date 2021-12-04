@@ -6,9 +6,10 @@ import java.util.function.Function;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -173,7 +174,7 @@ public class MultimeterClient {
 			connected = true;
 			
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
+				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).setStyle(new Style().setColor(Formatting.RED));
 				sendMessage(warning, false);
 			}
 			
@@ -285,11 +286,11 @@ public class MultimeterClient {
 	}
 	
 	private void onTargetBlock(Consumer<DimPos> consumer) {
-		HitResult hitResult = client.crosshairTarget;
+		BlockHitResult hitResult = client.crosshairTarget;
 		
-		if (hitResult.field_1330 == HitResult.Type.BLOCK) {
+		if (hitResult.type == BlockHitResult.Type.BLOCK) {
 			World world = client.world;
-			BlockPos blockPos = hitResult.method_1015();
+			BlockPos blockPos = hitResult.getBlockPos();
 			
 			consumer.accept(new DimPos(world, blockPos));
 		}
@@ -336,6 +337,6 @@ public class MultimeterClient {
 	}
 	
 	public void sendMessage(Text message, boolean actionBar) {
-		client.player.addChatMessage(message, actionBar);
+		client.player.sendMessage(message, actionBar);
 	}
 }

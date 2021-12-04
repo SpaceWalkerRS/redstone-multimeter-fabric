@@ -142,7 +142,7 @@ public class MeterLogs {
 			ListTag logs = toNbt(type);
 			
 			if (!logs.isEmpty()) {
-				nbt.method_10566(type.getName(), logs);
+				nbt.put(type.getName(), logs);
 			}
 		}
 		

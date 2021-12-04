@@ -28,7 +28,7 @@ public class HudSettings {
 		TextRenderer font = minecraftClient.textRenderer;
 		
 		this.columnWidth = 3;
-		this.rowHeight = font.fontHeight;
+		this.rowHeight = font.lineHeight;
 		this.gridSize = 1;
 		
 		this.colorBackground = 0x202020;

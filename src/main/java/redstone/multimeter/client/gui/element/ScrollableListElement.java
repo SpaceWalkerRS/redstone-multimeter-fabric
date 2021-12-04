@@ -1,7 +1,5 @@
 package redstone.multimeter.client.gui.element;
 
-import org.lwjgl.glfw.GLFW;
-
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;
 
@@ -57,7 +55,7 @@ public class ScrollableListElement extends SimpleListElement {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (!consumed && button == MOUSE_BUTTON_LEFT) {
 			scrollMode = getScrollMode(mouseX, mouseY);
 			
 			if (scrollMode != ScrollMode.NONE) {
@@ -72,7 +70,7 @@ public class ScrollableListElement extends SimpleListElement {
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 		
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (button == MOUSE_BUTTON_LEFT) {
 			scrollMode = ScrollMode.NONE;
 		}
 		

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import net.minecraft.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -117,7 +117,7 @@ public class MultimeterServer {
 	}
 	
 	public long getCurrentTick() {
-		long tick = server.getWorld(DimensionType.OVERWORLD).getTime();
+		long tick = server.getEntityWorld().getTime();
 		
 		if (!tickedTime) {
 			tick++;
@@ -192,7 +192,7 @@ public class MultimeterServer {
 	public void onPlayerLeave(ServerPlayerEntity player) {
 		multimeter.onPlayerLeave(player);
 		connectedPlayers.remove(player.getUuid());
-		playerNameCache.put(player.getUuid(), player.getEntityName());
+		playerNameCache.put(player.getUuid(), player.getName());
 	}
 	
 	public void onHandshake(ServerPlayerEntity player, String modVersion) {
@@ -203,8 +203,8 @@ public class MultimeterServer {
 	}
 	
 	public ServerWorld getWorld(Identifier dimensionId) {
-		DimensionType type = DimensionType.byId(dimensionId);
-		return server.getWorld(type);
+		DimensionType type = DimensionType.method_27530(dimensionId.getPath());
+		return server.getWorldById(type.getRawId());
 	}
 	
 	public ServerWorld getWorldOf(DimPos pos) {
@@ -227,7 +227,7 @@ public class MultimeterServer {
 	
 	public String getPlayerName(UUID playerUUID) {
 		ServerPlayerEntity player = getPlayer(playerUUID);
-		return player == null ? playerNameCache.get(playerUUID) : player.getEntityName();
+		return player == null ? playerNameCache.get(playerUUID) : player.getName();
 	}
 	
 	public ServerPlayerEntity getPlayer(String playerName) {
@@ -257,6 +257,6 @@ public class MultimeterServer {
 	}
 	
 	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
-		player.addChatMessage(message, actionBar);
+		player.sendMessage(message, actionBar);
 	}
 }

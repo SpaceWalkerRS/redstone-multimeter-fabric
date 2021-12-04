@@ -27,7 +27,7 @@ public class MeterGroupRefreshPacket implements RSMMPacket {
 	@Override
 	public void encode(CompoundTag data) {
 		data.putString("name", name);
-		data.method_10566("data", meterGroupData);
+		data.put("data", meterGroupData);
 	}
 	
 	@Override

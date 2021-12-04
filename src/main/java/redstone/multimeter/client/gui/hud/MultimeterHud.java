@@ -3,13 +3,14 @@ package redstone.multimeter.client.gui.hud;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.class_1015;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.Window;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Formatting;
+import net.minecraft.text.Style;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
@@ -71,8 +72,8 @@ public class MultimeterHud extends AbstractParentElement {
 			return;
 		}
 		
-		class_1015.method_4461();
-		class_1015.method_4412(0, 0, 100);
+		GlStateManager.pushMatrix();
+		GlStateManager.translated(0, 0, 100);
 		
 		List<IElement> children = getChildren();
 		
@@ -84,7 +85,7 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}
 		
-		class_1015.method_4350();
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
@@ -270,8 +271,8 @@ public class MultimeterHud extends AbstractParentElement {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.method_2238())), () -> null, button -> {
-			stepBackward(Screen.method_2238() ? 10 : 1);
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> null, button -> {
+			stepBackward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
 			
@@ -280,8 +281,8 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.method_2238())), () -> null, button -> {
-			stepForward(Screen.method_2238() ? 10 : 1);
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> null, button -> {
+			stepForward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
 			
@@ -290,7 +291,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").formatted(Formatting.BOLD)).setWithShadow(true));
+		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").setStyle(new Style().setBold(true))).setWithShadow(true));
 		
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);
@@ -463,10 +464,9 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 	
 	public void resetSize() {
-		MinecraftClient minecraftClient = client.getMinecraftClient();
-		Window window = minecraftClient.window;
-		int width = window.getScaledWidth();
-		int height = window.getScaledHeight();
+		Window window = new Window(client.getMinecraftClient());
+		int width = window.getWidth();
+		int height = window.getHeight();
 		
 		resize(width, height);
 	}

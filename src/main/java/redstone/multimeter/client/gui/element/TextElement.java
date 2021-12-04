@@ -68,7 +68,7 @@ public class TextElement extends AbstractElement {
 			textX = rightAligned ? right - getWidth(font, t) : left;
 			renderText(font, t, textX, textY, withShadow, color);
 			
-			textY += font.fontHeight + SPACING;
+			textY += font.lineHeight + SPACING;
 		}
 	}
 	
@@ -100,17 +100,17 @@ public class TextElement extends AbstractElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(int key) {
 		return false;
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(int key) {
 		return false;
 	}
 	
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		return false;
 	}
 	
@@ -182,6 +182,6 @@ public class TextElement extends AbstractElement {
 	}
 	
 	protected void updateHeight() {
-		setHeight((text.size() - 1) * (font.fontHeight + SPACING) + font.fontHeight);
+		setHeight((text.size() - 1) * (font.lineHeight + SPACING) + font.lineHeight);
 	}
 }

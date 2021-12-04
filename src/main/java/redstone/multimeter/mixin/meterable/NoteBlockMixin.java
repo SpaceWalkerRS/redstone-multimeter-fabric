@@ -7,10 +7,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.NoteBlock;
-import net.minecraft.state.property.Properties;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.NoteBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -23,10 +24,9 @@ public abstract class NoteBlockMixin implements MeterableBlock {
 			method = "neighborUpdate",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
-					value = "FIELD",
-					ordinal = 0,
+					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/NoteBlock;POWERED:Lnet/minecraft/state/property/BooleanProperty;"
+					target = "Lnet/minecraft/world/World;getBlockEntity(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/entity/BlockEntity;"
 			)
 	)
 	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, CallbackInfo ci, boolean powered) {
@@ -40,6 +40,12 @@ public abstract class NoteBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED);
+		BlockEntity blockEntity = world.getBlockEntity(pos);
+		
+		if (blockEntity instanceof NoteBlockEntity) {
+			return ((NoteBlockEntity)blockEntity).powered;
+		}
+		
+		return false;
 	}
 }

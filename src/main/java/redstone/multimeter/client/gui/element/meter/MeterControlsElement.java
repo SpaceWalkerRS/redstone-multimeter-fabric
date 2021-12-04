@@ -1,12 +1,13 @@
 package redstone.multimeter.client.gui.element.meter;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
 
-import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction.Axis;
@@ -50,21 +51,21 @@ public class MeterControlsElement extends AbstractParentElement {
 		
 		this.client = client;
 		
-		this.title = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).formatted(Formatting.UNDERLINE)).setWithShadow(true));
+		this.title = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).setStyle(new Style().setUnderline(true))).setWithShadow(true));
 		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Arrays.asList(new LiteralText(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide"))), button -> {
 			this.client.getMeterGroup().toggleHidden(meter);
 			return true;
 		});
-		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Arrays.asList(new LiteralText("Delete Meter")), button -> {
+		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").setStyle(new Style().setColor(triedDeleting ? Formatting.RED : Formatting.WHITE)), () -> Arrays.asList(new LiteralText("Delete Meter")), button -> {
 			tryDelete();
 			
-			if (triedDeleting && Screen.method_2223()) {
+			if (triedDeleting && Screen.hasShiftDown()) {
 				tryDelete(); // delete without asking for confirmation first
 			}
 			
 			return true;
 		});
-		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").formatted(Formatting.ITALIC)).setWithShadow(true));
+		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").setStyle(new Style().setItalic(true))).setWithShadow(true));
 		this.controls = new SimpleListElement(this.client, getWidth());
 		
 		this.deleteConfirm.setVisible(false);
@@ -89,10 +90,10 @@ public class MeterControlsElement extends AbstractParentElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = super.keyPress(keyCode, scanCode, modifiers);
+	public boolean keyPress(int key) {
+		boolean consumed = super.keyPress(key);
 		
-		if (triedDeleting && keyCode == GLFW.GLFW_KEY_ESCAPE) {
+		if (triedDeleting && key == Keyboard.KEY_ESCAPE) {
 			undoTryDelete();
 			consumed = true;
 		}
@@ -158,7 +159,7 @@ public class MeterControlsElement extends AbstractParentElement {
 				
 			}
 		}, () -> ColorUtils.toRGBString(meter.getColor()).toUpperCase()));
-		builder.addControl("Color", () -> new LiteralText("red").formatted(Formatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		builder.addControl("Color", () -> new LiteralText("red").setStyle(new Style().setColor(Formatting.RED)), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int color = meter.getColor();
 			int red = ColorUtils.getRed(color);
 			
@@ -174,7 +175,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			
 			return (double)red / 0xFF;
 		}, 0xFF));
-		builder.addControl("Color", () -> new LiteralText("green").formatted(Formatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		builder.addControl("Color", () -> new LiteralText("green").setStyle(new Style().setColor(Formatting.GREEN)), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int color = meter.getColor();
 			int green = ColorUtils.getGreen(color);
 			
@@ -190,7 +191,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			
 			return (double)green / 0xFF;
 		}, 0xFF));
-		builder.addControl("Color", () -> new LiteralText("blue").formatted(Formatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		builder.addControl("Color", () -> new LiteralText("blue").setStyle(new Style().setColor(Formatting.BLUE)), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int color = meter.getColor();
 			int blue = ColorUtils.getBlue(color);
 			

@@ -118,11 +118,12 @@ public class TickPhase {
 			return UNKNOWN;
 		}
 		
-		ByteArrayTag array = (ByteArrayTag)nbt;
-		TickTask[] tasks = new TickTask[array.size()];
+		ByteArrayTag arrayNbt = (ByteArrayTag)nbt;
+		byte[] byteArray = arrayNbt.getByteArray();
+		TickTask[] tasks = new TickTask[byteArray.length];
 		
 		for (int index = 0; index < tasks.length; index++) {
-			int taskIndex = array.get(index).getByte();
+			int taskIndex = byteArray[index];
 			tasks[index] = TickTask.fromIndex(taskIndex);
 		}
 		

@@ -51,7 +51,7 @@ public class MeterEvent {
 	public CompoundTag toNbt() {
 		CompoundTag nbt = new CompoundTag();
 		
-		nbt.method_10566("type", type.toNbt());
+		nbt.put("type", type.toNbt());
 		nbt.putInt("metadata", metadata);
 		
 		return nbt;

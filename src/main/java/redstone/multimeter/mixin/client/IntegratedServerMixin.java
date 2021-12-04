@@ -13,10 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-import com.mojang.datafixers.DataFixer;
 
+import net.minecraft.datafixer.DataFixer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.UserCache;
 
@@ -25,22 +24,22 @@ import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 @Mixin(IntegratedServer.class)
 public abstract class IntegratedServerMixin extends MinecraftServer implements IMinecraftServer {
 	
-	@Shadow private boolean field_5524;
+	@Shadow private boolean paused;
 	
-	public IntegratedServerMixin(File file, Proxy proxy, DataFixer dataFixer, CommandManager commandManager, YggdrasilAuthenticationService yggdrasilAuthenticationService, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache userCache) {
-		super(file, proxy, dataFixer, commandManager, yggdrasilAuthenticationService, minecraftSessionService, gameProfileRepository, userCache);
+	public IntegratedServerMixin(File gameDir, Proxy proxy, DataFixer dataFixer, YggdrasilAuthenticationService authService, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepository, UserCache userCache) {
+		super(gameDir, proxy, dataFixer, authService, sessionService, gameProfileRepository, userCache);
 	}
 	
 	@Inject(
 			method = "tick",
 			at = @At(
 					value = "FIELD",
-					target = "Lnet/minecraft/server/integrated/IntegratedServer;field_77592:Ljava/util/Queue;"
+					target = "Lnet/minecraft/server/integrated/IntegratedServer;tasks:Ljava/util/Queue;"
 			)
 	)
 	private void onTickStart(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
 		// When the server is paused, the tick method is not called
-		if (field_77592.isEmpty()) {
+		if (tasks.isEmpty()) {
 			getMultimeterServer().tickStart();
 		}
 	}
@@ -53,13 +52,13 @@ public abstract class IntegratedServerMixin extends MinecraftServer implements I
 	)
 	private void onTickEnd(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
 		// When the server is paused, the tick method is not called
-		if (field_5524) {
+		if (paused) {
 			getMultimeterServer().tickEnd();
 		}
 	}
 	
 	@Override
 	public boolean isPaused() {
-		return field_5524;
+		return paused;
 	}
 }

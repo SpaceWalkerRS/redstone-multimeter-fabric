@@ -2,11 +2,8 @@ package redstone.multimeter.client.gui.hud.element;
 
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
-
 import net.minecraft.text.Text;
 
-import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -19,23 +16,6 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	
 	public PrimaryEventViewer(MultimeterHud hud) {
 		super(hud);
-	}
-	
-	@Override
-	public void mouseMove(double mouseX, double mouseY) {
-		if (!isDraggingMouse()) {
-			CursorType cursor = CursorType.ARROW;
-			
-			if (isHovered(mouseX, mouseY)) {
-				if (isBorderHovered(mouseX)) {
-					cursor = CursorType.HRESIZE;
-				} else if (hud.isPaused()) {
-					cursor = CursorType.HAND;
-				}
-			}
-			
-			setCursor(hud.client.getMinecraftClient(), cursor);
-		}
 	}
 	
 	@Override
@@ -53,7 +33,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				
 				consumed = true;
 			}
-			if (hud.isPaused() && button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+			if (hud.isPaused() && button == MOUSE_BUTTON_RIGHT) {
 				int column = getHoveredColumn(mouseX);
 				int max = getColumnCount() - 1;
 				
@@ -73,7 +53,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (button == MOUSE_BUTTON_LEFT) {
 			dx = 0.0D;
 			resizing = false;
 		}

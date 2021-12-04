@@ -1,16 +1,14 @@
 package redstone.multimeter.server;
 
-import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import net.minecraft.BlockState;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,13 +17,13 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
@@ -45,7 +43,6 @@ import redstone.multimeter.server.meter.event.MeterEventPredicate;
 import redstone.multimeter.server.meter.event.MeterEventSupplier;
 import redstone.multimeter.server.option.Options;
 import redstone.multimeter.server.option.OptionsManager;
-import redstone.multimeter.util.TextUtils;
 
 public class Multimeter {
 	
@@ -268,7 +265,6 @@ public class Multimeter {
 		}
 		
 		server.getPacketHandler().sendToPlayer(packet, player);
-		server.getMinecraftServer().getPlayerManager().sendCommandTree(player);
 	}
 	
 	public void clearMembersOfMeterGroup(ServerMeterGroup meterGroup) {
@@ -292,12 +288,11 @@ public class Multimeter {
 		
 		Text message = new LiteralText("").
 			append(new LiteralText(String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()))).
-			append(new LiteralText("[here]").styled(style -> {
-				style.
-					setColor(Formatting.GREEN).
-					setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName())))).
-					setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
-			})).
+			append(new LiteralText("[here]").setStyle(new Style().
+				setColor(Formatting.GREEN).
+				setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName())))).
+				setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())))
+			)).
 			append(new LiteralText(" to subscribe to it."));
 		server.sendMessage(player, message, false);
 	}
@@ -352,55 +347,17 @@ public class Multimeter {
 				ServerWorld newWorld = server.getWorldOf(pos);
 				
 				if (newWorld != null) {
-					ServerWorld oldWorld = player.getServerWorld();
-					double oldX = player.x;
-					double oldY = player.y;
-					double oldZ = player.z;
-					
 					BlockPos blockPos = pos.getBlockPos();
 					
 					double newX = blockPos.getX() + 0.5D;
 					double newY = blockPos.getY();
 					double newZ = blockPos.getZ() + 0.5D;
-					float yaw = player.yaw;
-					float pitch = player.pitch;
 					
-					player.teleport(newWorld, newX, newY, newZ, yaw, pitch);
-					sendClickableReturnMessage(oldWorld, oldX, oldY, oldZ, yaw, pitch, player);
+					player.changeDimension(newWorld.dimension.getType().getRawId());
+					player.teleport(newX, newY, newZ);
 				}
 			}
 		}
-	}
-	
-	/**
-	 * Send the player a message they can click to return
-	 * to the location they were at before teleporting to
-	 * a meter.
-	 */
-	private void sendClickableReturnMessage(ServerWorld world, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayerEntity player) {
-		NumberFormat f = NumberFormat.getNumberInstance(Locale.US); // use . as decimal separator
-		
-		String dimensionId = DimensionType.getId(world.dimension.getType()).toString();
-		String x = f.format(_x);
-		String y = f.format(_y);
-		String z = f.format(_z);
-		String yaw = f.format(_yaw);
-		String pitch = f.format(_pitch);
-		
-		Text message = new LiteralText("Click ").
-			append(new LiteralText("[here]").styled((style) -> {
-				style.
-					setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Teleport to").
-						append(TextUtils.formatFancyText("\n  dimension", dimensionId)).
-						append(TextUtils.formatFancyText("\n  x", x)).
-						append(TextUtils.formatFancyText("\n  y", y)).
-						append(TextUtils.formatFancyText("\n  z", z)))).
-					setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/execute in %s run tp @s %s %s %s %s %s", dimensionId, x, y, z, yaw, pitch))).
-					setColor(Formatting.GREEN);
-			})).
-			append(new LiteralText(" to return to your previous location"));
-		
-		server.sendMessage(player, message, false);
 	}
 	
 	public void onBlockChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
@@ -478,8 +435,8 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.RANDOM_TICK, 0);
 	}
 	
-	public void logScheduledTick(World world, ScheduledTick<?> scheduledTick) {
-		tryLogEvent(world, scheduledTick.pos, EventType.SCHEDULED_TICK, scheduledTick.priority.getIndex());
+	public void logScheduledTick(World world, ScheduledTick scheduledTick) {
+		tryLogEvent(world, scheduledTick.pos, EventType.SCHEDULED_TICK, scheduledTick.priority);
 	}
 	
 	public void logBlockEvent(World world, BlockAction blockEvent) {

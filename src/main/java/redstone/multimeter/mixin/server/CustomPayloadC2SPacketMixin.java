@@ -12,12 +12,12 @@ import redstone.multimeter.interfaces.mixin.ICustomPayloadC2SPacket;
 @Mixin(CustomPayloadC2SPacket.class)
 public class CustomPayloadC2SPacketMixin implements ICustomPayloadC2SPacket {
 	
-	@Shadow private Identifier channel;
+	@Shadow private String field_31341;
 	@Shadow private PacketByteBuf data;
 	
 	@Override
 	public Identifier getPacketChannelRSMM() {
-		return channel;
+		return new Identifier(field_31341);
 	}
 	
 	@Override

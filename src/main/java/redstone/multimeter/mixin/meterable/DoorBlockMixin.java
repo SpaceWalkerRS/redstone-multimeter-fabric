@@ -7,11 +7,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
-import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.state.property.Properties;
+import net.minecraft.block.DoorBlock.DoubleBlockHalf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -48,11 +47,11 @@ public abstract class DoorBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.OPEN);
+		return state.get(DoorBlock.OPEN);
 	}
 	
 	private BlockPos getOtherHalf(BlockPos pos, BlockState state) {
-		DoubleBlockHalf half = state.get(Properties.DOUBLE_BLOCK_HALF);
+		DoubleBlockHalf half = state.get(DoorBlock.HALF);
 		Direction dir = (half == DoubleBlockHalf.LOWER) ? Direction.UP : Direction.DOWN;
 		
 		return pos.offset(dir);

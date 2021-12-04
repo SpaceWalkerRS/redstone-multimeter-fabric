@@ -1,7 +1,6 @@
 package redstone.multimeter.mixin.server;
 
 import java.util.Iterator;
-import java.util.function.BooleanSupplier;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -11,8 +10,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +28,7 @@ import redstone.multimeter.server.MultimeterServer;
 @Mixin(World.class)
 public abstract class WorldMixin implements IWorld {
 	
-	@Shadow protected abstract boolean isClient();
+	@Shadow private boolean isClient;
 	
 	@Inject(
 			method = "updateNeighbor",
@@ -37,11 +36,11 @@ public abstract class WorldMixin implements IWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/BlockState;method_73267(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/BlockState;neighbourUpdate(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
 	private void onBlockUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
-		if (isClient()) {
+		if (isClient) {
 			return;
 		}
 		
@@ -59,7 +58,22 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "onBlockChanged",
+			locals = LocalCapture.CAPTURE_FAILHARD,
+			at = @At(
+					value = "INVOKE",
+					shift = Shift.BEFORE,
+					target = "Lnet/minecraft/block/ObserverBlock;method_26711(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+			)
+	)
+	private void onObserverUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
+		if (!isClient) {
+			((IServerWorld)this).getMultimeter().logObserverUpdate((World)(Object)this, pos);
+		}
+	}
+	
+	@Inject(
+			method = "tickEntities",
 			at = @At(
 					value = "HEAD"
 			)
@@ -69,10 +83,10 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15396(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
 					args = "ldc=global"
 			)
 	)
@@ -81,7 +95,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
@@ -90,16 +104,16 @@ public abstract class WorldMixin implements IWorld {
 			)
 	)
 	private void onGlobalEntityTick(CallbackInfo ci, int index, Entity entity) {
-		if (!isClient()) {
+		if (!isClient) {
 			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
 		}
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 					args = "ldc=regular"
 			)
 	)
@@ -108,10 +122,10 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 					args = "ldc=blockEntities"
 			)
 	)
@@ -120,22 +134,22 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/util/Tickable;method_12953()V"
+					target = "Lnet/minecraft/util/Tickable;tick()V"
 			)
 	)
 	private void onBlockEntityTick(CallbackInfo ci, Iterator<BlockEntity> it, BlockEntity blockEntity) {
-		if (!isClient()) {
+		if (!isClient) {
 			((IServerWorld)this).getMultimeter().logBlockEntityTick((World)(Object)this, blockEntity);
 		}
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			at = @At(
 					value = "HEAD"
 			)
@@ -146,7 +160,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8553",
+			method = "method_26050",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
@@ -154,40 +168,28 @@ public abstract class WorldMixin implements IWorld {
 			)
 	)
 	private void onEntityTick(Entity entity, boolean bl, CallbackInfo ci) {
-		if (!isClient()) {
+		if (!isClient) {
 			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
 		}
 	}
 	
 	@Inject(
-			method = "method_8441",
+			method = "method_26148",
 			at = @At(
 					value = "HEAD"
 			)
 	)
-	private void startTickTaskWorldBorder(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		startTickTask(TickTask.WORLD_BORDER);
+	private void startTickTaskWeather(CallbackInfo ci) {
+		startTickTask(TickTask.WEATHER);
 	}
 	
 	@Inject(
-			method = "method_8441",
-			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/world/World;method_8511()V"
-			)
-	)
-	private void swapTickTaskWeather(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		swapTickTask(TickTask.WEATHER);
-	}
-	
-	@Inject(
-			method = "method_8441",
+			method = "method_26148",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void endTickTaskWeather(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+	private void endTickTaskWeather(CallbackInfo ci) {
 		endTickTask();
 	}
 	
@@ -197,11 +199,11 @@ public abstract class WorldMixin implements IWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/BlockState;method_73267(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/BlockState;neighbourUpdate(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
 	private void onComparatorUpdate(BlockPos fromPos, Block fromBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {
-		if (!isClient()) {
+		if (!isClient) {
 			((IServerWorld)this).getMultimeter().logComparatorUpdate((World)(Object)this, pos);
 		}
 	}

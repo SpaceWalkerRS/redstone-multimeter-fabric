@@ -22,7 +22,7 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 
 	@Override
 	protected Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer) {
-		return new CustomPayloadS2CPacket(id, buffer);
+		return new CustomPayloadS2CPacket(id.toString(), buffer);
 	}
 	
 	@Override

@@ -2,8 +2,10 @@ package redstone.multimeter.client.gui.hud.element;
 
 import java.util.List;
 
-import net.minecraft.class_1015;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -25,13 +27,13 @@ public class MeterListRenderer extends AbstractElement {
 	
 	@Override
 	public void render(int mouseX, int mouseY) {
-		class_1015.method_4461();
+		GlStateManager.pushMatrix();
 		drawHighlights(mouseX, mouseY);
-		class_1015.method_4412(0, 0, -1);
+		GlStateManager.translated(0, 0, -1);
 		drawNames();
-		class_1015.method_4412(0, 0, -1);
+		GlStateManager.translated(0, 0, -1);
 		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		class_1015.method_4350();
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
@@ -55,17 +57,17 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(int key) {
 		return false;
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(int key) {
 		return false;
 	}
 	
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		return false;
 	}
 	
@@ -122,7 +124,7 @@ public class MeterListRenderer extends AbstractElement {
 			Text name = new LiteralText(meter.getName());
 			
 			if (meter.isHidden()) {
-				name.formatted(Formatting.GRAY, Formatting.ITALIC);
+				name.setStyle(new Style().setColor(Formatting.GRAY).setItalic(true));
 			}
 			
 			hud.renderer.renderText(name, x, y, 0xFFFFFF);
@@ -135,7 +137,7 @@ public class MeterListRenderer extends AbstractElement {
 		int width = 0;
 		
 		for (Meter meter : hud.meters) {
-			int nameWidth = hud.font.getStringWidth(meter.getName());
+			int nameWidth = hud.font.getWidth(meter.getName());
 			
 			if (nameWidth > width) {
 				width = nameWidth;

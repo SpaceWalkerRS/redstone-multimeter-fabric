@@ -1,12 +1,13 @@
 package redstone.multimeter.mixin.client;
 
+import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -18,7 +19,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	private MultimeterClient multimeterClient;
 	
 	@Inject(
-			method = "init",
+			method = "initializeGame",
 			at = @At(
 					value = "RETURN"
 			)
@@ -28,7 +29,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
-			method = "method_1521",
+			method = "reloadResources",
 			at = @At(
 					value = "HEAD"
 			)
@@ -49,13 +50,30 @@ public class MinecraftClientMixin implements IMinecraftClient {
 		multimeterClient.getInputHandler().handleKeyBindings();
 	}
 	
+	@Redirect(
+			method = "method_28813",
+			at = @At(
+					value = "INVOKE",
+					target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I"
+			)
+	)
+	private int onGetEventDWheel() {
+		int scrollY = Mouse.getEventDWheel();
+		
+		if (multimeterClient.getInputHandler().handleMouseScroll(0, scrollY)) {
+			return 0;
+		}
+		
+		return scrollY;
+	}
+	
 	@Inject(
-			method = "method_1550",
+			method = "loadWorld(Lnet/minecraft/client/world/ClientWorld;Ljava/lang/String;)V",
 			at = @At(
 					value = "HEAD"
 			)
 	)
-	private void onDisconnect(ClientWorld world, Screen screen, CallbackInfo ci) {
+	private void onDisconnect(ClientWorld world, String name, CallbackInfo ci) {
 		if (world == null) {
 			multimeterClient.onDisconnect();
 		}

@@ -2,7 +2,8 @@ package redstone.multimeter.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.class_1015;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
@@ -26,10 +27,10 @@ public class MeterRenderer {
 	}
 	
 	public void renderMeters() {
-		class_1015.method_4454();
-		class_1015.method_4343(class_1015.class_1033.field_5138, class_1015.class_1027.field_5088, class_1015.class_1033.field_5140, class_1015.class_1027.field_5084);
-		class_1015.method_4407();
-		class_1015.method_4413(false);
+		GlStateManager.enableBlend();
+		GlStateManager.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
+		GlStateManager.disableTexture();
+		GlStateManager.depthMask(false);
 		
 		for (Meter meter : multimeterClient.getMeterGroup().getMeters()) {
 			if (meter.isIn(minecraftClient.world)) {
@@ -37,9 +38,9 @@ public class MeterRenderer {
 			}
 		}
 		
-		class_1015.method_4413(true);
-		class_1015.method_4397();
-		class_1015.method_4439();
+		GlStateManager.depthMask(true);
+		GlStateManager.enableTexture();
+		GlStateManager.disableBlend();
 	}
 	
 	private void drawMeter(Meter meter) {
@@ -53,8 +54,8 @@ public class MeterRenderer {
 		Entity camera = minecraftClient.getCameraEntity();
 		Vec3d cameraPos = camera.getPosVector();
 		
-		class_1015.method_4461();
-		class_1015.method_4412(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
+		GlStateManager.pushMatrix();
+		GlStateManager.translated(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
 		
 		float r = ColorUtils.getRed(color) / 255.0F;
 		float g = ColorUtils.getGreen(color) / 255.0F;
@@ -66,7 +67,7 @@ public class MeterRenderer {
 			drawBoxOutline(builder, tessellator, r, g, b, 1.0F);
 		}
 		
-		class_1015.method_4350();
+		GlStateManager.popMatrix();
 	}
 	
 	private void drawFilledBox(BufferBuilder builder, Tessellator tessellator, float r, float g, float b, float a) {

@@ -1,7 +1,6 @@
 package redstone.multimeter.mixin.meterable;
 
 import java.util.List;
-import java.util.Set;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -11,10 +10,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.PistonBlock;
 import net.minecraft.block.piston.PistonHandler;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -48,8 +46,8 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 					target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
 			)
 	)
-	private void onBlockMoved(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonHandler pistonHandler, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, int removedIndex, BlockState[] removedStates, Direction moveDir, Set<BlockPos> leftOverPositions, int brokenIndex, BlockPos movedPos, BlockState movedState) {
-		if (!world.isClient()) {
+	private void onBlockMoved(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, PistonHandler pistonHandler, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, int removedIndex, BlockState[] removedStates, Direction moveDir, int brokenIndex, BlockPos movedPos, BlockState movedState) {
+		if (!world.isClient) {
 			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 			
 			multimeter.logMoved(world, movedPos, moveDir);
@@ -64,11 +62,11 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return shouldExtend(world, pos, state.get(Properties.FACING));
+		return shouldExtend(world, pos, state.get(PistonBlock.FACING));
 	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.EXTENDED);
+		return state.get(PistonBlock.EXTENDED);
 	}
 }

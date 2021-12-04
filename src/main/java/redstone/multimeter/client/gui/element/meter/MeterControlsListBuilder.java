@@ -49,7 +49,7 @@ public class MeterControlsListBuilder extends ControlsListBuilder {
 	}
 	
 	private void updateMargin(String category) {
-		int width = font.getStringWidth(category) + 30;
+		int width = font.getWidth(category) + 30;
 		
 		if (width > margin) {
 			margin = width;

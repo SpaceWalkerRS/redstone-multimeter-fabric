@@ -11,8 +11,8 @@ import java.util.function.Supplier;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.RenderHelper2D;
@@ -56,7 +56,7 @@ public class ControlsListBuilder extends RenderHelper2D {
 			throw new IllegalStateException("This options list already contains a \'" + name + "\' category!");
 		}
 		
-		categories.put(name, new TextElement(client, 0, 0, t -> t.add(new LiteralText(name).formatted(Formatting.ITALIC)).setWithShadow(true), tooltip, onPress));
+		categories.put(name, new TextElement(client, 0, 0, t -> t.add(new LiteralText(name).setStyle(new Style().setItalic(true))).setWithShadow(true), tooltip, onPress));
 		factories.put(name, new ArrayList<>());
 	}
 	

@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.SharedConstants;
-import net.minecraft.class_1015;
-import net.minecraft.client.Keyboard;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
@@ -18,7 +18,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.util.TextUtils;
 
@@ -26,7 +25,6 @@ public class TextField extends AbstractButton {
 	
 	private static final int DOUBLE_CLICK_SPEED = 5;
 	
-	private final Keyboard keyboard;
 	private final Consumer<String> listener;
 	private final Supplier<String> textSupplier;
 	
@@ -54,18 +52,15 @@ public class TextField extends AbstractButton {
 	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<List<Text>> tooltip, Consumer<String> listener, Supplier<String> text) {
 		super(client, x, y, width, height, () -> null, tooltip);
 		
-		MinecraftClient minecraftClient = this.client.getMinecraftClient();
-		
-		this.keyboard = minecraftClient.keyboard;
 		this.listener = listener;
 		this.textSupplier = text;
 		
 		this.fullText = "";
 		this.visibleText = "";
 		this.textX = getX() + 4;
-		this.textY = getY() + (getHeight() - this.font.fontHeight) / 2;
+		this.textY = getY() + (getHeight() - this.font.lineHeight) / 2;
 		this.textWidth = getWidth() - 8;
-		this.textHeight = this.font.fontHeight;
+		this.textHeight = this.font.lineHeight;
 		this.selectionY = this.textY - 1;
 		this.selectionHeight = this.textHeight + 2;
 		
@@ -93,22 +88,10 @@ public class TextField extends AbstractButton {
 	}
 	
 	@Override
-	public void mouseMove(double mouseX, double mouseY) {
-		boolean wasHovered = isHovered();
-		super.mouseMove(mouseX, mouseY);
-		
-		if (isHovered()) {
-			setCursor(client.getMinecraftClient(), CursorType.IBEAM);
-		} else if (wasHovered) {
-			setCursor(client.getMinecraftClient(), CursorType.ARROW);
-		}
-	}
-	
-	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (!consumed && button == MOUSE_BUTTON_LEFT) {
 			if (!isFocused()) {
 				setFocused(true);
 			}
@@ -135,7 +118,7 @@ public class TextField extends AbstractButton {
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 		
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (button == MOUSE_BUTTON_LEFT) {
 			stopSelecting(SelectType.MOUSE);
 		}
 		
@@ -144,7 +127,7 @@ public class TextField extends AbstractButton {
 	
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (selection == SelectType.MOUSE && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (selection == SelectType.MOUSE && button == MOUSE_BUTTON_LEFT) {
 			setCursorFromMouse(mouseX);
 			return true;
 		}
@@ -158,54 +141,54 @@ public class TextField extends AbstractButton {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_ENTER) {
+	public boolean keyPress(int key) {
+		if (key == Keyboard.KEY_ESCAPE || key == Keyboard.KEY_RETURN) {
 			setFocused(false);
 			return true;
 		}
 		
-		switch (keyCode) {
-		case GLFW.GLFW_KEY_LEFT_SHIFT:
-		case GLFW.GLFW_KEY_RIGHT_SHIFT:
+		switch (key) {
+		case Keyboard.KEY_LSHIFT:
+		case Keyboard.KEY_RSHIFT:
 			startSelecting(SelectType.KEYBOARD);
 			break;
-		case GLFW.GLFW_KEY_LEFT:
+		case Keyboard.KEY_LEFT:
 			moveCursorFromKeyboard(-1);
 			break;
-		case GLFW.GLFW_KEY_RIGHT:
+		case Keyboard.KEY_RIGHT:
 			moveCursorFromKeyboard(1);
 			break;
-		case GLFW.GLFW_KEY_UP:
-		case GLFW.GLFW_KEY_PAGE_UP:
+		case Keyboard.KEY_UP:
+		case Keyboard.KEY_PRIOR:
 			setCursorFromKeyboard(0);
 			break;
-		case GLFW.GLFW_KEY_DOWN:
-		case GLFW.GLFW_KEY_PAGE_DOWN:
+		case Keyboard.KEY_DOWN:
+		case Keyboard.KEY_NEXT:
 			setCursorFromKeyboard(fullText.length());
 			break;
-		case GLFW.GLFW_KEY_BACKSPACE:
+		case Keyboard.KEY_BACK:
 			erase(false);
 			break;
-		case GLFW.GLFW_KEY_DELETE:
+		case Keyboard.KEY_DELETE:
 			erase(true);
 			break;
 		default:
 			if (!RSMMScreen.isControlPressed()) {
 				break;
 			}
-			switch (keyCode) {
-			case GLFW.GLFW_KEY_A:
+			switch (key) {
+			case Keyboard.KEY_A:
 				if (selection != SelectType.MOUSE) {
 					selectAll();
 				}
 				break;
-			case GLFW.GLFW_KEY_C:
+			case Keyboard.KEY_C:
 				copyTextToClipboard(false);
 				break;
-			case GLFW.GLFW_KEY_X:
+			case Keyboard.KEY_X:
 				copyTextToClipboard(true);
 				break;
-			case GLFW.GLFW_KEY_V:
+			case Keyboard.KEY_V:
 				pasteClipboard();
 				break;
 			default:
@@ -216,8 +199,8 @@ public class TextField extends AbstractButton {
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+	public boolean keyRelease(int key) {
+		if (key == Keyboard.KEY_LSHIFT || key == Keyboard.KEY_RSHIFT) {
 			stopSelecting(SelectType.KEYBOARD);
 		}
 		
@@ -225,7 +208,7 @@ public class TextField extends AbstractButton {
 	}
 	
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		if (isActive() && SharedConstants.isValidChar(chr)) {
 			write(String.valueOf(chr));
 			return true;
@@ -267,7 +250,7 @@ public class TextField extends AbstractButton {
 	@Override
 	public void setY(int y) {
 		super.setY(y);
-		textY = y + getHeight() - (getHeight() + font.fontHeight) / 2;
+		textY = y + getHeight() - (getHeight() + font.lineHeight) / 2;
 		selectionY = textY - 1;
 	}
 	
@@ -297,7 +280,7 @@ public class TextField extends AbstractButton {
 	@Override
 	public void setHeight(int height) {
 		super.setHeight(height);
-		textHeight = font.fontHeight;
+		textHeight = font.lineHeight;
 		selectionHeight = textHeight + 2;
 	}
 	
@@ -324,10 +307,10 @@ public class TextField extends AbstractButton {
 		if (isFocused()) {
 			if ((cursorTicks / 6) % 2 == 0) {
 				if (cursorIndex == fullText.length()) {
-					int x = textX + font.getStringWidth(visibleText);
+					int x = textX + font.getWidth(visibleText);
 					renderText(font, "_", x, textY, true, color);
 				} else {
-					int width = font.getStringWidth(fullText.substring(scrollIndex, cursorIndex));
+					int width = font.getWidth(fullText.substring(scrollIndex, cursorIndex));
 					int x = textX + width;
 					
 					renderRect(x, selectionY, 1, selectionHeight, color);
@@ -348,11 +331,11 @@ public class TextField extends AbstractButton {
 		
 		if (start >= scrollIndex) {
 			String t = fullText.substring(scrollIndex, start);
-			x0 = textX + font.getStringWidth(t);
+			x0 = textX + font.getWidth(t);
 		}
 		if (end <= scrollIndex + visibleText.length()) {
 			String t = fullText.substring(scrollIndex, end);
-			x1 = textX + font.getStringWidth(t);
+			x1 = textX + font.getWidth(t);
 		}
 		
 		if (x0 >= x1) {
@@ -363,10 +346,10 @@ public class TextField extends AbstractButton {
 		int y1 = selectionY + selectionHeight;
 		int z = 0;
 		
-		class_1015.method_4381(0.0F, 0.0F, 0xFF, 0xFF);
-		class_1015.method_4407();
-		class_1015.method_4430();
-		class_1015.method_4452(class_1015.class_1030.field_5110);
+		GlStateManager.color4f(0.0F, 0.0F, 0xFF, 0xFF);
+		GlStateManager.disableTexture();
+		GlStateManager.enableColorLogicOp();
+		GlStateManager.logicOp(GlStateManager.LogicOp.OR_REVERSE);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -380,9 +363,9 @@ public class TextField extends AbstractButton {
 		
 		tessellator.draw();
 		
-		class_1015.method_4446();
-		class_1015.method_4397();
-		class_1015.method_4381(0xFF, 0xFF, 0xFF, 0xFF);
+		GlStateManager.disableColorLogicOp();
+		GlStateManager.enableTexture();
+		GlStateManager.color4f(0xFF, 0xFF, 0xFF, 0xFF);
 	}
 	
 	private int getBorderColor() {
@@ -474,7 +457,7 @@ public class TextField extends AbstractButton {
 			String text = getSelection();
 			
 			if (!text.isEmpty()) {
-				keyboard.setClipboard(text);
+				Screen.setClipboard(text);
 				
 				if (erase) {
 					erase(false);
@@ -484,7 +467,7 @@ public class TextField extends AbstractButton {
 	}
 	
 	private void pasteClipboard() {
-		String text = keyboard.getClipboard();
+		String text = Screen.getClipboard();
 		
 		if (!text.isEmpty()) {
 			write(text);

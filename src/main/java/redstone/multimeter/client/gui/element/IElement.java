@@ -2,21 +2,21 @@ package redstone.multimeter.client.gui.element;
 
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
-
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
-import redstone.multimeter.client.gui.CursorType;
-
 public interface IElement {
+	
+	public static final int MOUSE_BUTTON_LEFT  = 0;
+	public static final int MOUSE_BUTTON_RIGHT = 1;
+	public static final int MOUSE_SCROLL_UP    = 7;
+	public static final int MOUSE_SCROLL_DOWN  = 8;
 	
 	public void render(int mouseX, int mouseY);
 	
 	public void mouseMove(double mouseX, double mouseY);
 	
 	default boolean mouseClick(double mouseX, double mouseY, int button) {
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (button == MOUSE_BUTTON_LEFT) {
 			setDraggingMouse(true);
 		}
 		
@@ -24,7 +24,7 @@ public interface IElement {
 	}
 	
 	default boolean mouseRelease(double mouseX, double mouseY, int button) {
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (button == MOUSE_BUTTON_LEFT) {
 			setDraggingMouse(false);
 		}
 		
@@ -39,11 +39,11 @@ public interface IElement {
 		return mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= getY() && mouseY <= (getY() + getHeight());
 	}
 	
-	public boolean keyPress(int keyCode, int scanCode, int modifiers);
+	public boolean keyPress(int key);
 	
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers);
+	public boolean keyRelease(int key);
 	
-	public boolean typeChar(char chr, int modifiers);
+	public boolean typeChar(char chr);
 	
 	public boolean isDraggingMouse();
 	
@@ -77,7 +77,4 @@ public interface IElement {
 	
 	public void update();
 	
-	default void setCursor(MinecraftClient client, CursorType type) {
-		GLFW.glfwSetCursor(client.window.getHandle(), type.getCursor());
-	}
 }

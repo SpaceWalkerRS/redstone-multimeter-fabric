@@ -6,8 +6,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
+import redstone.multimeter.util.AxisUtils;
 import redstone.multimeter.util.NbtUtils;
 
 public class DimPos {
@@ -25,7 +25,7 @@ public class DimPos {
 	}
 	
 	public DimPos(World world, BlockPos pos) {
-		this(DimensionType.getId(world.dimension.getType()), pos);
+		this(new Identifier(world.dimension.getType().getSaveDir()), pos);
 	}
 	
 	@Override
@@ -53,7 +53,7 @@ public class DimPos {
 	}
 	
 	public boolean isOf(World world) {
-		return DimensionType.getId(world.dimension.getType()).equals(dimensionId);
+		return new Identifier(world.dimension.getType().getSaveDir()).equals(dimensionId);
 	}
 	
 	public DimPos offset(Identifier dimensionId) {
@@ -69,7 +69,7 @@ public class DimPos {
 	}
 	
 	public DimPos offset(Direction dir, int distance) {
-		return new DimPos(dimensionId, blockPos.offset(dir, distance));
+		return new DimPos(dimensionId, blockPos.method_31896(dir, distance));
 	}
 	
 	public DimPos offset(Axis axis) {
@@ -77,9 +77,9 @@ public class DimPos {
 	}
 	
 	public DimPos offset(Axis axis, int distance) {
-		int dx = axis.choose(distance, 0, 0);
-		int dy = axis.choose(0, distance, 0);
-		int dz = axis.choose(0, 0, distance);
+		int dx = AxisUtils.choose(axis, distance, 0, 0);
+		int dy = AxisUtils.choose(axis, 0, distance, 0);
+		int dz = AxisUtils.choose(axis, 0, 0, distance);
 		
 		return offset(dx, dy, dz);
 	}
@@ -96,7 +96,7 @@ public class DimPos {
 		// allows clients and servers of different versions
 		// to communicate effectively through the use of
 		// mods like ViaVersion or multiconnect
-		nbt.method_10566("world id", NbtUtils.identifierToNbt(dimensionId));
+		nbt.put("world id", NbtUtils.identifierToNbt(dimensionId));
 		nbt.putInt("x", blockPos.getX());
 		nbt.putInt("y", blockPos.getY());
 		nbt.putInt("z", blockPos.getZ());

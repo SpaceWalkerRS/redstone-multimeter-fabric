@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -32,7 +33,7 @@ public class TextUtils {
 				
 				String subString = text.substring(0, length);
 				
-				if (font.getStringWidth(subString) > MAX_WIDTH) {
+				if (font.getWidth(subString) > MAX_WIDTH) {
 					if (lastSpace >= 0) {
 						subString = text.substring(0, lastSpace);
 						length = lastSpace + 1;
@@ -70,7 +71,7 @@ public class TextUtils {
 	
 	public static Text formatFancyText(String title, String info) {
 		return new LiteralText("").
-			append(new LiteralText(title + ": ").formatted(Formatting.GOLD)).
+			append(new LiteralText(title + ": ").setStyle(new Style().setColor(Formatting.GOLD))).
 			append(new LiteralText(info));
 	}
 }

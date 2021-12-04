@@ -19,7 +19,7 @@ public class EnderDragonFightMixin {
 	@Shadow @Final ServerWorld world;
 	
 	@Inject(
-			method = "tick",
+			method = "convertFromLegacy",
 			at = @At(
 					value = "HEAD"
 			)
@@ -29,7 +29,7 @@ public class EnderDragonFightMixin {
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "convertFromLegacy",
 			at = @At(
 					value = "RETURN"
 			)

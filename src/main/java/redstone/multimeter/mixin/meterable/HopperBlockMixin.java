@@ -7,9 +7,8 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -19,7 +18,7 @@ import redstone.multimeter.block.MeterableBlock;
 public abstract class HopperBlockMixin implements MeterableBlock {
 	
 	@Inject(
-			method = "method_10217",
+			method = "updateEnabled",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "FIELD",
@@ -39,6 +38,6 @@ public abstract class HopperBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.ENABLED);
+		return state.get(HopperBlock.ENABLED);
 	}
 }

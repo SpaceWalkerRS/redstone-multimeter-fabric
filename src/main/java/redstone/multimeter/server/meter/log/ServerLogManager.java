@@ -68,7 +68,7 @@ public class ServerLogManager extends LogManager {
 			
 			CompoundTag nbt = new CompoundTag();
 			nbt.putLong("id", id);
-			nbt.method_10566("logs", logs);
+			nbt.put("logs", logs);
 			nbt.putBoolean("powered", meter.isPowered());
 			nbt.putBoolean("active", meter.isActive());
 			list.add(nbt);
@@ -82,7 +82,7 @@ public class ServerLogManager extends LogManager {
 		
 		CompoundTag nbt = new CompoundTag();
 		nbt.putInt("subticks", nextSubtick);
-		nbt.method_10566("logs", list);
+		nbt.put("logs", list);
 		
 		MeterLogsPacket packet = new MeterLogsPacket(nbt);
 		meterGroup.getMultimeter().getMultimeterServer().getPacketHandler().sendToSubscribers(packet, meterGroup);
