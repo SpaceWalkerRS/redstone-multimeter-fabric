@@ -1,13 +1,23 @@
 package redstone.multimeter.client.gui.element;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
 public class ScreenWrapper extends Screen {
 	
 	private final Screen parent;
 	private final RSMMScreen screen;
+	
+	private double prevX;
+	private double prevY;
+	private double mouseX;
+	private double mouseY;
+	private int touchEvents;
+	private int lastButton;
+	private long buttonTicks;
 	
 	public ScreenWrapper(Screen parent, RSMMScreen screen) {
 		this.parent = parent;
@@ -22,51 +32,13 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	protected void mouseClicked(int mouseX, int mouseY, int button) {
-		System.out.println("check scroll");
-		if (button == IElement.MOUSE_SCROLL_UP) {
-			screen.mouseScroll(mouseX, mouseY, 0, -5);
-		} else if (button == IElement.MOUSE_SCROLL_DOWN) {
-			screen.mouseScroll(mouseX, mouseY, 0, 5);
-		} else {
-			screen.mouseClick(mouseX, mouseY, button);
+	public void handleInputEvents() {
+		if (Mouse.isCreated()) {
+			handleMouse();
 		}
-	}
-	
-	@Override
-	protected void mouseReleased(int mouseX, int mouseY, int button) {
-		screen.mouseRelease(mouseX, mouseY, button);
-	}
-	
-	@Override
-	protected void mouseDragged(int mouseX, int mouseY, int button, long duration) {
-		screen.mouseDrag(mouseX, mouseY, button, 0, 0);
-	}
-	
-	@Override
-	public void handleKeyboardEvents() {
-		char chr = Keyboard.getEventCharacter();
-		int key = Keyboard.getEventKey();
-		
-		boolean consumed = false;
-		
-		if (key != Keyboard.CHAR_NONE) {
-			if (Keyboard.getEventKeyState()) {
-				consumed = screen.keyPress(key);
-				
-				if (!consumed && key == Keyboard.KEY_ESCAPE) {
-					screen.close();
-					consumed = true;
-				}
-			} else {
-				consumed = screen.keyRelease(key);
-			}
+		if (Keyboard.isCreated()) {
+			handleKeyboard();
 		}
-		if (!consumed && chr >= ' ') {
-			screen.typeChar(chr);
-		}
-		
-		client.handleKeyboardEvents();
 	}
 	
 	@Override
@@ -95,5 +67,92 @@ public class ScreenWrapper extends Screen {
 	
 	public RSMMScreen getScreen() {
 		return screen;
+	}
+	
+	private void handleMouse() {
+		updateMousePos();
+		handleScroll();
+		
+		while (Mouse.next()) {
+			int button = Mouse.getEventButton();
+			
+			if (Mouse.getEventButtonState()) {
+				if (client.options.touchscreen && touchEvents++ > 0) {
+					continue;
+				}
+
+				lastButton = button;
+				buttonTicks = MinecraftClient.getTime();
+				
+				screen.mouseClick(mouseX, mouseY, button);
+			} else {
+				if (client.options.touchscreen && --touchEvents > 0) {
+					return;
+				}
+
+				screen.mouseRelease(mouseX, mouseY, button);
+				
+				if (button == lastButton) {
+					lastButton = -1;
+				}
+			}
+		}
+		
+		handleDrag();
+	}
+	
+	private void updateMousePos() {
+		prevX = mouseX;
+		prevY = mouseY;
+		mouseX = Mouse.getX() * (width / client.frameBufferWidth);
+		mouseY = height - 1 - Mouse.getY() * (height / client.frameBufferHeight);
+		
+		if (mouseX != prevX || mouseY != prevY) {
+			screen.mouseMove(mouseX, mouseY);
+		}
+	}
+	
+	private void handleScroll() {
+		int scrollY = Mouse.getDWheel();
+		
+		if (scrollY != 0) {
+			screen.mouseScroll(mouseX, mouseY, 0, scrollY);
+		}
+	}
+	
+	private void handleDrag() {
+		if (lastButton != -1 && buttonTicks > 0L) {
+			double deltaX = mouseX - prevX;
+			double deltaY = mouseY - prevY;
+			
+			screen.mouseDrag(mouseX, mouseY, lastButton, deltaX, deltaY);
+		}
+	}
+	
+	private void handleKeyboard() {
+		while (Keyboard.next()) {
+			char chr = Keyboard.getEventCharacter();
+			int key = Keyboard.getEventKey();
+			
+			boolean consumed = false;
+			
+			if (key != Keyboard.CHAR_NONE) {
+				if (Keyboard.getEventKeyState()) {
+					consumed = screen.keyPress(key);
+					
+					if (!consumed && key == Keyboard.KEY_ESCAPE) {
+						screen.close();
+						consumed = true;
+					}
+				} else {
+					consumed = screen.keyRelease(key);
+				}
+			}
+			if (!consumed && chr >= ' ') {
+				screen.typeChar(chr);
+			}
+			
+			client.handleKeyboardEvents();
+		}
 	}
 }
