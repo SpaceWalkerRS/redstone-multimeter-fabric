@@ -131,7 +131,7 @@ public class KeyBindings {
 	}
 	
 	public static boolean isPressed(MinecraftClient client, KeyBinding keyBinding) {
-		Key key = ((IKeyBinding)keyBinding).getBoundKey();
+		Key key = ((IKeyBinding)keyBinding).getBoundKeyRSMM();
 		return key != null && GLFW.glfwGetKey(client.getWindow().getHandle(), key.getCode()) == GLFW.GLFW_PRESS;
 	}
 	

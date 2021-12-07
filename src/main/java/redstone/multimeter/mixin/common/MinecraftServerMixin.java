@@ -86,7 +86,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Override
-	public boolean isPaused() {
+	public boolean isPausedRSMM() {
 		return false;
 	}
 }

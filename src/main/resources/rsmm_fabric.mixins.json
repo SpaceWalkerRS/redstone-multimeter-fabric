@@ -7,13 +7,11 @@
 		"common.AbstractBlockStateMixin",
 		"common.BlockMixin",
 		"common.CommandManagerMixin",
-		"common.CustomPayloadC2SPacketMixin",
 		"common.DirectBlockEntityTickInvokerMixin",
 		"common.EnderDragonFightMixin",
 		"common.FluidStateMixin",
 		"common.MinecraftServerMixin",
 		"common.PlayerManagerMixin",
-		"common.ServerCommandSourceMixin",
 		"common.ServerPlayNetworkHandlerMixin",
 		"common.ServerWorldMixin",
 		"common.SpawnHelperMixin",
@@ -57,7 +55,6 @@
 		"common.meterable.WeightedPressurePlateBlockMixin"
 	],
 	"client": [
-		"client.ClientCommandSourceMixin",
 		"client.ClientPlayNetworkHandlerMixin",
 		"client.GameOptionsMixin",
 		"client.InGameHudMixin",

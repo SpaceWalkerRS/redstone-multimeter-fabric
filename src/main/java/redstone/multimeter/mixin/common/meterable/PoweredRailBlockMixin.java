@@ -17,12 +17,12 @@ public abstract class PoweredRailBlockMixin implements MeterableBlock {
 	@Shadow protected abstract boolean isPoweredByOtherRails(World world, BlockPos pos, BlockState state, boolean boolean4, int distance);
 	
 	@Override
-	public boolean isPowered(World world, BlockPos pos, BlockState state) {
+	public boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
 		return world.isReceivingRedstonePower(pos) || isPoweredByOtherRails(world, pos, state, true, 0) || isPoweredByOtherRails(world, pos, state, false, 0);
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWERED);
 	}
 }

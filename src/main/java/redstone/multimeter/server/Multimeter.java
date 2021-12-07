@@ -457,12 +457,12 @@ public class Multimeter {
 		Block oldBlock = oldState.getBlock();
 		Block newBlock = newState.getBlock();
 		
-		if (oldBlock == newBlock && ((IBlock)newBlock).isPowerSource() && ((PowerSource)newBlock).logPowerChangeOnStateChange()) {
+		if (oldBlock == newBlock && ((IBlock)newBlock).isPowerSourceRSMM() && ((PowerSource)newBlock).logPowerChangeOnStateChangeRSMM()) {
 			logPowerChange(world, pos, oldState, newState);
 		}
 		
-		boolean wasMeterable = ((IBlock)oldBlock).isMeterable();
-		boolean isMeterable = ((IBlock)newBlock).isMeterable();
+		boolean wasMeterable = ((IBlock)oldBlock).isMeterableRSMM();
+		boolean isMeterable = ((IBlock)newBlock).isMeterableRSMM();
 		
 		if (wasMeterable || isMeterable) {
 			logActive(world, pos, newState);
@@ -475,7 +475,7 @@ public class Multimeter {
 	
 	public void logPowered(World world, BlockPos pos, BlockState state) {
 		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setPowered(event.getMetadata() != 0), new MeterEventSupplier(EventType.POWERED, () -> {
-			return ((IBlock)state.getBlock()).isPowered(world, pos, state) ? 1 : 0;
+			return ((IBlock)state.getBlock()).isPoweredRSMM(world, pos, state) ? 1 : 0;
 		}));
 	}
 	
@@ -486,7 +486,7 @@ public class Multimeter {
 	public void logActive(World world, BlockPos pos, BlockState state) {
 		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setActive(event.getMetadata() != 0), new MeterEventSupplier(EventType.ACTIVE, () -> {
 			Block block = state.getBlock();
-			return ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, pos, state) ? 1 : 0;
+			return ((IBlock)block).isMeterableRSMM() && ((Meterable)block).isActiveRSMM(world, pos, state) ? 1 : 0;
 		}));
 	}
 	
@@ -517,8 +517,8 @@ public class Multimeter {
 			return oldPower != newPower;
 		}, new MeterEventSupplier(EventType.POWER_CHANGE, () -> {
 			PowerSource block = (PowerSource)newState.getBlock();
-			int oldPower = block.getPowerLevel(world, pos, oldState);
-			int newPower = block.getPowerLevel(world, pos, newState);
+			int oldPower = block.getPowerLevelRSMM(world, pos, oldState);
+			int newPower = block.getPowerLevelRSMM(world, pos, newState);
 			
 			return (oldPower << 8) | newPower;
 		}));

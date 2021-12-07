@@ -26,21 +26,21 @@ public abstract class AbstractRedstoneGateBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onPowerCheck(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		logPowered(world, pos, cir.getReturnValue()); // repeaters
+		logPoweredRSMM(world, pos, cir.getReturnValue()); // repeaters
 	}
 	
 	@Override
-	public boolean logPoweredOnBlockUpdate() {
+	public boolean logPoweredOnBlockUpdateRSMM() {
 		return false;
 	}
 	
 	@Override
-	public boolean isPowered(World world, BlockPos pos, BlockState state) {
+	public boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
 		return hasPower(world, pos, state);
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWERED);
 	}
 }

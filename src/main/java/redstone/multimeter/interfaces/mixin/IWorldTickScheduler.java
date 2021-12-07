@@ -6,6 +6,6 @@ import net.minecraft.world.tick.OrderedTick;
 
 public interface IWorldTickScheduler {
 	
-	public void setTickLogger(Consumer<OrderedTick<?>> logger);
+	public void setTickConsumerRSMM(Consumer<OrderedTick<?>> consumer);
 	
 }

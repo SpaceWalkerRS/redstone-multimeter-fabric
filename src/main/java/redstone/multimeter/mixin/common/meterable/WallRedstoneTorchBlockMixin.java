@@ -22,6 +22,6 @@ public abstract class WallRedstoneTorchBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onPowerCheck(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		logPowered(world, pos, cir.getReturnValue());
+		logPoweredRSMM(world, pos, cir.getReturnValue());
 	}
 }

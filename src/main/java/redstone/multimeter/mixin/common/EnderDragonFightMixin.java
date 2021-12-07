@@ -25,7 +25,7 @@ public class EnderDragonFightMixin {
 			)
 	)
 	private void startTickTaskDragonFight(CallbackInfo ci) {
-		((IServerWorld)world).startTickTask(TickTask.DRAGON_FIGHT);
+		((IServerWorld)world).startTickTaskRSMM(TickTask.DRAGON_FIGHT);
 	}
 	
 	@Inject(
@@ -35,6 +35,6 @@ public class EnderDragonFightMixin {
 			)
 	)
 	private void endTickTaskDragonFight(CallbackInfo ci) {
-		((IServerWorld)world).endTickTask();
+		((IServerWorld)world).endTickTaskRSMM();
 	}
 }

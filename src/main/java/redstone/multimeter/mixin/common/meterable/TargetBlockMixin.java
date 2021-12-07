@@ -15,12 +15,12 @@ import redstone.multimeter.block.PowerSource;
 public class TargetBlockMixin implements Meterable, PowerSource {
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWER) > MIN_POWER;
 	}
 	
 	@Override
-	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+	public int getPowerLevelRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWER);
 	}
 }

@@ -14,7 +14,7 @@ import redstone.multimeter.block.Meterable;
 public abstract class TripwireBlockMixin implements Meterable {
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWERED);
 	}
 }

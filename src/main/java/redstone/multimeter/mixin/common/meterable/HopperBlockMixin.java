@@ -29,16 +29,16 @@ public abstract class HopperBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onUpdateEnabled(World world, BlockPos pos, BlockState state, CallbackInfo ci, boolean shouldBeEnabled) {
-		logPowered(world, pos, !shouldBeEnabled);
+		logPoweredRSMM(world, pos, !shouldBeEnabled);
 	}
 	
 	@Override
-	public boolean logPoweredOnBlockUpdate() {
+	public boolean logPoweredOnBlockUpdateRSMM() {
 		return false;
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.ENABLED);
 	}
 }

@@ -27,26 +27,26 @@ public abstract class RedstoneTorchBlockMixin implements MeterableBlock, PowerSo
 			)
 	)
 	private void onPowerCheck(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		logPowered(world, pos, cir.getReturnValue()); // floor redstone torches only
+		logPoweredRSMM(world, pos, cir.getReturnValue()); // floor redstone torches only
 	}
 	
 	@Override
-	public boolean logPoweredOnBlockUpdate() {
+	public boolean logPoweredOnBlockUpdateRSMM() {
 		return false;
 	}
 	
 	@Override
-	public boolean isPowered(World world, BlockPos pos, BlockState state) {
+	public boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
 		return shouldUnpower(world, pos, state);
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.LIT);
 	}
 	
 	@Override
-	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+	public int getPowerLevelRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.LIT) ? MAX_POWER : MIN_POWER;
 	}
 }

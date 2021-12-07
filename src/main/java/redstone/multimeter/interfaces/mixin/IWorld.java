@@ -4,15 +4,15 @@ import redstone.multimeter.common.TickTask;
 
 public interface IWorld {
 	
-	default void startTickTask(TickTask task) {
+	default void startTickTaskRSMM(TickTask task) {
 		
 	}
 	
-	default void endTickTask() {
+	default void endTickTaskRSMM() {
 		
 	}
 	
-	default void swapTickTask(TickTask task) {
+	default void swapTickTaskRSMM(TickTask task) {
 		
 	}
 }

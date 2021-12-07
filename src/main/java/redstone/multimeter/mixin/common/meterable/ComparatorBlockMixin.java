@@ -25,16 +25,16 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 			)
 	)
 	private void onPowerCheck(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
-		logPowered(world, pos, cir.getReturnValue() > MIN_POWER);
+		logPoweredRSMM(world, pos, cir.getReturnValue() > MIN_POWER);
 	}
 	
 	@Override
-	public boolean logPowerChangeOnStateChange() {
+	public boolean logPowerChangeOnStateChangeRSMM() {
 		return false;
 	}
 	
 	@Override
-	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+	public int getPowerLevelRSMM(World world, BlockPos pos, BlockState state) {
 		BlockEntity blockEntity = world.getBlockEntity(pos);
 		
 		if (blockEntity instanceof ComparatorBlockEntity) {

@@ -15,12 +15,12 @@ import redstone.multimeter.block.PowerSource;
 public abstract class TripwireHookBlockMixin implements Meterable, PowerSource {
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWERED);
 	}
 	
 	@Override
-	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+	public int getPowerLevelRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWERED) ? MAX_POWER : MIN_POWER;
 	}
 }

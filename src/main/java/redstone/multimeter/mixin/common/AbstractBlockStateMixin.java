@@ -54,12 +54,9 @@ public class AbstractBlockStateMixin {
 			)
 	)
 	private void onShapeUpdate(Direction direction, BlockState neighborState, WorldAccess worldAccess, BlockPos pos, BlockPos neighborPos, CallbackInfoReturnable<BlockState> ci) {
-		if (worldAccess instanceof World) {
-			World world = (World)worldAccess;
-			
-			if (!world.isClient()) {
-				((IServerWorld)world).getMultimeter().logShapeUpdate(world, pos, direction);
-			}
+		if (worldAccess instanceof ServerWorld) {
+			ServerWorld world = (ServerWorld)worldAccess;
+			((IServerWorld)world).getMultimeter().logShapeUpdate(world, pos, direction);
 		}
 	}
 }

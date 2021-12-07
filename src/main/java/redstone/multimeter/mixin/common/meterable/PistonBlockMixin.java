@@ -35,7 +35,7 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onShouldExtend(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
-		logPowered(world, pos, cir.getReturnValue());
+		logPoweredRSMM(world, pos, cir.getReturnValue());
 	}
 	
 	@Inject(
@@ -58,17 +58,17 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 	}
 	
 	@Override
-	public boolean logPoweredOnBlockUpdate() {
+	public boolean logPoweredOnBlockUpdateRSMM() {
 		return false;
 	}
 	
 	@Override
-	public boolean isPowered(World world, BlockPos pos, BlockState state) {
+	public boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
 		return shouldExtend(world, pos, state.get(Properties.FACING));
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.EXTENDED);
 	}
 }

@@ -15,17 +15,17 @@ import redstone.multimeter.block.chest.TrappedChestHelper;
 public abstract class TrappedChestBlockMixin implements Meterable, PowerSource {
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return TrappedChestHelper.getPower(world, pos, state) > MIN_POWER;
 	}
 	
 	@Override
-	public boolean logPowerChangeOnStateChange() {
+	public boolean logPowerChangeOnStateChangeRSMM() {
 		return false;
 	}
 	
 	@Override
-	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+	public int getPowerLevelRSMM(World world, BlockPos pos, BlockState state) {
 		return TrappedChestHelper.getPower(world, pos, state);
 	}
 }

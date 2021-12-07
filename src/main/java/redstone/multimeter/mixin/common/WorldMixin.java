@@ -35,7 +35,7 @@ public abstract class WorldMixin implements IWorld {
 			)
 	)
 	private void startTickTaskBlockEntities(CallbackInfo ci) {
-		startTickTask(TickTask.BLOCK_ENTITIES);
+		startTickTaskRSMM(TickTask.BLOCK_ENTITIES);
 	}
 	
 	@Inject(
@@ -45,7 +45,7 @@ public abstract class WorldMixin implements IWorld {
 			)
 	)
 	private void endTickTaskBlockEntities(CallbackInfo ci) {
-		endTickTask();
+		endTickTaskRSMM();
 	}
 	
 	@Inject(
@@ -70,7 +70,7 @@ public abstract class WorldMixin implements IWorld {
 		// 'powered' changes for most meterable blocks are handled in those classes
 		// to reduce expensive calls to 
 		// World.isReceivingRedstonePower and World.getReceivedRedstonePower
-		if (((IBlock)state.getBlock()).logPoweredOnBlockUpdate()) {
+		if (((IBlock)state.getBlock()).logPoweredOnBlockUpdateRSMM()) {
 			multimeter.logPowered((World)(Object)this, pos, state);
 		}
 	}

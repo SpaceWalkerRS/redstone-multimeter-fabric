@@ -26,11 +26,11 @@ public class RedstoneLampBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onScheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
-		logPowered(world, pos, world.isReceivingRedstonePower(pos));
+		logPoweredRSMM(world, pos, state);
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.LIT);
 	}
 }

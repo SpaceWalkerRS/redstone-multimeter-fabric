@@ -7,17 +7,17 @@ import redstone.multimeter.server.MultimeterServer;
 public interface IServerWorld extends IWorld {
 	
 	@Override
-	default void startTickTask(TickTask task) {
+	default void startTickTaskRSMM(TickTask task) {
 		getMultimeterServer().startTickTask(task);
 	}
 	
 	@Override
-	default void endTickTask() {
+	default void endTickTaskRSMM() {
 		getMultimeterServer().endTickTask();
 	}
 	
 	@Override
-	default void swapTickTask(TickTask task) {
+	default void swapTickTaskRSMM(TickTask task) {
 		getMultimeterServer().swapTickTask(task);
 	}
 	

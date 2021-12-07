@@ -23,6 +23,8 @@ public class FluidStateMixin {
 			)
 	)
 	private void onRandomTick(World world, BlockPos pos, Random random, CallbackInfo ci) {
-		((IServerWorld)world).getMultimeter().logRandomTick(world, pos);
+		if (!world.isClient()) {
+			((IServerWorld)world).getMultimeter().logRandomTick(world, pos);
+		}
 	}
 }

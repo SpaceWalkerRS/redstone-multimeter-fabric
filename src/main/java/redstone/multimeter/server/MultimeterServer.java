@@ -139,7 +139,7 @@ public class MultimeterServer {
 			}
 		}
 		
-		return frozen || ((IMinecraftServer)server).isPaused();
+		return frozen || ((IMinecraftServer)server).isPausedRSMM();
 	}
 	
 	public void tickStart() {

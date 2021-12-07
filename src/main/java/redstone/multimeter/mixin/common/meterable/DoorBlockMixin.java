@@ -32,26 +32,26 @@ public abstract class DoorBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
-		logPowered(world, pos, powered);
-		logPowered(world, getOtherHalf(pos, state), powered);
+		logPoweredRSMM(world, pos, powered);
+		logPoweredRSMM(world, getOtherHalfRSMM(pos, state), powered);
 	}
 	
 	@Override
-	public boolean logPoweredOnBlockUpdate() {
+	public boolean logPoweredOnBlockUpdateRSMM() {
 		return false;
 	}
 	
 	@Override
-	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return world.isReceivingRedstonePower(pos) || world.isReceivingRedstonePower(getOtherHalf(pos, state));
+	public boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
+		return world.isReceivingRedstonePower(pos) || world.isReceivingRedstonePower(getOtherHalfRSMM(pos, state));
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.OPEN);
 	}
 	
-	private BlockPos getOtherHalf(BlockPos pos, BlockState state) {
+	private BlockPos getOtherHalfRSMM(BlockPos pos, BlockState state) {
 		DoubleBlockHalf half = state.get(Properties.DOUBLE_BLOCK_HALF);
 		Direction dir = (half == DoubleBlockHalf.LOWER) ? Direction.UP : Direction.DOWN;
 		

@@ -19,7 +19,7 @@ import redstone.multimeter.interfaces.mixin.IWorldTickScheduler;
 @Mixin(WorldTickScheduler.class)
 public class WorldTickSchedulerMixin implements IWorldTickScheduler {
 	
-	private Consumer<OrderedTick<?>> tickLogger;
+	private Consumer<OrderedTick<?>> tickConsumer;
 	
 	@Inject(
 			method = "tick(Ljava/util/function/BiConsumer;)V",
@@ -31,13 +31,13 @@ public class WorldTickSchedulerMixin implements IWorldTickScheduler {
 			)
 	)
 	private void logScheduledTick(BiConsumer<BlockPos, ?> ticker, CallbackInfo ci, OrderedTick<?> scheduledTick) {
-		if (tickLogger != null) {
-			tickLogger.accept(scheduledTick);
+		if (tickConsumer != null) {
+			tickConsumer.accept(scheduledTick);
 		}
 	}
 	
 	@Override
-	public void setTickLogger(Consumer<OrderedTick<?>> logger) {
-		this.tickLogger = logger;
+	public void setTickConsumerRSMM(Consumer<OrderedTick<?>> consumer) {
+		this.tickConsumer = consumer;
 	}
 }

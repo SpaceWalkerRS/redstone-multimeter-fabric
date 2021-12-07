@@ -30,16 +30,16 @@ public abstract class NoteBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
-		logPowered(world, pos, powered);
+		logPoweredRSMM(world, pos, powered);
 	}
 	
 	@Override
-	public boolean logPoweredOnBlockUpdate() {
+	public boolean logPoweredOnBlockUpdateRSMM() {
 		return false;
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
 		return state.get(Properties.POWERED);
 	}
 }
