@@ -38,13 +38,10 @@ public interface IParentElement extends IElement {
 		boolean consumed = IElement.super.mouseClick(mouseX, mouseY, button);
 		
 		IElement hoveredElement = getHoveredElement(mouseX, mouseY);
+		setFocusedElement(hoveredElement);
 		
-		if (hoveredElement != null && hoveredElement.mouseClick(mouseX, mouseY, button)) {
-			setFocusedElement(hoveredElement);
-			consumed = true;
-		} else {
-			setFocusedElement(null);
-			consumed = false;
+		if (hoveredElement != null) {
+			consumed = hoveredElement.mouseClick(mouseX, mouseY, button);
 		}
 		
 		return consumed;

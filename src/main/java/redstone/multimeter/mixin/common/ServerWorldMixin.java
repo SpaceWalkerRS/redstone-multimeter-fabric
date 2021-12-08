@@ -36,7 +36,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	@Shadow @Final private WorldTickScheduler<Block> blockTickScheduler;
 	@Shadow @Final private WorldTickScheduler<Fluid> fluidTickScheduler;
 	
-	private OrderedTick<?> scheduledTick;
+	private OrderedTick<?> scheduledTickRSMM;
 	
 	@Inject(
 			method = "<init>",
@@ -46,10 +46,10 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	)
 	private void setTickConsumers(CallbackInfo ci) {
 		((IWorldTickScheduler)blockTickScheduler).setTickConsumerRSMM(scheduledTick -> {
-			this.scheduledTick = scheduledTick;
+			this.scheduledTickRSMM = scheduledTick;
 		});
 		((IWorldTickScheduler)fluidTickScheduler).setTickConsumerRSMM(scheduledTick -> {
-			this.scheduledTick = scheduledTick;
+			this.scheduledTickRSMM = scheduledTick;
 		});
 	}
 	
@@ -316,7 +316,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			)
 	)
 	private void onTickFluid(BlockPos pos, Fluid fluid, CallbackInfo ci) {
-		logCurrentScheduledTick();
+		logCurrentScheduledTickRSMM();
 	}
 	
 	@Inject(
@@ -328,7 +328,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			)
 	)
 	private void onTickBlock(BlockPos pos, Block block, CallbackInfo ci) {
-		logCurrentScheduledTick();
+		logCurrentScheduledTickRSMM();
 	}
 	
 	@Inject(
@@ -360,10 +360,10 @@ public abstract class ServerWorldMixin implements IServerWorld {
 		return ((IMinecraftServer)server).getMultimeterServer();
 	}
 	
-	private void logCurrentScheduledTick() {
-		if (scheduledTick != null) {
-			getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
-			scheduledTick = null;
+	private void logCurrentScheduledTickRSMM() {
+		if (scheduledTickRSMM != null) {
+			getMultimeter().logScheduledTick((World)(Object)this, scheduledTickRSMM);
+			scheduledTickRSMM = null;
 		}
 	}
 }

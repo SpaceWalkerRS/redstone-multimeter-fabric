@@ -22,9 +22,9 @@ public class EventLog {
 		
 	}
 	
-	public EventLog(long tick, int subTick, TickPhase tickPhase, MeterEvent event) {
+	public EventLog(long tick, int subtick, TickPhase tickPhase, MeterEvent event) {
 		this.tick = tick;
-		this.subtick = subTick;
+		this.subtick = subtick;
 		this.tickPhase = tickPhase;
 		this.event = event;
 	}
