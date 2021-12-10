@@ -26,8 +26,8 @@ public class ChunkMixin {
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/Block;onBlockRemoved(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V"
+					shift = Shift.AFTER,
+					target = "Lnet/minecraft/world/chunk/ChunkSection;method_27437(IIILnet/minecraft/block/BlockState;)V"
 			)
 	)
 	private void onBlockStateChanged(BlockPos pos, BlockState newState, CallbackInfoReturnable<BlockState> cir, int sectionX, int y, int sectionZ, int idk, int prevHeight, BlockState oldState) {

@@ -29,6 +29,11 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 	}
 	
 	@Override
+	public boolean isActive(World world, BlockPos pos, BlockState state) {
+		return getPowerLevel(world, pos, state) > MIN_POWER;
+	}
+	
+	@Override
 	public boolean logPowerChangeOnStateChange() {
 		return false;
 	}

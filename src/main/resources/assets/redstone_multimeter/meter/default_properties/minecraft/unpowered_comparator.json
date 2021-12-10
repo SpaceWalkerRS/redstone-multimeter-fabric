@@ -1,0 +1,7 @@
+{
+  "name": "comparator",
+  "event_types": [
+    "active",
+    "power_change"
+  ]
+}

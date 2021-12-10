@@ -1,0 +1,7 @@
+{
+  "name": "redstone_ore",
+  "event_types": [
+    "active",
+    "random_tick"
+  ]
+}

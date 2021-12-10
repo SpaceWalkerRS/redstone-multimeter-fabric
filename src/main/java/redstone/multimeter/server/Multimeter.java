@@ -354,7 +354,7 @@ public class Multimeter {
 					double newZ = blockPos.getZ() + 0.5D;
 					
 					player.changeDimension(newWorld.dimension.getType().getRawId());
-					player.teleport(newX, newY, newZ);
+					player.requestTeleport(newX, newY, newZ);
 				}
 			}
 		}
