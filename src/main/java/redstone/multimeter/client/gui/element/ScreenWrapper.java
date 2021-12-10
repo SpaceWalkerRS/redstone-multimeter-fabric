@@ -104,8 +104,8 @@ public class ScreenWrapper extends Screen {
 	private void updateMousePos() {
 		prevX = mouseX;
 		prevY = mouseY;
-		mouseX = Mouse.getX() * (width / client.frameBufferWidth);
-		mouseY = height - 1 - Mouse.getY() * (height / client.frameBufferHeight);
+		mouseX = Mouse.getX() * width / client.frameBufferWidth;
+		mouseY = height - 1 - Mouse.getY() * height / client.frameBufferHeight;
 		
 		if (mouseX != prevX || mouseY != prevY) {
 			screen.mouseMove(mouseX, mouseY);
@@ -113,7 +113,7 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	private void handleScroll() {
-		int scrollY = Mouse.getDWheel();
+		double scrollY = 0.05D * Mouse.getDWheel();
 		
 		if (scrollY != 0) {
 			screen.mouseScroll(mouseX, mouseY, 0, scrollY);
