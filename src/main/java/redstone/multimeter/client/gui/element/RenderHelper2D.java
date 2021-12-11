@@ -20,7 +20,7 @@ public class RenderHelper2D {
 	protected void renderRect(Drawer drawer) {
 		GlStateManager.enableBlend();
 		GlStateManager.disableTexture();
-		GlStateManager.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		
 		Tessellator tessellator = Tessellator.getInstance();
@@ -102,12 +102,12 @@ public class RenderHelper2D {
 		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
 		GlStateManager.enableBlend();
 		GlStateManager.enableTexture();
-		GlStateManager.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_F);
+		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
 		drawer.draw(bufferBuilder);
 		tessellator.draw();
 	}
@@ -152,12 +152,12 @@ public class RenderHelper2D {
 		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
 		GlStateManager.enableBlend();
 		GlStateManager.enableTexture();
-		GlStateManager.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR_TEXTURE_F);
+		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 		drawer.draw(bufferBuilder);
 		tessellator.draw();
 	}
@@ -204,16 +204,16 @@ public class RenderHelper2D {
 	}
 	
 	protected int getWidth(TextRenderer font, Text text) {
-		return font.getWidth(text.toFormattedString());
+		return font.getStringWidth(text.asFormattedString());
 	}
 	
 	protected void renderText(TextRenderer font, Text text, int x, int y, boolean shadow, int color) {
 		GlStateManager.enableTexture();
 		
 		if (shadow) {
-			font.drawWithShadow(text.toFormattedString(), x, y, color);
+			font.drawWithShadow(text.asFormattedString(), x, y, color);
 		} else {
-			font.draw(text.toFormattedString(), x, y, color);
+			font.draw(text.asFormattedString(), x, y, color);
 		}
 	}
 	

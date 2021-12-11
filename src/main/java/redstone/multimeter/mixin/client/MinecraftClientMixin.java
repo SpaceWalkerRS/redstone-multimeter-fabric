@@ -29,7 +29,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
-			method = "reloadResources",
+			method = "stitchTextures",
 			at = @At(
 					value = "HEAD"
 			)
@@ -41,9 +41,11 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
-			method = "handleInputEvents",
+			method = "tick",
 			at = @At(
-					value = "HEAD"
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=mouse"
 			)
 	)
 	private void handleInputEvents(CallbackInfo ci) {
@@ -51,7 +53,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Redirect(
-			method = "method_28813",
+			method = "tick",
 			at = @At(
 					value = "INVOKE",
 					target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I"
@@ -68,7 +70,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
-			method = "loadWorld(Lnet/minecraft/client/world/ClientWorld;Ljava/lang/String;)V",
+			method = "connect(Lnet/minecraft/client/world/ClientWorld;Ljava/lang/String;)V",
 			at = @At(
 					value = "HEAD"
 			)

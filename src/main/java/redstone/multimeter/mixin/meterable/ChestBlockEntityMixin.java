@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,7 +21,7 @@ import redstone.multimeter.server.MultimeterServer;
 public class ChestBlockEntityMixin extends BlockEntity {
 	
 	@Shadow private int viewerCount;
-	@Shadow private ChestBlock.Type field_25103;
+	@Shadow private int field_1416;
 	
 	@Inject(
 			method = "onInvOpen",
@@ -64,6 +63,6 @@ public class ChestBlockEntityMixin extends BlockEntity {
 	}
 	
 	private boolean isTrapped() {
-		return field_25103 == ChestBlock.Type.TRAP;
+		return field_1416 == 1;
 	}
 }

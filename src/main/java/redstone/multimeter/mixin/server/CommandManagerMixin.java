@@ -5,14 +5,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.command.AbstractCommandManager;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandManager;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.CommandRegistry;
 
 import redstone.multimeter.command.MeterGroupCommand;
 
-@Mixin(ServerCommandManager.class)
-public abstract class ServerCommandManagerMixin extends AbstractCommandManager {
+@Mixin(CommandManager.class)
+public abstract class CommandManagerMixin extends CommandRegistry {
 	
 	@Inject(
 			method="<init>",
@@ -20,7 +20,7 @@ public abstract class ServerCommandManagerMixin extends AbstractCommandManager {
 					value = "RETURN"
 			)
 	)
-	private void registerCommands(MinecraftServer server, CallbackInfo ci) {
-		register(new MeterGroupCommand(server));
+	private void registerCommands(CallbackInfo ci) {
+		registerCommand(new MeterGroupCommand(MinecraftServer.getServer()));
 	}
 }

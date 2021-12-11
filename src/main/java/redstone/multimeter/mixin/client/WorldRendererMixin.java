@@ -18,7 +18,7 @@ public class WorldRendererMixin {
 	@Shadow @Final private MinecraftClient client;
 	
 	@Inject(
-			method = "renderWorldBorder",
+			method = "method_3526",
 			at = @At(
 					value = "HEAD"
 			)

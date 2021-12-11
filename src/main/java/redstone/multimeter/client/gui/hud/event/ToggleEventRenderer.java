@@ -128,7 +128,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					String text = String.valueOf(pulseLength);
 					
 					int availableWidth = endX - startX;
-					int requiredWidth = hud.font.getWidth(text) + 1;
+					int requiredWidth = hud.font.getStringWidth(text) + 1;
 					
 					if (requiredWidth < availableWidth) {
 						boolean toggled = wasToggled(log);

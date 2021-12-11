@@ -33,7 +33,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metadata) {
-			TextUtils.addFancyText(lines, "direction", Direction.byId(metadata).getName());
+			TextUtils.addFancyText(lines, "direction", Direction.getById(metadata).getName());
 		}
 	},
 	POWER_CHANGE(3, "power_change") {
@@ -70,7 +70,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metadata) {
-			TextUtils.addFancyText(lines, "direction", Direction.byId(metadata).getName());
+			TextUtils.addFancyText(lines, "direction", Direction.getById(metadata).getName());
 		}
 	},
 	OBSERVER_UPDATE(12, "observer_update"),

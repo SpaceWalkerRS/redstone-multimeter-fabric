@@ -22,12 +22,12 @@ public class ChunkMixin {
 	@Shadow @Final private World world;
 	
 	@Inject(
-			method = "method_27373",
+			method = "getBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Lnet/minecraft/block/BlockState;",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.AFTER,
-					target = "Lnet/minecraft/world/chunk/ChunkSection;method_27437(IIILnet/minecraft/block/BlockState;)V"
+ 					target = "Lnet/minecraft/world/chunk/ChunkSection;method_1424(IIILnet/minecraft/block/BlockState;)V"
 			)
 	)
 	private void onBlockStateChanged(BlockPos pos, BlockState newState, CallbackInfoReturnable<BlockState> cir, int sectionX, int y, int sectionZ, int idk, int prevHeight, BlockState oldState) {

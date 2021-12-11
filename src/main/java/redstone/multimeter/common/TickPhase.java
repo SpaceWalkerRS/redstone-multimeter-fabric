@@ -119,7 +119,7 @@ public class TickPhase {
 		}
 		
 		ByteArrayTag arrayNbt = (ByteArrayTag)nbt;
-		byte[] byteArray = arrayNbt.getByteArray();
+		byte[] byteArray = arrayNbt.getArray();
 		TickTask[] tasks = new TickTask[byteArray.length];
 		
 		for (int index = 0; index < tasks.length; index++) {

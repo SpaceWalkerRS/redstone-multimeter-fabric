@@ -28,7 +28,7 @@ public class MeterRenderer {
 	
 	public void renderMeters() {
 		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.disableTexture();
 		GlStateManager.depthMask(false);
 		
@@ -52,7 +52,7 @@ public class MeterRenderer {
 		boolean movable = meter.isMovable();
 		
 		Entity camera = minecraftClient.getCameraEntity();
-		Vec3d cameraPos = camera.getPosVector();
+		Vec3d cameraPos = camera.getPos();
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.translated(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);

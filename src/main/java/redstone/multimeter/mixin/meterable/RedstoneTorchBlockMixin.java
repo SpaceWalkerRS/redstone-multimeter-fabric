@@ -18,12 +18,12 @@ import redstone.multimeter.block.PowerSource;
 @Mixin(RedstoneTorchBlock.class)
 public abstract class RedstoneTorchBlockMixin implements MeterableBlock, PowerSource {
 	
-	@Shadow @Final private boolean field_24721;
+	@Shadow @Final private boolean field_1156;
 	
-	@Shadow protected abstract boolean method_26773(World world, BlockPos pos, BlockState state);
+	@Shadow protected abstract boolean method_982(World world, BlockPos pos, BlockState state);
 	
 	@Inject(
-			method = "method_26773",
+			method = "method_982",
 			at = @At(
 					value = "RETURN"
 			)
@@ -39,16 +39,16 @@ public abstract class RedstoneTorchBlockMixin implements MeterableBlock, PowerSo
 	
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return method_26773(world, pos, state);
+		return method_982(world, pos, state);
 	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return field_24721;
+		return field_1156;
 	}
 	
 	@Override
 	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
-		return field_24721 ? MAX_POWER : MIN_POWER;
+		return field_1156 ? MAX_POWER : MIN_POWER;
 	}
 }

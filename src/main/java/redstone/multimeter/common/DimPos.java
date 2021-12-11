@@ -8,6 +8,7 @@ import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 
 import redstone.multimeter.util.AxisUtils;
+import redstone.multimeter.util.DimensionUtils;
 import redstone.multimeter.util.NbtUtils;
 
 public class DimPos {
@@ -17,7 +18,7 @@ public class DimPos {
 	
 	public DimPos(Identifier dimensionId, BlockPos blockPos) {
 		this.dimensionId = dimensionId;
-		this.blockPos = blockPos.toImmutable();
+		this.blockPos = blockPos;
 	}
 	
 	public DimPos(Identifier dimensionId, int x, int y, int z) {
@@ -25,7 +26,7 @@ public class DimPos {
 	}
 	
 	public DimPos(World world, BlockPos pos) {
-		this(new Identifier(world.dimension.getType().getSaveDir()), pos);
+		this(DimensionUtils.getId(world.dimension.getType()), pos);
 	}
 	
 	@Override
@@ -53,7 +54,7 @@ public class DimPos {
 	}
 	
 	public boolean isOf(World world) {
-		return new Identifier(world.dimension.getType().getSaveDir()).equals(dimensionId);
+		return DimensionUtils.getId(world.dimension.getType()).equals(dimensionId);
 	}
 	
 	public DimPos offset(Identifier dimensionId) {
@@ -69,7 +70,7 @@ public class DimPos {
 	}
 	
 	public DimPos offset(Direction dir, int distance) {
-		return new DimPos(dimensionId, blockPos.method_31896(dir, distance));
+		return new DimPos(dimensionId, blockPos.offset(dir, distance));
 	}
 	
 	public DimPos offset(Axis axis) {

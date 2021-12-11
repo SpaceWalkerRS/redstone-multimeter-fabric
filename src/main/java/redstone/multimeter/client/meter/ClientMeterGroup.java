@@ -1,9 +1,9 @@
 package redstone.multimeter.client.meter;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 import net.minecraft.nbt.CompoundTag;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -83,7 +83,7 @@ public class ClientMeterGroup extends MeterGroup {
 		return hasMeter(meter.getId());
 	}
 	
-	public void updateMeters(List<Long> removedMeters, Long2ObjectMap<MeterProperties> meterUpdates) {
+	public void updateMeters(List<Long> removedMeters, Map<Long, MeterProperties> meterUpdates) {
 		for (int index = 0; index < removedMeters.size(); index++) {
 			long id = removedMeters.get(index);
 			Meter meter = getMeter(id);
@@ -92,8 +92,8 @@ public class ClientMeterGroup extends MeterGroup {
 				removeMeter(meter);
 			}
 		}
-		for (Entry<MeterProperties> entry : meterUpdates.long2ObjectEntrySet()) {
-			long id = entry.getLongKey();
+		for (Entry<Long, MeterProperties> entry : meterUpdates.entrySet()) {
+			long id = entry.getKey();
 			MeterProperties newProperties = entry.getValue();
 			Meter meter = getMeter(id);
 			

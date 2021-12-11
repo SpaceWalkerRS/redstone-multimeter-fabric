@@ -18,7 +18,7 @@ import redstone.multimeter.block.PowerSource;
 public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSource {
 	
 	@Inject(
-			method = "method_26762",
+			method = "method_972",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "FIELD",

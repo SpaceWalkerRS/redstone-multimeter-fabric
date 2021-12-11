@@ -56,7 +56,7 @@ public class KeyBindings {
 	}
 	
 	private static KeyBinding registerKeyBinding(KeyBinding keyBinding) {
-		if (KEY_BINDINGS.putIfAbsent(keyBinding.getId(), keyBinding) != null) {
+		if (KEY_BINDINGS.putIfAbsent(keyBinding.getTranslationKey(), keyBinding) != null) {
 			throw new IllegalStateException("Cannot register multiple keybinds with the same name!");
 		}
 		
@@ -96,7 +96,7 @@ public class KeyBindings {
 				
 				if (keyBinding != null) {
 					try {
-						keyBinding.setKeyCode(Integer.parseInt(key));
+						keyBinding.setCode(Integer.parseInt(key));
 					} catch (NumberFormatException e) {
 						
 					}
@@ -122,8 +122,8 @@ public class KeyBindings {
 		
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
 			for (KeyBinding keyBinding : KEY_BINDINGS.values()) {
-				String name = keyBinding.getId();
-				int key = keyBinding.getKeyCode();
+				String name = keyBinding.getTranslationKey();
+				int key = keyBinding.getCode();
 				
 				bw.write(name + "=" + key);
 				bw.newLine();
@@ -134,15 +134,15 @@ public class KeyBindings {
 	}
 	
 	public static boolean isBoundToButton(KeyBinding keyBinding, int button) {
-		return keyBinding.getKeyCode() + MOUSE_BUTTON_OFFSET == button;
+		return keyBinding.getCode() + MOUSE_BUTTON_OFFSET == button;
 	}
 	
 	public static boolean isBoundToKey(KeyBinding keyBinding, int key) {
-		return keyBinding.getKeyCode() == key;
+		return keyBinding.getCode() == key;
 	}
 	
 	public static boolean isPressed(KeyBinding keyBinding) {
-		int keyCode = keyBinding.getKeyCode();
+		int keyCode = keyBinding.getCode();
 		
 		if (keyCode < 0) {
 			return Mouse.isButtonDown(keyCode + MOUSE_BUTTON_OFFSET);

@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.PistonBlock;
 import net.minecraft.block.piston.PistonHandler;
@@ -46,7 +47,7 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 					target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
 			)
 	)
-	private void onBlockMoved(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, PistonHandler pistonHandler, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, int removedIndex, BlockState[] removedStates, Direction moveDir, int brokenIndex, BlockPos movedPos, BlockState movedState) {
+	private void onBlockMoved(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, PistonHandler pistonHandler, List<BlockPos> movedPositions, List<BlockPos> brokenPositions, int removedIndex, Block[] removedBlocks, Direction moveDir, int brokenIndex, BlockPos movedPos, BlockState movedState) {
 		if (!world.isClient) {
 			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 			
@@ -62,7 +63,7 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return shouldExtend(world, pos, state.get(PistonBlock.FACING));
+		return shouldExtend(world, pos, state.get(PistonBlock.DIRECTION));
 	}
 	
 	@Override

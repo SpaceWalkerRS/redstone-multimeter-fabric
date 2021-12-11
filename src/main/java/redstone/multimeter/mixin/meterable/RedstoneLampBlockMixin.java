@@ -19,7 +19,7 @@ import redstone.multimeter.block.MeterableBlock;
 @Mixin(RedstoneLampBlock.class)
 public class RedstoneLampBlockMixin implements MeterableBlock {
 	
-	@Shadow @Final private boolean field_24720;
+	@Shadow @Final private boolean field_1155;
 	
 	@Inject(
 			method = "scheduledTick",
@@ -33,6 +33,6 @@ public class RedstoneLampBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return field_24720;
+		return field_1155;
 	}
 }

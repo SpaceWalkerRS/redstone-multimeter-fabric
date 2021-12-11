@@ -17,15 +17,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockAction;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.TickableEntry;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.profiler.Profiler;
-import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSaveHandler;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.level.LevelProperties;
 
 import redstone.multimeter.common.TickTask;
@@ -75,7 +75,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void onTickTime(CallbackInfo ci) {
-		if (dimension.getType() == DimensionType.OVERWORLD) {
+		if (dimension.getType() == 0) {
 			getMultimeterServer().onOverworldTickTime();
 		}
 	}
@@ -145,7 +145,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/world/ServerWorld;sendBlockActions()V"
+					target = "Lnet/minecraft/server/world/ServerWorld;method_6046()V"
 			)
 	)
 	private void swapTickTaskBlockEvents(CallbackInfo ci) {
@@ -163,7 +163,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "method_33478",
+			method = "method_6048",
 			at = @At(
 					value = "HEAD"
 			)
@@ -173,7 +173,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "method_33478",
+			method = "method_6048",
 			at = @At(
 					value = "RETURN"
 			)
@@ -183,11 +183,11 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickChunk",
+			method = "tickBlocks",
 			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
-					args = "ldc=pollingChunks"
+					value = "INVOKE",
+					ordinal = 1,
+					target = "Ljava/util/Set;iterator()Ljava/util/Iterator;"
 			)
 	)
 	private void startDummyTask(CallbackInfo ci) {
@@ -195,9 +195,10 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickChunk",
+			method = "tickBlocks",
 			at = @At(
 					value = "INVOKE",
+					ordinal = 1,
 					target = "Ljava/util/Iterator;hasNext()Z"
 			)
 	)
@@ -206,7 +207,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickChunk",
+			method = "tickBlocks",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
@@ -218,7 +219,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickChunk",
+			method = "tickBlocks",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
@@ -230,7 +231,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickChunk",
+			method = "tickBlocks",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
@@ -242,7 +243,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickChunk",
+			method = "tickBlocks",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
@@ -254,17 +255,17 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickChunk",
+			method = "tickBlocks",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/Block;randomTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Ljava/util/Random;)V"
+					target = "Lnet/minecraft/block/Block;onUpdateTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Ljava/util/Random;)V"
 			)
 	)
-	private void onRandomTick(CallbackInfo ci, int randomTickSpeed, boolean isRaining, boolean isThundering, Iterator<Chunk> it, Chunk chunk, int chunkX, int chunkZ, ChunkSection[] sections, int sectionCount, int sectionIndex, ChunkSection section, int randomTick, int idk, int dx, int dz, int dy, BlockState state, Block block) {
+	private void onRandomTick(CallbackInfo ci, int attemps, int succeeded, Iterator<Chunk> it, ChunkPos chunkPos, int chunkX, int chunkZ, Chunk chunk, int o, ChunkSection[] sections, int p, int q, ChunkSection section, int r, int s, int dx, int dz, int dy, BlockState state, Block block) {
 		int x = chunkX + dx;
-		int y = section.getYOffset() + dy;
+		int y = section.method_1432() + dy;
 		int z = chunkZ + dz;
 		BlockPos pos = new BlockPos(x, y, z);
 		
@@ -272,27 +273,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "method_26140",
-			at = @At(
-					value = "HEAD"
-			)
-	)
-	private void startTickTaskPlayers(CallbackInfo ci) {
-		startTickTask(TickTask.PLAYERS);
-	}
-	
-	@Inject(
-			method = "method_26140",
-			at = @At(
-					value = "RETURN"
-			)
-	)
-	private void endTickTaskPlayers(CallbackInfo ci) {
-		endTickTask();
-	}
-	
-	@Inject(
-			method = "tick(Z)Z",
+			method = "method_340(Z)Z",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
@@ -300,20 +281,40 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 					target = "Lnet/minecraft/block/Block;scheduledTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Ljava/util/Random;)V"
 			)
 	)
-	private void onScheduledTick(boolean bl, CallbackInfoReturnable<Boolean> cir, Iterator<ScheduledTick> it, ScheduledTick scheduledTick) {
+	private void onScheduledTick(boolean bl, CallbackInfoReturnable<Boolean> cir, Iterator<TickableEntry> it, TickableEntry scheduledTick) {
 		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
 	}
 	
 	@Inject(
-			method = "method_33462",
+			method = "method_6034",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BlockState;method_27175(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;II)Z"
+					target = "Lnet/minecraft/block/Block;onEvent(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;II)Z"
 			)
 	)
 	private void onProcessBlockEvent(BlockAction blockEvent, CallbackInfoReturnable<Boolean> cir) {
 		getMultimeter().logBlockEvent((World)(Object)this, blockEvent);
+	}
+	
+	@Inject(
+			method = "tickWeather",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void startTickTaskWeather(CallbackInfo ci) {
+		startTickTask(TickTask.WEATHER);
+	}
+	
+	@Inject(
+			method = "tickWeather",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void endTickTaskWeather(CallbackInfo ci) {
+		endTickTask();
 	}
 	
 	@Override

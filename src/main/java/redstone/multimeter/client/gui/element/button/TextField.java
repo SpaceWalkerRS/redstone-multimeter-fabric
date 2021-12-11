@@ -9,12 +9,12 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 
-import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.text.Text;
+import net.minecraft.util.SharedConstants;
 import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -58,9 +58,9 @@ public class TextField extends AbstractButton {
 		this.fullText = "";
 		this.visibleText = "";
 		this.textX = getX() + 4;
-		this.textY = getY() + (getHeight() - this.font.lineHeight) / 2;
+		this.textY = getY() + (getHeight() - this.font.fontHeight) / 2;
 		this.textWidth = getWidth() - 8;
-		this.textHeight = this.font.lineHeight;
+		this.textHeight = this.font.fontHeight;
 		this.selectionY = this.textY - 1;
 		this.selectionHeight = this.textHeight + 2;
 		
@@ -250,7 +250,7 @@ public class TextField extends AbstractButton {
 	@Override
 	public void setY(int y) {
 		super.setY(y);
-		textY = y + getHeight() - (getHeight() + font.lineHeight) / 2;
+		textY = y + getHeight() - (getHeight() + font.fontHeight) / 2;
 		selectionY = textY - 1;
 	}
 	
@@ -280,7 +280,7 @@ public class TextField extends AbstractButton {
 	@Override
 	public void setHeight(int height) {
 		super.setHeight(height);
-		textHeight = font.lineHeight;
+		textHeight = font.fontHeight;
 		selectionHeight = textHeight + 2;
 	}
 	
@@ -307,10 +307,10 @@ public class TextField extends AbstractButton {
 		if (isFocused()) {
 			if ((cursorTicks / 6) % 2 == 0) {
 				if (cursorIndex == fullText.length()) {
-					int x = textX + font.getWidth(visibleText);
+					int x = textX + font.getStringWidth(visibleText);
 					renderText(font, "_", x, textY, true, color);
 				} else {
-					int width = font.getWidth(fullText.substring(scrollIndex, cursorIndex));
+					int width = font.getStringWidth(fullText.substring(scrollIndex, cursorIndex));
 					int x = textX + width;
 					
 					renderRect(x, selectionY, 1, selectionHeight, color);
@@ -331,11 +331,11 @@ public class TextField extends AbstractButton {
 		
 		if (start >= scrollIndex) {
 			String t = fullText.substring(scrollIndex, start);
-			x0 = textX + font.getWidth(t);
+			x0 = textX + font.getStringWidth(t);
 		}
 		if (end <= scrollIndex + visibleText.length()) {
 			String t = fullText.substring(scrollIndex, end);
-			x1 = textX + font.getWidth(t);
+			x1 = textX + font.getStringWidth(t);
 		}
 		
 		if (x0 >= x1) {
@@ -348,8 +348,8 @@ public class TextField extends AbstractButton {
 		
 		GlStateManager.color4f(0.0F, 0.0F, 0xFF, 0xFF);
 		GlStateManager.disableTexture();
-		GlStateManager.enableColorLogicOp();
-		GlStateManager.logicOp(GlStateManager.LogicOp.OR_REVERSE);
+		GlStateManager.enableColorLogic();
+		GlStateManager.logicOp(GL11.GL_OR_REVERSE);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -363,7 +363,7 @@ public class TextField extends AbstractButton {
 		
 		tessellator.draw();
 		
-		GlStateManager.disableColorLogicOp();
+		GlStateManager.disableColorLogic();
 		GlStateManager.enableTexture();
 		GlStateManager.color4f(0xFF, 0xFF, 0xFF, 0xFF);
 	}

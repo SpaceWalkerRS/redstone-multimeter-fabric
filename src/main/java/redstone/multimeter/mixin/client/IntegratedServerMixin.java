@@ -9,14 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.mojang.authlib.GameProfileRepository;
-import com.mojang.authlib.minecraft.MinecraftSessionService;
-import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-
-import net.minecraft.datafixer.DataFixer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.UserCache;
 
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 
@@ -25,26 +19,27 @@ public abstract class IntegratedServerMixin extends MinecraftServer implements I
 	
 	@Shadow private boolean paused;
 	
-	public IntegratedServerMixin(File gameDir, Proxy proxy, DataFixer dataFixer, YggdrasilAuthenticationService authService, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepository, UserCache userCache) {
-		super(gameDir, proxy, dataFixer, authService, sessionService, gameProfileRepository, userCache);
+	public IntegratedServerMixin(Proxy proxy, File file) {
+		super(proxy, file);
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "setupWorld()V",
 			at = @At(
 					value = "FIELD",
-					target = "Lnet/minecraft/server/integrated/IntegratedServer;tasks:Ljava/util/Queue;"
+					ordinal = 0,
+					target = "Lnet/minecraft/server/integrated/IntegratedServer;queue:Ljava/util/Queue;"
 			)
 	)
 	private void onTickStart(CallbackInfo ci) {
 		// When the server is paused, the tick method is not called
-		if (tasks.isEmpty()) {
+		if (queue.isEmpty()) {
 			getMultimeterServer().tickStart();
 		}
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "setupWorld()V",
 			at = @At(
 					value = "RETURN"
 			)

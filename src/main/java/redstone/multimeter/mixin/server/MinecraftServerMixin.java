@@ -18,11 +18,11 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	private MultimeterServer multimeterServer;
 	
 	@Inject(
-			method = "<init>",
+			method = "<init>(Ljava/io/File;Ljava/net/Proxy;Ljava/io/File;)V",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/MinecraftServer;method_33269()Lnet/minecraft/server/command/ServerCommandManager;"
+					target = "Lnet/minecraft/server/MinecraftServer;createCommandManager()Lnet/minecraft/server/command/CommandManager;"
 			)
 	)
 	private void onInit(CallbackInfo ci) {
@@ -30,7 +30,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "setupWorld()V",
 			at = @At(
 					value = "HEAD"
 			)
@@ -40,7 +40,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tickWorlds",
+			method = "tick",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
@@ -52,7 +52,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tickWorlds",
+			method = "tick",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
@@ -64,36 +64,13 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tickWorlds",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=commandFunctions"
-			)
-	)
-	private void startTickTaskCommandFunctions(CallbackInfo ci) {
-		multimeterServer.startTickTask(TickTask.COMMAND_FUNCTIONS);
-	}
-	
-	@Inject(
-			method = "tick",
+			method = "setupWorld()V",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void endTickTaskPacketsAndEndTick(CallbackInfo ci) {
-		multimeterServer.endTickTask();
+	private void onTickEnd(CallbackInfo ci) {
 		multimeterServer.tickEnd();
-	}
-	
-	@Inject(
-			method = "reloadResources",
-			at = @At(
-					value = "HEAD"
-			)
-	)
-	private void onReload(CallbackInfo ci) {
-		multimeterServer.getMultimeter().reloadOptions();
 	}
 	
 	@Override

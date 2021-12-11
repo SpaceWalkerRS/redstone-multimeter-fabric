@@ -19,10 +19,10 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.TickableEntry;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
@@ -151,7 +151,7 @@ public class Multimeter {
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
 				Text message = new LiteralText(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
-				server.sendMessage(player, message, true);
+				server.sendMessage(player, message);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
 			}
@@ -294,7 +294,7 @@ public class Multimeter {
 				setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())))
 			)).
 			append(new LiteralText(" to subscribe to it."));
-		server.sendMessage(player, message, false);
+		server.sendMessage(player, message);
 	}
 	
 	public void removeMemberFromMeterGroup(ServerMeterGroup meterGroup, UUID playerUUID) {
@@ -311,7 +311,7 @@ public class Multimeter {
 				unsubscribeFromMeterGroup(meterGroup, player);
 				
 				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
-				server.sendMessage(player, message, false);
+				server.sendMessage(player, message);
 			}
 		}
 	}
@@ -332,7 +332,7 @@ public class Multimeter {
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
 			Text message = new LiteralText("This server does not allow meter teleporting!");
-			server.sendMessage(player, message, false);
+			server.sendMessage(player, message);
 			
 			return;
 		}
@@ -353,8 +353,8 @@ public class Multimeter {
 					double newY = blockPos.getY();
 					double newZ = blockPos.getZ() + 0.5D;
 					
-					player.changeDimension(newWorld.dimension.getType().getRawId());
-					player.requestTeleport(newX, newY, newZ);
+					player.teleportToDimension(newWorld.dimension.getType());
+					player.refreshPositionAfterTeleport(newX, newY, newZ);
 				}
 			}
 		}
@@ -435,7 +435,7 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.RANDOM_TICK, 0);
 	}
 	
-	public void logScheduledTick(World world, ScheduledTick scheduledTick) {
+	public void logScheduledTick(World world, TickableEntry scheduledTick) {
 		tryLogEvent(world, scheduledTick.pos, EventType.SCHEDULED_TICK, scheduledTick.priority);
 	}
 	

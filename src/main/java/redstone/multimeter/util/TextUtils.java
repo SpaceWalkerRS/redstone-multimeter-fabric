@@ -33,7 +33,7 @@ public class TextUtils {
 				
 				String subString = text.substring(0, length);
 				
-				if (font.getWidth(subString) > MAX_WIDTH) {
+				if (font.getStringWidth(subString) > MAX_WIDTH) {
 					if (lastSpace >= 0) {
 						subString = text.substring(0, lastSpace);
 						length = lastSpace + 1;

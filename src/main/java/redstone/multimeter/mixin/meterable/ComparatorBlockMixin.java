@@ -19,7 +19,7 @@ import redstone.multimeter.block.PowerSource;
 public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSource {
 	
 	@Inject(
-			method = "getPower",
+			method = "method_799",
 			at = @At(
 					value = "RETURN"
 			)

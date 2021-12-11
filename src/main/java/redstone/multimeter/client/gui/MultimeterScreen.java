@@ -72,8 +72,8 @@ public class MultimeterScreen extends RSMMScreen {
 				text = "Nothing to see here! Subscribe to a meter group to get started.";
 			}
 			
-			int textWidth = font.getWidth(text);
-			int textHeight = font.lineHeight;
+			int textWidth = font.getStringWidth(text);
+			int textHeight = font.fontHeight;
 			int x = getX() + (getWidth() - textWidth) / 2;
 			int y = getY() + (getHeight() - textHeight) / 2;
 			

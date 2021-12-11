@@ -28,7 +28,7 @@ public abstract class DispenserBlockMixin implements MeterableBlock {
 					target = "Lnet/minecraft/block/DispenserBlock;TRIGGERED:Lnet/minecraft/state/property/BooleanProperty;"
 			)
 	)
-	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, CallbackInfo ci, boolean powered) {
+	private void onNeighborUpdate(World world, BlockPos pos, BlockState state, Block block, CallbackInfo ci, boolean powered) {
 		logPowered(world, pos, powered);
 	}
 	

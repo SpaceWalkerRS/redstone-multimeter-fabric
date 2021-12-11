@@ -16,7 +16,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.TickPhase;
@@ -26,6 +25,7 @@ import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.ServerTickPacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.meter.ServerMeterGroup;
+import redstone.multimeter.util.DimensionUtils;
 
 public class MultimeterServer {
 	
@@ -117,7 +117,7 @@ public class MultimeterServer {
 	}
 	
 	public long getCurrentTick() {
-		long tick = server.getEntityWorld().getTime();
+		long tick = server.getWorld().getLastUpdateTime();
 		
 		if (!tickedTime) {
 			tick++;
@@ -173,7 +173,7 @@ public class MultimeterServer {
 		if (!paused) {
 			ServerTickPacket packet = new ServerTickPacket(getCurrentTick());
 			
-			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+			for (ServerPlayerEntity player : server.getPlayerManager().getPlayers()) {
 				if (multimeter.hasSubscription(player)) {
 					packetHandler.sendToPlayer(packet, player);
 				}
@@ -192,7 +192,7 @@ public class MultimeterServer {
 	public void onPlayerLeave(ServerPlayerEntity player) {
 		multimeter.onPlayerLeave(player);
 		connectedPlayers.remove(player.getUuid());
-		playerNameCache.put(player.getUuid(), player.getName());
+		playerNameCache.put(player.getUuid(), player.getTranslationKey());
 	}
 	
 	public void onHandshake(ServerPlayerEntity player, String modVersion) {
@@ -203,8 +203,8 @@ public class MultimeterServer {
 	}
 	
 	public ServerWorld getWorld(Identifier dimensionId) {
-		DimensionType type = DimensionType.method_27530(dimensionId.getPath());
-		return server.getWorldById(type.getRawId());
+		int rawId = DimensionUtils.getRawId(dimensionId);
+		return server.getWorld(rawId);
 	}
 	
 	public ServerWorld getWorldOf(DimPos pos) {
@@ -227,7 +227,7 @@ public class MultimeterServer {
 	
 	public String getPlayerName(UUID playerUUID) {
 		ServerPlayerEntity player = getPlayer(playerUUID);
-		return player == null ? playerNameCache.get(playerUUID) : player.getName();
+		return player == null ? playerNameCache.get(playerUUID) : player.getTranslationKey();
 	}
 	
 	public ServerPlayerEntity getPlayer(String playerName) {
@@ -256,7 +256,7 @@ public class MultimeterServer {
 		return players;
 	}
 	
-	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
-		player.sendMessage(message, actionBar);
+	public void sendMessage(ServerPlayerEntity player, Text message) {
+		player.sendMessage(message);
 	}
 }

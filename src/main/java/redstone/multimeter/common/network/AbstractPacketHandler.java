@@ -1,5 +1,7 @@
 package redstone.multimeter.common.network;
 
+import java.io.IOException;
+
 import io.netty.buffer.Unpooled;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
@@ -20,7 +22,8 @@ public abstract class AbstractPacketHandler {
 		
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		
-		buffer.writeIdentifier(id);
+		buffer.writeString(id.getNamespace());
+		buffer.writeString(id.getPath());
 		buffer.writeCompoundTag(data);
 		
 		return toCustomPayload(PacketManager.getPacketChannelId(), buffer);
@@ -30,8 +33,10 @@ public abstract class AbstractPacketHandler {
 	
 	public abstract <P extends RSMMPacket> void send(P packet);
 	
-	protected <P extends RSMMPacket> P decode(PacketByteBuf buffer) {
-		Identifier id = buffer.readIdentifier();
+	protected <P extends RSMMPacket> P decode(PacketByteBuf buffer) throws IOException {
+		String namespace = buffer.readString(32767);
+		String path = buffer.readString(32767);
+		Identifier id = new Identifier(namespace, path);
 		P packet = PacketManager.createPacket(id);
 		
 		if (packet == null) {

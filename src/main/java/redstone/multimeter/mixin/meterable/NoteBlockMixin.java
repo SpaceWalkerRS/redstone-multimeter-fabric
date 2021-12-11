@@ -11,7 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.NoteBlock;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.NoteBlockEntity;
+import net.minecraft.block.entity.NoteBlockBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -29,7 +29,7 @@ public abstract class NoteBlockMixin implements MeterableBlock {
 					target = "Lnet/minecraft/world/World;getBlockEntity(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/entity/BlockEntity;"
 			)
 	)
-	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, CallbackInfo ci, boolean powered) {
+	private void onNeighborUpdate(World world, BlockPos pos, BlockState state, Block block, CallbackInfo ci, boolean powered) {
 		logPowered(world, pos, powered);
 	}
 	
@@ -42,8 +42,8 @@ public abstract class NoteBlockMixin implements MeterableBlock {
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
 		BlockEntity blockEntity = world.getBlockEntity(pos);
 		
-		if (blockEntity instanceof NoteBlockEntity) {
-			return ((NoteBlockEntity)blockEntity).powered;
+		if (blockEntity instanceof NoteBlockBlockEntity) {
+			return ((NoteBlockBlockEntity)blockEntity).field_1459;
 		}
 		
 		return false;

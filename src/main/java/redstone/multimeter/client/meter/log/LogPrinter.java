@@ -90,7 +90,7 @@ public class LogPrinter {
 			
 			if (notifyPlayer) {
 				Text message = new LiteralText("Started printing logs to file...");
-				client.sendMessage(message, false);
+				client.sendMessage(message);
 			}
 			
 			client.getHUD().onTogglePrinter();
@@ -116,7 +116,7 @@ public class LogPrinter {
 			
 			if (notifyPlayer) {
 				Text message = new LiteralText("Stopped printing logs to file");
-				client.sendMessage(message, false);
+				client.sendMessage(message);
 			}
 			
 			client.getHUD().onTogglePrinter();
@@ -150,7 +150,7 @@ public class LogPrinter {
 			
 			if (limit >= 0 && runtime > limit) {
 				Text message = new LiteralText("Printer exceeded maximum runtime!");
-				client.sendMessage(message, false);
+				client.sendMessage(message);
 				
 				stop(true);
 			}
@@ -218,7 +218,7 @@ public class LogPrinter {
 			}
 		} catch (IOException e) {
 			Text message = new LiteralText("Printer encountered issues!");
-			client.sendMessage(message, false);
+			client.sendMessage(message);
 			
 			stop(true);
 		}

@@ -9,7 +9,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -175,7 +175,7 @@ public class MultimeterClient {
 			
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
 				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).setStyle(new Style().setColor(Formatting.RED));
-				sendMessage(warning, false);
+				sendMessage(warning);
 			}
 			
 			hud.reset();
@@ -286,9 +286,9 @@ public class MultimeterClient {
 	}
 	
 	private void onTargetBlock(Consumer<DimPos> consumer) {
-		BlockHitResult hitResult = client.crosshairTarget;
+		HitResult hitResult = client.result;
 		
-		if (hitResult.type == BlockHitResult.Type.BLOCK) {
+		if (hitResult.type == HitResult.Type.BLOCK) {
 			World world = client.world;
 			BlockPos blockPos = hitResult.getBlockPos();
 			
@@ -301,7 +301,7 @@ public class MultimeterClient {
 			hudEnabled = !hudEnabled;
 			
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(new LiteralText(message), true);
+			sendMessage(new LiteralText(message));
 		}
 	}
 	
@@ -336,7 +336,7 @@ public class MultimeterClient {
 		return screen != null && screen instanceof OptionsScreen;
 	}
 	
-	public void sendMessage(Text message, boolean actionBar) {
-		client.player.sendMessage(message, actionBar);
+	public void sendMessage(Text message) {
+		client.player.sendMessage(message);
 	}
 }
