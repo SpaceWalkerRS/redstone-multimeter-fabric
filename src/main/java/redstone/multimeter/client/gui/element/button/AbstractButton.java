@@ -1,26 +1,24 @@
 package redstone.multimeter.client.gui.element.button;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
+import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.AbstractElement;
 
 public abstract class AbstractButton extends AbstractElement implements IButton {
 	
 	protected final MultimeterClient client;
-	protected final TextureManager textures;
 	protected final TextRenderer font;
 	private final Supplier<Text> messageSupplier;
-	private final Supplier<List<Text>> tooltipSupplier;
+	private final Supplier<Tooltip> tooltipSupplier;
 	
 	private boolean active;
 	private boolean hovered;
@@ -28,18 +26,17 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	
 	private boolean moved;
 	
-	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<List<Text>> tooltip) {
+	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip);
 	}
 	
-	protected AbstractButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<List<Text>> tooltip) {
+	protected AbstractButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip) {
 		super(x, y, width, height);
 		
 		MinecraftClient minecraftClient = client.getMinecraftClient();
 		
 		this.client = client;
 		this.font = minecraftClient.textRenderer;
-		this.textures = minecraftClient.getTextureManager();
 		this.messageSupplier = message;
 		this.tooltipSupplier = tooltip;
 		
@@ -77,7 +74,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 	
 	@Override
-	public List<Text> getTooltip(int mouseX, int mouseY) {
+	public Tooltip getTooltip(int mouseX, int mouseY) {
 		return tooltipSupplier.get();
 	}
 	
@@ -116,9 +113,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 	
 	protected void updateHovered(double mouseX, double mouseY) {
-		if (isActive()) {
-			hovered = isHovered(mouseX, mouseY);
-		}
+		hovered = isActive() && isHovered(mouseX, mouseY);
 	}
 	
 	protected void updateMessage() {

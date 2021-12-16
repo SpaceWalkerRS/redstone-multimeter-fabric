@@ -1,11 +1,8 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import java.util.List;
-
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.element.button.IButton;
@@ -98,11 +95,6 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		}
 		
 		return drag(scrollX);
-	}
-	
-	@Override
-	public List<Text> getTooltip(int mouseX, int mouseY) {
-		return null;
 	}
 	
 	@Override

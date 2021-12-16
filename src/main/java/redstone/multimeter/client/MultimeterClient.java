@@ -14,11 +14,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
-import redstone.multimeter.client.gui.MultimeterScreen;
-import redstone.multimeter.client.gui.OptionsScreen;
-import redstone.multimeter.client.gui.element.RSMMScreen;
-import redstone.multimeter.client.gui.element.ScreenWrapper;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
+import redstone.multimeter.client.gui.screen.MultimeterScreen;
+import redstone.multimeter.client.gui.screen.OptionsScreen;
+import redstone.multimeter.client.gui.screen.RSMMScreen;
+import redstone.multimeter.client.gui.screen.ScreenWrapper;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
 import redstone.multimeter.client.option.Options;
@@ -26,7 +26,7 @@ import redstone.multimeter.client.render.MeterRenderer;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
-import redstone.multimeter.common.meter.MeterProperties;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.packets.AddMeterPacket;
 import redstone.multimeter.common.network.packets.HandshakePacket;
@@ -105,6 +105,10 @@ public class MultimeterClient {
 	
 	public boolean hasSubscription() {
 		return meterGroup.isSubscribed();
+	}
+	
+	public ClientMeterPropertiesManager getMeterPropertiesManager() {
+		return meterPropertiesManager;
 	}
 	
 	/**
@@ -230,7 +234,7 @@ public class MultimeterClient {
 	}
 	
 	private void addMeter(WorldPos pos) {
-		MeterProperties properties = new MeterProperties();
+		MutableMeterProperties properties = new MutableMeterProperties();
 		properties.setPos(pos);
 		
 		if (meterPropertiesManager.validate(properties)) {
@@ -241,7 +245,7 @@ public class MultimeterClient {
 	
 	public void resetMeter() {
 		onTargetMeter(meter -> {
-			MeterProperties newProperties = new MeterProperties();
+			MutableMeterProperties newProperties = new MutableMeterProperties();
 			newProperties.setPos(meter.getPos());
 			
 			if (meterPropertiesManager.validate(newProperties)) {
@@ -266,7 +270,7 @@ public class MultimeterClient {
 	
 	public void toggleEventType(EventType type) {
 		onTargetMeter(meter -> {
-			MeterProperties newProperties = new MeterProperties();
+			MutableMeterProperties newProperties = new MutableMeterProperties();
 			newProperties.setEventTypes(meter.getEventTypes());
 			newProperties.toggleEventType(type);
 			

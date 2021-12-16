@@ -1,11 +1,8 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import java.util.List;
-
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import redstone.multimeter.client.gui.element.AbstractElement;
@@ -78,11 +75,6 @@ public class MeterListRenderer extends AbstractElement {
 	@Override
 	public void tick() {
 		
-	}
-	
-	@Override
-	public List<Text> getTooltip(int mouseX, int mouseY) {
-		return null;
 	}
 	
 	@Override

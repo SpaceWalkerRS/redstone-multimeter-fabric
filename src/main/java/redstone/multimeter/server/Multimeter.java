@@ -35,6 +35,7 @@ import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.packets.ClearMeterGroupPacket;
 import redstone.multimeter.common.network.packets.MeterGroupDefaultPacket;
@@ -50,6 +51,8 @@ import redstone.multimeter.server.option.OptionsManager;
 import redstone.multimeter.util.TextUtils;
 
 public class Multimeter {
+	
+	private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance(Locale.US);
 	
 	private final MultimeterServer server;
 	private final Map<String, ServerMeterGroup> meterGroups;
@@ -199,7 +202,9 @@ public class Multimeter {
 		}
 	}
 	
-	public boolean addMeter(ServerMeterGroup meterGroup, MeterProperties properties) {
+	public boolean addMeter(ServerMeterGroup meterGroup, MeterProperties meterProperties) {
+		MutableMeterProperties properties = meterProperties.toMutable();
+		
 		if (!meterPropertiesManager.validate(properties) || !meterGroup.addMeter(properties)) {
 			return false;
 		}
@@ -286,6 +291,14 @@ public class Multimeter {
 		if (meterGroup.updateIdleState()) {
 			activeMeterGroups.add(meterGroup);
 			idleMeterGroups.remove(meterGroup);
+		}
+	}
+	
+	public void unsubscribeFromMeterGroup(ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = getSubscription(player);
+		
+		if (meterGroup != null) {
+			unsubscribeFromMeterGroup(meterGroup, player);
 		}
 	}
 	
@@ -428,14 +441,12 @@ public class Multimeter {
 	 * a meter.
 	 */
 	private void sendClickableReturnMessage(ServerWorld world, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayerEntity player) {
-		NumberFormat f = NumberFormat.getNumberInstance(Locale.US); // use . as decimal separator
-		
 		String worldId = world.getRegistryKey().getValue().toString();
-		String x = f.format(_x);
-		String y = f.format(_y);
-		String z = f.format(_z);
-		String yaw = f.format(_yaw);
-		String pitch = f.format(_pitch);
+		String x = NUMBER_FORMAT.format(_x);
+		String y = NUMBER_FORMAT.format(_y);
+		String z = NUMBER_FORMAT.format(_z);
+		String yaw = NUMBER_FORMAT.format(_yaw);
+		String pitch = NUMBER_FORMAT.format(_pitch);
 		
 		Text message = new LiteralText("Click ").
 			append(new LiteralText("[here]").styled((style) -> {

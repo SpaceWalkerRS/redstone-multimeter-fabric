@@ -1,4 +1,4 @@
-package redstone.multimeter.client.gui.element;
+package redstone.multimeter.client.gui.screen;
 
 import java.util.List;
 
@@ -9,7 +9,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.TextureRegion;
+import redstone.multimeter.client.gui.Texture;
+import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.element.AbstractParentElement;
 
 public abstract class RSMMScreen extends AbstractParentElement {
 	
@@ -44,9 +46,9 @@ public abstract class RSMMScreen extends AbstractParentElement {
 			renderText(font, matrices, title, x, y, true, 0xFFFFFFFF);
 		}
 		
-		List<Text> tooltip = getTooltip(mouseX, mouseY);
+		Tooltip tooltip = getTooltip(mouseX, mouseY);
 		
-		if (tooltip != null && !tooltip.isEmpty()) {
+		if (!tooltip.isEmpty()) {
 			drawTooltip(matrices, tooltip, mouseX, mouseY);
 		}
 	}
@@ -77,6 +79,16 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	@Override
+	public void setWidth(int width) {
+		super.setWidth(width);
+	}
+	
+	@Override
+	public void setHeight(int height) {
+		super.setHeight(height);
+	}
+	
+	@Override
 	protected final void onChangedX(int x) {
 		
 	}
@@ -97,24 +109,38 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	protected void renderBackground(MatrixStack matrices) {
-		MinecraftClient minecraftClient = client.getMinecraftClient();
-		
-		if (minecraftClient.world == null) {
-			renderBackgroundTexture(matrices);
-		} else {
+		if (hasTransparentBackground()) {
 			renderGradient(matrices, getX(), getY(), getWidth(), getHeight(), 0xC0101010, 0xD0101010);
+		} else {
+			renderBackgroundTexture(matrices);
 		}
 	}
 	
+	protected boolean hasTransparentBackground() {
+		return minecraftClient.world != null;
+	}
+	
 	protected void renderBackgroundTexture(MatrixStack matrices) {
-		renderTextureRegion(matrices, TextureRegion.OPTIONS_BACKGROUND, getX(), getY(), getWidth(), getHeight());
+		int x0 = getX();
+		int y0 = getY();
+		int x1 = x0 + getWidth();
+		int y1 = y0 + getHeight();
+		
+		int tx0 = x0 / 2;
+		int ty0 = y0 / 2;
+		int tx1 = x1 / 2;
+		int ty1 = y1 / 2;
+		
+		renderTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
 	}
 	
 	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY) {
 		super.render(matrices, mouseX, mouseY);
 	}
 	
-	protected void drawTooltip(MatrixStack matrices, List<Text> lines, int mouseX, int mouseY) {
+	protected void drawTooltip(MatrixStack matrices, Tooltip tooltip, int mouseX, int mouseY) {
+		List<Text> lines = tooltip.getLines();
+		
 		int lineHeight = font.fontHeight;
 		int lineSpacing = 1;
 		

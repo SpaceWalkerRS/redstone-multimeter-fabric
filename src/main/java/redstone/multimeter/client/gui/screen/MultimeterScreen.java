@@ -1,4 +1,4 @@
-package redstone.multimeter.client.gui;
+package redstone.multimeter.client.gui.screen;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -6,7 +6,6 @@ import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.element.RSMMScreen;
 import redstone.multimeter.client.gui.element.ScrollableListElement;
 import redstone.multimeter.client.gui.element.meter.MeterControlsElement;
 import redstone.multimeter.client.gui.hud.MultimeterHud;

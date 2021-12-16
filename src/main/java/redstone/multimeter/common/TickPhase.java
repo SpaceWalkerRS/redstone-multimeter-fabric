@@ -1,13 +1,11 @@
 package redstone.multimeter.common;
 
 import java.util.Arrays;
-import java.util.List;
 
 import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 
+import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.util.NbtUtils;
 import redstone.multimeter.util.TextUtils;
 
@@ -41,16 +39,14 @@ public class TickPhase {
 		return string;
 	}
 	
-	public void addTextForTooltip(List<Text> lines) {
-		TextUtils.addFancyText(lines, "tick phase", tasks[0].getName());
+	public void addTextToTooltip(Tooltip tooltip) {
+		tooltip.add(TextUtils.formatFancyText("tick phase", tasks[0].getName()));
 		
 		// used to indent subsequent lines
 		String whitespace = "              ";
 		
 		for (int index = 1; index < tasks.length; index++) {
-			String text = whitespace + "> " + tasks[index].getName();
-			lines.add(new LiteralText(text));
-			
+			tooltip.add(whitespace + "> " + tasks[index].getName());
 			whitespace += "  ";
 		}
 	}

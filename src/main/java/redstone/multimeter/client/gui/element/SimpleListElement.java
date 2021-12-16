@@ -1,17 +1,24 @@
 package redstone.multimeter.client.gui.element;
 
+import java.text.Collator;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.function.Predicate;
 
 import net.minecraft.client.util.math.MatrixStack;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
+import redstone.multimeter.client.gui.screen.RSMMScreen;
 
 public class SimpleListElement extends AbstractParentElement {
 	
 	protected static final int BORDER_MARGIN_TOP = 6;
 	protected static final int BORDER_MARGIN_BOTTOM = 3;
+	protected static final Collator COLLATOR = Collator.getInstance();
 	
 	protected final MultimeterClient client;
 	protected final int topBorder;
@@ -22,6 +29,11 @@ public class SimpleListElement extends AbstractParentElement {
 	private int minY;
 	private int maxY;
 	private boolean drawBackground;
+	
+	private Comparator<IElement> sorter;
+	private Predicate<IElement> filter;
+	
+	private boolean shouldUpdateHovered;
 	
 	public SimpleListElement(MultimeterClient client, int width) {
 		this(client, width, 0, 0);
@@ -34,31 +46,24 @@ public class SimpleListElement extends AbstractParentElement {
 		
 		this.spacing = 2;
 		
+		this.sorter = null;
+		this.filter = e -> true;
+		
 		setWidth(width);
 	}
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY) {
+		if (shouldUpdateHovered) {
+			updateHoveredElement(mouseX, mouseY);
+			shouldUpdateHovered = false;
+		}
+		
 		if (drawBackground) {
 			drawBackground(matrices);
 		}
 		
-		List<IElement> children = getChildren();
-		
-		for (int index = 0; index < children.size(); index++) {
-			IElement element = children.get(index);
-			
-			if (element.getY() + element.getHeight() < minY) {
-				continue;
-			}
-			if (element.getY() > maxY) {
-				break;
-			}
-			
-			if (element.isVisible()) {
-				element.render(matrices, mouseX, mouseY);
-			}
-		}
+		renderList(matrices, mouseX, mouseY);
 		
 		if (drawBackground) {
 			drawBorders(matrices);
@@ -67,21 +72,30 @@ public class SimpleListElement extends AbstractParentElement {
 	
 	@Override
 	public boolean isHovered(double mouseX, double mouseY) {
+		// ignore when the mouse is hovering over the borders
 		return mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= minY && mouseY <= maxY;
 	}
 	
 	@Override
 	public int getHeight() {
+		// return the height minus the borders
 		return height;
 	}
 	
 	@Override
-	public void onChangedX(int x) {
+	public void update() {
+		sort();
+		updateCoords();
+		super.update();
+	}
+	
+	@Override
+	protected void onChangedX(int x) {
 		updateContentX();
 	}
 	
 	@Override
-	public void onChangedY(int y) {
+	protected void onChangedY(int y) {
 		updateContentY();
 	}
 	
@@ -101,9 +115,36 @@ public class SimpleListElement extends AbstractParentElement {
 		renderTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x20, 0x20, 0x20);
 	}
 	
+	protected void renderList(MatrixStack matrices, int mouseX, int mouseY) {
+		List<IElement> children = getChildren();
+		
+		for (int index = 0; index < children.size(); index++) {
+			IElement element = children.get(index);
+			
+			if (element.getY() + element.getHeight() < minY) {
+				continue;
+			}
+			if (element.getY() > maxY) {
+				break;
+			}
+			
+			if (element.isVisible()) {
+				renderElement(element, matrices, mouseX, mouseY);
+			}
+		}
+	}
+	
+	protected void renderElement(IElement element, MatrixStack matrices, int mouseX, int mouseY) {
+		element.render(matrices, mouseX, mouseY);
+	}
+	
 	protected void drawBorders(MatrixStack matrices) {
 		boolean renderTop = topBorder > 0;
 		boolean renderBottom = bottomBorder > 0;
+		
+		if (!renderTop && !renderBottom) {
+			return;
+		}
 		
 		int x = getX();
 		int width = getWidth();
@@ -140,7 +181,7 @@ public class SimpleListElement extends AbstractParentElement {
 		}
 	}
 	
-	protected int getTotalHeight() {
+	public int getTotalHeight() {
 		return getHeight() + (topBorder + BORDER_MARGIN_TOP) + (bottomBorder + BORDER_MARGIN_BOTTOM);
 	}
 	
@@ -148,24 +189,68 @@ public class SimpleListElement extends AbstractParentElement {
 		return spacing * (getChildren().size() - 1);
 	}
 	
+	protected int getAmountOffScreen(IElement element) {
+		int top = element.getY();
+		
+		if (top < minY) {
+			return top - minY - 1;
+		}
+		
+		int bottom = top + element.getHeight();
+		
+		if (bottom > maxY) {
+			return bottom - maxY + 1;
+		}
+		
+		return 0;
+	}
+	
+	public int getEffectiveWidth() {
+		return getWidth();
+	}
+	
+	private void sort() {
+		if (sorter == null) {
+			return;
+		}
+		
+		List<IElement> children = getChildren();
+		Queue<IElement> queue = new PriorityQueue<>(sorter);
+		
+		for (int index = 0; index < children.size(); index++) {
+			queue.add(children.get(index));
+		}
+		
+		children.clear();
+		
+		while (!queue.isEmpty()) {
+			children.add(queue.poll());
+		}
+	}
+	
 	protected void updateContentX() {
+		List<IElement> children = getChildren();
 		int x = getX();
 		
-		for (IElement element : getChildren()) {
-			element.setX(x);
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).setX(x);
 		}
 	}
 	
 	protected void updateContentY() {
+		List<IElement> children = getChildren();
 		int yStart = getY() + topBorder + BORDER_MARGIN_TOP + getOffsetY();
 		int y = yStart;
 		
-		List<IElement> children = getChildren();
-		
 		for (int index = 0; index < children.size(); index++) {
 			IElement element = children.get(index);
+			
 			element.setY(y);
-			y += element.getHeight() + spacing;
+			element.setVisible(filter.test(element));
+			
+			if (element.isVisible()) {
+				y += element.getHeight() + spacing;
+			}
 		}
 		
 		RSMMScreen screen = client.getScreen();
@@ -173,13 +258,15 @@ public class SimpleListElement extends AbstractParentElement {
 		height = (y - spacing) - yStart;
 		minY = Math.max(getY() + topBorder, screen.getY());
 		maxY = Math.min(getY() + getTotalHeight() - bottomBorder, screen.getY() + screen.getHeight());
+		
+		shouldUpdateHovered = true;
 	}
 	
 	protected int getOffsetY() {
 		return 0;
 	}
 	
-	public boolean isDrawingBackground() {
+	public boolean shouldDrawBackground() {
 		return drawBackground;
 	}
 	
@@ -213,5 +300,17 @@ public class SimpleListElement extends AbstractParentElement {
 		}
 		
 		this.spacing = spacing;
+	}
+	
+	public void setSorter(Comparator<IElement> sorter) {
+		this.sorter = sorter;
+	}
+	
+	public void setFilter(Predicate<IElement> filter) {
+		if (filter == null) {
+			filter = e -> true;
+		}
+		
+		this.filter = filter;
 	}
 }

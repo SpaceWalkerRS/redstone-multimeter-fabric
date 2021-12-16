@@ -27,7 +27,7 @@ public class Options {
 		public static final BooleanOption                SHIFTY_METERS        = new BooleanOption("Shifty Meters", "Use the shift key to control whether a new meter is movable or not.", true);
 		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("Auto Random Ticks", String.format("Automatically enable the \'%s\' event type when placing a meter on a block that accepts random ticks.", EventType.RANDOM_TICK.getName()), true);
 		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("Create Group On Join", "Automatically create a new meter group upon joining a world or server.", true);
-		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption("Default Meter Group", "The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used.", "", MeterGroup.getMaxNameLength());
+		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption("Default Meter Group", "The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used instead.", "", MeterGroup.getMaxNameLength());
 		
 	}
 	
@@ -57,6 +57,7 @@ public class Options {
 	public static class Miscellaneous {
 		
 		public static final IntegerOption                SCROLL_SPEED         = new IntegerOption("Scroll Speed", "The scroll speed in Redstone Multimeter related GUIs.", 7, 1, 69);
+		public static final IntegerOption                DOUBLE_CLICK_TIME    = new IntegerOption("Double Click Time", "The double click time in Redstone Multimeter related GUIs.", 5, 1, 500);
 		public static final BooleanOption                VERSION_WARNING      = new BooleanOption("Version Warning", "Send a warning message in chat when you join a server that has a different version of Redstone Multimeter installed.", true);
 		
 	}
@@ -193,6 +194,7 @@ public class Options {
 		);
 		register("Miscellaneous",
 			Miscellaneous.SCROLL_SPEED,
+			Miscellaneous.DOUBLE_CLICK_TIME,
 			Miscellaneous.VERSION_WARNING
 		);
 	}

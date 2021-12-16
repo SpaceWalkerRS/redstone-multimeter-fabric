@@ -12,6 +12,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.IElement;
 import redstone.multimeter.client.gui.element.TextElement;
@@ -266,11 +267,11 @@ public class MultimeterHud extends AbstractParentElement {
 			t.add(text).setColor(color);
 		});
 		
-		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> null, button -> {
+		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.EMPTY, button -> {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> null, button -> {
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
 			stepBackward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -280,7 +281,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> null, button -> {
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
 			stepForward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {

@@ -3,10 +3,9 @@ package redstone.multimeter.client;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
-
-import redstone.multimeter.client.gui.MultimeterScreen;
-import redstone.multimeter.client.gui.OptionsScreen;
-import redstone.multimeter.client.gui.element.RSMMScreen;
+import redstone.multimeter.client.gui.screen.MultimeterScreen;
+import redstone.multimeter.client.gui.screen.OptionsScreen;
+import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.common.meter.event.EventType;
 
 public class InputHandler {

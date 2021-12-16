@@ -18,6 +18,7 @@ import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.MeterEvent;
 import redstone.multimeter.common.network.packets.MeterUpdatesPacket;
 import redstone.multimeter.server.Multimeter;
@@ -107,7 +108,7 @@ public class ServerMeterGroup extends MeterGroup {
 		return multimeter;
 	}
 	
-	public boolean addMeter(MeterProperties properties) {
+	public boolean addMeter(MutableMeterProperties properties) {
 		return addMeter(new Meter(properties));
 	}
 	
