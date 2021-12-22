@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import net.minecraft.class_1015;
+import com.mojang.blaze3d.platform.GlStateManager;
 
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.Directionality;
@@ -19,17 +19,17 @@ public abstract class MeterEventViewer extends AbstractElement {
 	
 	@Override
 	public void render(int mouseX, int mouseY) {
-		class_1015.method_4461();
+		GlStateManager.pushMatrix();
 		drawHighlights(mouseX, mouseY);
-		class_1015.method_4412(0, 0, -1);
+		GlStateManager.translated(0, 0, -1);
 		drawDecorators();
-		class_1015.method_4412(0, 0, -1);
+		GlStateManager.translated(0, 0, -1);
 		drawMeterEvents();
-		class_1015.method_4412(0, 0, -1);
+		GlStateManager.translated(0, 0, -1);
 		drawGridLines();
-		class_1015.method_4412(0, 0, -1);
+		GlStateManager.translated(0, 0, -1);
 		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		class_1015.method_4350();
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
@@ -107,7 +107,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 	protected abstract void drawMeterEvents();
 	
 	private void drawGridLines() {
-		class_1015.method_4461();
+		GlStateManager.pushMatrix();
 		
 		int columns = getColumnCount();
 		int rows = hud.meters.size();
@@ -130,7 +130,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		class_1015.method_4412(0, 0, -0.1);
+		GlStateManager.translated(0, 0, -0.1);
 		
 		// horizonal lines
 		for (int i = 0; i <= rows; i++) {
@@ -143,7 +143,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		class_1015.method_4412(0, 0, -0.1);
+		GlStateManager.translated(0, 0, -0.1);
 		
 		// vertical lines
 		for (int i = 0; i <= columns; i++) {
@@ -156,7 +156,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		class_1015.method_4350();
+		GlStateManager.popMatrix();
 	}
 	
 	protected abstract int getColumnCount();

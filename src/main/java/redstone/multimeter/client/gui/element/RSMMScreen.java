@@ -2,7 +2,8 @@ package redstone.multimeter.client.gui.element;
 
 import java.util.List;
 
-import net.minecraft.class_1015;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -151,8 +152,8 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		int borderColor0    = 0x505000FF;
 		int borderColor1    = 0x5028007F;
 		
-		class_1015.method_4461();
-		class_1015.method_4412(0, 0, 400);
+		GlStateManager.pushMatrix();
+		GlStateManager.translated(0, 0, 400);
 		
 		renderRect(bufferBuilder -> {
 			// background
@@ -177,7 +178,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 			textY += font.fontHeight + 1;
 		}
 		
-		class_1015.method_4350();
+		GlStateManager.popMatrix();
 	}
 	
 	public Text getTitle() {
@@ -189,6 +190,6 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	public static boolean isControlPressed() {
-		return Screen.method_2238() && !Screen.method_2223() && !Screen.method_2232();
+		return Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
 	}
 }

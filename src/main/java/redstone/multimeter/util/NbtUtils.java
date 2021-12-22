@@ -1,8 +1,8 @@
 package redstone.multimeter.util;
 
+import net.minecraft.class_4373;
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.util.Identifier;
 
 public class NbtUtils {
@@ -21,7 +21,7 @@ public class NbtUtils {
 	public static final byte TYPE_INT_ARRAY  = 11;
 	public static final byte TYPE_LONG_ARRAY = 12;
 	
-	public static final Tag NULL = new ByteTag((byte)0);
+	public static final class_4373 NULL = new ByteTag((byte)0);
 	
 	public static CompoundTag identifierToNbt(Identifier id) {
 		CompoundTag nbt = new CompoundTag();

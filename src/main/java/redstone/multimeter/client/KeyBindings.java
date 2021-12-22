@@ -15,8 +15,8 @@ import java.util.Set;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.class_305;
-import net.minecraft.class_305.class_306;
+import net.minecraft.class_4107;
+import net.minecraft.class_4107.class_4108;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 
@@ -57,7 +57,7 @@ public class KeyBindings {
 	}
 	
 	private static KeyBinding registerKeyBinding(KeyBinding keyBinding) {
-		if (KEY_BINDINGS.putIfAbsent(keyBinding.getId(), keyBinding) != null) {
+		if (KEY_BINDINGS.putIfAbsent(keyBinding.getTranslationKey(), keyBinding) != null) {
 			throw new IllegalStateException("Cannot register multiple keybinds with the same name!");
 		}
 		
@@ -96,7 +96,7 @@ public class KeyBindings {
 				KeyBinding keyBinding = KEY_BINDINGS.get(name);
 				
 				if (keyBinding != null) {
-					keyBinding.method_1422(class_305.method_1440(key));
+					keyBinding.method_18170(class_4107.method_18156(key));
 				}
 			}
 		} catch (IOException e) {
@@ -119,8 +119,8 @@ public class KeyBindings {
 		
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
 			for (KeyBinding keyBinding : KEY_BINDINGS.values()) {
-				String name = keyBinding.getId();
-				String key = keyBinding.getName();
+				String name = keyBinding.getTranslationKey();
+				String key = keyBinding.method_18176();
 				
 				bw.write(name + "=" + key);
 				bw.newLine();
@@ -131,8 +131,8 @@ public class KeyBindings {
 	}
 	
 	public static boolean isPressed(MinecraftClient client, KeyBinding keyBinding) {
-		class_306 key = ((IKeyBinding)keyBinding).getBoundKey();
-		return key != null && GLFW.glfwGetKey(client.window.getHandle(), key.method_1444()) == GLFW.GLFW_PRESS;
+		class_4108 key = ((IKeyBinding)keyBinding).getBoundKey();
+		return key != null && GLFW.glfwGetKey(client.field_19944.method_18315(), key.method_18159()) == GLFW.GLFW_PRESS;
 	}
 	
 	static {

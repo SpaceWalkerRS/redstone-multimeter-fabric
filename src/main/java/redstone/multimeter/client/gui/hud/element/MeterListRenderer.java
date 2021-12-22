@@ -2,7 +2,8 @@ package redstone.multimeter.client.gui.hud.element;
 
 import java.util.List;
 
-import net.minecraft.class_1015;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -25,13 +26,13 @@ public class MeterListRenderer extends AbstractElement {
 	
 	@Override
 	public void render(int mouseX, int mouseY) {
-		class_1015.method_4461();
+		GlStateManager.pushMatrix();
 		drawHighlights(mouseX, mouseY);
-		class_1015.method_4412(0, 0, -1);
+		GlStateManager.translated(0, 0, -1);
 		drawNames();
-		class_1015.method_4412(0, 0, -1);
+		GlStateManager.translated(0, 0, -1);
 		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		class_1015.method_4350();
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
@@ -122,7 +123,7 @@ public class MeterListRenderer extends AbstractElement {
 			Text name = new LiteralText(meter.getName());
 			
 			if (meter.isHidden()) {
-				name.formatted(Formatting.GRAY, Formatting.ITALIC);
+				name.method_20173(Formatting.GRAY, Formatting.ITALIC);
 			}
 			
 			hud.renderer.renderText(name, x, y, 0xFFFFFF);

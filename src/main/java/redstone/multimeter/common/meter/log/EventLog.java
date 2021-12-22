@@ -103,10 +103,10 @@ public class EventLog {
 	public CompoundTag toNbt() {
 		CompoundTag nbt = new CompoundTag();
 		
-		nbt.method_10566("meter event", event.toNbt());
+		nbt.method_814("meter event", event.toNbt());
 		nbt.putLong("tick", tick);
 		nbt.putInt("subtick", subtick);
-		nbt.method_10566("tick phase", tickPhase.toNbt());
+		nbt.method_814("tick phase", tickPhase.toNbt());
 		
 		return nbt;
 	}
@@ -117,7 +117,7 @@ public class EventLog {
 		log.event = MeterEvent.fromNbt(nbt.getCompound("meter event"));
 		log.tick = nbt.getLong("tick");
 		log.subtick = nbt.getInt("subtick");
-		log.tickPhase = TickPhase.fromNbt(nbt.get("tick phase"));
+		log.tickPhase = TickPhase.fromNbt(nbt.method_807("tick phase"));
 		
 		return log;
 	}

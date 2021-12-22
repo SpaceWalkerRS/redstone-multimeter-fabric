@@ -70,7 +70,7 @@ public class TextUtils {
 	
 	public static Text formatFancyText(String title, String info) {
 		return new LiteralText("").
-			append(new LiteralText(title + ": ").formatted(Formatting.GOLD)).
+			append(new LiteralText(title + ": ").method_20170(Formatting.GOLD)).
 			append(new LiteralText(info));
 	}
 }

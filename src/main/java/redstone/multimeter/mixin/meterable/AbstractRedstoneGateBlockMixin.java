@@ -6,21 +6,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.BlockState;
-import net.minecraft.block.AbstractRedstoneGateBlock;
-import net.minecraft.state.property.Properties;
+import net.minecraft.class_3772;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.RedstoneComponentBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 
-@Mixin(AbstractRedstoneGateBlock.class)
+@Mixin(RedstoneComponentBlock.class)
 public abstract class AbstractRedstoneGateBlockMixin implements MeterableBlock {
 	
-	@Shadow protected abstract boolean method_9990(World world, BlockPos pos, BlockState state);
+	@Shadow protected abstract boolean method_8727(World world, BlockPos pos, BlockState state);
 	
 	@Inject(
-			method = "method_9990",
+			method = "method_8727",
 			at = @At(
 					value = "RETURN"
 			)
@@ -36,11 +36,11 @@ public abstract class AbstractRedstoneGateBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return method_9990(world, pos, state);
+		return method_8727(world, pos, state);
 	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED);
+		return state.method_16934(class_3772.field_18783);
 	}
 }

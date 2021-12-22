@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -29,19 +29,19 @@ import redstone.multimeter.server.MultimeterServer;
 @Mixin(World.class)
 public abstract class WorldMixin implements IWorld {
 	
-	@Shadow protected abstract boolean isClient();
+	@Shadow protected abstract boolean method_16390();
 	
 	@Inject(
-			method = "updateNeighbor",
+			method = "method_8546",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/BlockState;method_73267(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/BlockState;method_16872(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
 	private void onBlockUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
-		if (isClient()) {
+		if (method_16390()) {
 			return;
 		}
 		
@@ -59,7 +59,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			at = @At(
 					value = "HEAD"
 			)
@@ -69,10 +69,10 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15396(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
 					args = "ldc=global"
 			)
 	)
@@ -81,7 +81,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
@@ -90,16 +90,16 @@ public abstract class WorldMixin implements IWorld {
 			)
 	)
 	private void onGlobalEntityTick(CallbackInfo ci, int index, Entity entity) {
-		if (!isClient()) {
+		if (!method_16390()) {
 			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
 		}
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 					args = "ldc=regular"
 			)
 	)
@@ -108,10 +108,10 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 					args = "ldc=blockEntities"
 			)
 	)
@@ -120,24 +120,24 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/util/Tickable;method_12953()V"
+					target = "Lnet/minecraft/util/Tickable;tick()V"
 			)
 	)
 	private void onBlockEntityTick(CallbackInfo ci, Iterator<BlockEntity> it, BlockEntity blockEntity) {
-		if (!isClient()) {
+		if (!method_16390()) {
 			((IServerWorld)this).getMultimeter().logBlockEntityTick((World)(Object)this, blockEntity);
 		}
 	}
 	
 	@Inject(
-			method = "method_8429",
+			method = "tickEntities",
 			at = @At(
-					value = "HEAD"
+					value = "RETURN"
 			)
 	)
 	private void endTickTaskBlockEntitiesAndEntities(CallbackInfo ci) {
@@ -146,7 +146,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8553",
+			method = "method_3636",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
@@ -154,13 +154,13 @@ public abstract class WorldMixin implements IWorld {
 			)
 	)
 	private void onEntityTick(Entity entity, boolean bl, CallbackInfo ci) {
-		if (!isClient()) {
+		if (!method_16390()) {
 			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
 		}
 	}
 	
 	@Inject(
-			method = "method_8441",
+			method = "method_16327",
 			at = @At(
 					value = "HEAD"
 			)
@@ -170,11 +170,11 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8441",
+			method = "method_16327",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/world/World;method_8511()V"
+					target = "Lnet/minecraft/world/World;tickWeather()V"
 			)
 	)
 	private void swapTickTaskWeather(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
@@ -182,7 +182,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_8441",
+			method = "method_16327",
 			at = @At(
 					value = "RETURN"
 			)
@@ -197,11 +197,11 @@ public abstract class WorldMixin implements IWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/BlockState;method_73267(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/BlockState;method_16872(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
 	private void onComparatorUpdate(BlockPos fromPos, Block fromBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {
-		if (!isClient()) {
+		if (!method_16390()) {
 			((IServerWorld)this).getMultimeter().logComparatorUpdate((World)(Object)this, pos);
 		}
 	}

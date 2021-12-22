@@ -18,7 +18,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	private MultimeterClient multimeterClient;
 	
 	@Inject(
-			method = "init",
+			method = "initializeGame",
 			at = @At(
 					value = "RETURN"
 			)
@@ -28,7 +28,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
-			method = "method_1521",
+			method = "stitchTextures",
 			at = @At(
 					value = "HEAD"
 			)
@@ -40,7 +40,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
-			method = "handleInputEvents",
+			method = "method_12140",
 			at = @At(
 					value = "HEAD"
 			)
@@ -50,7 +50,7 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
-			method = "method_1550",
+			method = "method_18206",
 			at = @At(
 					value = "HEAD"
 			)

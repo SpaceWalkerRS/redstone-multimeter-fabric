@@ -2,9 +2,9 @@ package redstone.multimeter.mixin.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.BlockState;
+import net.minecraft.class_3772;
 import net.minecraft.block.AbstractButtonBlock;
-import net.minecraft.state.property.Properties;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -16,11 +16,11 @@ public abstract class AbstractButtonBlockMixin implements Meterable, PowerSource
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED);
+		return state.method_16934(class_3772.field_18783);
 	}
 	
 	@Override
 	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED) ? MAX_POWER : MIN_POWER;
+		return state.method_16934(class_3772.field_18783) ? MAX_POWER : MIN_POWER;
 	}
 }

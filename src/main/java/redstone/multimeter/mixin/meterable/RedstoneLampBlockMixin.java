@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.BlockState;
+import net.minecraft.class_3772;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.RedstoneLampBlock;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -19,7 +19,7 @@ import redstone.multimeter.block.MeterableBlock;
 public class RedstoneLampBlockMixin implements MeterableBlock {
 	
 	@Inject(
-			method = "onScheduledTick",
+			method = "method_8661",
 			at = @At(
 					value = "HEAD"
 			)
@@ -30,6 +30,6 @@ public class RedstoneLampBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.LIT);
+		return state.method_16934(class_3772.field_18778);
 	}
 }

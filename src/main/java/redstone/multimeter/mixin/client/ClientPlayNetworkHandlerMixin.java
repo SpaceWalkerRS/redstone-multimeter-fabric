@@ -3,7 +3,6 @@ package redstone.multimeter.mixin.client;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -36,15 +35,13 @@ public class ClientPlayNetworkHandlerMixin {
 			method = "onCustomPayload",
 			cancellable = true,
 			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/network/packet/s2c/play/CustomPayloadS2CPacket;getChannel()Lnet/minecraft/util/Identifier;"
+					value = "HEAD"
 			)
 	)
 	private void handleCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
-		if (PacketManager.getPacketChannelId().equals(packet.getChannel())) {
-			NetworkThreadUtils.method_11074(packet, (ClientPlayNetworkHandler)(Object)this, client);
-			((IMinecraftClient)client).getMultimeterClient().getPacketHandler().onPacketReceived(packet.getData());
+		if (PacketManager.getPacketChannelId().equals(packet.method_7733())) {
+			NetworkThreadUtils.forceMainThread(packet, (ClientPlayNetworkHandler)(Object)this, client);
+			((IMinecraftClient)client).getMultimeterClient().getPacketHandler().onPacketReceived(packet.getPayload());
 			
 			ci.cancel();
 		}

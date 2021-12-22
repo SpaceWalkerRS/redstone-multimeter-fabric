@@ -11,10 +11,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
+import net.minecraft.class_3772;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.PistonBlock;
 import net.minecraft.block.piston.PistonHandler;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -34,7 +34,7 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 					value = "RETURN"
 			)
 	)
-	private void onShouldExtend(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
+	private void onPowerCheck(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
 		logPowered(world, pos, cir.getReturnValue());
 	}
 	
@@ -49,7 +49,7 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 			)
 	)
 	private void onBlockMoved(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonHandler pistonHandler, List<BlockPos> movedPositions, List<BlockState> movedStates, List<BlockPos> brokenPositions, int removedIndex, BlockState[] removedStates, Direction moveDir, Set<BlockPos> leftOverPositions, int brokenIndex, BlockPos movedPos, BlockState movedState) {
-		if (!world.isClient()) {
+		if (!world.method_16390()) {
 			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 			
 			multimeter.logMoved(world, movedPos, moveDir);
@@ -64,11 +64,11 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return shouldExtend(world, pos, state.get(Properties.FACING));
+		return shouldExtend(world, pos, state.method_16934(class_3772.field_18722));
 	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.EXTENDED);
+		return state.method_16934(class_3772.field_18769);
 	}
 }

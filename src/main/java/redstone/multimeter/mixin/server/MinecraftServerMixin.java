@@ -29,7 +29,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "method_20324",
 			at = @At(
 					value = "HEAD"
 			)
@@ -39,10 +39,10 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tickWorlds",
+			method = "method_20347",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15396(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
 					args = "ldc=jobs"
 			)
 	)
@@ -51,10 +51,10 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tickWorlds",
+			method = "method_20347",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 					args = "ldc=commandFunctions"
 			)
 	)
@@ -63,10 +63,10 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tickWorlds",
+			method = "method_20347",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/ProfilerSystem;method_15405(Ljava/lang/String;)V",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 					args = "ldc=levels"
 			)
 	)
@@ -75,17 +75,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "RETURN"
-			)
-	)
-	private void endTickTaskPacketsAndEndTick(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		multimeterServer.endTickTask();
-	}
-	
-	@Inject(
-			method = "tick",
+			method = "method_20324",
 			at = @At(
 					value = "RETURN"
 			)
@@ -95,7 +85,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "reload",
+			method = "method_14912",
 			at = @At(
 					value = "HEAD"
 			)

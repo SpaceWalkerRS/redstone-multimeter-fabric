@@ -128,7 +128,7 @@ public class Meter {
 		CompoundTag nbt = new CompoundTag();
 		
 		nbt.putLong("id", id);
-		nbt.method_10566("properties", properties.toNbt());
+		nbt.method_814("properties", properties.toNbt());
 		nbt.putBoolean("powered", powered);
 		nbt.putBoolean("active", active);
 		

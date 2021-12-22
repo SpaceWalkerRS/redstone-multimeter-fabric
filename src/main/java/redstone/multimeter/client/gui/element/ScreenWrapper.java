@@ -19,7 +19,7 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public void method_2214(int mouseX, int mouseY, float delta) {
+	public void render(int mouseX, int mouseY, float delta) {
 		screen.render(mouseX, mouseY);
 	}
 	
@@ -67,14 +67,14 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public boolean method_15913() {
+	public boolean method_18607() {
 		return screen.shouldCloseOnEsc();
 	}
 	
 	@Override
-	protected final void method_2224() {
-		screen.setWidth(field_2561);
-		screen.setHeight(field_2559);
+	protected final void init() {
+		screen.setWidth(width);
+		screen.setHeight(height);
 		
 		screen.removeChildren();
 		screen.initScreen();
@@ -82,14 +82,14 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public void method_2225() {
+	public void tick() {
 		screen.tick();
 	}
 	
 	@Override
-	public void method_2234() {
+	public void removed() {
 		screen.onRemoved();
-		screen.setCursor(field_2563, CursorType.ARROW);
+		screen.setCursor(client, CursorType.ARROW);
 	}
 	
 	public Screen getParent() {

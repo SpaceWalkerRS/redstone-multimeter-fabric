@@ -25,41 +25,41 @@ import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 @Mixin(IntegratedServer.class)
 public abstract class IntegratedServerMixin extends MinecraftServer implements IMinecraftServer {
 	
-	@Shadow private boolean field_5524;
+	@Shadow private boolean paused;
 	
 	public IntegratedServerMixin(File file, Proxy proxy, DataFixer dataFixer, CommandManager commandManager, YggdrasilAuthenticationService yggdrasilAuthenticationService, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache userCache) {
 		super(file, proxy, dataFixer, commandManager, yggdrasilAuthenticationService, minecraftSessionService, gameProfileRepository, userCache);
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "method_20324",
 			at = @At(
 					value = "FIELD",
-					target = "Lnet/minecraft/server/integrated/IntegratedServer;field_77592:Ljava/util/Queue;"
+					target = "Lnet/minecraft/server/integrated/IntegratedServer;queue:Ljava/util/Queue;"
 			)
 	)
 	private void onTickStart(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
 		// When the server is paused, the tick method is not called
-		if (field_77592.isEmpty()) {
+		if (queue.isEmpty()) {
 			getMultimeterServer().tickStart();
 		}
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "method_20324",
 			at = @At(
 					value = "RETURN"
 			)
 	)
 	private void onTickEnd(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
 		// When the server is paused, the tick method is not called
-		if (field_5524) {
+		if (paused) {
 			getMultimeterServer().tickEnd();
 		}
 	}
 	
 	@Override
 	public boolean isPaused() {
-		return field_5524;
+		return paused;
 	}
 }

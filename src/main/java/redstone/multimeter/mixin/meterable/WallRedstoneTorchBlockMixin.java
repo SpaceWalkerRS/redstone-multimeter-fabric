@@ -5,18 +5,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.BlockState;
-import net.minecraft.block.WallRedstoneTorchBlock;
+import net.minecraft.class_3717;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 
-@Mixin(WallRedstoneTorchBlock.class)
+@Mixin(class_3717.class)
 public abstract class WallRedstoneTorchBlockMixin implements MeterableBlock {
 	
 	@Inject(
-			method = "method_10488",
+			method = "method_8885",
 			at = @At(
 					value = "RETURN"
 			)

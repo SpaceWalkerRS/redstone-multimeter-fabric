@@ -78,6 +78,6 @@ public interface IElement {
 	public void update();
 	
 	default void setCursor(MinecraftClient client, CursorType type) {
-		GLFW.glfwSetCursor(client.window.getHandle(), type.getCursor());
+		GLFW.glfwSetCursor(client.field_19944.method_18315(), type.getCursor());
 	}
 }

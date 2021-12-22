@@ -173,7 +173,7 @@ public class MultimeterClient {
 			connected = true;
 			
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
+				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).method_20170(Formatting.RED);
 				sendMessage(warning, false);
 			}
 			
@@ -285,11 +285,11 @@ public class MultimeterClient {
 	}
 	
 	private void onTargetBlock(Consumer<DimPos> consumer) {
-		HitResult hitResult = client.crosshairTarget;
+		HitResult hitResult = client.result;
 		
-		if (hitResult.field_1330 == HitResult.Type.BLOCK) {
+		if (hitResult.type == HitResult.Type.BLOCK) {
 			World world = client.world;
-			BlockPos blockPos = hitResult.method_1015();
+			BlockPos blockPos = hitResult.getBlockPos();
 			
 			consumer.accept(new DimPos(world, blockPos));
 		}
@@ -336,6 +336,6 @@ public class MultimeterClient {
 	}
 	
 	public void sendMessage(Text message, boolean actionBar) {
-		client.player.addChatMessage(message, actionBar);
+		client.player.method_8428(message, actionBar);
 	}
 }

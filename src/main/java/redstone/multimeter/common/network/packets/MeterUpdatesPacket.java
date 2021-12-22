@@ -46,13 +46,13 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			list.add(nbt);
 		}
 		
-		data.putLongArray("removed meters", removedMeters);
-		data.method_10566("meter updates", list);
+		data.method_20094("removed meters", removedMeters);
+		data.method_814("meter updates", list);
 	}
 	
 	@Override
 	public void decode(CompoundTag data) {
-		long[] ids = data.getLongArray("removed meters");
+		long[] ids = data.method_20095("removed meters");
 		ListTag list = data.getList("meter updates", NbtUtils.TYPE_COMPOUND);
 		
 		for (long id : ids) {

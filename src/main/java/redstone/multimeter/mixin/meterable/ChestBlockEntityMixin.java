@@ -19,7 +19,7 @@ public class ChestBlockEntityMixin implements IChestBlockEntity {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose()V"
+					target = "Lnet/minecraft/block/entity/ChestBlockEntity;method_16795()V"
 			)
 	)
 	private void onOpenedByPlayer(PlayerEntity player, CallbackInfo ci) {
@@ -31,7 +31,7 @@ public class ChestBlockEntityMixin implements IChestBlockEntity {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose()V"
+					target = "Lnet/minecraft/block/entity/ChestBlockEntity;method_16795()V"
 			)
 	)
 	private void onClosedByPlayer(PlayerEntity player, CallbackInfo ci) {

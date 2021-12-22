@@ -19,13 +19,13 @@ public class MultimeterScreen extends RSMMScreen {
 	public MultimeterScreen(MultimeterClient client) {
 		super(client, new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
 		
-		this.isPauseScreen = !Screen.method_2223();
+		this.isPauseScreen = !Screen.hasShiftDown();
 	}
 	
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
-		minecraftClient.keyboard.enableRepeatEvents(false);
+		minecraftClient.field_19946.method_18191(false);
 	}
 	
 	@Override
@@ -36,7 +36,7 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	protected void initScreen() {
-		minecraftClient.keyboard.enableRepeatEvents(true);
+		minecraftClient.field_19946.method_18191(true);
 		
 		list = new ScrollableListElement(client, getWidth(), getHeight());
 		list.setX(getX());

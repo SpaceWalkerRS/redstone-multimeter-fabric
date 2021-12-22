@@ -7,14 +7,15 @@ import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.SharedConstants;
-import net.minecraft.class_1015;
-import net.minecraft.client.Keyboard;
+import com.mojang.blaze3d.platform.GlStateManager;
+
+import net.minecraft.class_4110;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.text.Text;
+import net.minecraft.util.SharedConstants;
 import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -26,7 +27,7 @@ public class TextField extends AbstractButton {
 	
 	private static final int DOUBLE_CLICK_SPEED = 5;
 	
-	private final Keyboard keyboard;
+	private final class_4110 keyboard;
 	private final Consumer<String> listener;
 	private final Supplier<String> textSupplier;
 	
@@ -56,7 +57,7 @@ public class TextField extends AbstractButton {
 		
 		MinecraftClient minecraftClient = this.client.getMinecraftClient();
 		
-		this.keyboard = minecraftClient.keyboard;
+		this.keyboard = minecraftClient.field_19946;
 		this.listener = listener;
 		this.textSupplier = text;
 		
@@ -363,10 +364,10 @@ public class TextField extends AbstractButton {
 		int y1 = selectionY + selectionHeight;
 		int z = 0;
 		
-		class_1015.method_4381(0.0F, 0.0F, 0xFF, 0xFF);
-		class_1015.method_4407();
-		class_1015.method_4430();
-		class_1015.method_4452(class_1015.class_1030.field_5110);
+		GlStateManager.color4f(0.0F, 0.0F, 0xFF, 0xFF);
+		GlStateManager.disableTexture();
+		GlStateManager.enableColorLogic();
+		GlStateManager.method_9807(GlStateManager.class_2868.field_13505);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -380,9 +381,9 @@ public class TextField extends AbstractButton {
 		
 		tessellator.draw();
 		
-		class_1015.method_4446();
-		class_1015.method_4397();
-		class_1015.method_4381(0xFF, 0xFF, 0xFF, 0xFF);
+		GlStateManager.disableColorLogic();
+		GlStateManager.enableTexture();
+		GlStateManager.color4f(0xFF, 0xFF, 0xFF, 0xFF);
 	}
 	
 	private int getBorderColor() {
@@ -474,7 +475,7 @@ public class TextField extends AbstractButton {
 			String text = getSelection();
 			
 			if (!text.isEmpty()) {
-				keyboard.setClipboard(text);
+				keyboard.method_18187(text);
 				
 				if (erase) {
 					erase(false);
@@ -484,7 +485,7 @@ public class TextField extends AbstractButton {
 	}
 	
 	private void pasteClipboard() {
-		String text = keyboard.getClipboard();
+		String text = keyboard.method_18177();
 		
 		if (!text.isEmpty()) {
 			write(text);

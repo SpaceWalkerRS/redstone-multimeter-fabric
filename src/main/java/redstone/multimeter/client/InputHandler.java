@@ -46,10 +46,10 @@ public class InputHandler {
 			client.getHUD().pause();
 		}
 		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
-			client.getHUD().stepBackward(Screen.method_2238() ? 10 : 1);
+			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 		}
 		while (KeyBindings.STEP_FORWARD.wasPressed()) {
-			client.getHUD().stepForward(Screen.method_2238() ? 10 : 1);
+			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 		}
 		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
@@ -83,7 +83,7 @@ public class InputHandler {
 	// Methods for handling keybindings while the client has a screen open
 	
 	public boolean mouseClick(RSMMScreen screen, double mouseX, double mouseY, int button) {
-		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
+		if (KeyBindings.OPEN_MULTIMETER_SCREEN.method_18165(button)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
@@ -94,7 +94,7 @@ public class InputHandler {
 				}
 			}
 		} else
-		if (KeyBindings.OPEN_OPTIONS_MENU.matchesMouse(button)) {
+		if (KeyBindings.OPEN_OPTIONS_MENU.method_18165(button)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
@@ -102,14 +102,14 @@ public class InputHandler {
 			}
 		} else
 		if (screen instanceof MultimeterScreen) {
-			if (KeyBindings.PAUSE_METERS.matchesMouse(button)) {
+			if (KeyBindings.PAUSE_METERS.method_18165(button)) {
 				client.getHUD().pause();
 			} else
-			if (KeyBindings.STEP_BACKWARD.matchesMouse(button)) {
-				client.getHUD().stepBackward(Screen.method_2238() ? 10 : 1);
+			if (KeyBindings.STEP_BACKWARD.method_18165(button)) {
+				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 			} else
-			if (KeyBindings.STEP_FORWARD.matchesMouse(button)) {
-				client.getHUD().stepForward(Screen.method_2238() ? 10 : 1);
+			if (KeyBindings.STEP_FORWARD.method_18165(button)) {
+				client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 			} else {
 				return false;
 			}
@@ -121,7 +121,7 @@ public class InputHandler {
 	}
 	
 	public boolean keyPress(RSMMScreen screen, int keyCode, int scanCode, int modifiers) {
-		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
+		if (KeyBindings.OPEN_MULTIMETER_SCREEN.method_18166(keyCode, scanCode)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
@@ -132,7 +132,7 @@ public class InputHandler {
 				}
 			}
 		} else
-		if (KeyBindings.OPEN_OPTIONS_MENU.matchesKey(keyCode, scanCode)) {
+		if (KeyBindings.OPEN_OPTIONS_MENU.method_18166(keyCode, scanCode)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
@@ -140,14 +140,14 @@ public class InputHandler {
 			}
 		} else
 		if (screen instanceof MultimeterScreen) {
-			if (KeyBindings.PAUSE_METERS.matchesKey(keyCode, scanCode)) {
+			if (KeyBindings.PAUSE_METERS.method_18166(keyCode, scanCode)) {
 				client.getHUD().pause();
 			} else
-			if (KeyBindings.STEP_BACKWARD.matchesKey(keyCode, scanCode)) {
-				client.getHUD().stepBackward(Screen.method_2238() ? 10 : 1);
+			if (KeyBindings.STEP_BACKWARD.method_18166(keyCode, scanCode)) {
+				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 			} else
-			if (KeyBindings.STEP_FORWARD.matchesKey(keyCode, scanCode)) {
-				client.getHUD().stepForward(Screen.method_2238() ? 10 : 1);
+			if (KeyBindings.STEP_FORWARD.method_18166(keyCode, scanCode)) {
+				client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 			} else {
 				return false;
 			}

@@ -2,8 +2,8 @@ package redstone.multimeter.mixin.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.BlockState;
-import net.minecraft.block.TrappedChestBlock;
+import net.minecraft.class_3731;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -11,7 +11,7 @@ import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
 import redstone.multimeter.block.chest.TrappedChestHelper;
 
-@Mixin(TrappedChestBlock.class)
+@Mixin(class_3731.class)
 public abstract class TrappedChestBlockMixin implements Meterable, PowerSource {
 	
 	@Override

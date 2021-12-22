@@ -20,7 +20,7 @@ public class PlayerManagerMixin {
 	@Shadow @Final private MinecraftServer server;
 	
 	@Inject(
-			method = "onPlayerConnect",
+			method = "method_12827",
 			at = @At(
 					value = "RETURN"
 			)
@@ -30,7 +30,7 @@ public class PlayerManagerMixin {
 	}
 	
 	@Inject(
-			method = "remove",
+			method = "method_12830",
 			at = @At(
 					value = "HEAD"
 			)

@@ -25,7 +25,7 @@ public class MeterUpdatePacket implements RSMMPacket {
 	@Override
 	public void encode(CompoundTag data) {
 		data.putLong("id", id);
-		data.method_10566("properties", properties.toNbt());
+		data.method_814("properties", properties.toNbt());
 	}
 	
 	@Override

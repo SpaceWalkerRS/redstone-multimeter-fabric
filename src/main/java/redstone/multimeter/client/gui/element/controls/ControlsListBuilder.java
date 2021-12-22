@@ -56,7 +56,7 @@ public class ControlsListBuilder extends RenderHelper2D {
 			throw new IllegalStateException("This options list already contains a \'" + name + "\' category!");
 		}
 		
-		categories.put(name, new TextElement(client, 0, 0, t -> t.add(new LiteralText(name).formatted(Formatting.ITALIC)).setWithShadow(true), tooltip, onPress));
+		categories.put(name, new TextElement(client, 0, 0, t -> t.add(new LiteralText(name).method_20170(Formatting.ITALIC)).setWithShadow(true), tooltip, onPress));
 		factories.put(name, new ArrayList<>());
 	}
 	

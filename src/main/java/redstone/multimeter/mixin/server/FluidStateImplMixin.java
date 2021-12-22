@@ -4,20 +4,20 @@ import java.util.Random;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.FluidStateImpl;
+import net.minecraft.class_4024;
+import net.minecraft.class_4025;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.interfaces.mixin.IFluid;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 
-@Mixin(FluidStateImpl.class)
-public abstract class FluidStateImplMixin implements FluidState {
+@Mixin(class_4025.class)
+public abstract class FluidStateImplMixin implements class_4024 {
 	
 	@Override
-	public void onRandomTick(World world, BlockPos pos, Random random) {
+	public void method_17806(World world, BlockPos pos, Random random) {
 		((IServerWorld)world).getMultimeter().logRandomTick(world, pos);
-		((IFluid)getFluid()).randomTick(world, pos, this, random);
+		((IFluid)method_17807()).randomTick(world, pos, this, random);
 	}
 }

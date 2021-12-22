@@ -4,6 +4,7 @@
   "package": "redstone.multimeter.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+  	"HopperBlockEntityMixin",
   	"compat.alternate_current.WorldAccessMixin",
   	"meterable.AbstractButtonBlockMixin",
   	"meterable.AbstractRedstoneGateBlockMixin",
@@ -44,23 +45,21 @@
   	"server.FluidStateImplMixin",
   	"server.MinecraftServerMixin",
   	"server.PlayerManagerMixin",
-  	"server.ServerCommandSourceMixin",
   	"server.ServerPlayNetworkHandlerMixin",
   	"server.ServerWorldMixin",
   	"server.WorldChunkMixin",
   	"server.WorldMixin"
   ],
   "client": [
-  	"client.ClientCommandSourceMixin",
   	"client.ClientPlayNetworkHandlerMixin",
   	"client.GameOptionsMixin",
+  	"client.GameRendererMixin",
   	"client.InGameHudMixin",
   	"client.IntegratedServerMixin",
   	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
   	"client.MouseMixin",
-  	"client.WindowMixin",
-  	"client.WorldRendererMixin"
+  	"client.WindowMixin"
   ],
   "injectors": {
     "defaultRequire": 1

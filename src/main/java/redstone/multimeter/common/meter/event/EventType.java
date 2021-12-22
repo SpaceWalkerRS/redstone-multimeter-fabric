@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.class_4373;
 import net.minecraft.nbt.ByteTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 
@@ -33,7 +33,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metadata) {
-			TextUtils.addFancyText(lines, "direction", Direction.byId(metadata).getName());
+			TextUtils.addFancyText(lines, "direction", Direction.getById(metadata).getName());
 		}
 	},
 	POWER_CHANGE(3, "power_change") {
@@ -70,7 +70,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metadata) {
-			TextUtils.addFancyText(lines, "direction", Direction.byId(metadata).getName());
+			TextUtils.addFancyText(lines, "direction", Direction.getById(metadata).getName());
 		}
 	},
 	OBSERVER_UPDATE(12, "observer_update"),
@@ -129,17 +129,17 @@ public enum EventType {
 		
 	}
 	
-	public Tag toNbt() {
+	public class_4373 toNbt() {
 		return new ByteTag((byte)index);
 	}
 	
-	public static EventType fromNbt(Tag nbt) {
-		if (nbt.getType() != NbtUtils.TYPE_BYTE) {
+	public static EventType fromNbt(class_4373 nbt) {
+		if (nbt.method_1645() != NbtUtils.TYPE_BYTE) {
 			return UNKNOWN;
 		}
 		
 		ByteTag byteTag = (ByteTag)nbt;
-		int index = byteTag.getByte();
+		int index = byteTag.method_7374();
 		
 		return fromIndex(index);
 	}

@@ -27,14 +27,14 @@ public class OptionsScreen extends RSMMScreen {
 	public void onRemoved() {
 		super.onRemoved();
 		Options.validate();
-		minecraftClient.options.write();
-		minecraftClient.keyboard.enableRepeatEvents(false);
+		minecraftClient.options.save();
+		minecraftClient.field_19946.method_18191(false);
 		client.getHUD().onOptionsChanged();
 	}
 	
 	@Override
 	protected void initScreen() {
-		minecraftClient.keyboard.enableRepeatEvents(true);
+		minecraftClient.field_19946.method_18191(true);
 		
 		ScrollableListElement list = new ScrollableListElement(client, getWidth(), getHeight(), 52, 36);
 		OptionsListBuilder builder = new OptionsListBuilder(client, getWidth());

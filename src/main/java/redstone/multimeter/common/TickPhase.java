@@ -3,8 +3,8 @@ package redstone.multimeter.common;
 import java.util.Arrays;
 import java.util.List;
 
+import net.minecraft.class_4373;
 import net.minecraft.nbt.ByteArrayTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
@@ -99,7 +99,7 @@ public class TickPhase {
 		return new TickPhase(array);
 	}
 	
-	public Tag toNbt() {
+	public class_4373 toNbt() {
 		if (this == UNKNOWN) {
 			return NbtUtils.NULL;
 		}
@@ -113,8 +113,8 @@ public class TickPhase {
 		return new ByteArrayTag(array);
 	}
 	
-	public static TickPhase fromNbt(Tag nbt) {
-		if (nbt.getType() != NbtUtils.TYPE_BYTE_ARRAY) {
+	public static TickPhase fromNbt(class_4373 nbt) {
+		if (nbt.method_1645() != NbtUtils.TYPE_BYTE_ARRAY) {
 			return UNKNOWN;
 		}
 		
@@ -122,7 +122,7 @@ public class TickPhase {
 		TickTask[] tasks = new TickTask[array.size()];
 		
 		for (int index = 0; index < tasks.length; index++) {
-			int taskIndex = array.get(index).getByte();
+			int taskIndex = array.get(index).method_7374();
 			tasks[index] = TickTask.fromIndex(taskIndex);
 		}
 		

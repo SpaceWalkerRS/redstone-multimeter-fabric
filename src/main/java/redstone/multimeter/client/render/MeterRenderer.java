@@ -2,14 +2,14 @@ package redstone.multimeter.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.class_1015;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.Meter;
@@ -20,16 +20,24 @@ public class MeterRenderer {
 	private final MultimeterClient multimeterClient;
 	private final MinecraftClient minecraftClient;
 	
+	private double cameraX;
+	private double cameraY;
+	private double cameraZ;
+	
 	public MeterRenderer(MultimeterClient multimeterClient) {
 		this.multimeterClient = multimeterClient;
 		this.minecraftClient = this.multimeterClient.getMinecraftClient();
 	}
 	
-	public void renderMeters() {
-		class_1015.method_4454();
-		class_1015.method_4343(class_1015.class_1033.field_5138, class_1015.class_1027.field_5088, class_1015.class_1033.field_5140, class_1015.class_1027.field_5084);
-		class_1015.method_4407();
-		class_1015.method_4413(false);
+	public void renderMeters(Entity camera, float tickDelta) {
+		cameraX = camera.prevTickX + tickDelta * (camera.x - camera.prevTickX);
+		cameraY = camera.prevTickY + tickDelta * (camera.y - camera.prevTickY);
+		cameraZ = camera.prevTickZ + tickDelta * (camera.z - camera.prevTickZ);
+		
+		GlStateManager.enableBlend();
+		GlStateManager.method_12288(GlStateManager.class_2870.field_13525, GlStateManager.class_2866.field_13480, GlStateManager.class_2870.field_13518, GlStateManager.class_2866.field_13484);
+		GlStateManager.disableTexture();
+		GlStateManager.depthMask(false);
 		
 		for (Meter meter : multimeterClient.getMeterGroup().getMeters()) {
 			if (meter.isIn(minecraftClient.world)) {
@@ -37,9 +45,9 @@ public class MeterRenderer {
 			}
 		}
 		
-		class_1015.method_4413(true);
-		class_1015.method_4397();
-		class_1015.method_4439();
+		GlStateManager.depthMask(true);
+		GlStateManager.enableTexture();
+		GlStateManager.disableBlend();
 	}
 	
 	private void drawMeter(Meter meter) {
@@ -50,11 +58,8 @@ public class MeterRenderer {
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
 		
-		Entity camera = minecraftClient.getCameraEntity();
-		Vec3d cameraPos = camera.getPosVector();
-		
-		class_1015.method_4461();
-		class_1015.method_4412(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
+		GlStateManager.pushMatrix();
+		GlStateManager.translated(pos.getX() - cameraX, pos.getY() - cameraY, pos.getZ() - cameraZ);
 		
 		float r = ColorUtils.getRed(color) / 255.0F;
 		float g = ColorUtils.getGreen(color) / 255.0F;
@@ -66,7 +71,7 @@ public class MeterRenderer {
 			drawBoxOutline(builder, tessellator, r, g, b, 1.0F);
 		}
 		
-		class_1015.method_4350();
+		GlStateManager.popMatrix();
 	}
 	
 	private void drawFilledBox(BufferBuilder builder, Tessellator tessellator, float r, float g, float b, float a) {

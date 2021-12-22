@@ -1,12 +1,12 @@
 package redstone.multimeter.common;
 
+import net.minecraft.class_3793;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.util.NbtUtils;
 
@@ -17,7 +17,7 @@ public class DimPos {
 	
 	public DimPos(Identifier dimensionId, BlockPos blockPos) {
 		this.dimensionId = dimensionId;
-		this.blockPos = blockPos.toImmutable();
+		this.blockPos = blockPos.method_12558();
 	}
 	
 	public DimPos(Identifier dimensionId, int x, int y, int z) {
@@ -25,7 +25,7 @@ public class DimPos {
 	}
 	
 	public DimPos(World world, BlockPos pos) {
-		this(DimensionType.getId(world.dimension.getType()), pos);
+		this(class_3793.method_17196(world.dimension.method_11789()), pos);
 	}
 	
 	@Override
@@ -53,7 +53,7 @@ public class DimPos {
 	}
 	
 	public boolean isOf(World world) {
-		return DimensionType.getId(world.dimension.getType()).equals(dimensionId);
+		return class_3793.method_17196(world.dimension.method_11789()).equals(dimensionId);
 	}
 	
 	public DimPos offset(Identifier dimensionId) {
@@ -77,9 +77,9 @@ public class DimPos {
 	}
 	
 	public DimPos offset(Axis axis, int distance) {
-		int dx = axis.choose(distance, 0, 0);
-		int dy = axis.choose(0, distance, 0);
-		int dz = axis.choose(0, 0, distance);
+		int dx = axis.method_19948(distance, 0, 0);
+		int dy = axis.method_19948(0, distance, 0);
+		int dz = axis.method_19948(0, 0, distance);
 		
 		return offset(dx, dy, dz);
 	}
@@ -96,7 +96,7 @@ public class DimPos {
 		// allows clients and servers of different versions
 		// to communicate effectively through the use of
 		// mods like ViaVersion or multiconnect
-		nbt.method_10566("world id", NbtUtils.identifierToNbt(dimensionId));
+		nbt.method_814("world id", NbtUtils.identifierToNbt(dimensionId));
 		nbt.putInt("x", blockPos.getX());
 		nbt.putInt("y", blockPos.getY());
 		nbt.putInt("z", blockPos.getZ());

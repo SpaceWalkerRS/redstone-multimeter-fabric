@@ -9,11 +9,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.WorldChunk;
 
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 
@@ -28,10 +28,10 @@ public class WorldAccessMixin {
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/class_16513;method_73551(Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/server/PlayerWorldManager;method_10748(Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
-	private void onSetWireState(BlockPos pos, BlockState newState, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, WorldChunk chunk, ChunkSection section, BlockState oldState) {
+	private void onSetWireState(BlockPos pos, BlockState newState, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, Chunk chunk, ChunkSection section, BlockState oldState) {
 		((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, newState);
 	}
 }

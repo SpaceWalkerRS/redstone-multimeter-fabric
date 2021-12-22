@@ -8,7 +8,7 @@ import redstone.multimeter.interfaces.mixin.IServerWorld;
 public interface MeterableBlock extends Meterable {
 	
 	default void logPowered(World world, BlockPos pos, boolean powered) {
-		if (!world.isClient()) {
+		if (!world.method_16390()) {
 			((IServerWorld)world).getMultimeter().logPowered(world, pos, powered);
 		}
 	}

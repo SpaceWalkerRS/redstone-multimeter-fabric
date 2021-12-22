@@ -2,7 +2,8 @@ package redstone.multimeter.client.gui.element;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.class_1015;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
@@ -17,10 +18,10 @@ import redstone.multimeter.util.ColorUtils;
 public class RenderHelper2D {
 	
 	protected void renderRect(Drawer drawer) {
-		class_1015.method_4454(); // enable blend
-		class_1015.method_4407(); // disable texture
-		class_1015.method_4343(class_1015.class_1033.field_5138, class_1015.class_1027.field_5088, class_1015.class_1033.field_5140, class_1015.class_1027.field_5084);
-		class_1015.method_4400(GL11.GL_SMOOTH); // shade model
+		GlStateManager.enableBlend();
+		GlStateManager.disableTexture();
+		GlStateManager.method_12288(GlStateManager.class_2870.field_13525, GlStateManager.class_2866.field_13480, GlStateManager.class_2870.field_13518, GlStateManager.class_2866.field_13484);
+		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -99,9 +100,9 @@ public class RenderHelper2D {
 	
 	protected void renderTexture(Texture texture, Drawer drawer) {
 		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
-		class_1015.method_4454();
-		class_1015.method_4397();
-		class_1015.method_4343(class_1015.class_1033.field_5138, class_1015.class_1027.field_5088, class_1015.class_1033.field_5140, class_1015.class_1027.field_5084);
+		GlStateManager.enableBlend();
+		GlStateManager.enableTexture();
+		GlStateManager.method_12288(GlStateManager.class_2870.field_13525, GlStateManager.class_2866.field_13480, GlStateManager.class_2870.field_13518, GlStateManager.class_2866.field_13484);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -149,9 +150,9 @@ public class RenderHelper2D {
 	
 	protected void renderTextureColor(Texture texture, Drawer drawer) {
 		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
-		class_1015.method_4454();
-		class_1015.method_4397();
-		class_1015.method_4343(class_1015.class_1033.field_5138, class_1015.class_1027.field_5088, class_1015.class_1033.field_5140, class_1015.class_1027.field_5084);
+		GlStateManager.enableBlend();
+		GlStateManager.enableTexture();
+		GlStateManager.method_12288(GlStateManager.class_2870.field_13525, GlStateManager.class_2866.field_13480, GlStateManager.class_2870.field_13518, GlStateManager.class_2866.field_13484);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -207,25 +208,26 @@ public class RenderHelper2D {
 	}
 	
 	protected void renderText(TextRenderer font, Text text, int x, int y, boolean shadow, int color) {
-		class_1015.method_4397();
+		GlStateManager.enableTexture();
 		
 		if (shadow) {
 			font.drawWithShadow(text.asFormattedString(), x, y, color);
 		} else {
-			font.draw(text.asFormattedString(), x, y, color);
+			font.method_18355(text.asFormattedString(), x, y, color);
 		}
 	}
 	
 	protected void renderText(TextRenderer font, String text, int x, int y, boolean shadow, int color) {
-		class_1015.method_4397();
+		GlStateManager.enableTexture();
 		
 		if (shadow) {
 			font.drawWithShadow(text, x, y, color);
 		} else {
-			font.draw(text, x, y, color);
+			font.method_18355(text, x, y, color);
 		}
 	}
 	
+	@FunctionalInterface
 	protected interface Drawer {
 		
 		public void draw(BufferBuilder bufferBuilder);
