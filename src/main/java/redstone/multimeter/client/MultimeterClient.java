@@ -174,8 +174,8 @@ public class MultimeterClient {
 			connected = true;
 			
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).setStyle(new Style().setColor(Formatting.RED));
-				sendMessage(warning);
+				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).setStyle(new Style().setFormatting(Formatting.RED));
+				sendMessage(warning, false);
 			}
 			
 			hud.reset();
@@ -301,7 +301,7 @@ public class MultimeterClient {
 			hudEnabled = !hudEnabled;
 			
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(new LiteralText(message));
+			sendMessage(new LiteralText(message), true);
 		}
 	}
 	
@@ -336,7 +336,7 @@ public class MultimeterClient {
 		return screen != null && screen instanceof OptionsScreen;
 	}
 	
-	public void sendMessage(Text message) {
+	public void sendMessage(Text message, boolean actionBar) {
 		client.player.sendMessage(message);
 	}
 }

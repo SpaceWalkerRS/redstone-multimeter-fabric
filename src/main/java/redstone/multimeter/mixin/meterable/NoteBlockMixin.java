@@ -43,7 +43,7 @@ public abstract class NoteBlockMixin implements MeterableBlock {
 		BlockEntity blockEntity = world.getBlockEntity(pos);
 		
 		if (blockEntity instanceof NoteBlockBlockEntity) {
-			return ((NoteBlockBlockEntity)blockEntity).field_1459;
+			return ((NoteBlockBlockEntity)blockEntity).field_559;
 		}
 		
 		return false;

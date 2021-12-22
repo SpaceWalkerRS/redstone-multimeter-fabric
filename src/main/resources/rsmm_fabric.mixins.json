@@ -6,6 +6,7 @@
   "mixins": [
   	"compat.alternate_current.WorldAccessMixin",
   	"meterable.AbstractButtonBlockMixin",
+  	"meterable.AbstractRedstoneGateBlockMixin",
   	"meterable.ChestBlockEntityMixin",
   	"meterable.ChestBlockMixin",
   	"meterable.ComparatorBlockEntityMixin",
@@ -22,7 +23,6 @@
   	"meterable.PistonBlockMixin",
   	"meterable.PoweredRailBlockMixin",
   	"meterable.PressurePlateBlockMixin",
-  	"meterable.RedstoneComponentBlockMixin",
   	"meterable.RedstoneLampBlockMixin",
   	"meterable.RedstoneOreBlockMixin",
   	"meterable.RedstoneTorchBlockMixin",
@@ -35,7 +35,6 @@
   	"server.BlockMixin",
   	"server.ChunkMixin",
   	"server.CommandManagerMixin",
-  	"server.CustomPayloadC2SPacketMixin",
   	"server.MinecraftServerMixin",
   	"server.PlayerManagerMixin",
   	"server.ServerPlayerInteractionManagerMixin",
@@ -46,11 +45,11 @@
   "client": [
   	"client.ClientPlayNetworkHandlerMixin",
   	"client.GameOptionsMixin",
+  	"client.GameRendererMixin",
   	"client.InGameHudMixin",
   	"client.IntegratedServerMixin",
   	"client.MinecraftClientMixin",
-  	"client.ScreenMixin",
-  	"client.WorldRendererMixin"
+  	"client.ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

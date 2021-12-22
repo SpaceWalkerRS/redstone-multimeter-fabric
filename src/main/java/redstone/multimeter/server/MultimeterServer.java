@@ -1,7 +1,6 @@
 package redstone.multimeter.server;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -18,9 +17,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickTask;
-import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.ServerTickPacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -35,7 +34,6 @@ public class MultimeterServer {
 	private final Map<UUID, String> connectedPlayers;
 	private final Map<UUID, String> playerNameCache;
 	
-	private Field carpetTickSpeedProccessEntities;
 	private TickPhase tickPhase;
 	/** true if the OverWorld already ticked time */
 	private boolean tickedTime;
@@ -49,8 +47,6 @@ public class MultimeterServer {
 		
 		this.tickPhase = TickPhase.UNKNOWN;
 		this.tickedTime = false;
-		
-		this.detectCarpetTickSpeed();
 	}
 	
 	public MinecraftServer getMinecraftServer() {
@@ -63,29 +59,6 @@ public class MultimeterServer {
 	
 	public Multimeter getMultimeter() {
 		return multimeter;
-	}
-	
-	/**
-	 * Carpet Mod allows players to freeze the game.
-	 * We need to detect when this is happening so
-	 * RSMM can freeze accordingly.
-	 */
-	private void detectCarpetTickSpeed() {
-		Class<?> clazzTickSpeed = null;
-		
-		try {
-			clazzTickSpeed = Class.forName("carpet.helpers.TickSpeed");
-		} catch (ClassNotFoundException e) {
-			
-		}
-		
-		if (clazzTickSpeed != null) {
-			try {
-				carpetTickSpeedProccessEntities = clazzTickSpeed.getField("process_entities");
-			} catch (NoSuchFieldException | SecurityException e) {
-				
-			}
-		}
 	}
 	
 	public boolean isDedicated() {
@@ -127,17 +100,7 @@ public class MultimeterServer {
 	}
 	
 	public boolean isPaused() {
-		boolean frozen = false;
-		
-		if (carpetTickSpeedProccessEntities != null) {
-			try {
-				frozen = !carpetTickSpeedProccessEntities.getBoolean(null);
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				
-			}
-		}
-		
-		return frozen || ((IMinecraftServer)server).isPaused();
+		return ((IMinecraftServer)server).isPaused();
 	}
 	
 	public void tickStart() {
@@ -203,8 +166,8 @@ public class MultimeterServer {
 	}
 	
 	public ServerWorld getWorld(Identifier dimensionId) {
-		int rawId = DimensionUtils.getRawId(dimensionId);
-		return server.getWorld(rawId);
+		Integer type = DimensionUtils.getRawId(dimensionId);
+		return type == null ? null : server.getWorld(type);
 	}
 	
 	public ServerWorld getWorldOf(DimPos pos) {
@@ -256,7 +219,7 @@ public class MultimeterServer {
 		return players;
 	}
 	
-	public void sendMessage(ServerPlayerEntity player, Text message) {
+	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
 		player.sendMessage(message);
 	}
 }

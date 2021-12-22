@@ -19,8 +19,8 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.TickableEntry;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.TickableEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -151,7 +151,7 @@ public class Multimeter {
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
 				Text message = new LiteralText(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
-				server.sendMessage(player, message);
+				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
 			}
@@ -289,12 +289,12 @@ public class Multimeter {
 		Text message = new LiteralText("").
 			append(new LiteralText(String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()))).
 			append(new LiteralText("[here]").setStyle(new Style().
-				setColor(Formatting.GREEN).
+				setFormatting(Formatting.GREEN).
 				setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName())))).
 				setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())))
 			)).
 			append(new LiteralText(" to subscribe to it."));
-		server.sendMessage(player, message);
+		server.sendMessage(player, message, false);
 	}
 	
 	public void removeMemberFromMeterGroup(ServerMeterGroup meterGroup, UUID playerUUID) {
@@ -311,7 +311,7 @@ public class Multimeter {
 				unsubscribeFromMeterGroup(meterGroup, player);
 				
 				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
-				server.sendMessage(player, message);
+				server.sendMessage(player, message, false);
 			}
 		}
 	}
@@ -332,7 +332,7 @@ public class Multimeter {
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
 			Text message = new LiteralText("This server does not allow meter teleporting!");
-			server.sendMessage(player, message);
+			server.sendMessage(player, message, false);
 			
 			return;
 		}
@@ -352,9 +352,13 @@ public class Multimeter {
 					double newX = blockPos.getX() + 0.5D;
 					double newY = blockPos.getY();
 					double newZ = blockPos.getZ() + 0.5D;
+					float yaw = player.yaw;
+					float pitch = player.pitch;
 					
-					player.teleportToDimension(newWorld.dimension.getType());
-					player.refreshPositionAfterTeleport(newX, newY, newZ);
+					if (newWorld != player.world) {
+						player.teleportToDimension(newWorld.dimension.getType());
+					}
+					player.networkHandler.requestTeleport(newX, newY, newZ, yaw, pitch);
 				}
 			}
 		}

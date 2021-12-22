@@ -124,7 +124,7 @@ public class MeterListRenderer extends AbstractElement {
 			Text name = new LiteralText(meter.getName());
 			
 			if (meter.isHidden()) {
-				name.setStyle(new Style().setColor(Formatting.GRAY).setItalic(true));
+				name.setStyle(new Style().setFormatting(Formatting.GRAY).setItalic(true));
 			}
 			
 			hud.renderer.renderText(name, x, y, 0xFFFFFF);

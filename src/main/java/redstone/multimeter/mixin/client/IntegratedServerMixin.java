@@ -27,7 +27,6 @@ public abstract class IntegratedServerMixin extends MinecraftServer implements I
 			method = "setupWorld()V",
 			at = @At(
 					value = "FIELD",
-					ordinal = 0,
 					target = "Lnet/minecraft/server/integrated/IntegratedServer;queue:Ljava/util/Queue;"
 			)
 	)

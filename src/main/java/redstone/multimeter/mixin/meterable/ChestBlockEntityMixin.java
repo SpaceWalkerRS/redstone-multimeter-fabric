@@ -18,11 +18,10 @@ import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(ChestBlockEntity.class)
-public abstract class ChestBlockEntityMixin extends BlockEntity {
+public class ChestBlockEntityMixin extends BlockEntity {
 	
 	@Shadow private int viewerCount;
-	
-	@Shadow public abstract int method_1126();
+	@Shadow private int field_5649; // chest type: 0 = normal, 1 = trapped
 	
 	@Inject(
 			method = "onInvOpen",
@@ -64,6 +63,6 @@ public abstract class ChestBlockEntityMixin extends BlockEntity {
 	}
 	
 	private boolean isTrapped() {
-		return method_1126() == 1;
+		return field_5649 == 1;
 	}
 }

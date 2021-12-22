@@ -26,7 +26,7 @@ public class ServerPlayerInteractionManagerMixin {
 					target = "Lnet/minecraft/block/Block;onUse(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/Direction;FFF)Z"
 			)
 	)
-	private void onInteractBlock(PlayerEntity player, World world, ItemStack stack, BlockPos pos, Direction direction, float x, float y, float z, CallbackInfoReturnable<Boolean> cir) {
+	private void onInteractBlock(PlayerEntity player, World world, ItemStack stack, BlockPos pos, Direction dir, float dx, float dy, float dz, CallbackInfoReturnable<Boolean> cir) {
 		((IServerWorld)world).getMultimeter().logInteractBlock(world, pos);
 	}
 }

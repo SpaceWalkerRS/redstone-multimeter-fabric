@@ -15,14 +15,14 @@ import net.minecraft.world.World;
 import redstone.multimeter.block.MeterableBlock;
 
 @Mixin(RedstoneComponentBlock.class)
-public abstract class RedstoneComponentBlockMixin implements MeterableBlock {
+public abstract class AbstractRedstoneGateBlockMixin implements MeterableBlock {
 	
-	@Shadow @Final private boolean field_851;
+	@Shadow @Final private boolean field_5539;
 	
-	@Shadow protected abstract boolean method_796(World world, BlockPos pos, BlockState state);
+	@Shadow protected abstract boolean method_8727(World world, BlockPos pos, BlockState state);
 	
 	@Inject(
-			method = "method_796",
+			method = "method_8727",
 			at = @At(
 					value = "RETURN"
 			)
@@ -38,11 +38,11 @@ public abstract class RedstoneComponentBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return method_796(world, pos, state);
+		return method_8727(world, pos, state);
 	}
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return field_851;
+		return field_5539;
 	}
 }

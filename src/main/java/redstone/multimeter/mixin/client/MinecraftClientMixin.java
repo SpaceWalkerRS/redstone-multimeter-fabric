@@ -2,12 +2,15 @@ package redstone.multimeter.mixin.client;
 
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -15,6 +18,8 @@ import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin implements IMinecraftClient {
+	
+	@Shadow private Screen currentScreen;
 	
 	private MultimeterClient multimeterClient;
 	
@@ -42,14 +47,23 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	
 	@Inject(
 			method = "tick",
+			slice = @Slice(
+					from = @At(
+							value = "FIELD",
+							ordinal = 0,
+							target = "Lnet/minecraft/client/gui/screen/Screen;passEvents:Z"
+					)
+			),
 			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=mouse"
+					value = "FIELD",
+					ordinal = 0,
+					target = "Lnet/minecraft/client/MinecraftClient;world:Lnet/minecraft/client/world/ClientWorld;"
 			)
 	)
 	private void handleInputEvents(CallbackInfo ci) {
-		multimeterClient.getInputHandler().handleKeyBindings();
+		if (currentScreen == null || currentScreen.passEvents) {
+			multimeterClient.getInputHandler().handleKeyBindings();
+		}
 	}
 	
 	@Redirect(

@@ -1,33 +1,47 @@
 package redstone.multimeter.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.minecraft.util.Identifier;
 
 public class DimensionUtils {
 	
-	public static int getRawId(Identifier id) {
-		switch (id.getPath()) {
-		case "overworld":
-			return 0;
-		case "the_nether":
-			return -1;
-		case "the_end":
-			return 1;
-		}
-		
-		return 0;
+	private static final Map<Identifier, Integer> ID_TO_RAW_ID;
+	private static final Map<Integer, Identifier> RAW_ID_TO_ID;
+	
+	public static final int TYPE_OVERWORLD;
+	public static final int TYPE_NETHER;
+	public static final int TYPE_END;
+	
+	private static void register(Identifier id, int rawId) {
+		ID_TO_RAW_ID.put(id, rawId);
+		RAW_ID_TO_ID.put(rawId, id);
+	}
+	
+	private static void register(String name, int rawId) {
+		register(new Identifier(name), rawId);
+	}
+	
+	public static Integer getRawId(Identifier id) {
+		return ID_TO_RAW_ID.get(id);
 	}
 	
 	public static Identifier getId(int rawId) {
-		switch (rawId) {
-		case 0:
-			return new Identifier("overworld");
-		case -1:
-			return new Identifier("the_nether");
-		case 1:
-			return new Identifier("the_end");
-			
-		}
+		return RAW_ID_TO_ID.get(rawId);
+	}
+	
+	static {
 		
-		return new Identifier("overworld");
+		RAW_ID_TO_ID = new HashMap<>();
+		ID_TO_RAW_ID = new HashMap<>();
+		
+		TYPE_OVERWORLD = 0;
+		TYPE_NETHER = -1;
+		TYPE_END = 1;
+		
+		register("overworld", TYPE_OVERWORLD);
+		register("the_nether", TYPE_NETHER);
+		register("the_end", TYPE_END);
 	}
 }

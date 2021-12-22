@@ -10,7 +10,6 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.Meter;
@@ -21,12 +20,20 @@ public class MeterRenderer {
 	private final MultimeterClient multimeterClient;
 	private final MinecraftClient minecraftClient;
 	
+	private double cameraX;
+	private double cameraY;
+	private double cameraZ;
+	
 	public MeterRenderer(MultimeterClient multimeterClient) {
 		this.multimeterClient = multimeterClient;
 		this.minecraftClient = this.multimeterClient.getMinecraftClient();
 	}
 	
-	public void renderMeters() {
+	public void renderMeters(Entity camera, float tickDelta) {
+		cameraX = camera.prevTickX + tickDelta * (camera.x - camera.prevTickX);
+		cameraY = camera.prevTickY + tickDelta * (camera.y - camera.prevTickY);
+		cameraZ = camera.prevTickZ + tickDelta * (camera.z - camera.prevTickZ);
+		
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.disableTexture();
@@ -51,11 +58,8 @@ public class MeterRenderer {
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
 		
-		Entity camera = minecraftClient.getCameraEntity();
-		Vec3d cameraPos = camera.getPos();
-		
 		GlStateManager.pushMatrix();
-		GlStateManager.translated(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
+		GlStateManager.translated(pos.getX() - cameraX, pos.getY() - cameraY, pos.getZ() - cameraZ);
 		
 		float r = ColorUtils.getRed(color) / 255.0F;
 		float g = ColorUtils.getGreen(color) / 255.0F;

@@ -22,8 +22,7 @@ public abstract class AbstractPacketHandler {
 		
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		
-		buffer.writeString(id.getNamespace());
-		buffer.writeString(id.getPath());
+		buffer.writeString(id.toString());
 		buffer.writeCompoundTag(data);
 		
 		return toCustomPayload(PacketManager.getPacketChannelId(), buffer);
@@ -34,9 +33,7 @@ public abstract class AbstractPacketHandler {
 	public abstract <P extends RSMMPacket> void send(P packet);
 	
 	protected <P extends RSMMPacket> P decode(PacketByteBuf buffer) throws IOException {
-		String namespace = buffer.readString(32767);
-		String path = buffer.readString(32767);
-		Identifier id = new Identifier(namespace, path);
+		Identifier id = new Identifier(buffer.readString(32767));
 		P packet = PacketManager.createPacket(id);
 		
 		if (packet == null) {

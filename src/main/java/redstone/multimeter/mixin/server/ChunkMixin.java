@@ -27,7 +27,7 @@ public class ChunkMixin {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.AFTER,
- 					target = "Lnet/minecraft/world/chunk/ChunkSection;method_1424(IIILnet/minecraft/block/BlockState;)V"
+					target = "Lnet/minecraft/world/chunk/ChunkSection;setBlockState(IIILnet/minecraft/block/BlockState;)V"
 			)
 	)
 	private void onBlockStateChanged(BlockPos pos, BlockState newState, CallbackInfoReturnable<BlockState> cir, int sectionX, int y, int sectionZ, int idk, int prevHeight, BlockState oldState) {

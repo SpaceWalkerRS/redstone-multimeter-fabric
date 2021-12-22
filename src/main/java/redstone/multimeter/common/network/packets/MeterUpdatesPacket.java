@@ -10,7 +10,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.Tag;
-
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -58,18 +57,18 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	
 	@Override
 	public void decode(CompoundTag data) {
-		ListTag idsList = data.getList("removed meters", NbtUtils.TYPE_LONG);
-		ListTag updatesList = data.getList("meter updates", NbtUtils.TYPE_COMPOUND);
+		ListTag idList = data.getList("removed meters", NbtUtils.TYPE_LONG);
+		ListTag updateList = data.getList("meter updates", NbtUtils.TYPE_COMPOUND);
 		
-		for (int index = 0; index < idsList.size(); index++) {
-			Tag tag = idsList.get(index);
+		for (int index = 0; index < idList.size(); index++) {
+			Tag tag = idList.get(index);
 			
 			if (tag.getType() == NbtUtils.TYPE_LONG) {
 				removedMeters.add(((LongTag)tag).getLong());
 			}
 		}
-		for (int index = 0; index < updatesList.size(); index++) {
-			CompoundTag nbt = updatesList.getCompound(index);
+		for (int index = 0; index < updateList.size(); index++) {
+			CompoundTag nbt = updateList.getCompound(index);
 			
 			long id = nbt.getLong("id");
 			MeterProperties update = MeterProperties.fromNbt(nbt);

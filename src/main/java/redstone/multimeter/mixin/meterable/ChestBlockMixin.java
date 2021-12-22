@@ -16,7 +16,7 @@ import redstone.multimeter.block.chest.TrappedChestHelper;
 @Mixin(ChestBlock.class)
 public abstract class ChestBlockMixin implements Meterable, PowerSource {
 	
-	@Shadow @Final private int field_831;
+	@Shadow @Final private int field_5532; // chest type: 0 = normal, 1 = trapped
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
@@ -34,6 +34,6 @@ public abstract class ChestBlockMixin implements Meterable, PowerSource {
 	}
 	
 	private boolean isTrappedRSMM() {
-		return field_831 == 1;
+		return field_5532 == 1;
 	}
 }

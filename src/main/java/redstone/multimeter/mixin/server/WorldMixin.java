@@ -136,7 +136,7 @@ public abstract class WorldMixin implements IWorld {
 	@Inject(
 			method = "tickEntities",
 			at = @At(
-					value = "HEAD"
+					value = "RETURN"
 			)
 	)
 	private void endTickTaskBlockEntitiesAndEntities(CallbackInfo ci) {
@@ -145,7 +145,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_335",
+			method = "method_3636",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
@@ -156,6 +156,26 @@ public abstract class WorldMixin implements IWorld {
 		if (!isClient) {
 			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
 		}
+	}
+	
+	@Inject(
+			method = "tick",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void startTickTaskWeather(CallbackInfo ci) {
+		startTickTask(TickTask.WEATHER);
+	}
+	
+	@Inject(
+			method = "tick",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void endTickTaskWeather(CallbackInfo ci) {
+		endTickTask();
 	}
 	
 	@Inject(

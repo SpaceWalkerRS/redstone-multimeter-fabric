@@ -23,7 +23,7 @@ public abstract class RepeaterBlockMixin extends RedstoneComponentBlock implemen
 	}
 	
 	@Inject(
-			method = "method_789",
+			method = "method_8722",
 			at = @At(
 					value = "RETURN"
 			)
@@ -33,13 +33,13 @@ public abstract class RepeaterBlockMixin extends RedstoneComponentBlock implemen
 			World world = (World)worldView;
 			
 			if (!world.isClient) {
-				logPowered(world, pos, method_796(world, pos, state));
+				logPowered(world, pos, method_8727(world, pos, state));
 			}
 		}
 	}
 	
 	@Override
 	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
-		return field_851 ? MAX_POWER : MIN_POWER;
+		return field_5539 ? MAX_POWER : MIN_POWER;
 	}
 }

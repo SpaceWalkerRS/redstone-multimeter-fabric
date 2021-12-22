@@ -28,7 +28,7 @@ public class WorldAccessMixin {
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/server/world/PlayerChunkWatchingManager;onBlockChange(Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/server/PlayerWorldManager;method_10748(Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
 	private void onSetWireState(BlockPos pos, BlockState newState, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, Chunk chunk, ChunkSection section, BlockState oldState) {

@@ -14,10 +14,10 @@ import redstone.multimeter.block.Meterable;
 @Mixin(RedstoneOreBlock.class)
 public class RedstoneOreBlockMixin implements Meterable {
 	
-	@Shadow @Final private boolean field_1142;
+	@Shadow @Final private boolean field_315;
 	
 	@Override
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return field_1142;
+		return field_315;
 	}
 }

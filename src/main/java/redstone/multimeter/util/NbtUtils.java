@@ -19,7 +19,6 @@ public class NbtUtils {
 	public static final byte TYPE_LIST       =  9;
 	public static final byte TYPE_COMPOUND   = 10;
 	public static final byte TYPE_INT_ARRAY  = 11;
-	public static final byte TYPE_LONG_ARRAY = 12;
 	
 	public static final Tag NULL = new ByteTag((byte)0);
 	
