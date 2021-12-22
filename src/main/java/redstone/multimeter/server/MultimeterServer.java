@@ -221,6 +221,6 @@ public class MultimeterServer {
 	}
 	
 	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
-		player.method_8428(message, actionBar);
+		player.sendMessage(message);
 	}
 }

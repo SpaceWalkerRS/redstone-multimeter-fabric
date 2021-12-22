@@ -20,7 +20,6 @@
   	"meterable.HopperBlockMixin",
   	"meterable.LeverBlockMixin",
   	"meterable.NoteBlockMixin",
-  	"meterable.ObserverBlockMixin",
   	"meterable.PistonBlockMixin",
   	"meterable.PoweredRailBlockMixin",
   	"meterable.PressurePlateBlockMixin",

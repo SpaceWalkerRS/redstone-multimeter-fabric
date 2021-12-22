@@ -31,15 +31,15 @@ public abstract class WorldMixin implements IWorld {
 	@Shadow private boolean isClient;
 	
 	@Inject(
-			method = "method_8546",
+			method = "neighbourUpdate",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BlockState;method_11707(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/BlockState;method_11707(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;)V"
 			)
 	)
-	private void onBlockUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
+	private void onBlockUpdate(BlockPos pos, Block fromBlock, CallbackInfo ci, BlockState state) {
 		if (isClient) {
 			return;
 		}
@@ -54,21 +54,6 @@ public abstract class WorldMixin implements IWorld {
 		// World.isReceivingRedstonePower and World.getReceivedRedstonePower
 		if (((IBlock)state.getBlock()).logPoweredOnBlockUpdate()) {
 			multimeter.logPowered((World)(Object)this, pos, state);
-		}
-	}
-	
-	@Inject(
-			method = "method_13691",
-			locals = LocalCapture.CAPTURE_FAILHARD,
-			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/class_3065;method_13711(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
-			)
-	)
-	private void onObserverUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
-		if (!isClient) {
-			((IServerWorld)this).getMultimeter().logObserverUpdate((World)(Object)this, pos);
 		}
 	}
 	
@@ -199,7 +184,7 @@ public abstract class WorldMixin implements IWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BlockState;method_11707(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/BlockState;method_11707(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;)V"
 			)
 	)
 	private void onComparatorUpdate(BlockPos fromPos, Block fromBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {

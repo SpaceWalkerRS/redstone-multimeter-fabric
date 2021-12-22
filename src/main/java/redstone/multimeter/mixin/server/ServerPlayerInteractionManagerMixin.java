@@ -25,7 +25,7 @@ public class ServerPlayerInteractionManagerMixin {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/Block;method_421(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/class_2961;Lnet/minecraft/util/math/Direction;FFF)Z"
+					target = "Lnet/minecraft/block/Block;method_421(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/class_2961;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/Direction;FFF)Z"
 			)
 	)
 	private void onInteractBlock(PlayerEntity player, World world, ItemStack stack, class_2961 hand, BlockPos pos, Direction dir, float dx, float dy, float dz, CallbackInfoReturnable<class_2962> cir) {

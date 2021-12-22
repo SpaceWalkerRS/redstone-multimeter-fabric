@@ -337,6 +337,6 @@ public class MultimeterClient {
 	}
 	
 	public void sendMessage(Text message, boolean actionBar) {
-		client.player.method_8428(message, actionBar);
+		client.player.sendMessage(message);
 	}
 }

@@ -29,7 +29,7 @@ public abstract class NoteBlockMixin implements MeterableBlock {
 					target = "Lnet/minecraft/world/World;getBlockEntity(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/entity/BlockEntity;"
 			)
 	)
-	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, CallbackInfo ci, boolean powered) {
+	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, CallbackInfo ci, boolean powered) {
 		logPowered(world, pos, powered);
 	}
 	
