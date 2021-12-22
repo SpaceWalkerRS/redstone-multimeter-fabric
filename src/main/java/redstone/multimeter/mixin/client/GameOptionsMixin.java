@@ -63,7 +63,7 @@ public class GameOptionsMixin {
 	}
 	
 	@Inject(
-			method = "write",
+			method = "save",
 			at = @At(
 					value = "HEAD"
 			)

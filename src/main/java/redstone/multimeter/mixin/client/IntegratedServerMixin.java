@@ -13,7 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 
-import net.minecraft.datafixer.DataFixer;
+import net.minecraft.class_2934;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.UserCache;
@@ -25,26 +25,26 @@ public abstract class IntegratedServerMixin extends MinecraftServer implements I
 	
 	@Shadow private boolean paused;
 	
-	public IntegratedServerMixin(File gameDir, Proxy proxy, DataFixer dataFixer, YggdrasilAuthenticationService authService, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepository, UserCache userCache) {
-		super(gameDir, proxy, dataFixer, authService, sessionService, gameProfileRepository, userCache);
+	public IntegratedServerMixin(File file, Proxy proxy, class_2934 arg, YggdrasilAuthenticationService yggdrasilAuthenticationService, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache userCache) {
+		super(file, proxy, arg, yggdrasilAuthenticationService, minecraftSessionService, gameProfileRepository, userCache);
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "setupWorld()V",
 			at = @At(
 					value = "FIELD",
-					target = "Lnet/minecraft/server/integrated/IntegratedServer;tasks:Ljava/util/Queue;"
+					target = "Lnet/minecraft/server/integrated/IntegratedServer;queue:Ljava/util/Queue;"
 			)
 	)
 	private void onTickStart(CallbackInfo ci) {
 		// When the server is paused, the tick method is not called
-		if (tasks.isEmpty()) {
+		if (queue.isEmpty()) {
 			getMultimeterServer().tickStart();
 		}
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "setupWorld()V",
 			at = @At(
 					value = "RETURN"
 			)

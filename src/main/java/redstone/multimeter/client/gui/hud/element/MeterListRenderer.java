@@ -124,7 +124,7 @@ public class MeterListRenderer extends AbstractElement {
 			Text name = new LiteralText(meter.getName());
 			
 			if (meter.isHidden()) {
-				name.setStyle(new Style().setColor(Formatting.GRAY).setItalic(true));
+				name.setStyle(new Style().setFormatting(Formatting.GRAY).setItalic(true));
 			}
 			
 			hud.renderer.renderText(name, x, y, 0xFFFFFF);
@@ -137,7 +137,7 @@ public class MeterListRenderer extends AbstractElement {
 		int width = 0;
 		
 		for (Meter meter : hud.meters) {
-			int nameWidth = hud.font.getWidth(meter.getName());
+			int nameWidth = hud.font.getStringWidth(meter.getName());
 			
 			if (nameWidth > width) {
 				width = nameWidth;

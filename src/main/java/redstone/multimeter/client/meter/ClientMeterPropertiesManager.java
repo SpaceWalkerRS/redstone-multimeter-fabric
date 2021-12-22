@@ -93,7 +93,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 				properties.toggleEventType(type);
 			}
 		}
-		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && block.hasRandomTicks()) {
+		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && block.ticksRandomly()) {
 			if (!properties.hasEventType(EventType.RANDOM_TICK)) {
 				properties.toggleEventType(EventType.RANDOM_TICK);
 			}
@@ -101,7 +101,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	private MeterProperties getPropertiesForBlock(Block block) {
-		Identifier blockId = Block.REGISTRY.getId(block);
+		Identifier blockId = Block.REGISTRY.getIdentifier(block);
 		
 		if (blockId == null) {
 			return null; // we should never get here
@@ -132,7 +132,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		
 		Set<String> namespaces = new HashSet<>();
 		
-		for (Identifier blockId : Block.REGISTRY.getIds()) {
+		for (Identifier blockId : Block.REGISTRY.method_12583()) {
 			String namespace = blockId.getNamespace();
 			String id = blockId.getPath();
 			

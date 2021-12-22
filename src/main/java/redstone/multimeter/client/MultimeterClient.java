@@ -9,7 +9,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -174,7 +174,7 @@ public class MultimeterClient {
 			connected = true;
 			
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).setStyle(new Style().setColor(Formatting.RED));
+				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).setStyle(new Style().setFormatting(Formatting.RED));
 				sendMessage(warning, false);
 			}
 			
@@ -286,9 +286,9 @@ public class MultimeterClient {
 	}
 	
 	private void onTargetBlock(Consumer<DimPos> consumer) {
-		BlockHitResult hitResult = client.crosshairTarget;
+		HitResult hitResult = client.result;
 		
-		if (hitResult.type == BlockHitResult.Type.BLOCK) {
+		if (hitResult.type == HitResult.Type.BLOCK) {
 			World world = client.world;
 			BlockPos blockPos = hitResult.getBlockPos();
 			
@@ -337,6 +337,6 @@ public class MultimeterClient {
 	}
 	
 	public void sendMessage(Text message, boolean actionBar) {
-		client.player.sendMessage(message, actionBar);
+		client.player.method_8428(message, actionBar);
 	}
 }

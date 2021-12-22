@@ -116,7 +116,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	protected void drawTooltip(List<Text> lines, int mouseX, int mouseY) {
-		int lineHeight = font.lineHeight;
+		int lineHeight = font.fontHeight;
 		int lineSpacing = 1;
 		
 		int width = 0;
@@ -175,7 +175,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 			Text line = lines.get(index);
 			renderText(font, line, textX, textY, true, 0xFFFFFFFF);
 			
-			textY += font.lineHeight + 1;
+			textY += font.fontHeight + 1;
 		}
 		
 		GlStateManager.popMatrix();

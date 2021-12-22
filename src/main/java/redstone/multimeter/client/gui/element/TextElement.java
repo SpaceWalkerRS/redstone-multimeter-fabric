@@ -68,7 +68,7 @@ public class TextElement extends AbstractElement {
 			textX = rightAligned ? right - getWidth(font, t) : left;
 			renderText(font, t, textX, textY, withShadow, color);
 			
-			textY += font.lineHeight + SPACING;
+			textY += font.fontHeight + SPACING;
 		}
 	}
 	
@@ -182,6 +182,6 @@ public class TextElement extends AbstractElement {
 	}
 	
 	protected void updateHeight() {
-		setHeight((text.size() - 1) * (font.lineHeight + SPACING) + font.lineHeight);
+		setHeight((text.size() - 1) * (font.fontHeight + SPACING) + font.fontHeight);
 	}
 }

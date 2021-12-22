@@ -207,7 +207,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 	
 	public int getMessageY() {
-		return getY() + getHeight() - (getHeight() + font.lineHeight) / 2;
+		return getY() + getHeight() - (getHeight() + font.fontHeight) / 2;
 	}
 	
 	protected int getMessageColor() {

@@ -35,7 +35,6 @@
   	"meterable.WeightedPressurePlateBlockMixin",
   	"server.BlockMixin",
   	"server.ChunkMixin",
-  	"server.CustomPayloadC2SPacketMixin",
   	"server.EnderDragonFightMixin",
   	"server.LongArrayTagMixin",
   	"server.MinecraftServerMixin",
@@ -49,12 +48,12 @@
   "client": [
   	"client.ClientPlayNetworkHandlerMixin",
   	"client.GameOptionsMixin",
+  	"client.GameRendererMixin",
   	"client.InGameHudMixin",
   	"client.IntegratedServerMixin",
   	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
-  	"client.ScreenMixin",
-  	"client.WorldRendererMixin"
+  	"client.ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

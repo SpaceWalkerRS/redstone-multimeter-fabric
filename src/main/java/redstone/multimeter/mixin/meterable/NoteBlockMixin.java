@@ -11,7 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.NoteBlock;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.NoteBlockEntity;
+import net.minecraft.block.entity.NoteBlockBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -21,7 +21,7 @@ import redstone.multimeter.block.MeterableBlock;
 public abstract class NoteBlockMixin implements MeterableBlock {
 	
 	@Inject(
-			method = "neighborUpdate",
+			method = "method_8641",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
@@ -42,8 +42,8 @@ public abstract class NoteBlockMixin implements MeterableBlock {
 	public boolean isActive(World world, BlockPos pos, BlockState state) {
 		BlockEntity blockEntity = world.getBlockEntity(pos);
 		
-		if (blockEntity instanceof NoteBlockEntity) {
-			return ((NoteBlockEntity)blockEntity).powered;
+		if (blockEntity instanceof NoteBlockBlockEntity) {
+			return ((NoteBlockBlockEntity)blockEntity).field_559;
 		}
 		
 		return false;

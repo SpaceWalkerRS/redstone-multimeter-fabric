@@ -19,7 +19,7 @@ import redstone.multimeter.block.MeterableBlock;
 public class FenceGateBlockMixin implements MeterableBlock {
 	
 	@Inject(
-			method = "neighborUpdate",
+			method = "method_8641",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "FIELD",

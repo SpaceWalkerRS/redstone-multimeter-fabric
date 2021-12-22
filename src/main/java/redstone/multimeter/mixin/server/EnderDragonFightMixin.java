@@ -7,34 +7,34 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.entity.boss.dragon.EnderDragonFight;
+import net.minecraft.class_2752;
 import net.minecraft.server.world.ServerWorld;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 
-@Mixin(EnderDragonFight.class)
+@Mixin(class_2752.class)
 public class EnderDragonFightMixin {
 	
-	@Shadow @Final ServerWorld world;
+	@Shadow @Final ServerWorld field_12937;
 	
 	@Inject(
-			method = "convertFromLegacy",
+			method = "method_11805",
 			at = @At(
 					value = "HEAD"
 			)
 	)
 	private void startTickTaskDragonFight(CallbackInfo ci) {
-		((IServerWorld)world).startTickTask(TickTask.DRAGON_FIGHT);
+		((IServerWorld)field_12937).startTickTask(TickTask.DRAGON_FIGHT);
 	}
 	
 	@Inject(
-			method = "convertFromLegacy",
+			method = "method_11805",
 			at = @At(
 					value = "RETURN"
 			)
 	)
 	private void endTickTaskDragonFight(CallbackInfo ci) {
-		((IServerWorld)world).endTickTask();
+		((IServerWorld)field_12937).endTickTask();
 	}
 }

@@ -22,7 +22,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/MinecraftServer;method_33269()Lnet/minecraft/server/command/ServerCommandManager;"
+					target = "Lnet/minecraft/server/MinecraftServer;createCommandManager()Lnet/minecraft/server/command/CommandManager;"
 			)
 	)
 	private void onInit(CallbackInfo ci) {
@@ -30,7 +30,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tick",
+			method = "setupWorld()V",
 			at = @At(
 					value = "HEAD"
 			)
@@ -40,7 +40,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tickWorlds",
+			method = "tick",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
@@ -52,7 +52,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tickWorlds",
+			method = "tick",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
@@ -64,7 +64,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tickWorlds",
+			method = "tick",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
@@ -78,16 +78,27 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	@Inject(
 			method = "tick",
 			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=tickables"
+			)
+	)
+	private void endTickTaskCommandFunctions(CallbackInfo ci) {
+		multimeterServer.endTickTask();
+	}
+	
+	@Inject(
+			method = "setupWorld()V",
+			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void endTickTaskPacketsAndEndTick(CallbackInfo ci) {
-		multimeterServer.endTickTask();
+	private void onTickEnd(CallbackInfo ci) {
 		multimeterServer.tickEnd();
 	}
 	
 	@Inject(
-			method = "reloadResources",
+			method = "method_14912",
 			at = @At(
 					value = "HEAD"
 			)

@@ -20,9 +20,9 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.TickableEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
@@ -289,7 +289,7 @@ public class Multimeter {
 		Text message = new LiteralText("").
 			append(new LiteralText(String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()))).
 			append(new LiteralText("[here]").setStyle(new Style().
-				setColor(Formatting.GREEN).
+				setFormatting(Formatting.GREEN).
 				setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName())))).
 				setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())))
 			)).
@@ -352,9 +352,13 @@ public class Multimeter {
 					double newX = blockPos.getX() + 0.5D;
 					double newY = blockPos.getY();
 					double newZ = blockPos.getZ() + 0.5D;
+					float yaw = player.yaw;
+					float pitch = player.pitch;
 					
-					player.changeDimension(newWorld.dimension.getType().getRawId());
-					player.requestTeleport(newX, newY, newZ);
+					if (newWorld != player.world) {
+						player.method_3197(newWorld.dimension.method_11789().method_11792());
+					}
+					player.networkHandler.requestTeleport(newX, newY, newZ, yaw, pitch);
 				}
 			}
 		}
@@ -435,7 +439,7 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.RANDOM_TICK, 0);
 	}
 	
-	public void logScheduledTick(World world, ScheduledTick scheduledTick) {
+	public void logScheduledTick(World world, TickableEntry scheduledTick) {
 		tryLogEvent(world, scheduledTick.pos, EventType.SCHEDULED_TICK, scheduledTick.priority);
 	}
 	

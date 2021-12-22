@@ -32,12 +32,12 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public void handleInputEvents() {
+	public void handleInput() {
 		if (Mouse.isCreated()) {
-			handleMouse();
+			handleMouseEvents();
 		}
 		if (Keyboard.isCreated()) {
-			handleKeyboard();
+			handleKeyboardEvents();
 		}
 	}
 	
@@ -69,7 +69,7 @@ public class ScreenWrapper extends Screen {
 		return screen;
 	}
 	
-	private void handleMouse() {
+	private void handleMouseEvents() {
 		updateMousePos();
 		handleScroll();
 		
@@ -77,7 +77,7 @@ public class ScreenWrapper extends Screen {
 			int button = Mouse.getEventButton();
 			
 			if (Mouse.getEventButtonState()) {
-				if (client.options.touchscreen && touchEvents++ > 0) {
+				if (client.options.touchScreen && touchEvents++ > 0) {
 					continue;
 				}
 
@@ -86,7 +86,7 @@ public class ScreenWrapper extends Screen {
 				
 				screen.mouseClick(mouseX, mouseY, button);
 			} else {
-				if (client.options.touchscreen && --touchEvents > 0) {
+				if (client.options.touchScreen && --touchEvents > 0) {
 					return;
 				}
 
@@ -104,8 +104,8 @@ public class ScreenWrapper extends Screen {
 	private void updateMousePos() {
 		prevX = mouseX;
 		prevY = mouseY;
-		mouseX = Mouse.getX() * width / client.frameBufferWidth;
-		mouseY = height - 1 - Mouse.getY() * height / client.frameBufferHeight;
+		mouseX = Mouse.getX() * width / client.width;
+		mouseY = height - 1 - Mouse.getY() * height / client.height;
 		
 		if (mouseX != prevX || mouseY != prevY) {
 			screen.mouseMove(mouseX, mouseY);
@@ -129,7 +129,7 @@ public class ScreenWrapper extends Screen {
 		}
 	}
 	
-	private void handleKeyboard() {
+	private void handleKeyboardEvents() {
 		while (Keyboard.next()) {
 			char chr = Keyboard.getEventCharacter();
 			int key = Keyboard.getEventKey();
@@ -152,7 +152,7 @@ public class ScreenWrapper extends Screen {
 				screen.typeChar(chr);
 			}
 			
-			client.handleKeyboardEvents();
+			client.handleKeyInput();
 		}
 	}
 }

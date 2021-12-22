@@ -31,12 +31,12 @@ public abstract class WorldMixin implements IWorld {
 	@Shadow private boolean isClient;
 	
 	@Inject(
-			method = "updateNeighbor",
+			method = "method_8546",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BlockState;neighbourUpdate(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/BlockState;method_11707(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
 	private void onBlockUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
@@ -58,12 +58,12 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "onBlockChanged",
+			method = "method_13691",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/ObserverBlock;method_26711(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/class_3065;method_13711(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
 	private void onObserverUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci, BlockState state) {
@@ -151,7 +151,7 @@ public abstract class WorldMixin implements IWorld {
 	@Inject(
 			method = "tickEntities",
 			at = @At(
-					value = "HEAD"
+					value = "RETURN"
 			)
 	)
 	private void endTickTaskBlockEntitiesAndEntities(CallbackInfo ci) {
@@ -160,7 +160,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_26050",
+			method = "method_3636",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
@@ -174,7 +174,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_26148",
+			method = "tick",
 			at = @At(
 					value = "HEAD"
 			)
@@ -184,7 +184,7 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "method_26148",
+			method = "tick",
 			at = @At(
 					value = "RETURN"
 			)
@@ -199,7 +199,7 @@ public abstract class WorldMixin implements IWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BlockState;neighbourUpdate(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/BlockState;method_11707(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
 	private void onComparatorUpdate(BlockPos fromPos, Block fromBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {

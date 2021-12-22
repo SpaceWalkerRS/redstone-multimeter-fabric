@@ -14,7 +14,6 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import redstone.multimeter.common.network.PacketManager;
-import redstone.multimeter.interfaces.mixin.ICustomPayloadC2SPacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 
 @Mixin(ServerPlayNetworkHandler.class)
@@ -30,12 +29,10 @@ public class ServerPlayNetworkHandlerMixin {
 					value = "HEAD"
 			)
 	)
-	private void onCustomPayload(CustomPayloadC2SPacket minecraftPacket, CallbackInfo ci) {
-		ICustomPayloadC2SPacket packet = (ICustomPayloadC2SPacket)minecraftPacket;
-		
-		if (PacketManager.getPacketChannelId().equals(packet.getPacketChannelRSMM())) {
-			NetworkThreadUtils.method_32357(minecraftPacket, (ServerPlayNetworkHandler)(Object)this, server);
-			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().onPacketReceived(packet.getPacketDataRSMM(), player);
+	private void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
+		if (PacketManager.getPacketChannelId().toString().equals(packet.getChannel())) {
+			NetworkThreadUtils.forceMainThread(packet, (ServerPlayNetworkHandler)(Object)this, server);
+			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().onPacketReceived(packet.getPayload(), player);
 			
 			ci.cancel();
 		}

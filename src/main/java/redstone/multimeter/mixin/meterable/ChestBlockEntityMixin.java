@@ -22,7 +22,7 @@ import redstone.multimeter.server.MultimeterServer;
 public class ChestBlockEntityMixin extends BlockEntity {
 	
 	@Shadow private int viewerCount;
-	@Shadow private ChestBlock.Type field_25103;
+	@Shadow private ChestBlock.class_2719 field_12843;
 	
 	@Inject(
 			method = "onInvOpen",
@@ -64,6 +64,6 @@ public class ChestBlockEntityMixin extends BlockEntity {
 	}
 	
 	private boolean isTrapped() {
-		return field_25103 == ChestBlock.Type.TRAP;
+		return field_12843 == ChestBlock.class_2719.field_12623;
 	}
 }

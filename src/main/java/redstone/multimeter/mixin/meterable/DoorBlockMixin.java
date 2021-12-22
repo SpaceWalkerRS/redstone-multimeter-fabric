@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
-import net.minecraft.block.DoorBlock.DoubleBlockHalf;
+import net.minecraft.block.DoorBlock.HalfType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -21,7 +21,7 @@ import redstone.multimeter.block.MeterableBlock;
 public abstract class DoorBlockMixin implements MeterableBlock {
 	
 	@Inject(
-			method = "neighborUpdate",
+			method = "method_8641",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "FIELD",
@@ -51,8 +51,8 @@ public abstract class DoorBlockMixin implements MeterableBlock {
 	}
 	
 	private BlockPos getOtherHalf(BlockPos pos, BlockState state) {
-		DoubleBlockHalf half = state.get(DoorBlock.HALF);
-		Direction dir = (half == DoubleBlockHalf.LOWER) ? Direction.UP : Direction.DOWN;
+		HalfType half = state.get(DoorBlock.HALF);
+		Direction dir = (half == HalfType.LOWER) ? Direction.UP : Direction.DOWN;
 		
 		return pos.offset(dir);
 	}

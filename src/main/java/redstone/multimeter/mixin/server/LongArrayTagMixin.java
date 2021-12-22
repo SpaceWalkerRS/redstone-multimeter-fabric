@@ -3,17 +3,17 @@ package redstone.multimeter.mixin.server;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import net.minecraft.nbt.LongArrayTag;
+import net.minecraft.class_3323;
 
 import redstone.multimeter.interfaces.mixin.ILongArrayTag;
 
-@Mixin(LongArrayTag.class)
+@Mixin(class_3323.class)
 public class LongArrayTagMixin implements ILongArrayTag {
 	
-	@Shadow private long[] value;
+	@Shadow private long[] field_16245;
 	
 	@Override
 	public long[] getLongArray() {
-		return value;
+		return field_16245;
 	}
 }

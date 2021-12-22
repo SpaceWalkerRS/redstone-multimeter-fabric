@@ -7,10 +7,9 @@ import java.util.Map;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-
+import net.minecraft.class_3323;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -49,7 +48,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			list.add(nbt);
 		}
 		
-		data.put("removed meters", new LongArrayTag(removedMeters));
+		data.put("removed meters", new class_3323(removedMeters));
 		data.put("meter updates", list);
 	}
 	
@@ -60,7 +59,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 		
 		long[] ids;
 		
-		if (idsNbt instanceof LongArrayTag) {
+		if (idsNbt instanceof class_3323) {
 			ids = ((ILongArrayTag)idsNbt).getLongArray();
 		} else {
 			ids = new long[0];

@@ -56,7 +56,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			this.client.getMeterGroup().toggleHidden(meter);
 			return true;
 		});
-		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").setStyle(new Style().setColor(triedDeleting ? Formatting.RED : Formatting.WHITE)), () -> Arrays.asList(new LiteralText("Delete Meter")), button -> {
+		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").setStyle(new Style().setFormatting(triedDeleting ? Formatting.RED : Formatting.WHITE)), () -> Arrays.asList(new LiteralText("Delete Meter")), button -> {
 			tryDelete();
 			
 			if (triedDeleting && Screen.hasShiftDown()) {
@@ -159,7 +159,7 @@ public class MeterControlsElement extends AbstractParentElement {
 				
 			}
 		}, () -> ColorUtils.toRGBString(meter.getColor()).toUpperCase()));
-		builder.addControl("Color", () -> new LiteralText("red").setStyle(new Style().setColor(Formatting.RED)), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		builder.addControl("Color", () -> new LiteralText("red").setStyle(new Style().setFormatting(Formatting.RED)), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int color = meter.getColor();
 			int red = ColorUtils.getRed(color);
 			
@@ -175,7 +175,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			
 			return (double)red / 0xFF;
 		}, 0xFF));
-		builder.addControl("Color", () -> new LiteralText("green").setStyle(new Style().setColor(Formatting.GREEN)), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		builder.addControl("Color", () -> new LiteralText("green").setStyle(new Style().setFormatting(Formatting.GREEN)), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int color = meter.getColor();
 			int green = ColorUtils.getGreen(color);
 			
@@ -191,7 +191,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			
 			return (double)green / 0xFF;
 		}, 0xFF));
-		builder.addControl("Color", () -> new LiteralText("blue").setStyle(new Style().setColor(Formatting.BLUE)), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		builder.addControl("Color", () -> new LiteralText("blue").setStyle(new Style().setFormatting(Formatting.BLUE)), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int color = meter.getColor();
 			int blue = ColorUtils.getBlue(color);
 			

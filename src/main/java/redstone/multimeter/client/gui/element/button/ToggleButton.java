@@ -16,7 +16,7 @@ public class ToggleButton extends Button {
 			Boolean value = getter.get();
 			Formatting color = value ? Formatting.GREEN : Formatting.RED;
 			
-			return new LiteralText(value.toString()).setStyle(new Style().setColor(color));
+			return new LiteralText(value.toString()).setStyle(new Style().setFormatting(color));
 		}, () -> null, button -> { toggle.accept(button); return true; });
 	}
 }

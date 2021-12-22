@@ -16,7 +16,7 @@ import redstone.multimeter.client.KeyBindings;
 @Mixin(KeyBinding.class)
 public class KeyBindingMixin {
 	
-	@Shadow @Final private static Map<String, Integer> CATEGORIES;
+	@Shadow @Final private static Map<String, Integer> field_15867;
 	
 	@Inject(
 			method = "<clinit>",
@@ -26,7 +26,7 @@ public class KeyBindingMixin {
 	)
 	private static void initKeybinds(CallbackInfo ci) {
 		for (String category : KeyBindings.getCategories()) {
-			CATEGORIES.put(category, CATEGORIES.size() + 1);
+			field_15867.put(category, field_15867.size() + 1);
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package redstone.multimeter.server;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -9,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import net.minecraft.class_2750;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -16,16 +16,16 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickTask;
-import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.ServerTickPacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.meter.ServerMeterGroup;
+import redstone.multimeter.util.DimensionUtils;
 
 public class MultimeterServer {
 	
@@ -35,7 +35,6 @@ public class MultimeterServer {
 	private final Map<UUID, String> connectedPlayers;
 	private final Map<UUID, String> playerNameCache;
 	
-	private Field carpetTickSpeedProccessEntities;
 	private TickPhase tickPhase;
 	/** true if the OverWorld already ticked time */
 	private boolean tickedTime;
@@ -49,8 +48,6 @@ public class MultimeterServer {
 		
 		this.tickPhase = TickPhase.UNKNOWN;
 		this.tickedTime = false;
-		
-		this.detectCarpetTickSpeed();
 	}
 	
 	public MinecraftServer getMinecraftServer() {
@@ -63,29 +60,6 @@ public class MultimeterServer {
 	
 	public Multimeter getMultimeter() {
 		return multimeter;
-	}
-	
-	/**
-	 * Carpet Mod allows players to freeze the game.
-	 * We need to detect when this is happening so
-	 * RSMM can freeze accordingly.
-	 */
-	private void detectCarpetTickSpeed() {
-		Class<?> clazzTickSpeed = null;
-		
-		try {
-			clazzTickSpeed = Class.forName("carpet.helpers.TickSpeed");
-		} catch (ClassNotFoundException e) {
-			
-		}
-		
-		if (clazzTickSpeed != null) {
-			try {
-				carpetTickSpeedProccessEntities = clazzTickSpeed.getField("process_entities");
-			} catch (NoSuchFieldException | SecurityException e) {
-				
-			}
-		}
 	}
 	
 	public boolean isDedicated() {
@@ -117,7 +91,7 @@ public class MultimeterServer {
 	}
 	
 	public long getCurrentTick() {
-		long tick = server.getEntityWorld().getTime();
+		long tick = server.getWorld().getLastUpdateTime();
 		
 		if (!tickedTime) {
 			tick++;
@@ -127,17 +101,7 @@ public class MultimeterServer {
 	}
 	
 	public boolean isPaused() {
-		boolean frozen = false;
-		
-		if (carpetTickSpeedProccessEntities != null) {
-			try {
-				frozen = !carpetTickSpeedProccessEntities.getBoolean(null);
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				
-			}
-		}
-		
-		return frozen || ((IMinecraftServer)server).isPaused();
+		return ((IMinecraftServer)server).isPaused();
 	}
 	
 	public void tickStart() {
@@ -173,7 +137,7 @@ public class MultimeterServer {
 		if (!paused) {
 			ServerTickPacket packet = new ServerTickPacket(getCurrentTick());
 			
-			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+			for (ServerPlayerEntity player : server.getPlayerManager().getPlayers()) {
 				if (multimeter.hasSubscription(player)) {
 					packetHandler.sendToPlayer(packet, player);
 				}
@@ -192,7 +156,7 @@ public class MultimeterServer {
 	public void onPlayerLeave(ServerPlayerEntity player) {
 		multimeter.onPlayerLeave(player);
 		connectedPlayers.remove(player.getUuid());
-		playerNameCache.put(player.getUuid(), player.getName());
+		playerNameCache.put(player.getUuid(), player.getTranslationKey());
 	}
 	
 	public void onHandshake(ServerPlayerEntity player, String modVersion) {
@@ -203,8 +167,8 @@ public class MultimeterServer {
 	}
 	
 	public ServerWorld getWorld(Identifier dimensionId) {
-		DimensionType type = DimensionType.method_27530(dimensionId.getPath());
-		return server.getWorldById(type.getRawId());
+		class_2750 type = DimensionUtils.getType(dimensionId);
+		return type == null ? null : server.getWorld(type.method_11792());
 	}
 	
 	public ServerWorld getWorldOf(DimPos pos) {
@@ -227,7 +191,7 @@ public class MultimeterServer {
 	
 	public String getPlayerName(UUID playerUUID) {
 		ServerPlayerEntity player = getPlayer(playerUUID);
-		return player == null ? playerNameCache.get(playerUUID) : player.getName();
+		return player == null ? playerNameCache.get(playerUUID) : player.getTranslationKey();
 	}
 	
 	public ServerPlayerEntity getPlayer(String playerName) {
@@ -257,6 +221,6 @@ public class MultimeterServer {
 	}
 	
 	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
-		player.sendMessage(message, actionBar);
+		player.method_8428(message, actionBar);
 	}
 }
