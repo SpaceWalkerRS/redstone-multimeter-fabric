@@ -65,7 +65,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			Tag tag = idList.get(index);
 			
 			if (tag.getType() == NbtUtils.TYPE_LONG) {
-				removedMeters.add(((LongTag)tag).method_7371());
+				removedMeters.add(((LongTag)tag).getLong());
 			}
 		}
 		for (int index = 0; index < updateList.size(); index++) {
