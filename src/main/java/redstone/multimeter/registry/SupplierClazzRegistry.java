@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import net.minecraft.util.Identifier;
-
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.util.Identifier;
 
 public class SupplierClazzRegistry<T> {
 	

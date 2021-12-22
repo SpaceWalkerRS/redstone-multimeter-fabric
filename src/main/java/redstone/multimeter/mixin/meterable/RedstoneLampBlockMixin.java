@@ -9,9 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.RedstoneLampBlock;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -22,17 +20,17 @@ public class RedstoneLampBlockMixin implements MeterableBlock {
 	@Shadow @Final private boolean field_316;
 	
 	@Inject(
-			method = "scheduledTick",
+			method = "method_436",
 			at = @At(
 					value = "HEAD"
 			)
 	)
-	private void onScheduledTick(World world, BlockPos pos, BlockState state, Random random, CallbackInfo ci) {
-		logPowered(world, pos, world.isReceivingRedstonePower(pos));
+	private void onScheduledTick(World world, int x, int y, int z, Random random, CallbackInfo ci) {
+		logPowered(world, x, y, z, world.method_3739(x, y, z));
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
+	public boolean isActive(World world, int x, int y, int z, int metadata) {
 		return field_316;
 	}
 }

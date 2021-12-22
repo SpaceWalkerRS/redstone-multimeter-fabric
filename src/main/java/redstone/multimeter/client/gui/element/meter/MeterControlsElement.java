@@ -9,8 +9,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction.Axis;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
@@ -29,6 +27,8 @@ import redstone.multimeter.common.network.packets.MeterUpdatePacket;
 import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 import redstone.multimeter.common.network.packets.TeleportToMeterPacket;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.Direction.Axis;
+import redstone.multimeter.util.Identifier;
 
 public class MeterControlsElement extends AbstractParentElement {
 	

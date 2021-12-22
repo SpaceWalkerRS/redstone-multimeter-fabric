@@ -181,11 +181,11 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 			int ty2 = region.y + region.height - bottomHeight;
 			int ty3 = region.y + region.height;
 			
-			renderTexture(texture, bufferBuilder -> {
-				drawTexture(bufferBuilder, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
-				drawTexture(bufferBuilder, texture, x0, y2, x1, y3, tx0, ty2, tx1, ty3);
-				drawTexture(bufferBuilder, texture, x2, y2, x3, y3, tx2, ty2, tx3, ty3);
-				drawTexture(bufferBuilder, texture, x2, y0, x3, y1, tx2, ty0, tx3, ty1);
+			renderTexture(texture, tessellator -> {
+				drawTexture(tessellator, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
+				drawTexture(tessellator, texture, x0, y2, x1, y3, tx0, ty2, tx1, ty3);
+				drawTexture(tessellator, texture, x2, y2, x3, y3, tx2, ty2, tx3, ty3);
+				drawTexture(tessellator, texture, x2, y0, x3, y1, tx2, ty0, tx3, ty1);
 			});
 		}
 	}

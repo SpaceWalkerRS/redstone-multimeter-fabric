@@ -7,12 +7,8 @@ import java.util.function.Supplier;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.text.Text;
 import net.minecraft.util.SharedConstants;
 import net.minecraft.util.math.MathHelper;
@@ -293,9 +289,9 @@ public class TextField extends AbstractButton {
 		int borderColor = getBorderColor();
 		int backgroundColor = 0xFF000000;
 		
-		renderRect(bufferBuilder -> {
-			drawRect(bufferBuilder, x    , y    , width    , height    , borderColor);
-			drawRect(bufferBuilder, x + 1, y + 1, width - 2, height - 2, backgroundColor);
+		renderRect(tessellator -> {
+			drawRect(tessellator, x    , y    , width    , height    , borderColor);
+			drawRect(tessellator, x + 1, y + 1, width - 2, height - 2, backgroundColor);
 		});
 	}
 	
@@ -346,26 +342,23 @@ public class TextField extends AbstractButton {
 		int y1 = selectionY + selectionHeight;
 		int z = 0;
 		
-		GlStateManager.color4f(0.0F, 0.0F, 0xFF, 0xFF);
-		GlStateManager.disableTexture();
-		GlStateManager.enableColorLogic();
-		GlStateManager.logicOp(GL11.GL_OR_REVERSE);
+		GL11.glColor4f(0.0F, 0.0F, 0xFF, 0xFF);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_COLOR_LOGIC_OP);
+		GL11.glLogicOp(GL11.GL_OR_REVERSE);
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
+		Tessellator tessellator = Tessellator.INSTANCE;
 		
-		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION);
+		tessellator.method_1405();
+		tessellator.method_1398(x0, y0, z);
+		tessellator.method_1398(x0, y1, z);
+		tessellator.method_1398(x1, y1, z);
+		tessellator.method_1398(x1, y0, z);
+		tessellator.method_1396();
 		
-		bufferBuilder.vertex(x0, y0, z).next();
-		bufferBuilder.vertex(x0, y1, z).next();
-		bufferBuilder.vertex(x1, y1, z).next();
-		bufferBuilder.vertex(x1, y0, z).next();
-		
-		tessellator.draw();
-		
-		GlStateManager.disableColorLogic();
-		GlStateManager.enableTexture();
-		GlStateManager.color4f(0xFF, 0xFF, 0xFF, 0xFF);
+		GL11.glDisable(GL11.GL_COLOR_LOGIC_OP);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glColor4f(0xFF, 0xFF, 0xFF, 0xFF);
 	}
 	
 	private int getBorderColor() {

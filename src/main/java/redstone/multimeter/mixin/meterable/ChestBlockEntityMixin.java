@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
 
 import redstone.multimeter.block.PowerSource;
 import redstone.multimeter.block.chest.TrappedChestHelper;
@@ -18,37 +17,38 @@ import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(ChestBlockEntity.class)
-public class ChestBlockEntityMixin extends BlockEntity {
+public abstract class ChestBlockEntityMixin extends BlockEntity {
 	
 	@Shadow private int viewerCount;
-	@Shadow private int field_5649; // chest type: 0 = normal, 1 = trapped
+	
+	@Shadow public abstract int method_4806();
 	
 	@Inject(
-			method = "onInvOpen",
+			method = "method_2390",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/world/World;addBlockAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;II)V"
+					target = "Lnet/minecraft/world/World;method_3654(IIILnet/minecraft/block/Block;II)V"
 			)
 	)
-	private void onOpenedByPlayer(PlayerEntity player, CallbackInfo ci) {
-		invOpenOrClose(true);
+	private void onOpenedByPlayer(CallbackInfo ci) {
+		invOpenOrCloseRSMM(true);
 	}
 	
 	@Inject(
-			method = "onInvClose",
+			method = "method_2387",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/world/World;addBlockAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;II)V"
+					target = "Lnet/minecraft/world/World;method_3654(IIILnet/minecraft/block/Block;II)V"
 			)
 	)
-	private void onClosedByPlayer(PlayerEntity player, CallbackInfo ci) {
-		invOpenOrClose(false);
+	private void onClosedByPlayer(CallbackInfo ci) {
+		invOpenOrCloseRSMM(false);
 	}
 	
-	private void invOpenOrClose(boolean open) {
-		if (!world.isClient && isTrapped()) {
+	private void invOpenOrCloseRSMM(boolean open) {
+		if (!world.isClient && isTrappedRSMM()) {
 			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 			
@@ -57,12 +57,12 @@ public class ChestBlockEntityMixin extends BlockEntity {
 			int oldPower = TrappedChestHelper.getPowerFromViewerCount(oldViewerCount);
 			int newPower = TrappedChestHelper.getPowerFromViewerCount(viewerCount);
 			
-			multimeter.logPowerChange(world, pos, oldPower, newPower);
-			multimeter.logActive(world, pos, newPower > PowerSource.MIN_POWER);
+			multimeter.logPowerChange(world, field_566, field_567, field_568, oldPower, newPower);
+			multimeter.logActive(world, field_566, field_567, field_568, newPower > PowerSource.MIN_POWER);
 		}
 	}
 	
-	private boolean isTrapped() {
-		return field_5649 == 1;
+	private boolean isTrappedRSMM() {
+		return method_4806() == 1;
 	}
 }

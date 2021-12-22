@@ -3,8 +3,6 @@ package redstone.multimeter.mixin.meterable;
 import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.block.AbstractButtonBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
@@ -14,12 +12,12 @@ import redstone.multimeter.block.PowerSource;
 public abstract class AbstractButtonBlockMixin implements Meterable, PowerSource {
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(AbstractButtonBlock.POWERED);
+	public boolean isActive(World world, int x, int y, int z, int metadata) {
+		return (metadata & 8) != 0;
 	}
 	
 	@Override
-	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
-		return state.get(AbstractButtonBlock.POWERED) ? MAX_POWER : MIN_POWER;
+	public int getPowerLevel(World world, int x, int y, int z, int metadata) {
+		return (metadata & 8) == 0 ? MIN_POWER : MAX_POWER;
 	}
 }

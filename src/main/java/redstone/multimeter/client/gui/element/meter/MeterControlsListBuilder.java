@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Direction.Axis;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.TextElement;
@@ -17,6 +16,7 @@ import redstone.multimeter.client.gui.element.controls.ControlElement;
 import redstone.multimeter.client.gui.element.controls.ControlsListBuilder;
 import redstone.multimeter.client.gui.element.controls.ControlsSectionElement;
 import redstone.multimeter.common.DimPos;
+import redstone.multimeter.util.Direction.Axis;
 
 public class MeterControlsListBuilder extends ControlsListBuilder {
 	

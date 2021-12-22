@@ -6,8 +6,6 @@ import java.util.function.Supplier;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.Axis;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.button.Button;
@@ -16,7 +14,7 @@ import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.element.controls.ControlElement;
 import redstone.multimeter.common.DimPos;
-import redstone.multimeter.util.AxisUtils;
+import redstone.multimeter.util.Direction.Axis;
 
 public class CoordinateControlElement extends ControlElement {
 	
@@ -75,8 +73,7 @@ public class CoordinateControlElement extends ControlElement {
 		return new TextField(client, 0, 0, width, height, () -> null, text -> {
 			try {
 				DimPos pos = getter.get();
-				BlockPos p = pos.getBlockPos();
-				int coord = AxisUtils.choose(axis, p.getX(), p.getY(), p.getZ());
+				int coord = axis.choose(pos.getX(), pos.getY(), pos.getZ());
 				int newCoord = Integer.valueOf(text);
 				DimPos newPos = pos.offset(axis, newCoord - coord);
 				
@@ -86,8 +83,7 @@ public class CoordinateControlElement extends ControlElement {
 			}
 		}, () -> {
 			DimPos pos = getter.get();
-			BlockPos p = pos.getBlockPos();
-			int coord = AxisUtils.choose(axis, p.getX(), p.getY(), p.getZ());
+			int coord = axis.choose(pos.getX(), pos.getY(), pos.getZ());
 			
 			return String.valueOf(coord);
 		});

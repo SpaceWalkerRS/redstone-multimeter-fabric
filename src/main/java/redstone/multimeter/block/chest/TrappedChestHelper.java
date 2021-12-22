@@ -1,9 +1,7 @@
 package redstone.multimeter.block.chest;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -11,8 +9,8 @@ import redstone.multimeter.block.PowerSource;
 
 public class TrappedChestHelper {
 	
-	public static int getPower(World world, BlockPos pos, BlockState state) {
-		BlockEntity blockEntity = world.getBlockEntity(pos);
+	public static int getPower(World world, int x, int y, int z) {
+		BlockEntity blockEntity = world.method_3781(x, y, z);
 		
 		if (blockEntity instanceof ChestBlockEntity) {
 			return getPowerFromViewerCount(((ChestBlockEntity)blockEntity).viewerCount);

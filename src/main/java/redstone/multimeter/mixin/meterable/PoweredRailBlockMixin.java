@@ -3,9 +3,7 @@ package redstone.multimeter.mixin.meterable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.PoweredRailBlock;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -13,15 +11,15 @@ import redstone.multimeter.block.MeterableBlock;
 @Mixin(PoweredRailBlock.class)
 public abstract class PoweredRailBlockMixin implements MeterableBlock {
 	
-	@Shadow protected abstract boolean isPoweredByOtherRails(World world, BlockPos pos, BlockState state, boolean boolean4, int distance);
+	@Shadow protected abstract boolean method_4780(World world, int x, int y, int z, int metadata, boolean bl, int depth);
 	
 	@Override
-	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return world.isReceivingRedstonePower(pos) || isPoweredByOtherRails(world, pos, state, true, 0) || isPoweredByOtherRails(world, pos, state, false, 0);
+	public boolean isPowered(World world, int x, int y, int z, int metadata) {
+		return world.method_3739(x, y, z) || method_4780(world, x, y, z, metadata, true, 0) || method_4780(world, x, y, z, metadata, false, 0);
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(PoweredRailBlock.POWERED);
+	public boolean isActive(World world, int x, int y, int z, int metadata) {
+		return (metadata & 8) != 0;
 	}
 }

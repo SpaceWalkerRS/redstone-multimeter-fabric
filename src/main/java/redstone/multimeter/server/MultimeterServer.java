@@ -4,17 +4,15 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.DimPos;
@@ -25,6 +23,7 @@ import redstone.multimeter.common.network.packets.ServerTickPacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.meter.ServerMeterGroup;
 import redstone.multimeter.util.DimensionUtils;
+import redstone.multimeter.util.Identifier;
 
 public class MultimeterServer {
 	
@@ -66,7 +65,7 @@ public class MultimeterServer {
 	}
 	
 	public File getConfigFolder() {
-		return new File(server.getRunDirectory(), RedstoneMultimeterMod.CONFIG_PATH);
+		return server.getFile(RedstoneMultimeterMod.CONFIG_PATH);
 	}
 	
 	public TickPhase getTickPhase() {
@@ -136,7 +135,7 @@ public class MultimeterServer {
 		if (!paused) {
 			ServerTickPacket packet = new ServerTickPacket(getCurrentTick());
 			
-			for (ServerPlayerEntity player : server.getPlayerManager().getPlayers()) {
+			for (ServerPlayerEntity player : getPlayers()) {
 				if (multimeter.hasSubscription(player)) {
 					packetHandler.sendToPlayer(packet, player);
 				}
@@ -174,18 +173,19 @@ public class MultimeterServer {
 		return getWorld(pos.getDimensionId());
 	}
 	
-	public BlockState getBlockState(DimPos pos) {
-		World world = getWorldOf(pos);
-		
-		if (world != null) {
-			return world.getBlockState(pos.getBlockPos());
-		}
-		
-		return null;
+	@SuppressWarnings("unchecked")
+	public List<ServerPlayerEntity> getPlayers() {
+		return server.getPlayerManager().players;
 	}
 	
 	public ServerPlayerEntity getPlayer(UUID playerUUID) {
-		return server.getPlayerManager().getPlayer(playerUUID);
+		for (ServerPlayerEntity player : getPlayers()) {
+			if (player.getUuid().equals(playerUUID)) {
+				return player;
+			}
+		}
+		
+		return null;
 	}
 	
 	public String getPlayerName(UUID playerUUID) {

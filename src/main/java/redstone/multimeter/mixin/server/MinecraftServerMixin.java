@@ -18,11 +18,11 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	private MultimeterServer multimeterServer;
 	
 	@Inject(
-			method = "<init>(Ljava/io/File;Ljava/net/Proxy;Ljava/io/File;)V",
+			method = "<init>",
 			at = @At(
-					value = "INVOKE",
+					value = "NEW",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/server/MinecraftServer;createCommandManager()Lnet/minecraft/server/command/CommandManager;"
+					target = "Lnet/minecraft/server/command/CommandManager;"
 			)
 	)
 	private void onInit(CallbackInfo ci) {
@@ -43,8 +43,8 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			method = "tick",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
-					args = "ldc=jobs"
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=connection"
 			)
 	)
 	private void startTickTaskPackets(CallbackInfo ci) {
@@ -54,9 +54,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	@Inject(
 			method = "tick",
 			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=levels"
+					value = "RETURN"
 			)
 	)
 	private void endTickTaskPackets(CallbackInfo ci) {

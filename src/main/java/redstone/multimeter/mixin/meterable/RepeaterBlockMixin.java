@@ -5,10 +5,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.RedstoneComponentBlock;
 import net.minecraft.block.RepeaterBlock;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
@@ -23,23 +21,23 @@ public abstract class RepeaterBlockMixin extends RedstoneComponentBlock implemen
 	}
 	
 	@Inject(
-			method = "method_8722",
+			method = "method_4758",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void onIsLocked(WorldView worldView, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+	private void onIsLocked(WorldView worldView, int x, int y, int z, int metadata, CallbackInfoReturnable<Boolean> cir) {
 		if (cir.getReturnValue() && worldView instanceof World) {
 			World world = (World)worldView;
 			
 			if (!world.isClient) {
-				logPowered(world, pos, method_8727(world, pos, state));
+				logPowered(world, x, y, z, method_4754(world, x, y, z, metadata));
 			}
 		}
 	}
 	
 	@Override
-	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
+	public int getPowerLevel(World world, int x, int y, int z, int metadata) {
 		return field_5539 ? MAX_POWER : MIN_POWER;
 	}
 }

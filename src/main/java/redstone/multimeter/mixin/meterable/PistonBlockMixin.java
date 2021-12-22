@@ -1,58 +1,68 @@
 package redstone.multimeter.mixin.meterable;
 
-import java.util.List;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import net.minecraft.class_830;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.PistonBlock;
-import net.minecraft.block.piston.PistonHandler;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.server.Multimeter;
+import redstone.multimeter.util.Direction;
 
 @Mixin(PistonBlock.class)
 public abstract class PistonBlockMixin implements MeterableBlock {
 	
-	@Shadow protected abstract boolean shouldExtend(World world, BlockPos pos, Direction facing);
+	@Shadow protected abstract boolean method_557(World world, int x, int y, int z, int facing);
 	
 	@Inject(
-			method = "shouldExtend",
+			method = "method_557",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void onShouldExtend(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
-		logPowered(world, pos, cir.getReturnValue());
+	private void onShouldExtend(World world, int x, int y, int z, int facing, CallbackInfoReturnable<Boolean> cir) {
+		logPowered(world, x, y, z, cir.getReturnValue());
 	}
 	
 	@Inject(
-			method = "move",
+			method = "method_435",
+			at = @At(
+					value = "INVOKE",
+					ordinal = 1,
+					target = "Lnet/minecraft/world/World;method_4721(IIILnet/minecraft/block/Block;II)Z"
+			)
+	)
+	private void onRetractBlock(World world, int x, int y, int z, int type, int data, CallbackInfoReturnable<Boolean> cir) {
+		if (!world.isClient) {
+			int movedX = x + 2 * class_830.field_3062[data];
+			int movedY = y + 2 * class_830.field_3063[data];
+			int movedZ = z + 2 * class_830.field_3064[data];
+			Direction dir = Direction.fromIndex(data);
+			
+			onBlockMoved(world, movedX, movedY, movedZ, dir);
+		}
+	}
+	
+	@Inject(
+			method = "method_560",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					ordinal = 1,
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
+					target = "Lnet/minecraft/world/World;method_4721(IIILnet/minecraft/block/Block;II)Z"
 			)
 	)
-	private void onBlockMoved(World world, BlockPos pistonPos, Direction facing, boolean extend, CallbackInfoReturnable<Boolean> cir, PistonHandler pistonHandler, List<BlockPos> movedPositions, List<BlockPos> brokenPositions, int removedIndex, Block[] removedBlocks, Direction moveDir, int brokenIndex, BlockPos movedPos, BlockState movedState) {
+	private void onBlockMoved(World world, int x, int y, int z, int dir, CallbackInfoReturnable<Boolean> cir, int destX, int destY, int destZ, int idk, int idk2, int idk3, int index, Block[] movedBlocks, int movedX, int movedY, int movedZ, Block movedBlock, int movedMetadata) {
 		if (!world.isClient) {
-			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
-			
-			multimeter.logMoved(world, movedPos, moveDir);
-			multimeter.moveMeters(world, movedPos, moveDir);
+			onBlockMoved(world, movedX, movedY, movedZ, Direction.fromIndex(dir));
 		}
 	}
 	
@@ -62,12 +72,19 @@ public abstract class PistonBlockMixin implements MeterableBlock {
 	}
 	
 	@Override
-	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return shouldExtend(world, pos, state.get(PistonBlock.DIRECTION));
+	public boolean isPowered(World world, int x, int y, int z, int metadata) {
+		return method_557(world, x, y, z, PistonBlock.method_556(metadata));
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(PistonBlock.EXTENDED);
+	public boolean isActive(World world, int x, int y, int z, int metadata) {
+		return PistonBlock.method_558(metadata);
+	}
+	
+	private void onBlockMoved(World world, int x, int y, int z, Direction dir) {
+		Multimeter multimeter = ((IServerWorld)world).getMultimeter();
+		
+		multimeter.logMoved(world, x, y, z, dir);
+		multimeter.moveMeters(world, x, y, z, dir);
 	}
 }

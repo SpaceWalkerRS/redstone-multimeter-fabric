@@ -9,8 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.interfaces.mixin.IServerWorld;
@@ -19,14 +17,14 @@ import redstone.multimeter.interfaces.mixin.IServerWorld;
 public class ServerPlayerInteractionManagerMixin {
 	
 	@Inject(
-			method = "interactBlock",
+			method = "method_2170",
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/Block;onUse(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/Direction;FFF)Z"
+					target = "Lnet/minecraft/block/Block;method_421(Lnet/minecraft/world/World;IIILnet/minecraft/entity/player/PlayerEntity;IFFF)Z"
 			)
 	)
-	private void onInteractBlock(PlayerEntity player, World world, ItemStack stack, BlockPos pos, Direction dir, float dx, float dy, float dz, CallbackInfoReturnable<Boolean> cir) {
-		((IServerWorld)world).getMultimeter().logInteractBlock(world, pos);
+	private void onInteractBlock(PlayerEntity playerEntity, World world, ItemStack stack, int x, int y, int z, int dir, float dx, float dy, float dz, CallbackInfoReturnable<Boolean> cir) {
+		((IServerWorld)world).getMultimeter().logInteractBlock(world, x, y, z);
 	}
 }

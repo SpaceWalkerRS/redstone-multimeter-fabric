@@ -4,13 +4,13 @@ import java.io.File;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import net.minecraft.class_235;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -288,11 +288,13 @@ public class MultimeterClient {
 	private void onTargetBlock(Consumer<DimPos> consumer) {
 		HitResult hitResult = client.result;
 		
-		if (hitResult.type == HitResult.Type.BLOCK) {
+		if (hitResult.type == class_235.field_7609) {
 			World world = client.world;
-			BlockPos blockPos = hitResult.getBlockPos();
+			int x = hitResult.field_596;
+			int y = hitResult.field_597;
+			int z = hitResult.field_598;
 			
-			consumer.accept(new DimPos(world, blockPos));
+			consumer.accept(new DimPos(world, x, y, z));
 		}
 	}
 	
@@ -337,6 +339,6 @@ public class MultimeterClient {
 	}
 	
 	public void sendMessage(Text message, boolean actionBar) {
-		client.player.sendMessage(message);
+		client.field_3805.sendMessage(message);
 	}
 }

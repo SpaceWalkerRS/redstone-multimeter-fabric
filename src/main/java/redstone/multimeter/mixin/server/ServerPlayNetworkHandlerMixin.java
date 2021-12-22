@@ -7,11 +7,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.network.NetworkThreadUtils;
+import io.netty.buffer.Unpooled;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.PacketByteBuf;
 
 import redstone.multimeter.common.network.PacketManager;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -31,8 +32,8 @@ public class ServerPlayNetworkHandlerMixin {
 	)
 	private void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		if (PacketManager.getPacketChannelId().toString().equals(packet.getChannel())) {
-			NetworkThreadUtils.forceMainThread(packet, (ServerPlayNetworkHandler)(Object)this, server);
-			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().onPacketReceived(packet.getPayload(), player);
+			PacketByteBuf buffer = new PacketByteBuf(Unpooled.wrappedBuffer(packet.method_7981()));
+			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().onPacketReceived(buffer, player);
 			
 			ci.cancel();
 		}

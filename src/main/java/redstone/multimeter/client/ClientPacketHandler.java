@@ -2,11 +2,11 @@ package redstone.multimeter.client;
 
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 
 import redstone.multimeter.common.network.AbstractPacketHandler;
 import redstone.multimeter.common.network.RSMMPacket;
+import redstone.multimeter.util.Identifier;
 
 public class ClientPacketHandler extends AbstractPacketHandler {
 	
@@ -17,7 +17,7 @@ public class ClientPacketHandler extends AbstractPacketHandler {
 	}
 	
 	@Override
-	protected Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer) {
+	protected Packet toCustomPayload(Identifier id, PacketByteBuf buffer) {
 		return new CustomPayloadC2SPacket(id.toString(), buffer);
 	}
 	

@@ -1,6 +1,5 @@
 package redstone.multimeter.server.meter;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
@@ -24,7 +23,7 @@ public class ServerMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	@Override
-	protected void postValidation(MeterProperties properties, World world, BlockPos pos) {
+	protected void postValidation(MeterProperties properties, World world, DimPos pos) {
 		// These are the backup values for if the saved defaults
 		// do not fully populate the meter settings.
 		

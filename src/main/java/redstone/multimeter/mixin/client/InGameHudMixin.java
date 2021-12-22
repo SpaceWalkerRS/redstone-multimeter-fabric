@@ -20,13 +20,13 @@ public class InGameHudMixin {
 	@Shadow @Final private MinecraftClient client;
 	
 	@Inject(
-			method = "render",
+			method = "method_979",
 			at = @At(
 					value = "FIELD",
 					target = "Lnet/minecraft/client/options/GameOptions;debugEnabled:Z"
 			)
 	)
-	private void renderHUD(float tickDelta, CallbackInfo ci) {
+	private void renderHUD(float tickDelta, boolean bl, int i, int j, CallbackInfo ci) {
 		MultimeterClient multimeterClient = ((IMinecraftClient)client).getMultimeterClient();
 		MultimeterHud hud = multimeterClient.getHUD();
 		

@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
 
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.Directionality;
@@ -19,17 +19,17 @@ public abstract class MeterEventViewer extends AbstractElement {
 	
 	@Override
 	public void render(int mouseX, int mouseY) {
-		GlStateManager.pushMatrix();
+		GL11.glPushMatrix();
 		drawHighlights(mouseX, mouseY);
-		GlStateManager.translated(0, 0, -1);
+		GL11.glTranslated(0, 0, -1);
 		drawDecorators();
-		GlStateManager.translated(0, 0, -1);
+		GL11.glTranslated(0, 0, -1);
 		drawMeterEvents();
-		GlStateManager.translated(0, 0, -1);
+		GL11.glTranslated(0, 0, -1);
 		drawGridLines();
-		GlStateManager.translated(0, 0, -1);
+		GL11.glTranslated(0, 0, -1);
 		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		GlStateManager.popMatrix();
+		GL11.glPopMatrix();
 	}
 	
 	@Override
@@ -107,7 +107,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 	protected abstract void drawMeterEvents();
 	
 	private void drawGridLines() {
-		GlStateManager.pushMatrix();
+		GL11.glPushMatrix();
 		
 		int columns = getColumnCount();
 		int rows = hud.meters.size();
@@ -130,7 +130,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		GlStateManager.translated(0, 0, -0.1);
+		GL11.glTranslated(0, 0, -0.1);
 		
 		// horizonal lines
 		for (int i = 0; i <= rows; i++) {
@@ -143,7 +143,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		GlStateManager.translated(0, 0, -0.1);
+		GL11.glTranslated(0, 0, -0.1);
 		
 		// vertical lines
 		for (int i = 0; i <= columns; i++) {
@@ -156,7 +156,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		GlStateManager.popMatrix();
+		GL11.glPopMatrix();
 	}
 	
 	protected abstract int getColumnCount();

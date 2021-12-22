@@ -2,7 +2,8 @@ package redstone.multimeter.client.gui.element;
 
 import java.util.List;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -152,20 +153,20 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		int borderColor0    = 0x505000FF;
 		int borderColor1    = 0x5028007F;
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(0, 0, 400);
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 400);
 		
-		renderRect(bufferBuilder -> {
+		renderRect(tessellator -> {
 			// background
-			drawRect(bufferBuilder, x    , y + 1         , width    , height - 2, backgroundColor); // center, left/right outer borders
-			drawRect(bufferBuilder, x + 1, y             , width - 2, 1         , backgroundColor); // top outer border
-			drawRect(bufferBuilder, x + 1, y + height - 1, width - 2, 1         , backgroundColor); // bottom outer border
+			drawRect(tessellator, x    , y + 1         , width    , height - 2, backgroundColor); // center, left/right outer borders
+			drawRect(tessellator, x + 1, y             , width - 2, 1         , backgroundColor); // top outer border
+			drawRect(tessellator, x + 1, y + height - 1, width - 2, 1         , backgroundColor); // bottom outer border
 			
 			// inner border
-			drawGradient(bufferBuilder, x + 1        , y + 2         , 1        , height - 4, borderColor0, borderColor1); // left
-			drawRect    (bufferBuilder, x + 1        , y + height - 2, width - 2, 1         , borderColor1);               // bottom
-			drawGradient(bufferBuilder, x + width - 2, y + 2         , 1        , height - 4, borderColor0, borderColor1); // right
-			drawRect    (bufferBuilder, x + 1        , y + 1         , width - 2, 1         , borderColor0);               // top
+			drawGradient(tessellator, x + 1        , y + 2         , 1        , height - 4, borderColor0, borderColor1); // left
+			drawRect    (tessellator, x + 1        , y + height - 2, width - 2, 1         , borderColor1);               // bottom
+			drawGradient(tessellator, x + width - 2, y + 2         , 1        , height - 4, borderColor0, borderColor1); // right
+			drawRect    (tessellator, x + 1        , y + 1         , width - 2, 1         , borderColor0);               // top
 		});
 		
 		int textX = x + 4;
@@ -178,7 +179,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 			textY += font.fontHeight + 1;
 		}
 		
-		GlStateManager.popMatrix();
+		GL11.glPopMatrix();
 	}
 	
 	public Text getTitle() {
@@ -189,7 +190,11 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		return true;
 	}
 	
+	public static boolean hasAltDown() {
+		return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);
+	}
+	
 	public static boolean isControlPressed() {
-		return Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
+		return Screen.hasControlDown() && !Screen.hasShiftDown() && !hasAltDown();
 	}
 }

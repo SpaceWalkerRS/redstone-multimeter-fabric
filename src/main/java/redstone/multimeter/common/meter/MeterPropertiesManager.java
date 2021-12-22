@@ -1,6 +1,5 @@
 package redstone.multimeter.common.meter;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
@@ -20,13 +19,13 @@ public abstract class MeterPropertiesManager {
 			return false;
 		}
 		
-		postValidation(properties, world, pos.getBlockPos());
+		postValidation(properties, world, pos);
 		
 		return true;
 	}
 	
 	protected abstract World getWorldOf(DimPos pos);
 	
-	protected abstract void postValidation(MeterProperties properties, World world, BlockPos pos);
+	protected abstract void postValidation(MeterProperties properties, World world, DimPos pos);
 	
 }

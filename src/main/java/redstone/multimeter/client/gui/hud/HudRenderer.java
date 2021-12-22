@@ -1,8 +1,8 @@
 package redstone.multimeter.client.gui.hud;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.element.IElement;
@@ -66,8 +66,8 @@ public class HudRenderer extends RenderHelper2D {
 	}
 	
 	@Override
-	protected void drawRect(BufferBuilder bufferBuilder, int x, int y, int width, int height, int color) {
-		GlStateManager.enableDepthTest();
+	protected void drawRect(Tessellator tessellator, int x, int y, int width, int height, int color) {
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
 		int x0 = translateX(x, width);
 		int y0 = translateY(y, height);
@@ -79,7 +79,7 @@ public class HudRenderer extends RenderHelper2D {
 		int g = ColorUtils.getGreen(color);
 		int b = ColorUtils.getBlue(color);
 		
-		drawRect(bufferBuilder, x0, y0, x1, y1, a, r, g, b);
+		drawRect(tessellator, x0, y0, x1, y1, a, r, g, b);
 	}
 	
 	public void renderText(String text, int x, int y, int color) {

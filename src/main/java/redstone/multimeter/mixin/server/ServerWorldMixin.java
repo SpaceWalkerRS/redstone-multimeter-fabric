@@ -13,20 +13,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockAction;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.TickableEntry;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.profiler.Profiler;
+import net.minecraft.world.SaveHandler;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldSaveHandler;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.level.LevelProperties;
+import net.minecraft.world.level.LevelInfo;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -39,8 +37,8 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	
 	@Shadow @Final private MinecraftServer server;
 	
-	protected ServerWorldMixin(WorldSaveHandler saveHandler, LevelProperties properties, Dimension dimension, Profiler profiler, boolean client) {
-		super(saveHandler, properties, dimension, profiler, client);
+	public ServerWorldMixin(SaveHandler saveHandler, String string, Dimension dimension, LevelInfo levelInfo, Profiler profiler) {
+		super(saveHandler, string, dimension, levelInfo, profiler);
 	}
 	
 	@Inject(
@@ -76,7 +74,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void onTickTime(CallbackInfo ci) {
-		if (dimension.getType() == DimensionUtils.TYPE_OVERWORLD) {
+		if (dimension.dimensionType == DimensionUtils.TYPE_OVERWORLD) {
 			getMultimeterServer().onOverworldTickTime();
 		}
 	}
@@ -186,29 +184,6 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	@Inject(
 			method = "tickBlocks",
 			at = @At(
-					value = "INVOKE",
-					ordinal = 1,
-					target = "Ljava/util/Set;iterator()Ljava/util/Iterator;"
-			)
-	)
-	private void startDummyTask(CallbackInfo ci) {
-		startTickTask(TickTask.UNKNOWN);
-	}
-	
-	@Inject(
-			method = "tickBlocks",
-			at = @At(
-					value = "INVOKE",
-					target = "Ljava/util/Iterator;hasNext()Z"
-			)
-	)
-	private void endTickTaskRandomTicks(CallbackInfo ci) {
-		endTickTask();
-	}
-	
-	@Inject(
-			method = "tickBlocks",
-			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 					args = "ldc=tickChunk"
@@ -260,16 +235,26 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/Block;onUpdateTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Ljava/util/Random;)V"
+					target = "Lnet/minecraft/block/Block;method_436(Lnet/minecraft/world/World;IIILjava/util/Random;)V"
 			)
 	)
-	private void onRandomTick(CallbackInfo ci, int attemps, int succeeded, Iterator<Chunk> it, ChunkPos chunkPos, int chunkX, int chunkZ, Chunk chunk, int o, ChunkSection[] sections, int p, int q, ChunkSection section, int r, int s, int dx, int dz, int dy, BlockState state, Block block) {
+	private void onRandomTick(CallbackInfo ci, int attemps, int succeeded, Iterator<Chunk> it, ChunkPos chunkPos, int chunkX, int chunkZ, Chunk chunk, ChunkSection[] sections, int p, int q, ChunkSection section, int r, int s, int dx, int dz, int dy, Block block) {
 		int x = chunkX + dx;
 		int y = section.getYOffset() + dy;
 		int z = chunkZ + dz;
-		BlockPos pos = new BlockPos(x, y, z);
 		
-		getMultimeter().logRandomTick((World)(Object)this, pos);
+		getMultimeter().logRandomTick((World)(Object)this, x, y, z);
+	}
+	
+	@Inject(
+			method = "tickBlocks",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/util/profiler/Profiler;pop()V"
+			)
+	)
+	private void endTickTaskRandomTicks(CallbackInfo ci) {
+		endTickTask();
 	}
 	
 	@Inject(
@@ -278,7 +263,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/Block;scheduledTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Ljava/util/Random;)V"
+					target = "Lnet/minecraft/block/Block;method_436(Lnet/minecraft/world/World;IIILjava/util/Random;)V"
 			)
 	)
 	private void onScheduledTick(boolean bl, CallbackInfoReturnable<Boolean> cir, Iterator<TickableEntry> it, TickableEntry scheduledTick) {
@@ -290,11 +275,31 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/Block;onEvent(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;II)Z"
+					target = "Lnet/minecraft/block/Block;method_435(Lnet/minecraft/world/World;IIIII)Z"
 			)
 	)
 	private void onProcessBlockEvent(BlockAction blockEvent, CallbackInfoReturnable<Boolean> cir) {
 		getMultimeter().logBlockEvent((World)(Object)this, blockEvent);
+	}
+	
+	@Inject(
+			method = "tickWeather",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void startTickTaskWeather(CallbackInfo ci) {
+		startTickTask(TickTask.WEATHER);
+	}
+	
+	@Inject(
+			method = "tickWeather",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void endTickTaskWeather(CallbackInfo ci) {
+		endTickTask();
 	}
 	
 	@Override

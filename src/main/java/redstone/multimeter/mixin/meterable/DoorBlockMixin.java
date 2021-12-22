@@ -2,17 +2,12 @@ package redstone.multimeter.mixin.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
-import net.minecraft.block.DoorBlock.HalfType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -21,18 +16,18 @@ import redstone.multimeter.block.MeterableBlock;
 public abstract class DoorBlockMixin implements MeterableBlock {
 	
 	@Inject(
-			method = "neighborUpdate",
+			method = "method_408",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
-					value = "FIELD",
-					ordinal = 0,
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/DoorBlock;POWERED:Lnet/minecraft/state/property/BooleanProperty;"
+					value = "HEAD"
 			)
 	)
-	private void onNeighborUpdate(World world, BlockPos pos, BlockState state, Block block, CallbackInfo ci, boolean powered) {
-		logPowered(world, pos, powered);
-		logPowered(world, getOtherHalf(pos, state), powered);
+	private void onNeighborUpdate(World world, int x, int y, int z, Block block, CallbackInfo ci) {
+		int metadata = world.method_3777(x, y, z);
+		boolean powered = isPowered(world, x, y, z, metadata);
+		
+		logPowered(world, x, y, z, powered);
+		logPowered(world, x, getOtherHalf(y, metadata), z, powered);
 	}
 	
 	@Override
@@ -41,19 +36,16 @@ public abstract class DoorBlockMixin implements MeterableBlock {
 	}
 	
 	@Override
-	public boolean isPowered(World world, BlockPos pos, BlockState state) {
-		return world.isReceivingRedstonePower(pos) || world.isReceivingRedstonePower(getOtherHalf(pos, state));
+	public boolean isPowered(World world, int x, int y, int z, int metadata) {
+		return world.method_3739(x, y, z) || world.method_3739(x, getOtherHalf(y, metadata), z);
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(DoorBlock.OPEN);
+	public boolean isActive(World world, int x, int y, int z, int metadata) {
+		return (metadata & 4) != 0;
 	}
 	
-	private BlockPos getOtherHalf(BlockPos pos, BlockState state) {
-		HalfType half = state.get(DoorBlock.HALF);
-		Direction dir = (half == HalfType.LOWER) ? Direction.UP : Direction.DOWN;
-		
-		return pos.offset(dir);
+	private int getOtherHalf(int y, int metadata) {
+		return (metadata & 8) == 0 ? y + 1 : y - 1;
 	}
 }

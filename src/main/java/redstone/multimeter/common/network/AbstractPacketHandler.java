@@ -5,12 +5,13 @@ import java.io.IOException;
 import io.netty.buffer.Unpooled;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
+
+import redstone.multimeter.util.Identifier;
 
 public abstract class AbstractPacketHandler {
 	
-	protected <P extends RSMMPacket> Packet<?> encode(P packet) {
+	protected <P extends RSMMPacket> Packet encode(P packet) {
 		Identifier id = PacketManager.getId(packet);
 		
 		if (id == null) {
@@ -22,13 +23,13 @@ public abstract class AbstractPacketHandler {
 		
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		
-		buffer.writeString(id.toString());
+		buffer.method_7423(id.toString());
 		buffer.writeCompoundTag(data);
 		
 		return toCustomPayload(PacketManager.getPacketChannelId(), buffer);
 	}
 	
-	protected abstract Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer);
+	protected abstract Packet toCustomPayload(Identifier id, PacketByteBuf buffer);
 	
 	public abstract <P extends RSMMPacket> void send(P packet);
 	

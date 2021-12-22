@@ -7,8 +7,8 @@ import java.util.Map;
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Direction;
 
+import redstone.multimeter.util.Direction;
 import redstone.multimeter.util.NbtUtils;
 import redstone.multimeter.util.TextUtils;
 
@@ -33,7 +33,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metadata) {
-			TextUtils.addFancyText(lines, "direction", Direction.getById(metadata).getName());
+			TextUtils.addFancyText(lines, "direction", Direction.fromIndex(metadata).getName());
 		}
 	},
 	POWER_CHANGE(3, "power_change") {
@@ -70,7 +70,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextForTooltip(List<Text> lines, int metadata) {
-			TextUtils.addFancyText(lines, "direction", Direction.getById(metadata).getName());
+			TextUtils.addFancyText(lines, "direction", Direction.fromIndex(metadata).getName());
 		}
 	},
 	OBSERVER_UPDATE(12, "observer_update"),
@@ -139,7 +139,7 @@ public enum EventType {
 		}
 		
 		ByteTag byteTag = (ByteTag)nbt;
-		int index = byteTag.getByte();
+		int index = byteTag.method_7374();
 		
 		return fromIndex(index);
 	}

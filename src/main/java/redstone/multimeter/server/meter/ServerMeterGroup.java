@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
@@ -23,6 +22,7 @@ import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.meter.event.MeterEventPredicate;
 import redstone.multimeter.server.meter.event.MeterEventSupplier;
 import redstone.multimeter.server.meter.log.ServerLogManager;
+import redstone.multimeter.util.Direction;
 
 public class ServerMeterGroup extends MeterGroup {
 	

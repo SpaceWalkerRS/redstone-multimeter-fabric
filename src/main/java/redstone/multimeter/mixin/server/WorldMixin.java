@@ -11,11 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.common.TickTask;
@@ -30,16 +27,18 @@ public abstract class WorldMixin implements IWorld {
 	
 	@Shadow private boolean isClient;
 	
+	@Shadow public abstract int method_3777(int x, int y, int z);
+	
 	@Inject(
-			method = "neighbourUpdate",
+			method = "method_3723",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/Block;neighborUpdate(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/Block;)V"
+					target = "Lnet/minecraft/block/Block;method_408(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
 			)
 	)
-	private void onBlockUpdate(BlockPos pos, Block fromBlock, CallbackInfo ci, BlockState state) {
+	private void onBlockUpdate(int x, int y, int z, Block fromBlock, CallbackInfo ci, Block block) {
 		if (isClient) {
 			return;
 		}
@@ -47,13 +46,13 @@ public abstract class WorldMixin implements IWorld {
 		MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
 		Multimeter multimeter = server.getMultimeter();
 		
-		multimeter.logBlockUpdate((World)(Object)this, pos);
+		multimeter.logBlockUpdate((World)(Object)this, x, y, z);
 		
 		// 'powered' changes for most meterable blocks are handled in those classes
 		// to reduce expensive calls to 
 		// World.isReceivingRedstonePower and World.getReceivedRedstonePower
-		if (((IBlock)state.getBlock()).logPoweredOnBlockUpdate()) {
-			multimeter.logPowered((World)(Object)this, pos, state);
+		if (((IBlock)block).logPoweredOnBlockUpdate()) {
+			multimeter.logPowered((World)(Object)this, x, y, z, block, method_3777(x, y, z));
 		}
 	}
 	
@@ -124,7 +123,7 @@ public abstract class WorldMixin implements IWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/util/Tickable;tick()V"
+					target = "Lnet/minecraft/block/entity/BlockEntity;method_545()V"
 			)
 	)
 	private void onBlockEntityTick(CallbackInfo ci, Iterator<BlockEntity> it, BlockEntity blockEntity) {
@@ -159,37 +158,17 @@ public abstract class WorldMixin implements IWorld {
 	}
 	
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "HEAD"
-			)
-	)
-	private void startTickTaskWeather(CallbackInfo ci) {
-		startTickTask(TickTask.WEATHER);
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "RETURN"
-			)
-	)
-	private void endTickTaskWeather(CallbackInfo ci) {
-		endTickTask();
-	}
-	
-	@Inject(
-			method = "updateHorizontalAdjacent",
+			method = "method_4725",
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/Block;neighborUpdate(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/Block;)V"
+					target = "Lnet/minecraft/block/Block;method_408(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
 			)
 	)
-	private void onComparatorUpdate(BlockPos fromPos, Block fromBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {
+	private void onComparatorUpdate(int fromX, int y, int fromZ, Block fromBlock, CallbackInfo ci, int dir, int x, int z, Block block) {
 		if (!isClient) {
-			((IServerWorld)this).getMultimeter().logComparatorUpdate((World)(Object)this, pos);
+			((IServerWorld)this).getMultimeter().logComparatorUpdate((World)(Object)this, x, y, z);
 		}
 	}
 }

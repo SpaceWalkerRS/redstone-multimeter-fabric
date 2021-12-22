@@ -1,39 +1,37 @@
 package redstone.multimeter.common;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 
-import redstone.multimeter.util.AxisUtils;
 import redstone.multimeter.util.DimensionUtils;
+import redstone.multimeter.util.Direction;
+import redstone.multimeter.util.Direction.Axis;
+import redstone.multimeter.util.Identifier;
 import redstone.multimeter.util.NbtUtils;
 
 public class DimPos {
 	
 	private final Identifier dimensionId;
-	private final BlockPos blockPos;
-	
-	public DimPos(Identifier dimensionId, BlockPos blockPos) {
-		this.dimensionId = dimensionId;
-		this.blockPos = blockPos;
-	}
+	private final int x;
+	private final int y;
+	private final int z;
 	
 	public DimPos(Identifier dimensionId, int x, int y, int z) {
-		this(dimensionId, new BlockPos(x, y, z));
+		this.dimensionId = dimensionId;
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
 	
-	public DimPos(World world, BlockPos pos) {
-		this(DimensionUtils.getId(world.dimension.getType()), pos);
+	public DimPos(World world, int x, int y, int z) {
+		this(DimensionUtils.getId(world.dimension.dimensionType), x, y, z);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof DimPos) {
 			DimPos pos = (DimPos)obj;
-			return pos.dimensionId.equals(dimensionId) && pos.blockPos.equals(blockPos);
+			return pos.dimensionId.equals(dimensionId) && pos.x == x && pos.y == y && pos.z == z;
 		}
 		
 		return false;
@@ -41,52 +39,56 @@ public class DimPos {
 	
 	@Override
 	public int hashCode() {
-		return blockPos.hashCode() + 31 * dimensionId.hashCode();
+		return x + 31 * (y + 31 * z) + 31 * dimensionId.hashCode();
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("%s[%d, %d, %d]", dimensionId.toString(), blockPos.getX(), blockPos.getY(), blockPos.getZ());
+		return String.format("%s[%d, %d, %d]", dimensionId.toString(), x, y, z);
 	}
 	
 	public Identifier getDimensionId() {
 		return dimensionId;
 	}
 	
+	public int getX() {
+		return x;
+	}
+	
+	public int getY() {
+		return y;
+	}
+	
+	public int getZ() {
+		return z;
+	}
+	
 	public boolean isOf(World world) {
-		return DimensionUtils.getId(world.dimension.getType()).equals(dimensionId);
+		return DimensionUtils.getId(world.dimension.dimensionType).equals(dimensionId);
 	}
 	
 	public DimPos offset(Identifier dimensionId) {
-		return new DimPos(dimensionId, blockPos);
-	}
-	
-	public BlockPos getBlockPos() {
-		return blockPos;
+		return offset(dimensionId, 0, 0, 0);
 	}
 	
 	public DimPos offset(Direction dir) {
 		return offset(dir, 1);
 	}
 	
-	public DimPos offset(Direction dir, int distance) {
-		return new DimPos(dimensionId, blockPos.offset(dir, distance));
+	public DimPos offset(Direction dir, int dist) {
+		return offset(dimensionId, dist * dir.getOffsetX(), dist * dir.getOffsetY(), dist * dir.getOffsetZ());
 	}
 	
 	public DimPos offset(Axis axis) {
 		return offset(axis, 1);
 	}
 	
-	public DimPos offset(Axis axis, int distance) {
-		int dx = AxisUtils.choose(axis, distance, 0, 0);
-		int dy = AxisUtils.choose(axis, 0, distance, 0);
-		int dz = AxisUtils.choose(axis, 0, 0, distance);
-		
-		return offset(dx, dy, dz);
+	public DimPos offset(Axis axis, int dist) {
+		return offset(dimensionId, axis.choose(dist, 0, 0), axis.choose(0, dist, 0), axis.choose(0, 0, dist));
 	}
 	
-	public DimPos offset(int dx, int dy, int dz) {
-		return new DimPos(dimensionId, blockPos.add(dx, dy, dz));
+	public DimPos offset(Identifier dimensionId, int dx, int dy, int dz) {
+		return new DimPos(dimensionId, x + dx, y + dy, z + dz);
 	}
 	
 	public CompoundTag toNbt() {
@@ -98,9 +100,9 @@ public class DimPos {
 		// to communicate effectively through the use of
 		// mods like ViaVersion or multiconnect
 		nbt.put("world id", NbtUtils.identifierToNbt(dimensionId));
-		nbt.putInt("x", blockPos.getX());
-		nbt.putInt("y", blockPos.getY());
-		nbt.putInt("z", blockPos.getZ());
+		nbt.putInt("x", x);
+		nbt.putInt("y", y);
+		nbt.putInt("z", z);
 		
 		return nbt;
 	}

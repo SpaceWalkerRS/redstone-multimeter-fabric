@@ -18,12 +18,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -34,6 +31,7 @@ import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.MeterPropertiesManager;
 import redstone.multimeter.common.meter.event.EventType;
+import redstone.multimeter.util.Identifier;
 
 public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	
@@ -66,9 +64,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	@Override
-	protected void postValidation(MeterProperties properties, World world, BlockPos pos) {
-		BlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
+	protected void postValidation(MeterProperties properties, World world, DimPos pos) {
+		Block block = world.method_3774(pos.getX(), pos.getY(), pos.getZ());
 		
 		MeterProperties defaultProperties = getPropertiesForBlock(block);
 		
@@ -101,12 +98,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	private MeterProperties getPropertiesForBlock(Block block) {
-		Identifier blockId = Block.REGISTRY.getIdentifier(block);
+		String rawId = Block.field_7260.method_7332(block);
 		
-		if (blockId == null) {
+		if (rawId == null) {
 			return null; // we should never get here
 		}
 		
+		Identifier blockId = new Identifier(rawId);
 		MeterProperties properties = blockDefaults.get(blockId);
 		
 		if (properties == null) {
@@ -131,8 +129,11 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		blockDefaults.clear();
 		
 		Set<String> namespaces = new HashSet<>();
+		@SuppressWarnings("unchecked")
+		Set<String> ids = Block.field_7260.keySet();
 		
-		for (Identifier blockId : Block.REGISTRY.keySet()) {
+		for (String rawId : ids) {
+			Identifier blockId = new Identifier(rawId);
 			String namespace = blockId.getNamespace();
 			String id = blockId.getPath();
 			

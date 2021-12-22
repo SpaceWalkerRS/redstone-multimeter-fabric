@@ -89,7 +89,7 @@ public class InputHandler {
 			} else {
 				MinecraftClient minecraftClient = client.getMinecraftClient();
 				
-				if (minecraftClient.player != null) {
+				if (minecraftClient.field_3805 != null) {
 					client.openScreen(new MultimeterScreen(client));
 				}
 			}
@@ -127,7 +127,7 @@ public class InputHandler {
 			} else {
 				MinecraftClient minecraftClient = client.getMinecraftClient();
 				
-				if (minecraftClient.player != null) {
+				if (minecraftClient.field_3805 != null) {
 					client.openScreen(new MultimeterScreen(client));
 				}
 			}

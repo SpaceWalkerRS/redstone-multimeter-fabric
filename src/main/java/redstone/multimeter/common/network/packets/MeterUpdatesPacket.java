@@ -9,12 +9,12 @@ import java.util.Map.Entry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.LongTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.network.RSMMPacket;
+import redstone.multimeter.interfaces.mixin.IListTag;
 import redstone.multimeter.server.MultimeterServer;
 import redstone.multimeter.util.NbtUtils;
 
@@ -61,11 +61,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 		ListTag updateList = data.getList("meter updates", NbtUtils.TYPE_COMPOUND);
 		
 		for (int index = 0; index < idList.size(); index++) {
-			Tag tag = idList.get(index);
-			
-			if (tag.getType() == NbtUtils.TYPE_LONG) {
-				removedMeters.add(((LongTag)tag).getLong());
-			}
+			removedMeters.add(((IListTag)idList).getLong(index));
 		}
 		for (int index = 0; index < updateList.size(); index++) {
 			CompoundTag nbt = updateList.getCompound(index);

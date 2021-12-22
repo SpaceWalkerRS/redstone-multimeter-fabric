@@ -3,7 +3,6 @@ package redstone.multimeter.util;
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.util.Identifier;
 
 public class NbtUtils {
 	

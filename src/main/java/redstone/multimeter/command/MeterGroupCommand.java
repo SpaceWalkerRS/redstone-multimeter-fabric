@@ -19,7 +19,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.PlayerSelector;
-import net.minecraft.util.math.BlockPos;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -89,8 +88,9 @@ public class MeterGroupCommand extends AbstractCommand {
 		return TOTAL_USAGE_MEMBER;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
-	public List<String> getAutoCompleteHints(CommandSource source, String[] args, BlockPos pos) {
+	public List method_3276(CommandSource source, String[] args) {
 		boolean isOwner = false;
 		
 		try {
@@ -110,7 +110,7 @@ public class MeterGroupCommand extends AbstractCommand {
 			switch (args[0]) {
 			case "subscribe":
 				try {
-					return method_10708(args, listMeterGroups(source));
+					return method_2893(args, listMeterGroups(source));
 				} catch (CommandException e) {
 					
 				}
@@ -138,7 +138,7 @@ public class MeterGroupCommand extends AbstractCommand {
 					return method_2894(args, server.getMinecraftServer().getPlayerNames());
 				case "remove":
 					try {
-						return method_10708(args, listMembers(source).keySet());
+						return method_2893(args, listMembers(source).keySet());
 					} catch (CommandException e) {
 						
 					}
@@ -262,6 +262,11 @@ public class MeterGroupCommand extends AbstractCommand {
 		}
 		
 		throw new IncorrectUsageException(getUsageTranslationKey(source));
+	}
+	
+	@Override
+	public int compareTo(Object obj) {
+		return 0;
 	}
 	
 	private boolean isMultimeterClient(CommandSource source) throws CommandException {
@@ -496,12 +501,6 @@ public class MeterGroupCommand extends AbstractCommand {
 	}
 	
 	private static List<ServerPlayerEntity> findMatchingPlayers(MinecraftServer server, CommandSource source, String arg) throws CommandException {
-		List<ServerPlayerEntity> list = PlayerSelector.method_10866(source, arg, ServerPlayerEntity.class);
-		
-		if (list.isEmpty()) {
-			return Arrays.asList(getPlayer(source, arg));
-		}
-		
-		return list;
+		return Arrays.asList(PlayerSelector.method_4092(source, arg));
 	}
 }

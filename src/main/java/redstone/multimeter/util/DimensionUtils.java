@@ -3,8 +3,6 @@ package redstone.multimeter.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.util.Identifier;
-
 public class DimensionUtils {
 	
 	private static final Map<Identifier, Integer> ID_TO_RAW_ID;

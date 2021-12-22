@@ -5,11 +5,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ComparatorBlockEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -19,18 +17,18 @@ import redstone.multimeter.block.PowerSource;
 public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSource {
 	
 	@Inject(
-			method = "method_8729",
+			method = "method_4757",
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void onPowerCheck(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
-		logPowered(world, pos, cir.getReturnValue() > MIN_POWER);
+	private void onPowerCheck(World world, int x, int y, int z, int metadata, CallbackInfoReturnable<Integer> cir) {
+		logPowered(world, x, y, z, cir.getReturnValue() > MIN_POWER);
 	}
 	
 	@Override
-	public boolean isActive(World world, BlockPos pos, BlockState state) {
-		return getPowerLevel(world, pos, state) > MIN_POWER;
+	public boolean isActive(World world, int x, int y, int z, int metadata) {
+		return getPowerLevel(world, x, y, z, metadata) > MIN_POWER;
 	}
 	
 	@Override
@@ -39,8 +37,8 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 	}
 	
 	@Override
-	public int getPowerLevel(World world, BlockPos pos, BlockState state) {
-		BlockEntity blockEntity = world.getBlockEntity(pos);
+	public int getPowerLevel(World world, int x, int y, int z, int metadata) {
+		BlockEntity blockEntity = world.method_3781(x, y, z);
 		
 		if (blockEntity instanceof ComparatorBlockEntity) {
 			return ((ComparatorBlockEntity)blockEntity).getOutputSignal();
