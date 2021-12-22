@@ -64,30 +64,6 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 	
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=commandFunctions"
-			)
-	)
-	private void startTickTaskCommandFunctions(CallbackInfo ci) {
-		multimeterServer.startTickTask(TickTask.COMMAND_FUNCTIONS);
-	}
-	
-	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=tickables"
-			)
-	)
-	private void endTickTaskCommandFunctions(CallbackInfo ci) {
-		multimeterServer.endTickTask();
-	}
-	
-	@Inject(
 			method = "setupWorld()V",
 			at = @At(
 					value = "RETURN"
@@ -95,16 +71,6 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void onTickEnd(CallbackInfo ci) {
 		multimeterServer.tickEnd();
-	}
-	
-	@Inject(
-			method = "method_14912",
-			at = @At(
-					value = "HEAD"
-			)
-	)
-	private void onReload(CallbackInfo ci) {
-		multimeterServer.getMultimeter().reloadOptions();
 	}
 	
 	@Override

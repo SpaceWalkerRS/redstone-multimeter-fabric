@@ -7,16 +7,15 @@ import java.util.Map;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.class_3323;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.network.RSMMPacket;
-import redstone.multimeter.interfaces.mixin.ILongArrayTag;
 import redstone.multimeter.server.MultimeterServer;
 import redstone.multimeter.util.NbtUtils;
 
@@ -37,39 +36,40 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	
 	@Override
 	public void encode(CompoundTag data) {
-		ListTag list = new ListTag();
+		ListTag ids = new ListTag();
+		ListTag updates = new ListTag();
 		
+		for (int index = 0; index < removedMeters.size(); index++) {
+			long id = removedMeters.get(index);
+			ids.add(new LongTag(id));
+		}
 		for (Entry<MeterProperties> entry : meterUpdates.long2ObjectEntrySet()) {
 			long id = entry.getLongKey();
 			MeterProperties update = entry.getValue();
 			
 			CompoundTag nbt = update.toNbt();
 			nbt.putLong("id", id);
-			list.add(nbt);
+			updates.add(nbt);
 		}
 		
-		data.put("removed meters", new class_3323(removedMeters));
-		data.put("meter updates", list);
+		data.put("removed meters", ids);
+		data.put("meter updates", updates);
 	}
 	
 	@Override
 	public void decode(CompoundTag data) {
-		Tag idsNbt = data.get("removed meters");
-		ListTag list = data.getList("meter updates", NbtUtils.TYPE_COMPOUND);
+		ListTag idList = data.getList("removed meters", NbtUtils.TYPE_LONG);
+		ListTag updateList = data.getList("meter updates", NbtUtils.TYPE_COMPOUND);
 		
-		long[] ids;
-		
-		if (idsNbt instanceof class_3323) {
-			ids = ((ILongArrayTag)idsNbt).getLongArray();
-		} else {
-			ids = new long[0];
+		for (int index = 0; index < idList.size(); index++) {
+			Tag tag = idList.get(index);
+			
+			if (tag.getType() == NbtUtils.TYPE_LONG) {
+				removedMeters.add(((LongTag)tag).method_7371());
+			}
 		}
-		
-		for (long id : ids) {
-			removedMeters.add(id);
-		}
-		for (int index = 0; index < list.size(); index++) {
-			CompoundTag nbt = list.getCompound(index);
+		for (int index = 0; index < updateList.size(); index++) {
+			CompoundTag nbt = updateList.getCompound(index);
 			
 			long id = nbt.getLong("id");
 			MeterProperties update = MeterProperties.fromNbt(nbt);

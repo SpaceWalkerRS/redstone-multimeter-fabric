@@ -36,7 +36,6 @@
   	"server.BlockMixin",
   	"server.ChunkMixin",
   	"server.EnderDragonFightMixin",
-  	"server.LongArrayTagMixin",
   	"server.MinecraftServerMixin",
   	"server.PlayerManagerMixin",
   	"server.ServerCommandManagerMixin",
@@ -51,7 +50,6 @@
   	"client.GameRendererMixin",
   	"client.InGameHudMixin",
   	"client.IntegratedServerMixin",
-  	"client.KeyBindingMixin",
   	"client.MinecraftClientMixin",
   	"client.ScreenMixin"
   ],

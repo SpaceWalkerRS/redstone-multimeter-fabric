@@ -3,6 +3,7 @@ package redstone.multimeter.common.meter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import net.minecraft.nbt.CompoundTag;
 
@@ -147,7 +148,7 @@ public class MeterProperties {
 			
 			for (EventType type : EventType.ALL) {
 				if (hasEventType(type)) {
-					types.add(type.getName());
+					types.add(new JsonPrimitive(type.getName()));
 				}
 			}
 			

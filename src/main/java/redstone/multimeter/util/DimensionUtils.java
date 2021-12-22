@@ -33,8 +33,8 @@ public class DimensionUtils {
 		ID_TO_TYPE = new HashMap<>();
 		TYPE_TO_ID = new HashMap<>();
 		
-		for (class_2750 type : class_2750.values()) {
-			register(type.method_11794(), type);
-		}
+		register("overworld", class_2750.field_12920);
+		register("the_nether", class_2750.field_12921);
+		register("the_end", class_2750.field_12922);
 	}
 }

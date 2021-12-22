@@ -1,6 +1,7 @@
 package redstone.multimeter.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import net.minecraft.command.NotFoundException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.PlayerSelector;
 import net.minecraft.util.math.BlockPos;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -226,7 +228,7 @@ public class MeterGroupCommand extends AbstractCommand {
 						throw new IncorrectUsageException(USAGE_MEMBERS_CLEAR);
 					case "add":
 						if (args.length == 3) {
-							membersAdd(source, method_14455(server, source, args[2]));
+							membersAdd(source, findMatchingPlayers(server, source, args[2]));
 							return;
 						}
 						
@@ -491,5 +493,15 @@ public class MeterGroupCommand extends AbstractCommand {
 		
 		public boolean execute(ServerPlayerEntity player) throws CommandException;
 		
+	}
+	
+	private static List<ServerPlayerEntity> findMatchingPlayers(MinecraftServer server, CommandSource source, String arg) throws CommandException {
+		List<ServerPlayerEntity> list = PlayerSelector.method_10866(source, arg, ServerPlayerEntity.class);
+		
+		if (list.isEmpty()) {
+			return Arrays.asList(method_4639(server, source, arg));
+		}
+		
+		return list;
 	}
 }

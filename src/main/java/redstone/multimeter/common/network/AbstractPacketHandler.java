@@ -20,7 +20,7 @@ public abstract class AbstractPacketHandler {
 		
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		
-		buffer.method_14780(id);
+		buffer.writeString(id.toString());
 		buffer.method_12595(data);
 		
 		return toCustomPayload(PacketManager.getPacketChannelId(), buffer);
@@ -31,7 +31,7 @@ public abstract class AbstractPacketHandler {
 	public abstract <P extends RSMMPacket> void send(P packet);
 	
 	protected <P extends RSMMPacket> P decode(PacketByteBuf buffer) {
-		Identifier id = buffer.method_14781();
+		Identifier id = new Identifier(buffer.readString(32767));
 		P packet = PacketManager.createPacket(id);
 		
 		if (packet == null) {
