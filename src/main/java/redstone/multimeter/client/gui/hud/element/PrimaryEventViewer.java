@@ -110,6 +110,10 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	
 	@Override
 	protected void drawDecorators(MatrixStack matrices) {
+		if (hud.settings.rowHeight < hud.font.fontHeight) {
+			return;
+		}
+		
 		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
 		long currentTick = hud.client.getPrevServerTime() + 1;
 		

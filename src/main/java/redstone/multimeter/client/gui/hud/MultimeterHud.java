@@ -115,6 +115,8 @@ public class MultimeterHud extends AbstractParentElement {
 		
 		onScreen = false;
 		
+		settings.rowHeight = Options.HUD.ROW_HEIGHT.get();
+		
 		settings.forceFullOpacity = false;
 		settings.ignoreHiddenMeters = true;
 		
@@ -309,6 +311,7 @@ public class MultimeterHud extends AbstractParentElement {
 		addChild(this.fastForwardButton);
 		addChild(this.printIndicator);
 		
+		onOptionsChanged();
 		resetSize();
 	}
 	
@@ -564,6 +567,10 @@ public class MultimeterHud extends AbstractParentElement {
 		
 		onScreen = true;
 		
+		if (settings.rowHeight < font.fontHeight) {
+			settings.rowHeight = font.fontHeight;
+		}
+		
 		settings.forceFullOpacity = true;
 		settings.ignoreHiddenMeters = false;
 		
@@ -582,6 +589,10 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 	
 	public void onOptionsChanged() {
+		settings.columnWidth = Options.HUD.COLUMN_WIDTH.get();
+		settings.rowHeight = Options.HUD.ROW_HEIGHT.get();
+		settings.gridSize = Options.HUD.GRID_SIZE.get();
+		
 		meterGroupName.update();
 		playPauseButton.setVisible(onScreen || Options.HUD.PAUSE_INDICATOR.get());
 		onResized();

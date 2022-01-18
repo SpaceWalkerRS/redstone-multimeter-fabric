@@ -1,15 +1,9 @@
 package redstone.multimeter.client.gui.hud;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-
 import redstone.multimeter.client.option.Options;
 
 public class HudSettings {
 	
-	public final int columnWidth;
-	public final int rowHeight;
-	public final int gridSize;
 	
 	public final int colorBackground;
 	public final int colorGridMain;
@@ -20,17 +14,13 @@ public class HudSettings {
 	public final int colorTextOn;
 	public final int colorTextOff;
 	
+	public int columnWidth;
+	public int rowHeight;
+	public int gridSize;
 	public boolean forceFullOpacity;
 	public boolean ignoreHiddenMeters;
 	
 	public HudSettings(MultimeterHud hud) {
-		MinecraftClient minecraftClient = hud.client.getMinecraftClient();
-		TextRenderer font = minecraftClient.textRenderer;
-		
-		this.columnWidth = 3;
-		this.rowHeight = font.fontHeight;
-		this.gridSize = 1;
-		
 		this.colorBackground = 0x202020;
 		this.colorGridMain = 0x404040;
 		this.colorGridInterval = 0x606060;

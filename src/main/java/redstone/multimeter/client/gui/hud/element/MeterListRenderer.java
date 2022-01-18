@@ -107,8 +107,12 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	private void drawNames(MatrixStack matrices) {
+		if (hud.settings.rowHeight < hud.font.fontHeight) {
+			return;
+		}
+		
 		int x = hud.settings.gridSize + 1;
-		int y = hud.settings.gridSize + 1;
+		int y = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
 		
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);

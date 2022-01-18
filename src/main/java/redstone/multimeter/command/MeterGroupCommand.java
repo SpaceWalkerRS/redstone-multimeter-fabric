@@ -151,7 +151,7 @@ public class MeterGroupCommand {
 					multimeter.subscribeToMeterGroup(meterGroup, player);
 					source.sendFeedback(new LiteralText(String.format("Subscribed to meter group \'%s\'", name)), false);
 				} else {
-					source.sendFeedback(new LiteralText("A meter group with that name already exists and it is private!"), false);
+					source.sendFeedback(new LiteralText("That meter group is private!"), false);
 				}
 			} else {
 				if (MeterGroup.isValidName(name)) {
