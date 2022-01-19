@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.Direction.Axis;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -147,7 +148,16 @@ public class MeterControlsElement extends AbstractParentElement {
 			teleport();
 			return true;
 		});
-		pos.addControl("dimension", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> changePos(meter.getPos().offset(new Identifier(text))), () -> meter.getPos().getWorldId().toString()));
+		pos.addControl("dimension", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
+			try {
+				Identifier worldId = new Identifier(text);
+				WorldPos newPos = meter.getPos().offset(worldId);
+				
+				changePos(newPos);
+			} catch (InvalidIdentifierException e) {
+				
+			}
+		}, () -> meter.getPos().getWorldId().toString()));
 		pos.addCoordinateControl(Axis.X, () -> meter.getPos(), p -> changePos(p));
 		pos.addCoordinateControl(Axis.Y, () -> meter.getPos(), p -> changePos(p));
 		pos.addCoordinateControl(Axis.Z, () -> meter.getPos(), p -> changePos(p));
