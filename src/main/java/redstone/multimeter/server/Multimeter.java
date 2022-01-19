@@ -429,6 +429,10 @@ public class Multimeter {
 					float pitch = player.getPitch();
 					
 					player.teleport(newWorld, newX, newY, newZ, yaw, pitch);
+					
+					Text text = new LiteralText(String.format("Teleported to meter \"%s\"", meter.getName()));
+					server.sendMessage(player, text, false);
+					
 					sendClickableReturnMessage(oldWorld, oldX, oldY, oldZ, yaw, pitch, player);
 				}
 			}
