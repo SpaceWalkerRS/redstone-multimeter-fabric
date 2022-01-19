@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -19,10 +20,12 @@ import redstone.multimeter.client.gui.screen.MultimeterScreen;
 import redstone.multimeter.client.gui.screen.OptionsScreen;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.client.gui.screen.ScreenWrapper;
+import redstone.multimeter.client.gui.screen.TickPhaseTreeScreen;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.client.render.MeterRenderer;
+import redstone.multimeter.common.TickPhaseTree;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -34,6 +37,7 @@ import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
 import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
 import redstone.multimeter.common.network.packets.MeterUpdatePacket;
 import redstone.multimeter.common.network.packets.RemoveMeterPacket;
+import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 
 public class MultimeterClient {
 	
@@ -57,6 +61,7 @@ public class MultimeterClient {
 	private final ClientMeterPropertiesManager meterPropertiesManager;
 	
 	private ClientMeterGroup meterGroup;
+	private TickPhaseTree tickPhaseTree;
 	private boolean connected; // true if the client is connected to a MultimeterServer
 	private boolean hudEnabled;
 	private long prevServerTime;
@@ -99,6 +104,10 @@ public class MultimeterClient {
 		return hud;
 	}
 	
+	public ClientMeterPropertiesManager getMeterPropertiesManager() {
+		return meterPropertiesManager;
+	}
+	
 	public ClientMeterGroup getMeterGroup() {
 		return meterGroup;
 	}
@@ -107,8 +116,29 @@ public class MultimeterClient {
 		return meterGroup.isSubscribed();
 	}
 	
-	public ClientMeterPropertiesManager getMeterPropertiesManager() {
-		return meterPropertiesManager;
+	public TickPhaseTree getTickPhaseTree() {
+		return tickPhaseTree;
+	}
+	
+	public void requestTickPhaseTree() {
+		TickPhaseTreePacket packet = new TickPhaseTreePacket(new NbtCompound());
+		packetHandler.send(packet);
+	}
+	
+	public void refreshTickPhaseTree(NbtCompound nbt) {
+		if (tickPhaseTree == null) {
+			tickPhaseTree = new TickPhaseTree();
+		}
+		
+		tickPhaseTree.fromNbt(nbt);
+		
+		if (hasRSMMScreenOpen()) {
+			RSMMScreen screen = getScreen();
+			
+			if (screen instanceof TickPhaseTreeScreen) {
+				((TickPhaseTreeScreen)screen).refresh();
+			}
+		}
 	}
 	
 	/**
@@ -170,6 +200,7 @@ public class MultimeterClient {
 			
 			hud.reset();
 			meterGroup.unsubscribe(true);
+			tickPhaseTree = null;
 		}
 	}
 	

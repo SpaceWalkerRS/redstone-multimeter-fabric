@@ -22,7 +22,7 @@ public class SpawnHelperMixin {
 			)
 	)
 	private static void startTickTaskMobSpawning(ServerWorld world, WorldChunk chunk, SpawnHelper.Info info, boolean spawnAnimals, boolean spawnMonsters, boolean rareSpawn, CallbackInfo ci) {
-		((IServerWorld)world).startTickTaskRSMM(TickTask.MOB_SPAWNING);
+		((IServerWorld)world).startTickTaskRSMM(false, TickTask.MOB_SPAWNING);
 	}
 	
 	@Inject(
@@ -32,6 +32,6 @@ public class SpawnHelperMixin {
 			)
 	)
 	private static void endTickTaskMobSpawning(ServerWorld world, WorldChunk chunk, SpawnHelper.Info info, boolean spawnAnimals, boolean spawnMonsters, boolean rareSpawn, CallbackInfo ci) {
-		((IServerWorld)world).endTickTaskRSMM();
+		((IServerWorld)world).endTickTaskRSMM(false);
 	}
 }

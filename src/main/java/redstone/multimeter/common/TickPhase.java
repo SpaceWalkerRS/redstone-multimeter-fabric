@@ -52,8 +52,8 @@ public class TickPhase {
 	}
 	
 	public TickPhase startTask(TickTask task) {
-		if (this == UNKNOWN) {
-			return new TickPhase(new TickTask[] { task });
+		if (this == UNKNOWN || tasks.length == 0) {
+			return new TickPhase(task);
 		}
 		
 		TickTask[] array = new TickTask[tasks.length + 1];
@@ -114,12 +114,12 @@ public class TickPhase {
 			return UNKNOWN;
 		}
 		
-		NbtByteArray array = (NbtByteArray)nbt;
-		TickTask[] tasks = new TickTask[array.size()];
+		NbtByteArray nbtArray = (NbtByteArray)nbt;
+		byte[] array = nbtArray.getByteArray();
+		TickTask[] tasks = new TickTask[array.length];
 		
 		for (int index = 0; index < tasks.length; index++) {
-			int taskIndex = array.get(index).byteValue();
-			tasks[index] = TickTask.fromIndex(taskIndex);
+			tasks[index] = TickTask.fromIndex(array[index]);
 		}
 		
 		return new TickPhase(tasks);

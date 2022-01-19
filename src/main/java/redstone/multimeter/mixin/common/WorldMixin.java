@@ -19,12 +19,12 @@ import net.minecraft.world.World;
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IBlock;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
-import redstone.multimeter.interfaces.mixin.IWorld;
+import redstone.multimeter.interfaces.mixin.TickTaskExecutor;
 import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(World.class)
-public abstract class WorldMixin implements IWorld {
+public abstract class WorldMixin implements TickTaskExecutor {
 	
 	@Shadow public abstract boolean isClient();
 	

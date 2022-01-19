@@ -1,10 +1,6 @@
 package redstone.multimeter.interfaces.mixin;
 
-import redstone.multimeter.server.MultimeterServer;
-
-public interface IMinecraftServer {
-	
-	public MultimeterServer getMultimeterServer();
+public interface IMinecraftServer extends MultimeterServerProvider {
 	
 	public boolean isPausedRSMM();
 	

@@ -12,6 +12,7 @@
 		"common.FluidStateMixin",
 		"common.MinecraftServerMixin",
 		"common.PlayerManagerMixin",
+		"common.ServerChunkManagerMixin",
 		"common.ServerPlayNetworkHandlerMixin",
 		"common.ServerWorldMixin",
 		"common.SpawnHelperMixin",

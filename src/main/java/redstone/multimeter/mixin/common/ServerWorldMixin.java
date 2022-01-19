@@ -1,6 +1,7 @@
 package redstone.multimeter.mixin.common;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,6 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -18,8 +20,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.profiler.Profiler;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.tick.OrderedTick;
 import net.minecraft.world.tick.WorldTickScheduler;
 
@@ -30,13 +36,18 @@ import redstone.multimeter.interfaces.mixin.IWorldTickScheduler;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(ServerWorld.class)
-public abstract class ServerWorldMixin implements IServerWorld {
+public abstract class ServerWorldMixin extends World implements IServerWorld {
 	
 	@Shadow @Final private MinecraftServer server;
 	@Shadow @Final private WorldTickScheduler<Block> blockTickScheduler;
 	@Shadow @Final private WorldTickScheduler<Fluid> fluidTickScheduler;
+	@Shadow @Final private boolean shouldTickTime;
 	
 	private OrderedTick<?> scheduledTickRSMM;
+	
+	protected ServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, DimensionType dimensionType, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
+		super(properties, registryRef, dimensionType, profiler, isClient, debugWorld, seed);
+	}
 	
 	@Inject(
 			method = "<init>",
@@ -51,6 +62,16 @@ public abstract class ServerWorldMixin implements IServerWorld {
 		((IWorldTickScheduler)fluidTickScheduler).setTickConsumerRSMM(scheduledTick -> {
 			this.scheduledTickRSMM = scheduledTick;
 		});
+	}
+	
+	@Inject(
+			method = "tick",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void startTickTaskTickWorld(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		startTickTaskRSMM(TickTask.TICK_WORLD, getRegistryKey().getValue().toString());
 	}
 	
 	@Inject(
@@ -115,11 +136,17 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	
 	@Inject(
 			method = "tick",
+			slice = @Slice(
+					from = @At(
+							value = "INVOKE_STRING",
+							target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+							args = "ldc=fluidTicks"
+					)
+			),
 			at = @At(
 					value = "INVOKE",
-					ordinal = 1,
-					shift = Shift.AFTER,
-					target = "Lnet/minecraft/world/tick/WorldTickScheduler;tick(JILjava/util/function/BiConsumer;)V"
+					ordinal = 0,
+					target = "Lnet/minecraft/util/profiler/Profiler;pop()V"
 			)
 	)
 	private void endTickTaskFluidTicks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
@@ -164,10 +191,17 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	
 	@Inject(
 			method = "tick",
+			slice = @Slice(
+					from = @At(
+							value = "INVOKE_STRING",
+							target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+							args = "ldc=blockEvents"
+					)
+			),
 			at = @At(
 					value = "INVOKE",
-					shift = Shift.AFTER,
-					target = "Lnet/minecraft/server/world/ServerWorld;processSyncedBlockEvents()V"
+					ordinal = 0,
+					target = "Lnet/minecraft/util/profiler/Profiler;pop()V"
 			)
 	)
 	private void endTickTaskBlockEvents(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
@@ -199,15 +233,68 @@ public abstract class ServerWorldMixin implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickTime",
+			method = "tick",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+					args = "ldc=entityManagement"
+			)
+	)
+	private void startTickTaskEntityManagement(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		startTickTaskRSMM(TickTask.ENTITY_MANAGEMENT);
+	}
+	
+	@Inject(
+			method = "tick",
+			slice = @Slice(
+					from = @At(
+							value = "INVOKE_STRING",
+							target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+							args = "ldc=entityManagement"
+					)
+			),
 			at = @At(
 					value = "INVOKE",
-					shift = Shift.AFTER,
-					target = "Lnet/minecraft/world/level/ServerWorldProperties;setTime(J)V"
+					ordinal = 0,
+					target = "Lnet/minecraft/util/profiler/Profiler;pop()V"
+			)
+	)
+	private void endTickTaskEntityManagement(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		endTickTaskRSMM();
+	}
+	
+	@Inject(
+			method = "tick",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void endTickTaskTickWorld(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+		endTickTaskRSMM();
+	}
+	
+	@Inject(
+			method = "tickTime",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void beforeTickTime(CallbackInfo ci) {
+		if (shouldTickTime) {
+			swapTickTaskRSMM(TickTask.TICK_TIME);
+		}
+	}
+	
+	@Inject(
+			method = "tickTime",
+			at = @At(
+					value = "RETURN"
 			)
 	)
 	private void onTickTime(CallbackInfo ci) {
-		getMultimeterServer().onOverworldTickTime();
+		if (shouldTickTime) {
+			getMultimeterServer().onOverworldTickTime();
+		}
 	}
 	
 	@Inject(
@@ -257,7 +344,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			)
 	)
 	private void startTickTaskTickChunk(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-		startTickTaskRSMM(TickTask.TICK_CHUNK);
+		startTickTaskRSMM(false, TickTask.TICK_CHUNK);
 	}
 	
 	@Inject(
@@ -269,7 +356,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			)
 	)
 	private void startTickTaskThunder(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-		startTickTaskRSMM(TickTask.THUNDER);
+		startTickTaskRSMM(false, TickTask.THUNDER);
 	}
 	
 	@Inject(
@@ -281,7 +368,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			)
 	)
 	private void swapTickTaskPrecipitation(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-		swapTickTaskRSMM(TickTask.PRECIPITATION);
+		swapTickTaskRSMM(false, TickTask.PRECIPITATION);
 	}
 	
 	@Inject(
@@ -293,7 +380,7 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			)
 	)
 	private void swapTickTaskRandomTicks(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-		swapTickTaskRSMM(TickTask.RANDOM_TICKS);
+		swapTickTaskRSMM(false, TickTask.RANDOM_TICKS);
 	}
 	
 	@Inject(
@@ -303,8 +390,8 @@ public abstract class ServerWorldMixin implements IServerWorld {
 			)
 	)
 	private void endTickTaskRandomTicksAndTickChunk(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-		endTickTaskRSMM();
-		endTickTaskRSMM();
+		endTickTaskRSMM(false);
+		endTickTaskRSMM(false);
 	}
 	
 	@Inject(
