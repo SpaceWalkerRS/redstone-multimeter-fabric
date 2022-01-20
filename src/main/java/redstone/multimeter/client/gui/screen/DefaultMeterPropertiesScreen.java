@@ -154,7 +154,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		x = getX() + getWidth() / 2;
 		y = getY() + getHeight() - (8 + IButton.DEFAULT_HEIGHT);
 		
-		IButton cancel = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new LiteralText("Cancel"), () -> Tooltip.EMPTY, button -> {
+		IButton cancel = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> ScreenTexts.CANCEL, () -> Tooltip.EMPTY, button -> {
 			close();
 			return true;
 		});
