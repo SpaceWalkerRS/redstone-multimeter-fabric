@@ -101,12 +101,16 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	protected void drawEdges(int x, int y, Meter meter, MeterEvent event) {
+		if (hud.settings.rowHeight < 3) {
+			return;
+		}
+		
 		int width = hud.settings.columnWidth;
 		int half = hud.settings.rowHeight / 2;
 		int height = (2 * half < hud.settings.rowHeight) ? 3 : 4;
 		int color = edgeColorProvider.apply(meter, event);
 		
-		hud.renderer.renderRect(x, y + half - 1, width, height, color);
+		hud.renderer.renderRect(x, y + half - (height / 2), width, height, color);
 	}
 	
 	protected void drawCenter(int x, int y, Meter meter, MeterEvent event) {
@@ -115,6 +119,6 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		int height = (2 * half < hud.settings.rowHeight) ? 1 : 2;
 		int color = centerColorProvider.apply(meter, event);
 		
-		hud.renderer.renderRect(x, y + half, width, height, color);
+		hud.renderer.renderRect(x, y + half - (height / 2), width, height, color);
 	}
 }

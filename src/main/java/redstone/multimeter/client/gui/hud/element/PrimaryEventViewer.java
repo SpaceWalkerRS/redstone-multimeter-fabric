@@ -1,10 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import java.util.List;
-
 import org.lwjgl.glfw.GLFW;
-
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.element.button.IButton;
@@ -100,11 +96,6 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 	
 	@Override
-	public List<Text> getTooltip(int mouseX, int mouseY) {
-		return null;
-	}
-	
-	@Override
 	protected void drawHighlights(int mouseX, int mouseY) {
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
 			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
@@ -117,6 +108,10 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	
 	@Override
 	protected void drawDecorators() {
+		if (hud.settings.rowHeight < hud.font.fontHeight) {
+			return;
+		}
+		
 		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
 		long currentTick = hud.client.getPrevServerTime() + 1;
 		

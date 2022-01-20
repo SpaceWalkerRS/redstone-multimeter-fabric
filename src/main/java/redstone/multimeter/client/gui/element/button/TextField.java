@@ -1,6 +1,5 @@
 package redstone.multimeter.client.gui.element.button;
 
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -15,17 +14,17 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.text.Text;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
-import redstone.multimeter.client.gui.element.RSMMScreen;
+import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.screen.RSMMScreen;
+import redstone.multimeter.client.option.Options;
 import redstone.multimeter.util.TextUtils;
 
 public class TextField extends AbstractButton {
-	
-	private static final int DOUBLE_CLICK_SPEED = 5;
 	
 	private final Keyboard keyboard;
 	private final Consumer<String> listener;
@@ -48,12 +47,12 @@ public class TextField extends AbstractButton {
 	private int selectionIndex;
 	private SelectType selection;
 	
-	public TextField(MultimeterClient client, int x, int y, Supplier<List<Text>> tooltip, Consumer<String> listener, Supplier<String> text) {
+	public TextField(MultimeterClient client, int x, int y, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, tooltip, listener, text);
 	}
 	
-	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<List<Text>> tooltip, Consumer<String> listener, Supplier<String> text) {
-		super(client, x, y, width, height, () -> null, tooltip);
+	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text) {
+		super(client, x, y, width, height, () -> new LiteralText(""), tooltip);
 		
 		MinecraftClient minecraftClient = this.client.getMinecraftClient();
 		
@@ -254,7 +253,7 @@ public class TextField extends AbstractButton {
 	
 	@Override
 	public void tick() {
-		if (isActive() && isFocused()) {
+		if (isFocused()) {
 			cursorTicks++;
 		}
 	}
@@ -273,12 +272,14 @@ public class TextField extends AbstractButton {
 	}
 	
 	@Override
-	public List<Text> getTooltip(int mouseX, int mouseY) {
-		if (isFocused() || visibleText.length() == fullText.length()) {
-			return null;
+	public Tooltip getTooltip(int mouseX, int mouseY) {
+		Tooltip tooltip = super.getTooltip(mouseX, mouseY);
+		
+		if (tooltip.isEmpty() && !isFocused() && visibleText.length() < fullText.length()) {
+			tooltip = Tooltip.of(TextUtils.toLines(font, fullText));
 		}
 		
-		return TextUtils.toLines(font, fullText);
+		return tooltip;
 	}
 	
 	@Override
@@ -323,7 +324,7 @@ public class TextField extends AbstractButton {
 		renderText(font, visibleText, textX, textY, true, color);
 		
 		if (isFocused()) {
-			if ((cursorTicks / 6) % 2 == 0) {
+			if (isActive() && (cursorTicks / 6) % 2 == 0) {
 				if (cursorIndex == fullText.length()) {
 					int x = textX + font.getStringWidth(visibleText);
 					renderText(font, "_", x, textY, true, color);
@@ -403,6 +404,10 @@ public class TextField extends AbstractButton {
 	
 	public String getText() {
 		return fullText;
+	}
+	
+	public void clear() {
+		replace("", 0, fullText.length());
 	}
 	
 	private void write(String text) {
@@ -579,7 +584,7 @@ public class TextField extends AbstractButton {
 	}
 	
 	private boolean isDoubleClick() {
-		return cursorTicks >= 0 && cursorTicks < DOUBLE_CLICK_SPEED;
+		return cursorTicks >= 0 && cursorTicks < Options.Miscellaneous.DOUBLE_CLICK_TIME.get();
 	}
 	
 	private boolean hasSelection() {

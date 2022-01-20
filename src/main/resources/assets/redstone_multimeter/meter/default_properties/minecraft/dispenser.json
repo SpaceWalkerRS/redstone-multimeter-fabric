@@ -1,6 +1,6 @@
 {
-  "name": "dispenser",
-  "event_types": [
-    "powered"
-  ]
+	"name": "dispenser",
+	"event_types": [
+		"powered"
+	]
 }

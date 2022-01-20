@@ -34,7 +34,7 @@ public class KeyBindingMixin implements IKeyBinding {
 	}
 	
 	@Override
-	public KeyCode getBoundKey() {
+	public KeyCode getBoundKeyRSMM() {
 		return keyCode;
 	}
 }

@@ -1,6 +1,6 @@
 {
-  "name": "tripwire_hook",
-  "event_types": [
-    "active"
-  ]
+	"name": "tripwire_hook",
+	"event_types": [
+		"active"
+	]
 }

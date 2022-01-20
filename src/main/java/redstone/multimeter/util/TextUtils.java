@@ -68,9 +68,9 @@ public class TextUtils {
 		lines.add(formatFancyText(title, info));
 	}
 	
-	public static Text formatFancyText(String title, String info) {
+	public static Text formatFancyText(String title, Object info) {
 		return new LiteralText("").
 			append(new LiteralText(title + ": ").formatted(Formatting.GOLD)).
-			append(new LiteralText(info));
+			append(new LiteralText(info.toString()));
 	}
 }

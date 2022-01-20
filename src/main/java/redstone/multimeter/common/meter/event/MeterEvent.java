@@ -1,10 +1,11 @@
 package redstone.multimeter.common.meter.event;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.Text;
+
+import redstone.multimeter.client.gui.Tooltip;
 
 public class MeterEvent {
 	
@@ -24,10 +25,11 @@ public class MeterEvent {
 	public String toString() {
 		String string = type.getName();
 		
-		List<Text> lines = new ArrayList<>();
-		type.addTextForTooltip(lines, metadata);
+		Tooltip tooltip = new Tooltip();
+		type.addTextToTooltip(tooltip, metadata);
 		
-		if (!lines.isEmpty()) {
+		if (!tooltip.isEmpty()) {
+			List<Text> lines = tooltip.getLines();
 			String[] args = new String[lines.size()];
 			
 			for (int index = 0; index < lines.size(); index++) {

@@ -98,6 +98,24 @@ public class RenderHelper2D {
 		bufferBuilder.vertex(x1, y0, z).color(r0, g0, b0, a0).next();
 	}
 	
+	protected void renderBorder(int x, int y, int width, int height, int color) {
+		renderBorder(x, y, width, height, 1, color);
+	}
+	
+	protected void renderBorder(int x, int y, int width, int height, int d, int color) {
+		int left = x;
+		int right = x + width;
+		int top = y;
+		int bottom = y + height;
+		
+		renderRect(bufferBuilder -> {
+			drawRect(bufferBuilder, left     , top       , d        , height - d, color); // left
+			drawRect(bufferBuilder, left     , bottom - d, width - d, d         , color); // bottom
+			drawRect(bufferBuilder, right - d, top    + d, d        , height - d, color); // right
+			drawRect(bufferBuilder, left  + d, top       , width - d, d         , color); // top
+		});
+	}
+	
 	protected void renderTexture(Texture texture, Drawer drawer) {
 		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
 		GlStateManager.enableBlend();
@@ -227,6 +245,7 @@ public class RenderHelper2D {
 		}
 	}
 	
+	@FunctionalInterface
 	protected interface Drawer {
 		
 		public void draw(BufferBuilder bufferBuilder);

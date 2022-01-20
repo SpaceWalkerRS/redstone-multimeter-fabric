@@ -24,28 +24,27 @@ public class ScrollableListElement extends SimpleListElement {
 		
 		this.height = height - (topBorder + bottomBorder);
 		this.scrollBarWidth = 6;
-		this.scrollBarX = (getX() + getWidth()) - (scrollBarWidth + 2);
 		this.scrollMode = ScrollMode.NONE;
 		
 		updateScrollBar();
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY) {
-		super.render(mouseX, mouseY);
+	protected void renderList(int mouseX, int mouseY) {
+		super.renderList(mouseX, mouseY);
 		
 		if (getMaxScrollAmount() > 0.0D) {
 			if (scrollMode == ScrollMode.PULL) {
-				int screenHeight = getHeight();
-				int totalHeight = screenHeight + (int)getMaxScrollAmount();
+				int visibleHeight = height;
+				int totalHeight = visibleHeight + (int)getMaxScrollAmount();
 				
-				int middle = scrollBarY + scrollBarHeight * ((int)scrollAmount + screenHeight / 2) / totalHeight;
+				int middle = scrollBarY + scrollBarHeight * ((int)scrollAmount + visibleHeight / 2) / totalHeight;
 				int margin = 5;
 				
 				if (mouseY < (middle - margin)) {
-					setScrollAmount(scrollAmount - Options.Miscellaneous.SCROLL_SPEED.get());
+					scroll(-Options.Miscellaneous.SCROLL_SPEED.get());
 				} else if (mouseY > (middle + margin)) {
-					setScrollAmount(scrollAmount + Options.Miscellaneous.SCROLL_SPEED.get());
+					scroll(Options.Miscellaneous.SCROLL_SPEED.get());
 				}
 			}
 			
@@ -84,8 +83,7 @@ public class ScrollableListElement extends SimpleListElement {
 		boolean consumed = super.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
 		
 		if (!consumed && scrollMode == ScrollMode.DRAG) {
-			double scroll = deltaY * (getMaxScrollAmount() + getHeight()) / scrollBarHeight;
-			consumed = setScrollAmount(scrollAmount + scroll);
+			consumed = scroll(deltaY * (getMaxScrollAmount() + height) / scrollBarHeight);
 		}
 		
 		return consumed;
@@ -96,7 +94,7 @@ public class ScrollableListElement extends SimpleListElement {
 		boolean consumed = super.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 		
 		if (!consumed && scrollMode == ScrollMode.NONE) {
-			consumed = setScrollAmount(scrollAmount - Options.Miscellaneous.SCROLL_SPEED.get() * scrollY);
+			consumed = scroll(-Options.Miscellaneous.SCROLL_SPEED.get() * scrollY);
 		}
 		
 		return consumed;
@@ -120,6 +118,17 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 	
 	@Override
+	public int getEffectiveWidth() {
+		return (scrollBarX - 2) - getX();
+	}
+	
+	@Override
+	protected void updateContentY() {
+		super.updateContentY();
+		validateScrollAmount();
+	}
+	
+	@Override
 	protected int getOffsetY() {
 		return -(int)scrollAmount;
 	}
@@ -130,15 +139,13 @@ public class ScrollableListElement extends SimpleListElement {
 		updateScrollBar();
 	}
 	
-	public int getEffectiveWidth() {
-		return scrollBarX - getX();
-	}
-	
 	protected double getMaxScrollAmount() {
-		double amount = getTotalSpacing() - getHeight();
+		double amount = getTotalSpacing() - height;
 		
 		for (IElement element : getChildren()) {
-			amount += element.getHeight();
+			if (element.isVisible()) {
+				amount += element.getHeight();
+			}
 		}
 		if (amount < 0.0D) {
 			amount = 0.0D;
@@ -147,8 +154,12 @@ public class ScrollableListElement extends SimpleListElement {
 		return amount;
 	}
 	
+	protected boolean scroll(double amount) {
+		return setScrollAmount(scrollAmount + amount);
+	}
+	
 	protected boolean setScrollAmount(double amount) {
-		double prevScrollAmount = scrollAmount;
+		double prevScroll = scrollAmount;
 		scrollAmount = amount;
 		
 		if (scrollAmount < 0.0D) {
@@ -161,11 +172,15 @@ public class ScrollableListElement extends SimpleListElement {
 			scrollAmount = maxAmount;
 		}
 		
-		if (scrollAmount != prevScrollAmount) {
+		if (scrollAmount != prevScroll) {
 			updateContentY();
 		}
 		
-		return scrollAmount != prevScrollAmount;
+		return scrollAmount != prevScroll;
+	}
+	
+	protected boolean validateScrollAmount() {
+		return setScrollAmount(scrollAmount);
 	}
 	
 	protected ScrollMode getScrollMode(double mouseX, double mouseY) {
@@ -195,7 +210,7 @@ public class ScrollableListElement extends SimpleListElement {
 		scrollBarY = getY() + topBorder + 3;
 		scrollBarHeight = height - 6;
 		
-		if (isDrawingBackground()) {
+		if (shouldDrawBackground()) {
 			scrollBarHeight += (BORDER_MARGIN_TOP + BORDER_MARGIN_BOTTOM);
 		} else {
 			scrollBarY += BORDER_MARGIN_TOP;
@@ -205,7 +220,7 @@ public class ScrollableListElement extends SimpleListElement {
 	protected void renderScrollBar(boolean dark) {
 		renderRect(scrollBarX, scrollBarY, scrollBarWidth, scrollBarHeight, 0xFF000000); // background
 		
-		int visibleHeight = getHeight();
+		int visibleHeight = height;
 		int totalHeight = visibleHeight + (int)getMaxScrollAmount();
 		
 		int x = scrollBarX;

@@ -1,6 +1,6 @@
 {
-  "name": "hopper",
-  "event_types": [
-    "powered"
-  ]
+	"name": "hopper",
+	"event_types": [
+		"powered"
+	]
 }

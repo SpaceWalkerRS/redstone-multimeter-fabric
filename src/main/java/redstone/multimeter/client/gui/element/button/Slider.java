@@ -1,6 +1,5 @@
 package redstone.multimeter.client.gui.element.button;
 
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -11,6 +10,7 @@ import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.TextureRegion;
+import redstone.multimeter.client.gui.Tooltip;
 
 public class Slider extends AbstractButton {
 	
@@ -22,11 +22,11 @@ public class Slider extends AbstractButton {
 	
 	private double value;
 	
-	public Slider(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<List<Text>> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
+	public Slider(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip, onSlide, valueSupplier, steps);
 	}
 	
-	public Slider(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<List<Text>> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
+	public Slider(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
 		super(client, x, y, width, height, message, tooltip);
 		
 		this.valueConsumer = valueConsumer;

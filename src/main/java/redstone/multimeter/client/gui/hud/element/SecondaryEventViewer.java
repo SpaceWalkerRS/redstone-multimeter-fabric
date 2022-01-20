@@ -1,9 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import java.util.List;
-
-import net.minecraft.text.Text;
-
+import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.log.EventLog;
@@ -23,7 +20,7 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 	
 	@Override
-	public List<Text> getTooltip(int mouseX, int mouseY) {
+	public Tooltip getTooltip(int mouseX, int mouseY) {
 		if (isHovered(mouseX, mouseY)) {
 			int row = hud.getHoveredRow(mouseY);
 			Meter meter = hud.meters.get(row);
@@ -34,11 +31,11 @@ public class SecondaryEventViewer extends MeterEventViewer {
 			EventLog log = logs.getLogAt(tick, subtick);
 			
 			if (log != null && meter.isMetering(log.getEvent().getType())) {
-				return log.getTextForTooltip();
+				return log.getTooltip();
 			}
 		}
 		
-		return null;
+		return super.getTooltip(mouseX, mouseY);
 	}
 	
 	@Override

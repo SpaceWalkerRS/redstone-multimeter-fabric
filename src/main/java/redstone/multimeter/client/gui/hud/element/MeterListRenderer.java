@@ -1,7 +1,5 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import java.util.List;
-
 import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.text.LiteralText;
@@ -81,11 +79,6 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	@Override
-	public List<Text> getTooltip(int mouseX, int mouseY) {
-		return null;
-	}
-	
-	@Override
 	public void update() {
 		
 	}
@@ -115,8 +108,12 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	private void drawNames() {
+		if (hud.settings.rowHeight < hud.font.fontHeight) {
+			return;
+		}
+		
 		int x = hud.settings.gridSize + 1;
-		int y = hud.settings.gridSize + 1;
+		int y = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
 		
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);

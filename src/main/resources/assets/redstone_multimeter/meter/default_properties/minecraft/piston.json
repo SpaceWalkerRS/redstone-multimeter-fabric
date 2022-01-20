@@ -1,7 +1,7 @@
 {
-  "name": "piston",
-  "event_types": [
-    "active",
-    "moved"
-  ]
+	"name": "piston",
+	"event_types": [
+		"active",
+		"moved"
+	]
 }

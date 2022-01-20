@@ -32,7 +32,7 @@ public abstract class IntegratedServerMixin implements IMinecraftServer {
 	}
 	
 	@Override
-	public boolean isPaused() {
+	public boolean isPausedRSMM() {
 		return field_5524;
 	}
 }

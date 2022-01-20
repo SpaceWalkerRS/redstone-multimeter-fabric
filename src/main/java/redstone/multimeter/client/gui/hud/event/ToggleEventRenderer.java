@@ -92,6 +92,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		}
 		
 		y += hud.settings.gridSize;
+		int textY = y + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
 		int color = meter.getColor();
 		
 		MeterLogs logs = meter.getLogs();
@@ -137,7 +138,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 						int textColor = toggled ? hud.settings.colorTextOn : hud.settings.colorTextOff;
 						
 						GlStateManager.pushMatrix();
-						hud.renderer.renderText(text, startX + 1, y + 1, textColor);
+						hud.renderer.renderText(text, startX + 1, textY + 1, textColor);
 						GlStateManager.translated(0, 0, -0.01);
 						hud.renderer.renderRect(startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
 						GlStateManager.popMatrix();

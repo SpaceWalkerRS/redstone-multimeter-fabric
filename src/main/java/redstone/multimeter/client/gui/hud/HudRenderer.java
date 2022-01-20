@@ -5,8 +5,8 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.text.Text;
 
-import redstone.multimeter.client.gui.element.IElement;
 import redstone.multimeter.client.gui.element.RenderHelper2D;
+import redstone.multimeter.client.gui.element.IElement;
 import redstone.multimeter.util.ColorUtils;
 
 public class HudRenderer extends RenderHelper2D {
@@ -45,22 +45,12 @@ public class HudRenderer extends RenderHelper2D {
 	}
 	
 	public void renderHighlight(int x, int y, int width, int height, boolean selection) {
-		int left   = x;
-		int right  = x + width;
-		int top    = y;
-		int bottom = y + height;
 		int d      = hud.settings.gridSize;
 		int color  = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
 		
-		renderRect(bufferBuilder -> {
-			drawRect(bufferBuilder, left     , top       , d     , height, color); // left
-			drawRect(bufferBuilder, left     , bottom    , width , d     , color); // bottom
-			drawRect(bufferBuilder, right    , top    + d, d     , height, color); // right
-			drawRect(bufferBuilder, left  + d, top       , width , d     , color); // top
-		});
+		renderBorder(x, y, width + d, height + d, d, color);
 	}
 	
-	@Override
 	public void renderRect(int x, int y, int width, int height, int color) {
 		super.renderRect(x, y, width, height, color);
 	}

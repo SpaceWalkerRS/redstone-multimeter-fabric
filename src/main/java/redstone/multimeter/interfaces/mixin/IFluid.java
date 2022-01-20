@@ -8,6 +8,6 @@ import net.minecraft.world.World;
 
 public interface IFluid {
 	
-	public void randomTick(World world, BlockPos pos, FluidState state, Random random);
+	public void randomTickRSMM(World world, BlockPos pos, FluidState state, Random random);
 	
 }
