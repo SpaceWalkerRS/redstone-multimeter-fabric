@@ -4,9 +4,12 @@ import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import net.minecraft.block.Block;
@@ -32,6 +35,7 @@ import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.packets.ClearMeterGroupPacket;
 import redstone.multimeter.common.network.packets.MeterGroupDefaultPacket;
@@ -48,9 +52,13 @@ import redstone.multimeter.util.TextUtils;
 
 public class Multimeter {
 	
+	private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance(Locale.US);
+	
 	private final MultimeterServer server;
 	private final Map<String, ServerMeterGroup> meterGroups;
 	private final Map<UUID, ServerMeterGroup> subscriptions;
+	private final Set<ServerMeterGroup> activeMeterGroups;
+	private final Set<ServerMeterGroup> idleMeterGroups;
 	private final ServerMeterPropertiesManager meterPropertiesManager;
 	
 	public Options options;
@@ -59,6 +67,8 @@ public class Multimeter {
 		this.server = server;
 		this.meterGroups = new LinkedHashMap<>();
 		this.subscriptions = new HashMap<>();
+		this.activeMeterGroups = new HashSet<>();
+		this.idleMeterGroups = new HashSet<>();
 		this.meterPropertiesManager = new ServerMeterPropertiesManager(this);
 		
 		reloadOptions();
@@ -103,11 +113,7 @@ public class Multimeter {
 	
 	public void tickStart(boolean paused) {
 		if (!paused) {
-			if (options.meter_group.max_idle_time >= 0) {
-				meterGroups.values().removeIf(meterGroup -> {
-					return meterGroup.isIdle() && (!meterGroup.hasMeters() || meterGroup.getIdleTime() > options.meter_group.max_idle_time);
-				});
-			}
+			removeIdleMeterGroups();
 			
 			for (ServerMeterGroup meterGroup : meterGroups.values()) {
 				meterGroup.tick();
@@ -120,6 +126,42 @@ public class Multimeter {
 		
 		if (!paused) {
 			broadcastMeterLogs();
+		}
+	}
+	
+	private void removeIdleMeterGroups() {
+		Iterator<ServerMeterGroup> it = idleMeterGroups.iterator();
+		
+		while (it.hasNext()) {
+			ServerMeterGroup meterGroup = it.next();
+			
+			if (tryRemoveMeterGroup(meterGroup)) {
+				it.remove();
+			}
+		}
+	}
+	
+	private boolean tryRemoveMeterGroup(ServerMeterGroup meterGroup) {
+		if (meterGroup.hasMeters() && !meterGroup.isPastIdleTimeLimit()) {
+			return false;
+		}
+		
+		meterGroups.remove(meterGroup.getName(), meterGroup);
+		
+		if (meterGroup.hasMeters()) {
+			notifyOwnerOfRemoval(meterGroup);
+		}
+		
+		return true;
+	}
+	
+	private void notifyOwnerOfRemoval(ServerMeterGroup meterGroup) {
+		UUID ownerUUID = meterGroup.getOwner();
+		ServerPlayerEntity owner = server.getPlayer(ownerUUID);
+		
+		if (owner != null) {
+			Text message = new LiteralText(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
+			server.sendMessage(owner, message, false);
 		}
 	}
 	
@@ -160,7 +202,9 @@ public class Multimeter {
 		}
 	}
 	
-	public boolean addMeter(ServerMeterGroup meterGroup, MeterProperties properties) {
+	public boolean addMeter(ServerMeterGroup meterGroup, MeterProperties meterProperties) {
+		MutableMeterProperties properties = meterProperties.toMutable();
+		
 		if (!meterPropertiesManager.validate(properties) || !meterGroup.addMeter(properties)) {
 			return false;
 		}
@@ -196,11 +240,15 @@ public class Multimeter {
 		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
-			meterGroup.clear();
-			
-			ClearMeterGroupPacket packet = new ClearMeterGroupPacket();
-			server.getPacketHandler().sendToSubscribers(packet, meterGroup);
+			clearMeterGroup(meterGroup);
 		}
+	}
+	
+	public void clearMeterGroup(ServerMeterGroup meterGroup) {
+		meterGroup.clear();
+		
+		ClearMeterGroupPacket packet = new ClearMeterGroupPacket();
+		server.getPacketHandler().sendToSubscribers(packet, meterGroup);
 	}
 	
 	public void createMeterGroup(ServerPlayerEntity player, String name) {
@@ -239,7 +287,19 @@ public class Multimeter {
 		
 		subscriptions.put(playerUUID, meterGroup);
 		meterGroup.addSubscriber(playerUUID);
-		meterGroup.updateIdleState();
+		
+		if (meterGroup.updateIdleState()) {
+			activeMeterGroups.add(meterGroup);
+			idleMeterGroups.remove(meterGroup);
+		}
+	}
+	
+	public void unsubscribeFromMeterGroup(ServerPlayerEntity player) {
+		ServerMeterGroup meterGroup = getSubscription(player);
+		
+		if (meterGroup != null) {
+			unsubscribeFromMeterGroup(meterGroup, player);
+		}
 	}
 	
 	public void unsubscribeFromMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
@@ -254,7 +314,11 @@ public class Multimeter {
 		
 		subscriptions.remove(playerUUID, meterGroup);
 		meterGroup.removeSubscriber(playerUUID);
-		meterGroup.updateIdleState();
+		
+		if (meterGroup.updateIdleState()) {
+			activeMeterGroups.remove(meterGroup);
+			idleMeterGroups.add(meterGroup);
+		}
 	}
 	
 	private void onSubscriptionChanged(ServerPlayerEntity player, ServerMeterGroup prevSubscription, ServerMeterGroup newSubscription) {
@@ -267,7 +331,7 @@ public class Multimeter {
 		}
 		
 		server.getPacketHandler().sendToPlayer(packet, player);
-		server.getMinecraftServer().getPlayerManager().sendCommandTree(player);
+		server.getPlayerManager().sendCommandTree(player);
 	}
 	
 	public void clearMembersOfMeterGroup(ServerMeterGroup meterGroup) {
@@ -365,6 +429,10 @@ public class Multimeter {
 					float pitch = player.pitch;
 					
 					player.teleport(newWorld, newX, newY, newZ, yaw, pitch);
+					
+					Text text = new LiteralText(String.format("Teleported to meter \"%s\"", meter.getName()));
+					server.sendMessage(player, text, false);
+					
 					sendClickableReturnMessage(oldWorld, oldX, oldY, oldZ, yaw, pitch, player);
 				}
 			}
@@ -377,14 +445,12 @@ public class Multimeter {
 	 * a meter.
 	 */
 	private void sendClickableReturnMessage(ServerWorld world, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayerEntity player) {
-		NumberFormat f = NumberFormat.getNumberInstance(Locale.US); // use . as decimal separator
-		
 		String worldId = world.getRegistryKey().getValue().toString();
-		String x = f.format(_x);
-		String y = f.format(_y);
-		String z = f.format(_z);
-		String yaw = f.format(_yaw);
-		String pitch = f.format(_pitch);
+		String x = NUMBER_FORMAT.format(_x);
+		String y = NUMBER_FORMAT.format(_y);
+		String z = NUMBER_FORMAT.format(_z);
+		String yaw = NUMBER_FORMAT.format(_yaw);
+		String pitch = NUMBER_FORMAT.format(_pitch);
 		
 		Text message = new LiteralText("Click ").
 			append(new LiteralText("[here]").styled((style) -> {
@@ -406,12 +472,12 @@ public class Multimeter {
 		Block oldBlock = oldState.getBlock();
 		Block newBlock = newState.getBlock();
 		
-		if (oldBlock == newBlock && ((IBlock)newBlock).isPowerSource() && ((PowerSource)newBlock).logPowerChangeOnStateChange()) {
+		if (oldBlock == newBlock && ((IBlock)newBlock).isPowerSourceRSMM() && ((PowerSource)newBlock).logPowerChangeOnStateChangeRSMM()) {
 			logPowerChange(world, pos, oldState, newState);
 		}
 		
-		boolean wasMeterable = ((IBlock)oldBlock).isMeterable();
-		boolean isMeterable = ((IBlock)newBlock).isMeterable();
+		boolean wasMeterable = ((IBlock)oldBlock).isMeterableRSMM();
+		boolean isMeterable = ((IBlock)newBlock).isMeterableRSMM();
 		
 		if (wasMeterable || isMeterable) {
 			logActive(world, pos, newState);
@@ -424,7 +490,7 @@ public class Multimeter {
 	
 	public void logPowered(World world, BlockPos pos, BlockState state) {
 		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setPowered(event.getMetadata() != 0), new MeterEventSupplier(EventType.POWERED, () -> {
-			return ((IBlock)state.getBlock()).isPowered(world, pos, state) ? 1 : 0;
+			return ((IBlock)state.getBlock()).isPoweredRSMM(world, pos, state) ? 1 : 0;
 		}));
 	}
 	
@@ -435,7 +501,7 @@ public class Multimeter {
 	public void logActive(World world, BlockPos pos, BlockState state) {
 		tryLogEvent(world, pos, (meterGroup, meter, event) -> meter.setActive(event.getMetadata() != 0), new MeterEventSupplier(EventType.ACTIVE, () -> {
 			Block block = state.getBlock();
-			return ((IBlock)block).isMeterable() && ((Meterable)block).isActive(world, pos, state) ? 1 : 0;
+			return ((IBlock)block).isMeterableRSMM() && ((Meterable)block).isActiveRSMM(world, pos, state) ? 1 : 0;
 		}));
 	}
 	
@@ -446,7 +512,7 @@ public class Multimeter {
 	public void moveMeters(World world, BlockPos blockPos, Direction dir) {
 		WorldPos pos = new WorldPos(world, blockPos);
 		
-		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+		for (ServerMeterGroup meterGroup : activeMeterGroups) {
 			meterGroup.tryMoveMeter(pos, dir);
 		}
 	}
@@ -466,8 +532,8 @@ public class Multimeter {
 			return oldPower != newPower;
 		}, new MeterEventSupplier(EventType.POWER_CHANGE, () -> {
 			PowerSource block = (PowerSource)newState.getBlock();
-			int oldPower = block.getPowerLevel(world, pos, oldState);
-			int newPower = block.getPowerLevel(world, pos, newState);
+			int oldPower = block.getPowerLevelRSMM(world, pos, oldState);
+			int newPower = block.getPowerLevelRSMM(world, pos, newState);
 			
 			return (oldPower << 8) | newPower;
 		}));
@@ -525,10 +591,8 @@ public class Multimeter {
 		if (options.hasEventType(supplier.type())) {
 			WorldPos pos = new WorldPos(world, blockPos);
 			
-			for (ServerMeterGroup meterGroup : meterGroups.values()) {
-				if (!meterGroup.isIdle()) {
-					meterGroup.tryLogEvent(pos, predicate, supplier);
-				}
+			for (ServerMeterGroup meterGroup : activeMeterGroups) {
+				meterGroup.tryLogEvent(pos, predicate, supplier);
 			}
 		}
 	}

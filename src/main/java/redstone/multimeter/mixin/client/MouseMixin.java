@@ -13,14 +13,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.element.RSMMScreen;
+import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 
 @Mixin(Mouse.class)
 public class MouseMixin {
 	
 	@Shadow @Final private MinecraftClient client;
-	@Shadow private double eventDeltaWheel;
 	
 	@Inject(
 			method = "onMouseScroll",

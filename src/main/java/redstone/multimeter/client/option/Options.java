@@ -27,7 +27,7 @@ public class Options {
 		public static final BooleanOption                SHIFTY_METERS        = new BooleanOption("Shifty Meters", "Use the shift key to control whether a new meter is movable or not.", true);
 		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("Auto Random Ticks", String.format("Automatically enable the \'%s\' event type when placing a meter on a block that accepts random ticks.", EventType.RANDOM_TICK.getName()), true);
 		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("Create Group On Join", "Automatically create a new meter group upon joining a world or server.", true);
-		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption("Default Meter Group", "The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used.", "", MeterGroup.getMaxNameLength());
+		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption("Default Meter Group", "The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used instead.", "", MeterGroup.getMaxNameLength());
 		
 	}
 	
@@ -38,7 +38,10 @@ public class Options {
 		public static final EnumOption<Directionality.X> DIRECTIONALITY_X     = new EnumOption<>("Horizontal Directionality", "The direction along which the events are drawn.", Directionality.X.class, Directionality.X.LEFT_TO_RIGHT);
 		public static final EnumOption<Directionality.Y> DIRECTIONALITY_Y     = new EnumOption<>("Vertical Directionality", "The direction along which meters are listed.", Directionality.Y.class, Directionality.Y.TOP_TO_BOTTOM);
 		public static final IntegerOption                COLUMN_COUNT         = new IntegerOption("History", "The number of ticks displayed in the primary overview.", 60, 1, 10001);
-		public static final IntegerOption                SELECTED_COLUMN      = new IntegerOption("Selected Column", "The column of the main overview that highlights the tick that is selected for showing sub-tick events in the secondary overview.", 44, 0, 10000);
+		public static final IntegerOption                SELECTED_COLUMN      = new IntegerOption("Selected Column", "The column of the primary overview that highlights the tick that is selected for showing sub-tick events in the secondary overview.", 44, 0, 10000);
+		public static final IntegerOption                COLUMN_WIDTH         = new IntegerOption("Column Width", "The width of a column of the primary and secondary overviews.", 3, 1, 50);
+		public static final IntegerOption                ROW_HEIGHT           = new IntegerOption("Row Height", "The height of a row in the HUD.", 9, 1, 50);
+		public static final IntegerOption                GRID_SIZE            = new IntegerOption("Grid Size", "The thickness of the gridlines in the HUD.", 1, 1, 5);
 		public static final BooleanOption                HIDE_HIGHLIGHT       = new BooleanOption("Hide Highlight", "Hide the highlight around the selected tick when the HUD is not paused.", true);
 		public static final BooleanOption                PAUSE_INDICATOR      = new BooleanOption("Pause Indicator", "Display a little play/pause indicator underneath the HUD.", false);
 		public static final IntegerOption                OPACITY              = new IntegerOption("Opacity", "", 100, 0, 100);
@@ -57,6 +60,7 @@ public class Options {
 	public static class Miscellaneous {
 		
 		public static final IntegerOption                SCROLL_SPEED         = new IntegerOption("Scroll Speed", "The scroll speed in Redstone Multimeter related GUIs.", 7, 1, 69);
+		public static final IntegerOption                DOUBLE_CLICK_TIME    = new IntegerOption("Double Click Time", "The double click time in Redstone Multimeter related GUIs.", 5, 1, 500);
 		public static final BooleanOption                VERSION_WARNING      = new BooleanOption("Version Warning", "Send a warning message in chat when you join a server that has a different version of Redstone Multimeter installed.", true);
 		
 	}
@@ -181,6 +185,9 @@ public class Options {
 			HUD.DIRECTIONALITY_Y,
 			HUD.COLUMN_COUNT,
 			HUD.SELECTED_COLUMN,
+			HUD.COLUMN_WIDTH,
+			HUD.ROW_HEIGHT,
+			HUD.GRID_SIZE,
 			HUD.HIDE_HIGHLIGHT,
 			HUD.PAUSE_INDICATOR,
 			HUD.OPACITY,
@@ -193,6 +200,7 @@ public class Options {
 		);
 		register("Miscellaneous",
 			Miscellaneous.SCROLL_SPEED,
+			Miscellaneous.DOUBLE_CLICK_TIME,
 			Miscellaneous.VERSION_WARNING
 		);
 	}

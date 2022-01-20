@@ -13,7 +13,7 @@ public abstract class IntegratedServerMixin implements IMinecraftServer {
 	@Shadow private boolean paused;
 	
 	@Override
-	public boolean isPaused() {
+	public boolean isPausedRSMM() {
 		return paused;
 	}
 }

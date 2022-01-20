@@ -38,8 +38,8 @@ public class MeterGroupCommand {
 			literal("metergroup").
 			requires(source -> isMultimeterClient(source)).
 			then(CommandManager.
-				literal("clear").
-				executes(context -> clear(context.getSource()))).
+				literal("list").
+				executes(context -> list(context.getSource()))).
 			then(CommandManager.
 				literal("subscribe").
 				executes(context -> subscribe(context.getSource(), null)).
@@ -61,8 +61,8 @@ public class MeterGroupCommand {
 				literal("members").
 				requires(source -> isOwnerOfSubscription(source)).
 				then(CommandManager.
-					literal("clear").
-					executes(context -> membersClear(context.getSource()))).
+					literal("list").
+					executes(context -> membersList(context.getSource()))).
 				then(CommandManager.
 					literal("add").
 					then(CommandManager.
@@ -75,11 +75,11 @@ public class MeterGroupCommand {
 						suggests((context, suggestionsBuilder) -> CommandSource.suggestMatching(listMembers(context.getSource()).keySet(), suggestionsBuilder)).
 						executes(context -> membersRemovePlayer(context.getSource(), StringArgumentType.getString(context, "member"))))).
 				then(CommandManager.
-					literal("list").
-					executes(context -> membersList(context.getSource())))).
+					literal("clear").
+					executes(context -> membersClear(context.getSource())))).
 			then(CommandManager.
-				literal("list").
-				executes(context -> list(context.getSource())));
+				literal("clear").
+				executes(context -> clear(context.getSource())));
 		
 		dispatcher.register(builder);
 	}
@@ -126,11 +126,17 @@ public class MeterGroupCommand {
 		return names;
 	}
 	
-	private static int clear(ServerCommandSource source) {
-		return command(source, (multimeter, meterGroup, player) -> {
-			multimeter.clearMeterGroup(player);
-			source.sendFeedback(new LiteralText(String.format("Removed all meters in meter group \'%s\'", multimeter.getSubscription(player).getName())), false);
-		});
+	private static int list(ServerCommandSource source) {
+		Collection<String> names = listMeterGroups(source);
+		
+		if (names.isEmpty()) {
+			source.sendFeedback(new LiteralText("There are no meter groups yet!"), false);
+		} else {
+			String message = "Meter groups:\n  " + String.join("\n  ", names);
+			source.sendFeedback(new LiteralText(message), false);
+		}
+		
+		return Command.SINGLE_SUCCESS;
 	}
 	
 	private static int subscribe(ServerCommandSource source, String name) {
@@ -145,7 +151,7 @@ public class MeterGroupCommand {
 					multimeter.subscribeToMeterGroup(meterGroup, player);
 					source.sendFeedback(new LiteralText(String.format("Subscribed to meter group \'%s\'", name)), false);
 				} else {
-					source.sendFeedback(new LiteralText("A meter group with that name already exists and it is private!"), false);
+					source.sendFeedback(new LiteralText("That meter group is private!"), false);
 				}
 			} else {
 				if (MeterGroup.isValidName(name)) {
@@ -183,10 +189,16 @@ public class MeterGroupCommand {
 		});
 	}
 	
-	private static int membersClear(ServerCommandSource source) {
+	private static int membersList(ServerCommandSource source) {
+		Map<String, UUID> members = listMembers(source);
+		
 		return commandMembers(source, (multimeter, meterGroup, owner) -> {
-			multimeter.clearMembersOfMeterGroup(meterGroup);
-			source.sendFeedback(new LiteralText(String.format("Removed all members from meter group \'%s\'", meterGroup.getName())), false);
+			if (members.isEmpty()) {
+				source.sendFeedback(new LiteralText(String.format("Meter group \'%s\' has no members yet!", meterGroup.getName())), false);
+			} else {
+				String message = String.format("Members of meter group \'%s\':\n  ", meterGroup.getName()) + String.join("\n  ", members.keySet());
+				source.sendFeedback(new LiteralText(message), false);
+			}
 		});
 	}
 	
@@ -238,16 +250,10 @@ public class MeterGroupCommand {
 		return null;
 	}
 	
-	private static int membersList(ServerCommandSource source) {
-		Map<String, UUID> members = listMembers(source);
-		
+	private static int membersClear(ServerCommandSource source) {
 		return commandMembers(source, (multimeter, meterGroup, owner) -> {
-			if (members.isEmpty()) {
-				source.sendFeedback(new LiteralText(String.format("Meter group \'%s\' has no members yet!", meterGroup.getName())), false);
-			} else {
-				String message = String.format("Members of meter group \'%s\':\n  ", meterGroup.getName()) + String.join("\n  ", members.keySet());
-				source.sendFeedback(new LiteralText(message), false);
-			}
+			multimeter.clearMembersOfMeterGroup(meterGroup);
+			source.sendFeedback(new LiteralText(String.format("Removed all members from meter group \'%s\'", meterGroup.getName())), false);
 		});
 	}
 	
@@ -263,17 +269,11 @@ public class MeterGroupCommand {
 		});
 	}
 	
-	private static int list(ServerCommandSource source) {
-		Collection<String> names = listMeterGroups(source);
-		
-		if (names.isEmpty()) {
-			source.sendFeedback(new LiteralText("There are no meter groups yet!"), false);
-		} else {
-			String message = "Meter groups:\n  " + String.join("\n  ", names);
-			source.sendFeedback(new LiteralText(message), false);
-		}
-		
-		return Command.SINGLE_SUCCESS;
+	private static int clear(ServerCommandSource source) {
+		return command(source, (multimeter, meterGroup, player) -> {
+			multimeter.clearMeterGroup(meterGroup);
+			source.sendFeedback(new LiteralText(String.format("Removed all meters in meter group \'%s\'", meterGroup.getName())), false);
+		});
 	}
 	
 	private static int command(ServerCommandSource source, MeterGroupCommandExecutor command) {

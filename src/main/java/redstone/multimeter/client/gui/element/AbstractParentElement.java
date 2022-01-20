@@ -3,11 +3,16 @@ package redstone.multimeter.client.gui.element;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractParentElement extends AbstractElement implements IParentElement {
+import net.minecraft.client.util.math.MatrixStack;
+
+import redstone.multimeter.client.gui.Tooltip;
+
+public abstract class AbstractParentElement extends AbstractElement {
 	
 	private final List<IElement> children = new ArrayList<>();
 	
 	private boolean focused;
+	private IElement hoveredElement;
 	private IElement focusedElement;
 	
 	protected AbstractParentElement() {
@@ -16,6 +21,108 @@ public abstract class AbstractParentElement extends AbstractElement implements I
 	
 	protected AbstractParentElement(int x, int y, int width, int height) {
 		super(x, y, width, height);
+	}
+	
+	@Override
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
+		for (int index = 0; index < children.size(); index++) {
+			IElement child = children.get(index);
+			
+			if (child.isVisible()) {
+				child.render(matrices, mouseX, mouseY);
+			}
+		}
+	}
+	
+	@Override
+	public void mouseMove(double mouseX, double mouseY) {
+		hoveredElement = null;
+		
+		for (int index = 0; index < children.size(); index++) {
+			IElement child = children.get(index);
+			
+			if (child.isVisible()) {
+				child.mouseMove(mouseX, mouseY);
+				
+				if (hoveredElement == null && child.isHovered(mouseX, mouseY)) {
+					hoveredElement = child;
+				}
+			}
+		}
+	}
+	
+	@Override
+	public boolean mouseClick(double mouseX, double mouseY, int button) {
+		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+		
+		if (!consumed) {
+			IElement focused = updateFocusedElement();
+			
+			if (focused != null) {
+				consumed = focused.mouseClick(mouseX, mouseY, button);
+			}
+		}
+		
+		return consumed;
+	}
+	
+	@Override
+	public boolean mouseRelease(double mouseX, double mouseY, int button) {
+		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
+		
+		if (!consumed) {
+			IElement focused = getFocusedElement();
+			
+			if (focused != null) {
+				consumed = focused.mouseRelease(mouseX, mouseY, button);
+			}
+		}
+		
+		return consumed;
+	}
+	
+	@Override
+	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+		if (isDraggingMouse()) {
+			IElement focused = getFocusedElement();
+			
+			if (focused != null) {
+				return focused.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
+			}
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+		IElement hovered = getHoveredElement();
+		return hovered != null && hovered.mouseScroll(mouseX, mouseY, scrollX, scrollY);
+	}
+	
+	@Override
+	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+		IElement focused = getFocusedElement();
+		return focused != null && focused.keyPress(keyCode, scanCode, modifiers);
+	}
+	
+	@Override
+	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+		IElement focused = getFocusedElement();
+		return focused != null && focused.keyRelease(keyCode, scanCode, modifiers);
+	}
+	
+	@Override
+	public boolean typeChar(char chr, int modifiers) {
+		IElement focused = getFocusedElement();
+		return focused != null && focused.typeChar(chr, modifiers);
+	}
+	
+	@Override
+	public void onRemoved() {
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).onRemoved();
+		}
 	}
 	
 	@Override
@@ -33,6 +140,17 @@ public abstract class AbstractParentElement extends AbstractElement implements I
 	}
 	
 	@Override
+	public void tick() {
+		for (int index = 0; index < children.size(); index++) {
+			IElement child = children.get(index);
+			
+			if (child.isVisible()) {
+				child.tick();
+			}
+		}
+	}
+	
+	@Override
 	public void setX(int x) {
 		super.setX(x);
 		onChangedX(x);
@@ -45,39 +163,95 @@ public abstract class AbstractParentElement extends AbstractElement implements I
 	}
 	
 	@Override
-	public List<IElement> getChildren() {
+	public Tooltip getTooltip(int mouseX, int mouseY) {
+		IElement hovered = getHoveredElement();
+		return hovered == null ? super.getTooltip(mouseX, mouseY) : hovered.getTooltip(mouseX, mouseY);
+	}
+	
+	@Override
+	public void update() {
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).update();
+		}
+	}
+	
+	protected List<IElement> getChildren() {
 		return children;
 	}
 	
-	@Override
-	public IElement getFocusedElement() {
-		return focusedElement != null && focusedElement.isFocused() ? focusedElement : null;
+	protected void addChild(IElement element) {
+		children.add(element);
 	}
 	
-	@Override
-	public void setFocusedElement(IElement element) {
-		IElement focused = this.focusedElement;
+	protected void addChild(int index, IElement element) {
+		children.add(index, element);
+	}
+	
+	public void removeChildren() {
+		hoveredElement = null;
+		focusedElement = null;
 		
-		if (element == focused) {
-			return;
+		for (int index = 0; index < children.size(); index++) {
+			children.get(index).onRemoved();
 		}
 		
-		if (focused != null) {
-			focused.setFocused(false);
+		children.clear();
+	}
+	
+	protected IElement getHoveredElement() {
+		return hoveredElement;
+	}
+	
+	protected void updateHoveredElement(double mouseX, double mouseY) {
+		hoveredElement = getHoveredElement(mouseX, mouseY);
+	}
+	
+	private IElement getHoveredElement(double mouseX, double mouseY) {
+		if (!isDraggingMouse() && isHovered(mouseX, mouseY)) {
+			for (int index = 0; index < children.size(); index++) {
+				IElement child = children.get(index);
+				
+				if (child.isVisible() && child.isHovered(mouseX, mouseY)) {
+					return child;
+				}
+			}
 		}
 		
-		this.focusedElement = element;
-		
-		if (element != null) {
-			element.setFocused(true);
+		return null;
+	}
+	
+	protected IElement getFocusedElement() {
+		if (focusedElement != null && !focusedElement.isFocused()) {
+			setFocusedElement(null);
 		}
+		
+		return focusedElement;
+	}
+	
+	protected IElement updateFocusedElement() {
+		return setFocusedElement(hoveredElement);
+	}
+	
+	private IElement setFocusedElement(IElement element) {
+		if (element == focusedElement) {
+			return focusedElement;
+		}
+		
+		if (focusedElement != null) {
+			focusedElement.setFocused(false);
+		}
+		
+		focusedElement = element;
+		
+		if (focusedElement != null) {
+			focusedElement.setFocused(true);
+		}
+		
+		return focusedElement;
 	}
 	
 	protected abstract void onChangedX(int x);
 	
 	protected abstract void onChangedY(int y);
 	
-	protected void addChild(IElement element) {
-		children.add(element);
-	}
 }

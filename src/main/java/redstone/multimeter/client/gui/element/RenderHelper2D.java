@@ -103,6 +103,24 @@ public class RenderHelper2D {
 		bufferBuilder.vertex(model, x1, y0, z).color(r0, g0, b0, a0).next();
 	}
 	
+	protected void renderBorder(MatrixStack matrices, int x, int y, int width, int height, int color) {
+		renderBorder(matrices, x, y, width, height, 1, color);
+	}
+	
+	protected void renderBorder(MatrixStack matrices, int x, int y, int width, int height, int d, int color) {
+		int left = x;
+		int right = x + width;
+		int top = y;
+		int bottom = y + height;
+		
+		renderRect(matrices, (bufferBuilder, model) -> {
+			drawRect(bufferBuilder, model, left     , top       , d        , height - d, color); // left
+			drawRect(bufferBuilder, model, left     , bottom - d, width - d, d         , color); // bottom
+			drawRect(bufferBuilder, model, right - d, top    + d, d        , height - d, color); // right
+			drawRect(bufferBuilder, model, left  + d, top       , width - d, d         , color); // top
+		});
+	}
+	
 	protected void renderTexture(MatrixStack matrices, Texture texture, Drawer drawer) {
 		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
 		RenderSystem.enableTexture();
@@ -244,12 +262,14 @@ public class RenderHelper2D {
 		font.draw(text, x, y, color, shadow, model, immediate, false, 0x00000000, 0x00F000F0);
 	}
 	
+	@FunctionalInterface
 	protected interface Drawer {
 		
 		public void draw(BufferBuilder bufferBuilder, Matrix4f model);
 		
 	}
 	
+	@FunctionalInterface
 	protected interface TextDrawer {
 		
 		public void draw(Immediate immediate, Matrix4f model);

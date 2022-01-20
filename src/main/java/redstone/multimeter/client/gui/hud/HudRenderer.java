@@ -49,19 +49,10 @@ public class HudRenderer extends RenderHelper2D {
 	}
 	
 	public void renderHighlight(MatrixStack matrices, int x, int y, int width, int height, boolean selection) {
-		int left   = x;
-		int right  = x + width;
-		int top    = y;
-		int bottom = y + height;
 		int d      = hud.settings.gridSize;
 		int color  = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
 		
-		renderRect(matrices, (bufferBuilder, model) -> {
-			drawRect(bufferBuilder, model, left     , top       , d     , height, color); // left
-			drawRect(bufferBuilder, model, left     , bottom    , width , d     , color); // bottom
-			drawRect(bufferBuilder, model, right    , top    + d, d     , height, color); // right
-			drawRect(bufferBuilder, model, left  + d, top       , width , d     , color); // top
-		});
+		renderBorder(matrices, x, y, width + d, height + d, d, color);
 	}
 	
 	public void renderRect(MatrixStack matrices, int x, int y, int width, int height, int color) {

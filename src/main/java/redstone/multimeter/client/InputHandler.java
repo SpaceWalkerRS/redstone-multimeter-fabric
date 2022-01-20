@@ -4,9 +4,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 
-import redstone.multimeter.client.gui.MultimeterScreen;
-import redstone.multimeter.client.gui.OptionsScreen;
-import redstone.multimeter.client.gui.element.RSMMScreen;
+import redstone.multimeter.client.gui.screen.MultimeterScreen;
+import redstone.multimeter.client.gui.screen.OptionsScreen;
+import redstone.multimeter.client.gui.screen.RSMMScreen;
+import redstone.multimeter.client.gui.screen.TickPhaseTreeScreen;
 import redstone.multimeter.common.meter.event.EventType;
 
 public class InputHandler {
@@ -30,6 +31,9 @@ public class InputHandler {
 		}
 		while (KeyBindings.OPEN_OPTIONS_MENU.wasPressed()) {
 			client.openScreen(new OptionsScreen(client));
+		}
+		while (KeyBindings.VIEW_TICK_PHASE_TREE.wasPressed()) {
+			client.openScreen(new TickPhaseTreeScreen(client));
 		}
 		
 		if (!client.hasSubscription()) {
@@ -101,6 +105,15 @@ public class InputHandler {
 				client.openScreen(new OptionsScreen(client));
 			}
 		} else
+		if (KeyBindings.VIEW_TICK_PHASE_TREE.matchesMouse(button)) {
+			if (!client.isConnected()) {
+				return false;
+			} else if (screen instanceof TickPhaseTreeScreen) {
+				screen.close();
+			} else {
+				client.openScreen(new TickPhaseTreeScreen(client));
+			}
+		} else
 		if (screen instanceof MultimeterScreen) {
 			if (KeyBindings.PAUSE_METERS.matchesMouse(button)) {
 				client.getHUD().pause();
@@ -137,6 +150,15 @@ public class InputHandler {
 				screen.close();
 			} else {
 				client.openScreen(new OptionsScreen(client));
+			}
+		} else
+		if (KeyBindings.VIEW_TICK_PHASE_TREE.matchesKey(keyCode, scanCode)) {
+			if (!client.isConnected()) {
+				return false;
+			} else if (screen instanceof TickPhaseTreeScreen) {
+				screen.close();
+			} else {
+				client.openScreen(new TickPhaseTreeScreen(client));
 			}
 		} else
 		if (screen instanceof MultimeterScreen) {

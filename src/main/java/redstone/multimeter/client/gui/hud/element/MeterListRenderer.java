@@ -1,11 +1,8 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import java.util.List;
-
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import redstone.multimeter.client.gui.element.AbstractElement;
@@ -81,11 +78,6 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	@Override
-	public List<Text> getTooltip(int mouseX, int mouseY) {
-		return null;
-	}
-	
-	@Override
 	public void update() {
 		
 	}
@@ -115,8 +107,12 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	private void drawNames(MatrixStack matrices) {
+		if (hud.settings.rowHeight < hud.font.fontHeight) {
+			return;
+		}
+		
 		int x = hud.settings.gridSize + 1;
-		int y = hud.settings.gridSize + 1;
+		int y = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
 		
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);

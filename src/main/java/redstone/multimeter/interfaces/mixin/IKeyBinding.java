@@ -4,6 +4,6 @@ import net.minecraft.client.util.InputUtil.Key;
 
 public interface IKeyBinding {
 	
-	public Key getBoundKey();
+	public Key getBoundKeyRSMM();
 	
 }

@@ -1,23 +1,21 @@
 package redstone.multimeter.common;
 
 import java.util.Arrays;
-import java.util.List;
 
 import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 
+import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.util.NbtUtils;
 import redstone.multimeter.util.TextUtils;
 
 public class TickPhase {
 	
-	public static final TickPhase UNKNOWN = new TickPhase(new TickTask[] { TickTask.UNKNOWN });
+	public static final TickPhase UNKNOWN = new TickPhase(TickTask.UNKNOWN);
 	
 	private final TickTask[] tasks;
 	
-	public TickPhase(TickTask[] tasks) {
+	public TickPhase(TickTask... tasks) {
 		this.tasks = tasks;
 	}
 	
@@ -41,23 +39,21 @@ public class TickPhase {
 		return string;
 	}
 	
-	public void addTextForTooltip(List<Text> lines) {
-		TextUtils.addFancyText(lines, "tick phase", tasks[0].getName());
+	public void addTextToTooltip(Tooltip tooltip) {
+		tooltip.add(TextUtils.formatFancyText("tick phase", tasks[0].getName()));
 		
 		// used to indent subsequent lines
 		String whitespace = "              ";
 		
 		for (int index = 1; index < tasks.length; index++) {
-			String text = whitespace + "> " + tasks[index].getName();
-			lines.add(new LiteralText(text));
-			
+			tooltip.add(whitespace + "> " + tasks[index].getName());
 			whitespace += "  ";
 		}
 	}
 	
 	public TickPhase startTask(TickTask task) {
-		if (this == UNKNOWN) {
-			return new TickPhase(new TickTask[] { task });
+		if (this == UNKNOWN || tasks.length == 0) {
+			return new TickPhase(task);
 		}
 		
 		TickTask[] array = new TickTask[tasks.length + 1];
@@ -118,12 +114,12 @@ public class TickPhase {
 			return UNKNOWN;
 		}
 		
-		NbtByteArray array = (NbtByteArray)nbt;
-		TickTask[] tasks = new TickTask[array.size()];
+		NbtByteArray nbtArray = (NbtByteArray)nbt;
+		byte[] array = nbtArray.getByteArray();
+		TickTask[] tasks = new TickTask[array.length];
 		
 		for (int index = 0; index < tasks.length; index++) {
-			int taskIndex = array.get(index).byteValue();
-			tasks[index] = TickTask.fromIndex(taskIndex);
+			tasks[index] = TickTask.fromIndex(array[index]);
 		}
 		
 		return new TickPhase(tasks);
