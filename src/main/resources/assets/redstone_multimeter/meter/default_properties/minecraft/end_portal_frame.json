@@ -1,6 +1,6 @@
 {
-  "name": "end_portal_frame",
-  "event_types": [
-    "active"
-  ]
+	"name": "end_portal_frame",
+	"event_types": [
+		"active"
+ 	]
 }

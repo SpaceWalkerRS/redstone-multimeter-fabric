@@ -1,6 +1,6 @@
 {
-  "name": "lever",
-  "event_types": [
-    "active"
-  ]
+	"name": "lever",
+	"event_types": [
+		"active"
+	]
 }

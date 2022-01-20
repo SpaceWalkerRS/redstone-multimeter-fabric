@@ -1,6 +1,6 @@
 {
-  "name": "redstone_torch",
-  "event_types": [
-    "active"
-  ]
+	"name": "redstone_torch",
+	"event_types": [
+		"active"
+	]
 }

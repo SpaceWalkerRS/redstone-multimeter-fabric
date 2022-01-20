@@ -1,0 +1,8 @@
+{
+	"name": "note_block",
+	"event_types": [
+		"powered",
+		"moved",
+		"interact_block"
+	]
+}

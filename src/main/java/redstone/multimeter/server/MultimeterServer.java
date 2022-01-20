@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -21,10 +22,12 @@ import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.TickPhase;
+import redstone.multimeter.common.TickPhaseTree;
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.ServerTickPacket;
+import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.meter.ServerMeterGroup;
 
@@ -35,6 +38,7 @@ public class MultimeterServer {
 	private final Multimeter multimeter;
 	private final Map<UUID, String> connectedPlayers;
 	private final Map<UUID, String> playerNameCache;
+	private final TickPhaseTree tickPhaseTree;
 	
 	private Field carpetTickSpeedProccessEntities;
 	private TickPhase tickPhase;
@@ -47,6 +51,7 @@ public class MultimeterServer {
 		this.multimeter = new Multimeter(this);
 		this.connectedPlayers = new HashMap<>();
 		this.playerNameCache = new HashMap<>();
+		this.tickPhaseTree = new TickPhaseTree();
 		
 		this.tickPhase = TickPhase.UNKNOWN;
 		this.tickedTime = false;
@@ -64,6 +69,10 @@ public class MultimeterServer {
 	
 	public Multimeter getMultimeter() {
 		return multimeter;
+	}
+	
+	public TickPhaseTree getTickPhaseTree() {
+		return tickPhaseTree;
 	}
 	
 	/**
@@ -101,16 +110,25 @@ public class MultimeterServer {
 		return tickPhase;
 	}
 	
-	public void startTickTask(TickTask task) {
+	public void startTickTask(boolean updateTree, TickTask task, String... args) {
 		tickPhase = tickPhase.startTask(task);
+		if (updateTree) {
+			tickPhaseTree.startTask(task, args);
+		}
 	}
 	
-	public void endTickTask() {
+	public void endTickTask(boolean updateTree) {
 		tickPhase = tickPhase.endTask();
+		if (updateTree) {
+			tickPhaseTree.endTask();
+		}
 	}
 	
-	public void swapTickTask(TickTask task) {
+	public void swapTickTask(boolean updateTree, TickTask task, String... args) {
 		tickPhase = tickPhase.swapTask(task);
+		if (updateTree) {
+			tickPhaseTree.swapTask(task, args);
+		}
 	}
 	
 	public void onOverworldTickTime() {
@@ -138,7 +156,7 @@ public class MultimeterServer {
 			}
 		}
 		
-		return frozen || ((IMinecraftServer)server).isPaused();
+		return frozen || ((IMinecraftServer)server).isPausedRSMM();
 	}
 	
 	public void tickStart() {
@@ -149,6 +167,9 @@ public class MultimeterServer {
 			
 			if (server.getTicks() % 72000 == 0) {
 				cleanPlayerNameCache();
+			}
+			if (shouldBuildTickPhaseTree()) {
+				tickPhaseTree.start();
 			}
 		}
 		
@@ -168,6 +189,10 @@ public class MultimeterServer {
 		});
 	}
 	
+	private boolean shouldBuildTickPhaseTree() {
+		return !tickPhaseTree.isComplete() && !tickPhaseTree.isBuilding();
+	}
+	
 	public void tickEnd() {
 		boolean paused = isPaused();
 		
@@ -179,6 +204,9 @@ public class MultimeterServer {
 					packetHandler.sendToPlayer(packet, player);
 				}
 			}
+		}
+		if (tickPhaseTree.isBuilding()) {
+			tickPhaseTree.end();
 		}
 		
 		tickPhase = TickPhase.UNKNOWN;
@@ -200,6 +228,15 @@ public class MultimeterServer {
 		if (connectedPlayers.put(player.getUuid(), modVersion) == null) {
 			HandshakePacket packet = new HandshakePacket();
 			packetHandler.sendToPlayer(packet, player);
+			
+			refreshTickPhaseTree(player);
+		}
+	}
+	
+	public void refreshTickPhaseTree(ServerPlayerEntity player) {
+		if (tickPhaseTree.isComplete()) {
+			TickPhaseTreePacket packet = new TickPhaseTreePacket(tickPhaseTree.toNbt());
+			packetHandler.sendToPlayer(packet, player);
 		}
 	}
 	
@@ -220,6 +257,10 @@ public class MultimeterServer {
 		}
 		
 		return null;
+	}
+	
+	public PlayerManager getPlayerManager() {
+		return server.getPlayerManager();
 	}
 	
 	public ServerPlayerEntity getPlayer(UUID playerUUID) {

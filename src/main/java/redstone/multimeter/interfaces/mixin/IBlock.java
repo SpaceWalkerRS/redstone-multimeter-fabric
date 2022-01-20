@@ -6,19 +6,19 @@ import net.minecraft.world.World;
 
 public interface IBlock {
 	
-	default boolean isMeterable() {
+	default boolean isMeterableRSMM() {
 		return false;
 	}
 	
-	default boolean isPowerSource() {
+	default boolean isPowerSourceRSMM() {
 		return false;
 	}
 	
-	default boolean logPoweredOnBlockUpdate() {
+	default boolean logPoweredOnBlockUpdateRSMM() {
 		return true;
 	}
 	
-	default boolean isPowered(World world, BlockPos pos, BlockState state) {
+	default boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
 		return world.isReceivingRedstonePower(pos);
 	}
 }

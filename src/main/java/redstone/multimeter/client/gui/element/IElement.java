@@ -1,14 +1,12 @@
 package redstone.multimeter.client.gui.element;
 
-import java.util.List;
-
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.CursorType;
+import redstone.multimeter.client.gui.Tooltip;
 
 public interface IElement {
 	
@@ -74,7 +72,9 @@ public interface IElement {
 	
 	public void setVisible(boolean visible);
 	
-	public List<Text> getTooltip(int mouseX, int mouseY);
+	default Tooltip getTooltip(int mouseX, int mouseY) {
+		return Tooltip.EMPTY;
+	}
 	
 	public void update();
 	

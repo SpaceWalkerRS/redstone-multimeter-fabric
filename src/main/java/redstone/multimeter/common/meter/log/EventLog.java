@@ -1,11 +1,8 @@
 package redstone.multimeter.common.meter.log;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
 
+import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.event.MeterEvent;
@@ -22,9 +19,9 @@ public class EventLog {
 		
 	}
 	
-	public EventLog(long tick, int subTick, TickPhase tickPhase, MeterEvent event) {
+	public EventLog(long tick, int subtick, TickPhase tickPhase, MeterEvent event) {
 		this.tick = tick;
-		this.subtick = subTick;
+		this.subtick = subtick;
 		this.tickPhase = tickPhase;
 		this.event = event;
 	}
@@ -85,19 +82,19 @@ public class EventLog {
 		return event;
 	}
 	
-	public List<Text> getTextForTooltip() {
+	public Tooltip getTooltip() {
 		EventType type = event.getType();
 		int data = event.getMetadata();
 		
-		List<Text> lines = new ArrayList<>();
+		Tooltip tooltip = new Tooltip();
 		
-		TextUtils.addFancyText(lines, "event type", type.getName());
-		type.addTextForTooltip(lines, data);
-		TextUtils.addFancyText(lines, "tick", tick);
-		TextUtils.addFancyText(lines, "subtick", subtick);
-		tickPhase.addTextForTooltip(lines);
+		tooltip.add(TextUtils.formatFancyText("event type", type.getName()));
+		type.addTextToTooltip(tooltip, data);
+		tooltip.add(TextUtils.formatFancyText("tick", tick));
+		tooltip.add(TextUtils.formatFancyText("subtick", subtick));
+		tickPhase.addTextToTooltip(tooltip);
 		
-		return lines;
+		return tooltip;
 	}
 	
 	public NbtCompound toNbt() {

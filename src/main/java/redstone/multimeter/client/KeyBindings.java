@@ -44,6 +44,7 @@ public class KeyBindings {
 	public static final KeyBinding OPEN_MULTIMETER_SCREEN;
 	public static final KeyBinding OPEN_METER_CONTROLS;
 	public static final KeyBinding OPEN_OPTIONS_MENU;
+	public static final KeyBinding VIEW_TICK_PHASE_TREE;
 	public static final KeyBinding PRINT_LOGS;
 	
 	public static final KeyBinding[] TOGGLE_EVENT_TYPES;
@@ -131,7 +132,7 @@ public class KeyBindings {
 	}
 	
 	public static boolean isPressed(MinecraftClient client, KeyBinding keyBinding) {
-		Key key = ((IKeyBinding)keyBinding).getBoundKey();
+		Key key = ((IKeyBinding)keyBinding).getBoundKeyRSMM();
 		return key != null && GLFW.glfwGetKey(client.getWindow().getHandle(), key.getCode()) == GLFW.GLFW_PRESS;
 	}
 	
@@ -150,6 +151,7 @@ public class KeyBindings {
 		OPEN_MULTIMETER_SCREEN = registerKeyBinding(new KeyBinding("Open Multimeter Screen", GLFW.GLFW_KEY_G       , MAIN));
 		OPEN_METER_CONTROLS    = registerKeyBinding(new KeyBinding("Open Meter Controls"   , GLFW.GLFW_KEY_I       , MAIN));
 		OPEN_OPTIONS_MENU      = registerKeyBinding(new KeyBinding("Open Options Menu"     , GLFW.GLFW_KEY_O       , MAIN));
+		VIEW_TICK_PHASE_TREE   = registerKeyBinding(new KeyBinding("View Tick Phase Tree"  , GLFW.GLFW_KEY_U       , MAIN));
 		PRINT_LOGS             = registerKeyBinding(new KeyBinding("Print Logs To File"    , GLFW.GLFW_KEY_P       , MAIN));
 		
 		TOGGLE_EVENT_TYPES = new KeyBinding[EventType.ALL.length];

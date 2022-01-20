@@ -1,7 +1,7 @@
 {
-  "name": "sculk_sensor",
-  "event_types": [
-    "active",
-    "power_change"
-  ]
+	"name": "sculk_sensor",
+	"event_types": [
+		"active",
+		"power_change"
+	]
 }

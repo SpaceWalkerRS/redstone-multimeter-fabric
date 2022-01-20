@@ -1,7 +1,7 @@
 {
-  "name": "daylight_detector",
-  "event_types": [
-    "active",
-    "power_change"
-  ]
+	"name": "daylight_detector",
+	"event_types": [
+		"active",
+		"power_change"
+	]
 }
