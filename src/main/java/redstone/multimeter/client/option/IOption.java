@@ -1,18 +1,11 @@
 package redstone.multimeter.client.option;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.button.IButton;
 
 public interface IOption {
 	
 	public String getName();
-	
-	default Text getDisplayName() {
-		return new LiteralText(getName());
-	}
 	
 	public String getDescription();
 	

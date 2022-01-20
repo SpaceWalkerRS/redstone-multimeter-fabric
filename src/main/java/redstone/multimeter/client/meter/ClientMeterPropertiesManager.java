@@ -2,16 +2,20 @@ package redstone.multimeter.client.meter;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
@@ -23,6 +27,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -33,6 +38,7 @@ import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.MeterProperties;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.MeterPropertiesManager;
 import redstone.multimeter.common.meter.event.EventType;
 
@@ -40,23 +46,27 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	
 	private static final String PROPERTIES_PATH = "meter/default_properties";
 	private static final String RESOURCES_PATH = String.format("/assets/%s/%s", RedstoneMultimeterMod.NAMESPACE, PROPERTIES_PATH);
-	private static final String FILE_EXTENSION = "json";
+	private static final String FILE_EXTENSION = ".json";
 	private static final String DEFAULT_ID = "block";
-	private static final Gson GSON = new Gson();
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
 	private final MultimeterClient client;
 	private final File folder;
-	private final Map<String, MeterProperties> namespaceDefaults;
-	private final Map<Identifier, MeterProperties> blockDefaults;
+	private final Map<Identifier, MeterProperties> defaults;
+	private final Map<Identifier, MeterProperties> overrides;
+	private final Map<Identifier, MeterProperties> cache;
 	
 	public ClientMeterPropertiesManager(MultimeterClient multimeterClient) {
 		this.client = multimeterClient;
 		this.folder = new File(this.client.getConfigFolder(), PROPERTIES_PATH);
-		this.namespaceDefaults = new HashMap<>();
-		this.blockDefaults = new HashMap<>();
+		this.defaults = new HashMap<>();
+		this.overrides = new HashMap<>();
+		this.cache = new HashMap<>();
 		
-		if (!this.folder.exists()) {
-			this.folder.mkdirs();
+		initDefaults();
+		
+		if (!folder.exists()) {
+			folder.mkdirs();
 		}
 	}
 	
@@ -67,11 +77,11 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	@Override
-	protected void postValidation(MeterProperties properties, World world, BlockPos pos) {
+	protected void postValidation(MutableMeterProperties properties, World world, BlockPos pos) {
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 		
-		MeterProperties defaultProperties = getPropertiesForBlock(block);
+		MeterProperties defaultProperties = getDefaultProperties(block);
 		
 		if (defaultProperties != null) {
 			properties.fill(defaultProperties);
@@ -101,55 +111,69 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 	
-	private MeterProperties getPropertiesForBlock(Block block) {
+	public Map<Identifier, MeterProperties> getDefaults() {
+		return Collections.unmodifiableMap(defaults);
+	}
+	
+	public Map<Identifier, MeterProperties> getOverrides() {
+		return Collections.unmodifiableMap(overrides);
+	}
+	
+	public <T extends MeterProperties> void update(Map<Identifier, T> newOverrides) {
+		Map<Identifier, MeterProperties> prev = new HashMap<>(overrides);
+		
+		overrides.clear();
+		cache.clear();
+		
+		for (Entry<Identifier, T> entry : newOverrides.entrySet()) {
+			Identifier blockId = entry.getKey();
+			MeterProperties properties = entry.getValue();
+			
+			prev.remove(blockId);
+			overrides.put(blockId, properties.toImmutable());
+		}
+		
+		save();
+		
+		for (Identifier blockId : prev.keySet()) {
+			deleteOverrideFile(blockId);
+		}
+	}
+	
+	private MeterProperties getDefaultProperties(Block block) {
 		Identifier blockId = Registry.BLOCK.getId(block);
 		
 		if (blockId == null) {
 			return null; // we should never get here
 		}
 		
-		MeterProperties properties = blockDefaults.get(blockId);
-		
-		if (properties == null) {
-			properties = getPropertiesForNamespace(blockId.getNamespace());
-		}
-		
-		return properties;
+		return cache.computeIfAbsent(blockId, key -> {
+			String namespace = blockId.getNamespace();
+			Identifier defaultId = new Identifier(namespace, DEFAULT_ID);
+			
+			return new MutableMeterProperties().
+				fill(overrides.get(blockId)).
+				fill(defaults.get(blockId)).
+				fill(overrides.get(defaultId)).
+				fill(defaults.get(defaultId)).
+				toImmutable();
+		});
 	}
 	
-	private MeterProperties getPropertiesForNamespace(String namespace) {
-		MeterProperties properties = namespaceDefaults.get(namespace);
-		
-		if (properties == null) {
-			properties = namespaceDefaults.get(RedstoneMultimeterMod.MINECRAFT_NAMESPACE);
-		}
-		
-		return properties;
-	}
-	
-	public void reload() {
-		namespaceDefaults.clear();
-		blockDefaults.clear();
-		
+	private void initDefaults() {
 		Set<String> namespaces = new HashSet<>();
 		
 		for (Identifier blockId : Registry.BLOCK.getIds()) {
-			String namespace = blockId.getNamespace();
-			String id = blockId.getPath();
+			loadDefaultProperties(blockId);
 			
-			loadDefaultProperties(namespace, id);
-			loadUserOverrides(namespace, id);
-			
-			namespaces.add(namespace);
-		}
-		for (String namespace : namespaces) {
-			loadDefaultProperties(namespace, DEFAULT_ID);
-			loadUserOverrides(namespace, DEFAULT_ID);
+			if (namespaces.add(blockId.getNamespace())) {
+				loadDefaultProperties(new Identifier(blockId.getNamespace(), DEFAULT_ID));
+			}
 		}
 	}
 	
-	private void loadDefaultProperties(String namespace, String id) {
-		String path = String.format("%s/%s/%s.%s", RESOURCES_PATH, namespace, id, FILE_EXTENSION);
+	private void loadDefaultProperties(Identifier blockId) {
+		String path = String.format("%s/%s/%s%s", RESOURCES_PATH, blockId.getNamespace(), blockId.getPath(), FILE_EXTENSION);
 		InputStream resource = getClass().getResourceAsStream(path);
 		
 		if (resource == null) {
@@ -157,43 +181,118 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 		
 		try (InputStreamReader isr = new InputStreamReader(resource)) {
-			loadProperties(namespace, id, isr);
+			loadProperties(defaults, blockId, isr);
 		} catch (IOException | JsonSyntaxException | JsonIOException e) {
 			
 		}
 	}
 	
-	private void loadUserOverrides(String namespace, String id) {
-		String path = String.format("%s/%s.%s", namespace, id, FILE_EXTENSION);
-		File file = new File(folder, path);
+	public void reload() {
+		overrides.clear();
+		cache.clear();
 		
-		if (!file.exists() || !file.isFile()) {
+		for (File subFolder : folder.listFiles()) {
+			if (subFolder.isDirectory()) {
+				String namespace = subFolder.getName();
+				
+				for (File file : subFolder.listFiles()) {
+					if (file.isFile()) {
+						loadUserOverrides(namespace, file);
+					}
+				}
+			}
+		}
+	}
+	
+	private void loadUserOverrides(String namespace, File file) {
+		String path = file.getName();
+		
+		if (!path.endsWith(FILE_EXTENSION)) {
 			return;
 		}
 		
+		path = path.substring(0, path.length() - FILE_EXTENSION.length());
+		
 		try (FileReader fr = new FileReader(file)) {
-			loadProperties(namespace, id, fr);
-		} catch (IOException | JsonSyntaxException | JsonIOException e) {
+			loadProperties(overrides, new Identifier(namespace, path), fr);
+		} catch (InvalidIdentifierException | IOException | JsonSyntaxException | JsonIOException e) {
 			
 		}
 	}
 	
-	private void loadProperties(String namespace, String id, Reader reader) {
+	private static void loadProperties(Map<Identifier, MeterProperties> map, Identifier blockId, Reader reader) {
 		JsonElement rawJson = GSON.fromJson(reader, JsonElement.class);
 		
 		if (rawJson.isJsonObject()) {
 			JsonObject json = rawJson.getAsJsonObject();
 			MeterProperties properties = MeterProperties.fromJson(json);
 			
-			register(namespace, id, properties);
+			map.put(blockId, properties);
 		}
 	}
 	
-	private void register(String namespace, String path, MeterProperties properties) {
-		if (path.equals(DEFAULT_ID)) {
-			namespaceDefaults.put(namespace, properties);
-		} else {
-			blockDefaults.put(new Identifier(namespace, path), properties);
+	public void save() {
+		for (Entry<Identifier, MeterProperties> entry : overrides.entrySet()) {
+			Identifier blockId = entry.getKey();
+			MeterProperties properties = entry.getValue();
+			
+			saveUserOverrides(blockId, properties);
 		}
+	}
+	
+	private void saveUserOverrides(Identifier blockId, MeterProperties properties) {
+		String namespace = blockId.getNamespace();
+		String path = blockId.getPath();
+		
+		File subFolder = new File(folder, namespace);
+		
+		if (!subFolder.exists()) {
+			subFolder.mkdirs();
+		}
+		if (!subFolder.isDirectory()) {
+			RedstoneMultimeterMod.LOGGER.warn("Unable to save properties for \'" + blockId.toString() + "\' - the \'" + namespace + "\' folder does not exist and cannot be created!");
+			return;
+		}
+		
+		File file = new File(subFolder, String.format("%s%s", path, FILE_EXTENSION));
+		
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				
+			}
+		}
+		if (!file.isFile()) {
+			RedstoneMultimeterMod.LOGGER.warn("Unable to save properties for \'" + blockId.toString() + "\' - the \'" + path + "\' file does not exist and cannot be created!");
+			return;
+		}
+		
+		JsonObject json = properties.toJson();
+		
+		try (FileWriter fw = new FileWriter(file)) {
+			fw.write(GSON.toJson(json));
+		} catch (IOException | JsonSyntaxException | JsonIOException e) {
+			
+		}
+	}
+	
+	private void deleteOverrideFile(Identifier blockId) {
+		String namespace = blockId.getNamespace();
+		String path = blockId.getPath();
+		
+		File subFolder = new File(folder, namespace);
+		
+		if (!subFolder.exists() || !subFolder.isDirectory()) {
+			return;
+		}
+		
+		File file = new File(subFolder, String.format("%s%s", path, FILE_EXTENSION));
+		
+		if (!file.exists() || !file.isFile()) {
+			return;
+		}
+		
+		file.delete();
 	}
 }

@@ -98,7 +98,7 @@ public class ClientMeterGroup extends MeterGroup {
 			Meter meter = getMeter(id);
 			
 			if (meter == null) {
-				addMeter(new Meter(id, newProperties));
+				addMeter(new Meter(id, newProperties.toMutable()));
 			} else {
 				updateMeter(meter, newProperties);
 			}

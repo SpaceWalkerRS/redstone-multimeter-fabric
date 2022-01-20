@@ -142,13 +142,14 @@ public abstract class MeterGroup {
 	}
 	
 	protected void moveMeter(Meter meter, DimPos newPos) {
+		long id = meter.getId();
 		DimPos pos = meter.getPos();
 		
 		if (pos.equals(newPos)) {
 			return;
 		}
 		
-		int index = posToIndex.getOrDefault(pos, -1);
+		int index = idToIndex.getOrDefault(id, -1);
 		
 		if (index < 0 || index >= meters.size()) {
 			return;

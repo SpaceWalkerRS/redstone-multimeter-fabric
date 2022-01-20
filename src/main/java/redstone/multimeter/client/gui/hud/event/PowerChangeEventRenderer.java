@@ -32,6 +32,6 @@ public class PowerChangeEventRenderer extends BasicEventRenderer {
 			x += 1;
 		}
 		
-		hud.renderer.renderRect(matrices, x, y + half, width, height, color);
+		hud.renderer.renderRect(matrices, x, y + half - (height / 2), width, height, color);
 	}
 }

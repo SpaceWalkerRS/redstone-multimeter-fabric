@@ -45,6 +45,10 @@ public abstract class Option<T> implements IOption {
 	@Override
 	public void setListener(OptionListener listener) {
 		this.listener = listener;
+		
+		if (this.listener != null) {
+			this.listener.valueChanged();
+		}
 	}
 	
 	public T getDefault() {

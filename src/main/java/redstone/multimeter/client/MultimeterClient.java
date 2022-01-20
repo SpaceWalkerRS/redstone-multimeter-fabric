@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -14,19 +15,21 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
-import redstone.multimeter.client.gui.MultimeterScreen;
-import redstone.multimeter.client.gui.OptionsScreen;
-import redstone.multimeter.client.gui.element.RSMMScreen;
-import redstone.multimeter.client.gui.element.ScreenWrapper;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
+import redstone.multimeter.client.gui.screen.MultimeterScreen;
+import redstone.multimeter.client.gui.screen.OptionsScreen;
+import redstone.multimeter.client.gui.screen.RSMMScreen;
+import redstone.multimeter.client.gui.screen.ScreenWrapper;
+import redstone.multimeter.client.gui.screen.TickPhaseTreeScreen;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.client.render.MeterRenderer;
+import redstone.multimeter.common.TickPhaseTree;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
-import redstone.multimeter.common.meter.MeterProperties;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.packets.AddMeterPacket;
 import redstone.multimeter.common.network.packets.HandshakePacket;
@@ -34,6 +37,7 @@ import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
 import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
 import redstone.multimeter.common.network.packets.MeterUpdatePacket;
 import redstone.multimeter.common.network.packets.RemoveMeterPacket;
+import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 
 public class MultimeterClient {
 	
@@ -57,6 +61,7 @@ public class MultimeterClient {
 	private final ClientMeterPropertiesManager meterPropertiesManager;
 	
 	private ClientMeterGroup meterGroup;
+	private TickPhaseTree tickPhaseTree;
 	private boolean connected; // true if the client is connected to a MultimeterServer
 	private boolean hudEnabled;
 	private long prevServerTime;
@@ -99,12 +104,41 @@ public class MultimeterClient {
 		return hud;
 	}
 	
+	public ClientMeterPropertiesManager getMeterPropertiesManager() {
+		return meterPropertiesManager;
+	}
+	
 	public ClientMeterGroup getMeterGroup() {
 		return meterGroup;
 	}
 	
 	public boolean hasSubscription() {
 		return meterGroup.isSubscribed();
+	}
+	
+	public TickPhaseTree getTickPhaseTree() {
+		return tickPhaseTree;
+	}
+	
+	public void requestTickPhaseTree() {
+		TickPhaseTreePacket packet = new TickPhaseTreePacket(new CompoundTag());
+		packetHandler.send(packet);
+	}
+	
+	public void refreshTickPhaseTree(CompoundTag nbt) {
+		if (tickPhaseTree == null) {
+			tickPhaseTree = new TickPhaseTree();
+		}
+		
+		tickPhaseTree.fromNbt(nbt);
+		
+		if (hasRSMMScreenOpen()) {
+			RSMMScreen screen = getScreen();
+			
+			if (screen instanceof TickPhaseTreeScreen) {
+				((TickPhaseTreeScreen)screen).refresh();
+			}
+		}
 	}
 	
 	/**
@@ -166,6 +200,7 @@ public class MultimeterClient {
 			
 			hud.reset();
 			meterGroup.unsubscribe(true);
+			tickPhaseTree = null;
 		}
 	}
 	
@@ -230,7 +265,7 @@ public class MultimeterClient {
 	}
 	
 	private void addMeter(DimPos pos) {
-		MeterProperties properties = new MeterProperties();
+		MutableMeterProperties properties = new MutableMeterProperties();
 		properties.setPos(pos);
 		
 		if (meterPropertiesManager.validate(properties)) {
@@ -241,7 +276,7 @@ public class MultimeterClient {
 	
 	public void resetMeter() {
 		onTargetMeter(meter -> {
-			MeterProperties newProperties = new MeterProperties();
+			MutableMeterProperties newProperties = new MutableMeterProperties();
 			newProperties.setPos(meter.getPos());
 			
 			if (meterPropertiesManager.validate(newProperties)) {
@@ -266,7 +301,7 @@ public class MultimeterClient {
 	
 	public void toggleEventType(EventType type) {
 		onTargetMeter(meter -> {
-			MeterProperties newProperties = new MeterProperties();
+			MutableMeterProperties newProperties = new MutableMeterProperties();
 			newProperties.setEventTypes(meter.getEventTypes());
 			newProperties.toggleEventType(type);
 			

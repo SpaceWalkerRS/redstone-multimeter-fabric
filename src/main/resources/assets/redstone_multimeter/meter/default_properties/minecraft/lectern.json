@@ -1,6 +1,6 @@
 {
-  "name": "lectern",
-  "event_types": [
-    "active"
-  ]
+	"name": "lectern",
+	"event_types": [
+		"active"
+	]
 }

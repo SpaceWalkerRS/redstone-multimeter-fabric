@@ -25,14 +25,14 @@ public abstract class IntegratedServerMixin implements IMinecraftServer {
 			)
 	)
 	private void onTickStart(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		// When the server is paused, the tick method is not called
+		// When the server is paused, the super tick method is not called
 		if (paused) {
 			getMultimeterServer().tickStart();
 		}
 	}
 	
 	@Override
-	public boolean isPaused() {
+	public boolean isPausedRSMM() {
 		return paused;
 	}
 }

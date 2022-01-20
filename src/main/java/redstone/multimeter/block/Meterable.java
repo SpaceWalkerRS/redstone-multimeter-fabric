@@ -9,10 +9,10 @@ import redstone.multimeter.interfaces.mixin.IBlock;
 public interface Meterable extends IBlock {
 	
 	@Override
-	default boolean isMeterable() {
+	default boolean isMeterableRSMM() {
 		return true;
 	}
 	
-	public boolean isActive(World world, BlockPos pos, BlockState state);
+	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state);
 	
 }

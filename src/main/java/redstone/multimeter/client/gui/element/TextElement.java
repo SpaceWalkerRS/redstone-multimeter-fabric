@@ -1,6 +1,7 @@
 package redstone.multimeter.client.gui.element;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -12,33 +13,33 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.action.MousePress;
 import redstone.multimeter.client.gui.element.button.IButton;
 
 public class TextElement extends AbstractElement {
 	
-	private static final int SPACING = 2;
-	
 	private final MultimeterClient client;
 	private final TextRenderer font;
 	private final Consumer<TextElement> updater;
-	private final Supplier<List<Text>> tooltipSupplier;
+	private final Supplier<Tooltip> tooltipSupplier;
 	private final MousePress<TextElement> mousePress;
 	
 	private List<Text> text;
+	private int spacing;
 	private boolean rightAligned;
 	private boolean withShadow;
 	private int color;
 	
 	public TextElement(MultimeterClient client, int x, int y, Consumer<TextElement> updater) {
-		this(client, x, y, updater, () -> null);
+		this(client, x, y, updater, () -> Tooltip.EMPTY);
 	}
 	
-	public TextElement(MultimeterClient client, int x, int y, Consumer<TextElement> updater, Supplier<List<Text>> tooltipSupplier) {
+	public TextElement(MultimeterClient client, int x, int y, Consumer<TextElement> updater, Supplier<Tooltip> tooltipSupplier) {
 		this(client, x, y, updater, tooltipSupplier, textElement -> false);
 	}
 	
-	public TextElement(MultimeterClient client, int x, int y, Consumer<TextElement> updater, Supplier<List<Text>> tooltipSupplier, MousePress<TextElement> mousePress) {
+	public TextElement(MultimeterClient client, int x, int y, Consumer<TextElement> updater, Supplier<Tooltip> tooltipSupplier, MousePress<TextElement> mousePress) {
 		super(x, y, 0, 0);
 		
 		MinecraftClient minecraftClient = client.getMinecraftClient();
@@ -49,6 +50,7 @@ public class TextElement extends AbstractElement {
 		this.tooltipSupplier = tooltipSupplier;
 		this.mousePress = mousePress;
 		
+		this.spacing = 2;
 		this.rightAligned = false;
 		this.withShadow = false;
 		this.color = 0xFFFFFFFF;
@@ -69,7 +71,7 @@ public class TextElement extends AbstractElement {
 				int textX = rightAligned ? right - getWidth(font, t) : left;
 				drawText(immediate, model, font, t, textX, textY, withShadow, color);
 				
-				textY += font.fontHeight + SPACING;
+				textY += font.fontHeight + spacing;
 			}
 		});
 	}
@@ -127,7 +129,7 @@ public class TextElement extends AbstractElement {
 	}
 	
 	@Override
-	public List<Text> getTooltip(int mouseX, int mouseY) {
+	public Tooltip getTooltip(int mouseX, int mouseY) {
 		return tooltipSupplier.get();
 	}
 	
@@ -154,6 +156,21 @@ public class TextElement extends AbstractElement {
 		return this;
 	}
 	
+	public TextElement setText(String text) {
+		this.text = Arrays.asList(new LiteralText(text));
+		return this;
+	}
+	
+	public TextElement setText(Text text) {
+		this.text = Arrays.asList(text);
+		return this;
+	}
+	
+	public TextElement setSpacing(int spacing) {
+		this.spacing = spacing;
+		return this;
+	}
+	
 	public TextElement setRightAligned(boolean rightAligned) {
 		this.rightAligned = rightAligned;
 		return this;
@@ -172,7 +189,8 @@ public class TextElement extends AbstractElement {
 	protected void updateWidth() {
 		int width = 0;
 		
-		for (Text t : text) {
+		for (int index = 0; index < text.size(); index++) {
+			Text t = text.get(index);
 			int textWidth = getWidth(font, t);
 			
 			if (textWidth > width) {
@@ -184,6 +202,6 @@ public class TextElement extends AbstractElement {
 	}
 	
 	protected void updateHeight() {
-		setHeight((text.size() - 1) * (font.fontHeight + SPACING) + font.fontHeight);
+		setHeight((text.size() - 1) * (font.fontHeight + spacing) + font.fontHeight);
 	}
 }
