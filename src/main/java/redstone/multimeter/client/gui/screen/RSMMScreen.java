@@ -3,8 +3,10 @@ package redstone.multimeter.client.gui.screen;
 import java.util.List;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
@@ -96,6 +98,22 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	@Override
 	protected final void onChangedY(int y) {
 		
+	}
+	
+	public void init(int width, int height) {
+		setWidth(width);
+		setHeight(height);
+		
+		removeChildren();
+		initScreen();
+		update();
+		
+		Window window = minecraftClient.getWindow();
+		Mouse mouse = minecraftClient.mouse;
+		double mouseX = (double)mouse.getX() * window.getScaledWidth() / window.getWidth();
+		double mouseY = (double)mouse.getY() * window.getScaledHeight() / window.getHeight();
+		
+		updateHoveredElement(mouseX, mouseY);
 	}
 	
 	protected abstract void initScreen();
