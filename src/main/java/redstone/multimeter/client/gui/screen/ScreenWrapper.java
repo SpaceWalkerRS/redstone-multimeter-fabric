@@ -87,12 +87,7 @@ public class ScreenWrapper extends Screen {
 	
 	@Override
 	protected final void init() {
-		screen.setWidth(width);
-		screen.setHeight(height);
-		
-		screen.removeChildren();
-		screen.initScreen();
-		screen.update();
+		screen.init(width, height);
 	}
 	
 	@Override
