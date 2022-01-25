@@ -80,12 +80,25 @@ public class ServerChunkManagerMixin {
 			method = "tickChunks",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=broadcast"
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+					args = "ldc=customSpawners"
 			)
 	)
-	private void startTickTaskBroadcastChunks(CallbackInfo ci) {
-		((TickTaskExecutor)world).startTickTaskRSMM(TickTask.BROADCAST_CHUNKS);
+	private void startTickTaskCustomMobSpawning(CallbackInfo ci) {
+		((TickTaskExecutor)world).startTickTaskRSMM(TickTask.CUSTOM_MOB_SPAWNING);
+	}
+	
+	@Inject(
+			method = "tickChunks",
+			at = @At(
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=broadcast"
+			),
+			require = 0 // broadcasts are done differently in 1.17.0
+	)
+	private void swapTickTaskBroadcastChunks(CallbackInfo ci) {
+		((TickTaskExecutor)world).swapTickTaskRSMM(TickTask.BROADCAST_CHUNKS);
 	}
 	
 	@Inject(
@@ -93,8 +106,8 @@ public class ServerChunkManagerMixin {
 			slice = @Slice(
 					from = @At(
 							value = "INVOKE_STRING",
-							target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-							args = "ldc=broadcast"
+							target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+							args = "ldc=customSpawners"
 					)
 			),
 			at = @At(

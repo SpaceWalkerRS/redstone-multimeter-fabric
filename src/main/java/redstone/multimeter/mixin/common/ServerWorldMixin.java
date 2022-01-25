@@ -283,26 +283,6 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickSpawners",
-			at = @At(
-					value = "HEAD"
-			)
-	)
-	private void startTickTaskCustomMobSpawning(boolean spawnMonsters, boolean spawnAnimals, CallbackInfo ci) {
-		startTickTaskRSMM(TickTask.CUSTOM_MOB_SPAWNING);
-	}
-	
-	@Inject(
-			method = "tickSpawners",
-			at = @At(
-					value = "RETURN"
-			)
-	)
-	private void endTickTaskCustomMobSpawning(boolean spawnMonsters, boolean spawnAnimals, CallbackInfo ci) {
-		endTickTaskRSMM();
-	}
-	
-	@Inject(
 			method = "wakeSleepingPlayers",
 			at = @At(
 					value = "HEAD"
