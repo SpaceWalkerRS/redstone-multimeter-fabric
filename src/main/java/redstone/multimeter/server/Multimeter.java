@@ -597,4 +597,10 @@ public class Multimeter {
 			}
 		}
 	}
+	
+	static {
+		
+		NUMBER_FORMAT.setGroupingUsed(false);
+		
+	}
 }

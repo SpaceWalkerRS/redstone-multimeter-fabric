@@ -110,9 +110,6 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 	
 	public void refresh() {
 		tickPhaseTree = client.getTickPhaseTree();
-		
-		removeChildren();
-		initScreen();
-		update();
+		init(getWidth(), getHeight());
 	}
 }

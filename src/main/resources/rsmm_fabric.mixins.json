@@ -55,12 +55,12 @@
 	"client": [
 		"client.ClientPlayNetworkHandlerMixin",
 		"client.GameOptionsMixin",
+		"client.GameRendererMixin",
 		"client.InGameHudMixin",
 		"client.IntegratedServerMixin",
 		"client.KeyBindingMixin",
 		"client.MinecraftClientMixin",
-		"client.MouseMixin",
-		"client.WorldRendererMixin"
+		"client.MouseMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -5,8 +5,10 @@ import java.util.List;
 import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -98,6 +100,22 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	protected final void onChangedY(int y) {
 		
 	}
+	
+	public void init(int width, int height) {
+ 		setWidth(width);
+ 		setHeight(height);
+ 		
+ 		removeChildren();
+ 		initScreen();
+ 		update();
+ 		
+ 		Window window = minecraftClient.window;
+ 		Mouse mouse = minecraftClient.mouse;
+ 		double mouseX = (double)mouse.getX() * window.getScaledWidth() / window.getWidth();
+ 		double mouseY = (double)mouse.getY() * window.getScaledHeight() / window.getHeight();
+ 		
+ 		updateHoveredElement(mouseX, mouseY);
+ 	}
 	
 	protected abstract void initScreen();
 	

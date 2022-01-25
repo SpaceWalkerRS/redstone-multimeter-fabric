@@ -8,23 +8,24 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.GameRenderer;
 
 import redstone.multimeter.interfaces.mixin.IMinecraftClient;
 
-@Mixin(WorldRenderer.class)
-public class WorldRendererMixin {
+@Mixin(GameRenderer.class)
+public class GameRendererMixin {
 	
 	@Shadow @Final private MinecraftClient client;
 	
 	@Inject(
-			method = "renderWorldBorder",
+			method = "renderCenter",
 			at = @At(
-					value = "HEAD"
+					value = "INVOKE_STRING",
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+					args = "ldc=hand"
 			)
 	)
-	private void onRenderInjectBeforeRenderParticles(Camera camera, float delta, CallbackInfo ci) {
+	private void renderMeters(float tickDelta, long endTime, CallbackInfo ci) {
 		((IMinecraftClient)client).getMultimeterClient().getMeterRenderer().renderMeters();
 	}
 }
