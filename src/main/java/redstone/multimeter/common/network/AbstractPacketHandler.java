@@ -1,7 +1,7 @@
 package redstone.multimeter.common.network;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -15,13 +15,13 @@ public abstract class AbstractPacketHandler {
 			throw new IllegalStateException("Unable to encode packet: " + packet.getClass());
 		}
 		
-		NbtCompound data = new NbtCompound();
+		CompoundTag data = new CompoundTag();
 		packet.encode(data);
 		
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		
 		buffer.writeIdentifier(id);
-		buffer.writeNbt(data);
+		buffer.writeCompoundTag(data);
 		
 		return toCustomPayload(PacketManager.getPacketChannelId(), buffer);
 	}
@@ -38,7 +38,7 @@ public abstract class AbstractPacketHandler {
 			throw new IllegalStateException("Unable to decode packet: " + id);
 		}
 		
-		NbtCompound data = buffer.readNbt();
+		CompoundTag data = buffer.readCompoundTag();
 		packet.decode(data);
 		
 		return packet;

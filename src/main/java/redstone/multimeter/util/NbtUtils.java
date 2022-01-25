@@ -1,8 +1,8 @@
 package redstone.multimeter.util;
 
-import net.minecraft.nbt.NbtByte;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.ByteTag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.Identifier;
 
 public class NbtUtils {
@@ -21,10 +21,10 @@ public class NbtUtils {
 	public static final byte TYPE_INT_ARRAY  = 11;
 	public static final byte TYPE_LONG_ARRAY = 12;
 	
-	public static final NbtElement NULL = NbtByte.ZERO;
+	public static final Tag NULL = ByteTag.ZERO;
 	
-	public static NbtCompound identifierToNbt(Identifier id) {
-		NbtCompound nbt = new NbtCompound();
+	public static CompoundTag identifierToNbt(Identifier id) {
+		CompoundTag nbt = new CompoundTag();
 		
 		nbt.putString("namespace", id.getNamespace());
 		nbt.putString("path", id.getPath());
@@ -32,7 +32,7 @@ public class NbtUtils {
 		return nbt;
 	}
 	
-	public static Identifier nbtToIdentifier(NbtCompound nbt) {
+	public static Identifier nbtToIdentifier(CompoundTag nbt) {
 		String namespace = nbt.getString("namespace");
 		String path = nbt.getString("path");
 		

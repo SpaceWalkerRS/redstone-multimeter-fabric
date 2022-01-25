@@ -24,9 +24,6 @@
 	"entrypoints": {
 		"main": [
 			"redstone.multimeter.RedstoneMultimeterMod"
-		],
-		"modmenu": [
-			"redstone.multimeter.modmenu.RedstoneMultimeterMod"
 		]
 	},
 	"mixins": [

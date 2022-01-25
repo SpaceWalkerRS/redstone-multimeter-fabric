@@ -8,8 +8,8 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -34,14 +34,14 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void encode(NbtCompound data) {
-		NbtList list = new NbtList();
+	public void encode(CompoundTag data) {
+		ListTag list = new ListTag();
 		
 		for (Entry<MeterProperties> entry : meterUpdates.long2ObjectEntrySet()) {
 			long id = entry.getLongKey();
 			MeterProperties update = entry.getValue();
 			
-			NbtCompound nbt = update.toNbt();
+			CompoundTag nbt = update.toNbt();
 			nbt.putLong("id", id);
 			list.add(nbt);
 		}
@@ -51,15 +51,15 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void decode(NbtCompound data) {
+	public void decode(CompoundTag data) {
 		long[] ids = data.getLongArray("removed meters");
-		NbtList list = data.getList("meter updates", NbtUtils.TYPE_COMPOUND);
+		ListTag list = data.getList("meter updates", NbtUtils.TYPE_COMPOUND);
 		
 		for (long id : ids) {
 			removedMeters.add(id);
 		}
 		for (int index = 0; index < list.size(); index++) {
-			NbtCompound nbt = list.getCompound(index);
+			CompoundTag nbt = list.getCompound(index);
 			
 			long id = nbt.getLong("id");
 			MeterProperties update = MeterProperties.fromNbt(nbt);

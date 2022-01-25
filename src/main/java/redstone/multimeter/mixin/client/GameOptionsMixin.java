@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.options.KeyBinding;
 
 import redstone.multimeter.client.KeyBindings;
 import redstone.multimeter.client.MultimeterClient;
@@ -31,7 +31,7 @@ public class GameOptionsMixin {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/client/option/GameOptions;load()V"
+					target = "Lnet/minecraft/client/options/GameOptions;load()V"
 			)
 	)
 	private void initOptions(MinecraftClient client, File optionsFile, CallbackInfo ci) {

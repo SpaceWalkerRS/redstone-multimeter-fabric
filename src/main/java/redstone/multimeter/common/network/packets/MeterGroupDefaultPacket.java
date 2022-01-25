@@ -1,6 +1,6 @@
 package redstone.multimeter.common.network.packets;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -14,12 +14,12 @@ public class MeterGroupDefaultPacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void encode(NbtCompound data) {
+	public void encode(CompoundTag data) {
 		
 	}
 	
 	@Override
-	public void decode(NbtCompound data) {
+	public void decode(CompoundTag data) {
 		
 	}
 	

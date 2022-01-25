@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import net.minecraft.client.gui.screen.ScreenTexts;
-import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
+import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 
@@ -29,13 +29,13 @@ public class OptionsScreen extends RSMMScreen {
 		super.onRemoved();
 		Options.validate();
 		minecraftClient.options.write();
-		minecraftClient.keyboard.setRepeatEvents(false);
+		minecraftClient.keyboard.enableRepeatEvents(false);
 		client.getHUD().onOptionsChanged();
 	}
 	
 	@Override
 	protected void initScreen() {
-		minecraftClient.keyboard.setRepeatEvents(true);
+		minecraftClient.keyboard.enableRepeatEvents(true);
 		
 		ScrollableListElement list = new ScrollableListElement(client, getWidth(), getHeight(), 52, 36);
 		

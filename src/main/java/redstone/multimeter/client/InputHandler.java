@@ -2,7 +2,7 @@ package redstone.multimeter.client;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.options.KeyBinding;
 
 import redstone.multimeter.client.gui.screen.MultimeterScreen;
 import redstone.multimeter.client.gui.screen.OptionsScreen;

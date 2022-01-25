@@ -358,7 +358,7 @@ public class Multimeter {
 			append(new LiteralText("[here]").styled(style -> {
 				return style.
 					withColor(Formatting.GREEN).
-					withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName())))).
+					setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName())))).
 					withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
 			})).
 			append(new LiteralText(" to subscribe to it."));
@@ -455,7 +455,7 @@ public class Multimeter {
 		Text message = new LiteralText("Click ").
 			append(new LiteralText("[here]").styled((style) -> {
 				return style.
-					withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Teleport to").
+					setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Teleport to").
 						append(TextUtils.formatFancyText("\n  dimension", worldId)).
 						append(TextUtils.formatFancyText("\n  x", x)).
 						append(TextUtils.formatFancyText("\n  y", y)).
@@ -595,5 +595,11 @@ public class Multimeter {
 				meterGroup.tryLogEvent(pos, predicate, supplier);
 			}
 		}
+	}
+	
+	static {
+		
+		NUMBER_FORMAT.setGroupingUsed(false);
+		
 	}
 }

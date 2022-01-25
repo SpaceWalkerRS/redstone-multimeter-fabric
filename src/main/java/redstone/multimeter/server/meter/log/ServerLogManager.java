@@ -1,7 +1,7 @@
 package redstone.multimeter.server.meter.log;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.Meter;
@@ -56,7 +56,7 @@ public class ServerLogManager extends LogManager {
 			return;
 		}
 		
-		NbtList list = new NbtList();
+		ListTag list = new ListTag();
 		
 		for (Meter meter : meterGroup.getMeters()) {
 			if (meter.getLogs().isEmpty()) {
@@ -64,9 +64,9 @@ public class ServerLogManager extends LogManager {
 			}
 			
 			long id = meter.getId();
-			NbtCompound logs = meter.getLogs().toNbt();
+			CompoundTag logs = meter.getLogs().toNbt();
 			
-			NbtCompound nbt = new NbtCompound();
+			CompoundTag nbt = new CompoundTag();
 			nbt.putLong("id", id);
 			nbt.put("logs", logs);
 			nbt.putBoolean("powered", meter.isPowered());
@@ -80,7 +80,7 @@ public class ServerLogManager extends LogManager {
 			return;
 		}
 		
-		NbtCompound nbt = new NbtCompound();
+		CompoundTag nbt = new CompoundTag();
 		nbt.putInt("subticks", nextSubtick);
 		nbt.put("logs", list);
 		

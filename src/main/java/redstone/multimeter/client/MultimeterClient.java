@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -121,11 +121,11 @@ public class MultimeterClient {
 	}
 	
 	public void requestTickPhaseTree() {
-		TickPhaseTreePacket packet = new TickPhaseTreePacket(new NbtCompound());
+		TickPhaseTreePacket packet = new TickPhaseTreePacket(new CompoundTag());
 		packetHandler.send(packet);
 	}
 	
-	public void refreshTickPhaseTree(NbtCompound nbt) {
+	public void refreshTickPhaseTree(CompoundTag nbt) {
 		if (tickPhaseTree == null) {
 			tickPhaseTree = new TickPhaseTree();
 		}

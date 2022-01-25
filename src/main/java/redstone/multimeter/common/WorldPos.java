@@ -1,6 +1,6 @@
 package redstone.multimeter.common;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -76,15 +76,19 @@ public class WorldPos {
 	}
 	
 	public WorldPos offset(Axis axis, int distance) {
-		return new WorldPos(worldId, blockPos.offset(axis, distance));
+		int dx = axis.choose(distance, 0, 0);
+		int dy = axis.choose(0, distance, 0);
+		int dz = axis.choose(0, 0, distance);
+		
+		return new WorldPos(worldId, dx, dy, dz);
 	}
 	
 	public WorldPos offset(int dx, int dy, int dz) {
 		return new WorldPos(worldId, blockPos.add(dx, dy, dz));
 	}
 	
-	public NbtCompound toNbt() {
-		NbtCompound nbt = new NbtCompound();
+	public CompoundTag toNbt() {
+		CompoundTag nbt = new CompoundTag();
 		
 		nbt.put("world id", NbtUtils.identifierToNbt(worldId));
 		nbt.putInt("x", blockPos.getX());
@@ -94,7 +98,7 @@ public class WorldPos {
 		return nbt;
 	}
 	
-	public static WorldPos fromNbt(NbtCompound nbt) {
+	public static WorldPos fromNbt(CompoundTag nbt) {
 		Identifier worldId = NbtUtils.nbtToIdentifier(nbt.getCompound("world id"));
 		int x = nbt.getInt("x");
 		int y = nbt.getInt("y");

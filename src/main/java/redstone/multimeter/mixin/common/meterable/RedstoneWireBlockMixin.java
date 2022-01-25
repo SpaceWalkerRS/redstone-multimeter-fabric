@@ -18,10 +18,10 @@ import redstone.multimeter.block.PowerSource;
 @Mixin(RedstoneWireBlock.class)
 public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSource {
 	
-	@Shadow protected abstract int getReceivedRedstonePower(World world, BlockPos pos);
+	@Shadow protected abstract int method_27842(World world, BlockPos pos);
 	
 	@Inject(
-			method = "getReceivedRedstonePower",
+			method = "method_27842",
 			at = @At(
 					value = "RETURN"
 			)
@@ -37,7 +37,7 @@ public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSou
 	
 	@Override
 	public boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
-		return getReceivedRedstonePower(world, pos) > MIN_POWER;
+		return method_27842(world, pos) > MIN_POWER;
 	}
 	
 	@Override

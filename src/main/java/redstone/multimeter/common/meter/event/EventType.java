@@ -3,8 +3,8 @@ package redstone.multimeter.common.meter.event;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.nbt.NbtByte;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.ByteTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.math.Direction;
 
 import redstone.multimeter.client.gui.Tooltip;
@@ -128,17 +128,17 @@ public enum EventType {
 		
 	}
 	
-	public NbtElement toNbt() {
-		return NbtByte.of((byte)index);
+	public Tag toNbt() {
+		return ByteTag.of((byte)index);
 	}
 	
-	public static EventType fromNbt(NbtElement nbt) {
+	public static EventType fromNbt(Tag nbt) {
 		if (nbt.getType() != NbtUtils.TYPE_BYTE) {
 			return UNKNOWN;
 		}
 		
-		NbtByte nbtByte = (NbtByte)nbt;
-		int index = nbtByte.byteValue();
+		ByteTag nbtByte = (ByteTag)nbt;
+		int index = nbtByte.getByte();
 		
 		return fromIndex(index);
 	}

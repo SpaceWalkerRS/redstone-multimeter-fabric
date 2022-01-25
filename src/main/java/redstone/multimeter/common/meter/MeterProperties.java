@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.event.EventType;
@@ -67,8 +67,8 @@ public class MeterProperties {
 		return this;
 	}
 	
-	public NbtCompound toNbt() {
-		NbtCompound nbt = new NbtCompound();
+	public CompoundTag toNbt() {
+		CompoundTag nbt = new CompoundTag();
 		
 		if (pos != null) {
 			nbt.put("pos", pos.toNbt());
@@ -89,7 +89,7 @@ public class MeterProperties {
 		return nbt;
 	}
 	
-	public static MeterProperties fromNbt(NbtCompound nbt) {
+	public static MeterProperties fromNbt(CompoundTag nbt) {
 		MeterProperties properties = new MeterProperties();
 		
 		if (nbt.contains("pos")) {

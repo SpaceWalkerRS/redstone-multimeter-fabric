@@ -2,7 +2,7 @@ package redstone.multimeter.common.meter.event;
 
 import java.util.List;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.Tooltip;
@@ -50,8 +50,8 @@ public class MeterEvent {
 		return metadata;
 	}
 	
-	public NbtCompound toNbt() {
-		NbtCompound nbt = new NbtCompound();
+	public CompoundTag toNbt() {
+		CompoundTag nbt = new CompoundTag();
 		
 		nbt.put("type", type.toNbt());
 		nbt.putInt("metadata", metadata);
@@ -59,7 +59,7 @@ public class MeterEvent {
 		return nbt;
 	}
 	
-	public static MeterEvent fromNbt(NbtCompound nbt) {
+	public static MeterEvent fromNbt(CompoundTag nbt) {
 		MeterEvent event = new MeterEvent();
 		
 		event.type = EventType.fromNbt(nbt.get("type"));

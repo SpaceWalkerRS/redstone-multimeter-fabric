@@ -35,10 +35,10 @@ import redstone.multimeter.server.MultimeterServer;
 public abstract class ServerWorldMixin extends World implements IServerWorld {
 	
 	@Shadow @Final private MinecraftServer server;
-	@Shadow @Final private boolean shouldTickTime;
+	@Shadow @Final private boolean field_25143;
 	
-	protected ServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, DimensionType dimensionType, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
-		super(properties, registryRef, dimensionType, profiler, isClient, debugWorld, seed);
+	protected ServerWorldMixin(MutableWorldProperties mutableWorldProperties, RegistryKey<World> registryKey, RegistryKey<DimensionType> registryKey2, DimensionType dimensionType, Supplier<Profiler> profiler, boolean bl, boolean bl2, long l) {
+		super(mutableWorldProperties, registryKey, registryKey2, dimensionType, profiler, bl, bl2, l);
 	}
 	
 	@Inject(
@@ -203,7 +203,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void beforeTickTime(CallbackInfo ci) {
-		if (shouldTickTime) {
+		if (field_25143) {
 			swapTickTaskRSMM(TickTask.TICK_TIME);
 		}
 	}
@@ -215,13 +215,13 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void onTickTime(CallbackInfo ci) {
-		if (shouldTickTime) {
+		if (field_25143) {
 			getMultimeterServer().onOverworldTickTime();
 		}
 	}
 	
 	@Inject(
-			method = "tickSpawners",
+			method = "method_29202",
 			at = @At(
 					value = "HEAD"
 			)
@@ -231,7 +231,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
-			method = "tickSpawners",
+			method = "method_29202",
 			at = @At(
 					value = "RETURN"
 			)

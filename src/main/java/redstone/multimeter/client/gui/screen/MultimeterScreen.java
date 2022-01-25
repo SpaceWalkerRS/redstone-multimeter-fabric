@@ -25,7 +25,7 @@ public class MultimeterScreen extends RSMMScreen {
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
-		minecraftClient.keyboard.setRepeatEvents(false);
+		minecraftClient.keyboard.enableRepeatEvents(false);
 	}
 	
 	@Override
@@ -36,7 +36,7 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	protected void initScreen() {
-		minecraftClient.keyboard.setRepeatEvents(true);
+		minecraftClient.keyboard.enableRepeatEvents(true);
 		
 		list = new ScrollableListElement(client, getWidth(), getHeight());
 		list.setX(getX());
