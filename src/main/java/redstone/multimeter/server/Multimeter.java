@@ -547,8 +547,8 @@ public class Multimeter {
 		tryLogEvent(world, scheduledTick.pos, EventType.SCHEDULED_TICK, scheduledTick.priority.getIndex());
 	}
 	
-	public void logBlockEvent(World world, BlockEvent blockEvent) {
-		tryLogEvent(world, blockEvent.getPos(), EventType.BLOCK_EVENT, blockEvent.getType());
+	public void logBlockEvent(World world, BlockEvent blockEvent, int depth) {
+		tryLogEvent(world, blockEvent.getPos(), EventType.BLOCK_EVENT, (depth << 4) | blockEvent.getType());
 	}
 	
 	public void logEntityTick(World world, Entity entity) {
