@@ -57,7 +57,11 @@ public enum EventType {
 		
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatFancyText("type", metadata));
+			int depth = (metadata >> 4) & 0xFFFF;
+			int type  =  metadata       & 0xF;
+			
+			tooltip.add(TextUtils.formatFancyText("type", type));
+			tooltip.add(TextUtils.formatFancyText("depth", depth));
 		}
 	},
 	ENTITY_TICK(7, "entity_tick"),

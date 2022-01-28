@@ -13,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
@@ -41,9 +43,12 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	@Shadow @Final private MinecraftServer server;
 	@Shadow @Final private WorldTickScheduler<Block> blockTickScheduler;
 	@Shadow @Final private WorldTickScheduler<Fluid> fluidTickScheduler;
+	@Shadow @Final private ObjectLinkedOpenHashSet<BlockEvent> syncedBlockEventQueue;
 	@Shadow @Final private boolean shouldTickTime;
 	
 	private OrderedTick<?> scheduledTickRSMM;
+	private int currentDepth;
+	private int currentBatch;
 	
 	protected ServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, DimensionType dimensionType, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
 		super(properties, registryRef, dimensionType, profiler, isClient, debugWorld, seed);
@@ -431,6 +436,33 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
+			method = "processSyncedBlockEvents",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onProcessBlockEvents(CallbackInfo ci) {
+		currentDepth = 0;
+		currentBatch = syncedBlockEventQueue.size();
+	}
+	
+	@Inject(
+			method = "processSyncedBlockEvents",
+			at = @At(
+					value = "INVOKE",
+					target = "Lit/unimi/dsi/fastutil/objects/ObjectLinkedOpenHashSet;isEmpty()Z"
+			)
+	)
+	private void onNextBlockEvent(CallbackInfo ci) {
+		if (currentBatch == 0) {
+			currentDepth++;
+			currentBatch = syncedBlockEventQueue.size();
+		}
+		
+		currentBatch--;
+	}
+	
+	@Inject(
 			method = "processBlockEvent",
 			at = @At(
 					value = "INVOKE",
@@ -439,7 +471,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void onProcessBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
-		getMultimeter().logBlockEvent((World)(Object)this, blockEvent);
+		getMultimeter().logBlockEvent((World)(Object)this, blockEvent, currentDepth);
 	}
 	
 	@Override
