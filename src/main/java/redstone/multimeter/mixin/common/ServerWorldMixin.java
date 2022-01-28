@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
@@ -36,6 +38,10 @@ import redstone.multimeter.server.MultimeterServer;
 public abstract class ServerWorldMixin extends World implements IServerWorld {
 	
 	@Shadow @Final private MinecraftServer server;
+	@Shadow @Final private ObjectLinkedOpenHashSet<BlockAction> pendingBlockActions;
+	
+	private int currentDepth;
+	private int currentBatch;
 	
 	protected ServerWorldMixin(LevelProperties levelProperties, DimensionType dimensionType, BiFunction<World, Dimension, ChunkManager> chunkManagerProvider, Profiler profiler, boolean isClient) {
 		super(levelProperties, dimensionType, chunkManagerProvider, profiler, isClient);
@@ -338,6 +344,33 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
+			method = "sendBlockActions",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onProcessBlockEvents(CallbackInfo ci) {
+		currentDepth = 0;
+		currentBatch = pendingBlockActions.size();
+	}
+	
+	@Inject(
+			method = "sendBlockActions",
+			at = @At(
+					value = "INVOKE",
+					target = "Lit/unimi/dsi/fastutil/objects/ObjectLinkedOpenHashSet;isEmpty()Z"
+			)
+	)
+	private void onNextBlockEvent(CallbackInfo ci) {
+		if (currentBatch == 0) {
+			currentDepth++;
+			currentBatch = pendingBlockActions.size();
+		}
+		
+		currentBatch--;
+	}
+	
+	@Inject(
 			method = "method_14174",
 			at = @At(
 					value = "INVOKE",
@@ -346,7 +379,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void onProcessBlockEvent(BlockAction blockEvent, CallbackInfoReturnable<Boolean> cir) {
-		getMultimeter().logBlockEvent((World)(Object)this, blockEvent);
+		getMultimeter().logBlockEvent((World)(Object)this, blockEvent, currentDepth);
 	}
 	
 	@Override
