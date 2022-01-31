@@ -37,6 +37,7 @@ public class KeyBindings {
 	public static final KeyBinding TOGGLE_METER;
 	public static final KeyBinding RESET_METER;
 	public static final KeyBinding PAUSE_METERS;
+	public static final KeyBinding TOGGLE_MARKER;
 	public static final KeyBinding STEP_BACKWARD;
 	public static final KeyBinding STEP_FORWARD;
 	public static final KeyBinding SCROLL_HUD;
@@ -144,6 +145,7 @@ public class KeyBindings {
 		TOGGLE_METER           = registerKeyBinding(new KeyBinding("Toggle Meter"          , GLFW.GLFW_KEY_M       , MAIN));
 		RESET_METER            = registerKeyBinding(new KeyBinding("Reset Meter"           , GLFW.GLFW_KEY_B       , MAIN));
 		PAUSE_METERS           = registerKeyBinding(new KeyBinding("Pause Meters"          , GLFW.GLFW_KEY_N       , MAIN));
+		TOGGLE_MARKER          = registerKeyBinding(new KeyBinding("Toggle Tick Marker"    , GLFW.GLFW_KEY_Y       , MAIN));
 		STEP_BACKWARD          = registerKeyBinding(new KeyBinding("Step Backward"         , GLFW.GLFW_KEY_COMMA   , MAIN));
 		STEP_FORWARD           = registerKeyBinding(new KeyBinding("Step Forward"          , GLFW.GLFW_KEY_PERIOD  , MAIN));
 		SCROLL_HUD             = registerKeyBinding(new KeyBinding("Scroll HUD"            , GLFW.GLFW_KEY_LEFT_ALT, MAIN));
