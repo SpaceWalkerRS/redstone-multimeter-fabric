@@ -92,6 +92,11 @@ public abstract class MeterEventViewer extends AbstractElement {
 	protected abstract void drawHighlights(MatrixStack matrices, int mouseX, int mouseY);
 	
 	protected void drawHighlight(MatrixStack matrices, int column, int columnCount, int row, int rowCount, boolean selection) {
+		int color = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
+ 		drawHighlight(matrices, column, columnCount, row, rowCount, color);
+	}
+	
+	protected void drawHighlight(MatrixStack matrices, int column, int columnCount, int row, int rowCount, int color) {
 		int w = hud.settings.columnWidth + hud.settings.gridSize;
 		int h = hud.settings.rowHeight + hud.settings.gridSize;
 		int x = column * w;
@@ -99,7 +104,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 		int width = columnCount * w;
 		int height = rowCount * h;
 		
-		hud.renderer.renderHighlight(matrices, x, y, width, height, selection);
+		hud.renderer.renderHighlight(matrices, x, y, width, height, color);
 	}
 	
 	protected abstract void drawDecorators(MatrixStack matrices);
@@ -111,7 +116,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 		
 		int columns = getColumnCount();
 		int rows = hud.meters.size();
-		int marker = getMarkerColumn();
+		int marker = getCurrentTickMarkerColumn();
 		
 		int lineX;
 		int lineY;
@@ -119,8 +124,8 @@ public abstract class MeterEventViewer extends AbstractElement {
 		int lineHeight;
 		int color;
 		
-		// marker
-		if (marker >= 0 && marker <= columns) {
+		// current tick marker
+		if (marker >= 0) {
 			lineX = marker * (hud.settings.columnWidth + hud.settings.gridSize);
 			lineY = hud.settings.gridSize;
 			lineWidth = hud.settings.gridSize;
@@ -161,7 +166,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 	
 	protected abstract int getColumnCount();
 	
-	protected int getMarkerColumn() {
+	protected int getCurrentTickMarkerColumn() {
 		return -1;
 	}
 	

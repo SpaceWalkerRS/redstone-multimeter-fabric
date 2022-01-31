@@ -48,10 +48,8 @@ public class HudRenderer extends RenderHelper2D {
 		}
 	}
 	
-	public void renderHighlight(MatrixStack matrices, int x, int y, int width, int height, boolean selection) {
-		int d      = hud.settings.gridSize;
-		int color  = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
-		
+	public void renderHighlight(MatrixStack matrices, int x, int y, int width, int height, int color) {
+		int d = hud.settings.gridSize;
 		renderBorder(matrices, x, y, width + d, height + d, d, color);
 	}
 	
