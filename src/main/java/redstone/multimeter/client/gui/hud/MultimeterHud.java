@@ -39,6 +39,7 @@ public class MultimeterHud extends AbstractParentElement {
 	private PrimaryEventViewer ticks;
 	private SecondaryEventViewer subticks;
 	private TextElement meterGroupName;
+	private TextElement tickMarkerCounter;
 	
 	private TransparentButton playPauseButton;
 	private TransparentButton fastBackwardButton;
@@ -55,6 +56,7 @@ public class MultimeterHud extends AbstractParentElement {
 	private int offset;
 	private boolean onScreen;
 	private Meter selectedMeter;
+	private long tickMarker;
 	
 	public MultimeterHud(MultimeterClient client) {
 		MinecraftClient minecraftClient = client.getMinecraftClient();
@@ -65,6 +67,8 @@ public class MultimeterHud extends AbstractParentElement {
 		this.renderer = new HudRenderer(this);
 		this.eventRenderers = new MeterEventRenderDispatcher(this);
 		this.meters = new ArrayList<>();
+		
+		this.tickMarker = -1L;
 	}
 	
 	@Override
@@ -185,6 +189,7 @@ public class MultimeterHud extends AbstractParentElement {
 			
 			x += settings.columnWidth + settings.gridSize;
 			subticks.setX(x);
+			tickMarkerCounter.setX(x);
 			
 			break;
 		case RIGHT_TO_LEFT:
@@ -203,7 +208,10 @@ public class MultimeterHud extends AbstractParentElement {
 			fastForwardButton.setX(x);
 			printIndicator.setX(x + 3 * w);
 			
-			x -= (settings.columnWidth + settings.gridSize + subticks.getWidth());
+			x -= settings.columnWidth;
+			tickMarkerCounter.setX(x);
+			
+			x -= (settings.gridSize + subticks.getWidth());
 			subticks.setX(x);
 			
 			break;
@@ -249,6 +257,7 @@ public class MultimeterHud extends AbstractParentElement {
 		}
 		
 		y = fastBackwardButton.getMessageY();
+		tickMarkerCounter.setY(y);
 		printIndicator.setY(y);
 	}
 	
@@ -269,6 +278,20 @@ public class MultimeterHud extends AbstractParentElement {
 			
 			t.add(text).setColor(color);
 		});
+		this.tickMarkerCounter = new TextElement(this.client, 0, 0, t -> {
+ 			if (hasTickMarker()) {
+ 				long tick = paused ? getSelectedTick() : getCurrentTick();
+ 				String text = String.valueOf(tick - tickMarker);
+ 				
+ 				int a = Math.round(0xFF * settings.opacity() / 100.0F);
+ 				int rgb = settings.colorHighlightTickMarker;
+ 				int color = ColorUtils.setAlpha(rgb, a);
+ 				
+ 				t.add(text).setColor(color).setVisible(true);
+ 			} else {
+ 				t.setVisible(false);
+ 			}
+ 		});
 		
 		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.EMPTY, button -> {
 			pause();
@@ -307,6 +330,7 @@ public class MultimeterHud extends AbstractParentElement {
 		addChild(this.ticks);
 		addChild(this.subticks);
 		addChild(this.meterGroupName);
+		addChild(this.tickMarkerCounter);
 		addChild(this.playPauseButton);
 		addChild(this.fastBackwardButton);
 		addChild(this.fastForwardButton);
@@ -366,11 +390,31 @@ public class MultimeterHud extends AbstractParentElement {
 			updateEventViewersWidth();
 		} else {
 			resetOffset();
+			
+			if (hasTickMarker() && Options.HUD.AUTO_REMOVE_MARKER.get()) {
+				toggleTickMarker(false);
+			}
 		}
 	}
 	
+	public int getColumn(long tick) {
+ 		return getColumn(tick, false);
+ 	}
+	
+ 	public int getColumn(long tick, boolean allowRightEdge) {
+ 		long first = client.getPrevServerTime() + offset;
+ 		long last = first + Options.HUD.COLUMN_COUNT.get();
+ 		
+ 		if (!allowRightEdge) {
+ 			last--;
+ 		}
+ 		
+ 		return tick < first || tick > last ? -1 : (int)(tick - first);
+ 	}
+	
 	private void setOffset(int offset) {
 		this.offset = offset;
+		updateTickMarkerCounter();
 		updateEventViewersWidth();
 	}
 	
@@ -424,6 +468,59 @@ public class MultimeterHud extends AbstractParentElement {
 		return true;
 	}
 	
+	public boolean hasTickMarker() {
+ 		return tickMarker >= 0L;
+ 	}
+	
+ 	public long getTickMarker() {
+ 		return tickMarker;
+ 	}
+ 	
+ 	public void toggleTickMarker(boolean force) {
+ 		if (tickMarker < 0L || force) {
+ 			tickMarker = paused ? getSelectedTick() : getCurrentTick();
+ 		} else {
+ 			tickMarker = -1;
+ 		}
+ 		
+ 		updateTickMarkerCounter();
+ 	}
+ 	
+ 	public boolean setTickMarkerColor(String rawColor) {
+ 		try {
+ 			int color = ColorUtils.fromRGBString(rawColor);
+ 			setTickMarkerColor(color);
+ 			
+ 			return true;
+ 		} catch (NumberFormatException e) {
+ 			return false;
+ 		}
+ 	}
+ 	
+ 	public void setTickMarkerColor(int color) {
+ 		settings.colorHighlightTickMarker = color;
+ 	}
+ 	
+ 	private void updateTickMarkerCounter() {
+ 		tickMarkerCounter.update();
+ 		
+ 		if (tickMarkerCounter.isVisible()) {
+ 			int x;
+ 			
+ 			switch (getDirectionalityX()) {
+ 			default:
+ 			case LEFT_TO_RIGHT:
+ 				x = subticks.getX();
+ 				break;
+ 			case RIGHT_TO_LEFT:
+ 				x = subticks.getX() + subticks.getWidth() - tickMarkerCounter.getWidth();
+ 				break;
+ 			}
+ 			
+ 			tickMarkerCounter.setX(x);
+ 		}
+ 	}
+	
 	public int getHoveredRow(double mouseY) {
 		int max = meters.size() - 1;
 		int row = Math.min(max, (int)((mouseY - names.getY()) / (settings.rowHeight + settings.gridSize)));
@@ -441,6 +538,10 @@ public class MultimeterHud extends AbstractParentElement {
 	
 	public long getSelectedTick() {
 		return client.getPrevServerTime() + offset + Options.HUD.SELECTED_COLUMN.get();
+	}
+	
+	public long getCurrentTick() {
+		return client.getPrevServerTime() + 1;
 	}
 	
 	public int getAvailableWidth() {
@@ -550,6 +651,7 @@ public class MultimeterHud extends AbstractParentElement {
 	
 	public void reset() {
 		paused = false;
+		tickMarker = -1L;
 		meters.clear();
 		resetOffset();
 		setX(0);
@@ -559,6 +661,8 @@ public class MultimeterHud extends AbstractParentElement {
 	public void onServerTick() {
 		if (paused) {
 			setOffset(offset - 1);
+		} else {
+			updateTickMarkerCounter();
 		}
 	}
 	
@@ -594,11 +698,21 @@ public class MultimeterHud extends AbstractParentElement {
 		settings.columnWidth = Options.HUD.COLUMN_WIDTH.get();
 		settings.rowHeight = Options.HUD.ROW_HEIGHT.get();
 		settings.gridSize = Options.HUD.GRID_SIZE.get();
+		updateTickMarkerColor();
 		
 		meterGroupName.update();
 		playPauseButton.setVisible(onScreen || Options.HUD.PAUSE_INDICATOR.get());
 		onResized();
 	}
+	
+	public void updateTickMarkerColor() {
+ 		String rawColor = Options.HUD.TICK_MARKER_COLOR.get();
+ 		
+ 		if (!setTickMarkerColor(rawColor)) {
+ 			rawColor = Options.HUD.TICK_MARKER_COLOR.getDefault();
+ 			setTickMarkerColor(rawColor);
+ 		}
+ 	}
 	
 	public void onTogglePrinter() {
 		printIndicator.setVisible(client.getMeterGroup().getLogManager().getPrinter().isPrinting());

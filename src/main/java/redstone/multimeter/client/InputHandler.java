@@ -49,6 +49,9 @@ public class InputHandler {
 		while (KeyBindings.PAUSE_METERS.wasPressed()) {
 			client.getHUD().pause();
 		}
+		while (KeyBindings.TOGGLE_MARKER.wasPressed()) {
+			client.getHUD().toggleTickMarker(Screen.hasControlDown());
+		}
 		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
 			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 		}
@@ -118,6 +121,9 @@ public class InputHandler {
 			if (KeyBindings.PAUSE_METERS.matchesMouse(button)) {
 				client.getHUD().pause();
 			} else
+			if (KeyBindings.TOGGLE_MARKER.matchesMouse(button)) {
+				client.getHUD().toggleTickMarker(Screen.hasControlDown());
+			} else
 			if (KeyBindings.STEP_BACKWARD.matchesMouse(button)) {
 				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
 			} else
@@ -164,6 +170,9 @@ public class InputHandler {
 		if (screen instanceof MultimeterScreen) {
 			if (KeyBindings.PAUSE_METERS.matchesKey(keyCode, scanCode)) {
 				client.getHUD().pause();
+			} else
+			if (KeyBindings.TOGGLE_MARKER.matchesKey(keyCode, scanCode)) {
+				client.getHUD().toggleTickMarker(Screen.hasControlDown());
 			} else
 			if (KeyBindings.STEP_BACKWARD.matchesKey(keyCode, scanCode)) {
 				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);

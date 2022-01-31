@@ -2,6 +2,8 @@ package redstone.multimeter.client.gui.hud.element;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.hud.Directionality;
@@ -97,6 +99,8 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	
 	@Override
 	protected void drawHighlights(int mouseX, int mouseY) {
+		GlStateManager.pushMatrix();
+		
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
 			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
 				drawHighlight(getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
@@ -104,6 +108,19 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			
 			drawHighlight(Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
 		}
+		
+		GlStateManager.translated(0, 0, -0.1);
+		
+		if (hud.hasTickMarker()) {
+ 			long tick = hud.getTickMarker();
+ 			int column = hud.getColumn(tick);
+ 			
+ 			if (column >= 0) {
+ 				drawHighlight(column, 1, 0, hud.meters.size(), hud.settings.colorHighlightTickMarker);
+ 			}
+ 		}
+		
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
@@ -136,12 +153,8 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 	
 	@Override
-	protected int getMarkerColumn() {
-		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
-		long lastTick = firstTick + Options.HUD.COLUMN_COUNT.get();
-		long currentTick = hud.client.getPrevServerTime() + 1;
-		
-		return (currentTick < firstTick || currentTick > lastTick) ? -1 : (int)(currentTick - firstTick);
+	protected int getCurrentTickMarkerColumn() {
+		return hud.getColumn(hud.getCurrentTick(), true);
 	}
 	
 	private boolean isBorderHovered(double mouseX) {
