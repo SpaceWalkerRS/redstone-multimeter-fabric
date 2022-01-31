@@ -102,8 +102,9 @@ public class MeterListRenderer extends AbstractElement {
 		int y = row * h;
 		int width = getWidth() - hud.settings.gridSize;
 		int height = h;
+		int color = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
 		
-		hud.renderer.renderHighlight(matrices, x, y, width, height, selection);
+		hud.renderer.renderHighlight(matrices, x, y, width, height, color);
 	}
 	
 	private void drawNames(MatrixStack matrices) {
