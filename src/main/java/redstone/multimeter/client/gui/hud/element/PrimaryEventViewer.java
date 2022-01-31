@@ -99,6 +99,8 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	
 	@Override
 	protected void drawHighlights(MatrixStack matrices, int mouseX, int mouseY) {
+		matrices.push();
+		
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
 			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
 				drawHighlight(matrices, getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
@@ -106,6 +108,19 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			
 			drawHighlight(matrices, Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
 		}
+		
+		matrices.translate(0, 0, -0.1);
+		
+		if (hud.hasTickMarker()) {
+ 			long tick = hud.getTickMarker();
+ 			int column = hud.getColumn(tick);
+ 			
+ 			if (column >= 0) {
+ 				drawHighlight(matrices, column, 1, 0, hud.meters.size(), hud.settings.colorHighlightTickMarker);
+ 			}
+ 		}
+		
+		matrices.pop();
 	}
 	
 	@Override
@@ -138,12 +153,8 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 	
 	@Override
-	protected int getMarkerColumn() {
-		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
-		long lastTick = firstTick + Options.HUD.COLUMN_COUNT.get();
-		long currentTick = hud.client.getPrevServerTime() + 1;
-		
-		return (currentTick < firstTick || currentTick > lastTick) ? -1 : (int)(currentTick - firstTick);
+	protected int getCurrentTickMarkerColumn() {
+		return hud.getColumn(hud.getCurrentTick(), true);
 	}
 	
 	private boolean isBorderHovered(double mouseX) {
