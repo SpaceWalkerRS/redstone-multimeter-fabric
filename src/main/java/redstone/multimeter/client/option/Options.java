@@ -18,6 +18,7 @@ import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.event.EventType;
+import redstone.multimeter.util.ColorUtils;
 
 public class Options {
 	
@@ -42,6 +43,8 @@ public class Options {
 		public static final IntegerOption                COLUMN_WIDTH         = new IntegerOption("Column Width", "The width of a column of the primary and secondary overviews.", 3, 1, 50);
 		public static final IntegerOption                ROW_HEIGHT           = new IntegerOption("Row Height", "The height of a row in the HUD.", 9, 1, 50);
 		public static final IntegerOption                GRID_SIZE            = new IntegerOption("Grid Size", "The thickness of the gridlines in the HUD.", 1, 1, 5);
+		public static final StringOption                 TICK_MARKER_COLOR    = new StringOption("Tick Marker Color", "The color of the highlight around the tick marker, in RRGGBB format.", "FF0000", 6);
+		public static final BooleanOption                AUTO_REMOVE_MARKER   = new BooleanOption("Auto Remove Tick Marker", "Automatically remove the tick marker when unpausing the HUD.", false);
 		public static final BooleanOption                HIDE_HIGHLIGHT       = new BooleanOption("Hide Highlight", "Hide the highlight around the selected tick when the HUD is not paused.", true);
 		public static final BooleanOption                PAUSE_INDICATOR      = new BooleanOption("Pause Indicator", "Display a little play/pause indicator underneath the HUD.", false);
 		public static final IntegerOption                OPACITY              = new IntegerOption("Opacity", "", 100, 0, 100);
@@ -87,6 +90,13 @@ public class Options {
 		
 		if (HUD.SELECTED_COLUMN.get() >= history) {
 			HUD.SELECTED_COLUMN.set(history - 1);
+		}
+		
+		try {
+			String rawColor = Options.HUD.TICK_MARKER_COLOR.get();
+			ColorUtils.fromRGBString(rawColor);
+		} catch (NumberFormatException e) {
+			Options.HUD.TICK_MARKER_COLOR.reset();
 		}
 	}
 	
@@ -188,6 +198,8 @@ public class Options {
 			HUD.COLUMN_WIDTH,
 			HUD.ROW_HEIGHT,
 			HUD.GRID_SIZE,
+			HUD.TICK_MARKER_COLOR,
+			HUD.AUTO_REMOVE_MARKER,
 			HUD.HIDE_HIGHLIGHT,
 			HUD.PAUSE_INDICATOR,
 			HUD.OPACITY,

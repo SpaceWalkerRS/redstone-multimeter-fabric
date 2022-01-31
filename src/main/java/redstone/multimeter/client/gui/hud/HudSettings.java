@@ -17,6 +17,7 @@ public class HudSettings {
 	public int columnWidth;
 	public int rowHeight;
 	public int gridSize;
+	public int colorHighlightTickMarker;
 	public boolean forceFullOpacity;
 	public boolean ignoreHiddenMeters;
 	
