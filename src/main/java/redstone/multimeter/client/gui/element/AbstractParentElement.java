@@ -3,6 +3,8 @@ package redstone.multimeter.client.gui.element;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.util.math.MatrixStack;
+
 import redstone.multimeter.client.gui.Tooltip;
 
 public abstract class AbstractParentElement extends AbstractElement {
@@ -22,12 +24,12 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		for (int index = 0; index < children.size(); index++) {
 			IElement child = children.get(index);
 			
 			if (child.isVisible()) {
-				child.render(mouseX, mouseY);
+				child.render(matrices, mouseX, mouseY);
 			}
 		}
 	}
@@ -99,21 +101,21 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode) {
+	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
 		IElement focused = getFocusedElement();
-		return focused != null && focused.keyPress(keyCode);
+		return focused != null && focused.keyPress(keyCode, scanCode, modifiers);
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode) {
+	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
 		IElement focused = getFocusedElement();
-		return focused != null && focused.keyRelease(keyCode);
+		return focused != null && focused.keyRelease(keyCode, scanCode, modifiers);
 	}
 	
 	@Override
-	public boolean typeChar(char chr) {
+	public boolean typeChar(char chr, int modifiers) {
 		IElement focused = getFocusedElement();
-		return focused != null && focused.typeChar(chr);
+		return focused != null && focused.typeChar(chr, modifiers);
 	}
 	
 	@Override

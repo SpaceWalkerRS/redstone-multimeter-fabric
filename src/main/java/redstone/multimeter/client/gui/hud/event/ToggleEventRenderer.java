@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.util.math.MatrixStack;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
@@ -18,7 +18,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderTickLogs(int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderTickLogs(MatrixStack matrices, int x, int y, long firstTick, long lastTick, Meter meter) {
 		updateMode(meter);
 		
 		y += hud.settings.gridSize;
@@ -37,7 +37,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		if (nextLog == null) {
 			if (isToggled(meter)) {
-				draw(x + hud.settings.gridSize, y, color, (int)(lastHudTick - firstTick));
+				draw(matrices, x + hud.settings.gridSize, y, color, (int)(lastHudTick - firstTick));
 			}
 			
 			return;
@@ -56,9 +56,9 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
 				if (wasToggled(log)) {
-					drawOn(columnX, y, color);
+					drawOn(matrices, columnX, y, color);
 				} else {
-					drawOff(columnX, y, color);
+					drawOff(matrices, columnX, y, color);
 				}
 			}
 			
@@ -69,7 +69,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int column = (int)(start - firstTick);
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
-				draw(columnX, y, color, (int)(end - start));
+				draw(matrices, columnX, y, color, (int)(end - start));
 			}
 			
 			do {
@@ -84,7 +84,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderPulseLengths(int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderPulseLengths(MatrixStack matrices, int x, int y, long firstTick, long lastTick, Meter meter) {
 		updateMode(meter);
 		
 		if (mode != Mode.ALL) {
@@ -92,7 +92,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		}
 		
 		y += hud.settings.gridSize;
-		int textY = y + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.FONT_HEIGHT) / 2;
+		int textY = y + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
 		int color = meter.getColor();
 		
 		MeterLogs logs = meter.getLogs();
@@ -129,7 +129,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					String text = String.valueOf(pulseLength);
 					
 					int availableWidth = endX - startX;
-					int requiredWidth = hud.font.getStringWidth(text) + 1;
+					int requiredWidth = hud.font.getWidth(text) + 1;
 					
 					if (requiredWidth < availableWidth) {
 						boolean toggled = wasToggled(log);
@@ -137,11 +137,11 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 						int bgColor = toggled ? color : hud.settings.colorBackground;
 						int textColor = toggled ? hud.settings.colorTextOn : hud.settings.colorTextOff;
 						
-						GlStateManager.pushMatrix();
-						hud.renderer.renderText(text, startX + 1, textY + 1, textColor);
-						GlStateManager.translate(0, 0, -0.01);
-						hud.renderer.renderRect(startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
-						GlStateManager.popMatrix();
+						matrices.push();
+						hud.renderer.renderText(matrices, text, startX + 1, textY + 1, textColor);
+						matrices.translate(0, 0, -0.01);
+						hud.renderer.renderRect(matrices, startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
+						matrices.pop();
 					}
 				}
 			}
@@ -158,7 +158,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubtickLogs(int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderSubtickLogs(MatrixStack matrices, int x, int y, long tick, int subTickCount, Meter meter) {
 		updateMode(meter);
 		
 		y += hud.settings.gridSize;
@@ -171,7 +171,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		
 		if (nextLog == null) {
 			if (isToggled(meter)) {
-				draw(x + hud.settings.gridSize, y, color, subTickCount);
+				draw(matrices, x + hud.settings.gridSize, y, color, subTickCount);
 			}
 			
 			return;
@@ -186,9 +186,9 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
 				if (wasToggled(log)) {
-					drawOn(columnX, y, color);
+					drawOn(matrices, columnX, y, color);
 				} else {
-					drawOff(columnX, y, color);
+					drawOff(matrices, columnX, y, color);
 				}
 			}
 			
@@ -198,7 +198,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			if (log == null ? !wasToggled(nextLog) : wasToggled(log)) {
 				int columnX = x + start * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
-				draw(columnX, y, color, end - start);
+				draw(matrices, columnX, y, color, end - start);
 			}
 			
 			log = nextLog;
@@ -218,7 +218,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	
 	protected abstract boolean isToggled(Meter meter);
 	
-	private void draw(int x, int y, int color) {
+	private void draw(MatrixStack matrices, int x, int y, int color) {
 		int width = hud.settings.columnWidth;
 		int height = hud.settings.rowHeight;
 		
@@ -230,16 +230,16 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			}
 		}
 		
-		hud.renderer.renderRect(x, y, width, height, color);
+		hud.renderer.renderRect(matrices, x, y, width, height, color);
 	}
 	
-	private void draw(int x, int y, int color, int count) {
+	private void draw(MatrixStack matrices, int x, int y, int color, int count) {
 		for (int i = 0; i < count; i++) {
-			draw(x + i * (hud.settings.columnWidth + hud.settings.gridSize), y, color);
+			draw(matrices, x + i * (hud.settings.columnWidth + hud.settings.gridSize), y, color);
 		}
 	}
 	
-	private void drawOn(int x, int y, int color) {
+	private void drawOn(MatrixStack matrices, int x, int y, int color) {
 		x += 1;
 		y += 1;
 		int width = hud.settings.columnWidth - 2;
@@ -253,15 +253,15 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			}
 		}
 		
-		hud.renderer.renderRect(x, y, width, height, color);
+		hud.renderer.renderRect(matrices, x, y, width, height, color);
 	}
 	
-	private void drawOff(int x, int y, int color) {
-		GlStateManager.pushMatrix();
-		drawOn(x, y, hud.settings.colorBackground);
-		GlStateManager.translate(0, 0, -0.01);
-		draw(x, y, color);
-		GlStateManager.popMatrix();
+	private void drawOff(MatrixStack matrices, int x, int y, int color) {
+		matrices.push();
+		drawOn(matrices, x, y, hud.settings.colorBackground);
+		matrices.translate(0, 0, -0.01);
+		draw(matrices, x, y, color);
+		matrices.pop();
 	}
 	
 	protected enum Mode {

@@ -2,9 +2,10 @@ package redstone.multimeter.client.gui.element.button;
 
 import java.util.function.Supplier;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
@@ -15,27 +16,27 @@ import redstone.multimeter.client.gui.element.AbstractElement;
 public abstract class AbstractButton extends AbstractElement implements IButton {
 	
 	protected final MultimeterClient client;
-	protected final FontRenderer font;
-	private final Supplier<ITextComponent> messageSupplier;
+	protected final TextRenderer font;
+	private final Supplier<Text> messageSupplier;
 	private final Supplier<Tooltip> tooltipSupplier;
 	
 	private boolean active;
 	private boolean hovered;
-	private ITextComponent message;
+	private Text message;
 	
 	private boolean moved;
 	
-	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<ITextComponent> message, Supplier<Tooltip> tooltip) {
+	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip);
 	}
 	
-	protected AbstractButton(MultimeterClient client, int x, int y, int width, int height, Supplier<ITextComponent> message, Supplier<Tooltip> tooltip) {
+	protected AbstractButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip) {
 		super(x, y, width, height);
 		
-		Minecraft minecraftClient = client.getMinecraftClient();
+		MinecraftClient minecraftClient = client.getMinecraftClient();
 		
 		this.client = client;
-		this.font = minecraftClient.fontRenderer;
+		this.font = minecraftClient.textRenderer;
 		this.messageSupplier = message;
 		this.tooltipSupplier = tooltip;
 		
@@ -45,14 +46,14 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		if (moved) {
 			moved = false;
 			updateHovered(mouseX, mouseY);
 		}
 		
-		renderButton();
-		renderButtonMessage();
+		renderButton(matrices);
+		renderButtonMessage(matrices);
 	}
 	
 	@Override
@@ -98,12 +99,12 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 	
 	@Override
-	public ITextComponent getMessage() {
+	public Text getMessage() {
 		return message;
 	}
 	
 	@Override
-	public void setMessage(ITextComponent message) {
+	public void setMessage(Text message) {
 		this.message = message;
 	}
 	
@@ -119,11 +120,11 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 		setMessage(messageSupplier.get());
 	}
 	
-	protected void renderButton() {
+	protected void renderButton(MatrixStack matrices) {
 		TextureRegion texture = getBackgroundTexture();
 		
 		if (texture != null) {
-			drawTexturedButton(texture, getX(), getY(), getWidth(), getHeight());
+			drawTexturedButton(matrices, texture, getX(), getY(), getWidth(), getHeight());
 		}
 	}
 	
@@ -142,12 +143,12 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 		return TextureRegion.BASIC_BUTTON;
 	}
 	
-	protected void drawTexturedButton(TextureRegion region, int x, int y, int width, int height) {
+	protected void drawTexturedButton(MatrixStack matrices, TextureRegion region, int x, int y, int width, int height) {
 		boolean matchWidth = (width == region.width);
 		boolean matchHeight = (height == region.height);
 		
 		if (matchWidth && matchHeight) {
-			renderTextureRegion(region, x, y, width, height);
+			renderTextureRegion(matrices, region, x, y, width, height);
 		} else {
 			Texture texture = region.texture;
 			
@@ -176,33 +177,33 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 			int ty2 = region.y + region.height - bottomHeight;
 			int ty3 = region.y + region.height;
 			
-			renderTexture(texture, bufferBuilder -> {
-				drawTexture(bufferBuilder, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
-				drawTexture(bufferBuilder, texture, x0, y2, x1, y3, tx0, ty2, tx1, ty3);
-				drawTexture(bufferBuilder, texture, x2, y2, x3, y3, tx2, ty2, tx3, ty3);
-				drawTexture(bufferBuilder, texture, x2, y0, x3, y1, tx2, ty0, tx3, ty1);
+			renderTexture(matrices, texture, (bufferBuilder, model) -> {
+				drawTexture(bufferBuilder, model, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
+				drawTexture(bufferBuilder, model, texture, x0, y2, x1, y3, tx0, ty2, tx1, ty3);
+				drawTexture(bufferBuilder, model, texture, x2, y2, x3, y3, tx2, ty2, tx3, ty3);
+				drawTexture(bufferBuilder, model, texture, x2, y0, x3, y1, tx2, ty0, tx3, ty1);
 			});
 		}
 	}
 	
-	protected void renderButtonMessage() {
-		ITextComponent message = getMessage();
+	protected void renderButtonMessage(MatrixStack matrices) {
+		Text message = getMessage();
 		
 		if (message != null) {
 			int x = getMessageX(message);
 			int y = getMessageY();
 			int color = getMessageColor();
 			
-			renderText(font, message, x, y, true, color);
+			renderText(font, matrices, message, x, y, true, color);
 		}
 	}
 	
-	protected int getMessageX(ITextComponent message) {
-		return getX() + getWidth() - (getWidth() + getWidth(font, message)) / 2;
+	protected int getMessageX(Text message) {
+		return getX() + getWidth() - (getWidth() + font.getWidth(message)) / 2;
 	}
 	
 	public int getMessageY() {
-		return getY() + getHeight() - (getHeight() + font.FONT_HEIGHT) / 2;
+		return getY() + getHeight() - (getHeight() + font.fontHeight) / 2;
 	}
 	
 	protected int getMessageColor() {

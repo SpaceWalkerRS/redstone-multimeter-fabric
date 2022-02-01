@@ -4,15 +4,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NbtCompound;
 
-import redstone.multimeter.common.DimPos;
+import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ColorUtils;
 
 public class MeterProperties {
 	
-	private DimPos pos;
+	private WorldPos pos;
 	private String name;
 	private Integer color;
 	private Boolean movable;
@@ -22,7 +22,7 @@ public class MeterProperties {
 		
 	}
 	
-	public MeterProperties(DimPos pos, String name, Integer color, Boolean movable, Integer eventTypes) {
+	public MeterProperties(WorldPos pos, String name, Integer color, Boolean movable, Integer eventTypes) {
 		this.pos = pos;
 		this.name = name;
 		this.color = color;
@@ -35,7 +35,7 @@ public class MeterProperties {
 		return String.format("MeterProperties[pos: %s, name: %s, color: %s, movable: %s, event types: %s]", pos, name, color, movable, eventTypes);
 	}
 	
-	public DimPos getPos() {
+	public WorldPos getPos() {
 		return pos;
 	}
 	
@@ -67,45 +67,45 @@ public class MeterProperties {
 		return this;
 	}
 	
-	public NBTTagCompound toNbt() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public NbtCompound toNbt() {
+		NbtCompound nbt = new NbtCompound();
 		
 		if (pos != null) {
-			nbt.setTag("pos", pos.toNbt());
+			nbt.put("pos", pos.toNbt());
 		}
 		if (name != null) {
-			nbt.setString("name", name);
+			nbt.putString("name", name);
 		}
 		if (color != null) {
-			nbt.setInteger("color", color);
+			nbt.putInt("color", color);
 		}
 		if (movable != null) {
-			nbt.setBoolean("movable", movable);
+			nbt.putBoolean("movable", movable);
 		}
 		if (eventTypes != null) {
-			nbt.setInteger("event types", eventTypes);
+			nbt.putInt("event types", eventTypes);
 		}
 		
 		return nbt;
 	}
 	
-	public static MeterProperties fromNbt(NBTTagCompound nbt) {
+	public static MeterProperties fromNbt(NbtCompound nbt) {
 		MeterProperties properties = new MeterProperties();
 		
-		if (nbt.hasKey("pos")) {
-			properties.pos = DimPos.fromNbt(nbt.getCompoundTag("pos"));
+		if (nbt.contains("pos")) {
+			properties.pos = WorldPos.fromNbt(nbt.getCompound("pos"));
 		}
-		if (nbt.hasKey("name")) {
+		if (nbt.contains("name")) {
 			properties.name = nbt.getString("name");
 		}
-		if (nbt.hasKey("color")) {
-			properties.color = nbt.getInteger("color");
+		if (nbt.contains("color")) {
+			properties.color = nbt.getInt("color");
 		}
-		if (nbt.hasKey("movable")) {
+		if (nbt.contains("movable")) {
 			properties.movable = nbt.getBoolean("movable");
 		}
-		if (nbt.hasKey("event types")) {
-			properties.eventTypes = nbt.getInteger("event types");
+		if (nbt.contains("event types")) {
+			properties.eventTypes = nbt.getInt("event types");
 		}
 		
 		return properties;
@@ -193,8 +193,8 @@ public class MeterProperties {
 	
 	public static class MutableMeterProperties extends MeterProperties {
 		
-		public boolean setPos(DimPos pos) {
-			DimPos prevPos = super.pos;
+		public boolean setPos(WorldPos pos) {
+			WorldPos prevPos = super.pos;
 			super.pos = pos;
 			
 			return prevPos == null || !prevPos.equals(pos);

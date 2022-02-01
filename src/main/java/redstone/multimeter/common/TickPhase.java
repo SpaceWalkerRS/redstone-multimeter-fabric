@@ -2,8 +2,8 @@ package redstone.multimeter.common;
 
 import java.util.Arrays;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagByteArray;
+import net.minecraft.nbt.NbtByteArray;
+import net.minecraft.nbt.NbtElement;
 
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.util.NbtUtils;
@@ -95,7 +95,7 @@ public class TickPhase {
 		return new TickPhase(array);
 	}
 	
-	public NBTBase toNbt() {
+	public NbtElement toNbt() {
 		if (this == UNKNOWN) {
 			return NbtUtils.NULL;
 		}
@@ -106,15 +106,15 @@ public class TickPhase {
 			array[index] = (byte)tasks[index].getIndex();
 		}
 		
-		return new NBTTagByteArray(array);
+		return new NbtByteArray(array);
 	}
 	
-	public static TickPhase fromNbt(NBTBase nbt) {
-		if (nbt.getId() != NbtUtils.TYPE_BYTE_ARRAY) {
+	public static TickPhase fromNbt(NbtElement nbt) {
+		if (nbt.getType() != NbtElement.BYTE_ARRAY_TYPE) {
 			return UNKNOWN;
 		}
 		
-		NBTTagByteArray nbtArray = (NBTTagByteArray)nbt;
+		NbtByteArray nbtArray = (NbtByteArray)nbt;
 		byte[] array = nbtArray.getByteArray();
 		TickTask[] tasks = new TickTask[array.length];
 		

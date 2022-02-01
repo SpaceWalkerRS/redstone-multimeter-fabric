@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class Tooltip {
 	
 	public static final Tooltip EMPTY = new Tooltip();
 	
-	private final List<ITextComponent> lines;
+	private final List<Text> lines;
 	
-	public Tooltip(ITextComponent... lines) {
+	public Tooltip(Text... lines) {
 		this.lines = new ArrayList<>();
 		
 		if (lines != null && lines.length > 0) {
-			for (ITextComponent line : lines) {
+			for (Text line : lines) {
 				this.lines.add(line);
 			}
 		}
@@ -27,15 +27,15 @@ public class Tooltip {
 		return this == EMPTY || lines.isEmpty();
 	}
 	
-	public List<ITextComponent> getLines() {
+	public List<Text> getLines() {
 		return Collections.unmodifiableList(lines);
 	}
 	
 	public void add(String line) {
-		add(new TextComponentString(line));
+		add(new LiteralText(line));
 	}
 	
-	public void add(ITextComponent line) {
+	public void add(Text line) {
 		if (this == EMPTY) {
 			throw new UnsupportedOperationException("cannot add more lines to the EMPTY tooltip!");
 		}
@@ -48,16 +48,16 @@ public class Tooltip {
 			return EMPTY;
 		}
 		
-		ITextComponent[] lines = new ITextComponent[strings.length];
+		Text[] lines = new Text[strings.length];
 		
 		for (int index = 0; index < strings.length; index++) {
-			lines[index] = new TextComponentString(strings[index]);
+			lines[index] = new LiteralText(strings[index]);
 		}
 		
 		return new Tooltip(lines);
 	}
 	
-	public static Tooltip of(ITextComponent... lines) {
+	public static Tooltip of(Text... lines) {
 		if (lines == null || lines.length == 0) {
 			return EMPTY;
 		}
@@ -65,12 +65,12 @@ public class Tooltip {
 		return new Tooltip(lines);
 	}
 	
-	public static Tooltip of(List<ITextComponent> texts) {
+	public static Tooltip of(List<Text> texts) {
 		if (texts == null || texts.isEmpty()) {
 			return EMPTY;
 		}
 		
-		ITextComponent[] lines = new ITextComponent[texts.size()];
+		Text[] lines = new Text[texts.size()];
 		
 		for (int index = 0; index < texts.size(); index++) {
 			lines[index] = texts.get(index);

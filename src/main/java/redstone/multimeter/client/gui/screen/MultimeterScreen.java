@@ -1,9 +1,8 @@
 package redstone.multimeter.client.gui.screen;
 
-import org.lwjgl.input.Keyboard;
-
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
@@ -18,15 +17,15 @@ public class MultimeterScreen extends RSMMScreen {
 	private ScrollableListElement list;
 	
 	public MultimeterScreen(MultimeterClient client) {
-		super(client, new TextComponentString(RedstoneMultimeterMod.MOD_NAME), false);
+		super(client, new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
 		
-		this.isPauseScreen = !GuiScreen.isShiftKeyDown();
+		this.isPauseScreen = !Screen.hasShiftDown();
 	}
 	
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
-		Keyboard.enableRepeatEvents(false);
+		minecraftClient.keyboard.setRepeatEvents(false);
 	}
 	
 	@Override
@@ -37,7 +36,7 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	protected void initScreen() {
-		Keyboard.enableRepeatEvents(true);
+		minecraftClient.keyboard.setRepeatEvents(true);
 		
 		list = new ScrollableListElement(client, getWidth(), getHeight());
 		list.setX(getX());
@@ -59,9 +58,9 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 	
 	@Override
-	protected void renderContent(int mouseX, int mouseY) {
+	protected void renderContent(MatrixStack matrices, int mouseX, int mouseY) {
 		if (client.getHUD().hasContent()) {
-			super.renderContent(mouseX, mouseY);
+			super.renderContent(matrices, mouseX, mouseY);
 		} else {
 			String text;
 			
@@ -71,12 +70,12 @@ public class MultimeterScreen extends RSMMScreen {
 				text = "Nothing to see here! Subscribe to a meter group to get started.";
 			}
 			
-			int textWidth = font.getStringWidth(text);
-			int textHeight = font.FONT_HEIGHT;
+			int textWidth = font.getWidth(text);
+			int textHeight = font.fontHeight;
 			int x = getX() + (getWidth() - textWidth) / 2;
 			int y = getY() + (getHeight() - textHeight) / 2;
 			
-			renderText(font, text, x, y, true, 0xFFFFFFFF);
+			renderText(font, matrices, text, x, y, true, 0xFFFFFFFF);
 		}
 	}
 }

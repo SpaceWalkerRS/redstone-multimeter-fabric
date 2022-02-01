@@ -3,10 +3,10 @@ package redstone.multimeter.common.meter;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
 
-import redstone.multimeter.common.DimPos;
+import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.log.MeterLogs;
@@ -63,7 +63,7 @@ public class Meter {
 		update.accept(properties);
 	}
 	
-	public DimPos getPos() {
+	public WorldPos getPos() {
 		return properties.getPos();
 	}
 	
@@ -125,20 +125,20 @@ public class Meter {
 		this.hidden = hidden;
 	}
 	
-	public NBTTagCompound toNbt() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public NbtCompound toNbt() {
+		NbtCompound nbt = new NbtCompound();
 		
-		nbt.setLong("id", id);
-		nbt.setTag("properties", properties.toNbt());
-		nbt.setBoolean("powered", powered);
-		nbt.setBoolean("active", active);
+		nbt.putLong("id", id);
+		nbt.put("properties", properties.toNbt());
+		nbt.putBoolean("powered", powered);
+		nbt.putBoolean("active", active);
 		
 		return nbt;
 	}
 	
-	public static Meter fromNbt(NBTTagCompound nbt) {
+	public static Meter fromNbt(NbtCompound nbt) {
 		long id = nbt.getLong("id");
-		MeterProperties properties = MeterProperties.fromNbt(nbt.getCompoundTag("properties"));
+		MeterProperties properties = MeterProperties.fromNbt(nbt.getCompound("properties"));
 		boolean powered = nbt.getBoolean("powered");
 		boolean active = nbt.getBoolean("active");
 		

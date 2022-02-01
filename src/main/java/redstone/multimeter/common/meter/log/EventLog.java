@@ -1,6 +1,6 @@
 package redstone.multimeter.common.meter.log;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NbtCompound;
 
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.common.TickPhase;
@@ -97,24 +97,24 @@ public class EventLog {
 		return tooltip;
 	}
 	
-	public NBTTagCompound toNbt() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public NbtCompound toNbt() {
+		NbtCompound nbt = new NbtCompound();
 		
-		nbt.setTag("meter event", event.toNbt());
-		nbt.setLong("tick", tick);
-		nbt.setInteger("subtick", subtick);
-		nbt.setTag("tick phase", tickPhase.toNbt());
+		nbt.put("meter event", event.toNbt());
+		nbt.putLong("tick", tick);
+		nbt.putInt("subtick", subtick);
+		nbt.put("tick phase", tickPhase.toNbt());
 		
 		return nbt;
 	}
 	
-	public static EventLog fromNbt(NBTTagCompound nbt) {
+	public static EventLog fromNbt(NbtCompound nbt) {
 		EventLog log = new EventLog();
 		
-		log.event = MeterEvent.fromNbt(nbt.getCompoundTag("meter event"));
+		log.event = MeterEvent.fromNbt(nbt.getCompound("meter event"));
 		log.tick = nbt.getLong("tick");
-		log.subtick = nbt.getInteger("subtick");
-		log.tickPhase = TickPhase.fromNbt(nbt.getTag("tick phase"));
+		log.subtick = nbt.getInt("subtick");
+		log.tickPhase = TickPhase.fromNbt(nbt.get("tick phase"));
 		
 		return log;
 	}

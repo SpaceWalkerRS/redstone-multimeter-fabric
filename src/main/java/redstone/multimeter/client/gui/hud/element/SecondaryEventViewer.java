@@ -1,5 +1,7 @@
 package redstone.multimeter.client.gui.hud.element;
 
+import net.minecraft.client.util.math.MatrixStack;
+
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
@@ -13,9 +15,9 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
 		if (hud.isPaused() && getColumnCount() > 0) {
-			super.render(mouseX, mouseY);
+			super.render(matrices, mouseX, mouseY);
 		}
 	}
 	
@@ -39,27 +41,27 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 	
 	@Override
-	protected void drawHighlights(int mouseX, int mouseY) {
+	protected void drawHighlights(MatrixStack matrices, int mouseX, int mouseY) {
 		if (isHovered(mouseX, mouseY)) {
 			int column = getHoveredColumn(mouseX);
 			int row = hud.getHoveredRow(mouseY);
 			
-			drawHighlight(column, 1, row, 1, false);
+			drawHighlight(matrices, column, 1, row, 1, false);
 		}
 	}
 	
 	@Override
-	protected void drawDecorators() {
+	protected void drawDecorators(MatrixStack matrices) {
 		
 	}
 	
 	@Override
-	protected void drawMeterEvents() {
+	protected void drawMeterEvents(MatrixStack matrices) {
 		long tick = hud.getSelectedTick();
 		int subticks = hud.client.getMeterGroup().getLogManager().getSubTickCount(tick);
 		
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderSubtickLogs(x, y, tick, subticks, meter);
+			hud.eventRenderers.renderSubtickLogs(matrices, x, y, tick, subticks, meter);
 		});
 	}
 	

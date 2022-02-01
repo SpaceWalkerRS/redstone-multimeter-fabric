@@ -1,6 +1,6 @@
 package redstone.multimeter.interfaces.mixin;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -18,7 +18,7 @@ public interface IBlock {
 		return true;
 	}
 	
-	default boolean isPoweredRSMM(World world, BlockPos pos, IBlockState state) {
-		return world.isBlockPowered(pos);
+	default boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
+		return world.isReceivingRedstonePower(pos);
 	}
 }

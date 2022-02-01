@@ -2,7 +2,7 @@ package redstone.multimeter.client.gui.hud.event;
 
 import java.util.function.BiFunction;
 
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.util.math.MatrixStack;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
@@ -29,7 +29,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderTickLogs(int x, int y, long firstTick, long lastTick,  Meter meter) {
+	public void renderTickLogs(MatrixStack matrices, int x, int y, long firstTick, long lastTick,  Meter meter) {
 		y += hud.settings.gridSize;
 		
 		MeterLogs logs = meter.getLogs();
@@ -55,7 +55,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 				int column = (int)(tick - firstTick); // The event is no older than 1M ticks, so we can safely cast to int
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 				
-				drawEvent(columnX, y, meter, log.getEvent());
+				drawEvent(matrices, columnX, y, meter, log.getEvent());
 			}
 			
 			if ((log = logs.getLog(type, ++index)) == null) {
@@ -65,7 +65,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 	
 	@Override
-	public void renderSubtickLogs(int x, int y, long tick, int subTickCount, Meter meter) {
+	public void renderSubtickLogs(MatrixStack matrices, int x, int y, long tick, int subTickCount, Meter meter) {
 		y += hud.settings.gridSize;
 		
 		MeterLogs logs = meter.getLogs();
@@ -80,7 +80,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 			int column = log.getSubtick();
 			int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 			
-			drawEvent(columnX, y, meter, log.getEvent());
+			drawEvent(matrices, columnX, y, meter, log.getEvent());
 			
 			if ((log = logs.getLog(type, ++index)) == null) {
 				break;
@@ -92,15 +92,15 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		this.type = type;
 	}
 	
-	protected void drawEvent(int x, int y, Meter meter, MeterEvent event) {
-		GlStateManager.pushMatrix();
-		drawCenter(x, y, meter ,event);
-		GlStateManager.translate(0, 0, -0.01);
-		drawEdges(x, y, meter ,event);
-		GlStateManager.popMatrix();
+	protected void drawEvent(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
+		matrices.push();
+		drawCenter(matrices, x, y, meter ,event);
+		matrices.translate(0, 0, -0.01);
+		drawEdges(matrices, x, y, meter ,event);
+		matrices.pop();
 	}
 	
-	protected void drawEdges(int x, int y, Meter meter, MeterEvent event) {
+	protected void drawEdges(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
 		if (hud.settings.rowHeight < 3) {
 			return;
 		}
@@ -110,15 +110,15 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		int height = (2 * half < hud.settings.rowHeight) ? 3 : 4;
 		int color = edgeColorProvider.apply(meter, event);
 		
-		hud.renderer.renderRect(x, y + half - (height / 2), width, height, color);
+		hud.renderer.renderRect(matrices, x, y + half - (height / 2), width, height, color);
 	}
 	
-	protected void drawCenter(int x, int y, Meter meter, MeterEvent event) {
+	protected void drawCenter(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
 		int width = hud.settings.columnWidth;
 		int half = hud.settings.rowHeight / 2;
 		int height = (2 * half < hud.settings.rowHeight) ? 1 : 2;
 		int color = centerColorProvider.apply(meter, event);
 		
-		hud.renderer.renderRect(x, y + half - (height / 2), width, height, color);
+		hud.renderer.renderRect(matrices, x, y + half - (height / 2), width, height, color);
 	}
 }

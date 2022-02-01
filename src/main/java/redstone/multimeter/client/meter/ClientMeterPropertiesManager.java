@@ -22,19 +22,21 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.KeyBindings;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;
-import redstone.multimeter.common.DimPos;
+import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.MeterPropertiesManager;
@@ -50,9 +52,9 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	
 	private final MultimeterClient client;
 	private final File folder;
-	private final Map<ResourceLocation, MeterProperties> defaults;
-	private final Map<ResourceLocation, MeterProperties> overrides;
-	private final Map<ResourceLocation, MeterProperties> cache;
+	private final Map<Identifier, MeterProperties> defaults;
+	private final Map<Identifier, MeterProperties> overrides;
+	private final Map<Identifier, MeterProperties> cache;
 	
 	public ClientMeterPropertiesManager(MultimeterClient multimeterClient) {
 		this.client = multimeterClient;
@@ -69,14 +71,14 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	@Override
-	protected World getWorldOf(DimPos pos) {
-		Minecraft minecraftClient = client.getMinecraftClient();
+	protected World getWorldOf(WorldPos pos) {
+		MinecraftClient minecraftClient = client.getMinecraftClient();
 		return pos.isOf(minecraftClient.world) ? minecraftClient.world : null;
 	}
 	
 	@Override
 	protected void postValidation(MutableMeterProperties properties, World world, BlockPos pos) {
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 		
 		MeterProperties defaultProperties = getDefaultProperties(block);
@@ -92,7 +94,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			properties.setName(String.format("%s %d", name, number));
 		}
 		if (Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
-			properties.setMovable(!GuiScreen.isShiftKeyDown());
+			properties.setMovable(!Screen.hasShiftDown());
 		}
 		for (int index = 0; index < EventType.ALL.length; index++) {
 			KeyBinding keyBind = KeyBindings.TOGGLE_EVENT_TYPES[index];
@@ -102,29 +104,29 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 				properties.toggleEventType(type);
 			}
 		}
-		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && block.getTickRandomly()) {
+		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.hasRandomTicks()) {
 			if (!properties.hasEventType(EventType.RANDOM_TICK)) {
 				properties.toggleEventType(EventType.RANDOM_TICK);
 			}
 		}
 	}
 	
-	public Map<ResourceLocation, MeterProperties> getDefaults() {
+	public Map<Identifier, MeterProperties> getDefaults() {
 		return Collections.unmodifiableMap(defaults);
 	}
 	
-	public Map<ResourceLocation, MeterProperties> getOverrides() {
+	public Map<Identifier, MeterProperties> getOverrides() {
 		return Collections.unmodifiableMap(overrides);
 	}
 	
-	public <T extends MeterProperties> void update(Map<ResourceLocation, T> newOverrides) {
-		Map<ResourceLocation, MeterProperties> prev = new HashMap<>(overrides);
+	public <T extends MeterProperties> void update(Map<Identifier, T> newOverrides) {
+		Map<Identifier, MeterProperties> prev = new HashMap<>(overrides);
 		
 		overrides.clear();
 		cache.clear();
 		
-		for (Entry<ResourceLocation, T> entry : newOverrides.entrySet()) {
-			ResourceLocation blockId = entry.getKey();
+		for (Entry<Identifier, T> entry : newOverrides.entrySet()) {
+			Identifier blockId = entry.getKey();
 			MeterProperties properties = entry.getValue();
 			
 			prev.remove(blockId);
@@ -133,13 +135,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		
 		save();
 		
-		for (ResourceLocation blockId : prev.keySet()) {
+		for (Identifier blockId : prev.keySet()) {
 			deleteOverrideFile(blockId);
 		}
 	}
 	
 	private MeterProperties getDefaultProperties(Block block) {
-		ResourceLocation blockId = Block.REGISTRY.getNameForObject(block);
+		Identifier blockId = Registry.BLOCK.getId(block);
 		
 		if (blockId == null) {
 			return null; // we should never get here
@@ -147,7 +149,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		
 		return cache.computeIfAbsent(blockId, key -> {
 			String namespace = blockId.getNamespace();
-			ResourceLocation defaultId = new ResourceLocation(namespace, DEFAULT_ID);
+			Identifier defaultId = new Identifier(namespace, DEFAULT_ID);
 			
 			return new MutableMeterProperties().
 				fill(overrides.get(blockId)).
@@ -161,16 +163,16 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	private void initDefaults() {
 		Set<String> namespaces = new HashSet<>();
 		
-		for (ResourceLocation blockId : Block.REGISTRY.getKeys()) {
+		for (Identifier blockId : Registry.BLOCK.getIds()) {
 			loadDefaultProperties(blockId);
 			
 			if (namespaces.add(blockId.getNamespace())) {
-				loadDefaultProperties(new ResourceLocation(blockId.getNamespace(), DEFAULT_ID));
+				loadDefaultProperties(new Identifier(blockId.getNamespace(), DEFAULT_ID));
 			}
 		}
 	}
 	
-	private void loadDefaultProperties(ResourceLocation blockId) {
+	private void loadDefaultProperties(Identifier blockId) {
 		String path = String.format("%s/%s/%s%s", RESOURCES_PATH, blockId.getNamespace(), blockId.getPath(), FILE_EXTENSION);
 		InputStream resource = getClass().getResourceAsStream(path);
 		
@@ -212,13 +214,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		path = path.substring(0, path.length() - FILE_EXTENSION.length());
 		
 		try (FileReader fr = new FileReader(file)) {
-			loadProperties(overrides, new ResourceLocation(namespace, path), fr);
-		} catch (IOException | JsonSyntaxException | JsonIOException e) {
+			loadProperties(overrides, new Identifier(namespace, path), fr);
+		} catch (InvalidIdentifierException | IOException | JsonSyntaxException | JsonIOException e) {
 			
 		}
 	}
 	
-	private static void loadProperties(Map<ResourceLocation, MeterProperties> map, ResourceLocation blockId, Reader reader) {
+	private static void loadProperties(Map<Identifier, MeterProperties> map, Identifier blockId, Reader reader) {
 		JsonElement rawJson = GSON.fromJson(reader, JsonElement.class);
 		
 		if (rawJson.isJsonObject()) {
@@ -230,15 +232,15 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	public void save() {
-		for (Entry<ResourceLocation, MeterProperties> entry : overrides.entrySet()) {
-			ResourceLocation blockId = entry.getKey();
+		for (Entry<Identifier, MeterProperties> entry : overrides.entrySet()) {
+			Identifier blockId = entry.getKey();
 			MeterProperties properties = entry.getValue();
 			
 			saveUserOverrides(blockId, properties);
 		}
 	}
 	
-	private void saveUserOverrides(ResourceLocation blockId, MeterProperties properties) {
+	private void saveUserOverrides(Identifier blockId, MeterProperties properties) {
 		String namespace = blockId.getNamespace();
 		String path = blockId.getPath();
 		
@@ -275,7 +277,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 	
-	private void deleteOverrideFile(ResourceLocation blockId) {
+	private void deleteOverrideFile(Identifier blockId) {
 		String namespace = blockId.getNamespace();
 		String path = blockId.getPath();
 		

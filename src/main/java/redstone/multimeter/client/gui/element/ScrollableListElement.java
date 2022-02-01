@@ -1,5 +1,9 @@
 package redstone.multimeter.client.gui.element;
 
+import org.lwjgl.glfw.GLFW;
+
+import net.minecraft.client.util.math.MatrixStack;
+
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;
 
@@ -28,8 +32,8 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 	
 	@Override
-	protected void renderList(int mouseX, int mouseY) {
-		super.renderList(mouseX, mouseY);
+	protected void renderList(MatrixStack matrices, int mouseX, int mouseY) {
+		super.renderList(matrices, mouseX, mouseY);
 		
 		if (getMaxScrollAmount() > 0.0D) {
 			if (scrollMode == ScrollMode.PULL) {
@@ -46,7 +50,7 @@ public class ScrollableListElement extends SimpleListElement {
 				}
 			}
 			
-			renderScrollBar(isHovered(mouseX, mouseY));
+			renderScrollBar(matrices, isHovered(mouseX, mouseY));
 		}
 	}
 	
@@ -54,7 +58,7 @@ public class ScrollableListElement extends SimpleListElement {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!consumed && button == MOUSE_BUTTON_LEFT) {
+		if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			scrollMode = getScrollMode(mouseX, mouseY);
 			
 			if (scrollMode != ScrollMode.NONE) {
@@ -69,7 +73,7 @@ public class ScrollableListElement extends SimpleListElement {
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 		
-		if (button == MOUSE_BUTTON_LEFT) {
+		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			scrollMode = ScrollMode.NONE;
 		}
 		
@@ -215,8 +219,8 @@ public class ScrollableListElement extends SimpleListElement {
 		}
 	}
 	
-	protected void renderScrollBar(boolean dark) {
-		renderRect(scrollBarX, scrollBarY, scrollBarWidth, scrollBarHeight, 0xFF000000); // background
+	protected void renderScrollBar(MatrixStack matrices, boolean dark) {
+		renderRect(matrices, scrollBarX, scrollBarY, scrollBarWidth, scrollBarHeight, 0xFF000000); // background
 		
 		int visibleHeight = height;
 		int totalHeight = visibleHeight + (int)getMaxScrollAmount();
@@ -229,8 +233,8 @@ public class ScrollableListElement extends SimpleListElement {
 		int color0 = dark ? 0xFF555555 : 0xFF777777;
 		int color1 = dark ? 0xFF999999 : 0xFFBBBBBB;
 		
-		renderRect(x, y, width    , height    , color0);
-		renderRect(x, y, width - 1, height - 1, color1);
+		renderRect(matrices, x, y, width    , height    , color0);
+		renderRect(matrices, x, y, width - 1, height - 1, color1);
 	}
 	
 	protected enum ScrollMode {

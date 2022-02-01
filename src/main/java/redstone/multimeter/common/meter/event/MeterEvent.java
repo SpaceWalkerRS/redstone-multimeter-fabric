@@ -2,8 +2,8 @@ package redstone.multimeter.common.meter.event;
 
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.Tooltip;
 
@@ -29,11 +29,11 @@ public class MeterEvent {
 		type.addTextToTooltip(tooltip, metadata);
 		
 		if (!tooltip.isEmpty()) {
-			List<ITextComponent> lines = tooltip.getLines();
+			List<Text> lines = tooltip.getLines();
 			String[] args = new String[lines.size()];
 			
 			for (int index = 0; index < lines.size(); index++) {
-				args[index] = lines.get(index).getUnformattedText();
+				args[index] = lines.get(index).getString();
 			}
 			
 			string += "[" + String.join(", ", args) + "]";
@@ -50,20 +50,20 @@ public class MeterEvent {
 		return metadata;
 	}
 	
-	public NBTTagCompound toNbt() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public NbtCompound toNbt() {
+		NbtCompound nbt = new NbtCompound();
 		
-		nbt.setTag("type", type.toNbt());
-		nbt.setInteger("metadata", metadata);
+		nbt.put("type", type.toNbt());
+		nbt.putInt("metadata", metadata);
 		
 		return nbt;
 	}
 	
-	public static MeterEvent fromNbt(NBTTagCompound nbt) {
+	public static MeterEvent fromNbt(NbtCompound nbt) {
 		MeterEvent event = new MeterEvent();
 		
-		event.type = EventType.fromNbt(nbt.getTag("type"));
-		event.metadata = nbt.getInteger("metadata");
+		event.type = EventType.fromNbt(nbt.get("type"));
+		event.metadata = nbt.getInt("metadata");
 		
 		return event;
 	}

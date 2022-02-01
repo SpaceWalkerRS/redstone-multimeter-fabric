@@ -4,14 +4,14 @@ import java.io.File;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -26,7 +26,7 @@ import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.client.render.MeterRenderer;
 import redstone.multimeter.common.TickPhaseTree;
-import redstone.multimeter.common.DimPos;
+import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
@@ -53,7 +53,7 @@ public class MultimeterClient {
 		return warning;
 	};
 	
-	private final Minecraft client;
+	private final MinecraftClient client;
 	private final ClientPacketHandler packetHandler;
 	private final InputHandler inputHandler;
 	private final MeterRenderer meterRenderer;
@@ -66,7 +66,7 @@ public class MultimeterClient {
 	private boolean hudEnabled;
 	private long prevServerTime;
 	
-	public MultimeterClient(Minecraft client) {
+	public MultimeterClient(MinecraftClient client) {
 		this.client = client;
 		this.packetHandler = new ClientPacketHandler(this);
 		this.inputHandler = new InputHandler(this);
@@ -84,7 +84,7 @@ public class MultimeterClient {
 		reloadResources();
 	}
 	
-	public Minecraft getMinecraftClient() {
+	public MinecraftClient getMinecraftClient() {
 		return client;
 	}
 	
@@ -121,11 +121,11 @@ public class MultimeterClient {
 	}
 	
 	public void requestTickPhaseTree() {
-		TickPhaseTreePacket packet = new TickPhaseTreePacket(new NBTTagCompound());
+		TickPhaseTreePacket packet = new TickPhaseTreePacket(new NbtCompound());
 		packetHandler.send(packet);
 	}
 	
-	public void refreshTickPhaseTree(NBTTagCompound nbt) {
+	public void refreshTickPhaseTree(NbtCompound nbt) {
 		if (tickPhaseTree == null) {
 			tickPhaseTree = new TickPhaseTree();
 		}
@@ -164,8 +164,8 @@ public class MultimeterClient {
 		return getConfigFolder(client);
 	}
 	
-	public static File getConfigFolder(Minecraft client) {
-		return new File(client.gameDir, RedstoneMultimeterMod.CONFIG_PATH);
+	public static File getConfigFolder(MinecraftClient client) {
+		return new File(client.runDirectory, RedstoneMultimeterMod.CONFIG_PATH);
 	}
 	
 	public void reloadResources() {
@@ -209,7 +209,7 @@ public class MultimeterClient {
 			connected = true;
 			
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				ITextComponent warning = new TextComponentString(VERSION_WARNING.apply(modVersion)).setStyle(new Style().setColor(TextFormatting.RED));
+				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
 				sendMessage(warning, false);
 			}
 			
@@ -264,7 +264,7 @@ public class MultimeterClient {
 		});
 	}
 	
-	private void addMeter(DimPos pos) {
+	private void addMeter(WorldPos pos) {
 		MutableMeterProperties properties = new MutableMeterProperties();
 		properties.setPos(pos);
 		
@@ -320,14 +320,14 @@ public class MultimeterClient {
 		});
 	}
 	
-	private void onTargetBlock(Consumer<DimPos> consumer) {
-		RayTraceResult hitResult = client.objectMouseOver;
+	private void onTargetBlock(Consumer<WorldPos> consumer) {
+		HitResult hitResult = client.crosshairTarget;
 		
-		if (hitResult.typeOfHit == RayTraceResult.Type.BLOCK) {
+		if (hitResult.getType() == HitResult.Type.BLOCK) {
 			World world = client.world;
-			BlockPos blockPos = hitResult.getBlockPos();
+			BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
 			
-			consumer.accept(new DimPos(world, blockPos));
+			consumer.accept(new WorldPos(world, blockPos));
 		}
 	}
 	
@@ -336,7 +336,7 @@ public class MultimeterClient {
 			hudEnabled = !hudEnabled;
 			
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(new TextComponentString(message), true);
+			sendMessage(new LiteralText(message), true);
 		}
 	}
 	
@@ -350,7 +350,7 @@ public class MultimeterClient {
 	}
 	
 	public void openScreen(RSMMScreen screen) {
-		client.displayGuiScreen(new ScreenWrapper(client.currentScreen, screen));
+		client.setScreen(new ScreenWrapper(client.currentScreen, screen));
 	}
 	
 	public boolean hasScreenOpen() {
@@ -371,7 +371,7 @@ public class MultimeterClient {
 		return screen != null && screen instanceof OptionsScreen;
 	}
 	
-	public void sendMessage(ITextComponent message, boolean actionBar) {
-		client.player.sendStatusMessage(message, actionBar);
+	public void sendMessage(Text message, boolean actionBar) {
+		client.player.sendMessage(message, actionBar);
 	}
 }

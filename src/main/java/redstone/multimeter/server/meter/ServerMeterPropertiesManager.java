@@ -3,7 +3,7 @@ package redstone.multimeter.server.meter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import redstone.multimeter.common.DimPos;
+import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.MeterPropertiesManager;
 import redstone.multimeter.common.meter.event.EventType;
@@ -19,7 +19,7 @@ public class ServerMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	@Override
-	protected World getWorldOf(DimPos pos) {
+	protected World getWorldOf(WorldPos pos) {
 		return multimeter.getMultimeterServer().getWorldOf(pos);
 	}
 	

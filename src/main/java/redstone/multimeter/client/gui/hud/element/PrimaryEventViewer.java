@@ -1,7 +1,10 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.client.util.math.MatrixStack;
+
+import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -14,6 +17,23 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	
 	public PrimaryEventViewer(MultimeterHud hud) {
 		super(hud);
+	}
+	
+	@Override
+	public void mouseMove(double mouseX, double mouseY) {
+		if (!isDraggingMouse()) {
+			CursorType cursor = CursorType.ARROW;
+			
+			if (isHovered(mouseX, mouseY)) {
+				if (isBorderHovered(mouseX)) {
+					cursor = CursorType.HRESIZE;
+				} else if (hud.isPaused()) {
+					cursor = CursorType.HAND;
+				}
+			}
+			
+			setCursor(hud.client.getMinecraftClient(), cursor);
+		}
 	}
 	
 	@Override
@@ -31,7 +51,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				
 				consumed = true;
 			}
-			if (hud.isPaused() && button == MOUSE_BUTTON_RIGHT) {
+			if (hud.isPaused() && button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
 				int column = getHoveredColumn(mouseX);
 				int max = getColumnCount() - 1;
 				
@@ -51,7 +71,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		if (button == MOUSE_BUTTON_LEFT) {
+		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			dx = 0.0D;
 			resizing = false;
 		}
@@ -78,34 +98,34 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 	
 	@Override
-	protected void drawHighlights(int mouseX, int mouseY) {
-		GlStateManager.pushMatrix();
+	protected void drawHighlights(MatrixStack matrices, int mouseX, int mouseY) {
+		matrices.push();
 		
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
 			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
-				drawHighlight(getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
+				drawHighlight(matrices, getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
 			}
 			
-			drawHighlight(Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
+			drawHighlight(matrices, Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
 		}
 		
-		GlStateManager.translate(0, 0, -0.1);
+		matrices.translate(0, 0, -0.1);
 		
 		if (hud.hasTickMarker()) {
- 			long tick = hud.getTickMarker();
- 			int column = hud.getColumn(tick);
- 			
- 			if (column >= 0) {
- 				drawHighlight(column, 1, 0, hud.meters.size(), hud.settings.colorHighlightTickMarker);
- 			}
- 		}
+			long tick = hud.getTickMarker();
+			int column = hud.getColumn(tick);
+			
+			if (column >= 0) {
+				drawHighlight(matrices, column, 1, 0, hud.meters.size(), hud.settings.colorHighlightTickMarker);
+			}
+		}
 		
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 	
 	@Override
-	protected void drawDecorators() {
-		if (hud.settings.rowHeight < hud.font.FONT_HEIGHT) {
+	protected void drawDecorators(MatrixStack matrices) {
+		if (hud.settings.rowHeight < hud.font.fontHeight) {
 			return;
 		}
 		
@@ -113,17 +133,17 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		long currentTick = hud.client.getPrevServerTime() + 1;
 		
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderPulseLengths(x, y, firstTick, currentTick, meter);
+			hud.eventRenderers.renderPulseLengths(matrices, x, y, firstTick, currentTick, meter);
 		});
 	}
 	
 	@Override
-	protected void drawMeterEvents() {
+	protected void drawMeterEvents(MatrixStack matrices) {
 		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
 		long lastTick = hud.client.getPrevServerTime() + 1;
 		
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderTickLogs(x, y, firstTick, lastTick, meter);
+			hud.eventRenderers.renderTickLogs(matrices, x, y, firstTick, lastTick, meter);
 		});
 	}
 	

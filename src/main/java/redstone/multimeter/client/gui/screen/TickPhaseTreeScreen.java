@@ -1,7 +1,7 @@
 package redstone.multimeter.client.gui.screen;
 
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.client.gui.screen.ScreenTexts;
+import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -19,7 +19,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 	private long lastRequestTime;
 	
 	public TickPhaseTreeScreen(MultimeterClient client) {
-		super(client, new TextComponentString("Tick Phase Tree"), true);
+		super(client, new LiteralText("Tick Phase Tree"), true);
 		
 		this.tickPhaseTree = this.client.getTickPhaseTree();
 		this.lastRequestTime = -1;
@@ -42,8 +42,8 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			request();
 			
 			String text = "Requesting tick phase tree from server...";
-			int x = getX() + (getWidth() - font.getStringWidth(text)) / 2;
-			int y = getY() + (getHeight() - font.FONT_HEIGHT) / 2;
+			int x = getX() + (getWidth() - font.getWidth(text)) / 2;
+			int y = getY() + (getHeight() - font.fontHeight) / 2;
 			TextElement textElement = new TextElement(client, x, y, t -> t.add(text).setWithShadow(true), () -> {
 				if (lastRequestTime > 0) {
 					long time = System.currentTimeMillis();
@@ -77,7 +77,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 		int x = getX() + (getWidth() - IButton.DEFAULT_WIDTH) / 2;
 		int y = getY() + getHeight() - (8 + IButton.DEFAULT_HEIGHT);
 		
-		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TextComponentTranslation("gui.done"), () -> Tooltip.EMPTY, button -> {
+		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> ScreenTexts.DONE, () -> Tooltip.EMPTY, button -> {
 			close();
 			return true;
 		});

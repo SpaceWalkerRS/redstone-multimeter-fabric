@@ -5,12 +5,13 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -19,21 +20,21 @@ import redstone.multimeter.util.TextUtils;
 
 public class BlockListElement extends SelectableScrollableListElement {
 	
-	private final RenderItem itemRenderer;
-	private final FontRenderer textRenderer;
-	private final Consumer<ResourceLocation> selectionListener;
+	private final ItemRenderer itemRenderer;
+	private final TextRenderer textRenderer;
+	private final Consumer<Identifier> selectionListener;
 	
-	public BlockListElement(MultimeterClient client, int width, int height, Consumer<ResourceLocation> selector) {
+	public BlockListElement(MultimeterClient client, int width, int height, Consumer<Identifier> selector) {
 		this(client, width, height, 0, 0, selector);
 	}
 	
-	public BlockListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder, Consumer<ResourceLocation> selectionListener) {
+	public BlockListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder, Consumer<Identifier> selectionListener) {
 		super(client, width, height, topBorder, bottomBorder);
 		
-		Minecraft minecraftClient = this.client.getMinecraftClient();
+		MinecraftClient minecraftClient = this.client.getMinecraftClient();
 		
-		this.itemRenderer = minecraftClient.getRenderItem();
-		this.textRenderer = minecraftClient.fontRenderer;
+		this.itemRenderer = minecraftClient.getItemRenderer();
+		this.textRenderer = minecraftClient.textRenderer;
 		this.selectionListener = selectionListener;
 		
 		setSorter((o1, o2) -> {
@@ -58,17 +59,17 @@ public class BlockListElement extends SelectableScrollableListElement {
 		}
 	}
 	
-	public void add(ResourceLocation blockId) {
+	public void add(Identifier blockId) {
 		addChild(new BlockListEntry(getEffectiveWidth(), IButton.DEFAULT_HEIGHT, blockId));
 	}
 	
-	public void add(Collection<ResourceLocation> blockIds) {
-		for (ResourceLocation blockId : blockIds) {
+	public void add(Collection<Identifier> blockIds) {
+		for (Identifier blockId : blockIds) {
 			add(blockId);
 		}
 	}
 	
-	public void setBlockFilter(Predicate<ResourceLocation> filter) {
+	public void setBlockFilter(Predicate<Identifier> filter) {
 		setFilter(e -> {
 			if (e instanceof BlockListEntry) {
 				BlockListEntry entry = (BlockListEntry)e;
@@ -81,38 +82,36 @@ public class BlockListElement extends SelectableScrollableListElement {
 	
 	private class BlockListEntry extends AbstractElement {
 		
-		private final ResourceLocation blockId;
+		private final Identifier blockId;
 		private final Block block;
 		private final ItemStack stack;
 		
-		protected BlockListEntry(int width, int height, ResourceLocation blockId) {
+		protected BlockListEntry(int width, int height, Identifier blockId) {
 			super(0, 0, width, height);
 			
 			this.blockId = blockId;
-			this.block = Block.REGISTRY.getObject(blockId);
+			this.block = Registry.BLOCK.get(blockId);
 			
 			if (this.block == null) {
 				this.stack = null;
 			} else {
-				this.stack = new ItemStack(this.block);
+				this.stack = new ItemStack(this.block.asItem());
 			}
 		}
 		
 		@Override
-		public void render(int mouseX, int mouseY) {
+		public void render(MatrixStack matrices, int mouseX, int mouseY) {
 			int height = getHeight();
 			int x = getX() + 2;
 			int y = getY() + (height - 16) / 2;
 			
-			RenderHelper.enableGUIStandardItemLighting();
-			itemRenderer.renderItemIntoGUI(stack, x, y);
-			RenderHelper.disableStandardItemLighting();
+			itemRenderer.renderInGui(stack, x, y);
 			
 			x = getX() + 22;
-			y = getY() + height - (height + textRenderer.FONT_HEIGHT) / 2;
-			String text = textRenderer.trimStringToWidth(blockId.toString(), getWidth() - 22);
+			y = getY() + height - (height + textRenderer.fontHeight) / 2;
+			String text = textRenderer.trimToWidth(blockId.toString(), getWidth() - 22);
 			
-			renderText(textRenderer, text, x, y, true, 0xFFFFFFFF);
+			renderText(textRenderer, matrices, text, x, y, true, 0xFFFFFFFF);
 		}
 		
 		@Override
@@ -131,17 +130,17 @@ public class BlockListElement extends SelectableScrollableListElement {
 		}
 		
 		@Override
-		public boolean keyPress(int keyCode) {
+		public boolean keyPress(int keyCode, int scanCode, int modifiers) {
 			return false;
 		}
 		
 		@Override
-		public boolean keyRelease(int keyCode) {
+		public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
 			return false;
 		}
 		
 		@Override
-		public boolean typeChar(char chr) {
+		public boolean typeChar(char chr, int modifiers) {
 			return false;
 		}
 		
@@ -162,7 +161,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 			if (tooltip.isEmpty()) {
 				String rawId = blockId.toString();
 				
-				if (textRenderer.getStringWidth(rawId) > (getWidth() - 22)) {
+				if (textRenderer.getWidth(rawId) > (getWidth() - 22)) {
 					tooltip = Tooltip.of(TextUtils.toLines(textRenderer, rawId));
 				}
 			}

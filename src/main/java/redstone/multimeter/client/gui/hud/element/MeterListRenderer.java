@@ -1,10 +1,9 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.util.Formatting;
 
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -23,14 +22,14 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY) {
-		GlStateManager.pushMatrix();
-		drawHighlights(mouseX, mouseY);
-		GlStateManager.translate(0, 0, -1);
-		drawNames();
-		GlStateManager.translate(0, 0, -1);
-		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		GlStateManager.popMatrix();
+	public void render(MatrixStack matrices, int mouseX, int mouseY) {
+		matrices.push();
+		drawHighlights(matrices, mouseX, mouseY);
+		matrices.translate(0, 0, -1);
+		drawNames(matrices);
+		matrices.translate(0, 0, -1);
+		hud.renderer.renderRect(matrices, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
+		matrices.pop();
 	}
 	
 	@Override
@@ -54,17 +53,17 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode) {
+	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode) {
+	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
 	
 	@Override
-	public boolean typeChar(char chr) {
+	public boolean typeChar(char chr, int modifiers) {
 		return false;
 	}
 	
@@ -83,21 +82,21 @@ public class MeterListRenderer extends AbstractElement {
 		
 	}
 	
-	private void drawHighlights(int mouseX, int mouseY) {
+	private void drawHighlights(MatrixStack matrices, int mouseX, int mouseY) {
 		if (hud.isOnScreen()) {
 			if (isHovered(mouseX, mouseY)) {
-				drawHighlight(hud.getHoveredRow(mouseY), false);
+				drawHighlight(matrices, hud.getHoveredRow(mouseY), false);
 			}
 			
 			int selectedRow = hud.getSelectedRow();
 			
 			if (selectedRow >= 0) {
-				drawHighlight(selectedRow, true);
+				drawHighlight(matrices, selectedRow, true);
 			}
 		}
 	}
 	
-	private void drawHighlight(int row, boolean selection) {
+	private void drawHighlight(MatrixStack matrices, int row, boolean selection) {
 		int h = hud.settings.rowHeight + hud.settings.gridSize;
 		int x = 0;
 		int y = row * h;
@@ -105,26 +104,26 @@ public class MeterListRenderer extends AbstractElement {
 		int height = h;
 		int color = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
 		
-		hud.renderer.renderHighlight(x, y, width, height, color);
+		hud.renderer.renderHighlight(matrices, x, y, width, height, color);
 	}
 	
-	private void drawNames() {
-		if (hud.settings.rowHeight < hud.font.FONT_HEIGHT) {
+	private void drawNames(MatrixStack matrices) {
+		if (hud.settings.rowHeight < hud.font.fontHeight) {
 			return;
 		}
 		
 		int x = hud.settings.gridSize + 1;
-		int y = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.FONT_HEIGHT) / 2;
+		int y = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
 		
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);
-			ITextComponent name = new TextComponentString(meter.getName());
+			MutableText name = new LiteralText(meter.getName());
 			
 			if (meter.isHidden()) {
-				name.setStyle(new Style().setItalic(true).setColor(TextFormatting.GRAY));
+				name.formatted(Formatting.GRAY, Formatting.ITALIC);
 			}
 			
-			hud.renderer.renderText(name, x, y, 0xFFFFFF);
+			hud.renderer.renderText(matrices, name, x, y, 0xFFFFFF);
 			
 			y += hud.settings.rowHeight + hud.settings.gridSize;
 		}
@@ -134,7 +133,7 @@ public class MeterListRenderer extends AbstractElement {
 		int width = 0;
 		
 		for (Meter meter : hud.meters) {
-			int nameWidth = hud.font.getStringWidth(meter.getName());
+			int nameWidth = hud.font.getWidth(meter.getName());
 			
 			if (nameWidth > width) {
 				width = nameWidth;

@@ -12,7 +12,7 @@ public interface Cyclable<T extends Cyclable<T>> {
 		return fromOrdinal(clazz, value.ordinal() - 1);
 	}
 	
-	public static <T extends Enum<T> & Cyclable<T>> T fromOrdinal(Class<T> clazz, int ordinal) {
+	private static <T extends Enum<T> & Cyclable<T>> T fromOrdinal(Class<T> clazz, int ordinal) {
 		T[] values = clazz.getEnumConstants();
 		
 		if (ordinal < 0) {

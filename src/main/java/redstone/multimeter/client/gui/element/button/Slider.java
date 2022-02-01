@@ -3,8 +3,11 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.lwjgl.glfw.GLFW;
+
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.TextureRegion;
@@ -20,11 +23,11 @@ public class Slider extends AbstractButton {
 	
 	private double value;
 	
-	public Slider(MultimeterClient client, int x, int y, Supplier<ITextComponent> message, Supplier<Tooltip> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
+	public Slider(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip, onSlide, valueSupplier, steps);
 	}
 	
-	public Slider(MultimeterClient client, int x, int y, int width, int height, Supplier<ITextComponent> message, Supplier<Tooltip> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
+	public Slider(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
 		super(client, x, y, width, height, message, tooltip);
 		
 		this.valueConsumer = valueConsumer;
@@ -36,7 +39,7 @@ public class Slider extends AbstractButton {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!consumed && isActive() && button == MOUSE_BUTTON_LEFT) {
+		if (!consumed && isActive() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			updateValue(mouseX);
 			consumed = true;
 		}
@@ -58,7 +61,7 @@ public class Slider extends AbstractButton {
 	
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (isActive() && isDraggingMouse() && button == MOUSE_BUTTON_LEFT) {
+		if (isActive() && isDraggingMouse() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 			updateValue(mouseX);
 			return true;
 		}
@@ -72,17 +75,17 @@ public class Slider extends AbstractButton {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode) {
+	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode) {
+	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
 	
 	@Override
-	public boolean typeChar(char chr) {
+	public boolean typeChar(char chr, int modifiers) {
 		return false;
 	}
 	
@@ -102,8 +105,8 @@ public class Slider extends AbstractButton {
 	}
 	
 	@Override
-	protected void renderButton() {
-		super.renderButton();
+	protected void renderButton(MatrixStack matrices) {
+		super.renderButton(matrices);
 		
 		TextureRegion texture = getButtonTexture();
 		int x = getX() + getSliderX();
@@ -111,7 +114,7 @@ public class Slider extends AbstractButton {
 		int width = SLIDER_WIDTH;
 		int height = getHeight();
 		
-		drawTexturedButton(texture, x, y, width, height);
+		drawTexturedButton(matrices, texture, x, y, width, height);
 	}
 	
 	@Override

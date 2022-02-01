@@ -1,10 +1,11 @@
 package redstone.multimeter.client.gui.element.button;
 
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.client.sound.SoundManager;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.IElement;
@@ -20,18 +21,18 @@ public interface IButton extends IElement {
 	
 	public boolean isHovered();
 	
-	public ITextComponent getMessage();
+	public Text getMessage();
 	
-	public void setMessage(ITextComponent message);
+	public void setMessage(Text message);
 	
 	default void setMessage(String message) {
-		setMessage(new TextComponentString(message));
+		setMessage(new LiteralText(message));
 	}
 	
 	public static void playClickSound(MultimeterClient client) {
-		SoundHandler soundManager = client.getMinecraftClient().getSoundHandler();
-		PositionedSoundRecord sound = PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F);
+		SoundManager soundManager = client.getMinecraftClient().getSoundManager();
+		SoundInstance sound = PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F);
 		
-		soundManager.playSound(sound);
+		soundManager.play(sound);
 	}
 }
