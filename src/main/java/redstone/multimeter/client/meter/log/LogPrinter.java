@@ -10,9 +10,9 @@ import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
@@ -82,14 +82,14 @@ public class LogPrinter {
 			writer.write("-------------------------------------");
 			writer.newLine();
 			
-			if (Options.LogPrinter.PRINT_OLD_LOGS.get() || Screen.hasShiftDown()) {
+			if (Options.LogPrinter.PRINT_OLD_LOGS.get() || GuiScreen.isShiftKeyDown()) {
 				printLogs();
 			} else {
 				prevTick = firstTick;
 			}
 			
 			if (notifyPlayer) {
-				Text message = new LiteralText("Started printing logs to file...");
+				ITextComponent message = new TextComponentString("Started printing logs to file...");
 				client.sendMessage(message, false);
 			}
 			
@@ -115,7 +115,7 @@ public class LogPrinter {
 			writer = null;
 			
 			if (notifyPlayer) {
-				Text message = new LiteralText("Stopped printing logs to file");
+				ITextComponent message = new TextComponentString("Stopped printing logs to file");
 				client.sendMessage(message, false);
 			}
 			
@@ -149,7 +149,7 @@ public class LogPrinter {
 			long runtime = logManager.getLastTick() - firstTick;
 			
 			if (limit >= 0 && runtime > limit) {
-				Text message = new LiteralText("Printer exceeded maximum runtime!");
+				ITextComponent message = new TextComponentString("Printer exceeded maximum runtime!");
 				client.sendMessage(message, false);
 				
 				stop(true);
@@ -217,7 +217,7 @@ public class LogPrinter {
 				writer.newLine();
 			}
 		} catch (IOException e) {
-			Text message = new LiteralText("Printer encountered issues!");
+			ITextComponent message = new TextComponentString("Printer encountered issues!");
 			client.sendMessage(message, false);
 			
 			stop(true);

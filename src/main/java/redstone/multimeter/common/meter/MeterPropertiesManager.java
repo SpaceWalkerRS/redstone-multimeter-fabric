@@ -3,13 +3,13 @@ package redstone.multimeter.common.meter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import redstone.multimeter.common.WorldPos;
+import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 
 public abstract class MeterPropertiesManager {
 	
 	public boolean validate(MutableMeterProperties properties) {
-		WorldPos pos = properties.getPos();
+		DimPos pos = properties.getPos();
 		
 		if (pos == null) {
 			return false;
@@ -26,7 +26,7 @@ public abstract class MeterPropertiesManager {
 		return true;
 	}
 	
-	protected abstract World getWorldOf(WorldPos pos);
+	protected abstract World getWorldOf(DimPos pos);
 	
 	protected abstract void postValidation(MutableMeterProperties properties, World world, BlockPos pos);
 	

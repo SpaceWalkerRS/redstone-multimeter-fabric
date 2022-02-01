@@ -1,7 +1,7 @@
 package redstone.multimeter.common.network.packets;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
@@ -17,17 +17,17 @@ public class HandshakePacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void encode(NbtCompound data) {
-		data.putString("mod version", modVersion);
+	public void encode(NBTTagCompound data) {
+		data.setString("mod version", modVersion);
 	}
 	
 	@Override
-	public void decode(NbtCompound data) {
+	public void decode(NBTTagCompound data) {
 		modVersion = data.getString("mod version");
 	}
 	
 	@Override
-	public void execute(MultimeterServer server, ServerPlayerEntity player) {
+	public void execute(MultimeterServer server, EntityPlayerMP player) {
 		server.onHandshake(player, modVersion);
 	}
 	

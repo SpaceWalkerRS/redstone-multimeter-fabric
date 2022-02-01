@@ -1,7 +1,6 @@
 package redstone.multimeter.server;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -9,27 +8,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.server.management.PlayerList;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickPhaseTree;
 import redstone.multimeter.common.TickTask;
-import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.ServerTickPacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.meter.ServerMeterGroup;
+import redstone.multimeter.util.DimensionUtils;
 
 public class MultimeterServer {
 	
@@ -40,7 +39,6 @@ public class MultimeterServer {
 	private final Map<UUID, String> playerNameCache;
 	private final TickPhaseTree tickPhaseTree;
 	
-	private Field carpetTickSpeedProccessEntities;
 	private TickPhase tickPhase;
 	/** true if the OverWorld already ticked time */
 	private boolean tickedTime;
@@ -55,8 +53,6 @@ public class MultimeterServer {
 		
 		this.tickPhase = TickPhase.UNKNOWN;
 		this.tickedTime = false;
-		
-		this.detectCarpetTickSpeed();
 	}
 	
 	public MinecraftServer getMinecraftServer() {
@@ -75,35 +71,12 @@ public class MultimeterServer {
 		return tickPhaseTree;
 	}
 	
-	/**
-	 * Carpet Mod allows players to freeze the game.
-	 * We need to detect when this is happening so
-	 * RSMM can freeze accordingly.
-	 */
-	private void detectCarpetTickSpeed() {
-		Class<?> clazzTickSpeed = null;
-		
-		try {
-			clazzTickSpeed = Class.forName("carpet.helpers.TickSpeed");
-		} catch (ClassNotFoundException e) {
-			
-		}
-		
-		if (clazzTickSpeed != null) {
-			try {
-				carpetTickSpeedProccessEntities = clazzTickSpeed.getField("process_entities");
-			} catch (NoSuchFieldException | SecurityException e) {
-				
-			}
-		}
-	}
-	
 	public boolean isDedicated() {
-		return server.isDedicated();
+		return server.isDedicatedServer();
 	}
 	
 	public File getConfigFolder() {
-		return new File(server.getRunDirectory(), RedstoneMultimeterMod.CONFIG_PATH);
+		return new File(server.getDataDirectory(), RedstoneMultimeterMod.CONFIG_PATH);
 	}
 	
 	public TickPhase getTickPhase() {
@@ -136,7 +109,7 @@ public class MultimeterServer {
 	}
 	
 	public long getCurrentTick() {
-		long tick = server.getOverworld().getTime();
+		long tick = server.getWorld(DimensionType.OVERWORLD.getId()).getTotalWorldTime();
 		
 		if (!tickedTime) {
 			tick++;
@@ -146,17 +119,7 @@ public class MultimeterServer {
 	}
 	
 	public boolean isPaused() {
-		boolean frozen = false;
-		
-		if (carpetTickSpeedProccessEntities != null) {
-			try {
-				frozen = !carpetTickSpeedProccessEntities.getBoolean(null);
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				
-			}
-		}
-		
-		return frozen || ((IMinecraftServer)server).isPausedRSMM();
+		return ((IMinecraftServer)server).isPausedRSMM();
 	}
 	
 	public void tickStart() {
@@ -165,7 +128,7 @@ public class MultimeterServer {
 		if (!paused) {
 			tickedTime = false;
 			
-			if (server.getTicks() % 72000 == 0) {
+			if (server.getTickCounter() % 72000 == 0) {
 				cleanPlayerNameCache();
 			}
 			if (shouldBuildTickPhaseTree()) {
@@ -199,7 +162,7 @@ public class MultimeterServer {
 		if (!paused) {
 			ServerTickPacket packet = new ServerTickPacket(getCurrentTick());
 			
-			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+			for (EntityPlayerMP player : server.getPlayerList().getPlayers()) {
 				if (multimeter.hasSubscription(player)) {
 					packetHandler.sendToPlayer(packet, player);
 				}
@@ -213,19 +176,19 @@ public class MultimeterServer {
 		multimeter.tickEnd(paused);
 	}
 	
-	public void onPlayerJoin(ServerPlayerEntity player) {
+	public void onPlayerJoin(EntityPlayerMP player) {
 		multimeter.onPlayerJoin(player);
-		playerNameCache.remove(player.getUuid());
+		playerNameCache.remove(player.getUniqueID());
 	}
 	
-	public void onPlayerLeave(ServerPlayerEntity player) {
+	public void onPlayerLeave(EntityPlayerMP player) {
 		multimeter.onPlayerLeave(player);
-		connectedPlayers.remove(player.getUuid());
-		playerNameCache.put(player.getUuid(), player.getEntityName());
+		connectedPlayers.remove(player.getUniqueID());
+		playerNameCache.put(player.getUniqueID(), player.getName());
 	}
 	
-	public void onHandshake(ServerPlayerEntity player, String modVersion) {
-		if (connectedPlayers.put(player.getUuid(), modVersion) == null) {
+	public void onHandshake(EntityPlayerMP player, String modVersion) {
+		if (connectedPlayers.put(player.getUniqueID(), modVersion) == null) {
 			HandshakePacket packet = new HandshakePacket();
 			packetHandler.sendToPlayer(packet, player);
 			
@@ -233,23 +196,23 @@ public class MultimeterServer {
 		}
 	}
 	
-	public void refreshTickPhaseTree(ServerPlayerEntity player) {
+	public void refreshTickPhaseTree(EntityPlayerMP player) {
 		if (tickPhaseTree.isComplete()) {
 			TickPhaseTreePacket packet = new TickPhaseTreePacket(tickPhaseTree.toNbt());
 			packetHandler.sendToPlayer(packet, player);
 		}
 	}
 	
-	public ServerWorld getWorld(Identifier worldId) {
-		RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, worldId);
-		return server.getWorld(key);
+	public WorldServer getWorld(ResourceLocation dimensionId) {
+		DimensionType type = DimensionUtils.getType(dimensionId);
+		return server.getWorld(type.getId());
 	}
 	
-	public ServerWorld getWorldOf(WorldPos pos) {
-		return getWorld(pos.getWorldId());
+	public WorldServer getWorldOf(DimPos pos) {
+		return getWorld(pos.getDimensionId());
 	}
 	
-	public BlockState getBlockState(WorldPos pos) {
+	public IBlockState getBlockState(DimPos pos) {
 		World world = getWorldOf(pos);
 		
 		if (world != null) {
@@ -259,36 +222,36 @@ public class MultimeterServer {
 		return null;
 	}
 	
-	public PlayerManager getPlayerManager() {
-		return server.getPlayerManager();
+	public PlayerList getPlayerManager() {
+		return server.getPlayerList();
 	}
 	
-	public ServerPlayerEntity getPlayer(UUID playerUUID) {
-		return server.getPlayerManager().getPlayer(playerUUID);
+	public EntityPlayerMP getPlayer(UUID playerUUID) {
+		return server.getPlayerList().getPlayerByUUID(playerUUID);
 	}
 	
 	public String getPlayerName(UUID playerUUID) {
-		ServerPlayerEntity player = getPlayer(playerUUID);
-		return player == null ? playerNameCache.get(playerUUID) : player.getEntityName();
+		EntityPlayerMP player = getPlayer(playerUUID);
+		return player == null ? playerNameCache.get(playerUUID) : player.getName();
 	}
 	
-	public ServerPlayerEntity getPlayer(String playerName) {
-		return server.getPlayerManager().getPlayer(playerName);
+	public EntityPlayerMP getPlayer(String playerName) {
+		return server.getPlayerList().getPlayerByUsername(playerName);
 	}
 	
 	public boolean isMultimeterClient(UUID playerUUID) {
 		return connectedPlayers.containsKey(playerUUID);
 	}
 	
-	public boolean isMultimeterClient(ServerPlayerEntity player) {
-		return connectedPlayers.containsKey(player.getUuid());
+	public boolean isMultimeterClient(EntityPlayerMP player) {
+		return connectedPlayers.containsKey(player.getUniqueID());
 	}
 	
-	public Collection<ServerPlayerEntity> collectPlayers(Collection<UUID> playerUUIDs) {
-		Set<ServerPlayerEntity> players = new LinkedHashSet<>();
+	public Collection<EntityPlayerMP> collectPlayers(Collection<UUID> playerUUIDs) {
+		Set<EntityPlayerMP> players = new LinkedHashSet<>();
 		
 		for (UUID playerUUID : playerUUIDs) {
-			ServerPlayerEntity player = getPlayer(playerUUID);
+			EntityPlayerMP player = getPlayer(playerUUID);
 			
 			if (player != null) {
 				players.add(player);
@@ -298,7 +261,7 @@ public class MultimeterServer {
 		return players;
 	}
 	
-	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
-		player.sendMessage(message, actionBar);
+	public void sendMessage(EntityPlayerMP player, ITextComponent message, boolean actionBar) {
+		player.sendStatusMessage(message, actionBar);
 	}
 }

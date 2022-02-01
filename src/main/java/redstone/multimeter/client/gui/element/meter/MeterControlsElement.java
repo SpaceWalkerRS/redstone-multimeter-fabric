@@ -2,14 +2,14 @@ package redstone.multimeter.client.gui.element.meter;
 
 import java.util.function.Consumer;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -21,7 +21,7 @@ import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.element.button.Slider;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.ToggleButton;
-import redstone.multimeter.common.WorldPos;
+import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
@@ -29,6 +29,7 @@ import redstone.multimeter.common.network.packets.MeterUpdatePacket;
 import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 import redstone.multimeter.common.network.packets.TeleportToMeterPacket;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.IdentifierUtils;
 
 public class MeterControlsElement extends AbstractParentElement {
 	
@@ -51,21 +52,21 @@ public class MeterControlsElement extends AbstractParentElement {
 		
 		this.client = client;
 		
-		this.title = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).formatted(Formatting.UNDERLINE)).setWithShadow(true));
-		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltip.of(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide")), button -> {
+		this.title = new TextElement(this.client, 0, 0, t -> t.add(new TextComponentString(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).setStyle(new Style().setUnderlined(true))).setWithShadow(true));
+		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> new TextComponentString(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltip.of(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide")), button -> {
 			this.client.getMeterGroup().toggleHidden(meter);
 			return true;
 		});
-		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltip.of("Delete Meter"), button -> {
+		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new TextComponentString("X").setStyle(new Style().setColor(triedDeleting ? TextFormatting.RED : TextFormatting.WHITE)), () -> Tooltip.of("Delete Meter"), button -> {
 			tryDelete();
 			
-			if (triedDeleting && Screen.hasShiftDown()) {
+			if (triedDeleting && GuiScreen.isShiftKeyDown()) {
 				tryDelete(); // delete without asking for confirmation first
 			}
 			
 			return true;
 		});
-		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").formatted(Formatting.ITALIC)).setWithShadow(true));
+		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(new TextComponentString("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").setStyle(new Style().setUnderlined(true))).setWithShadow(true));
 		this.controls = new SimpleListElement(this.client, getWidth());
 		
 		this.deleteConfirm.setVisible(false);
@@ -90,10 +91,10 @@ public class MeterControlsElement extends AbstractParentElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = super.keyPress(keyCode, scanCode, modifiers);
+	public boolean keyPress(int keyCode) {
+		boolean consumed = super.keyPress(keyCode);
 		
-		if (triedDeleting && keyCode == GLFW.GLFW_KEY_ESCAPE) {
+		if (triedDeleting && keyCode == Keyboard.KEY_ESCAPE) {
 			undoTryDelete();
 			consumed = true;
 		}
@@ -149,15 +150,12 @@ public class MeterControlsElement extends AbstractParentElement {
 			return true;
 		});
 		pos.addControl("dimension", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
-			try {
-				Identifier worldId = new Identifier(text);
-				WorldPos newPos = meter.getPos().offset(worldId);
-				
-				changePos(newPos);
-			} catch (InvalidIdentifierException e) {
-				
+			ResourceLocation dimensionId = new ResourceLocation(text);
+			
+			if (IdentifierUtils.isValid(dimensionId)) {
+				changePos(meter.getPos().offset(dimensionId));
 			}
-		}, () -> meter.getPos().getWorldId().toString()));
+		}, () -> meter.getPos().getDimensionId().toString()));
 		pos.addCoordinateControl(Axis.X, () -> meter.getPos(), p -> changePos(p));
 		pos.addCoordinateControl(Axis.Y, () -> meter.getPos(), p -> changePos(p));
 		pos.addCoordinateControl(Axis.Z, () -> meter.getPos(), p -> changePos(p));
@@ -166,18 +164,18 @@ public class MeterControlsElement extends AbstractParentElement {
 		name.addControl("", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> changeName(text), () -> meter.getName()));
 		
 		MeterPropertyElement color = new MeterPropertyElement(client, totalWidth, buttonWidth, "Color");
-		color.addControl("rgb", style -> style.withColor(meter.getColor()), (client, width, height) -> new TextField(client, 0, 0, width, height,  () -> Tooltip.EMPTY, text -> {
+		color.addControl("rgb", (client, width, height) -> new TextField(client, 0, 0, width, height,  () -> Tooltip.EMPTY, text -> {
 			try {
 				changeColor(ColorUtils.fromRGBString(text));
 			} catch (NumberFormatException e) {
 				
 			}
 		}, () -> ColorUtils.toRGBString(meter.getColor())));
-		color.addControl("red", style -> style.withColor(Formatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		color.addControl("red", style -> style.setColor(TextFormatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int red = ColorUtils.getRed(c);
 			
-			return new LiteralText(String.valueOf(red));
+			return new TextComponentString(String.valueOf(red));
 		}, () -> Tooltip.EMPTY, value -> {
 			int red = (int)Math.round(value * 0xFF);
 			int c = ColorUtils.setRed(meter.getColor(), red);
@@ -189,11 +187,11 @@ public class MeterControlsElement extends AbstractParentElement {
 			
 			return (double)red / 0xFF;
 		}, 0xFF));
-		color.addControl("blue", style -> style.withColor(Formatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		color.addControl("blue", style -> style.setColor(TextFormatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int blue = ColorUtils.getBlue(c);
 			
-			return new LiteralText(String.valueOf(blue));
+			return new TextComponentString(String.valueOf(blue));
 		}, () -> Tooltip.EMPTY, value -> {
 			int blue = (int)Math.round(value * 0xFF);
 			int c = ColorUtils.setBlue(meter.getColor(), blue);
@@ -205,11 +203,11 @@ public class MeterControlsElement extends AbstractParentElement {
 			
 			return (double)blue / 0xFF;
 		}, 0xFF));
-		color.addControl("green", style -> style.withColor(Formatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		color.addControl("green", style -> style.setColor(TextFormatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int green = ColorUtils.getGreen(c);
 			
-			return new LiteralText(String.valueOf(green));
+			return new TextComponentString(String.valueOf(green));
 		}, () -> Tooltip.EMPTY, value -> {
 			int green = (int)Math.round(value * 0xFF);
 			int c = ColorUtils.setGreen(meter.getColor(), green);
@@ -293,7 +291,7 @@ public class MeterControlsElement extends AbstractParentElement {
 		client.getPacketHandler().send(packet);
 	}
 	
-	private void changePos(WorldPos pos) {
+	private void changePos(DimPos pos) {
 		changeProperty(properties -> properties.setPos(pos));
 	}
 	

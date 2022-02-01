@@ -1,7 +1,5 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import net.minecraft.client.util.math.MatrixStack;
-
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
@@ -16,7 +14,7 @@ public class PowerChangeEventRenderer extends BasicEventRenderer {
 	}
 	
 	@Override
-	protected void drawCenter(MatrixStack matrices, int x, int y, Meter meter, MeterEvent event) {
+	protected void drawCenter(int x, int y, Meter meter, MeterEvent event) {
 		int metaData = event.getMetadata();
 		int oldPower = (metaData >> 8) & 0xFF;
 		int newPower = metaData        & 0xFF;
@@ -32,6 +30,6 @@ public class PowerChangeEventRenderer extends BasicEventRenderer {
 			x += 1;
 		}
 		
-		hud.renderer.renderRect(matrices, x, y + half - (height / 2), width, height, color);
+		hud.renderer.renderRect(x, y + half - (height / 2), width, height, color);
 	}
 }

@@ -4,16 +4,15 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -26,12 +25,13 @@ import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.element.button.TransparentToggleButton;
-import redstone.multimeter.common.WorldPos;
+import redstone.multimeter.common.DimPos;
+import redstone.multimeter.util.AxisUtils;
 
 public class MeterPropertyElement extends AbstractParentElement {
 	
 	private final MultimeterClient client;
-	private final TextRenderer font;
+	private final FontRenderer font;
 	private final TextElement property;
 	private final SimpleListElement controls;
 	private final int buttonWidth;
@@ -46,11 +46,11 @@ public class MeterPropertyElement extends AbstractParentElement {
 	}
 	
 	public MeterPropertyElement(MultimeterClient client, int width, int buttonWidth, String name, Supplier<Tooltip> tooltip, MousePress<TextElement> onPress) {
-		MinecraftClient minecraftClient = client.getMinecraftClient();
+		Minecraft minecraftClient = client.getMinecraftClient();
 		
 		this.client = client;
-		this.font = minecraftClient.textRenderer;
-		this.property = new TextElement(this.client, 0, 0, t -> t.setText(new LiteralText(name).formatted(Formatting.ITALIC, this.active ? Formatting.WHITE : Formatting.GRAY)).setWithShadow(true), tooltip, onPress);
+		this.font = minecraftClient.fontRenderer;
+		this.property = new TextElement(this.client, 0, 0, t -> t.setText(new TextComponentString(name).setStyle(new Style().setColor(this.active ? TextFormatting.WHITE : TextFormatting.GRAY).setItalic(true))).setWithShadow(true), tooltip, onPress);
 		this.controls = new SimpleListElement(client, width);
 		this.buttonWidth = buttonWidth;
 		this.active = true;
@@ -78,13 +78,13 @@ public class MeterPropertyElement extends AbstractParentElement {
 		if (toggle != null) {
 			toggle.setY(y + IButton.DEFAULT_HEIGHT - (IButton.DEFAULT_HEIGHT + toggle.getHeight()) / 2);
 		}
-		property.setY(y + IButton.DEFAULT_HEIGHT - (IButton.DEFAULT_HEIGHT + font.fontHeight) / 2);
+		property.setY(y + IButton.DEFAULT_HEIGHT - (IButton.DEFAULT_HEIGHT + font.FONT_HEIGHT) / 2);
 		controls.setY(y);
 	}
 	
 	public void withToggle(Consumer<Boolean> listener) {
 		if (toggle == null) {
-			addChild(0, toggle = new TransparentToggleButton(client, 0, 0, 12, 12, on -> new LiteralText(on ? "\u25A0" : "\u25A1"), () -> isActive(), button -> setActive(!active)));
+			addChild(0, toggle = new TransparentToggleButton(client, 0, 0, 12, 12, on -> new TextComponentString(on ? "\u25A0" : "\u25A1"), () -> isActive(), button -> setActive(!active)));
 		}
 		
 		this.listener = listener;
@@ -105,7 +105,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 		addControl(new MeterControlElement(name, formatter, factory));
 	}
 	
-	public void addCoordinateControl(Axis axis, Supplier<WorldPos> getter, Consumer<WorldPos> setter) {
+	public void addCoordinateControl(Axis axis, Supplier<DimPos> getter, Consumer<DimPos> setter) {
 		addControl(new CoordinateControlElement(axis, getter, setter));
 	}
 	
@@ -164,14 +164,14 @@ public class MeterPropertyElement extends AbstractParentElement {
 		protected void onChangedY(int y) {
 			int height = getHeight();
 			
-			name.setY(y + height - (height + font.fontHeight) / 2);
+			name.setY(y + height - (height + font.FONT_HEIGHT) / 2);
 			control.setY(y);
 		}
 		
-		protected Text formatName(String name, UnaryOperator<Style> formatter) {
+		protected ITextComponent formatName(String name, UnaryOperator<Style> formatter) {
 			int width = controls.getWidth() - (4 + buttonWidth + 10);
-			MutableText text = new LiteralText(font.trimToWidth(name, width, true));
-			return active ? text.styled(formatter) : text.formatted(Formatting.GRAY);
+			ITextComponent text = new TextComponentString(font.trimStringToWidth(name, width, true));
+			return text.setStyle(active ? formatter.apply(new Style()) : new Style().setColor(TextFormatting.GRAY));
 		}
 	}
 	
@@ -180,24 +180,24 @@ public class MeterPropertyElement extends AbstractParentElement {
 		private final IButton increase;
 		private final IButton decrease;
 		
-		public CoordinateControlElement(Axis axis, Supplier<WorldPos> getter, Consumer<WorldPos> setter) {
+		public CoordinateControlElement(Axis axis, Supplier<DimPos> getter, Consumer<DimPos> setter) {
 			super(axis.getName(), (client, width, height) -> {
 				return new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
 					try {
-						WorldPos pos = getter.get();
+						DimPos pos = getter.get();
 						BlockPos p = pos.getBlockPos();
-						int coord = axis.choose(p.getX(), p.getY(), p.getZ());
+						int coord = AxisUtils.choose(axis, p.getX(), p.getY(), p.getZ());
 						int newCoord = Integer.valueOf(text);
-						WorldPos newPos = pos.offset(axis, newCoord - coord);
+						DimPos newPos = pos.offset(axis, newCoord - coord);
 						
 						setter.accept(newPos);
 					} catch (NumberFormatException e) {
 						
 					}
 				}, () -> {
-					WorldPos pos = getter.get();
+					DimPos pos = getter.get();
 					BlockPos p = pos.getBlockPos();
-					int coord = axis.choose(p.getX(), p.getY(), p.getZ());
+					int coord = AxisUtils.choose(axis, p.getX(), p.getY(), p.getZ());
 					
 					return String.valueOf(coord);
 				});
@@ -205,19 +205,19 @@ public class MeterPropertyElement extends AbstractParentElement {
 			
 			int size = getHeight() / 2 - 1;
 			
-			this.increase = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("+"), () -> Tooltip.EMPTY, button -> {
-				int distance = Screen.hasShiftDown() ? 10 : 1;
-				WorldPos pos = getter.get();
-				WorldPos newPos = pos.offset(axis, distance);
+			this.increase = new TransparentButton(client, 0, 0, size, size, () -> new TextComponentString("+"), () -> Tooltip.EMPTY, button -> {
+				int distance = GuiScreen.isShiftKeyDown() ? 10 : 1;
+				DimPos pos = getter.get();
+				DimPos newPos = pos.offset(axis, distance);
 				
 				setter.accept(newPos);
 				
 				return true;
 			});
-			this.decrease = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("-"), () -> Tooltip.EMPTY, button -> {
-				int distance = Screen.hasShiftDown() ? 10 : 1;
-				WorldPos pos = getter.get();
-				WorldPos newPos = pos.offset(axis, -distance);
+			this.decrease = new TransparentButton(client, 0, 0, size, size, () -> new TextComponentString("-"), () -> Tooltip.EMPTY, button -> {
+				int distance = GuiScreen.isShiftKeyDown() ? 10 : 1;
+				DimPos pos = getter.get();
+				DimPos newPos = pos.offset(axis, -distance);
 				
 				setter.accept(newPos);
 				

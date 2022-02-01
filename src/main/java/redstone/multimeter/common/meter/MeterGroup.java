@@ -6,19 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
-import redstone.multimeter.common.WorldPos;
+import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.log.LogManager;
+import redstone.multimeter.util.NbtUtils;
 
 public abstract class MeterGroup {
 	
 	private final String name;
 	private final List<Meter> meters;
 	private final Map<Long, Integer> idToIndex;
-	private final Map<WorldPos, Integer> posToIndex;
+	private final Map<DimPos, Integer> posToIndex;
 	
 	protected MeterGroup(String name) {
 		this.name = name;
@@ -28,7 +28,7 @@ public abstract class MeterGroup {
 	}
 	
 	public static boolean isValidName(String name) {
-		return !name.isBlank() && name.length() <= getMaxNameLength();
+		return !name.trim().isEmpty() && name.length() <= getMaxNameLength();
 	}
 	
 	public static int getMaxNameLength() {
@@ -58,7 +58,7 @@ public abstract class MeterGroup {
 		return idToIndex.containsKey(id);
 	}
 	
-	public boolean hasMeterAt(WorldPos pos) {
+	public boolean hasMeterAt(DimPos pos) {
 		return posToIndex.containsKey(pos);
 	}
 	
@@ -66,7 +66,7 @@ public abstract class MeterGroup {
 		return fromIndex(idToIndex.getOrDefault(id, -1));
 	}
 	
-	public Meter getMeterAt(WorldPos pos) {
+	public Meter getMeterAt(DimPos pos) {
 		return fromIndex(posToIndex.getOrDefault(pos, -1));
 	}
 	
@@ -141,9 +141,9 @@ public abstract class MeterGroup {
 		return true;
 	}
 	
-	protected void moveMeter(Meter meter, WorldPos newPos) {
+	protected void moveMeter(Meter meter, DimPos newPos) {
 		long id = meter.getId();
-		WorldPos pos = meter.getPos();
+		DimPos pos = meter.getPos();
 		
 		if (pos.equals(newPos)) {
 			return;
@@ -173,26 +173,26 @@ public abstract class MeterGroup {
 	
 	public abstract LogManager getLogManager();
 	
-	public NbtCompound toNbt() {
-		NbtList list = new NbtList();
+	public NBTTagCompound toNbt() {
+		NBTTagList list = new NBTTagList();
 		
 		for (Meter meter : meters) {
-			list.add(meter.toNbt());
+			list.appendTag(meter.toNbt());
 		}
 		
-		NbtCompound nbt = new NbtCompound();
-		nbt.put("meters", list);
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setTag("meters", list);
 		
 		return nbt;
 	}
 	
-	public void updateFromNbt(NbtCompound nbt) {
+	public void updateFromNbt(NBTTagCompound nbt) {
 		clear();
 		
-		NbtList list = nbt.getList("meters", NbtElement.COMPOUND_TYPE);
+		NBTTagList list = nbt.getTagList("meters", NbtUtils.TYPE_COMPOUND);
 		
-		for (int index = 0; index < list.size(); index++) {
-			NbtCompound meterNbt = list.getCompound(index);
+		for (int index = 0; index < list.tagCount(); index++) {
+			NBTTagCompound meterNbt = list.getCompoundTagAt(index);
 			Meter meter = Meter.fromNbt(meterNbt);
 			
 			addMeter(meter);

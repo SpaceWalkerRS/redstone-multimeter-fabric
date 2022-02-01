@@ -3,17 +3,18 @@ package redstone.multimeter.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
 public class TextUtils {
 	
 	private static final int MAX_WIDTH = 200;
 	
-	public static List<Text> toLines(TextRenderer font, String text) {
-		List<Text> lines = new ArrayList<>();
+	public static List<ITextComponent> toLines(FontRenderer font, String text) {
+		List<ITextComponent> lines = new ArrayList<>();
 		
 		while (!text.isEmpty()) {
 			int lastSpace = -1;
@@ -32,13 +33,13 @@ public class TextUtils {
 				
 				String subString = text.substring(0, length);
 				
-				if (font.getWidth(subString) > MAX_WIDTH) {
+				if (font.getStringWidth(subString) > MAX_WIDTH) {
 					if (lastSpace >= 0) {
 						subString = text.substring(0, lastSpace);
 						length = lastSpace + 1;
 					}
 					
-					Text line = new LiteralText(subString);
+					ITextComponent line = new TextComponentString(subString);
 					lines.add(line);
 					
 					break;
@@ -47,7 +48,7 @@ public class TextUtils {
 			
 			if (length == text.length()) {
 				if (length > 0) {
-					Text line = new LiteralText(text);
+					ITextComponent line = new TextComponentString(text);
 					lines.add(line);
 				}
 				
@@ -60,17 +61,17 @@ public class TextUtils {
 		return lines;
 	}
 	
-	public static void addFancyText(List<Text> lines, String title, Object info) {
+	public static void addFancyText(List<ITextComponent> lines, String title, Object info) {
 		addFancyText(lines, title, info.toString());
 	}
 	
-	public static void addFancyText(List<Text> lines, String title, String info) {
+	public static void addFancyText(List<ITextComponent> lines, String title, String info) {
 		lines.add(formatFancyText(title, info));
 	}
 	
-	public static Text formatFancyText(String title, Object info) {
-		return new LiteralText("").
-			append(new LiteralText(title + ": ").formatted(Formatting.GOLD)).
-			append(new LiteralText(info.toString()));
+	public static ITextComponent formatFancyText(String title, Object info) {
+		return new TextComponentString("").
+			appendSibling(new TextComponentString(title + ": ").setStyle(new Style().setColor(TextFormatting.GOLD))).
+			appendSibling(new TextComponentString(info.toString()));
 	}
 }

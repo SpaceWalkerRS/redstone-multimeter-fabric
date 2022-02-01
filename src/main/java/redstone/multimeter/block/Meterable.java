@@ -1,6 +1,6 @@
 package redstone.multimeter.block;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -13,6 +13,6 @@ public interface Meterable extends IBlock {
 		return true;
 	}
 	
-	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state);
+	public boolean isActiveRSMM(World world, BlockPos pos, IBlockState state);
 	
 }

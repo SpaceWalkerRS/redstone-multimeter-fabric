@@ -3,12 +3,12 @@ package redstone.multimeter.common.meter.log;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ListUtils;
+import redstone.multimeter.util.NbtUtils;
 
 public class MeterLogs {
 	
@@ -135,43 +135,43 @@ public class MeterLogs {
 		return log != null && log.isAt(tick, subtick) ? log : null;
 	}
 	
-	public NbtCompound toNbt() {
-		NbtCompound nbt = new NbtCompound();
+	public NBTTagCompound toNbt() {
+		NBTTagCompound nbt = new NBTTagCompound();
 		
 		for (EventType type : EventType.ALL) {
-			NbtList logs = toNbt(type);
+			NBTTagList logs = toNbt(type);
 			
 			if (!logs.isEmpty()) {
-				nbt.put(type.getName(), logs);
+				nbt.setTag(type.getName(), logs);
 			}
 		}
 		
 		return nbt;
 	}
 	
-	private NbtList toNbt(EventType type) {
-		NbtList list = new NbtList();
+	private NBTTagList toNbt(EventType type) {
+		NBTTagList list = new NBTTagList();
 		
 		for (EventLog log : getLogs(type)) {
-			list.add(log.toNbt());
+			list.appendTag(log.toNbt());
 		}
 		
 		return list;
 	}
 	
-	public void updateFromNbt(NbtCompound nbt) {
-		for (String key : nbt.getKeys()) {
+	public void updateFromNbt(NBTTagCompound nbt) {
+		for (String key : nbt.getKeySet()) {
 			EventType type = EventType.fromName(key);
 			
 			if (type != null) {
-				updateFromNbt(type, nbt.getList(key, NbtElement.COMPOUND_TYPE));
+				updateFromNbt(type, nbt.getTagList(key, NbtUtils.TYPE_COMPOUND));
 			}
 		}
 	}
 	
-	public void updateFromNbt(EventType type, NbtList logs) {
-		for (int index = 0; index < logs.size(); index++) {
-			NbtCompound nbt = logs.getCompound(index);
+	public void updateFromNbt(EventType type, NBTTagList logs) {
+		for (int index = 0; index < logs.tagCount(); index++) {
+			NBTTagCompound nbt = logs.getCompoundTagAt(index);
 			EventLog log = EventLog.fromNbt(nbt);
 			
 			add(log);

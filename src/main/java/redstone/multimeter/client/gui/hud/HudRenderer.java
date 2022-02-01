@@ -1,16 +1,11 @@
 package redstone.multimeter.client.gui.hud;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.text.ITextComponent;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.VertexConsumerProvider.Immediate;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Matrix4f;
-
-import redstone.multimeter.client.gui.element.RenderHelper2D;
 import redstone.multimeter.client.gui.element.IElement;
+import redstone.multimeter.client.gui.element.RenderHelper2D;
 import redstone.multimeter.util.ColorUtils;
 
 public class HudRenderer extends RenderHelper2D {
@@ -24,8 +19,8 @@ public class HudRenderer extends RenderHelper2D {
 		this.target = hud;
 	}
 	
-	public void render(IElement element, MatrixStack matrices, int mouseX, int mouseY) {
-		(target = element).render(matrices, mouseX, mouseY);
+	public void render(IElement element, int mouseX, int mouseY) {
+		(target = element).render(mouseX, mouseY);
 	}
 	
 	private int translateX(int x, int width) {
@@ -48,26 +43,18 @@ public class HudRenderer extends RenderHelper2D {
 		}
 	}
 	
-	public void renderHighlight(MatrixStack matrices, int x, int y, int width, int height, int color) {
+	public void renderHighlight(int x, int y, int width, int height, int color) {
 		int d = hud.settings.gridSize;
-		renderBorder(matrices, x, y, width + d, height + d, d, color);
+		renderBorder(x, y, width + d, height + d, d, color);
 	}
 	
-	public void renderRect(MatrixStack matrices, int x, int y, int width, int height, int color) {
-		super.renderRect(matrices, x, y, width, height, color);
-	}
-	
-	public void renderText(MatrixStack matrices, String text, int x, int y, int color) {
-		super.renderText(hud.font, matrices, text, x, y, false, color);
-	}
-	
-	public void renderText(MatrixStack matrices, Text text, int x, int y, int color) {
-		super.renderText(hud.font, matrices, text, x, y, false, color);
+	public void renderRect(int x, int y, int width, int height, int color) {
+		super.renderRect(x, y, width, height, color);
 	}
 	
 	@Override
-	protected void drawRect(BufferBuilder bufferBuilder, Matrix4f model, int x, int y, int width, int height, int color) {
-		RenderSystem.enableDepthTest();
+	protected void drawRect(BufferBuilder bufferBuilder, int x, int y, int width, int height, int color) {
+		GlStateManager.enableDepth();
 		
 		int x0 = translateX(x, width);
 		int y0 = translateY(y, height);
@@ -79,28 +66,26 @@ public class HudRenderer extends RenderHelper2D {
 		int g = ColorUtils.getGreen(color);
 		int b = ColorUtils.getBlue(color);
 		
-		drawRect(bufferBuilder, model, x0, y0, x1, y1, a, r, g, b);
+		drawRect(bufferBuilder, x0, y0, x1, y1, a, r, g, b);
 	}
 	
-	@Override
-	protected void drawText(Immediate immediate, Matrix4f model, TextRenderer font, String text, int x, int y, boolean shadow, int color) {
-		x = translateX(x, font.getWidth(text) - 1);
-		y = translateY(y, font.fontHeight - 2);
+	public void renderText(String text, int x, int y, int color) {
+		x = translateX(x, hud.font.getStringWidth(text) - 1);
+		y = translateY(y, hud.font.FONT_HEIGHT - 2);
 		
 		int alpha = Math.round(0xFF * hud.settings.opacity() / 100.0F);
 		color = ColorUtils.setAlpha(color, alpha);
 		
-		super.drawText(immediate, model, font, text, x, y, shadow, color);
+		super.renderText(hud.font, text, x, y, false, color);
 	}
 	
-	@Override
-	protected void drawText(Immediate immediate, Matrix4f model, TextRenderer font, Text text, int x, int y, boolean shadow, int color) {
-		x = translateX(x, font.getWidth(text) - 1);
-		y = translateY(y, font.fontHeight - 2);
+	public void renderText(ITextComponent text, int x, int y, int color) {
+		x = translateX(x, getWidth(hud.font, text) - 1);
+		y = translateY(y, hud.font.FONT_HEIGHT - 2);
 		
 		int alpha = Math.round(0xFF * hud.settings.opacity() / 100.0F);
 		color = ColorUtils.setAlpha(color, alpha);
 		
-		super.drawText(immediate, model, font, text, x, y, shadow, color);
+		super.renderText(hud.font, text, x, y, false, color);
 	}
 }

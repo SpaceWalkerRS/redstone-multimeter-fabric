@@ -1,7 +1,0 @@
-{
-	"name": "lightning_rod",
-	"event_types": [
-		"active",
-		"moved"
-	]
-}

@@ -8,8 +8,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.Predicate;
 
-import net.minecraft.client.util.math.MatrixStack;
-
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
@@ -53,20 +51,20 @@ public class SimpleListElement extends AbstractParentElement {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY) {
+	public void render(int mouseX, int mouseY) {
 		if (shouldUpdateHovered) {
 			updateHoveredElement(mouseX, mouseY);
 			shouldUpdateHovered = false;
 		}
 		
 		if (drawBackground) {
-			drawBackground(matrices);
+			drawBackground();
 		}
 		
-		renderList(matrices, mouseX, mouseY);
+		renderList(mouseX, mouseY);
 		
 		if (drawBackground) {
-			drawBorders(matrices);
+			drawBorders();
 		}
 	}
 	
@@ -99,7 +97,7 @@ public class SimpleListElement extends AbstractParentElement {
 		updateContentY();
 	}
 	
-	protected void drawBackground(MatrixStack matrices) {
+	protected void drawBackground() {
 		int x0 = getX();
 		int y0 = getY() + topBorder;
 		int x1 = getX() + getWidth();
@@ -112,10 +110,10 @@ public class SimpleListElement extends AbstractParentElement {
 		int tx1 = x1 / 2;
 		int ty1 = (y1 - offsetY) / 2;
 		
-		renderTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x20, 0x20, 0x20);
+		renderTextureColor(Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x20, 0x20, 0x20);
 	}
 	
-	protected void renderList(MatrixStack matrices, int mouseX, int mouseY) {
+	protected void renderList(int mouseX, int mouseY) {
 		List<IElement> children = getChildren();
 		
 		for (int index = 0; index < children.size(); index++) {
@@ -129,16 +127,16 @@ public class SimpleListElement extends AbstractParentElement {
 			}
 			
 			if (element.isVisible()) {
-				renderElement(element, matrices, mouseX, mouseY);
+				renderElement(element, mouseX, mouseY);
 			}
 		}
 	}
 	
-	protected void renderElement(IElement element, MatrixStack matrices, int mouseX, int mouseY) {
-		element.render(matrices, mouseX, mouseY);
+	protected void renderElement(IElement element, int mouseX, int mouseY) {
+		element.render(mouseX, mouseY);
 	}
 	
-	protected void drawBorders(MatrixStack matrices) {
+	protected void drawBorders() {
 		boolean renderTop = topBorder > 0;
 		boolean renderBottom = bottomBorder > 0;
 		
@@ -166,8 +164,8 @@ public class SimpleListElement extends AbstractParentElement {
 			ty0 = y0 / 2;
 			ty1 = y1 / 2;
 			
-			renderTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
-			renderGradient(matrices, x0, y1, width, 4, 0xFF000000, 0x00000000);
+			renderTextureColor(Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
+			renderGradient(x0, y1, width, 4, 0xFF000000, 0x00000000);
 		}
 		if (renderBottom) {
 			y0 = maxY;
@@ -176,8 +174,8 @@ public class SimpleListElement extends AbstractParentElement {
 			ty0 = y0 / 2;
 			ty1 = y1 / 2;
 			
-			renderTextureColor(matrices, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
-			renderGradient(matrices, x0, y0 - 4, width, 4, 0x00000000, 0xFF000000);
+			renderTextureColor(Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
+			renderGradient(x0, y0 - 4, width, 4, 0x00000000, 0xFF000000);
 		}
 	}
 	

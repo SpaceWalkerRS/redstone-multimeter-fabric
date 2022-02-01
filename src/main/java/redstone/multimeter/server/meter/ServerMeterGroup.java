@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Direction;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import redstone.multimeter.common.WorldPos;
+import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
@@ -42,13 +42,13 @@ public class ServerMeterGroup extends MeterGroup {
 	private boolean idle;
 	private long idleTime;
 	
-	public ServerMeterGroup(Multimeter multimeter, String name, ServerPlayerEntity owner) {
+	public ServerMeterGroup(Multimeter multimeter, String name, EntityPlayerMP owner) {
 		super(name);
 		
 		this.multimeter = multimeter;
 		this.logManager = new ServerLogManager(this);
 		
-		this.owner = owner.getUuid();
+		this.owner = owner.getUniqueID();
 		this.members = new HashSet<>();
 		this.subscribers = new HashSet<>();
 		
@@ -69,7 +69,7 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	@Override
-	protected void moveMeter(Meter meter, WorldPos newPos) {
+	protected void moveMeter(Meter meter, DimPos newPos) {
 		if (hasMeterAt(newPos)) {
 			return;
 		}
@@ -120,7 +120,7 @@ public class ServerMeterGroup extends MeterGroup {
 		return hasMeter(id) && updateMeter(getMeter(id), newProperties);
 	}
 	
-	public void tryMoveMeter(WorldPos pos, Direction dir) {
+	public void tryMoveMeter(DimPos pos, EnumFacing dir) {
 		if (!hasMeterAt(pos)) {
 			return;
 		}
@@ -143,8 +143,8 @@ public class ServerMeterGroup extends MeterGroup {
 		return owner;
 	}
 	
-	public boolean isOwnedBy(ServerPlayerEntity player) {
-		return isOwnedBy(player.getUuid());
+	public boolean isOwnedBy(EntityPlayerMP player) {
+		return isOwnedBy(player.getUniqueID());
 	}
 	
 	public boolean isOwnedBy(UUID playerUUID) {
@@ -159,8 +159,8 @@ public class ServerMeterGroup extends MeterGroup {
 		return Collections.unmodifiableCollection(members);
 	}
 	
-	public boolean hasMember(ServerPlayerEntity player) {
-		return hasMember(player.getUuid());
+	public boolean hasMember(EntityPlayerMP player) {
+		return hasMember(player.getUniqueID());
 	}
 	
 	public boolean hasMember(UUID playerUUID) {
@@ -187,8 +187,8 @@ public class ServerMeterGroup extends MeterGroup {
 		return Collections.unmodifiableCollection(subscribers);
 	}
 	
-	public boolean hasSubscriber(ServerPlayerEntity player) {
-		return hasSubscriber(player.getUuid());
+	public boolean hasSubscriber(EntityPlayerMP player) {
+		return hasSubscriber(player.getUniqueID());
 	}
 	
 	public boolean hasSubscriber(UUID playerUUID) {
@@ -262,7 +262,7 @@ public class ServerMeterGroup extends MeterGroup {
 		meterUpdates.clear();
 	}
 	
-	public void tryLogEvent(WorldPos pos, MeterEventPredicate predicate, MeterEventSupplier supplier) {
+	public void tryLogEvent(DimPos pos, MeterEventPredicate predicate, MeterEventSupplier supplier) {
 		if (hasMeterAt(pos)) {
 			Meter meter = getMeterAt(pos);
 			

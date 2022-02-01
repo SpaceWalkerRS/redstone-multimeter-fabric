@@ -1,7 +1,7 @@
 package redstone.multimeter.server.meter.log;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.Meter;
@@ -56,7 +56,7 @@ public class ServerLogManager extends LogManager {
 			return;
 		}
 		
-		NbtList list = new NbtList();
+		NBTTagList list = new NBTTagList();
 		
 		for (Meter meter : meterGroup.getMeters()) {
 			if (meter.getLogs().isEmpty()) {
@@ -64,14 +64,14 @@ public class ServerLogManager extends LogManager {
 			}
 			
 			long id = meter.getId();
-			NbtCompound logs = meter.getLogs().toNbt();
+			NBTTagCompound logs = meter.getLogs().toNbt();
 			
-			NbtCompound nbt = new NbtCompound();
-			nbt.putLong("id", id);
-			nbt.put("logs", logs);
-			nbt.putBoolean("powered", meter.isPowered());
-			nbt.putBoolean("active", meter.isActive());
-			list.add(nbt);
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setLong("id", id);
+			nbt.setTag("logs", logs);
+			nbt.setBoolean("powered", meter.isPowered());
+			nbt.setBoolean("active", meter.isActive());
+			list.appendTag(nbt);
 			
 			meter.getLogs().clear();
 		}
@@ -80,9 +80,9 @@ public class ServerLogManager extends LogManager {
 			return;
 		}
 		
-		NbtCompound nbt = new NbtCompound();
-		nbt.putInt("subticks", nextSubtick);
-		nbt.put("logs", list);
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setInteger("subticks", nextSubtick);
+		nbt.setTag("logs", list);
 		
 		MeterLogsPacket packet = new MeterLogsPacket(nbt);
 		meterGroup.getMultimeter().getMultimeterServer().getPacketHandler().sendToSubscribers(packet, meterGroup);

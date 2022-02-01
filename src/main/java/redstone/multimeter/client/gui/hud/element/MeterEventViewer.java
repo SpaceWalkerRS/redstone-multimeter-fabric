@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.renderer.GlStateManager;
 
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.Directionality;
@@ -18,18 +18,18 @@ public abstract class MeterEventViewer extends AbstractElement {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY) {
-		matrices.push();
-		drawHighlights(matrices, mouseX, mouseY);
-		matrices.translate(0, 0, -1);
-		drawDecorators(matrices);
-		matrices.translate(0, 0, -1);
-		drawMeterEvents(matrices);
-		matrices.translate(0, 0, -1);
-		drawGridLines(matrices);
-		matrices.translate(0, 0, -1);
-		hud.renderer.renderRect(matrices, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		matrices.pop();
+	public void render(int mouseX, int mouseY) {
+		GlStateManager.pushMatrix();
+		drawHighlights(mouseX, mouseY);
+		GlStateManager.translate(0, 0, -1);
+		drawDecorators();
+		GlStateManager.translate(0, 0, -1);
+		drawMeterEvents();
+		GlStateManager.translate(0, 0, -1);
+		drawGridLines();
+		GlStateManager.translate(0, 0, -1);
+		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
@@ -48,17 +48,17 @@ public abstract class MeterEventViewer extends AbstractElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(int keyCode) {
 		return false;
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(int keyCode) {
 		return false;
 	}
 	
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		return false;
 	}
 	
@@ -89,14 +89,14 @@ public abstract class MeterEventViewer extends AbstractElement {
 		}
 	}
 	
-	protected abstract void drawHighlights(MatrixStack matrices, int mouseX, int mouseY);
+	protected abstract void drawHighlights(int mouseX, int mouseY);
 	
-	protected void drawHighlight(MatrixStack matrices, int column, int columnCount, int row, int rowCount, boolean selection) {
+	protected void drawHighlight(int column, int columnCount, int row, int rowCount, boolean selection) {
 		int color = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
-		drawHighlight(matrices, column, columnCount, row, rowCount, color);
+		drawHighlight(column, columnCount, row, rowCount, color);
 	}
 	
-	protected void drawHighlight(MatrixStack matrices, int column, int columnCount, int row, int rowCount, int color) {
+	protected void drawHighlight(int column, int columnCount, int row, int rowCount, int color) {
 		int w = hud.settings.columnWidth + hud.settings.gridSize;
 		int h = hud.settings.rowHeight + hud.settings.gridSize;
 		int x = column * w;
@@ -104,15 +104,15 @@ public abstract class MeterEventViewer extends AbstractElement {
 		int width = columnCount * w;
 		int height = rowCount * h;
 		
-		hud.renderer.renderHighlight(matrices, x, y, width, height, color);
+		hud.renderer.renderHighlight(x, y, width, height, color);
 	}
 	
-	protected abstract void drawDecorators(MatrixStack matrices);
+	protected abstract void drawDecorators();
 	
-	protected abstract void drawMeterEvents(MatrixStack matrices);
+	protected abstract void drawMeterEvents();
 	
-	private void drawGridLines(MatrixStack matrices) {
-		matrices.push();
+	private void drawGridLines() {
+		GlStateManager.pushMatrix();
 		
 		int columns = getColumnCount();
 		int rows = hud.meters.size();
@@ -132,10 +132,10 @@ public abstract class MeterEventViewer extends AbstractElement {
 			lineHeight = getHeight() - 2 * hud.settings.gridSize;
 			color = hud.settings.colorGridMarker;
 			
-			hud.renderer.renderRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
+			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		matrices.translate(0, 0, -0.1);
+		GlStateManager.translate(0, 0, -0.1);
 		
 		// horizonal lines
 		for (int i = 0; i <= rows; i++) {
@@ -145,10 +145,10 @@ public abstract class MeterEventViewer extends AbstractElement {
 			lineHeight = hud.settings.gridSize;
 			color = hud.settings.colorGridMain;
 			
-			hud.renderer.renderRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
+			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		matrices.translate(0, 0, -0.1);
+		GlStateManager.translate(0, 0, -0.1);
 		
 		// vertical lines
 		for (int i = 0; i <= columns; i++) {
@@ -158,10 +158,10 @@ public abstract class MeterEventViewer extends AbstractElement {
 			lineHeight = getHeight();
 			color = (i > 0 && i < columns && i % 5 == 0) ? hud.settings.colorGridInterval : hud.settings.colorGridMain;
 			
-			hud.renderer.renderRect(matrices, lineX, lineY, lineWidth, lineHeight, color);
+			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		matrices.pop();
+		GlStateManager.popMatrix();
 	}
 	
 	protected abstract int getColumnCount();
