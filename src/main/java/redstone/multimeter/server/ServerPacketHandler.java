@@ -2,11 +2,10 @@ package redstone.multimeter.server;
 
 import java.util.Collection;
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.server.SPacketCustomPayload;
 
 import redstone.multimeter.common.network.AbstractPacketHandler;
 import redstone.multimeter.common.network.RSMMPacket;
@@ -21,25 +20,25 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 	}
 
 	@Override
-	protected Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer) {
-		return new CustomPayloadS2CPacket(id, buffer);
+	protected Packet<?> toCustomPayload(String id, PacketBuffer buffer) {
+		return new SPacketCustomPayload(id, buffer);
 	}
 	
 	@Override
 	public <P extends RSMMPacket> void send(P packet) {
 		Packet<?> mcPacket = encode(packet);
-		server.getPlayerManager().sendToAll(mcPacket);
+		server.getPlayerManager().sendPacketToAllPlayers(mcPacket);
 	}
 	
-	public <P extends RSMMPacket> void sendToPlayer(P packet, ServerPlayerEntity player) {
-		player.networkHandler.sendPacket(encode(packet));
+	public <P extends RSMMPacket> void sendToPlayer(P packet, EntityPlayerMP player) {
+		player.connection.sendPacket(encode(packet));
 	}
 	
-	public <P extends RSMMPacket> void sendToPlayers(P packet, Collection<ServerPlayerEntity> players) {
+	public <P extends RSMMPacket> void sendToPlayers(P packet, Collection<EntityPlayerMP> players) {
 		Packet<?> mcPacket = encode(packet);
 		
-		for (ServerPlayerEntity player : players) {
-			player.networkHandler.sendPacket(mcPacket);
+		for (EntityPlayerMP player : players) {
+			player.connection.sendPacket(mcPacket);
 		}
 	}
 	
@@ -47,7 +46,7 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 		sendToPlayers(packet, server.collectPlayers(meterGroup.getSubscribers()));
 	}
 	
-	public void onPacketReceived(PacketByteBuf buffer, ServerPlayerEntity player) {
+	public void onPacketReceived(PacketBuffer buffer, EntityPlayerMP player) {
 		try {
 			decode(buffer).execute(server, player);
 		} catch (Exception e) {

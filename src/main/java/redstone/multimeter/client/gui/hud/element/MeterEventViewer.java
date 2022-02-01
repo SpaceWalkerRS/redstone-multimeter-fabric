@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager;
 
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.Directionality;
@@ -21,13 +21,13 @@ public abstract class MeterEventViewer extends AbstractElement {
 	public void render(int mouseX, int mouseY) {
 		GlStateManager.pushMatrix();
 		drawHighlights(mouseX, mouseY);
-		GlStateManager.translated(0, 0, -1);
+		GlStateManager.translate(0, 0, -1);
 		drawDecorators();
-		GlStateManager.translated(0, 0, -1);
+		GlStateManager.translate(0, 0, -1);
 		drawMeterEvents();
-		GlStateManager.translated(0, 0, -1);
+		GlStateManager.translate(0, 0, -1);
 		drawGridLines();
-		GlStateManager.translated(0, 0, -1);
+		GlStateManager.translate(0, 0, -1);
 		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
 		GlStateManager.popMatrix();
 	}
@@ -48,17 +48,17 @@ public abstract class MeterEventViewer extends AbstractElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(int keyCode) {
 		return false;
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(int keyCode) {
 		return false;
 	}
 	
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		return false;
 	}
 	
@@ -135,7 +135,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		GlStateManager.translated(0, 0, -0.1);
+		GlStateManager.translate(0, 0, -0.1);
 		
 		// horizonal lines
 		for (int i = 0; i <= rows; i++) {
@@ -148,7 +148,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
 		}
 		
-		GlStateManager.translated(0, 0, -0.1);
+		GlStateManager.translate(0, 0, -0.1);
 		
 		// vertical lines
 		for (int i = 0; i <= columns; i++) {

@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.common.meter.Meter;
@@ -82,20 +82,20 @@ public class ClientLogManager extends LogManager {
 	/**
 	 * Log all events from the past server tick
 	 */
-	public void updateMeterLogs(CompoundTag data) {
-		int subtickCount = data.getInt("subticks");
+	public void updateMeterLogs(NBTTagCompound data) {
+		int subtickCount = data.getInteger("subticks");
 		subticks.put(getLastTick(), subtickCount);
 		
-		ListTag list = data.getList("logs", NbtUtils.TYPE_COMPOUND);
+		NBTTagList list = data.getTagList("logs", NbtUtils.TYPE_COMPOUND);
 		
-		for (int index = 0; index < list.size(); index++) {
-			CompoundTag nbt = list.getCompound(index);
+		for (int index = 0; index < list.tagCount(); index++) {
+			NBTTagCompound nbt = list.getCompoundTagAt(index);
 			
 			long id = nbt.getLong("id");
 			Meter meter = meterGroup.getMeter(id);
 			
 			if (meter != null) {
-				CompoundTag logs = nbt.getCompound("logs");
+				NBTTagCompound logs = nbt.getCompoundTag("logs");
 				boolean powered = nbt.getBoolean("powered");
 				boolean active = nbt.getBoolean("active");
 				

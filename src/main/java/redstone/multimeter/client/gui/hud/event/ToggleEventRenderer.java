@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
@@ -92,7 +92,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		}
 		
 		y += hud.settings.gridSize;
-		int textY = y + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
+		int textY = y + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.FONT_HEIGHT) / 2;
 		int color = meter.getColor();
 		
 		MeterLogs logs = meter.getLogs();
@@ -139,7 +139,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 						
 						GlStateManager.pushMatrix();
 						hud.renderer.renderText(text, startX + 1, textY + 1, textColor);
-						GlStateManager.translated(0, 0, -0.01);
+						GlStateManager.translate(0, 0, -0.01);
 						hud.renderer.renderRect(startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
 						GlStateManager.popMatrix();
 					}
@@ -259,7 +259,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	private void drawOff(int x, int y, int color) {
 		GlStateManager.pushMatrix();
 		drawOn(x, y, hud.settings.colorBackground);
-		GlStateManager.translated(0, 0, -0.01);
+		GlStateManager.translate(0, 0, -0.01);
 		draw(x, y, color);
 		GlStateManager.popMatrix();
 	}

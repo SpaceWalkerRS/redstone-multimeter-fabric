@@ -1,7 +1,7 @@
 package redstone.multimeter.common.network.packets;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
@@ -9,28 +9,28 @@ import redstone.multimeter.server.MultimeterServer;
 
 public class TickPhaseTreePacket implements RSMMPacket {
 	
-	private CompoundTag nbt;
+	private NBTTagCompound nbt;
 	
 	public TickPhaseTreePacket() {
 		
 	}
 	
-	public TickPhaseTreePacket(CompoundTag nbt) {
+	public TickPhaseTreePacket(NBTTagCompound nbt) {
 		this.nbt = nbt;
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
-		data.put("tick phase tree", nbt);
+	public void encode(NBTTagCompound data) {
+		data.setTag("tick phase tree", nbt);
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
-		nbt = data.getCompound("tick phase tree");
+	public void decode(NBTTagCompound data) {
+		nbt = data.getCompoundTag("tick phase tree");
 	}
 	
 	@Override
-	public void execute(MultimeterServer server, ServerPlayerEntity player) {
+	public void execute(MultimeterServer server, EntityPlayerMP player) {
 		server.refreshTickPhaseTree(player);
 	}
 	

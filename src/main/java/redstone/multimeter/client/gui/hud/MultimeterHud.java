@@ -3,14 +3,13 @@ package redstone.multimeter.client.gui.hud;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.Window;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -29,7 +28,7 @@ import redstone.multimeter.util.ColorUtils;
 public class MultimeterHud extends AbstractParentElement {
 	
 	public final MultimeterClient client;
-	public final TextRenderer font;
+	public final FontRenderer font;
 	public final HudSettings settings;
 	public final HudRenderer renderer;
 	public final MeterEventRenderDispatcher eventRenderers;
@@ -59,10 +58,10 @@ public class MultimeterHud extends AbstractParentElement {
 	private long tickMarker;
 	
 	public MultimeterHud(MultimeterClient client) {
-		MinecraftClient minecraftClient = client.getMinecraftClient();
+		Minecraft minecraftClient = client.getMinecraftClient();
 		
 		this.client = client;
-		this.font = minecraftClient.textRenderer;
+		this.font = minecraftClient.fontRenderer;
 		this.settings = new HudSettings(this);
 		this.renderer = new HudRenderer(this);
 		this.eventRenderers = new MeterEventRenderDispatcher(this);
@@ -78,7 +77,7 @@ public class MultimeterHud extends AbstractParentElement {
 		}
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translated(0, 0, 100);
+		GlStateManager.translate(0, 0, 100);
 		
 		List<IElement> children = getChildren();
 		
@@ -293,12 +292,12 @@ public class MultimeterHud extends AbstractParentElement {
  			}
  		});
 		
-		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.EMPTY, button -> {
+		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new TextComponentString(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.EMPTY, button -> {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
-			stepBackward(Screen.hasControlDown() ? 10 : 1);
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new TextComponentString(getStepSymbol(false, GuiScreen.isCtrlKeyDown())), () -> Tooltip.EMPTY, button -> {
+			stepBackward(GuiScreen.isCtrlKeyDown() ? 10 : 1);
 			return true;
 		}) {
 			
@@ -307,8 +306,8 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
-			stepForward(Screen.hasControlDown() ? 10 : 1);
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new TextComponentString(getStepSymbol(true, GuiScreen.isCtrlKeyDown())), () -> Tooltip.EMPTY, button -> {
+			stepForward(GuiScreen.isCtrlKeyDown() ? 10 : 1);
 			return true;
 		}) {
 			
@@ -317,7 +316,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").formatted(Formatting.BOLD)).setWithShadow(true));
+		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new TextComponentString("P").setStyle(new Style().setBold(true))).setWithShadow(true));
 		
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);
@@ -569,10 +568,10 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 	
 	public void resetSize() {
-		MinecraftClient minecraftClient = client.getMinecraftClient();
-		Window window = minecraftClient.window;
-		int width = window.getScaledWidth();
-		int height = window.getScaledHeight();
+		Minecraft minecraftClient = client.getMinecraftClient();
+		ScaledResolution resolution = new ScaledResolution(minecraftClient);
+		int width = resolution.getScaledWidth();
+		int height = resolution.getScaledHeight();
 		
 		resize(width, height);
 	}
@@ -673,8 +672,8 @@ public class MultimeterHud extends AbstractParentElement {
 		
 		onScreen = true;
 		
-		if (settings.rowHeight < font.fontHeight) {
-			settings.rowHeight = font.fontHeight;
+		if (settings.rowHeight < font.FONT_HEIGHT) {
+			settings.rowHeight = font.FONT_HEIGHT;
 		}
 		
 		settings.forceFullOpacity = true;

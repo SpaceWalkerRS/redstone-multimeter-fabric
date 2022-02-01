@@ -1,7 +1,7 @@
 package redstone.multimeter.common.network.packets;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
@@ -14,17 +14,17 @@ public class ClearMeterGroupPacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
+	public void encode(NBTTagCompound data) {
 		
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NBTTagCompound data) {
 		
 	}
 	
 	@Override
-	public void execute(MultimeterServer server, ServerPlayerEntity player) {
+	public void execute(MultimeterServer server, EntityPlayerMP player) {
 		
 	}
 	

@@ -3,10 +3,8 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
-
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.TextureRegion;
@@ -22,11 +20,11 @@ public class Slider extends AbstractButton {
 	
 	private double value;
 	
-	public Slider(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
+	public Slider(MultimeterClient client, int x, int y, Supplier<ITextComponent> message, Supplier<Tooltip> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip, onSlide, valueSupplier, steps);
 	}
 	
-	public Slider(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
+	public Slider(MultimeterClient client, int x, int y, int width, int height, Supplier<ITextComponent> message, Supplier<Tooltip> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
 		super(client, x, y, width, height, message, tooltip);
 		
 		this.valueConsumer = valueConsumer;
@@ -38,7 +36,7 @@ public class Slider extends AbstractButton {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 		
-		if (!consumed && isActive() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (!consumed && isActive() && button == MOUSE_BUTTON_LEFT) {
 			updateValue(mouseX);
 			consumed = true;
 		}
@@ -60,7 +58,7 @@ public class Slider extends AbstractButton {
 	
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (isActive() && isDraggingMouse() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (isActive() && isDraggingMouse() && button == MOUSE_BUTTON_LEFT) {
 			updateValue(mouseX);
 			return true;
 		}
@@ -74,17 +72,17 @@ public class Slider extends AbstractButton {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(int keyCode) {
 		return false;
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(int keyCode) {
 		return false;
 	}
 	
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		return false;
 	}
 	

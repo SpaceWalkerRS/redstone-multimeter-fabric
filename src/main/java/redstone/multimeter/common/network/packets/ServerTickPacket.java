@@ -1,7 +1,7 @@
 package redstone.multimeter.common.network.packets;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
@@ -20,17 +20,17 @@ public class ServerTickPacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
-		data.putLong("server time", serverTime);
+	public void encode(NBTTagCompound data) {
+		data.setLong("server time", serverTime);
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NBTTagCompound data) {
 		serverTime = data.getLong("server time");
 	}
 	
 	@Override
-	public void execute(MultimeterServer server, ServerPlayerEntity player) {
+	public void execute(MultimeterServer server, EntityPlayerMP player) {
 		
 	}
 	

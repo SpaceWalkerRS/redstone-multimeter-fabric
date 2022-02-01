@@ -1,7 +1,9 @@
 package redstone.multimeter.client.gui.screen;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
+import org.lwjgl.input.Keyboard;
+
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.text.TextComponentString;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
@@ -16,15 +18,15 @@ public class MultimeterScreen extends RSMMScreen {
 	private ScrollableListElement list;
 	
 	public MultimeterScreen(MultimeterClient client) {
-		super(client, new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
+		super(client, new TextComponentString(RedstoneMultimeterMod.MOD_NAME), false);
 		
-		this.isPauseScreen = !Screen.hasShiftDown();
+		this.isPauseScreen = !GuiScreen.isShiftKeyDown();
 	}
 	
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
-		minecraftClient.keyboard.enableRepeatEvents(false);
+		Keyboard.enableRepeatEvents(false);
 	}
 	
 	@Override
@@ -35,7 +37,7 @@ public class MultimeterScreen extends RSMMScreen {
 	
 	@Override
 	protected void initScreen() {
-		minecraftClient.keyboard.enableRepeatEvents(true);
+		Keyboard.enableRepeatEvents(true);
 		
 		list = new ScrollableListElement(client, getWidth(), getHeight());
 		list.setX(getX());
@@ -70,7 +72,7 @@ public class MultimeterScreen extends RSMMScreen {
 			}
 			
 			int textWidth = font.getStringWidth(text);
-			int textHeight = font.fontHeight;
+			int textHeight = font.FONT_HEIGHT;
 			int x = getX() + (getWidth() - textWidth) / 2;
 			int y = getY() + (getHeight() - textHeight) / 2;
 			

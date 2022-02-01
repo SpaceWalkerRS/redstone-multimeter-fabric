@@ -2,14 +2,13 @@ package redstone.multimeter.client.gui.screen;
 
 import java.util.List;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.input.Mouse;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.Window;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.text.ITextComponent;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
@@ -19,18 +18,18 @@ import redstone.multimeter.client.gui.element.AbstractParentElement;
 public abstract class RSMMScreen extends AbstractParentElement {
 	
 	protected final MultimeterClient client;
-	protected final MinecraftClient minecraftClient;
-	protected final TextRenderer font;
+	protected final Minecraft minecraftClient;
+	protected final FontRenderer font;
 	
-	private final Text title;
+	private final ITextComponent title;
 	private final boolean drawTitle;
 	
 	protected ScreenWrapper wrapper;
 	
-	protected RSMMScreen(MultimeterClient client, Text title, boolean drawTitle) {
+	protected RSMMScreen(MultimeterClient client, ITextComponent title, boolean drawTitle) {
 		this.client = client;
 		this.minecraftClient = client.getMinecraftClient();
-		this.font = this.minecraftClient.textRenderer;
+		this.font = this.minecraftClient.fontRenderer;
 		
 		this.title = title;
 		this.drawTitle = drawTitle;
@@ -62,8 +61,8 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		return super.keyPress(keyCode, scanCode, modifiers) || client.getInputHandler().keyPress(this, keyCode, scanCode, modifiers);
+	public boolean keyPress(int keyCode) {
+		return super.keyPress(keyCode) || client.getInputHandler().keyPress(this, keyCode);
 	}
 	
 	@Override
@@ -109,10 +108,8 @@ public abstract class RSMMScreen extends AbstractParentElement {
  		initScreen();
  		update();
  		
- 		Window window = minecraftClient.window;
- 		Mouse mouse = minecraftClient.mouse;
- 		double mouseX = (double)mouse.getX() * window.getScaledWidth() / window.getWidth();
- 		double mouseY = (double)mouse.getY() * window.getScaledHeight() / window.getHeight();
+		double mouseX = Mouse.getX() * width / minecraftClient.displayWidth;
+		double mouseY = height - 1 - Mouse.getY() * height / minecraftClient.displayHeight;
  		
  		updateHoveredElement(mouseX, mouseY);
  	}
@@ -124,7 +121,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	public void close() {
-		minecraftClient.openScreen(wrapper.getParent());
+		minecraftClient.displayGuiScreen(wrapper.getParent());
 	}
 	
 	protected void renderBackground() {
@@ -158,16 +155,16 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	protected void drawTooltip(Tooltip tooltip, int mouseX, int mouseY) {
-		List<Text> lines = tooltip.getLines();
+		List<ITextComponent> lines = tooltip.getLines();
 		
-		int lineHeight = font.fontHeight;
+		int lineHeight = font.FONT_HEIGHT;
 		int lineSpacing = 1;
 		
 		int width = 0;
 		int height = (lines.size() - 1) * (lineHeight + lineSpacing) + lineHeight;
 		
 		for (int index = 0; index < lines.size(); index++) {
-			Text text = lines.get(index);
+			ITextComponent text = lines.get(index);
 			int lineWidth = getWidth(font, text);
 			
 			if (lineWidth > width) {
@@ -191,13 +188,13 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		drawTooltip(lines, x, y, width, height);
 	}
 	
-	private void drawTooltip(List<Text> lines, int x, int y, int width, int height) {
+	private void drawTooltip(List<ITextComponent> lines, int x, int y, int width, int height) {
 		int backgroundColor = 0xF0100010;
 		int borderColor0    = 0x505000FF;
 		int borderColor1    = 0x5028007F;
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translated(0, 0, 400);
+		GlStateManager.translate(0, 0, 400);
 		
 		renderRect(bufferBuilder -> {
 			// background
@@ -216,16 +213,16 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		int textY = y + 4;
 		
 		for (int index = 0; index < lines.size(); index++) {
-			Text line = lines.get(index);
+			ITextComponent line = lines.get(index);
 			renderText(font, line, textX, textY, true, 0xFFFFFFFF);
 			
-			textY += font.fontHeight + 1;
+			textY += font.FONT_HEIGHT + 1;
 		}
 		
 		GlStateManager.popMatrix();
 	}
 	
-	public Text getTitle() {
+	public ITextComponent getTitle() {
 		return title;
 	}
 	
@@ -234,6 +231,6 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 	
 	public static boolean isControlPressed() {
-		return Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
+		return GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown();
 	}
 }

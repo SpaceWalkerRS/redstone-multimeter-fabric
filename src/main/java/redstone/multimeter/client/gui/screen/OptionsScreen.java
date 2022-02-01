@@ -3,9 +3,11 @@ package redstone.multimeter.client.gui.screen;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import org.lwjgl.input.Keyboard;
+
+import net.minecraft.client.gui.GuiControls;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
@@ -20,21 +22,21 @@ import redstone.multimeter.client.option.Options;
 public class OptionsScreen extends RSMMScreen {
 	
 	public OptionsScreen(MultimeterClient client) {
-		super(client, new LiteralText(String.format("%s Options", RedstoneMultimeterMod.MOD_NAME)), true);
+		super(client, new TextComponentString(String.format("%s Options", RedstoneMultimeterMod.MOD_NAME)), true);
 	}
 	
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
 		Options.validate();
-		minecraftClient.options.write();
-		minecraftClient.keyboard.enableRepeatEvents(false);
+		minecraftClient.gameSettings.saveOptions();
+		Keyboard.enableRepeatEvents(false);
 		client.getHUD().onOptionsChanged();
 	}
 	
 	@Override
 	protected void initScreen() {
-		minecraftClient.keyboard.enableRepeatEvents(true);
+		Keyboard.enableRepeatEvents(true);
 		
 		ScrollableListElement list = new ScrollableListElement(client, getWidth(), getHeight(), 52, 36);
 		
@@ -55,18 +57,18 @@ public class OptionsScreen extends RSMMScreen {
 		int x = getX() + getWidth() / 2;
 		int y = getY() + 22;
 		
-		IButton properties = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new LiteralText("Default Meter Properties"), () -> Tooltip.EMPTY, button -> {
+		IButton properties = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TextComponentString("Default Meter Properties"), () -> Tooltip.EMPTY, button -> {
 			client.openScreen(new DefaultMeterPropertiesScreen(client));
 			return true;
 		});
-		IButton controls = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("options.controls"), () -> Tooltip.EMPTY, button -> {
-			minecraftClient.openScreen(new ControlsOptionsScreen(wrapper, minecraftClient.options));
+		IButton controls = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TextComponentTranslation("options.controls"), () -> Tooltip.EMPTY, button -> {
+			minecraftClient.displayGuiScreen(new GuiControls(wrapper, minecraftClient.gameSettings));
 			return true;
 		});
 		
 		y = getY() + getHeight() - (IButton.DEFAULT_HEIGHT + 8);
 		
-		IButton reset = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), () -> Tooltip.EMPTY, button -> {
+		IButton reset = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TextComponentTranslation("controls.reset"), () -> Tooltip.EMPTY, button -> {
 			for (IOption option : Options.all()) {
 				option.reset();
 			}
@@ -74,7 +76,7 @@ public class OptionsScreen extends RSMMScreen {
 			
 			return true;
 		});
-		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("gui.done"), () -> Tooltip.EMPTY, button -> {
+		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TextComponentTranslation("gui.done"), () -> Tooltip.EMPTY, button -> {
 			close();
 			return true;
 		});

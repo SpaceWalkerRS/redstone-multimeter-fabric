@@ -1,9 +1,9 @@
 package redstone.multimeter.util;
 
-import net.minecraft.nbt.ByteTag;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagByte;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 
 public class NbtUtils {
 	
@@ -21,21 +21,21 @@ public class NbtUtils {
 	public static final byte TYPE_INT_ARRAY  = 11;
 	public static final byte TYPE_LONG_ARRAY = 12;
 	
-	public static final Tag NULL = new ByteTag((byte)0);
+	public static final NBTBase NULL = new NBTTagByte((byte)0);
 	
-	public static CompoundTag identifierToNbt(Identifier id) {
-		CompoundTag nbt = new CompoundTag();
+	public static NBTTagCompound identifierToNbt(ResourceLocation id) {
+		NBTTagCompound nbt = new NBTTagCompound();
 		
-		nbt.putString("namespace", id.getNamespace());
-		nbt.putString("path", id.getPath());
+		nbt.setString("namespace", id.getNamespace());
+		nbt.setString("path", id.getPath());
 		
 		return nbt;
 	}
 	
-	public static Identifier nbtToIdentifier(CompoundTag nbt) {
+	public static ResourceLocation nbtToIdentifier(NBTTagCompound nbt) {
 		String namespace = nbt.getString("namespace");
 		String path = nbt.getString("path");
 		
-		return new Identifier(namespace, path);
+		return new ResourceLocation(namespace, path);
 	}
 }

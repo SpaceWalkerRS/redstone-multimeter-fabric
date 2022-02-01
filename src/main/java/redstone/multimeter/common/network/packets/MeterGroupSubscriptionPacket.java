@@ -1,7 +1,7 @@
 package redstone.multimeter.common.network.packets;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.meter.ClientMeterGroup;
@@ -25,19 +25,19 @@ public class MeterGroupSubscriptionPacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
-		data.putString("name", name);
-		data.putBoolean("subscribed", subscribed);
+	public void encode(NBTTagCompound data) {
+		data.setString("name", name);
+		data.setBoolean("subscribed", subscribed);
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NBTTagCompound data) {
 		name = data.getString("name");
 		subscribed = data.getBoolean("subscribed");
 	}
 	
 	@Override
-	public void execute(MultimeterServer server, ServerPlayerEntity player) {
+	public void execute(MultimeterServer server, EntityPlayerMP player) {
 		Multimeter multimeter = server.getMultimeter();
 		ServerMeterGroup meterGroup = multimeter.getMeterGroup(name);
 		

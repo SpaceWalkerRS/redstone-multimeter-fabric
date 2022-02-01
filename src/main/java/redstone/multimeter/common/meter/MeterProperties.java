@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NBTTagCompound;
 
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.event.EventType;
@@ -67,45 +67,45 @@ public class MeterProperties {
 		return this;
 	}
 	
-	public CompoundTag toNbt() {
-		CompoundTag nbt = new CompoundTag();
+	public NBTTagCompound toNbt() {
+		NBTTagCompound nbt = new NBTTagCompound();
 		
 		if (pos != null) {
-			nbt.put("pos", pos.toNbt());
+			nbt.setTag("pos", pos.toNbt());
 		}
 		if (name != null) {
-			nbt.putString("name", name);
+			nbt.setString("name", name);
 		}
 		if (color != null) {
-			nbt.putInt("color", color);
+			nbt.setInteger("color", color);
 		}
 		if (movable != null) {
-			nbt.putBoolean("movable", movable);
+			nbt.setBoolean("movable", movable);
 		}
 		if (eventTypes != null) {
-			nbt.putInt("event types", eventTypes);
+			nbt.setInteger("event types", eventTypes);
 		}
 		
 		return nbt;
 	}
 	
-	public static MeterProperties fromNbt(CompoundTag nbt) {
+	public static MeterProperties fromNbt(NBTTagCompound nbt) {
 		MeterProperties properties = new MeterProperties();
 		
-		if (nbt.contains("pos")) {
-			properties.pos = DimPos.fromNbt(nbt.getCompound("pos"));
+		if (nbt.hasKey("pos")) {
+			properties.pos = DimPos.fromNbt(nbt.getCompoundTag("pos"));
 		}
-		if (nbt.contains("name")) {
+		if (nbt.hasKey("name")) {
 			properties.name = nbt.getString("name");
 		}
-		if (nbt.contains("color")) {
-			properties.color = nbt.getInt("color");
+		if (nbt.hasKey("color")) {
+			properties.color = nbt.getInteger("color");
 		}
-		if (nbt.contains("movable")) {
+		if (nbt.hasKey("movable")) {
 			properties.movable = nbt.getBoolean("movable");
 		}
-		if (nbt.contains("event types")) {
-			properties.eventTypes = nbt.getInt("event types");
+		if (nbt.hasKey("event types")) {
+			properties.eventTypes = nbt.getInteger("event types");
 		}
 		
 		return properties;

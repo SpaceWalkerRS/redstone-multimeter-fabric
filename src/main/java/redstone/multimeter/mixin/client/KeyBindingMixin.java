@@ -9,17 +9,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.options.KeyBinding;
-import net.minecraft.client.util.InputUtil.KeyCode;
+import net.minecraft.client.settings.KeyBinding;
 
 import redstone.multimeter.client.KeyBindings;
-import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
 @Mixin(KeyBinding.class)
-public class KeyBindingMixin implements IKeyBinding {
+public class KeyBindingMixin {
 	
-	@Shadow @Final private static Map<String, Integer> categoryOrderMap;
-	@Shadow private KeyCode keyCode;
+	@Shadow @Final private static Map<String, Integer> CATEGORY_ORDER;
 	
 	@Inject(
 			method = "<clinit>",
@@ -29,12 +26,7 @@ public class KeyBindingMixin implements IKeyBinding {
 	)
 	private static void initKeybinds(CallbackInfo ci) {
 		for (String category : KeyBindings.getCategories()) {
-			categoryOrderMap.put(category, categoryOrderMap.size() + 1);
+			CATEGORY_ORDER.put(category, CATEGORY_ORDER.size() + 1);
 		}
-	}
-	
-	@Override
-	public KeyCode getBoundKeyRSMM() {
-		return keyCode;
 	}
 }

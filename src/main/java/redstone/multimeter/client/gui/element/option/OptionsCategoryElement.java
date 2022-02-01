@@ -2,11 +2,11 @@ package redstone.multimeter.client.gui.element.option;
 
 import java.util.Collection;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -22,16 +22,16 @@ import redstone.multimeter.util.TextUtils;
 public class OptionsCategoryElement extends AbstractParentElement {
 	
 	private final MultimeterClient client;
-	private final TextRenderer font;
+	private final FontRenderer font;
 	private final TextElement category;
 	private final SimpleListElement options;
 	
 	public OptionsCategoryElement(MultimeterClient client, int width, String category, Collection<IOption> options) {
-		MinecraftClient minecraftClient = client.getMinecraftClient();
+		Minecraft minecraftClient = client.getMinecraftClient();
 		
 		this.client = client;
-		this.font = minecraftClient.textRenderer;
-		this.category = new TextElement(this.client, 0, 0, t -> t.setText(new LiteralText(category).formatted(Formatting.ITALIC)).setWithShadow(true));
+		this.font = minecraftClient.fontRenderer;
+		this.category = new TextElement(this.client, 0, 0, t -> t.setText(new TextComponentString(category).setStyle(new Style().setUnderlined(true))).setWithShadow(true));
 		this.options = new SimpleListElement(this.client, width);
 		
 		for (IOption option : options) {
@@ -72,7 +72,7 @@ public class OptionsCategoryElement extends AbstractParentElement {
 			this.option = option;
 			this.name = new TextElement(client, 0, 0, t -> t.setText(this.option.getName()).setWithShadow(true), () -> tooltip, t -> false);
 			this.control = this.option.createControl(client, 100, IButton.DEFAULT_HEIGHT);
-			this.reset = new Button(client, 0, 0, 50, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), () -> Tooltip.EMPTY, button -> {
+			this.reset = new Button(client, 0, 0, 50, IButton.DEFAULT_HEIGHT, () -> new TextComponentTranslation("controls.reset"), () -> Tooltip.EMPTY, button -> {
 				this.option.reset();
 				return true;
 			});
@@ -106,7 +106,7 @@ public class OptionsCategoryElement extends AbstractParentElement {
 		protected void onChangedY(int y) {
 			int height = getHeight();
 			
-			name.setY(y + height - (height + font.fontHeight) / 2);
+			name.setY(y + height - (height + font.FONT_HEIGHT) / 2);
 			control.setY(y);
 			reset.setY(y);
 		}

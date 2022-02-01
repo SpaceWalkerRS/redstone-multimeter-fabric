@@ -3,9 +3,9 @@ package redstone.multimeter.common.meter.event;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.nbt.ByteTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.util.math.Direction;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagByte;
+import net.minecraft.util.EnumFacing;
 
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.util.NbtUtils;
@@ -32,7 +32,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatFancyText("direction", Direction.byId(metadata).getName()));
+			tooltip.add(TextUtils.formatFancyText("direction", EnumFacing.byIndex(metadata).getName()));
 		}
 	},
 	POWER_CHANGE(3, "power_change") {
@@ -73,7 +73,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatFancyText("direction", Direction.byId(metadata).getName()));
+			tooltip.add(TextUtils.formatFancyText("direction", EnumFacing.byIndex(metadata).getName()));
 		}
 	},
 	OBSERVER_UPDATE(12, "observer_update"),
@@ -132,17 +132,17 @@ public enum EventType {
 		
 	}
 	
-	public Tag toNbt() {
-		return new ByteTag((byte)index);
+	public NBTBase toNbt() {
+		return new NBTTagByte((byte)index);
 	}
 	
-	public static EventType fromNbt(Tag nbt) {
-		if (nbt.getType() != NbtUtils.TYPE_BYTE) {
+	public static EventType fromNbt(NBTBase nbt) {
+		if (nbt.getId() != NbtUtils.TYPE_BYTE) {
 			return UNKNOWN;
 		}
 		
-		ByteTag ByteTag = (ByteTag)nbt;
-		int index = ByteTag.getByte();
+		NBTTagByte NBTTagByte = (NBTTagByte)nbt;
+		int index = NBTTagByte.getByte();
 		
 		return fromIndex(index);
 	}

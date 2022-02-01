@@ -1,12 +1,11 @@
 package redstone.multimeter.client.gui.hud;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.text.ITextComponent;
 
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.text.Text;
-
-import redstone.multimeter.client.gui.element.RenderHelper2D;
 import redstone.multimeter.client.gui.element.IElement;
+import redstone.multimeter.client.gui.element.RenderHelper2D;
 import redstone.multimeter.util.ColorUtils;
 
 public class HudRenderer extends RenderHelper2D {
@@ -55,7 +54,7 @@ public class HudRenderer extends RenderHelper2D {
 	
 	@Override
 	protected void drawRect(BufferBuilder bufferBuilder, int x, int y, int width, int height, int color) {
-		GlStateManager.enableDepthTest();
+		GlStateManager.enableDepth();
 		
 		int x0 = translateX(x, width);
 		int y0 = translateY(y, height);
@@ -72,7 +71,7 @@ public class HudRenderer extends RenderHelper2D {
 	
 	public void renderText(String text, int x, int y, int color) {
 		x = translateX(x, hud.font.getStringWidth(text) - 1);
-		y = translateY(y, hud.font.fontHeight - 2);
+		y = translateY(y, hud.font.FONT_HEIGHT - 2);
 		
 		int alpha = Math.round(0xFF * hud.settings.opacity() / 100.0F);
 		color = ColorUtils.setAlpha(color, alpha);
@@ -80,9 +79,9 @@ public class HudRenderer extends RenderHelper2D {
 		super.renderText(hud.font, text, x, y, false, color);
 	}
 	
-	public void renderText(Text text, int x, int y, int color) {
+	public void renderText(ITextComponent text, int x, int y, int color) {
 		x = translateX(x, getWidth(hud.font, text) - 1);
-		y = translateY(y, hud.font.fontHeight - 2);
+		y = translateY(y, hud.font.FONT_HEIGHT - 2);
 		
 		int alpha = Math.round(0xFF * hud.settings.opacity() / 100.0F);
 		color = ColorUtils.setAlpha(color, alpha);

@@ -1,10 +1,10 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -26,9 +26,9 @@ public class MeterListRenderer extends AbstractElement {
 	public void render(int mouseX, int mouseY) {
 		GlStateManager.pushMatrix();
 		drawHighlights(mouseX, mouseY);
-		GlStateManager.translated(0, 0, -1);
+		GlStateManager.translate(0, 0, -1);
 		drawNames();
-		GlStateManager.translated(0, 0, -1);
+		GlStateManager.translate(0, 0, -1);
 		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
 		GlStateManager.popMatrix();
 	}
@@ -54,17 +54,17 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(int keyCode) {
 		return false;
 	}
 	
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(int keyCode) {
 		return false;
 	}
 	
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		return false;
 	}
 	
@@ -109,19 +109,19 @@ public class MeterListRenderer extends AbstractElement {
 	}
 	
 	private void drawNames() {
-		if (hud.settings.rowHeight < hud.font.fontHeight) {
+		if (hud.settings.rowHeight < hud.font.FONT_HEIGHT) {
 			return;
 		}
 		
 		int x = hud.settings.gridSize + 1;
-		int y = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
+		int y = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.FONT_HEIGHT) / 2;
 		
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);
-			Text name = new LiteralText(meter.getName());
+			ITextComponent name = new TextComponentString(meter.getName());
 			
 			if (meter.isHidden()) {
-				name.formatted(Formatting.GRAY, Formatting.ITALIC);
+				name.setStyle(new Style().setItalic(true).setColor(TextFormatting.GRAY));
 			}
 			
 			hud.renderer.renderText(name, x, y, 0xFFFFFF);

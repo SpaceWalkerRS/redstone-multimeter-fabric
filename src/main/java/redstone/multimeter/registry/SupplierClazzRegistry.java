@@ -4,40 +4,40 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 
 public class SupplierClazzRegistry<T> {
 	
-	private final Identifier id;
-	private final Map<Class<? extends T>, Identifier> clazzToId;
-	private final Map<Identifier, Supplier<? extends T>> idToSupplier;
+	private final ResourceLocation id;
+	private final Map<Class<? extends T>, ResourceLocation> clazzToId;
+	private final Map<ResourceLocation, Supplier<? extends T>> idToSupplier;
 	
 	public SupplierClazzRegistry(String name) {
-		this.id = new Identifier(RedstoneMultimeterMod.NAMESPACE, name);
+		this.id = new ResourceLocation(RedstoneMultimeterMod.NAMESPACE, name);
 		this.clazzToId = new HashMap<>();
 		this.idToSupplier = new HashMap<>();
 	}
 	
-	public Identifier getRegistryId() {
+	public ResourceLocation getId() {
 		return id;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <P extends T> P get(Identifier id) {
+	public <P extends T> P get(ResourceLocation id) {
 		Supplier<? extends T> objSupplier = idToSupplier.get(id);
 		return objSupplier == null ? null : (P)objSupplier.get();
 	}
 	
-	public <P extends T> Identifier getId(P obj) {
+	public <P extends T> ResourceLocation getId(P obj) {
 		return clazzToId.get(obj.getClass());
 	}
 	
 	public <P extends T> void register(String name, Class<P> clazz, Supplier<P> supplier) {
 		String namespace = id.getNamespace();
 		String path = String.format("%s/%s", id.getPath(), name);
-		Identifier id = new Identifier(namespace, path);
+		ResourceLocation id = new ResourceLocation(namespace, path);
 		
 		if (clazzToId.containsKey(clazz)) {
 			throw new IllegalStateException("Registry " + this.id + " already registered an entry with clazz " + clazz);

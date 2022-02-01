@@ -2,14 +2,13 @@ package redstone.multimeter.client.gui.element;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.text.ITextComponent;
 
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
@@ -19,14 +18,15 @@ public class RenderHelper2D {
 	
 	protected void renderRect(Drawer drawer) {
 		GlStateManager.enableBlend();
-		GlStateManager.disableTexture();
-		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.disableTexture2D();
+		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.color(1.0F, 1.0F, 1.0F);
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 		drawer.draw(bufferBuilder);
 		tessellator.draw();
 	}
@@ -64,10 +64,10 @@ public class RenderHelper2D {
 	protected void drawRect(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int a, int r, int g, int b) {
 		int z = 0;
 		
-		bufferBuilder.vertex(x0, y0, z).color(r, g, b, a).next();
-		bufferBuilder.vertex(x0, y1, z).color(r, g, b, a).next();
-		bufferBuilder.vertex(x1, y1, z).color(r, g, b, a).next();
-		bufferBuilder.vertex(x1, y0, z).color(r, g, b, a).next();
+		bufferBuilder.pos(x0, y0, z).color(r, g, b, a).endVertex();
+		bufferBuilder.pos(x0, y1, z).color(r, g, b, a).endVertex();
+		bufferBuilder.pos(x1, y1, z).color(r, g, b, a).endVertex();
+		bufferBuilder.pos(x1, y0, z).color(r, g, b, a).endVertex();
 	}
 	
 	protected void drawGradient(BufferBuilder bufferBuilder, int x, int y, int width, int height, int color0, int color1) {
@@ -92,10 +92,10 @@ public class RenderHelper2D {
 	protected void drawGradient(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int a0, int r0, int g0, int b0, int a1, int r1, int g1, int b1) {
 		int z = 0;
 		
-		bufferBuilder.vertex(x0, y0, z).color(r0, g0, b0, a0).next();
-		bufferBuilder.vertex(x0, y1, z).color(r1, g1, b1, a1).next();
-		bufferBuilder.vertex(x1, y1, z).color(r1, g1, b1, a1).next();
-		bufferBuilder.vertex(x1, y0, z).color(r0, g0, b0, a0).next();
+		bufferBuilder.pos(x0, y0, z).color(r0, g0, b0, a0).endVertex();
+		bufferBuilder.pos(x0, y1, z).color(r1, g1, b1, a1).endVertex();
+		bufferBuilder.pos(x1, y1, z).color(r1, g1, b1, a1).endVertex();
+		bufferBuilder.pos(x1, y0, z).color(r0, g0, b0, a0).endVertex();
 	}
 	
 	protected void renderBorder(int x, int y, int width, int height, int color) {
@@ -117,15 +117,16 @@ public class RenderHelper2D {
 	}
 	
 	protected void renderTexture(Texture texture, Drawer drawer) {
-		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(texture.id);
 		GlStateManager.enableBlend();
-		GlStateManager.enableTexture();
-		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.enableTexture2D();
+		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.color(1.0F, 1.0F, 1.0F);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
+		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 		drawer.draw(bufferBuilder);
 		tessellator.draw();
 	}
@@ -160,22 +161,23 @@ public class RenderHelper2D {
 		float u1 = (float)tx1 / texture.width;
 		float v1 = (float)ty1 / texture.height;
 		
-		bufferBuilder.vertex(x0, y0, z).texture(u0, v0).next();
-		bufferBuilder.vertex(x0, y1, z).texture(u0, v1).next();
-		bufferBuilder.vertex(x1, y1, z).texture(u1, v1).next();
-		bufferBuilder.vertex(x1, y0, z).texture(u1, v0).next();
+		bufferBuilder.pos(x0, y0, z).tex(u0, v0).endVertex();
+		bufferBuilder.pos(x0, y1, z).tex(u0, v1).endVertex();
+		bufferBuilder.pos(x1, y1, z).tex(u1, v1).endVertex();
+		bufferBuilder.pos(x1, y0, z).tex(u1, v0).endVertex();
 	}
 	
 	protected void renderTextureColor(Texture texture, Drawer drawer) {
-		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.id);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(texture.id);
 		GlStateManager.enableBlend();
-		GlStateManager.enableTexture();
-		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-		
+		GlStateManager.enableTexture2D();
+		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.color(1.0F, 1.0F, 1.0F);
+		GlStateManager.color(1.0F, 1.0F, 1.0F);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		bufferBuilder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 		drawer.draw(bufferBuilder);
 		tessellator.draw();
 	}
@@ -215,33 +217,33 @@ public class RenderHelper2D {
 		float u1 = (float)tx1 / texture.width;
 		float v1 = (float)ty1 / texture.height;
 		
-		bufferBuilder.vertex(x0, y0, z).texture(u0, v0).color(r, g, b, a).next();
-		bufferBuilder.vertex(x0, y1, z).texture(u0, v1).color(r, g, b, a).next();
-		bufferBuilder.vertex(x1, y1, z).texture(u1, v1).color(r, g, b, a).next();
-		bufferBuilder.vertex(x1, y0, z).texture(u1, v0).color(r, g, b, a).next();
+		bufferBuilder.pos(x0, y0, z).tex(u0, v0).color(r, g, b, a).endVertex();
+		bufferBuilder.pos(x0, y1, z).tex(u0, v1).color(r, g, b, a).endVertex();
+		bufferBuilder.pos(x1, y1, z).tex(u1, v1).color(r, g, b, a).endVertex();
+		bufferBuilder.pos(x1, y0, z).tex(u1, v0).color(r, g, b, a).endVertex();
 	}
 	
-	protected int getWidth(TextRenderer font, Text text) {
-		return font.getStringWidth(text.asFormattedString());
+	protected int getWidth(FontRenderer font, ITextComponent text) {
+		return font.getStringWidth(text.getFormattedText());
 	}
 	
-	protected void renderText(TextRenderer font, Text text, int x, int y, boolean shadow, int color) {
-		GlStateManager.enableTexture();
+	protected void renderText(FontRenderer font, ITextComponent text, int x, int y, boolean shadow, int color) {
+		GlStateManager.enableTexture2D();
 		
 		if (shadow) {
-			font.drawWithShadow(text.asFormattedString(), x, y, color);
+			font.drawStringWithShadow(text.getFormattedText(), x, y, color);
 		} else {
-			font.draw(text.asFormattedString(), x, y, color);
+			font.drawString(text.getFormattedText(), x, y, color);
 		}
 	}
 	
-	protected void renderText(TextRenderer font, String text, int x, int y, boolean shadow, int color) {
-		GlStateManager.enableTexture();
+	protected void renderText(FontRenderer font, String text, int x, int y, boolean shadow, int color) {
+		GlStateManager.enableTexture2D();
 		
 		if (shadow) {
-			font.drawWithShadow(text, x, y, color);
+			font.drawStringWithShadow(text, x, y, color);
 		} else {
-			font.draw(text, x, y, color);
+			font.drawString(text, x, y, color);
 		}
 	}
 	

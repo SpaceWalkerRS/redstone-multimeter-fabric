@@ -3,10 +3,10 @@ package redstone.multimeter.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.nbt.ByteArrayTag;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NBTTagByteArray;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.util.NbtUtils;
@@ -79,34 +79,34 @@ public class TickPhaseTree {
 		}
 	}
 	
-	public CompoundTag toNbt() {
-		ListTag tasks = new ListTag();
-		ListTag args = new ListTag();
+	public NBTTagCompound toNbt() {
+		NBTTagList tasks = new NBTTagList();
+		NBTTagList args = new NBTTagList();
 		
 		addNode(tasks, args, root, 0);
 		
-		CompoundTag nbt = new CompoundTag();
-		nbt.put("tasks", tasks);
-		nbt.put("args", args);
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setTag("tasks", tasks);
+		nbt.setTag("args", args);
 		
 		return nbt;
 	}
 	
-	private void addNode(ListTag tasks, ListTag args, TickTaskNode node, int depth) {
+	private void addNode(NBTTagList tasks, NBTTagList args, TickTaskNode node, int depth) {
 		if (depth > 0) { // depth 0 is root
 			byte[] array = new byte[3];
 			array[0] = (byte)depth;
 			array[1] = (byte)node.task.getIndex();
 			array[2] = (byte)node.args.length;
-			ByteArrayTag taskNbt = new ByteArrayTag(array);
+			NBTTagByteArray taskNbt = new NBTTagByteArray(array);
 			
-			tasks.add(taskNbt);
+			tasks.appendTag(taskNbt);
 			
 			for (int index = 0; index < node.args.length; index++) {
 				String arg = node.args[index];
-				StringTag argNbt = new StringTag(arg);
+				NBTTagString argNbt = new NBTTagString(arg);
 				
-				args.add(argNbt);
+				args.appendTag(argNbt);
 			}
 		}
 		
@@ -117,9 +117,9 @@ public class TickPhaseTree {
 		}
 	}
 	
-	public void fromNbt(CompoundTag nbt) {
-		ListTag tasks = nbt.getList("tasks", NbtUtils.TYPE_BYTE_ARRAY);
-		ListTag args = nbt.getList("args", NbtUtils.TYPE_STRING);
+	public void fromNbt(NBTTagCompound nbt) {
+		NBTTagList tasks = nbt.getTagList("tasks", NbtUtils.TYPE_BYTE_ARRAY);
+		NBTTagList args = nbt.getTagList("args", NbtUtils.TYPE_STRING);
 		
 		if (!tasks.isEmpty()) {
 			start();
@@ -128,8 +128,8 @@ public class TickPhaseTree {
 		}
 	}
 	
-	private void addNode(ListTag tasks, ListTag args, int taskIndex, int argIndex, int lastDepth) {
-		ByteArrayTag taskNbt = (ByteArrayTag)tasks.get(taskIndex);
+	private void addNode(NBTTagList tasks, NBTTagList args, int taskIndex, int argIndex, int lastDepth) {
+		NBTTagByteArray taskNbt = (NBTTagByteArray)tasks.get(taskIndex);
 		byte[] array = taskNbt.getByteArray();
 		int depth = array[0];
 		TickTask task = TickTask.fromIndex(array[1]);
@@ -140,8 +140,8 @@ public class TickPhaseTree {
 		if (argsLength > 0) {
 			taskArgs = new String[argsLength];
 			
-			for (int i = 0; i < argsLength && argIndex < args.size(); ) {
-				taskArgs[i++] = args.getString(argIndex++);
+			for (int i = 0; i < argsLength && argIndex < args.tagCount(); ) {
+				taskArgs[i++] = args.getStringTagAt(argIndex++);
 			}
 		} else {
 			taskArgs = new String[0];
@@ -158,7 +158,7 @@ public class TickPhaseTree {
 			swapTask(task, taskArgs);
 		}
 		
-		if (++taskIndex < tasks.size()) {
+		if (++taskIndex < tasks.tagCount()) {
 			addNode(tasks, args, taskIndex, argIndex, depth);
 		}
 	}

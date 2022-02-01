@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import net.minecraft.text.Text;
+import net.minecraft.util.text.ITextComponent;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.TextureRegion;
@@ -15,7 +15,7 @@ public class TransparentToggleButton extends ToggleButton {
 		super(client, x, y, width, height, getter, toggle);
 	}
 	
-	public TransparentToggleButton(MultimeterClient client, int x, int y, int width, int height, Function<Boolean, Text> text, Supplier<Boolean> getter, Consumer<Button> toggle) {
+	public TransparentToggleButton(MultimeterClient client, int x, int y, int width, int height, Function<Boolean, ITextComponent> text, Supplier<Boolean> getter, Consumer<Button> toggle) {
 		super(client, x, y, width, height, text, getter, toggle);
 	}
 	

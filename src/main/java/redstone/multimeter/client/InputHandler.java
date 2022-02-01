@@ -1,8 +1,8 @@
 package redstone.multimeter.client;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.settings.KeyBinding;
 
 import redstone.multimeter.client.gui.screen.MultimeterScreen;
 import redstone.multimeter.client.gui.screen.OptionsScreen;
@@ -26,13 +26,13 @@ public class InputHandler {
 			return;
 		}
 		
-		while (KeyBindings.OPEN_MULTIMETER_SCREEN.wasPressed()) {
+		while (KeyBindings.OPEN_MULTIMETER_SCREEN.isPressed()) {
 			client.openScreen(new MultimeterScreen(client));
 		}
-		while (KeyBindings.OPEN_OPTIONS_MENU.wasPressed()) {
+		while (KeyBindings.OPEN_OPTIONS_MENU.isPressed()) {
 			client.openScreen(new OptionsScreen(client));
 		}
-		while (KeyBindings.VIEW_TICK_PHASE_TREE.wasPressed()) {
+		while (KeyBindings.VIEW_TICK_PHASE_TREE.isPressed()) {
 			client.openScreen(new TickPhaseTreeScreen(client));
 		}
 		
@@ -40,37 +40,37 @@ public class InputHandler {
 			return;
 		}
 		
-		while (KeyBindings.TOGGLE_METER.wasPressed()) {
+		while (KeyBindings.TOGGLE_METER.isPressed()) {
 			client.toggleMeter();
 		}
-		while (KeyBindings.RESET_METER.wasPressed()) {
+		while (KeyBindings.RESET_METER.isPressed()) {
 			client.resetMeter();
 		}
-		while (KeyBindings.PAUSE_METERS.wasPressed()) {
+		while (KeyBindings.PAUSE_METERS.isPressed()) {
 			client.getHUD().pause();
 		}
-		while (KeyBindings.TOGGLE_MARKER.wasPressed()) {
-			client.getHUD().toggleTickMarker(Screen.hasControlDown());
+		while (KeyBindings.TOGGLE_MARKER.isPressed()) {
+			client.getHUD().toggleTickMarker(GuiScreen.isCtrlKeyDown());
 		}
-		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
-			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+		while (KeyBindings.STEP_BACKWARD.isPressed()) {
+			client.getHUD().stepBackward(GuiScreen.isCtrlKeyDown() ? 10 : 1);
 		}
-		while (KeyBindings.STEP_FORWARD.wasPressed()) {
-			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
+		while (KeyBindings.STEP_FORWARD.isPressed()) {
+			client.getHUD().stepForward(GuiScreen.isCtrlKeyDown() ? 10 : 1);
 		}
-		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
+		while (KeyBindings.TOGGLE_HUD.isPressed()) {
 			client.toggleHud();
 		}
-		while (KeyBindings.PRINT_LOGS.wasPressed()) {
+		while (KeyBindings.PRINT_LOGS.isPressed()) {
 			client.togglePrinter();
 		}
-		while (KeyBindings.OPEN_METER_CONTROLS.wasPressed()) {
+		while (KeyBindings.OPEN_METER_CONTROLS.isPressed()) {
 			client.openMeterControls();
 		}
 		for (int index = 0; index < KeyBindings.TOGGLE_EVENT_TYPES.length; index++) {
 			KeyBinding keyBinding = KeyBindings.TOGGLE_EVENT_TYPES[index];
 			
-			while (keyBinding.wasPressed()) {
+			while (keyBinding.isPressed()) {
 				client.toggleEventType(EventType.fromIndex(index));
 			}
 		}
@@ -90,25 +90,25 @@ public class InputHandler {
 	// Methods for handling keybindings while the client has a screen open
 	
 	public boolean mouseClick(RSMMScreen screen, double mouseX, double mouseY, int button) {
-		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
+		if (KeyBindings.isBoundToButton(KeyBindings.OPEN_MULTIMETER_SCREEN, button)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
-				MinecraftClient minecraftClient = client.getMinecraftClient();
+				Minecraft minecraftClient = client.getMinecraftClient();
 				
 				if (minecraftClient.player != null) {
 					client.openScreen(new MultimeterScreen(client));
 				}
 			}
 		} else
-		if (KeyBindings.OPEN_OPTIONS_MENU.matchesMouse(button)) {
+		if (KeyBindings.isBoundToButton(KeyBindings.OPEN_OPTIONS_MENU, button)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
 				client.openScreen(new OptionsScreen(client));
 			}
 		} else
-		if (KeyBindings.VIEW_TICK_PHASE_TREE.matchesMouse(button)) {
+		if (KeyBindings.isBoundToButton(KeyBindings.VIEW_TICK_PHASE_TREE, button)) {
 			if (!client.isConnected()) {
 				return false;
 			} else if (screen instanceof TickPhaseTreeScreen) {
@@ -118,17 +118,17 @@ public class InputHandler {
 			}
 		} else
 		if (screen instanceof MultimeterScreen) {
-			if (KeyBindings.PAUSE_METERS.matchesMouse(button)) {
+			if (KeyBindings.isBoundToButton(KeyBindings.PAUSE_METERS, button)) {
 				client.getHUD().pause();
 			} else
-			if (KeyBindings.TOGGLE_MARKER.matchesMouse(button)) {
-				client.getHUD().toggleTickMarker(Screen.hasControlDown());
+			if (KeyBindings.isBoundToButton(KeyBindings.TOGGLE_MARKER, button)) {
+				client.getHUD().toggleTickMarker(GuiScreen.isCtrlKeyDown());
 			} else
-			if (KeyBindings.STEP_BACKWARD.matchesMouse(button)) {
-				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+			if (KeyBindings.isBoundToButton(KeyBindings.STEP_BACKWARD, button)) {
+				client.getHUD().stepBackward(GuiScreen.isCtrlKeyDown() ? 10 : 1);
 			} else
-			if (KeyBindings.STEP_FORWARD.matchesMouse(button)) {
-				client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
+			if (KeyBindings.isBoundToButton(KeyBindings.STEP_FORWARD, button)) {
+				client.getHUD().stepForward(GuiScreen.isCtrlKeyDown() ? 10 : 1);
 			} else {
 				return false;
 			}
@@ -139,26 +139,26 @@ public class InputHandler {
 		return true;
 	}
 	
-	public boolean keyPress(RSMMScreen screen, int keyCode, int scanCode, int modifiers) {
-		if (KeyBindings.OPEN_MULTIMETER_SCREEN.matchesKey(keyCode, scanCode)) {
+	public boolean keyPress(RSMMScreen screen, int keyCode) {
+		if (KeyBindings.isBoundToKey(KeyBindings.OPEN_MULTIMETER_SCREEN, keyCode)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
-				MinecraftClient minecraftClient = client.getMinecraftClient();
+				Minecraft minecraftClient = client.getMinecraftClient();
 				
 				if (minecraftClient.player != null) {
 					client.openScreen(new MultimeterScreen(client));
 				}
 			}
 		} else
-		if (KeyBindings.OPEN_OPTIONS_MENU.matchesKey(keyCode, scanCode)) {
+		if (KeyBindings.isBoundToKey(KeyBindings.OPEN_OPTIONS_MENU, keyCode)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
 				client.openScreen(new OptionsScreen(client));
 			}
 		} else
-		if (KeyBindings.VIEW_TICK_PHASE_TREE.matchesKey(keyCode, scanCode)) {
+		if (KeyBindings.isBoundToKey(KeyBindings.VIEW_TICK_PHASE_TREE, keyCode)) {
 			if (!client.isConnected()) {
 				return false;
 			} else if (screen instanceof TickPhaseTreeScreen) {
@@ -168,17 +168,17 @@ public class InputHandler {
 			}
 		} else
 		if (screen instanceof MultimeterScreen) {
-			if (KeyBindings.PAUSE_METERS.matchesKey(keyCode, scanCode)) {
+			if (KeyBindings.isBoundToKey(KeyBindings.PAUSE_METERS, keyCode)) {
 				client.getHUD().pause();
 			} else
-			if (KeyBindings.TOGGLE_MARKER.matchesKey(keyCode, scanCode)) {
-				client.getHUD().toggleTickMarker(Screen.hasControlDown());
+			if (KeyBindings.isBoundToKey(KeyBindings.TOGGLE_MARKER, keyCode)) {
+				client.getHUD().toggleTickMarker(GuiScreen.isCtrlKeyDown());
 			} else
-			if (KeyBindings.STEP_BACKWARD.matchesKey(keyCode, scanCode)) {
-				client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+			if (KeyBindings.isBoundToKey(KeyBindings.STEP_BACKWARD, keyCode)) {
+				client.getHUD().stepBackward(GuiScreen.isCtrlKeyDown() ? 10 : 1);
 			} else
-			if (KeyBindings.STEP_FORWARD.matchesKey(keyCode, scanCode)) {
-				client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
+			if (KeyBindings.isBoundToKey(KeyBindings.STEP_FORWARD, keyCode)) {
+				client.getHUD().stepForward(GuiScreen.isCtrlKeyDown() ? 10 : 1);
 			} else {
 				return false;
 			}
@@ -191,7 +191,7 @@ public class InputHandler {
 	
 	public boolean mouseScroll(RSMMScreen screen, double scrollX, double scrollY) {
 		if (screen instanceof MultimeterScreen) {
-			if (isPressed(KeyBindings.SCROLL_HUD)) {
+			if (KeyBindings.isPressed(KeyBindings.SCROLL_HUD)) {
 				client.getHUD().stepBackward((int)Math.round(scrollY));
 			} else {
 				return false;
@@ -201,9 +201,5 @@ public class InputHandler {
 		}
 		
 		return true;
-	}
-	
-	private boolean isPressed(KeyBinding keyBinding) {
-		return KeyBindings.isPressed(client.getMinecraftClient(), keyBinding);
 	}
 }
