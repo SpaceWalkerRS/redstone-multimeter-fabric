@@ -2,6 +2,7 @@ package redstone.multimeter.mixin.common;
 
 import java.util.Iterator;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +29,7 @@ import redstone.multimeter.server.MultimeterServer;
 @Mixin(World.class)
 public abstract class WorldMixin implements TickTaskExecutor {
 	
-	@Shadow private boolean isRemote;
+	@Shadow @Final private boolean isRemote;
 	
 	@Inject(
 			method = "neighborChanged",
@@ -62,7 +63,7 @@ public abstract class WorldMixin implements TickTaskExecutor {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BlockObserver;observedNeighborChanged(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/Block;observedNeighborChange(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
 	private void onObserverUpdate(BlockPos pos, Block fromBlock, BlockPos fromPos, CallbackInfo ci) {
@@ -191,10 +192,10 @@ public abstract class WorldMixin implements TickTaskExecutor {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/state/IBlockState;neighborChanged(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+					target = "Lnet/minecraft/block/Block;onNeighborChange(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
-	private void onComparatorUpdate(BlockPos fromPos, Block fromBlock, CallbackInfo ci, Iterator<EnumFacing> it, EnumFacing dir, BlockPos pos) {
+	private void onComparatorUpdate(BlockPos fromPos, Block fromBlock, CallbackInfo ci, EnumFacing[] dirs, int i, int j, EnumFacing dir, BlockPos pos) {
 		if (!isRemote) {
 			((IWorldServer)this).getMultimeter().logComparatorUpdate((World)(Object)this, pos);
 		}

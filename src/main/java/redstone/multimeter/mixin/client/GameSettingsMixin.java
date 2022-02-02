@@ -3,9 +3,7 @@ package redstone.multimeter.mixin.client;
 import java.io.File;
 import java.util.Collection;
 
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,7 +20,7 @@ import redstone.multimeter.client.option.Options;
 @Mixin(GameSettings.class)
 public class GameSettingsMixin {
 	
-	@Shadow @Final @Mutable private KeyBinding[] keyBindings;
+	@Shadow private KeyBinding[] keyBindings;
 	@Shadow private Minecraft mc;
 	
 	private boolean initialized;

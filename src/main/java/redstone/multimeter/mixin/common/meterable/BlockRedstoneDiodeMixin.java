@@ -1,5 +1,6 @@
 package redstone.multimeter.mixin.common.meterable;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +17,7 @@ import redstone.multimeter.block.MeterableBlock;
 @Mixin(BlockRedstoneDiode.class)
 public abstract class BlockRedstoneDiodeMixin implements MeterableBlock {
 	
-	@Shadow private boolean isRepeaterPowered;
+	@Shadow @Final private boolean isRepeaterPowered;
 	
 	@Shadow protected abstract boolean shouldBePowered(World world, BlockPos pos, IBlockState state);
 	

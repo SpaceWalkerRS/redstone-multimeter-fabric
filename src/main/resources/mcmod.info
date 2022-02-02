@@ -1,0 +1,16 @@
+[
+{
+  "modid": "rsmm_forge",
+  "name": "Redstone Multimeter Forge",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://modrinth.com/mod/redstone-multimeter",
+  "updateUrl": "",
+  "authorList": ["Space Walker"],
+  "credits": "NarcolepticFrog, for developing the original Redstone Multimeter mod.",
+  "logoFile": "assets/redstone_multimeter/icon.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]

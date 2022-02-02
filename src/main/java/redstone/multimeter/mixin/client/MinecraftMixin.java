@@ -54,7 +54,8 @@ public class MinecraftMixin implements IMinecraft {
 			method = "runTickMouse",
 			at = @At(
 					value = "INVOKE",
-					target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I"
+					target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I",
+					remap = false
 			)
 	)
 	private int onGetEventDWheel() {

@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
@@ -21,11 +22,12 @@ public class PlayerListMixin {
 	
 	@Inject(
 			method = "initializeConnectionToPlayer",
+			remap = false,
 			at = @At(
 					value = "RETURN"
 			)
 	)
-	private void onPlayerJoin(NetworkManager connection, EntityPlayerMP player, CallbackInfo ci) {
+	private void onPlayerJoin(NetworkManager connection, EntityPlayerMP player, NetHandlerPlayServer nethandler, CallbackInfo ci) {
 		((IMinecraftServer)server).getMultimeterServer().onPlayerJoin(player);
 	}
 	

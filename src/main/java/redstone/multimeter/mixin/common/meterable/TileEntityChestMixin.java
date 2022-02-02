@@ -19,10 +19,11 @@ import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(TileEntityChest.class)
-public class TileEntityChestMixin extends TileEntity {
+public abstract class TileEntityChestMixin extends TileEntity {
 	
 	@Shadow private int numPlayersUsing;
-	@Shadow private BlockChest.Type cachedChestType;
+	
+	@Shadow protected abstract BlockChest.Type getChestType();
 	
 	@Inject(
 			method = "openInventory",
@@ -64,6 +65,6 @@ public class TileEntityChestMixin extends TileEntity {
 	}
 	
 	private boolean isTrappedRSMM() {
-		return cachedChestType == BlockChest.Type.TRAP;
+		return getChestType() == BlockChest.Type.TRAP;
 	}
 }

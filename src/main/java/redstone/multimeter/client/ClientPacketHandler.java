@@ -30,8 +30,6 @@ public class ClientPacketHandler extends AbstractPacketHandler {
 			decode(buffer).execute(client);
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			buffer.release();
 		}
 	}
 }

@@ -1,59 +1,142 @@
 buildscript {
 	repositories {
-		mavenLocal()
+		maven { url = 'https://maven.minecraftforge.net/' }
+		maven { url = "https://repo.spongepowered.org/repository/maven-public" }
 		mavenCentral()
-		maven {
-			name = "sonatype"
-			url = "https://oss.sonatype.org/content/repositories/snapshots/"
-		}
-		maven {
-			name = "forge"
-			url = "https://files.minecraftforge.net/maven"
-		}
-		maven {
-			name = 'sponge'
-			url = 'https://repo.spongepowered.org/maven'
-		}
 	}
 	dependencies {
-		classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-		classpath 'org.spongepowered:mixingradle:0.4-SNAPSHOT'
+		classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+		classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT"
 	}
 }
 
-apply plugin: 'net.minecraftforge.gradle.liteloader'
-apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: "org.spongepowered.mixin"
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
-group = 'rsmm_lite'
 version = '1.6.0'
-archivesBaseName = "redstone-multimeter-lite-mc${project.mcVersion}"
+group = 'rsmm-forge' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'redstone-multimeter-forge-mc1.12.2'
+def mixinLoadingPlugin = "redstone.multimeter.mixin.LoadingPlugin"
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-	version = project.mcVersion
-	mappings = project.mcpMappings
-	runDir = "run"
-}
+	// The mappings can be changed at any time, and must be in the following format.
+	// snapshot_YYYYMMDD   Snapshot are built nightly.
+	// stable_#            Stables are built at the discretion of the MCP team.
+	// Use non-default mappings at your own risk. they may not always work.
+	// Simply re-run your setup task after changing the mappings to update your workspace.
+	//mappings channel: 'snapshot', version: '20171003-1.12'
+	mappings channel: 'stable', version: '39-1.12'
+	// makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
-sourceSets {
-	main {
-		// Refmap declaration must match the refmap name specified in the json config
-		ext.refMap = "mixins.rsmm_lite.refmap.json"
+	// accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+	// Default run configurations.
+	// These can be tweaked, removed, or duplicated as needed.
+	runs {
+		client {
+			workingDirectory project.file('run')
+
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+
+			property "fml.coreMods.load", mixinLoadingPlugin
+			property "mixin.debug.export", "true"
+			property "mixin.debug.verbose", "true"
+		}
+
+		server {
+
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+
+			property "fml.coreMods.load", mixinLoadingPlugin
+			property "mixin.debug.export", "true"
+			property "mixin.debug.verbose", "true"
+		}
 	}
 }
 
-litemod {
-	json{
-		name = "rsmm_lite"
-		mcversion = project.mcVersion
-		description = "A remake of NarcolepticFrog's Redstone Multimeter mod."
-		mixinConfigs += "mixins.rsmm_lite.json"
-	}
+configurations {
+	jarLibs
+	implementation.extendsFrom jarLibs
+}
+
+repositories {
+	maven { url = "https://repo.spongepowered.org/repository/maven-public" }
+}
+
+dependencies {
+	// Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+	// that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+	// The userdev artifact is a special name and will get all sorts of transformations applied to it.
+	minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2859'
+
+	jarLibs "org.spongepowered:mixin:0.8.3"
+	annotationProcessor "org.spongepowered:mixin:0.8.3:processor"
+
+	// You may put jars on which you depend on in ./libs or you may define them like so..
+	// compile "some.group:artifact:version:classifier"
+	// compile "some.group:artifact:version"
+
+	// Real examples
+	// compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+	// compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+	// The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+	// provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+	// These dependencies get remapped to your current MCP mappings
+	// deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+	// For more info...
+	// http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+	// http://www.gradle.org/docs/current/userguide/dependency_management.html
 }
 
 mixin {
-	defaultObfuscationEnv notch
+	add sourceSets.main, "mixins.rsmm_forge.refmap.json"
+	config "mixins.rsmm_forge.json"
 }
 
 jar {
-	from litemod.outputs
+	manifest.attributes(
+			"TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+			"FMLCorePluginContainsFMLMod": true,
+			"FMLCorePlugin": mixinLoadingPlugin,
+			"ForceLoadAsMod": true,
+	)
+
+	from(configurations.jarLibs.collect { it.isDirectory() ? it : zipTree(it) }) {
+		exclude "META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA"
+	}
+}
+
+// Example configuration to allow publishing using the maven-publish task
+// This is the preferred method to reobfuscate your jar file
+jar.finalizedBy('reobfJar')
+// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
+//publish.dependsOn('reobfJar')
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifact jar
+		}
+	}
+	repositories {
+		maven {
+			url "file:///${project.projectDir}/mcmodsrepo"
+		}
+	}
 }

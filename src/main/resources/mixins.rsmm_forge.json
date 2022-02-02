@@ -1,8 +1,9 @@
 {
 	"required": true,
-	"minVersion": "0.5.3",
+	"minVersion": "0.7.3",
 	"package": "redstone.multimeter.mixin",
-	"refmap": "mixins.rsmm_lite.refmap.json",
+	"refmap": "mixins.rsmm_forge.refmap.json",
+	"compatibilityLevel": "JAVA_8",
 	"mixins": [
 		"common.BlockMixin",
 		"common.ChunkMixin",
@@ -46,7 +47,7 @@
 	"client": [
 		"client.EntityRendererMixin",
 		"client.GameSettingsMixin",
-		"client.GuiIngameMixin",
+		"client.GuiIngameForgeMixin",
 		"client.GuiScreenMixin",
 		"client.IntegratedServerMixin",
 		"client.KeyBindingMixin",
