@@ -1,6 +1,6 @@
 {
 	"name": "Redstone Multimeter Lite",
-	"version": "1.5.0",
+	"version": "1.6.1",
 	"mcversion": "1.12.2",
 	"mixinConfigs": [
 		"mixins.rsmm_lite.json"
