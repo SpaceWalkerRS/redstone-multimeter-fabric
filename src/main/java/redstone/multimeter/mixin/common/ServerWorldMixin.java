@@ -91,6 +91,9 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	)
 	private void swapTickTaskChunkSource(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
 		swapTickTaskRSMM(TickTask.CHUNK_SOURCE);
+		// Some jank workaround for a bug that means I can't inject into the
+		// ServerChunkManager#tick(Ljava/util/function/BooleanSupplier;)V method.
+		startTickTaskRSMM(TickTask.PURGE_UNLOADED_CHUNKS);
 	}
 	
 	@Inject(
