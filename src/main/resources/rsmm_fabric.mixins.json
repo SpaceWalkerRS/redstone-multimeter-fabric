@@ -17,6 +17,7 @@
 		"common.ServerPlayNetworkHandlerMixin",
 		"common.ServerWorldMixin",
 		"common.SpawnHelperMixin",
+		"common.ThreadedAnvilChunkStorageMixin",
 		"common.WorldChunkMixin",
 		"common.WorldMixin",
 		"common.compat.alternate_current.WorldAccessMixin",
