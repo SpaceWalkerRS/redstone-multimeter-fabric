@@ -16,7 +16,7 @@ apply plugin: "org.spongepowered.mixin"
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.6.0'
+version = '1.6.1'
 group = 'rsmm-forge' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'redstone-multimeter-forge-mc1.12.2'
 def mixinLoadingPlugin = "redstone.multimeter.mixin.LoadingPlugin"

@@ -14,7 +14,7 @@ public class RedstoneMultimeterMod {
 	
 	public static final String MOD_ID = "rsmm_forge";
 	public static final String MOD_NAME = "Redstone Multimeter";
-	public static final String MOD_VERSION = "1.6.0";
+	public static final String MOD_VERSION = "1.6.1";
 	public static final String NAMESPACE = "redstone_multimeter";
 	public static final String MINECRAFT_NAMESPACE = "minecraft";
 	public static final String CONFIG_PATH = "config/" + NAMESPACE;
