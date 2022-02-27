@@ -11,22 +11,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ServerTask;
 import net.minecraft.util.TickDurationMonitor;
-import net.minecraft.util.thread.ReentrantThreadExecutor;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin extends ReentrantThreadExecutor<ServerTask> implements IMinecraftServer {
+public abstract class MinecraftServerMixin implements IMinecraftServer {
 	
 	private MultimeterServer multimeterServer;
-	
-	public MinecraftServerMixin(String name) {
-		super(name);
-	}
 	
 	@Inject(
 			method = "<init>",
@@ -193,7 +187,7 @@ public abstract class MinecraftServerMixin extends ReentrantThreadExecutor<Serve
 			)
 	)
 	private void onReloadResources(Collection<String> datapacks, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-		execute(() -> multimeterServer.getMultimeter().reloadOptions());
+		((MinecraftServer)(Object)this).execute(() -> multimeterServer.getMultimeter().reloadOptions());
 	}
 	
 	@Override
