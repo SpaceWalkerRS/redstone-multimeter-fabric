@@ -540,7 +540,7 @@ public class Multimeter {
 	}
 	
 	public void logRandomTick(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.RANDOM_TICK, 0);
+		tryLogEvent(world, pos, EventType.RANDOM_TICK);
 	}
 	
 	public void logScheduledTick(World world, OrderedTick<?> scheduledTick) {
@@ -552,19 +552,19 @@ public class Multimeter {
 	}
 	
 	public void logEntityTick(World world, Entity entity) {
-		tryLogEvent(world, entity.getBlockPos(), EventType.ENTITY_TICK, 0);
+		tryLogEvent(world, entity.getBlockPos(), EventType.ENTITY_TICK);
 	}
 	
 	public void logBlockEntityTick(World world, BlockEntity blockEntity) {
-		tryLogEvent(world, blockEntity.getPos(), EventType.BLOCK_ENTITY_TICK, 0);
+		tryLogEvent(world, blockEntity.getPos(), EventType.BLOCK_ENTITY_TICK);
 	}
 	
 	public void logBlockUpdate(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.BLOCK_UPDATE, 0);
+		tryLogEvent(world, pos, EventType.BLOCK_UPDATE);
 	}
 	
 	public void logComparatorUpdate(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.COMPARATOR_UPDATE, 0);
+		tryLogEvent(world, pos, EventType.COMPARATOR_UPDATE);
 	}
 	
 	public void logShapeUpdate(World world, BlockPos pos, Direction dir) {
@@ -572,11 +572,15 @@ public class Multimeter {
 	}
 	
 	public void logObserverUpdate(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.OBSERVER_UPDATE, 0);
+		tryLogEvent(world, pos, EventType.OBSERVER_UPDATE);
 	}
 	
 	public void logInteractBlock(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.INTERACT_BLOCK, 0);
+		tryLogEvent(world, pos, EventType.INTERACT_BLOCK);
+	}
+	
+	private void tryLogEvent(World world, BlockPos pos, EventType type) {
+		tryLogEvent(world, pos, type, 0);
 	}
 	
 	private void tryLogEvent(World world, BlockPos pos, EventType type, int data) {
