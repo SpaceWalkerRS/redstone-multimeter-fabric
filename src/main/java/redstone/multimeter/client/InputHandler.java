@@ -46,18 +46,6 @@ public class InputHandler {
 		while (KeyBindings.RESET_METER.wasPressed()) {
 			client.resetMeter();
 		}
-		while (KeyBindings.PAUSE_METERS.wasPressed()) {
-			client.getHUD().pause();
-		}
-		while (KeyBindings.TOGGLE_MARKER.wasPressed()) {
-			client.getHUD().toggleTickMarker(Screen.hasControlDown());
-		}
-		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
-			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
-		}
-		while (KeyBindings.STEP_FORWARD.wasPressed()) {
-			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
-		}
 		while (KeyBindings.TOGGLE_HUD.wasPressed()) {
 			client.toggleHud();
 		}
@@ -73,6 +61,23 @@ public class InputHandler {
 			while (keyBinding.wasPressed()) {
 				client.toggleEventType(EventType.fromIndex(index));
 			}
+		}
+		
+		if (!client.isHudActive()) {
+			return;
+		}
+		
+		while (KeyBindings.PAUSE_METERS.wasPressed()) {
+			client.getHUD().pause();
+		}
+		while (KeyBindings.TOGGLE_MARKER.wasPressed()) {
+			client.getHUD().toggleTickMarker(Screen.hasControlDown());
+		}
+		while (KeyBindings.STEP_BACKWARD.wasPressed()) {
+			client.getHUD().stepBackward(Screen.hasControlDown() ? 10 : 1);
+		}
+		while (KeyBindings.STEP_FORWARD.wasPressed()) {
+			client.getHUD().stepForward(Screen.hasControlDown() ? 10 : 1);
 		}
 	}
 	
