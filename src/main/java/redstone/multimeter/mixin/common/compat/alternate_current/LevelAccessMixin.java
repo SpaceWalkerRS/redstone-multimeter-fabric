@@ -18,10 +18,10 @@ import net.minecraft.world.chunk.ChunkSection;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 
 @Pseudo
-@Mixin(targets = "alternate.current.redstone.WorldAccess")
-public class WorldAccessMixin {
+@Mixin(targets = "alternate.current.wire.LevelAccess")
+public class LevelAccessMixin {
 	
-	@Shadow @Final private ServerWorld world;
+	@Shadow @Final private ServerWorld level;
 	
 	@Inject(
 			method = "setWireState",
@@ -32,6 +32,6 @@ public class WorldAccessMixin {
 			)
 	)
 	private void onSetWireState(BlockPos pos, BlockState newState, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, Chunk chunk, ChunkSection section, BlockState oldState) {
-		((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, newState);
+		((IServerWorld)level).getMultimeter().onBlockChange(level, pos, oldState, newState);
 	}
 }

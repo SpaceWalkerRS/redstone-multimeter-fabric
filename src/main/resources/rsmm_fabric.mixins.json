@@ -19,7 +19,7 @@
 		"common.WorldChunkMixin",
 		"common.WorldMixin",
 		"common.WorldTickSchedulerMixin",
-		"common.compat.alternate_current.WorldAccessMixin",
+		"common.compat.alternate_current.LevelAccessMixin",
 		"common.meterable.AbstractButtonBlockMixin",
 		"common.meterable.AbstractRedstoneGateBlockMixin",
 		"common.meterable.BellBlockMixin",
