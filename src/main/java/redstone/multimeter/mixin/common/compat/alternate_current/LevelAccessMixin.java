@@ -31,7 +31,7 @@ public class LevelAccessMixin {
 					target = "Lnet/minecraft/server/world/ServerChunkManager;markForUpdate(Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
-	private void onSetWireState(BlockPos pos, BlockState newState, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, Chunk chunk, ChunkSection section, BlockState oldState) {
+	private void onSetWireState(BlockPos pos, BlockState newState, boolean updateNeighborShapes, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, Chunk chunk, ChunkSection section, BlockState oldState) {
 		((IServerWorld)level).getMultimeter().onBlockChange(level, pos, oldState, newState);
 	}
 }
