@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -38,7 +37,7 @@ public class TextUtils {
 						length = lastSpace + 1;
 					}
 					
-					Text line = new LiteralText(subString);
+					Text line = Text.literal(subString);
 					lines.add(line);
 					
 					break;
@@ -47,7 +46,7 @@ public class TextUtils {
 			
 			if (length == text.length()) {
 				if (length > 0) {
-					Text line = new LiteralText(text);
+					Text line = Text.literal(text);
 					lines.add(line);
 				}
 				
@@ -69,8 +68,8 @@ public class TextUtils {
 	}
 	
 	public static Text formatFancyText(String title, Object info) {
-		return new LiteralText("").
-			append(new LiteralText(title + ": ").formatted(Formatting.GOLD)).
-			append(new LiteralText(info.toString()));
+		return Text.literal("").
+			append(Text.literal(title + ": ").formatted(Formatting.GOLD)).
+			append(Text.literal(info.toString()));
 	}
 }

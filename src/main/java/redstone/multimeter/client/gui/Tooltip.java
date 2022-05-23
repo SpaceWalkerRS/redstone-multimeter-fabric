@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public class Tooltip {
@@ -32,7 +31,7 @@ public class Tooltip {
 	}
 	
 	public void add(String line) {
-		add(new LiteralText(line));
+		add(Text.literal(line));
 	}
 	
 	public void add(Text line) {
@@ -51,7 +50,7 @@ public class Tooltip {
 		Text[] lines = new Text[strings.length];
 		
 		for (int index = 0; index < strings.length; index++) {
-			lines[index] = new LiteralText(strings[index]);
+			lines[index] = Text.literal(strings[index]);
 		}
 		
 		return new Tooltip(lines);

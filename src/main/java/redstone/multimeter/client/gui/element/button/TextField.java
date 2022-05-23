@@ -17,7 +17,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 
@@ -56,7 +56,7 @@ public class TextField extends AbstractButton {
 	}
 	
 	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text) {
-		super(client, x, y, width, height, () -> new LiteralText(""), tooltip);
+		super(client, x, y, width, height, () -> Text.literal(""), tooltip);
 		
 		MinecraftClient minecraftClient = this.client.getMinecraftClient();
 		

@@ -51,8 +51,8 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	private int currentDepth;
 	private int currentBatch;
 	
-	protected ServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> key, RegistryEntry<DimensionType> entry, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
-		super(properties, key, entry, profiler, isClient, debugWorld, seed);
+	protected ServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, RegistryEntry<DimensionType> dimension, Supplier<Profiler> supplier, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
+		super(properties, registryRef, dimension, supplier, isClient, debugWorld, seed, maxChainedNeighborUpdates);
 	}
 	
 	@Inject(
@@ -417,7 +417,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BlockState;scheduledTick(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V"
+					target = "Lnet/minecraft/block/BlockState;scheduledTick(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/random/Random;)V"
 			)
 	)
 	private void onTickBlock(BlockPos pos, Block block, CallbackInfo ci) {

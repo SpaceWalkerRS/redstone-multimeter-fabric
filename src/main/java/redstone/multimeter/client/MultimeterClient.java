@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
@@ -209,7 +208,7 @@ public class MultimeterClient {
 			connected = true;
 			
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
+				Text warning = Text.literal(VERSION_WARNING.apply(modVersion)).formatted(Formatting.RED);
 				sendMessage(warning, false);
 			}
 			
@@ -336,7 +335,7 @@ public class MultimeterClient {
 			hudEnabled = !hudEnabled;
 			
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(new LiteralText(message), true);
+			sendMessage(Text.literal(message), true);
 		}
 	}
 	

@@ -4,13 +4,15 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At.Shift;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.brigadier.CommandDispatcher;
 
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 import net.minecraft.server.command.ServerCommandSource;
 
 import redstone.multimeter.command.MeterGroupCommand;
@@ -25,10 +27,10 @@ public class CommandManagerMixin {
 			at = @At(
 					value = "INVOKE",
 					shift = Shift.BEFORE,
-					target = "Lcom/mojang/brigadier/CommandDispatcher;findAmbiguities(Lcom/mojang/brigadier/AmbiguityConsumer;)V"
+					target = "Lcom/mojang/brigadier/CommandDispatcher;setConsumer(Lcom/mojang/brigadier/ResultConsumer;)V"
 			)
 	)
-	private void registerCommands(CommandManager.RegistrationEnvironment environment, CallbackInfo ci) {
+	private void registerCommands(RegistrationEnvironment environment, CommandRegistryAccess access, CallbackInfo ci) {
 		MeterGroupCommand.register(dispatcher);
 	}
 }

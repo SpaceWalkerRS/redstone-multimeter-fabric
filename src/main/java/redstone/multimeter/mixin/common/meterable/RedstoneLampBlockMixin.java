@@ -1,7 +1,5 @@
 package redstone.multimeter.mixin.common.meterable;
 
-import java.util.Random;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -12,6 +10,7 @@ import net.minecraft.block.RedstoneLampBlock;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;

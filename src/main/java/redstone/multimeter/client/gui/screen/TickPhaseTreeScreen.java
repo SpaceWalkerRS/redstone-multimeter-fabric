@@ -1,7 +1,7 @@
 package redstone.multimeter.client.gui.screen;
 
-import net.minecraft.client.gui.screen.ScreenTexts;
-import net.minecraft.text.LiteralText;
+import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -19,7 +19,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 	private long lastRequestTime;
 	
 	public TickPhaseTreeScreen(MultimeterClient client) {
-		super(client, new LiteralText("Tick Phase Tree"), true);
+		super(client, Text.literal("Tick Phase Tree"), true);
 		
 		this.tickPhaseTree = this.client.getTickPhaseTree();
 		this.lastRequestTime = -1;

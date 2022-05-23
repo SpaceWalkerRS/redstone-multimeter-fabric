@@ -6,8 +6,8 @@ import java.util.Map.Entry;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.screen.ScreenTexts;
-import net.minecraft.text.LiteralText;
+import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -45,7 +45,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	private TextField create;
 	
 	protected DefaultMeterPropertiesScreen(MultimeterClient client) {
-		super(client, new LiteralText("Default Meter Properties"), true);
+		super(client, Text.literal("Default Meter Properties"), true);
 		
 		this.meterPropertiesManager = this.client.getMeterPropertiesManager();
 		this.defaults = new HashMap<>();
@@ -120,18 +120,18 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		width = half - (IButton.DEFAULT_HEIGHT + 2);
 		
 		searchbar = new TextField(client, x, y, width, IButton.DEFAULT_HEIGHT, () -> Tooltip.EMPTY, text -> blockList.update(), null);
-		IButton clear = new Button(client, x + width + 2, y, 20, IButton.DEFAULT_HEIGHT, () -> new LiteralText("X"), () -> Tooltip.EMPTY, button -> {
+		IButton clear = new Button(client, x + width + 2, y, 20, IButton.DEFAULT_HEIGHT, () -> Text.literal("X"), () -> Tooltip.EMPTY, button -> {
 			searchbar.clear();
 			return true;
 		});
 		
 		y = getY() + getHeight() - (bottom - 6);
 		
-		add = new Button(client, x, y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> new LiteralText("+").formatted(Formatting.GREEN), () -> Tooltip.EMPTY, button -> {
+		add = new Button(client, x, y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> Text.literal("+").formatted(Formatting.GREEN), () -> Tooltip.EMPTY, button -> {
 			add();
 			return true;
 		});
-		remove = new Button(client, x + (IButton.DEFAULT_HEIGHT + 2), y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> new LiteralText("-").formatted(Formatting.RED), () -> Tooltip.EMPTY, button -> {
+		remove = new Button(client, x + (IButton.DEFAULT_HEIGHT + 2), y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> Text.literal("-").formatted(Formatting.RED), () -> Tooltip.EMPTY, button -> {
 			remove();
 			return true;
 		});
@@ -186,7 +186,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 	
 	private IButton createTabButton(Tab tab, int x, int y, int width, int height) {
-		return new Button(client, x, y, width, height, () -> new LiteralText(tab.name), () -> Tooltip.EMPTY, button -> {
+		return new Button(client, x, y, width, height, () -> Text.literal(tab.name), () -> Tooltip.EMPTY, button -> {
 			selectTab(tab);
 			selectBlock(null);
 			return true;
@@ -274,7 +274,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 				int c = properties.color();
 				int red = ColorUtils.getRed(c);
 				
-				return new LiteralText(String.valueOf(red));
+				return Text.literal(String.valueOf(red));
 			}, () -> Tooltip.EMPTY, value -> {
 				int red = (int)Math.round(value * 0xFF);
 				int c = ColorUtils.setRed(properties.color(), red);
@@ -291,7 +291,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 				int c = properties.color();
 				int blue = ColorUtils.getBlue(c);
 				
-				return new LiteralText(String.valueOf(blue));
+				return Text.literal(String.valueOf(blue));
 			}, () -> Tooltip.EMPTY, value -> {
 				int blue = (int)Math.round(value * 0xFF);
 				int c = ColorUtils.setBlue(properties.color(), blue);
@@ -308,7 +308,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 				int c = properties.color();
 				int green = ColorUtils.getGreen(c);
 				
-				return new LiteralText(String.valueOf(green));
+				return Text.literal(String.valueOf(green));
 			}, () -> Tooltip.EMPTY, value -> {
 				int green = (int)Math.round(value * 0xFF);
 				int c = ColorUtils.setGreen(properties.color(), green);

@@ -7,7 +7,6 @@ import java.util.function.UnaryOperator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -50,7 +49,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 		
 		this.client = client;
 		this.font = minecraftClient.textRenderer;
-		this.property = new TextElement(this.client, 0, 0, t -> t.setText(new LiteralText(name).formatted(Formatting.ITALIC, this.active ? Formatting.WHITE : Formatting.GRAY)).setWithShadow(true), tooltip, onPress);
+		this.property = new TextElement(this.client, 0, 0, t -> t.setText(Text.literal(name).formatted(Formatting.ITALIC, this.active ? Formatting.WHITE : Formatting.GRAY)).setWithShadow(true), tooltip, onPress);
 		this.controls = new SimpleListElement(client, width);
 		this.buttonWidth = buttonWidth;
 		this.active = true;
@@ -84,7 +83,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 	
 	public void withToggle(Consumer<Boolean> listener) {
 		if (toggle == null) {
-			addChild(0, toggle = new TransparentToggleButton(client, 0, 0, 12, 12, on -> new LiteralText(on ? "\u25A0" : "\u25A1"), () -> isActive(), button -> setActive(!active)));
+			addChild(0, toggle = new TransparentToggleButton(client, 0, 0, 12, 12, on -> Text.literal(on ? "\u25A0" : "\u25A1"), () -> isActive(), button -> setActive(!active)));
 		}
 		
 		this.listener = listener;
@@ -170,7 +169,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 		
 		protected Text formatName(String name, UnaryOperator<Style> formatter) {
 			int width = controls.getWidth() - (4 + buttonWidth + 10);
-			MutableText text = new LiteralText(font.trimToWidth(name, width, true));
+			MutableText text = Text.literal(font.trimToWidth(name, width, true));
 			return active ? text.styled(formatter) : text.formatted(Formatting.GRAY);
 		}
 	}
@@ -205,7 +204,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 			
 			int size = getHeight() / 2 - 1;
 			
-			this.increase = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("+"), () -> Tooltip.EMPTY, button -> {
+			this.increase = new TransparentButton(client, 0, 0, size, size, () -> Text.literal("+"), () -> Tooltip.EMPTY, button -> {
 				int distance = Screen.hasShiftDown() ? 10 : 1;
 				WorldPos pos = getter.get();
 				WorldPos newPos = pos.offset(axis, distance);
@@ -214,7 +213,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 				
 				return true;
 			});
-			this.decrease = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("-"), () -> Tooltip.EMPTY, button -> {
+			this.decrease = new TransparentButton(client, 0, 0, size, size, () -> Text.literal("-"), () -> Tooltip.EMPTY, button -> {
 				int distance = Screen.hasShiftDown() ? 10 : 1;
 				WorldPos pos = getter.get();
 				WorldPos newPos = pos.offset(axis, -distance);

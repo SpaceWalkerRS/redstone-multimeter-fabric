@@ -1,6 +1,6 @@
 package redstone.multimeter.modmenu;
 
-import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+/*import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 
 import net.minecraft.client.MinecraftClient;
@@ -8,11 +8,11 @@ import net.minecraft.client.MinecraftClient;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.screen.OptionsScreen;
 import redstone.multimeter.client.gui.screen.ScreenWrapper;
-import redstone.multimeter.interfaces.mixin.IMinecraftClient;
+import redstone.multimeter.interfaces.mixin.IMinecraftClient;*/
 
-public class RedstoneMultimeterMod implements ModMenuApi {
+public class RedstoneMultimeterMod /*implements ModMenuApi*/ {
 	
-	@Override
+	/*@Override
 	public ConfigScreenFactory<?> getModConfigScreenFactory() {
 		return parent -> {
 			MinecraftClient minecraftClient = MinecraftClient.getInstance();
@@ -20,5 +20,5 @@ public class RedstoneMultimeterMod implements ModMenuApi {
 			
 			return new ScreenWrapper(parent, new OptionsScreen(client));
 		};
-	}
+	}*/
 }

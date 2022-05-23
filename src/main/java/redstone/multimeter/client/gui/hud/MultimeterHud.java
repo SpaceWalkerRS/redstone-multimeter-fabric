@@ -8,7 +8,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -292,11 +292,11 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		});
 		
-		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.EMPTY, button -> {
+		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Text.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.EMPTY, button -> {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Text.literal(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
 			stepBackward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -306,7 +306,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Text.literal(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
 			stepForward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -316,7 +316,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").formatted(Formatting.BOLD)).setWithShadow(true));
+		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(Text.literal("P").formatted(Formatting.BOLD)).setWithShadow(true));
 		
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);

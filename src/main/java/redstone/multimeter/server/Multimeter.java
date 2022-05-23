@@ -21,7 +21,6 @@ import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -160,7 +159,7 @@ public class Multimeter {
 		ServerPlayerEntity owner = server.getPlayer(ownerUUID);
 		
 		if (owner != null) {
-			Text message = new LiteralText(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
+			Text message = Text.literal(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
 			server.sendMessage(owner, message, false);
 		}
 	}
@@ -194,7 +193,7 @@ public class Multimeter {
 		
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
-				Text message = new LiteralText(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
+				Text message = Text.literal(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
 				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
@@ -353,15 +352,15 @@ public class Multimeter {
 		
 		meterGroup.addMember(playerUUID);
 		
-		Text message = new LiteralText("").
-			append(new LiteralText(String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()))).
-			append(new LiteralText("[here]").styled(style -> {
+		Text message = Text.literal("").
+			append(Text.literal(String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()))).
+			append(Text.literal("[here]").styled(style -> {
 				return style.
 					withColor(Formatting.GREEN).
-					withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName())))).
+					withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(String.format("Subscribe to meter group \'%s\'", meterGroup.getName())))).
 					withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
 			})).
-			append(new LiteralText(" to subscribe to it."));
+			append(Text.literal(" to subscribe to it."));
 		server.sendMessage(player, message, false);
 	}
 	
@@ -378,7 +377,7 @@ public class Multimeter {
 			if (player != null && meterGroup.hasSubscriber(playerUUID)) {
 				unsubscribeFromMeterGroup(meterGroup, player);
 				
-				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
+				Text message = Text.literal(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
 				server.sendMessage(player, message, false);
 			}
 		}
@@ -399,7 +398,7 @@ public class Multimeter {
 	
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
-			Text message = new LiteralText("This server does not allow meter teleporting!");
+			Text message = Text.literal("This server does not allow meter teleporting!");
 			server.sendMessage(player, message, false);
 			
 			return;
@@ -430,7 +429,7 @@ public class Multimeter {
 					
 					player.teleport(newWorld, newX, newY, newZ, yaw, pitch);
 					
-					Text text = new LiteralText(String.format("Teleported to meter \"%s\"", meter.getName()));
+					Text text = Text.literal(String.format("Teleported to meter \"%s\"", meter.getName()));
 					server.sendMessage(player, text, false);
 					
 					sendClickableReturnMessage(oldWorld, oldX, oldY, oldZ, yaw, pitch, player);
@@ -452,10 +451,10 @@ public class Multimeter {
 		String yaw = NUMBER_FORMAT.format(_yaw);
 		String pitch = NUMBER_FORMAT.format(_pitch);
 		
-		Text message = new LiteralText("Click ").
-			append(new LiteralText("[here]").styled((style) -> {
+		Text message = Text.literal("Click ").
+			append(Text.literal("[here]").styled((style) -> {
 				return style.
-					withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Teleport to").
+					withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Teleport to").
 						append(TextUtils.formatFancyText("\n  dimension", worldId)).
 						append(TextUtils.formatFancyText("\n  x", x)).
 						append(TextUtils.formatFancyText("\n  y", y)).
@@ -463,7 +462,7 @@ public class Multimeter {
 					withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/execute in %s run tp @s %s %s %s %s %s", worldId, x, y, z, yaw, pitch))).
 					withColor(Formatting.GREEN);
 			})).
-			append(new LiteralText(" to return to your previous location"));
+			append(Text.literal(" to return to your previous location"));
 		
 		server.sendMessage(player, message, false);
 	}

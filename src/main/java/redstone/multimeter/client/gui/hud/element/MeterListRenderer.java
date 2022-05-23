@@ -1,8 +1,8 @@
 package redstone.multimeter.client.gui.hud.element;
 
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import redstone.multimeter.client.gui.element.AbstractElement;
@@ -117,7 +117,7 @@ public class MeterListRenderer extends AbstractElement {
 		
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);
-			MutableText name = new LiteralText(meter.getName());
+			MutableText name = Text.literal(meter.getName());
 			
 			if (meter.isHidden()) {
 				name.formatted(Formatting.GRAY, Formatting.ITALIC);

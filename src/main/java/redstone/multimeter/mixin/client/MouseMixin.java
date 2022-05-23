@@ -34,8 +34,8 @@ public class MouseMixin {
 		RSMMScreen screen = multimeterClient.getScreen();
 		
 		if (screen != null) {
-			boolean discrete = client.options.discreteMouseScroll;
-			double sensitivity = client.options.mouseWheelSensitivity;
+			boolean discrete = client.options.getDiscreteMouseScroll().getValue();
+			double sensitivity = client.options.getMouseWheelSensitivity().getValue();
 			double scrollX = sensitivity * (discrete ? Math.signum(horizontal) : horizontal);
 			
 			screen.mouseScroll(mouseX, mouseY, scrollX, scrollY);
@@ -53,8 +53,8 @@ public class MouseMixin {
 			)
 	)
 	private void scrollInGame(long windowHandle, double horizontal, double vertical, CallbackInfo ci, double scrollY, int scrollDeltaY) {
-		boolean discrete = client.options.discreteMouseScroll;
-		double sensitivity = client.options.mouseWheelSensitivity;
+		boolean discrete = client.options.getDiscreteMouseScroll().getValue();
+		double sensitivity = client.options.getMouseWheelSensitivity().getValue();
 		double scrollX = sensitivity * (discrete ? Math.signum(horizontal) : horizontal);
 		
 		if (((IMinecraftClient)client).getMultimeterClient().getInputHandler().handleMouseScroll(scrollX, scrollY)) {

@@ -14,7 +14,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -22,7 +21,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -130,10 +129,10 @@ public class MeterGroupCommand {
 		Collection<String> names = listMeterGroups(source);
 		
 		if (names.isEmpty()) {
-			source.sendFeedback(new LiteralText("There are no meter groups yet!"), false);
+			source.sendFeedback(Text.literal("There are no meter groups yet!"), false);
 		} else {
 			String message = "Meter groups:\n  " + String.join("\n  ", names);
-			source.sendFeedback(new LiteralText(message), false);
+			source.sendFeedback(Text.literal(message), false);
 		}
 		
 		return Command.SINGLE_SUCCESS;
@@ -143,22 +142,22 @@ public class MeterGroupCommand {
 		return command(source, (multimeter, player) -> {
 			if (name == null) {
 				multimeter.subscribeToDefaultMeterGroup(player);
-				source.sendFeedback(new LiteralText("Subscribed to default meter group"), false);
+				source.sendFeedback(Text.literal("Subscribed to default meter group"), false);
 			} else if (multimeter.hasMeterGroup(name)) {
 				ServerMeterGroup meterGroup = multimeter.getMeterGroup(name);
 				
 				if (!meterGroup.isPrivate() || meterGroup.hasMember(player) || meterGroup.isOwnedBy(player)) {
 					multimeter.subscribeToMeterGroup(meterGroup, player);
-					source.sendFeedback(new LiteralText(String.format("Subscribed to meter group \'%s\'", name)), false);
+					source.sendFeedback(Text.literal(String.format("Subscribed to meter group \'%s\'", name)), false);
 				} else {
-					source.sendFeedback(new LiteralText("That meter group is private!"), false);
+					source.sendFeedback(Text.literal("That meter group is private!"), false);
 				}
 			} else {
 				if (MeterGroup.isValidName(name)) {
 					multimeter.createMeterGroup(player, name);
-					source.sendFeedback(new LiteralText(String.format("Created meter group \'%s\'", name)), false);
+					source.sendFeedback(Text.literal(String.format("Created meter group \'%s\'", name)), false);
 				} else {
-					source.sendFeedback(new LiteralText(String.format("\'%s\' is not a valid meter group name!", name)), false);
+					source.sendFeedback(Text.literal(String.format("\'%s\' is not a valid meter group name!", name)), false);
 				}
 			}
 		});
@@ -167,14 +166,14 @@ public class MeterGroupCommand {
 	private static int unsubscribe(ServerCommandSource source) {
 		return command(source, (multimeter, meterGroup, player) -> {
 			multimeter.unsubscribeFromMeterGroup(meterGroup, player);
-			source.sendFeedback(new LiteralText(String.format("Unsubscribed from meter group \'%s\'", meterGroup.getName())), false);
+			source.sendFeedback(Text.literal(String.format("Unsubscribed from meter group \'%s\'", meterGroup.getName())), false);
 		});
 	}
 	
 	private static int queryPrivate(ServerCommandSource source) {
 		return command(source, (multimeter, meterGroup, player) -> {
 			String status = meterGroup.isPrivate() ? "private" : "public";
-			source.sendFeedback(new LiteralText(String.format("Meter group \'%s\' is %s", meterGroup.getName(), status)), false);
+			source.sendFeedback(Text.literal(String.format("Meter group \'%s\' is %s", meterGroup.getName(), status)), false);
 		});
 	}
 	
@@ -182,9 +181,9 @@ public class MeterGroupCommand {
 		return command(source, (multimeter, meterGroup, player) -> {
 			if (meterGroup.isOwnedBy(player)) {
 				meterGroup.setPrivate(isPrivate);
-				source.sendFeedback(new LiteralText(String.format("Meter group \'%s\' is now %s", meterGroup.getName(), (isPrivate ? "private" : "public"))), false);
+				source.sendFeedback(Text.literal(String.format("Meter group \'%s\' is now %s", meterGroup.getName(), (isPrivate ? "private" : "public"))), false);
 			} else {
-				source.sendFeedback(new LiteralText("Only the owner of a meter group can change its privacy!"), false);
+				source.sendFeedback(Text.literal("Only the owner of a meter group can change its privacy!"), false);
 			}
 		});
 	}
@@ -194,10 +193,10 @@ public class MeterGroupCommand {
 		
 		return commandMembers(source, (multimeter, meterGroup, owner) -> {
 			if (members.isEmpty()) {
-				source.sendFeedback(new LiteralText(String.format("Meter group \'%s\' has no members yet!", meterGroup.getName())), false);
+				source.sendFeedback(Text.literal(String.format("Meter group \'%s\' has no members yet!", meterGroup.getName())), false);
 			} else {
 				String message = String.format("Members of meter group \'%s\':\n  ", meterGroup.getName()) + String.join("\n  ", members.keySet());
-				source.sendFeedback(new LiteralText(message), false);
+				source.sendFeedback(Text.literal(message), false);
 			}
 		});
 	}
@@ -206,14 +205,14 @@ public class MeterGroupCommand {
 		return commandMembers(source, (multimeter, meterGroup, owner) -> {
 			for (ServerPlayerEntity player : players) {
 				if (player == owner) {
-					source.sendFeedback(new LiteralText("You cannot add yourself as a member!"), false);
+					source.sendFeedback(Text.literal("You cannot add yourself as a member!"), false);
 				} else if (meterGroup.hasMember(player)) {
-					source.sendFeedback(new LiteralText(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getEntityName(), meterGroup.getName())), false);
+					source.sendFeedback(Text.literal(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getEntityName(), meterGroup.getName())), false);
 				} else if (!multimeter.getMultimeterServer().isMultimeterClient(player)) {
-					source.sendFeedback(new LiteralText(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getEntityName(), RedstoneMultimeterMod.MOD_NAME)), false);
+					source.sendFeedback(Text.literal(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getEntityName(), RedstoneMultimeterMod.MOD_NAME)), false);
 				} else {
 					multimeter.addMemberToMeterGroup(meterGroup, player.getUuid());
-					source.sendFeedback(new LiteralText(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getEntityName(), meterGroup.getName())), false);
+					source.sendFeedback(Text.literal(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getEntityName(), meterGroup.getName())), false);
 				}
 			}
 		});
@@ -227,13 +226,13 @@ public class MeterGroupCommand {
 				ServerPlayerEntity player = multimeter.getMultimeterServer().getPlayer(playerName);
 				
 				if (player == owner) {
-					source.sendFeedback(new LiteralText("You cannot remove yourself as a member!"), false);
+					source.sendFeedback(Text.literal("You cannot remove yourself as a member!"), false);
 				} else {
-					source.sendFeedback(new LiteralText(String.format("Meter group \'%s\' has no member with the name \'%s\'!", meterGroup.getName(), playerName)), false);
+					source.sendFeedback(Text.literal(String.format("Meter group \'%s\' has no member with the name \'%s\'!", meterGroup.getName(), playerName)), false);
 				}
 			} else {
 				multimeter.removeMemberFromMeterGroup(meterGroup, member.getValue());
-				source.sendFeedback(new LiteralText(String.format("Player \'%s\' is no longer a member of meter group \'%s\'", member.getKey(), meterGroup.getName())), false);
+				source.sendFeedback(Text.literal(String.format("Player \'%s\' is no longer a member of meter group \'%s\'", member.getKey(), meterGroup.getName())), false);
 			}
 		});
 	}
@@ -253,7 +252,7 @@ public class MeterGroupCommand {
 	private static int membersClear(ServerCommandSource source) {
 		return commandMembers(source, (multimeter, meterGroup, owner) -> {
 			multimeter.clearMembersOfMeterGroup(meterGroup);
-			source.sendFeedback(new LiteralText(String.format("Removed all members from meter group \'%s\'", meterGroup.getName())), false);
+			source.sendFeedback(Text.literal(String.format("Removed all members from meter group \'%s\'", meterGroup.getName())), false);
 		});
 	}
 	
@@ -263,7 +262,7 @@ public class MeterGroupCommand {
 				command.execute(multimeter, meterGroup, player);
 				
 				if (!meterGroup.isPrivate()) {
-					source.sendFeedback(new LiteralText("NOTE: this meter group is public; adding/removing members will not have any effect until you make it private!"), false);
+					source.sendFeedback(Text.literal("NOTE: this meter group is public; adding/removing members will not have any effect until you make it private!"), false);
 				}
 			}
 		});
@@ -272,7 +271,7 @@ public class MeterGroupCommand {
 	private static int clear(ServerCommandSource source) {
 		return command(source, (multimeter, meterGroup, player) -> {
 			multimeter.clearMeterGroup(meterGroup);
-			source.sendFeedback(new LiteralText(String.format("Removed all meters in meter group \'%s\'", meterGroup.getName())), false);
+			source.sendFeedback(Text.literal(String.format("Removed all meters in meter group \'%s\'", meterGroup.getName())), false);
 		});
 	}
 	
@@ -281,7 +280,7 @@ public class MeterGroupCommand {
 			ServerMeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup == null) {
-				source.sendFeedback(new LiteralText("Please subscribe to a meter group first!"), false);
+				source.sendFeedback(Text.literal("Please subscribe to a meter group first!"), false);
 			} else {
 				command.execute(multimeter, meterGroup, player);
 			}
@@ -293,16 +292,12 @@ public class MeterGroupCommand {
 	}
 	
 	private static boolean execute(ServerCommandSource source, BiFunction<Multimeter, ServerPlayerEntity, Boolean> command) {
-		try {
-			ServerPlayerEntity player = source.getPlayer();
-			MinecraftServer server = source.getServer();
-			MultimeterServer multimeterServer = ((IMinecraftServer)server).getMultimeterServer();
-			Multimeter multimeter = multimeterServer.getMultimeter();
-			
-			return command.apply(multimeter, player);
-		} catch (CommandSyntaxException e) {
-			return false;
-		}
+		ServerPlayerEntity player = source.getPlayer();
+		MinecraftServer server = source.getServer();
+		MultimeterServer multimeterServer = ((IMinecraftServer)server).getMultimeterServer();
+		Multimeter multimeter = multimeterServer.getMultimeter();
+		
+		return command.apply(multimeter, player);
 	}
 	
 	@FunctionalInterface
