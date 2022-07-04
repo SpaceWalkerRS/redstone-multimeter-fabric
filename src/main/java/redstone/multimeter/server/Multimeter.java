@@ -17,7 +17,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -25,8 +24,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
-import net.minecraft.world.tick.OrderedTick;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
@@ -542,12 +541,12 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.RANDOM_TICK);
 	}
 	
-	public void logScheduledTick(World world, OrderedTick<?> scheduledTick) {
-		tryLogEvent(world, scheduledTick.pos(), EventType.SCHEDULED_TICK, scheduledTick.priority().getIndex());
+	public void logScheduledTick(World world, BlockPos pos, TickPriority priority, boolean scheduling) {
+		tryLogEvent(world, pos, EventType.SCHEDULED_TICK, (scheduling ? (1 << 30) : 0) | (priority.getIndex() + 3));
 	}
 	
-	public void logBlockEvent(World world, BlockEvent blockEvent, int depth) {
-		tryLogEvent(world, blockEvent.pos(), EventType.BLOCK_EVENT, (depth << 4) | blockEvent.type());
+	public void logBlockEvent(World world, BlockPos pos, int type, int depth, boolean queueing) {
+		tryLogEvent(world, pos, EventType.BLOCK_EVENT, (queueing ? (1 << 30) : 0) | (depth << 4) | type);
 	}
 	
 	public void logEntityTick(World world, Entity entity) {
