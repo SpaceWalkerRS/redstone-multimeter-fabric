@@ -27,7 +27,7 @@ public class LevelHelperMixin {
 					target = "Lnet/minecraft/server/world/ServerChunkManager;markForUpdate(Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
-	private static void onSetWireState(ServerWorld world, BlockPos pos, BlockState newState, boolean updateNeighborShapes, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, Chunk chunk, ChunkSection section, BlockState oldState) {
+	private static void onSetWireState(ServerWorld world, BlockPos pos, BlockState newState, boolean updateNeighborShapes, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, Chunk chunk, ChunkSection section, BlockState oldState) {
 		((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, newState);
 	}
 }
