@@ -50,16 +50,22 @@ public enum EventType {
 		
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatFancyText("priority", metadata));
+			String status = ((metadata >> 30) == 1) ? "scheduling" : "performing";
+			int priority = (metadata & 0xF) - 3;
+
+			tooltip.add(TextUtils.formatFancyText("status", status));
+			tooltip.add(TextUtils.formatFancyText("priority", priority));
 		}
 	},
 	BLOCK_EVENT(6, "block_event") {
 		
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
+			String status = ((metadata >> 30) == 1) ? "queueing" : "performing";
 			int depth = (metadata >> 4) & 0xFFFF;
 			int type  =  metadata       & 0xF;
 			
+			tooltip.add(TextUtils.formatFancyText("status", status));
 			tooltip.add(TextUtils.formatFancyText("type", type));
 			tooltip.add(TextUtils.formatFancyText("depth", depth));
 		}
