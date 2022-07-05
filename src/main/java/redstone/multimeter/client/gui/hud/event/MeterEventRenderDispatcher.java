@@ -22,6 +22,8 @@ public class MeterEventRenderDispatcher {
 		registerEventRenderer(new PoweredEventRenderer(hud));
 		registerEventRenderer(new ActiveEventRenderer(hud));
 		registerEventRenderer(new PowerChangeEventRenderer(hud));
+		registerEventRenderer(new ScheduledEventRenderer(hud, EventType.SCHEDULED_TICK));
+		registerEventRenderer(new ScheduledEventRenderer(hud, EventType.BLOCK_EVENT));
 	}
 	
 	private void registerEventRenderer(MeterEventRenderer eventRenderer) {
