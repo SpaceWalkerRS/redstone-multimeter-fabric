@@ -24,10 +24,6 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	modImplementation("net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}") {
-		transitive = false
-	}
-	include "net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}"
 }
 
 processResources {

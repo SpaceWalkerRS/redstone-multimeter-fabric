@@ -52,7 +52,7 @@ public class MouseMixin {
 					target = "Lnet/minecraft/client/network/ClientPlayerEntity;isSpectator()Z"
 			)
 	)
-	private void scrollInGame(long windowHandle, double horizontal, double vertical, CallbackInfo ci, double scrollY, float scrollDeltaY) {
+	private void scrollInGame(long windowHandle, double horizontal, double vertical, CallbackInfo ci, double scrollY, int scrollDeltaY) {
 		boolean discrete = client.options.discreteMouseScroll;
 		double sensitivity = client.options.mouseWheelSensitivity;
 		double scrollX = sensitivity * (discrete ? Math.signum(horizontal) : horizontal);

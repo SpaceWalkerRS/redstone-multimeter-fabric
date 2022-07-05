@@ -22,43 +22,43 @@ public class ServerChunkManagerMixin {
 	@Shadow @Final private ServerWorld world;
 	
 	@Inject(
-			method = "tick(Ljava/util/function/BooleanSupplier;)V",
+			method = "tick(Ljava/util/function/BooleanSupplier;Z)V",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
 					args = "ldc=purge"
 			)
 	)
-	private void startpTickTaskPurgeUnloadedChunks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+	private void startpTickTaskPurgeUnloadedChunks(BooleanSupplier isAheadOfTime, boolean tickChunks, CallbackInfo ci) {
 		((TickTaskExecutor)world).startTickTaskRSMM(TickTask.PURGE_UNLOADED_CHUNKS);
 	}
 	
 	@Inject(
-			method = "tick(Ljava/util/function/BooleanSupplier;)V",
+			method = "tick(Ljava/util/function/BooleanSupplier;Z)V",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 					args = "ldc=chunks"
 			)
 	)
-	private void swapTickTaskTickChunks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+	private void swapTickTaskTickChunks(BooleanSupplier isAheadOfTime, boolean tickChunks, CallbackInfo ci) {
 		((TickTaskExecutor)world).swapTickTaskRSMM(TickTask.TICK_CHUNKS);
 	}
 	
 	@Inject(
-			method = "tick(Ljava/util/function/BooleanSupplier;)V",
+			method = "tick(Ljava/util/function/BooleanSupplier;Z)V",
 			at = @At(
 					value = "INVOKE_STRING",
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 					args = "ldc=unload"
 			)
 	)
-	private void swapTickTaskUnloadChunks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+	private void swapTickTaskUnloadChunks(BooleanSupplier isAheadOfTime, boolean tickChunks, CallbackInfo ci) {
 		((TickTaskExecutor)world).swapTickTaskRSMM(TickTask.UNLOAD_CHUNKS);
 	}
 	
 	@Inject(
-			method = "tick(Ljava/util/function/BooleanSupplier;)V",
+			method = "tick(Ljava/util/function/BooleanSupplier;Z)V",
 			slice = @Slice(
 					from = @At(
 							value = "INVOKE_STRING",
@@ -72,7 +72,7 @@ public class ServerChunkManagerMixin {
 					target = "Lnet/minecraft/util/profiler/Profiler;pop()V"
 			)
 	)
-	private void endTickTaskUnloadChunks(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
+	private void endTickTaskUnloadChunks(BooleanSupplier isAheadOfTime, boolean tickChunks, CallbackInfo ci) {
 		((TickTaskExecutor)world).endTickTaskRSMM();
 	}
 	
