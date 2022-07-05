@@ -19,7 +19,20 @@ import redstone.multimeter.interfaces.mixin.IWorldTickScheduler;
 @Mixin(WorldTickScheduler.class)
 public class WorldTickSchedulerMixin implements IWorldTickScheduler {
 	
-	private Consumer<OrderedTick<?>> tickConsumerRSMM;
+	private Consumer<OrderedTick<?>> tickScheduleConsumerRSMM;
+	private Consumer<OrderedTick<?>> tickExecutionConsumerRSMM;
+	
+	@Inject(
+			method = "schedule(Lnet/minecraft/world/tick/OrderedTick;)V",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void logTickScheduled(OrderedTick<?> scheduledTick, CallbackInfo ci) {
+		if (tickScheduleConsumerRSMM != null) {
+			tickScheduleConsumerRSMM.accept(scheduledTick);
+		}
+	}
 	
 	@Inject(
 			method = "tick(Ljava/util/function/BiConsumer;)V",
@@ -31,13 +44,18 @@ public class WorldTickSchedulerMixin implements IWorldTickScheduler {
 			)
 	)
 	private void logScheduledTick(BiConsumer<BlockPos, ?> ticker, CallbackInfo ci, OrderedTick<?> scheduledTick) {
-		if (tickConsumerRSMM != null) {
-			tickConsumerRSMM.accept(scheduledTick);
+		if (tickExecutionConsumerRSMM != null) {
+			tickExecutionConsumerRSMM.accept(scheduledTick);
 		}
 	}
 	
 	@Override
-	public void setTickConsumerRSMM(Consumer<OrderedTick<?>> consumer) {
-		this.tickConsumerRSMM = consumer;
+	public void setTickScheduleConsumerRSMM(Consumer<OrderedTick<?>> consumer) {
+		this.tickScheduleConsumerRSMM = consumer;
+	}
+
+	@Override
+	public void setTickExecutionConsumerRSMM(Consumer<OrderedTick<?>> consumer) {
+		this.tickExecutionConsumerRSMM = consumer;
 	}
 }

@@ -47,6 +47,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	@Shadow @Final private boolean shouldTickTime;
 	
 	private OrderedTick<?> scheduledTickRSMM;
+	private int queueSize;
 	private int currentDepth;
 	private int currentBatch;
 	
@@ -61,10 +62,16 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void setTickConsumers(CallbackInfo ci) {
-		((IWorldTickScheduler)blockTickScheduler).setTickConsumerRSMM(scheduledTick -> {
+		((IWorldTickScheduler)blockTickScheduler).setTickScheduleConsumerRSMM(scheduledTick -> {
+			getMultimeter().logScheduledTick((World)(Object)this, scheduledTick.pos(), scheduledTick.priority(), true);
+		});
+		((IWorldTickScheduler)blockTickScheduler).setTickExecutionConsumerRSMM(scheduledTick -> {
 			this.scheduledTickRSMM = scheduledTick;
 		});
-		((IWorldTickScheduler)fluidTickScheduler).setTickConsumerRSMM(scheduledTick -> {
+		((IWorldTickScheduler)fluidTickScheduler).setTickScheduleConsumerRSMM(scheduledTick -> {
+			getMultimeter().logScheduledTick((World)(Object)this, scheduledTick.pos(), scheduledTick.priority(), true);
+		});
+		((IWorldTickScheduler)fluidTickScheduler).setTickExecutionConsumerRSMM(scheduledTick -> {
 			this.scheduledTickRSMM = scheduledTick;
 		});
 	}
@@ -436,6 +443,31 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
+			method = "addSyncedBlockEvent",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onAddBlockEvent(BlockPos pos, Block block, int type, int data, CallbackInfo ci) {
+		queueSize = syncedBlockEventQueue.size();
+	}
+
+	@Inject(
+			method = "addSyncedBlockEvent",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void postAddBlockEvent(BlockPos pos, Block block, int type, int data, CallbackInfo ci) {
+		// The queue is a set; only one block event for the same block and position
+		// can exist at any time. To check whether the block event was added, we
+		// check the queue size before and after the new block event was offered.
+		if (queueSize < syncedBlockEventQueue.size()) {
+			getMultimeter().logBlockEvent((World)(Object)this, pos, type, currentDepth + 1, true);
+		}
+	}
+	
+	@Inject(
 			method = "processSyncedBlockEvents",
 			at = @At(
 					value = "HEAD"
@@ -463,6 +495,17 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
+			method = "processSyncedBlockEvents",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void postProcessBlockEvents(CallbackInfo ci) {
+		currentDepth = -1;
+		currentBatch = 0;
+	}
+	
+	@Inject(
 			method = "processBlockEvent",
 			at = @At(
 					value = "INVOKE",
@@ -471,7 +514,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void onProcessBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
-		getMultimeter().logBlockEvent((World)(Object)this, blockEvent, currentDepth);
+		getMultimeter().logBlockEvent((World)(Object)this, blockEvent.pos(), blockEvent.type(), currentDepth, false);
 	}
 	
 	@Override
@@ -481,7 +524,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	
 	private void logCurrentScheduledTickRSMM() {
 		if (scheduledTickRSMM != null) {
-			getMultimeter().logScheduledTick((World)(Object)this, scheduledTickRSMM);
+			getMultimeter().logScheduledTick((World)(Object)this, scheduledTickRSMM.pos(), scheduledTickRSMM.priority(), false);
 			scheduledTickRSMM = null;
 		}
 	}
