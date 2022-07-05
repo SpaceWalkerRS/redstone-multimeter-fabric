@@ -1,9 +1,7 @@
 package redstone.multimeter.mixin.common.compat.alternate_current;
 
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -18,10 +16,8 @@ import net.minecraft.world.chunk.ChunkSection;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 
 @Pseudo
-@Mixin(targets = "alternate.current.redstone.WorldAccess")
-public class WorldAccessMixin {
-	
-	@Shadow @Final private ServerWorld world;
+@Mixin(targets = "alternate.current.wire.LevelHelper")
+public class LevelHelperMixin {
 	
 	@Inject(
 			method = "setWireState",
@@ -31,7 +27,7 @@ public class WorldAccessMixin {
 					target = "Lnet/minecraft/server/world/ServerChunkManager;markForUpdate(Lnet/minecraft/util/math/BlockPos;)V"
 			)
 	)
-	private void onSetWireState(BlockPos pos, BlockState newState, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, Chunk chunk, ChunkSection section, BlockState oldState) {
+	private static void onSetWireState(ServerWorld world, BlockPos pos, BlockState newState, boolean updateNeighborShapes, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, Chunk chunk, ChunkSection section, BlockState oldState) {
 		((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, newState);
 	}
 }
