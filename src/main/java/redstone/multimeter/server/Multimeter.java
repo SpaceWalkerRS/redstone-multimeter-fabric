@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEventData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -26,7 +25,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
-import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
@@ -507,12 +505,12 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.RANDOM_TICK);
 	}
 	
-	public void logScheduledTick(World world, NextTickListEntry scheduledTick) {
-		tryLogEvent(world, scheduledTick.position, EventType.SCHEDULED_TICK, scheduledTick.priority);
+	public void logScheduledTick(World world, BlockPos pos, int priority, boolean scheduling) {
+		tryLogEvent(world, pos, EventType.SCHEDULED_TICK, (scheduling ? (1 << 30) : 0) | (priority + 3));
 	}
 	
-	public void logBlockEvent(World world, BlockEventData blockEvent, int depth) {
-		tryLogEvent(world, blockEvent.getPosition(), EventType.BLOCK_EVENT, (depth << 4) | blockEvent.getEventID());
+	public void logBlockEvent(World world, BlockPos pos, int type, int depth, boolean queueing) {
+		tryLogEvent(world, pos, EventType.BLOCK_EVENT, (queueing ? (1 << 30) : 0) | (depth << 4) | type);
 	}
 	
 	public void logEntityTick(World world, Entity entity) {
