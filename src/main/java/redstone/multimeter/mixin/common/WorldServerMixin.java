@@ -1,6 +1,7 @@
 package redstone.multimeter.mixin.common;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockEventData;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
@@ -36,7 +38,9 @@ import redstone.multimeter.util.DimensionUtils;
 public abstract class WorldServerMixin extends World implements IWorldServer {
 	
 	@Shadow @Final private MinecraftServer server;
+	@Shadow @Final private Set<NextTickListEntry> pendingTickListEntriesHashSet;
 	
+	private int queueSize;
 	private int currentDepth;
 	
 	protected WorldServerMixin(ISaveHandler saveHandlerIn, WorldInfo info, WorldProvider providerIn, Profiler profilerIn, boolean client) {
@@ -298,6 +302,28 @@ public abstract class WorldServerMixin extends World implements IWorldServer {
 	}
 	
 	@Inject(
+			method = "updateBlockTick",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onSchedule(BlockPos pos, Block block, int delay, int priority, CallbackInfo ci) {
+		queueSize = pendingTickListEntriesHashSet.size();
+	}
+	
+	@Inject(
+			method = "updateBlockTick",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void postSchedule(BlockPos pos, Block block, int delay, int priority, CallbackInfo ci) {
+		if (queueSize < pendingTickListEntriesHashSet.size()) {
+			getMultimeter().logScheduledTick((World)(Object)this, pos, priority, true);
+		}
+	}
+	
+	@Inject(
 			method = "updateEntities",
 			at = @At(
 					value = "HEAD"
@@ -347,17 +373,17 @@ public abstract class WorldServerMixin extends World implements IWorldServer {
 			)
 	)
 	private void onScheduledTick(boolean runAllPending, CallbackInfoReturnable<Boolean> ci, Iterator<NextTickListEntry> it, NextTickListEntry scheduledTick) {
-		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
+		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick.position, scheduledTick.priority, false);
 	}
 	
 	@Inject(
-			method = "sendQueuedBlockEvents",
+			method = "addBlockEvent",
 			at = @At(
-					value = "HEAD"
+					value = "TAIL"
 			)
 	)
-	private void onProcessBlockEvents(CallbackInfo ci) {
-		currentDepth = -1; // this value will get updated to 0 before any block events are processed
+	private void postAddBlockEvent(BlockPos pos, Block block, int type, int data, CallbackInfo ci) {
+		getMultimeter().logBlockEvent((World)(Object)this, pos, type, currentDepth + 1, true);
 	}
 	
 	@Inject(
@@ -372,6 +398,16 @@ public abstract class WorldServerMixin extends World implements IWorldServer {
 	}
 	
 	@Inject(
+			method = "sendQueuedBlockEvents",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void onProcessBlockEvents(CallbackInfo ci) {
+		currentDepth = -1;
+	}
+	
+	@Inject(
 			method = "fireBlockEvent",
 			at = @At(
 					value = "INVOKE",
@@ -380,7 +416,7 @@ public abstract class WorldServerMixin extends World implements IWorldServer {
 			)
 	)
 	private void onProcessBlockEvent(BlockEventData blockEvent, CallbackInfoReturnable<Boolean> cir) {
-		getMultimeter().logBlockEvent((World)(Object)this, blockEvent, currentDepth);
+		getMultimeter().logBlockEvent((World)(Object)this, blockEvent.getPosition(), blockEvent.getEventID(), currentDepth, false);
 	}
 	
 	@Override
