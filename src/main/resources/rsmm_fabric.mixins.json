@@ -15,6 +15,7 @@
 		"common.PlayerManagerMixin",
 		"common.ServerChunkManagerMixin",
 		"common.ServerPlayNetworkHandlerMixin",
+		"common.ServerTickSchedulerMixin",
 		"common.ServerWorldMixin",
 		"common.SpawnHelperMixin",
 		"common.ThreadedAnvilChunkStorageMixin",
