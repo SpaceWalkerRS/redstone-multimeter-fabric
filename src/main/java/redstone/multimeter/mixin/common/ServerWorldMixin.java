@@ -20,6 +20,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.MutableWorldProperties;
@@ -40,6 +41,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	@Shadow @Final private ObjectLinkedOpenHashSet<BlockEvent> syncedBlockEventQueue;
 	@Shadow @Final private boolean field_25143;
 	
+	private int queueSize;
 	private int currentDepth;
 	private int currentBatch;
 	
@@ -332,7 +334,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void onTickFluid(ScheduledTick<Fluid> scheduledTick, CallbackInfo ci) {
-		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
+		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick.pos, scheduledTick.priority, false);
 	}
 	
 	@Inject(
@@ -344,7 +346,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void onTickBlock(ScheduledTick<Block> scheduledTick, CallbackInfo ci) {
-		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick);
+		getMultimeter().logScheduledTick((World)(Object)this, scheduledTick.pos, scheduledTick.priority, false);
 	}
 	
 	@Inject(
@@ -357,6 +359,31 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	)
 	private void onTickEntity(Entity entity, CallbackInfo ci) {
 		getMultimeter().logEntityTick((World)(Object)this, entity);
+	}
+	
+	@Inject(
+			method = "addSyncedBlockEvent",
+			at = @At(
+					value = "HEAD"
+			)
+	)
+	private void onAddBlockEvent(BlockPos pos, Block block, int type, int data, CallbackInfo ci) {
+		queueSize = syncedBlockEventQueue.size();
+	}
+
+	@Inject(
+			method = "addSyncedBlockEvent",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void postAddBlockEvent(BlockPos pos, Block block, int type, int data, CallbackInfo ci) {
+		// The queue is a set; only one block event for the same block and position
+		// can exist at any time. To check whether the block event was added, we
+		// check the queue size before and after the new block event was offered.
+		if (queueSize < syncedBlockEventQueue.size()) {
+			getMultimeter().logBlockEvent((World)(Object)this, pos, type, currentDepth + 1, true);
+		}
 	}
 	
 	@Inject(
@@ -387,6 +414,17 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 	
 	@Inject(
+			method = "processSyncedBlockEvents",
+			at = @At(
+					value = "RETURN"
+			)
+	)
+	private void postProcessBlockEvents(CallbackInfo ci) {
+		currentDepth = -1;
+		currentBatch = 0;
+	}
+	
+	@Inject(
 			method = "processBlockEvent",
 			at = @At(
 					value = "INVOKE",
@@ -395,7 +433,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			)
 	)
 	private void onProcessBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
-		getMultimeter().logBlockEvent((World)(Object)this, blockEvent, currentDepth);
+		getMultimeter().logBlockEvent((World)(Object)this, blockEvent.getPos(), blockEvent.getType(), currentDepth, false);
 	}
 	
 	@Override
