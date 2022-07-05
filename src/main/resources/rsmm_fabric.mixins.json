@@ -18,7 +18,7 @@
 		"common.SpawnHelperMixin",
 		"common.WorldChunkMixin",
 		"common.WorldMixin",
-		"common.compat.alternate_current.WorldAccessMixin",
+		"common.compat.alternate_current.LevelHelperMixin",
 		"common.meterable.AbstractButtonBlockMixin",
 		"common.meterable.AbstractRedstoneGateBlockMixin",
 		"common.meterable.BellBlockMixin",
