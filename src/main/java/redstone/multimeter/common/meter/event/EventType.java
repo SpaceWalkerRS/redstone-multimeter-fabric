@@ -17,21 +17,21 @@ public enum EventType {
 		
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatFancyText("became powered", metadata == 1));
+			tooltip.add(TextUtils.formatKeyValue("became powered", metadata == 1));
 		}
 	},
 	ACTIVE(1, "active") {
 		
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatFancyText("became active", metadata == 1));
+			tooltip.add(TextUtils.formatKeyValue("became active", metadata == 1));
 		}
 	},
 	MOVED(2, "moved") {
 		
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatFancyText("direction", Direction.byId(metadata).getName()));
+			tooltip.add(TextUtils.formatKeyValue("direction", Direction.byId(metadata).getName()));
 		}
 	},
 	POWER_CHANGE(3, "power_change") {
@@ -41,8 +41,8 @@ public enum EventType {
 			int oldPower = (metadata >> 8) & 0xFF;
 			int newPower =  metadata       & 0xFF;
 			
-			tooltip.add(TextUtils.formatFancyText("old power", oldPower));
-			tooltip.add(TextUtils.formatFancyText("new power", newPower));
+			tooltip.add(TextUtils.formatKeyValue("old power", oldPower));
+			tooltip.add(TextUtils.formatKeyValue("new power", newPower));
 		}
 	},
 	RANDOM_TICK(4, "random_tick"),
@@ -53,8 +53,8 @@ public enum EventType {
 			String status = ((metadata >> 30) == 1) ? "scheduling" : "performing";
 			int priority = (metadata & 0xF) - 3;
 
-			tooltip.add(TextUtils.formatFancyText("status", status));
-			tooltip.add(TextUtils.formatFancyText("priority", priority));
+			tooltip.add(TextUtils.formatKeyValue("status", status));
+			tooltip.add(TextUtils.formatKeyValue("priority", priority));
 		}
 	},
 	BLOCK_EVENT(6, "block_event") {
@@ -65,9 +65,9 @@ public enum EventType {
 			int depth = (metadata >> 4) & 0xFFFF;
 			int type  =  metadata       & 0xF;
 			
-			tooltip.add(TextUtils.formatFancyText("status", status));
-			tooltip.add(TextUtils.formatFancyText("type", type));
-			tooltip.add(TextUtils.formatFancyText("depth", depth));
+			tooltip.add(TextUtils.formatKeyValue("status", status));
+			tooltip.add(TextUtils.formatKeyValue("type", type));
+			tooltip.add(TextUtils.formatKeyValue("depth", depth));
 		}
 	},
 	ENTITY_TICK(7, "entity_tick"),
@@ -78,7 +78,7 @@ public enum EventType {
 		
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatFancyText("direction", Direction.byId(metadata).getName()));
+			tooltip.add(TextUtils.formatKeyValue("direction", Direction.byId(metadata).getName()));
 		}
 	},
 	OBSERVER_UPDATE(12, "observer_update"),
