@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.hud.Directionality;
+import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ColorUtils;
@@ -65,6 +66,12 @@ public class Options {
 		public static final IntegerOption                SCROLL_SPEED         = new IntegerOption("Scroll Speed", "The scroll speed in Redstone Multimeter related GUIs.", 7, 1, 69);
 		public static final IntegerOption                DOUBLE_CLICK_TIME    = new IntegerOption("Double Click Time", "The double click time in Redstone Multimeter related GUIs.", 5, 1, 500);
 		public static final BooleanOption                VERSION_WARNING      = new BooleanOption("Version Warning", "Send a warning message in chat when you join a server that has a different version of Redstone Multimeter installed.", true);
+		
+	}
+	
+	public static class Hidden {
+		
+		public static final EnumOption<TutorialStep>     TUTORIAL_STEP        = new EnumOption<>("Tutorial Step", "", TutorialStep.class, TutorialStep.JOIN_METER_GROUP);
 		
 	}
 	
@@ -161,11 +168,13 @@ public class Options {
 	}
 	
 	private static void register(String category, IOption... options) {
-		if (BY_CATEGORY.containsKey(category)) {
-			throw new IllegalStateException("Cannot register a category multiple times!");
+		if (category != null) {
+			if (BY_CATEGORY.containsKey(category)) {
+				throw new IllegalStateException("Cannot register a category multiple times!");
+			}
+			
+			BY_CATEGORY.put(category, Arrays.asList(options));
 		}
-		
-		BY_CATEGORY.put(category, Arrays.asList(options));
 		
 		for (IOption option : options) {
 			if (BY_NAME.containsKey(option.getName())) {
@@ -214,6 +223,9 @@ public class Options {
 			Miscellaneous.SCROLL_SPEED,
 			Miscellaneous.DOUBLE_CLICK_TIME,
 			Miscellaneous.VERSION_WARNING
+		);
+		register(null,
+			Hidden.TUTORIAL_STEP
 		);
 	}
 }

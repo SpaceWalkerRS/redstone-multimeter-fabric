@@ -155,6 +155,10 @@ public class TextUtils {
 		return text;
 	}
 	
+	public static MutableText formatKey(KeyBinding keybind) {
+		return keybind.isUnbound() ? Text.literal("-").formatted(Formatting.YELLOW) : formatKey(((IKeyBinding)keybind).getBoundKeyRSMM());
+	}
+	
 	public static MutableText formatKey(Key key) {
 		return key.getLocalizedText().copy().formatted(Formatting.YELLOW);
 	}

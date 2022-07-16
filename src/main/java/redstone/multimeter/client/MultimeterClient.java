@@ -24,6 +24,7 @@ import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.client.render.MeterRenderer;
+import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.common.TickPhaseTree;
 import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.meter.Meter;
@@ -58,6 +59,7 @@ public class MultimeterClient {
 	private final MeterRenderer meterRenderer;
 	private final MultimeterHud hud;
 	private final ClientMeterPropertiesManager meterPropertiesManager;
+	private final Tutorial tutorial;
 	
 	private ClientMeterGroup meterGroup;
 	private TickPhaseTree tickPhaseTree;
@@ -72,6 +74,7 @@ public class MultimeterClient {
 		this.meterRenderer = new MeterRenderer(this);
 		this.hud = new MultimeterHud(this);
 		this.meterPropertiesManager = new ClientMeterPropertiesManager(this);
+		this.tutorial = new Tutorial(this);
 		
 		this.meterGroup = new ClientMeterGroup(this);
 		this.connected = false;
@@ -105,6 +108,10 @@ public class MultimeterClient {
 	
 	public ClientMeterPropertiesManager getMeterPropertiesManager() {
 		return meterPropertiesManager;
+	}
+	
+	public Tutorial getTutorial() {
+		return tutorial;
 	}
 	
 	public ClientMeterGroup getMeterGroup() {
@@ -259,6 +266,8 @@ public class MultimeterClient {
 			} else {
 				RemoveMeterPacket packet = new RemoveMeterPacket(meter.getId());
 				packetHandler.send(packet);
+				
+				tutorial.onMeterRemoveRequested(pos);
 			}
 		});
 	}
@@ -270,6 +279,8 @@ public class MultimeterClient {
 		if (meterPropertiesManager.validate(properties)) {
 			AddMeterPacket packet = new AddMeterPacket(properties);
 			packetHandler.send(packet);
+			
+			tutorial.onMeterAddRequested(pos);
 		}
 	}
 	
@@ -336,6 +347,8 @@ public class MultimeterClient {
 			
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
 			sendMessage(Text.literal(message), true);
+			
+			tutorial.onToggleHud(hudEnabled);
 		}
 	}
 	
@@ -350,6 +363,7 @@ public class MultimeterClient {
 	
 	public void openScreen(RSMMScreen screen) {
 		client.setScreen(new ScreenWrapper(client.currentScreen, screen));
+		tutorial.onScreenOpened(screen);
 	}
 	
 	public boolean hasScreenOpen() {

@@ -30,7 +30,7 @@ public class CommandManagerMixin {
 					target = "Lcom/mojang/brigadier/CommandDispatcher;setConsumer(Lcom/mojang/brigadier/ResultConsumer;)V"
 			)
 	)
-	private void registerCommands(RegistrationEnvironment environment, CommandRegistryAccess access, CallbackInfo ci) {
-		MeterGroupCommand.register(dispatcher);
+	private void registerCommands(RegistrationEnvironment environment, CommandRegistryAccess registry, CallbackInfo ci) {
+		MeterGroupCommand.register(dispatcher, registry);
 	}
 }

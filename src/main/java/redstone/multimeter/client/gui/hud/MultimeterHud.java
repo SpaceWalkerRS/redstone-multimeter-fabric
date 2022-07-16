@@ -395,6 +395,8 @@ public class MultimeterHud extends AbstractParentElement {
 				toggleTickMarker(false);
 			}
 		}
+		
+		client.getTutorial().onPauseHud(paused);
 	}
 	
 	public int getColumn(long tick) {
@@ -414,6 +416,7 @@ public class MultimeterHud extends AbstractParentElement {
 	
 	private void setOffset(int offset) {
 		this.offset = offset;
+		
 		updateTickMarkerCounter();
 		updateEventViewersWidth();
 	}
@@ -425,12 +428,14 @@ public class MultimeterHud extends AbstractParentElement {
 	public void stepBackward(int amount) {
 		if (paused) {
 			setOffset(offset - amount);
+			client.getTutorial().onScrollHud(-amount);
 		}
 	}
 	
 	public void stepForward(int amount) {
 		if (paused) {
 			setOffset(offset + amount);
+			client.getTutorial().onScrollHud(amount);
 		}
 	}
 	
