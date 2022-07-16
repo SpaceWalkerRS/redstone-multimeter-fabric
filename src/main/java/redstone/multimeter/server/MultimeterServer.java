@@ -230,6 +230,7 @@ public class MultimeterServer {
 			packetHandler.sendToPlayer(packet, player);
 			
 			refreshTickPhaseTree(player);
+			server.getPlayerManager().sendCommandTree(player);
 		}
 	}
 	
