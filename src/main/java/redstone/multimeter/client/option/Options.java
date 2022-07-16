@@ -71,7 +71,7 @@ public class Options {
 	
 	public static class Hidden {
 		
-		public static final EnumOption<TutorialStep>     TUTORIAL_STEP        = new EnumOption<>("Tutorial Step", "", TutorialStep.class, TutorialStep.JOIN_METER_GROUP);
+		public static final EnumOption<TutorialStep>     TUTORIAL_STEP        = new EnumOption<>("Tutorial Step", "", TutorialStep.class, TutorialStep.OPEN_OPTIONS_SCREEN);
 		
 	}
 	
