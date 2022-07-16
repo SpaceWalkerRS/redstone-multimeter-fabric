@@ -16,6 +16,7 @@ import redstone.multimeter.client.tutorial.instance.TutorialInstance;
 
 public enum TutorialStep implements Cyclable<TutorialStep> {
 	
+	OPEN_OPTIONS_SCREEN("open options screen", OpenOptionsScreenTutorial::new),
 	JOIN_METER_GROUP("join meter group", JoinMeterGroupTutorial::new),
 	PLACE_METER("place meter", PlaceMeterTutorial::new),
 	PAUSE_HUD("pause hud", PauseHudTutorial::new),
@@ -23,7 +24,6 @@ public enum TutorialStep implements Cyclable<TutorialStep> {
 	REMOVE_METER("remove meter", RemoveMeterTutorial::new),
 	OPEN_MULTIMETER_SCREEN("open multimeter screen", OpenMultimeterScreenTutorial::new),
 	OPEN_METER_CONTROLS("open meter controls", OpenMeterControlsTutorial::new),
-	OPEN_OPTIONS_SCREEN("open options screen", OpenOptionsScreenTutorial::new),
 	NONE("none", CompletedTutorial::new);
 	
 	private final String name;

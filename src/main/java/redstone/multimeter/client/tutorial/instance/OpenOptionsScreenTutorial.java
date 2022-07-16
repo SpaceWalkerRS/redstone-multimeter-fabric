@@ -16,7 +16,7 @@ public class OpenOptionsScreenTutorial extends TutorialInstance {
 	private static final Text DESCRIPTION = Text.literal("").
 													append("Press ").
 													append(TextUtils.formatKey(KeyBindings.OPEN_OPTIONS_MENU)).
-													append(" to open the options menu.");
+													append(" to open the options menu, or access it through Mod Menu.");
 	
 	public OpenOptionsScreenTutorial(Tutorial tutorial) {
 		super(tutorial);
@@ -41,6 +41,6 @@ public class OpenOptionsScreenTutorial extends TutorialInstance {
 	
 	@Override
 	public TutorialStep getNextStep() {
-		return TutorialStep.NONE;
+		return TutorialStep.JOIN_METER_GROUP;
 	}
 }
