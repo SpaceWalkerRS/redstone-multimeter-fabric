@@ -88,10 +88,10 @@ public class EventLog {
 		
 		Tooltip tooltip = new Tooltip();
 		
-		tooltip.add(TextUtils.formatFancyText("event type", type.getName()));
+		tooltip.add(TextUtils.formatKeyValue("event type", type.getName()));
 		type.addTextToTooltip(tooltip, data);
-		tooltip.add(TextUtils.formatFancyText("tick", tick));
-		tooltip.add(TextUtils.formatFancyText("subtick", subtick));
+		tooltip.add(TextUtils.formatKeyValue("tick", tick));
+		tooltip.add(TextUtils.formatKeyValue("subtick", subtick));
 		tickPhase.addTextToTooltip(tooltip);
 		
 		return tooltip;

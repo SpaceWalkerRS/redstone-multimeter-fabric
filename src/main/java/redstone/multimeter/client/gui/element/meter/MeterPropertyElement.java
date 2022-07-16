@@ -101,8 +101,16 @@ public class MeterPropertyElement extends AbstractParentElement {
 		addControl(name, UnaryOperator.identity(), factory);
 	}
 	
+	public void addControl(String name, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+		addControl(name, UnaryOperator.identity(), factory, tooltip);
+	}
+	
 	public void addControl(String name, UnaryOperator<Style> formatter, ButtonFactory factory) {
 		addControl(new MeterControlElement(name, formatter, factory));
+	}
+	
+	public void addControl(String name, UnaryOperator<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+		addControl(new MeterControlElement(name, formatter, factory, tooltip));
 	}
 	
 	public void addCoordinateControl(Axis axis, Supplier<WorldPos> getter, Consumer<WorldPos> setter) {
@@ -133,7 +141,11 @@ public class MeterPropertyElement extends AbstractParentElement {
 		}
 		
 		public MeterControlElement(String name, UnaryOperator<Style> formatter, ButtonFactory factory) {
-			this.name = new TextElement(client, 0, 0, t -> t.setText(formatName(name, formatter)).setWithShadow(true));
+			this(name, formatter, factory, () -> Tooltip.EMPTY);
+		}
+		
+		public MeterControlElement(String name, UnaryOperator<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+			this.name = new TextElement(client, 0, 0, t -> t.setText(formatName(name, formatter)).setWithShadow(true), tooltip);
 			this.control = factory.create(client, buttonWidth, IButton.DEFAULT_HEIGHT);
 			
 			addChild(this.name);

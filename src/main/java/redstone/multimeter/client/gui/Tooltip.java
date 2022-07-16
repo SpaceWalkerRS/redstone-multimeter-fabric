@@ -31,16 +31,17 @@ public class Tooltip {
 		return Collections.unmodifiableList(lines);
 	}
 	
-	public void add(String line) {
+	public Tooltip add(String line) {
 		add(new LiteralText(line));
+		return this;
 	}
 	
-	public void add(Text line) {
+	public Tooltip add(Text line) {
 		if (this == EMPTY) {
 			throw new UnsupportedOperationException("cannot add more lines to the EMPTY tooltip!");
 		}
-		
 		lines.add(line);
+		return this;
 	}
 	
 	public static Tooltip of(String... strings) {
