@@ -40,7 +40,7 @@ public class TickPhase {
 	}
 	
 	public void addTextToTooltip(Tooltip tooltip) {
-		tooltip.add(TextUtils.formatFancyText("tick phase", tasks[0].getName()));
+		tooltip.add(TextUtils.formatKeyValue("tick phase", tasks[0].getName()));
 		
 		// used to indent subsequent lines
 		String whitespace = "              ";
