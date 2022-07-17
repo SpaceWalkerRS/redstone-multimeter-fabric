@@ -1,16 +1,19 @@
 package redstone.multimeter.client.gui.element.meter;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.Direction.Axis;
 
+import redstone.multimeter.client.KeyBindings;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
@@ -29,6 +32,7 @@ import redstone.multimeter.common.network.packets.MeterUpdatePacket;
 import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 import redstone.multimeter.common.network.packets.TeleportToMeterPacket;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.TextUtils;
 
 public class MeterControlsElement extends AbstractParentElement {
 	
@@ -56,7 +60,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			this.client.getMeterGroup().toggleHidden(meter);
 			return true;
 		});
-		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltip.of("Delete Meter"), button -> {
+		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltip.of("Delete Meter").add(TextUtils.formatKeybind(KeyBindings.TOGGLE_METER)), button -> {
 			tryDelete();
 			
 			if (triedDeleting && Screen.hasShiftDown()) {
@@ -227,7 +231,14 @@ public class MeterControlsElement extends AbstractParentElement {
 		
 		MeterPropertyElement eventTypes = new MeterPropertyElement(client, totalWidth, buttonWidth, "Event Types");
 		for (EventType type : EventType.ALL) {
-			eventTypes.addControl(type.getName(), (client, width, height) -> new ToggleButton(client, 0, 0, width, height, () -> meter.isMetering(type), button -> toggleEventType(type)));
+			KeyBinding keyBinding = KeyBindings.TOGGLE_EVENT_TYPES[type.getIndex()];
+			Supplier<Tooltip> tooltip = () -> Tooltip.EMPTY;
+
+			if (!keyBinding.isNotBound()) {
+				tooltip = () -> Tooltip.of(TextUtils.formatKeybind(keyBinding));
+			}
+
+			eventTypes.addControl(type.getName(), (client, width, height) -> new ToggleButton(client, 0, 0, width, height, () -> meter.isMetering(type), button -> toggleEventType(type)), tooltip);
 		}
 		
 		controls.add(pos);

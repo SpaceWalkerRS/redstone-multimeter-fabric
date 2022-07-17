@@ -6,9 +6,12 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import redstone.multimeter.client.KeyBindings;
+import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
+import redstone.multimeter.util.TextUtils;
 
 public class MeterListRenderer extends AbstractElement {
 	
@@ -76,6 +79,21 @@ public class MeterListRenderer extends AbstractElement {
 	@Override
 	public void tick() {
 		
+	}
+	
+	@Override
+	public Tooltip getTooltip(int mouseX, int mouseY) {
+		if (KeyBindings.OPEN_METER_CONTROLS.isNotBound()) {
+			return super.getTooltip(mouseX, mouseY);
+		}
+
+		int hoveredRow = hud.getHoveredRow(mouseY);
+
+		if (hoveredRow < 0 || hoveredRow == hud.getSelectedRow()) {
+			return super.getTooltip(mouseX, mouseY);
+		}
+
+		return Tooltip.of(TextUtils.formatKeybind(KeyBindings.OPEN_METER_CONTROLS));
 	}
 	
 	@Override

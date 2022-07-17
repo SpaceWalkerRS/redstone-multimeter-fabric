@@ -12,6 +12,7 @@ import net.minecraft.client.util.Window;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
+import redstone.multimeter.client.KeyBindings;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
@@ -25,6 +26,7 @@ import redstone.multimeter.client.gui.hud.event.MeterEventRenderDispatcher;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.TextUtils;
 
 public class MultimeterHud extends AbstractParentElement {
 	
@@ -291,13 +293,13 @@ public class MultimeterHud extends AbstractParentElement {
  			} else {
  				t.setVisible(false);
  			}
- 		});
+ 		}, () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.TOGGLE_MARKER)));
 		
-		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.EMPTY, button -> {
+		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.PAUSE_METERS)), button -> {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.STEP_BACKWARD, KeyBindings.SCROLL_HUD).append(" + ").append(TextUtils.formatKey("scroll"))), button -> {
 			stepBackward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -307,7 +309,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.EMPTY, button -> {
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.STEP_FORWARD, KeyBindings.SCROLL_HUD).append(" + ").append(TextUtils.formatKey("scroll"))), button -> {
 			stepForward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -317,7 +319,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").formatted(Formatting.BOLD)).setWithShadow(true));
+		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").formatted(Formatting.BOLD)).setWithShadow(true), () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.PRINT_LOGS)));
 		
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);

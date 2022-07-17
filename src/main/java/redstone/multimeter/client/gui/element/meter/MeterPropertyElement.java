@@ -99,8 +99,16 @@ public class MeterPropertyElement extends AbstractParentElement {
 		addControl(name, style -> { }, factory);
 	}
 	
+	public void addControl(String name, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+		addControl(name, style -> { }, factory, tooltip);
+	}
+	
 	public void addControl(String name, Consumer<Style> formatter, ButtonFactory factory) {
 		addControl(new MeterControlElement(name, formatter, factory));
+	}
+	
+	public void addControl(String name, Consumer<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+		addControl(new MeterControlElement(name, formatter, factory, tooltip));
 	}
 	
 	public void addCoordinateControl(Axis axis, Supplier<DimPos> getter, Consumer<DimPos> setter) {
@@ -131,7 +139,11 @@ public class MeterPropertyElement extends AbstractParentElement {
 		}
 		
 		public MeterControlElement(String name, Consumer<Style> formatter, ButtonFactory factory) {
-			this.name = new TextElement(client, 0, 0, t -> t.setText(formatName(name, formatter)).setWithShadow(true));
+			this(name, formatter, factory, () -> Tooltip.EMPTY);
+		}
+		
+		public MeterControlElement(String name, Consumer<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+			this.name = new TextElement(client, 0, 0, t -> t.setText(formatName(name, formatter)).setWithShadow(true), tooltip);
 			this.control = factory.create(client, buttonWidth, IButton.DEFAULT_HEIGHT);
 			
 			addChild(this.name);
