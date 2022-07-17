@@ -46,6 +46,7 @@ public class TutorialToast implements Toast {
 	
 	@Override
 	public Visibility draw(ToastManager manager, long age) {
+		RenderSystem.pushMatrix();
 		RenderSystem.translatef(DEFAULT_TOAST_WIDTH - toastWidth, 0, 0);
 		
 		drawBackground(manager, age);
