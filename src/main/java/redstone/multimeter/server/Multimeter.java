@@ -455,10 +455,10 @@ public class Multimeter {
 			append(new LiteralText("[here]").styled((style) -> {
 				return style.
 					setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Teleport to").
-						append(TextUtils.formatFancyText("\n  dimension", worldId)).
-						append(TextUtils.formatFancyText("\n  x", x)).
-						append(TextUtils.formatFancyText("\n  y", y)).
-						append(TextUtils.formatFancyText("\n  z", z)))).
+						append(TextUtils.formatKeyValue("\n  dimension", worldId)).
+						append(TextUtils.formatKeyValue("\n  x", x)).
+						append(TextUtils.formatKeyValue("\n  y", y)).
+						append(TextUtils.formatKeyValue("\n  z", z)))).
 					withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/execute in %s run tp @s %s %s %s %s %s", worldId, x, y, z, yaw, pitch))).
 					withColor(Formatting.GREEN);
 			})).
