@@ -55,6 +55,18 @@ public class MinecraftClientMixin implements IMinecraftClient {
 	}
 	
 	@Inject(
+			method = "tick()V",
+			at = @At(
+					value = "INVOKE",
+					shift = Shift.AFTER,
+					target = "Lnet/minecraft/client/tutorial/TutorialManager;tick()V"
+			)
+	)
+	private void tickTutorial(CallbackInfo ci) {
+		multimeterClient.getTutorial().tick();
+	}
+	
+	@Inject(
 			method = "handleInputEvents",
 			at = @At(
 					value = "HEAD"
