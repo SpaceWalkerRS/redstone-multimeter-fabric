@@ -40,12 +40,14 @@ public class ClientMeterGroup extends MeterGroup {
 		super.clear();
 		nextIndex = 0;
 		client.getHUD().updateMeterList();
+		client.getTutorial().onMeterGroupRefreshed();
 	}
 	
 	@Override
 	protected void meterAdded(Meter meter) {
 		nextIndex++;
 		client.getHUD().updateMeterList();
+		client.getTutorial().onMeterAdded(meter);
 	}
 	
 	@Override
@@ -55,6 +57,7 @@ public class ClientMeterGroup extends MeterGroup {
 		}
 		
 		client.getHUD().updateMeterList();
+		client.getTutorial().onMeterRemoved(meter);
 	}
 	
 	@Override
@@ -117,6 +120,7 @@ public class ClientMeterGroup extends MeterGroup {
 		clear();
 		
 		client.refreshMeterGroup();
+		client.getTutorial().onJoinMeterGroup();
 	}
 	
 	public void unsubscribe(boolean disconnect) {
@@ -124,11 +128,14 @@ public class ClientMeterGroup extends MeterGroup {
 		name = super.getName();
 		logManager.getPrinter().stop(!disconnect);
 		clear();
+		
+		client.getTutorial().onLeaveMeterGroup();
 	}
 	
 	public void refresh(CompoundTag nbt) {
 		updateFromNbt(nbt);
 		client.getHUD().updateMeterList();
+		client.getTutorial().onMeterGroupRefreshed();
 	}
 	
 	public void tick() {

@@ -247,6 +247,8 @@ public class MeterControlsElement extends AbstractParentElement {
 		controls.add(color);
 		controls.add(movable);
 		controls.add(eventTypes);
+		
+		client.getTutorial().onMeterControlsOpened();
 	}
 	
 	private void updateCoords() {
