@@ -4,8 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil.Key;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
 public class TextUtils {
 	
@@ -59,17 +65,105 @@ public class TextUtils {
 		return lines;
 	}
 	
-	public static void addFancyText(List<Text> lines, String title, Object info) {
-		addFancyText(lines, title, info.toString());
+	public static void formatKeyValue(List<Text> lines, String key, Object value) {
+		formatKeyValue(lines, key, value.toString());
 	}
 	
-	public static void addFancyText(List<Text> lines, String title, String info) {
-		lines.add(formatFancyText(title, info));
+	public static void formatKeyValue(List<Text> lines, String key, String value) {
+		lines.add(formatKeyValue(key, value));
 	}
 	
-	public static Text formatFancyText(String title, Object info) {
+	public static void formatKeyValue(Tooltip tooltip, String key, Object value) {
+		formatKeyValue(tooltip, key, value.toString());
+	}
+	
+	public static void formatKeyValue(Tooltip tooltip, String key, String value) {
+		tooltip.add(formatKeyValue(key, value));
+	}
+	
+	public static Text formatKeyValue(String key, Object value) {
 		return Text.literal("").
-			append(Text.literal(title + ": ").formatted(Formatting.GOLD)).
-			append(Text.literal(info.toString()));
+			append(Text.literal(key + ": ").formatted(Formatting.GOLD)).
+			append(Text.literal(value.toString()));
+	}
+	
+	public static void formatKeybind(List<Text> lines, Key... keys) {
+		formatKeybind(lines, keys);
+	}
+	
+	public static void formatKeybind(List<Text> lines, Key[]... keybindings) {
+		lines.add(formatKeybind(keybindings));
+	}
+	
+	public static void formatKeybind(Tooltip tooltip, Key... keys) {
+		formatKeybind(tooltip, keys);
+	}
+	
+	public static void formatKeybind(Tooltip tooltip, Key[]... keybindings) {
+		tooltip.add(formatKeybind(keybindings));
+	}
+	
+	public static MutableText formatKeybind(KeyBinding... keyBindings) {
+		List<KeyBinding> boundKeyBindings = new ArrayList<>();
+
+		for (KeyBinding keyBinding : keyBindings) {
+			if (!keyBinding.isUnbound()) {
+				boundKeyBindings.add(keyBinding);
+			}
+		}
+
+		if (boundKeyBindings.isEmpty()) {
+			return Text.literal("keybind: -");
+		}
+		
+		Key[][] keybindings = new Key[keyBindings.length][];
+		
+		for (int i = 0; i < boundKeyBindings.size(); i++) {
+			Key key = ((IKeyBinding)boundKeyBindings.get(i)).getBoundKeyRSMM();
+			keybindings[i] = new Key[] { key };
+		}
+		
+		return formatKeybind(keybindings);
+	}
+	
+	public static MutableText formatKeybind(Key... keys) {
+		return formatKeybind(keys);
+	}
+	
+	public static MutableText formatKeybind(Key[]... keybindings) {
+		MutableText text = Text.literal("").
+			append(Text.literal("keybind: ").formatted(Formatting.GOLD));
+		
+		int i = 0;
+		
+		for (Key[] keys : keybindings) {
+			int j = 0;
+			
+			if (i++ > 0) {
+				text.append(" OR ");
+			}
+			
+			for (Key key : keys) {
+				if (j++ > 0) {
+					text.append(" + ");
+				}
+				
+				text.append(formatKey(key));
+			}
+		}
+		
+		return text;
+	}
+	
+	public static MutableText formatKey(KeyBinding keybind) {
+		return keybind.isUnbound() ? Text.literal("-").formatted(Formatting.YELLOW) : formatKey(((IKeyBinding)keybind).getBoundKeyRSMM());
+	}
+	
+	public static MutableText formatKey(Key key) {
+		return key.getLocalizedText().copy().formatted(Formatting.YELLOW);
+	}
+	
+	public static MutableText formatKey(String key) {
+		return Text.literal(key).formatted(Formatting.YELLOW);
 	}
 }

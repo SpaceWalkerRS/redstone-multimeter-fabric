@@ -199,7 +199,9 @@ public class MultimeterServer {
 		if (!paused) {
 			ServerTickPacket packet = new ServerTickPacket(getCurrentTick());
 			
-			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+			for (UUID uuid : connectedPlayers.keySet()) {
+				ServerPlayerEntity player = getPlayer(uuid);
+				
 				if (multimeter.hasSubscription(player)) {
 					packetHandler.sendToPlayer(packet, player);
 				}
@@ -230,6 +232,7 @@ public class MultimeterServer {
 			packetHandler.sendToPlayer(packet, player);
 			
 			refreshTickPhaseTree(player);
+			server.getPlayerManager().sendCommandTree(player);
 		}
 	}
 	

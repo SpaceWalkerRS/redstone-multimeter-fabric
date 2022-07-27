@@ -15,6 +15,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.MinecraftServer;
@@ -32,7 +33,7 @@ import redstone.multimeter.server.meter.ServerMeterGroup;
 
 public class MeterGroupCommand {
 	
-	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registry) {
 		LiteralArgumentBuilder<ServerCommandSource> builder = CommandManager.
 			literal("metergroup").
 			requires(source -> isMultimeterClient(source)).
