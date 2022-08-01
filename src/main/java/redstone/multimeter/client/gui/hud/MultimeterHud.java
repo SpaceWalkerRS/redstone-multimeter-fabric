@@ -292,13 +292,13 @@ public class MultimeterHud extends AbstractParentElement {
  			} else {
  				t.setVisible(false);
  			}
- 		}, () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.TOGGLE_MARKER)));
+ 		}, () -> Tooltip.of(TextUtils.formatKeybindInfo(KeyBindings.TOGGLE_MARKER)));
 		
-		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.PAUSE_METERS)), button -> {
+		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.of(TextUtils.formatKeybindInfo(KeyBindings.PAUSE_METERS)), button -> {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.STEP_BACKWARD, KeyBindings.SCROLL_HUD).append(" + ").append(TextUtils.formatKey("scroll"))), button -> {
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(KeyBindings.STEP_BACKWARD, new Object[] { KeyBindings.SCROLL_HUD, "scroll" })), button -> {
 			stepBackward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -308,7 +308,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.STEP_FORWARD, KeyBindings.SCROLL_HUD).append(" + ").append(TextUtils.formatKey("scroll"))), button -> {
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(KeyBindings.STEP_FORWARD, new Object[] { KeyBindings.SCROLL_HUD, "scroll" })), button -> {
 			stepForward(Screen.hasControlDown() ? 10 : 1);
 			return true;
 		}) {
@@ -318,7 +318,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").formatted(Formatting.BOLD)).setWithShadow(true), () -> Tooltip.of(TextUtils.formatKeybind(KeyBindings.PRINT_LOGS)));
+		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").formatted(Formatting.BOLD)).setWithShadow(true), () -> Tooltip.of(TextUtils.formatKeybindInfo(KeyBindings.PRINT_LOGS)));
 		
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);

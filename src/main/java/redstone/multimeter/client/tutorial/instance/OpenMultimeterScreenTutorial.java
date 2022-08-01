@@ -16,7 +16,7 @@ public class OpenMultimeterScreenTutorial extends TutorialInstance {
 	private static final Text TITLE = new LiteralText("Open The Multimeter Screen");
 	private static final Text DESCRIPTION = new LiteralText("").
 													append("Press ").
-													append(TextUtils.formatKey(KeyBindings.OPEN_MULTIMETER_SCREEN)).
+													append(TextUtils.formatKeybind(KeyBindings.OPEN_MULTIMETER_SCREEN)).
 													append(" to open the Multimeter screen.");
 	
 	public OpenMultimeterScreenTutorial(Tutorial tutorial) {
