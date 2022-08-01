@@ -16,6 +16,13 @@ repositories {
 		name = "TerraformersMC"
 		url = "https://maven.terraformersmc.com/releases/"
 	}
+	maven {
+		url "https://maven.siphalor.de/"
+		name "Siphalor's Maven"
+	}
+	maven {
+		url "https://jitpack.io"
+	}
 }
 
 dependencies {
@@ -24,6 +31,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+	modImplementation "de.siphalor:amecsapi-1.18:1+"
+	include "de.siphalor:amecsapi-1.18:1+"
 }
 
 processResources {
