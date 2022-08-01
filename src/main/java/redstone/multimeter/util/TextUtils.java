@@ -180,7 +180,7 @@ public class TextUtils {
 	}
 
 	public static MutableText formatKeybind(Object... keys) {
-		Collection<Text> formattedKeys = new LinkedList<>();
+		List<Text> formattedKeys = new ArrayList<>();
 
 		for (Object o : keys) {
 			if (o instanceof KeyBinding) {
@@ -196,7 +196,13 @@ public class TextUtils {
 
 		MutableText text = Text.literal("");
 
-		for (Text key : formattedKeys) {
+		for (int i = 0; i < formattedKeys.size(); i++) {
+			Text key = formattedKeys.get(i);
+
+			if (i > 0) {
+				text.append(" + ");
+			}
+
 			text.append(key);
 		}
 
