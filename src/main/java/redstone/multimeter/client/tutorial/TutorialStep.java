@@ -21,9 +21,9 @@ public enum TutorialStep implements Cyclable<TutorialStep> {
 	PLACE_METER("place meter", PlaceMeterTutorial::new),
 	PAUSE_HUD("pause hud", PauseHudTutorial::new),
 	SCROLL_HUD("scroll hud", ScrollHudTutorial::new),
-	REMOVE_METER("remove meter", RemoveMeterTutorial::new),
 	OPEN_MULTIMETER_SCREEN("open multimeter screen", OpenMultimeterScreenTutorial::new),
 	OPEN_METER_CONTROLS("open meter controls", OpenMeterControlsTutorial::new),
+	REMOVE_METER("remove meter", RemoveMeterTutorial::new),
 	NONE("none", CompletedTutorial::new);
 	
 	private final String name;

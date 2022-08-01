@@ -80,7 +80,7 @@ public class RemoveMeterTutorial extends StagedTutorialInstance {
 	
 	@Override
 	public TutorialStep getNextStep() {
-		return TutorialStep.OPEN_MULTIMETER_SCREEN;
+		return TutorialStep.NONE;
 	}
 	
 	@Override
