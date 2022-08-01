@@ -17,13 +17,11 @@ public class ScrollHudTutorial extends StagedTutorialInstance {
 	private static final Text TITLE = Text.literal("Scroll The HUD");
 	private static final Text DESCRIPTION = Text.literal("").
 													append("Use the ").
-													append(TextUtils.formatKey(KeyBindings.STEP_BACKWARD)).
+													append(TextUtils.formatKeybind(KeyBindings.STEP_BACKWARD)).
 													append(" and ").
-													append(TextUtils.formatKey(KeyBindings.STEP_FORWARD)).
+													append(TextUtils.formatKeybind(KeyBindings.STEP_FORWARD)).
 													append(" keys or ").
-													append(TextUtils.formatKey(KeyBindings.SCROLL_HUD)).
-													append(" + ").
-													append(TextUtils.formatKey("scroll")).
+													append(TextUtils.formatKeybind(KeyBindings.SCROLL_HUD, "scroll")).
 													append(" to scroll through the primary overview of the Multimeter HUD.");
 	
 	private static final int TIMES_SCROLLED_TARGET = 5;

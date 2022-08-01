@@ -17,7 +17,7 @@ public class PlaceMeterTutorial extends StagedTutorialInstance {
 	private static final Text TITLE = Text.literal("Place A Meter");
 	private static final Text DESCRIPTION = Text.literal("").
 													append("Look at a block and press ").
-													append(TextUtils.formatKey(KeyBindings.TOGGLE_METER)).
+													append(TextUtils.formatKeybind(KeyBindings.TOGGLE_METER)).
 													append(" to place a meter.");
 	
 	private Stage stage;
