@@ -11,6 +11,11 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
+	mavenCentral()
+	maven {
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/releases/"
+	}
 }
 
 dependencies {
@@ -18,6 +23,7 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+	modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
 	modImplementation("net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}") {
 		transitive = false
 	}
