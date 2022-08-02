@@ -93,7 +93,8 @@ public class TextUtils {
 	}
 	
 	public static MutableText formatKeybindInfo(Object... keybinds) {
-		MutableText text = Text.literal("keybind: ");
+		MutableText text = Text.literal("").
+			append(Text.literal("keybind: ").formatted(Formatting.GOLD));
 		Collection<Object> boundKeybinds = filterUnboundKeybinds(keybinds);
 
 		if (boundKeybinds.isEmpty()) {
