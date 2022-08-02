@@ -16,7 +16,7 @@ public class OpenOptionsScreenTutorial extends TutorialInstance {
 	private static final Text TITLE = new LiteralText("Open The Options Screen");
 	private static final Text DESCRIPTION = new LiteralText("").
 													append("Press ").
-													append(TextUtils.formatKey(KeyBindings.OPEN_OPTIONS_MENU)).
+													append(TextUtils.formatKeybind(KeyBindings.OPEN_OPTIONS_MENU)).
 													append(" to open the options menu, or access it through Mod Menu.");
 	
 	public OpenOptionsScreenTutorial(Tutorial tutorial) {

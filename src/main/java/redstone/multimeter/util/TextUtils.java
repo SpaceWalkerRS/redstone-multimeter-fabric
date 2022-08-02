@@ -1,8 +1,12 @@
 package redstone.multimeter.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+
+import de.siphalor.amecs.api.KeyModifier;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.options.KeyBinding;
@@ -13,6 +17,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import redstone.multimeter.client.compat.amecs.AmecsHelper;
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
@@ -90,76 +95,122 @@ public class TextUtils {
 			append(new LiteralText(value.toString()));
 	}
 	
-	public static void formatKeybind(List<Text> lines, KeyCode... keys) {
-		formatKeybind(lines, keys);
-	}
-	
-	public static void formatKeybind(List<Text> lines, KeyCode[]... keybindings) {
-		lines.add(formatKeybind(keybindings));
-	}
-	
-	public static void formatKeybind(Tooltip tooltip, KeyCode... keys) {
-		formatKeybind(tooltip, keys);
-	}
-	
-	public static void formatKeybind(Tooltip tooltip, KeyCode[]... keybindings) {
-		tooltip.add(formatKeybind(keybindings));
-	}
-	
-	public static Text formatKeybind(KeyBinding... keyBindings) {
-		List<KeyBinding> boundKeyBindings = new ArrayList<>();
-
-		for (KeyBinding keyBinding : keyBindings) {
-			if (!keyBinding.isNotBound()) {
-				boundKeyBindings.add(keyBinding);
-			}
-		}
-
-		if (boundKeyBindings.isEmpty()) {
-			return new LiteralText("keybind: -");
-		}
-		
-		KeyCode[][] keybindings = new KeyCode[keyBindings.length][];
-		
-		for (int i = 0; i < boundKeyBindings.size(); i++) {
-			KeyCode key = ((IKeyBinding)boundKeyBindings.get(i)).getBoundKeyRSMM();
-			keybindings[i] = new KeyCode[] { key };
-		}
-		
-		return formatKeybind(keybindings);
-	}
-	
-	public static Text formatKeybind(KeyCode... keys) {
-		return formatKeybind(keys);
-	}
-	
-	public static Text formatKeybind(KeyCode[]... keybindings) {
+	public static Text formatKeybindInfo(Object... keybinds) {
 		Text text = new LiteralText("").
-			append(new LiteralText("keybind: ").formatted(Formatting.GOLD));
-		
+				append(new LiteralText("keybind: ").formatted(Formatting.GOLD));
+		Collection<Object> boundKeybinds = filterUnboundKeybinds(keybinds);
+
+		if (boundKeybinds.isEmpty()) {
+			return text.append("-");
+		}
+
 		int i = 0;
-		
-		for (KeyCode[] keys : keybindings) {
-			int j = 0;
-			
+
+		for (Object o : boundKeybinds) {
 			if (i++ > 0) {
 				text.append(" OR ");
 			}
-			
-			for (KeyCode key : keys) {
-				if (j++ > 0) {
-					text.append(" + ");
-				}
-				
-				text.append(formatKey(key));
+
+			if (o instanceof KeyBinding) {
+				text.append(formatKeybind((KeyBinding)o));
+			} else
+			if (o instanceof KeyCode) {
+				text.append(formatKeybind((KeyCode)o));
+			} else
+			if (o instanceof KeyCode[]) {
+				text.append(formatKeybind((KeyCode[])o));
+			} else
+			if (o instanceof Object[]) {
+				text.append(formatKeybind((Object[])o));
 			}
 		}
+
+		return text;
+	}
+
+	private static Collection<Object> filterUnboundKeybinds(Object... keybinds) {
+		Collection<Object> boundKeybinds = new LinkedList<>();
+
+		for (Object o : keybinds) {
+			if (o instanceof KeyBinding) {
+				KeyBinding keybind = (KeyBinding)o;
+
+				if (keybind.isNotBound()) {
+					continue;
+				}
+			}
+
+			boundKeybinds.add(o);
+		}
+
+		return boundKeybinds;
+	}
+	
+	public static Text formatKeybind(KeyBinding keybind) {
+		Text text = new LiteralText("");
+
+		if (keybind.isNotBound()) {
+			return text;
+		}
+		
+		KeyCode boundKey = ((IKeyBinding)keybind).getBoundKeyRSMM();
+		Collection<KeyModifier> modifiers = AmecsHelper.getKeyModifiers(keybind);
+		
+		for (KeyModifier modifier : modifiers) {
+			text.
+				append(formatKey(AmecsHelper.getModifierName(modifier))).
+				append(" + ");
+		}
+		
+		text.append(formatKey(boundKey));
 		
 		return text;
 	}
 	
-	public static Text formatKey(KeyBinding keybind) {
-		return keybind.isNotBound() ? new LiteralText("-").formatted(Formatting.YELLOW) : formatKey(((IKeyBinding)keybind).getBoundKeyRSMM());
+	public static Text formatKeybind(KeyCode... keys) {
+		Text text = new LiteralText("");
+		
+		for (int i = 0; i < keys.length; i++) {
+			KeyCode key = keys[i];
+			
+			if (i > 0) {
+				text.append(" + ");
+			}
+			
+			text.append(formatKey(key));
+		}
+		
+		return text;
+	}
+
+	public static Text formatKeybind(Object... keys) {
+		List<Text> formattedKeys = new ArrayList<>();
+
+		for (Object o : keys) {
+			if (o instanceof KeyBinding) {
+				formattedKeys.add(formatKeybind((KeyBinding)o));
+			} else
+			if (o instanceof KeyCode) {
+				formattedKeys.add(formatKey((KeyCode)o));
+			} else 
+			if (o instanceof String) {
+				formattedKeys.add(formatKey((String)o));
+			}
+		}
+
+		Text text = new LiteralText("");
+
+		for (int i = 0; i < formattedKeys.size(); i++) {
+			Text key = formattedKeys.get(i);
+
+			if (i > 0) {
+				text.append(" + ");
+			}
+
+			text.append(key);
+		}
+
+		return text;
 	}
 	
 	public static Text formatKey(KeyCode key) {
@@ -193,5 +244,9 @@ public class TextUtils {
 	
 	public static Text formatKey(String key) {
 		return new LiteralText(key).formatted(Formatting.YELLOW);
+	}
+	
+	public static Text formatKey(Text text) {
+		return text.copy().formatted(Formatting.YELLOW);
 	}
 }

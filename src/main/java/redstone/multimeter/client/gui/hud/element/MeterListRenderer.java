@@ -92,7 +92,7 @@ public class MeterListRenderer extends AbstractElement {
 			return super.getTooltip(mouseX, mouseY);
 		}
 
-		return Tooltip.of(TextUtils.formatKeybind(KeyBindings.OPEN_METER_CONTROLS));
+		return Tooltip.of(TextUtils.formatKeybindInfo(KeyBindings.OPEN_METER_CONTROLS));
 	}
 	
 	@Override
