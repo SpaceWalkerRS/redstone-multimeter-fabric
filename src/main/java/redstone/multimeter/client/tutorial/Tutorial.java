@@ -11,12 +11,14 @@ import redstone.multimeter.common.meter.Meter;
 
 public class Tutorial implements TutorialListener {
 	
+	private static final int MAX_TIME = 3 * 60 * 20;
 	private static final int COOLDOWN = 24;
 	
 	private final MinecraftClient client;
 	private final MultimeterClient multimeterClient;
 	
 	private TutorialInstance instance;
+	private int time;
 	private int cooldown;
 	
 	public Tutorial(MultimeterClient multimeterClient) {
@@ -132,12 +134,18 @@ public class Tutorial implements TutorialListener {
 				if (nextStep != null) {
 					advance(nextStep);
 				}
+			} else if (time++ > MAX_TIME) {
+				advance(TutorialStep.NONE);
 			} else {
 				instance.tick();
 			}
 		} else {
 			stop();
 		}
+	}
+
+	public void reset() {
+		advance(Options.Hidden.TUTORIAL_STEP.getDefault());
 	}
 	
 	public void advance(TutorialStep step) {
@@ -161,12 +169,15 @@ public class Tutorial implements TutorialListener {
 		
 		instance = Options.Hidden.TUTORIAL_STEP.get().createInstance(this);
 		instance.start();
+
+		time = 0;
 	}
 	
 	private void stop() {
 		if (instance != null) {
 			instance.stop();
 			instance = null;
+			time = -1;
 			cooldown = COOLDOWN;
 		}
 	}
