@@ -60,7 +60,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			this.client.getMeterGroup().toggleHidden(meter);
 			return true;
 		});
-		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltip.of("Delete Meter").add(TextUtils.formatKeybind(KeyBindings.TOGGLE_METER)), button -> {
+		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").formatted(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltip.of("Delete Meter").add(TextUtils.formatKeybindInfo(KeyBindings.TOGGLE_METER)), button -> {
 			tryDelete();
 			
 			if (triedDeleting && Screen.hasShiftDown()) {
@@ -235,7 +235,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			Supplier<Tooltip> tooltip = () -> Tooltip.EMPTY;
 
 			if (!keyBinding.isNotBound()) {
-				tooltip = () -> Tooltip.of(TextUtils.formatKeybind(keyBinding));
+				tooltip = () -> Tooltip.of(TextUtils.formatKeybindInfo(keyBinding));
 			}
 
 			eventTypes.addControl(type.getName(), (client, width, height) -> new ToggleButton(client, 0, 0, width, height, () -> meter.isMetering(type), button -> toggleEventType(type)), tooltip);

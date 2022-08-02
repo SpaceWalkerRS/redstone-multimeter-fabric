@@ -11,12 +11,22 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
+	maven {
+		url "https://maven.siphalor.de/"
+		name "Siphalor's Maven"
+	}
+	maven {
+		url "https://jitpack.io"
+	}
 }
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	modImplementation "de.siphalor:amecsapi-1.14:1+"
+	include "de.siphalor:amecsapi-1.14:1+"
 }
 
 processResources {
