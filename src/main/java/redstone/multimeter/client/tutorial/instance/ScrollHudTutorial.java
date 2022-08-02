@@ -98,7 +98,7 @@ public class ScrollHudTutorial extends StagedTutorialInstance {
 	
 	@Override
 	public TutorialStep getNextStep() {
-		return TutorialStep.REMOVE_METER;
+		return TutorialStep.OPEN_MULTIMETER_SCREEN;
 	}
 	
 	@Override

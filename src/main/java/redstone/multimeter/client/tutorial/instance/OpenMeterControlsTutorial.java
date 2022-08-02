@@ -75,7 +75,7 @@ public class OpenMeterControlsTutorial extends StagedTutorialInstance {
 	
 	@Override
 	public TutorialStep getNextStep() {
-		return TutorialStep.NONE;
+		return TutorialStep.REMOVE_METER;
 	}
 	
 	@Override
