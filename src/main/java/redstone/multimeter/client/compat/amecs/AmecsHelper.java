@@ -9,6 +9,8 @@ import de.siphalor.amecs.api.KeyModifiers;
 import de.siphalor.amecs.impl.ModifierPrefixTextProvider.Variation;
 import de.siphalor.amecs.impl.duck.IKeyBinding;
 
+import net.fabricmc.loader.api.FabricLoader;
+
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -16,6 +18,8 @@ import net.minecraft.text.Text;
 import redstone.multimeter.util.TextUtils;
 
 public class AmecsHelper {
+
+	private static boolean isAmecsApiLoaded = FabricLoader.getInstance().isModLoaded("amecsapi");
 
 	public static Collection<KeyModifier> getKeyModifiers(KeyBinding keybind) {
 		KeyModifiers keyModifiers = ((IKeyBinding)keybind).amecs$getKeyModifiers();
@@ -44,14 +48,12 @@ public class AmecsHelper {
 	}
 
 	public static MutableText addModifiers(MutableText text, KeyBinding keybind) {
-		try {
+		if (isAmecsApiLoaded) {
 			for (KeyModifier modifier : getKeyModifiers(keybind)) {
 				text.
 					append(TextUtils.formatKey(getModifierName(modifier))).
 					append(" + ");
 			}
-		} catch (Exception e) {
-			
 		}
 		
 		return text;
