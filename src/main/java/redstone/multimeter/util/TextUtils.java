@@ -6,8 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-import de.siphalor.amecs.api.KeyModifier;
-
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
@@ -153,15 +151,9 @@ public class TextUtils {
 			return text;
 		}
 		
+		AmecsHelper.addModifiers(text, keybind);
+		
 		KeyCode boundKey = ((IKeyBinding)keybind).getBoundKeyRSMM();
-		Collection<KeyModifier> modifiers = AmecsHelper.getKeyModifiers(keybind);
-		
-		for (KeyModifier modifier : modifiers) {
-			text.
-				append(formatKey(AmecsHelper.getModifierName(modifier))).
-				append(" + ");
-		}
-		
 		text.append(formatKey(boundKey));
 		
 		return text;
