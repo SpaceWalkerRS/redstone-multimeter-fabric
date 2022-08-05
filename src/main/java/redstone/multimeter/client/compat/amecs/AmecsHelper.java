@@ -13,6 +13,8 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
+import redstone.multimeter.util.TextUtils;
+
 public class AmecsHelper {
 
 	public static Collection<KeyModifier> getKeyModifiers(KeyBinding keybind) {
@@ -39,5 +41,19 @@ public class AmecsHelper {
 
 	public static Text getModifierName(KeyModifier modifier) {
 		return getModifierName(modifier, Variation.NORMAL);
+	}
+
+	public static MutableText addModifiers(MutableText text, KeyBinding keybind) {
+		try {
+			for (KeyModifier modifier : getKeyModifiers(keybind)) {
+				text.
+					append(TextUtils.formatKey(getModifierName(modifier))).
+					append(" + ");
+			}
+		} catch (Exception e) {
+			
+		}
+		
+		return text;
 	}
 }
