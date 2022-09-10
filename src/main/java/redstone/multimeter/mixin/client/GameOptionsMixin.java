@@ -23,7 +23,7 @@ import redstone.multimeter.client.option.Options;
 @Mixin(GameOptions.class)
 public class GameOptionsMixin {
 	
-	@Shadow @Final @Mutable private KeyBinding[] keysAll;
+	@Shadow @Final @Mutable private KeyBinding[] allKeys;
 	@Shadow private MinecraftClient client;
 	
 	@Inject(
@@ -37,15 +37,15 @@ public class GameOptionsMixin {
 	private void initOptions(MinecraftClient client, File optionsFile, CallbackInfo ci) {
 		Collection<KeyBinding> rsmmKeys = KeyBindings.getKeyBindings();
 		
-		KeyBinding[] mcKeys = keysAll;
-		keysAll = new KeyBinding[mcKeys.length + rsmmKeys.size()];
+		KeyBinding[] mcKeys = allKeys;
+		allKeys = new KeyBinding[mcKeys.length + rsmmKeys.size()];
 		
 		int index = 0;
 		for (int i = 0; i < mcKeys.length; i++) {
-			keysAll[index++] = mcKeys[i];
+			allKeys[index++] = mcKeys[i];
 		}
 		for (KeyBinding key : rsmmKeys) {
-			keysAll[index++] = key;
+			allKeys[index++] = key;
 		}
 	}
 	

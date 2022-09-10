@@ -1,12 +1,21 @@
 package redstone.multimeter.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil.Key;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import redstone.multimeter.client.compat.amecs.AmecsHelper;
+import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
 public class TextUtils {
 	
@@ -60,17 +69,149 @@ public class TextUtils {
 		return lines;
 	}
 	
-	public static void addFancyText(List<Text> lines, String title, Object info) {
-		addFancyText(lines, title, info.toString());
+	public static void formatKeyValue(List<Text> lines, String key, Object value) {
+		formatKeyValue(lines, key, value.toString());
 	}
 	
-	public static void addFancyText(List<Text> lines, String title, String info) {
-		lines.add(formatFancyText(title, info));
+	public static void formatKeyValue(List<Text> lines, String key, String value) {
+		lines.add(formatKeyValue(key, value));
 	}
 	
-	public static Text formatFancyText(String title, Object info) {
+	public static void formatKeyValue(Tooltip tooltip, String key, Object value) {
+		formatKeyValue(tooltip, key, value.toString());
+	}
+	
+	public static void formatKeyValue(Tooltip tooltip, String key, String value) {
+		tooltip.add(formatKeyValue(key, value));
+	}
+	
+	public static Text formatKeyValue(String key, Object value) {
 		return new LiteralText("").
-			append(new LiteralText(title + ": ").formatted(Formatting.GOLD)).
-			append(new LiteralText(info.toString()));
+			append(new LiteralText(key + ": ").formatted(Formatting.GOLD)).
+			append(new LiteralText(value.toString()));
+	}
+	
+	public static MutableText formatKeybindInfo(Object... keybinds) {
+		MutableText text = new LiteralText("").
+			append(new LiteralText("keybind: ").formatted(Formatting.GOLD));
+		Collection<Object> boundKeybinds = filterUnboundKeybinds(keybinds);
+
+		if (boundKeybinds.isEmpty()) {
+			return text.append("-");
+		}
+
+		int i = 0;
+
+		for (Object o : boundKeybinds) {
+			if (i++ > 0) {
+				text.append(" OR ");
+			}
+
+			if (o instanceof KeyBinding) {
+				text.append(formatKeybind((KeyBinding)o));
+			} else
+			if (o instanceof Key) {
+				text.append(formatKeybind((Key)o));
+			} else
+			if (o instanceof Key[]) {
+				text.append(formatKeybind((Key[])o));
+			} else
+			if (o instanceof Object[]) {
+				text.append(formatKeybind((Object[])o));
+			}
+		}
+
+		return text;
+	}
+
+	private static Collection<Object> filterUnboundKeybinds(Object... keybinds) {
+		Collection<Object> boundKeybinds = new LinkedList<>();
+
+		for (Object o : keybinds) {
+			if (o instanceof KeyBinding) {
+				KeyBinding keybind = (KeyBinding)o;
+
+				if (keybind.isUnbound()) {
+					continue;
+				}
+			}
+
+			boundKeybinds.add(o);
+		}
+
+		return boundKeybinds;
+	}
+	
+	public static MutableText formatKeybind(KeyBinding keybind) {
+		MutableText text = new LiteralText("");
+
+		if (keybind.isUnbound()) {
+			return text;
+		}
+		
+		AmecsHelper.addModifiers(text, keybind);
+		
+		Key boundKey = ((IKeyBinding)keybind).getBoundKeyRSMM();
+		text.append(formatKey(boundKey));
+		
+		return text;
+	}
+	
+	public static MutableText formatKeybind(Key... keys) {
+		MutableText text = new LiteralText("");
+		
+		for (int i = 0; i < keys.length; i++) {
+			Key key = keys[i];
+			
+			if (i > 0) {
+				text.append(" + ");
+			}
+			
+			text.append(formatKey(key));
+		}
+		
+		return text;
+	}
+
+	public static MutableText formatKeybind(Object... keys) {
+		List<Text> formattedKeys = new ArrayList<>();
+
+		for (Object o : keys) {
+			if (o instanceof KeyBinding) {
+				formattedKeys.add(formatKeybind((KeyBinding)o));
+			} else
+			if (o instanceof Key) {
+				formattedKeys.add(formatKey((Key)o));
+			} else 
+			if (o instanceof String) {
+				formattedKeys.add(formatKey((String)o));
+			}
+		}
+
+		MutableText text = new LiteralText("");
+
+		for (int i = 0; i < formattedKeys.size(); i++) {
+			Text key = formattedKeys.get(i);
+
+			if (i > 0) {
+				text.append(" + ");
+			}
+
+			text.append(key);
+		}
+
+		return text;
+	}
+	
+	public static MutableText formatKey(Key key) {
+		return key.getLocalizedText().copy().formatted(Formatting.YELLOW);
+	}
+	
+	public static MutableText formatKey(String key) {
+		return new LiteralText(key).formatted(Formatting.YELLOW);
+	}
+	
+	public static MutableText formatKey(Text text) {
+		return text.copy().formatted(Formatting.YELLOW);
 	}
 }

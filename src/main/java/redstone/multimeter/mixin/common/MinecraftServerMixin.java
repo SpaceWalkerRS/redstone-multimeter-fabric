@@ -65,7 +65,7 @@ public abstract class MinecraftServerMixin implements IMinecraftServer {
 			method = "tick",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lorg/apache/logging/log4j/Logger;debug(Ljava/lang/String;)V",
+					target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
 					args = "ldc=Autosave started"
 			)
 	)
@@ -77,7 +77,7 @@ public abstract class MinecraftServerMixin implements IMinecraftServer {
 			method = "tick",
 			at = @At(
 					value = "INVOKE_STRING",
-					target = "Lorg/apache/logging/log4j/Logger;debug(Ljava/lang/String;)V",
+					target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
 					args = "ldc=Autosave finished"
 			)
 	)
