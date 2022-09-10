@@ -184,18 +184,7 @@ public class MultimeterServer {
 		
 		if (!paused) {
 			ServerTickPacket packet = new ServerTickPacket(getCurrentTick());
-<<<<<<< HEAD
 			playerList.send(packet, player -> multimeter.hasSubscription(player));
-=======
-			
-			for (UUID uuid : connectedPlayers.keySet()) {
-				ServerPlayerEntity player = getPlayer(uuid);
-				
-				if (multimeter.hasSubscription(player)) {
-					packetHandler.sendToPlayer(packet, player);
-				}
-			}
->>>>>>> 4e72636524a790670c2c4a92238a13a031f6dad3
 		}
 		if (tickPhaseTree.isBuilding()) {
 			tickPhaseTree.end();
@@ -220,21 +209,6 @@ public class MultimeterServer {
 	
 	public void onPlayerLeave(ServerPlayerEntity player) {
 		multimeter.onPlayerLeave(player);
-<<<<<<< HEAD
-=======
-		connectedPlayers.remove(player.getUuid());
-		playerNameCache.put(player.getUuid(), player.getEntityName());
-	}
-	
-	public void onHandshake(ServerPlayerEntity player, String modVersion) {
-		if (connectedPlayers.put(player.getUuid(), modVersion) == null) {
-			HandshakePacket packet = new HandshakePacket();
-			packetHandler.sendToPlayer(packet, player);
-			
-			refreshTickPhaseTree(player);
-			server.getPlayerManager().sendCommandTree(player);
-		}
->>>>>>> 4e72636524a790670c2c4a92238a13a031f6dad3
 	}
 	
 	public void refreshTickPhaseTree(ServerPlayerEntity player) {
