@@ -9,11 +9,11 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.util.Identifier;
 
-import redstone.multimeter.common.network.AbstractPacketHandler;
+import redstone.multimeter.common.network.PacketHandler;
 //import redstone.multimeter.common.network.PacketManager;
 import redstone.multimeter.common.network.RSMMPacket;
 
-public class ClientPacketHandler extends AbstractPacketHandler {
+public class ClientPacketHandler extends PacketHandler {
 	
 	private final MultimeterClient client;
 	
@@ -48,9 +48,8 @@ public class ClientPacketHandler extends AbstractPacketHandler {
 	protected Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer) {
 		return new CustomPayloadC2SPacket(id, buffer);
 	}
-	
-	@Override
-	public <P extends RSMMPacket> void send(P packet) {
+
+	public void send(RSMMPacket packet) {
 		client.getMinecraftClient().getNetworkHandler().sendPacket(encode(packet));
 	}
 	
