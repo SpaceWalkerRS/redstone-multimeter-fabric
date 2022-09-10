@@ -16,7 +16,7 @@ public class OpenMeterControlsTutorial extends StagedTutorialInstance {
 	private static final Text TITLE = Text.literal("Open Meter Controls");
 	private static final Text DESCRIPTION = Text.literal("").
 													append("Open a meter's controls through the Multimeter screen or by looking at it and pressing ").
-													append(TextUtils.formatKey(KeyBindings.OPEN_METER_CONTROLS));
+													append(TextUtils.formatKeybind(KeyBindings.OPEN_METER_CONTROLS));
 	
 	private Stage stage;
 	
@@ -74,7 +74,7 @@ public class OpenMeterControlsTutorial extends StagedTutorialInstance {
 	
 	@Override
 	public TutorialStep getNextStep() {
-		return TutorialStep.NONE;
+		return TutorialStep.REMOVE_METER;
 	}
 	
 	@Override

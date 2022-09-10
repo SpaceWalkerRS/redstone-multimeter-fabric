@@ -17,7 +17,7 @@ public class PauseHudTutorial extends StagedTutorialInstance {
 	private static final Text TITLE = Text.literal("Pause The HUD");
 	private static final Text DESCRIPTION = Text.literal("").
 													append("Press ").
-													append(TextUtils.formatKey(KeyBindings.PAUSE_METERS)).
+													append(TextUtils.formatKeybind(KeyBindings.PAUSE_METERS)).
 													append(" to pause the primary overview of the Multimeter HUD.");
 	
 	private Stage stage;

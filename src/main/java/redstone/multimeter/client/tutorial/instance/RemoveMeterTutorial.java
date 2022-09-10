@@ -17,7 +17,7 @@ public class RemoveMeterTutorial extends StagedTutorialInstance {
 	private static final Text TITLE = Text.literal("Remove A Meter");
 	private static final Text DESCRIPTION = Text.literal("").
 													append("Look at a meter and press ").
-													append(TextUtils.formatKey(KeyBindings.TOGGLE_METER)).
+													append(TextUtils.formatKeybind(KeyBindings.TOGGLE_METER)).
 													append(" to remove it.");
 	
 	private Stage stage;
@@ -80,7 +80,7 @@ public class RemoveMeterTutorial extends StagedTutorialInstance {
 	
 	@Override
 	public TutorialStep getNextStep() {
-		return TutorialStep.OPEN_MULTIMETER_SCREEN;
+		return TutorialStep.NONE;
 	}
 	
 	@Override
