@@ -1,24 +1,6 @@
 package redstone.multimeter.util;
 
-import java.awt.Color;
-
 public class ColorUtils {
-	
-	private static int colorIndex = 0;
-	
-	public static int nextColor() {
-		return nextColor(true);
-	}
-	
-	public static int nextColor(boolean cycleIndex) {
-		float hue = ((colorIndex * 11) % 8 + (colorIndex / 8) / 2.0F) / 8.0F;
-		
-		if (cycleIndex) {
-			colorIndex = (colorIndex + 1) % 16;
-		}
-		
-		return 0xFFFFFF & Color.HSBtoRGB(hue, 0.7F, 1.0F);
-	}
 	
 	public static int getAlpha(int argb) {
 		return (argb >> 24) & 0xFF;
