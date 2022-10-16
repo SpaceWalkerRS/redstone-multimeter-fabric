@@ -39,7 +39,7 @@ public class ClientPlayNetworkHandlerMixin {
 			)
 	)
 	private void handleCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
-		if (PacketManager.getPacketChannelId().equals(packet.getChannel())) {
+		if (PacketManager.getChannelId().equals(packet.getChannel())) {
 			NetworkThreadUtils.forceMainThread(packet, (ClientPlayNetworkHandler)(Object)this, client);
 			((IMinecraftClient)client).getMultimeterClient().getPacketHandler().onPacketReceived(packet.getData());
 			

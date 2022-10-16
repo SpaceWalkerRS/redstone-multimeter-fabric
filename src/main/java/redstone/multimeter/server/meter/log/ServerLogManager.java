@@ -85,6 +85,6 @@ public class ServerLogManager extends LogManager {
 		nbt.put("logs", list);
 		
 		MeterLogsPacket packet = new MeterLogsPacket(nbt);
-		meterGroup.getMultimeter().getMultimeterServer().getPacketHandler().sendToSubscribers(packet, meterGroup);
+		meterGroup.getMultimeter().getMultimeterServer().getPlayerList().send(packet, player -> meterGroup.hasSubscriber(player));
 	}
 }
