@@ -6,9 +6,9 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public abstract class AbstractPacketHandler {
+public abstract class PacketHandler {
 	
-	protected <P extends RSMMPacket> Packet<?> encode(P packet) {
+	public Packet<?> encode(RSMMPacket packet) {
 		Identifier id = PacketManager.getId(packet);
 		
 		if (id == null) {
@@ -23,16 +23,14 @@ public abstract class AbstractPacketHandler {
 		buffer.writeIdentifier(id);
 		buffer.writeNbt(data);
 		
-		return toCustomPayload(PacketManager.getPacketChannelId(), buffer);
+		return toCustomPayload(PacketManager.getChannelId(), buffer);
 	}
 	
 	protected abstract Packet<?> toCustomPayload(Identifier id, PacketByteBuf buffer);
 	
-	public abstract <P extends RSMMPacket> void send(P packet);
-	
-	protected <P extends RSMMPacket> P decode(PacketByteBuf buffer) {
+	protected RSMMPacket decode(PacketByteBuf buffer) {
 		Identifier id = buffer.readIdentifier();
-		P packet = PacketManager.createPacket(id);
+		RSMMPacket packet = PacketManager.create(id);
 		
 		if (packet == null) {
 			throw new IllegalStateException("Unable to decode packet: " + id);
