@@ -5,10 +5,10 @@ import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
+import redstone.multimeter.common.meter.ColorPicker;
 import redstone.multimeter.common.meter.MeterPropertiesManager;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.server.Multimeter;
-import redstone.multimeter.util.ColorUtils;
 
 public class ServerMeterPropertiesManager extends MeterPropertiesManager {
 	
@@ -32,7 +32,7 @@ public class ServerMeterPropertiesManager extends MeterPropertiesManager {
 			properties.setName("Meter");
 		}
 		if (properties.getColor() == null) {
-			properties.setColor(ColorUtils.nextColor());
+			properties.setColor(ColorPicker.RANDOM.next());
 		}
 		if (properties.getMovable() == null) {
 			properties.setMovable(true);
