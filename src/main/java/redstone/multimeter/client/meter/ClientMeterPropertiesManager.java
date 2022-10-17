@@ -93,6 +93,9 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			
 			properties.setName(String.format("%s %d", name, number));
 		}
+		if (properties.getColor() == null) {
+			properties.setColor(Options.RedstoneMultimeter.COLOR_PICKER.get().next());
+		}
 		if (Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
 			properties.setMovable(!Screen.hasShiftDown());
 		}
