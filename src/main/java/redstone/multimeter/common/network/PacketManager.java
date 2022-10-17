@@ -3,27 +3,27 @@ package redstone.multimeter.common.network;
 import net.minecraft.util.Identifier;
 
 import redstone.multimeter.common.network.packets.*;
-import redstone.multimeter.registry.SupplierClazzRegistry;
+import redstone.multimeter.registry.SupplierRegistry;
 
 public class PacketManager {
 	
-	private static final SupplierClazzRegistry<RSMMPacket> PACKETS;
+	private static final SupplierRegistry<RSMMPacket> PACKETS;
 	
-	public static Identifier getPacketChannelId() {
+	public static Identifier getChannelId() {
 		return PACKETS.getRegistryId();
 	}
 	
-	public static <P extends RSMMPacket> Identifier getId(P packet) {
+	public static Identifier getId(RSMMPacket packet) {
 		return PACKETS.getId(packet);
 	}
 	
-	public static <P extends RSMMPacket> P createPacket(Identifier id) {
+	public static RSMMPacket create(Identifier id) {
 		return PACKETS.get(id);
 	}
 	
 	static {
 		
-		PACKETS = new SupplierClazzRegistry<>("network");
+		PACKETS = new SupplierRegistry<>("network");
 		
 		PACKETS.register("handshake"               , HandshakePacket.class             , () -> new HandshakePacket());
 		PACKETS.register("tick_phase_tree"         , TickPhaseTreePacket.class         , () -> new TickPhaseTreePacket());
