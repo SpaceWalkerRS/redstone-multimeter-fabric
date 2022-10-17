@@ -32,6 +32,7 @@
 		"common.meterable.EndPortalFrameBlockMixin",
 		"common.meterable.FenceGateBlockMixin",
 		"common.meterable.HopperBlockMixin",
+		"common.meterable.HopperBlockEntityMixin",
 		"common.meterable.LecternBlockMixin",
 		"common.meterable.LeverBlockMixin",
 		"common.meterable.LightningRodBlockMixin",
