@@ -2,18 +2,20 @@ package redstone.multimeter.mixin.common.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At.Shift;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
-import net.minecraft.state.property.Properties;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
+import redstone.multimeter.interfaces.mixin.IHopperBlockEntity;
 
 @Mixin(HopperBlock.class)
 public abstract class HopperBlockMixin implements MeterableBlock {
@@ -39,6 +41,12 @@ public abstract class HopperBlockMixin implements MeterableBlock {
 	
 	@Override
 	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.ENABLED);
+		BlockEntity blockEntity = world.getBlockEntity(pos);
+
+		if (blockEntity instanceof HopperBlockEntity) {
+			return !((IHopperBlockEntity)blockEntity).isOnCooldown();
+		}
+
+		return false;
 	}
 }
