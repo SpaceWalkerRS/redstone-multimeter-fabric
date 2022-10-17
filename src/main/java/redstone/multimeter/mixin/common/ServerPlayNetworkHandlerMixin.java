@@ -33,7 +33,7 @@ public class ServerPlayNetworkHandlerMixin {
 	private void onCustomPayload(CustomPayloadC2SPacket minecraftPacket, CallbackInfo ci) {
 		ICustomPayloadC2SPacket packet = (ICustomPayloadC2SPacket)minecraftPacket;
 		
-		if (PacketManager.getPacketChannelId().equals(packet.getPacketChannelRSMM())) {
+		if (PacketManager.getChannelId().equals(packet.getPacketChannelRSMM())) {
 			NetworkThreadUtils.forceMainThread(minecraftPacket, (ServerPlayNetworkHandler)(Object)this, server);
 			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().onPacketReceived(packet.getPacketDataRSMM(), player);
 			

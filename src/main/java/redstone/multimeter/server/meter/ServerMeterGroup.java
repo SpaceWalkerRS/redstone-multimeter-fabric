@@ -256,7 +256,7 @@ public class ServerMeterGroup extends MeterGroup {
 		}
 		
 		MeterUpdatesPacket packet = new MeterUpdatesPacket(removedMeters, meterUpdates);
-		multimeter.getMultimeterServer().getPacketHandler().sendToSubscribers(packet, this);
+		multimeter.getMultimeterServer().getPlayerList().send(packet, player -> hasSubscriber(player));
 		
 		removedMeters.clear();
 		meterUpdates.clear();

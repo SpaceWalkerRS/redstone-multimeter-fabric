@@ -157,7 +157,7 @@ public class Multimeter {
 	
 	private void notifyOwnerOfRemoval(ServerMeterGroup meterGroup) {
 		UUID ownerUUID = meterGroup.getOwner();
-		ServerPlayerEntity owner = server.getPlayer(ownerUUID);
+		ServerPlayerEntity owner = server.getPlayerList().get(ownerUUID);
 		
 		if (owner != null) {
 			Text message = new LiteralText(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
@@ -178,7 +178,8 @@ public class Multimeter {
 	}
 	
 	public void onPlayerJoin(ServerPlayerEntity player) {
-		
+		server.refreshTickPhaseTree(player);
+		server.getPlayerList().updatePermissions(player);
 	}
 	
 	public void onPlayerLeave(ServerPlayerEntity player) {
@@ -248,7 +249,7 @@ public class Multimeter {
 		meterGroup.clear();
 		
 		ClearMeterGroupPacket packet = new ClearMeterGroupPacket();
-		server.getPacketHandler().sendToSubscribers(packet, meterGroup);
+		server.getPlayerList().send(packet, player -> meterGroup.hasSubscriber(player));
 	}
 	
 	public void createMeterGroup(ServerPlayerEntity player, String name) {
@@ -279,7 +280,7 @@ public class Multimeter {
 	
 	public void subscribeToDefaultMeterGroup(ServerPlayerEntity player) {
 		MeterGroupDefaultPacket packet = new MeterGroupDefaultPacket();
-		server.getPacketHandler().sendToPlayer(packet, player);
+		server.getPlayerList().send(packet, player);
 	}
 	
 	private void addSubscriberToMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
@@ -330,8 +331,8 @@ public class Multimeter {
 			packet = new MeterGroupSubscriptionPacket(newSubscription.getName(), true);
 		}
 		
-		server.getPacketHandler().sendToPlayer(packet, player);
-		server.getPlayerManager().sendCommandTree(player);
+		server.getPlayerList().send(packet, player);
+		server.getPlayerList().updatePermissions(player);
 	}
 	
 	public void clearMembersOfMeterGroup(ServerMeterGroup meterGroup) {
@@ -345,7 +346,7 @@ public class Multimeter {
 			return;
 		}
 		
-		ServerPlayerEntity player = server.getPlayer(playerUUID);
+		ServerPlayerEntity player = server.getPlayerList().get(playerUUID);
 		
 		if (player == null) {
 			return;
@@ -373,7 +374,7 @@ public class Multimeter {
 		meterGroup.removeMember(playerUUID);
 		
 		if (meterGroup.isPrivate()) {
-			ServerPlayerEntity player = server.getPlayer(playerUUID);
+			ServerPlayerEntity player = server.getPlayerList().get(playerUUID);
 			
 			if (player != null && meterGroup.hasSubscriber(playerUUID)) {
 				unsubscribeFromMeterGroup(meterGroup, player);
@@ -394,7 +395,7 @@ public class Multimeter {
 	
 	private void refreshMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
 		MeterGroupRefreshPacket packet = new MeterGroupRefreshPacket(meterGroup);
-		server.getPacketHandler().sendToPlayer(packet, player);
+		server.getPlayerList().send(packet, player);
 	}
 	
 	public void teleportToMeter(ServerPlayerEntity player, long id) {

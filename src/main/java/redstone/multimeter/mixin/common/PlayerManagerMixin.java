@@ -6,11 +6,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.network.ClientConnection;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 
@@ -20,13 +21,13 @@ public class PlayerManagerMixin {
 	@Shadow @Final private MinecraftServer server;
 	
 	@Inject(
-			method = "onPlayerConnect",
-			at = @At(
-					value = "RETURN"
-			)
+		method = "respawnPlayer",
+		at = @At(
+			value = "RETURN"
+		)
 	)
-	private void onPlayerJoin(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
-		((IMinecraftServer)server).getMultimeterServer().onPlayerJoin(player);
+	private void onPlayerRespawn(ServerPlayerEntity player, DimensionType dimensionType, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
+		((IMinecraftServer)server).getMultimeterServer().getPlayerList().respawn(cir.getReturnValue());
 	}
 	
 	@Inject(
@@ -36,6 +37,6 @@ public class PlayerManagerMixin {
 			)
 	)
 	private void onPlayerLeave(ServerPlayerEntity player, CallbackInfo ci) {
-		((IMinecraftServer)server).getMultimeterServer().onPlayerLeave(player);
+		((IMinecraftServer)server).getMultimeterServer().getPlayerList().remove(player);
 	}
 }

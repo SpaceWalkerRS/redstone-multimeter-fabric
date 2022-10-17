@@ -114,7 +114,7 @@ public class MeterGroupCommand {
 			
 			if (meterGroup != null && meterGroup.isOwnedBy(player)) {
 				for (UUID playerUUID : meterGroup.getMembers()) {
-					String playerName = multimeter.getMultimeterServer().getPlayerName(playerUUID);
+					String playerName = multimeter.getMultimeterServer().getPlayerList().getName(playerUUID);
 					
 					if (playerName != null) {
 						names.put(playerName, playerUUID);
@@ -224,7 +224,7 @@ public class MeterGroupCommand {
 			Entry<String, UUID> member = findMember(listMembers(source), playerName);
 			
 			if (member == null) {
-				ServerPlayerEntity player = multimeter.getMultimeterServer().getPlayer(playerName);
+				ServerPlayerEntity player = multimeter.getMultimeterServer().getPlayerList().get(playerName);
 				
 				if (player == owner) {
 					source.sendFeedback(new LiteralText("You cannot remove yourself as a member!"), false);
