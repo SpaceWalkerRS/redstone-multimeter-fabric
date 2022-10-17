@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.tutorial.TutorialStep;
+import redstone.multimeter.common.meter.ColorPicker;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ColorUtils;
@@ -26,6 +27,7 @@ public class Options {
 	public static class RedstoneMultimeter {
 		
 		public static final BooleanOption                NUMBERED_NAMES       = new BooleanOption("Numbered Meter Names", "Add a number at the end of meter names that increments with each meter you add.", true);
+		public static final EnumOption<ColorPicker>      COLOR_PICKER         = new EnumOption<>("Color Picker", "The algorithm used to pick colors for new meters", ColorPicker.class, ColorPicker.RANDOM);
 		public static final BooleanOption                SHIFTY_METERS        = new BooleanOption("Shifty Meters", "Use the shift key to control whether a new meter is movable or not.", true);
 		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("Auto Random Ticks", String.format("Automatically enable the \'%s\' event type when placing a meter on a block that accepts random ticks.", EventType.RANDOM_TICK.getName()), true);
 		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("Create Group On Join", "Automatically create a new meter group upon joining a world or server.", true);
@@ -192,6 +194,7 @@ public class Options {
 		
 		register(RedstoneMultimeterMod.MOD_NAME,
 			RedstoneMultimeter.NUMBERED_NAMES,
+			RedstoneMultimeter.COLOR_PICKER,
 			RedstoneMultimeter.SHIFTY_METERS,
 			RedstoneMultimeter.AUTO_RANDOM_TICKS,
 			RedstoneMultimeter.CREATE_GROUP_ON_JOIN,
