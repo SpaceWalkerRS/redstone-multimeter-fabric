@@ -165,11 +165,38 @@ public abstract class MeterGroup {
 		});
 	}
 	
+	protected boolean setIndex(Meter meter, int index) {
+		int oldIndex = idToIndex.getOrDefault(meter.getId(), -1);
+
+		if (index < 0 || index >= meters.size() || oldIndex < 0) {
+			return false;
+		}
+
+		meters.remove(oldIndex);
+		meters.add(index, meter);
+
+		int start = Math.min(oldIndex, index);
+		int end = Math.max(oldIndex, index);
+
+		for (index = start; index <= end; index++) {
+			meter = meters.get(index);
+
+			idToIndex.put(meter.getId(), index);
+			posToIndex.put(meter.getPos(), index);
+
+			indexChanged(meter);
+		}
+
+		return true;
+	}
+	
 	protected abstract void meterAdded(Meter meter);
 	
 	protected abstract void meterRemoved(Meter meter);
 	
 	protected abstract void meterUpdated(Meter meter);
+	
+	protected abstract void indexChanged(Meter meter);
 	
 	public abstract LogManager getLogManager();
 	
