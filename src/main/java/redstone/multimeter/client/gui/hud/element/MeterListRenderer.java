@@ -193,9 +193,8 @@ public class MeterListRenderer extends AbstractElement {
 			}
 			
 			int selectedRow = hud.getSelectedRow();
-			Meter selectedMeter = hud.meters.get(selectedRow);
 			
-			if (selectedMeter != cursorMeter && selectedRow >= 0) {
+			if ((cursorMeter == null || selectedRow != cursorOriginRow) && selectedRow >= 0) {
 				int highlightRow = selectedRow;
 
 				if (selectedRow > cursorOriginRow && selectedRow <= cursorRow) {
