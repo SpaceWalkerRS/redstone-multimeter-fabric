@@ -159,8 +159,17 @@ public class MeterListRenderer extends AbstractElement {
 			int startY = mouseY + cursorOffsetY;
 			int alpha = 0xDD;
 
-			int x = startX + hud.settings.gridSize + 1;
-			int y = startY + hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
+			int x = startX;
+			int y = startY;
+
+			if (cursorOriginRow == hud.getSelectedRow()) {
+				drawHighlight(x, y, true);
+
+				GlStateManager.translated(0, 0, -0.1);
+			}
+
+			x = startX + hud.settings.gridSize + 1;
+			y = startY + hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
 
 			drawName(cursorMeter, x, y, ColorUtils.setAlpha(0xFFFFFF, alpha));
 
@@ -186,20 +195,33 @@ public class MeterListRenderer extends AbstractElement {
 			
 			int selectedRow = hud.getSelectedRow();
 			
-			if (selectedRow >= 0) {
-				drawHighlight(selectedRow, true);
+			if ((cursorMeter == null || selectedRow != cursorOriginRow) && selectedRow >= 0) {
+				int highlightRow = selectedRow;
+
+				if (selectedRow > cursorOriginRow && selectedRow <= cursorRow) {
+					highlightRow--;
+				}
+				if (selectedRow < cursorOriginRow && selectedRow >= cursorRow) {
+					highlightRow++;
+				}
+
+				drawHighlight(highlightRow, true);
 			}
 		}
 	}
 	
 	private void drawHighlight(int row, boolean selection) {
-		int h = hud.settings.rowHeight + hud.settings.gridSize;
 		int x = 0;
-		int y = row * h;
+		int y = row * (hud.settings.rowHeight + hud.settings.gridSize);
+
+		drawHighlight(x, y, selection);
+	}
+
+	private void drawHighlight(int x, int y, boolean selection) {
 		int width = getWidth() - hud.settings.gridSize;
-		int height = h;
+		int height = hud.settings.rowHeight + hud.settings.gridSize;
 		int color = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
-		
+
 		hud.renderer.renderHighlight(x, y, width, height, color);
 	}
 	
