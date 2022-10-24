@@ -37,6 +37,7 @@ public class PacketManager {
 		PACKETS.register("add_meter"               , AddMeterPacket.class              , () -> new AddMeterPacket());
 		PACKETS.register("remove_meter"            , RemoveMeterPacket.class           , () -> new RemoveMeterPacket());
 		PACKETS.register("meter_update"            , MeterUpdatePacket.class           , () -> new MeterUpdatePacket());
+		PACKETS.register("meter_index"             , MeterIndexPacket.class            , () -> new MeterIndexPacket());
 		PACKETS.register("teleport_to_meter"       , TeleportToMeterPacket.class       , () -> new TeleportToMeterPacket());
 		
 	}
