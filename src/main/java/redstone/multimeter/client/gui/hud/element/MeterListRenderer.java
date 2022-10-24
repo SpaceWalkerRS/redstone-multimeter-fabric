@@ -198,11 +198,13 @@ public class MeterListRenderer extends AbstractElement {
 			if ((cursorMeter == null || selectedRow != cursorOriginRow) && selectedRow >= 0) {
 				int highlightRow = selectedRow;
 
-				if (selectedRow > cursorOriginRow && selectedRow <= cursorRow) {
-					highlightRow--;
-				}
-				if (selectedRow < cursorOriginRow && selectedRow >= cursorRow) {
-					highlightRow++;
+				if (cursorMeter != null) {
+					if (selectedRow > cursorOriginRow && selectedRow <= cursorRow) {
+						highlightRow--;
+					}
+					if (selectedRow < cursorOriginRow && selectedRow >= cursorRow) {
+						highlightRow++;
+					}
 				}
 
 				drawHighlight(highlightRow, true);
