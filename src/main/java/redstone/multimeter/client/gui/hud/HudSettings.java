@@ -22,14 +22,14 @@ public class HudSettings {
 	public boolean ignoreHiddenMeters;
 	
 	public HudSettings(MultimeterHud hud) {
-		this.colorBackground = 0x202020;
-		this.colorGridMain = 0x404040;
-		this.colorGridInterval = 0x606060;
-		this.colorGridMarker = 0xC0C0C0;
-		this.colorHighlightHovered = 0x808080;
-		this.colorHighlightSelected = 0xFFFFFF;
-		this.colorTextOn = 0x000000;
-		this.colorTextOff = 0x707070;
+		this.colorBackground = 0xFF202020;
+		this.colorGridMain = 0xFF404040;
+		this.colorGridInterval = 0xFF606060;
+		this.colorGridMarker = 0xFFC0C0C0;
+		this.colorHighlightHovered = 0xFF808080;
+		this.colorHighlightSelected = 0xFFFFFFFF;
+		this.colorTextOn = 0xFF000000;
+		this.colorTextOff = 0xFF707070;
 	}
 	
 	public int opacity() {
