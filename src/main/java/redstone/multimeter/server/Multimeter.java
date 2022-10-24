@@ -234,6 +234,14 @@ public class Multimeter {
 			refreshMeterGroup(meterGroup, player);
 		}
 	}
+
+	public void setMeterIndex(ServerPlayerEntity player, long id, int index) {
+		ServerMeterGroup meterGroup = getSubscription(player);
+
+		if (meterGroup != null && !meterGroup.setMeterIndex(id, index)) {
+			refreshMeterGroup(meterGroup, player);
+		}
+	}
 	
 	public void clearMeterGroup(ServerPlayerEntity player) {
 		ServerMeterGroup meterGroup = getSubscription(player);

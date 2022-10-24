@@ -22,15 +22,18 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	
 	private List<Long> removedMeters;
 	private Long2ObjectMap<MeterProperties> meterUpdates;
+	private List<Long> meterSwaps;
 	
 	public MeterUpdatesPacket() {
 		this.removedMeters = new ArrayList<>();
 		this.meterUpdates = new Long2ObjectOpenHashMap<>();
+		this.meterSwaps = new ArrayList<>();
 	}
 	
-	public MeterUpdatesPacket(List<Long> removedMeters, Map<Long, MeterProperties> updates) {
+	public MeterUpdatesPacket(List<Long> removedMeters, Map<Long, MeterProperties> updates, List<Long> meterSwaps) {
 		this.removedMeters = new ArrayList<>(removedMeters);
 		this.meterUpdates = new Long2ObjectOpenHashMap<>(updates);
+		this.meterSwaps = new ArrayList<>(meterSwaps);
 	}
 	
 	@Override
@@ -48,14 +51,16 @@ public class MeterUpdatesPacket implements RSMMPacket {
 		
 		data.putLongArray("removed meters", removedMeters);
 		data.put("meter updates", list);
+		data.putLongArray("meter swaps", meterSwaps);
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
-		long[] ids = data.getLongArray("removed meters");
+		long[] removedIds = data.getLongArray("removed meters");
 		NbtList list = data.getList("meter updates", NbtElement.COMPOUND_TYPE);
+		long[] swappedIds = data.getLongArray("meter swaps");
 		
-		for (long id : ids) {
+		for (long id : removedIds) {
 			removedMeters.add(id);
 		}
 		for (int index = 0; index < list.size(); index++) {
@@ -64,6 +69,9 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			long id = nbt.getLong("id");
 			MeterProperties update = MeterProperties.fromNbt(nbt);
 			meterUpdates.put(id, update);
+		}
+		for (long id : swappedIds) {
+			meterSwaps.add(id);
 		}
 	}
 	
@@ -74,6 +82,6 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().updateMeters(removedMeters, meterUpdates);
+		client.getMeterGroup().updateMeters(removedMeters, meterUpdates, meterSwaps);
 	}
 }
