@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,7 @@ public class ServerMeterGroup extends MeterGroup {
 	
 	private final List<Long> removedMeters;
 	private final Map<Long, MeterProperties> meterUpdates;
+	private boolean meterIndicesChanged;
 	
 	private boolean isPrivate;
 	private boolean idle;
@@ -100,6 +102,11 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	@Override
+	protected void indexChanged(Meter meter) {
+		meterIndicesChanged = true;
+	}
+	
+	@Override
 	public ServerLogManager getLogManager() {
 		return logManager;
 	}
@@ -132,6 +139,10 @@ public class ServerMeterGroup extends MeterGroup {
 		}
 		
 		moveMeter(meter, pos.offset(dir));
+	}
+	
+	public boolean setMeterIndex(long id, int index) {
+		return hasMeter(id) && setIndex(getMeter(id), index);
 	}
 	
 	public boolean isPastMeterLimit() {
@@ -251,15 +262,25 @@ public class ServerMeterGroup extends MeterGroup {
 	}
 	
 	public void flushUpdates() {
-		if (removedMeters.isEmpty() && meterUpdates.isEmpty()) {
+		if (removedMeters.isEmpty() && meterUpdates.isEmpty() && !meterIndicesChanged) {
 			return;
 		}
 		
-		MeterUpdatesPacket packet = new MeterUpdatesPacket(removedMeters, meterUpdates);
+		List<Long> meters = new LinkedList<>();
+
+		if (meterIndicesChanged) {
+			for (Meter meter : getMeters()) {
+				meters.add(meter.getId());
+			}
+		}
+
+		MeterUpdatesPacket packet = new MeterUpdatesPacket(removedMeters, meterUpdates, meters);
 		multimeter.getMultimeterServer().getPlayerList().send(packet, player -> hasSubscriber(player));
 		
 		removedMeters.clear();
 		meterUpdates.clear();
+		
+		meterIndicesChanged = false;
 	}
 	
 	public void tryLogEvent(WorldPos pos, MeterEventPredicate predicate, MeterEventSupplier supplier) {
