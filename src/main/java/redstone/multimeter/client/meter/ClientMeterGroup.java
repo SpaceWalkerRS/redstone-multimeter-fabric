@@ -66,6 +66,11 @@ public class ClientMeterGroup extends MeterGroup {
 	}
 	
 	@Override
+	protected void indexChanged(Meter meter) {
+		client.getHUD().updateMeterList();
+	}
+	
+	@Override
 	public ClientLogManager getLogManager() {
 		return logManager;
 	}
@@ -86,7 +91,7 @@ public class ClientMeterGroup extends MeterGroup {
 		return hasMeter(meter.getId());
 	}
 	
-	public void updateMeters(List<Long> removedMeters, Long2ObjectMap<MeterProperties> meterUpdates) {
+	public void updateMeters(List<Long> removedMeters, Long2ObjectMap<MeterProperties> meterUpdates, List<Long> meters) {
 		for (int index = 0; index < removedMeters.size(); index++) {
 			long id = removedMeters.get(index);
 			Meter meter = getMeter(id);
@@ -104,6 +109,14 @@ public class ClientMeterGroup extends MeterGroup {
 				addMeter(new Meter(id, newProperties.toMutable()));
 			} else {
 				updateMeter(meter, newProperties);
+			}
+		}
+		for (int index = 0; index < meters.size(); index++) {
+			long id = meters.get(index);
+			Meter meter = getMeter(id);
+
+			if (meter != null) {
+				setIndex(meter, index);
 			}
 		}
 	}

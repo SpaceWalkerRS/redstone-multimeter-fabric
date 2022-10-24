@@ -74,7 +74,7 @@ public class HudRenderer extends RenderHelper2D {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 		
-		int a = Math.round(0xFF * hud.settings.opacity() / 100.0F);
+		int a = Math.round(ColorUtils.getAlpha(color) * hud.settings.opacity() / 100.0F);
 		int r = ColorUtils.getRed(color);
 		int g = ColorUtils.getGreen(color);
 		int b = ColorUtils.getBlue(color);
@@ -87,7 +87,7 @@ public class HudRenderer extends RenderHelper2D {
 		x = translateX(x, font.getStringWidth(text) - 1);
 		y = translateY(y, font.fontHeight - 2);
 		
-		int alpha = Math.round(0xFF * hud.settings.opacity() / 100.0F);
+		int alpha = Math.round(ColorUtils.getAlpha(color) * hud.settings.opacity() / 100.0F);
 		color = ColorUtils.setAlpha(color, alpha);
 		
 		super.drawText(immediate, model, font, text, x, y, shadow, color);
@@ -98,7 +98,7 @@ public class HudRenderer extends RenderHelper2D {
 		x = translateX(x, getWidth(font, text) - 1);
 		y = translateY(y, font.fontHeight - 2);
 		
-		int alpha = Math.round(0xFF * hud.settings.opacity() / 100.0F);
+		int alpha = Math.round(ColorUtils.getAlpha(color) * hud.settings.opacity() / 100.0F);
 		color = ColorUtils.setAlpha(color, alpha);
 		
 		super.drawText(immediate, model, font, text, x, y, shadow, color);
