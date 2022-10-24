@@ -22,18 +22,18 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	
 	private List<Long> removedMeters;
 	private Long2ObjectMap<MeterProperties> meterUpdates;
-	private List<Long> meterSwaps;
+	private List<Long> meters;
 	
 	public MeterUpdatesPacket() {
 		this.removedMeters = new ArrayList<>();
 		this.meterUpdates = new Long2ObjectOpenHashMap<>();
-		this.meterSwaps = new ArrayList<>();
+		this.meters = new ArrayList<>();
 	}
 	
-	public MeterUpdatesPacket(List<Long> removedMeters, Map<Long, MeterProperties> updates, List<Long> meterSwaps) {
+	public MeterUpdatesPacket(List<Long> removedMeters, Map<Long, MeterProperties> updates, List<Long> meters) {
 		this.removedMeters = new ArrayList<>(removedMeters);
 		this.meterUpdates = new Long2ObjectOpenHashMap<>(updates);
-		this.meterSwaps = new ArrayList<>(meterSwaps);
+		this.meters = new ArrayList<>(meters);
 	}
 	
 	@Override
@@ -51,14 +51,14 @@ public class MeterUpdatesPacket implements RSMMPacket {
 		
 		data.putLongArray("removed meters", removedMeters);
 		data.put("meter updates", list);
-		data.putLongArray("meter swaps", meterSwaps);
+		data.putLongArray("meters", meters);
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
 		long[] removedIds = data.getLongArray("removed meters");
 		NbtList list = data.getList("meter updates", NbtElement.COMPOUND_TYPE);
-		long[] swappedIds = data.getLongArray("meter swaps");
+		long[] meterIds = data.getLongArray("meters");
 		
 		for (long id : removedIds) {
 			removedMeters.add(id);
@@ -70,8 +70,8 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			MeterProperties update = MeterProperties.fromNbt(nbt);
 			meterUpdates.put(id, update);
 		}
-		for (long id : swappedIds) {
-			meterSwaps.add(id);
+		for (long id : meterIds) {
+			meters.add(id);
 		}
 	}
 	
@@ -82,6 +82,6 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	
 	@Override
 	public void execute(MultimeterClient client) {
-		client.getMeterGroup().updateMeters(removedMeters, meterUpdates, meterSwaps);
+		client.getMeterGroup().updateMeters(removedMeters, meterUpdates, meters);
 	}
 }
