@@ -5,13 +5,13 @@ import java.lang.reflect.Field;
 import java.util.UUID;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -215,7 +215,7 @@ public class MultimeterServer {
 	}
 	
 	public ServerWorld getWorld(Identifier worldId) {
-		RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, worldId);
+		RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, worldId);
 		return server.getWorld(key);
 	}
 	

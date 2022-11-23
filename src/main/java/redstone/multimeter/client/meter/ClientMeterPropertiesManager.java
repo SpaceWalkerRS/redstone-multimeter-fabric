@@ -26,10 +26,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -144,7 +144,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	private MeterProperties getDefaultProperties(Block block) {
-		Identifier blockId = Registry.BLOCK.getId(block);
+		Identifier blockId = Registries.BLOCK.getId(block);
 		
 		if (blockId == null) {
 			return null; // we should never get here
@@ -166,7 +166,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	private void initDefaults() {
 		Set<String> namespaces = new HashSet<>();
 		
-		for (Identifier blockId : Registry.BLOCK.getIds()) {
+		for (Identifier blockId : Registries.BLOCK.getIds()) {
 			loadDefaultProperties(blockId);
 			
 			if (namespaces.add(blockId.getNamespace())) {

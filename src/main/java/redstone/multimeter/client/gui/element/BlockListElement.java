@@ -10,8 +10,8 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -90,7 +90,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 			super(0, 0, width, height);
 			
 			this.blockId = blockId;
-			this.block = Registry.BLOCK.get(blockId);
+			this.block = Registries.BLOCK.get(blockId);
 			
 			if (this.block == null) {
 				this.stack = null;

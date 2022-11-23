@@ -86,13 +86,10 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
-		minecraftClient.keyboard.setRepeatEvents(false);
 	}
 	
 	@Override
 	protected void initScreen() {
-		minecraftClient.keyboard.setRepeatEvents(true);
-		
 		int spacing = 10;
 		int top = 10 + 3 * (IButton.DEFAULT_HEIGHT + 2);
 		int bottom = 18 + 2 * (IButton.DEFAULT_HEIGHT + 2);

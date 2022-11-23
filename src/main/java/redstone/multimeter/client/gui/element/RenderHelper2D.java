@@ -1,5 +1,7 @@
 package redstone.multimeter.client.gui.element;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
@@ -12,7 +14,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Matrix4f;
 
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
@@ -21,7 +22,7 @@ import redstone.multimeter.util.ColorUtils;
 public class RenderHelper2D {
 	
 	protected void renderRect(MatrixStack matrices, Drawer drawer) {
-		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
+		RenderSystem.setShader(() -> GameRenderer.getPositionColorProgram());
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
@@ -121,7 +122,7 @@ public class RenderHelper2D {
 	}
 	
 	protected void renderTexture(MatrixStack matrices, Texture texture, Drawer drawer) {
-		RenderSystem.setShader(() -> GameRenderer.getPositionTexShader());
+		RenderSystem.setShader(() -> GameRenderer.getPositionTexProgram());
 		RenderSystem.setShaderTexture(0, texture.id);
 		RenderSystem.enableTexture();
 		RenderSystem.enableBlend();
@@ -173,7 +174,7 @@ public class RenderHelper2D {
 	}
 	
 	protected void renderTextureColor(MatrixStack matrices, Texture texture, Drawer drawer) {
-		RenderSystem.setShader(() -> GameRenderer.getPositionTexColorShader());
+		RenderSystem.setShader(() -> GameRenderer.getPositionTexColorProgram());
 		RenderSystem.setShaderTexture(0, texture.id);
 		RenderSystem.enableTexture();
 		RenderSystem.enableBlend();

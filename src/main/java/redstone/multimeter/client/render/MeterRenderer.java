@@ -1,5 +1,7 @@
 package redstone.multimeter.client.render;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
@@ -11,7 +13,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -29,7 +30,7 @@ public class MeterRenderer {
 	}
 	
 	public void renderMeters(MatrixStack matrices) {
-		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
+		RenderSystem.setShader(() -> GameRenderer.getPositionColorProgram());
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableTexture();

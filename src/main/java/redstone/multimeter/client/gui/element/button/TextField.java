@@ -3,6 +3,7 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -19,7 +20,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
@@ -369,7 +369,7 @@ public class TextField extends AbstractButton {
 		int y1 = selectionY + selectionHeight;
 		int z = 0;
 		
-		RenderSystem.setShader(() -> GameRenderer.getPositionShader());
+		RenderSystem.setShader(() -> GameRenderer.getPositionProgram());
 		RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
 		RenderSystem.disableTexture();
 		RenderSystem.enableColorLogicOp();

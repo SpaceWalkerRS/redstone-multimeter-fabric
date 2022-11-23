@@ -28,14 +28,11 @@ public class OptionsScreen extends RSMMScreen {
 		super.onRemoved();
 		Options.validate();
 		minecraftClient.options.write();
-		minecraftClient.keyboard.setRepeatEvents(false);
 		client.getHUD().onOptionsChanged();
 	}
 	
 	@Override
 	protected void initScreen() {
-		minecraftClient.keyboard.setRepeatEvents(true);
-		
 		ScrollableListElement list = new ScrollableListElement(client, getWidth(), getHeight(), 52, 36);
 		
 		list.setSpacing(IButton.DEFAULT_HEIGHT);
