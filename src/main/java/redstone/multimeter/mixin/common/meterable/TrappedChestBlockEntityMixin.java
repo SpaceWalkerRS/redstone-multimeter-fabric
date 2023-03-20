@@ -20,7 +20,7 @@ import redstone.multimeter.server.MultimeterServer;
 public class TrappedChestBlockEntityMixin {
 	
 	@Inject(
-			method = "onInvOpenOrClose",
+			method = "onViewerCountUpdate",
 			at = @At(
 					value = "HEAD"
 			)

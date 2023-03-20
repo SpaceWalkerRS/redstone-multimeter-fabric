@@ -3,8 +3,8 @@ package redstone.multimeter.common.network;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Identifier;
 
 public abstract class PacketHandler {

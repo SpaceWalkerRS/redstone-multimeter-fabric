@@ -5,6 +5,7 @@ import org.joml.Matrix4f;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.font.TextRenderer.TextLayerType;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -24,7 +25,6 @@ public class RenderHelper2D {
 	protected void renderRect(MatrixStack matrices, Drawer drawer) {
 		RenderSystem.setShader(() -> GameRenderer.getPositionColorProgram());
 		RenderSystem.enableBlend();
-		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
 		
 		Tessellator tessellator = Tessellator.getInstance();
@@ -124,7 +124,6 @@ public class RenderHelper2D {
 	protected void renderTexture(MatrixStack matrices, Texture texture, Drawer drawer) {
 		RenderSystem.setShader(() -> GameRenderer.getPositionTexProgram());
 		RenderSystem.setShaderTexture(0, texture.id);
-		RenderSystem.enableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		
@@ -176,7 +175,6 @@ public class RenderHelper2D {
 	protected void renderTextureColor(MatrixStack matrices, Texture texture, Drawer drawer) {
 		RenderSystem.setShader(() -> GameRenderer.getPositionTexColorProgram());
 		RenderSystem.setShaderTexture(0, texture.id);
-		RenderSystem.enableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		
@@ -253,7 +251,7 @@ public class RenderHelper2D {
 	}
 	
 	protected void drawText(Immediate immediate, Matrix4f model, TextRenderer font, Text text, int x, int y, boolean shadow, int color) {
-		font.draw(text, x, y, color, shadow, model, immediate, false, 0x00000000, 0x00F000F0);
+		font.draw(text, x, y, color, shadow, model, immediate, TextLayerType.NORMAL, 0x00000000, 0x00F000F0);
 	}
 	
 	protected void drawText(Immediate immediate, Matrix4f model, TextRenderer font, String text, int x, int y, boolean shadow) {
@@ -261,7 +259,7 @@ public class RenderHelper2D {
 	}
 	
 	protected void drawText(Immediate immediate, Matrix4f model, TextRenderer font, String text, int x, int y, boolean shadow, int color) {
-		font.draw(text, x, y, color, shadow, model, immediate, false, 0x00000000, 0x00F000F0);
+		font.draw(text, x, y, color, shadow, model, immediate, TextLayerType.NORMAL, 0x00000000, 0x00F000F0);
 	}
 	
 	@FunctionalInterface

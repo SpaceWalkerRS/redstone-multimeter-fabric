@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import redstone.multimeter.common.network.RSMMPacket;

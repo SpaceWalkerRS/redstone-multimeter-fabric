@@ -6,6 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
@@ -85,7 +86,7 @@ public class TutorialToast implements Toast {
 		int height = getHeight();
 		
 		if (width == TEXTURE_WIDTH && height == TEXTURE_HEIGHT) {
-			manager.drawTexture(matrices, 0, 0, TEXTURE_U, TEXTURE_V, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+			DrawableHelper.drawTexture(matrices, 0, 0, TEXTURE_U, TEXTURE_V, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 		} else {
 			int x = 0;
 			int y = 0;
@@ -94,19 +95,19 @@ public class TutorialToast implements Toast {
 			int w = EDGE;
 			int h = EDGE;
 			
-			manager.drawTexture(matrices, x, y, u, v, w, h); // top left corner
+			DrawableHelper.drawTexture(matrices, x, y, u, v, w, h); // top left corner
 			
 			u += EDGE;
 			w = INNER_WIDTH;
 			
 			for (x = EDGE; x < (width - w - EDGE); x += w) {
-				manager.drawTexture(matrices, x, y, u, v, w, h); // top edge
+				DrawableHelper.drawTexture(matrices, x, y, u, v, w, h); // top edge
 			}
 			
 			w = width - x;
 			u = TEXTURE_U + TEXTURE_WIDTH - w;
 			
-			manager.drawTexture(matrices, x, y, u, v, w, h); // top right corner
+			DrawableHelper.drawTexture(matrices, x, y, u, v, w, h); // top right corner
 			
 			v += EDGE;
 			h = INNER_HEIGHT;
@@ -116,19 +117,19 @@ public class TutorialToast implements Toast {
 				u = TEXTURE_U;
 				w = EDGE;
 				
-				manager.drawTexture(matrices, x, y, u, v, w, h); // left edge
+				DrawableHelper.drawTexture(matrices, x, y, u, v, w, h); // left edge
 				
 				u += EDGE;
 				w = INNER_WIDTH;
 				
 				for (x = EDGE; x < (width - w - EDGE); x += w) {
-					manager.drawTexture(matrices, x, y, u, v, w, h); // middle
+					DrawableHelper.drawTexture(matrices, x, y, u, v, w, h); // middle
 				}
 				
 				w = width - x;
 				u = TEXTURE_U + TEXTURE_WIDTH - w;
 				
-				manager.drawTexture(matrices, x, y, u, v, w, h); // right edge
+				DrawableHelper.drawTexture(matrices, x, y, u, v, w, h); // right edge
 			}
 			
 			h = height - y;
@@ -138,19 +139,19 @@ public class TutorialToast implements Toast {
 			u = TEXTURE_U;
 			w = EDGE;
 			
-			manager.drawTexture(matrices, x, y, u, v, w, h); // bottom left corner
+			DrawableHelper.drawTexture(matrices, x, y, u, v, w, h); // bottom left corner
 			
 			u += EDGE;
 			w = INNER_WIDTH;
 			
 			for (x = EDGE; x < (width - w - EDGE); x += w) {
-				manager.drawTexture(matrices, x, y, u, v, w, h); // bottom edge
+				DrawableHelper.drawTexture(matrices, x, y, u, v, w, h); // bottom edge
 			}
 			
 			w = width - x;
 			u = TEXTURE_U + TEXTURE_WIDTH - w;
 			
-			manager.drawTexture(matrices, x, y, u, v, w, h); // bottom right corner
+			DrawableHelper.drawTexture(matrices, x, y, u, v, w, h); // bottom right corner
 		}
 	}
 	

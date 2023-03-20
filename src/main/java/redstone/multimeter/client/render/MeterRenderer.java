@@ -33,7 +33,6 @@ public class MeterRenderer {
 		RenderSystem.setShader(() -> GameRenderer.getPositionColorProgram());
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.disableTexture();
 		RenderSystem.depthMask(false);
 		
 		for (Meter meter : multimeterClient.getMeterGroup().getMeters()) {
@@ -43,7 +42,6 @@ public class MeterRenderer {
 		}
 		
 		RenderSystem.depthMask(true);
-		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
 	

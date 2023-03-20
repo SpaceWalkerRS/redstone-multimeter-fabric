@@ -1,5 +1,5 @@
 package redstone.multimeter.client.compat.amecs;
-
+/*
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -10,7 +10,7 @@ import de.siphalor.amecs.impl.ModifierPrefixTextProvider.Variation;
 import de.siphalor.amecs.impl.duck.IKeyBinding;
 
 import net.fabricmc.loader.api.FabricLoader;
-
+*/
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -18,7 +18,7 @@ import net.minecraft.text.Text;
 import redstone.multimeter.util.TextUtils;
 
 public class AmecsHelper {
-
+/*
 	private static boolean isAmecsApiLoaded = FabricLoader.getInstance().isModLoaded("amecsapi");
 
 	public static Collection<KeyModifier> getKeyModifiers(KeyBinding keybind) {
@@ -46,15 +46,15 @@ public class AmecsHelper {
 	public static Text getModifierName(KeyModifier modifier) {
 		return getModifierName(modifier, Variation.NORMAL);
 	}
-
+*/
 	public static MutableText addModifiers(MutableText text, KeyBinding keybind) {
-		if (isAmecsApiLoaded) {
+		/*if (isAmecsApiLoaded) {
 			for (KeyModifier modifier : getKeyModifiers(keybind)) {
 				text.
 					append(TextUtils.formatKey(getModifierName(modifier))).
 					append(" + ");
 			}
-		}
+		}*/
 		
 		return text;
 	}

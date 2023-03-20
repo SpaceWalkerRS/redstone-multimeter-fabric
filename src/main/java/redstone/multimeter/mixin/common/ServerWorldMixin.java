@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
@@ -40,7 +41,7 @@ import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin extends World implements IServerWorld {
-	
+
 	@Shadow @Final private MinecraftServer server;
 	@Shadow @Final private WorldTickScheduler<Block> blockTickScheduler;
 	@Shadow @Final private WorldTickScheduler<Fluid> fluidTickScheduler;
@@ -52,8 +53,8 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	private int currentDepth;
 	private int currentBatch;
 	
-	private ServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, RegistryEntry<DimensionType> dimension, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
-		super(properties, registryRef, dimension, profiler, isClient, debugWorld, seed, maxChainedNeighborUpdates);
+	private ServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, DynamicRegistryManager registryManager, RegistryEntry<DimensionType> dimensionEntry, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
+		super(properties, registryRef, registryManager, dimensionEntry, profiler, isClient, debugWorld, seed, maxChainedNeighborUpdates);
 	}
 	
 	@Inject(

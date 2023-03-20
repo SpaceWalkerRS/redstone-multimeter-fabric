@@ -371,7 +371,6 @@ public class TextField extends AbstractButton {
 		
 		RenderSystem.setShader(() -> GameRenderer.getPositionProgram());
 		RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
-		RenderSystem.disableTexture();
 		RenderSystem.enableColorLogicOp();
 		RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
 		
@@ -389,7 +388,6 @@ public class TextField extends AbstractButton {
 		tessellator.draw();
 		
 		RenderSystem.disableColorLogicOp();
-		RenderSystem.enableTexture();
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	

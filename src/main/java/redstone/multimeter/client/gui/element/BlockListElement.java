@@ -105,7 +105,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int x = getX() + 2;
 			int y = getY() + (height - 16) / 2;
 			
-			itemRenderer.renderInGui(stack, x, y);
+			itemRenderer.renderInGui(matrices, stack, x, y);
 			
 			x = getX() + 22;
 			y = getY() + height - (height + textRenderer.fontHeight) / 2;

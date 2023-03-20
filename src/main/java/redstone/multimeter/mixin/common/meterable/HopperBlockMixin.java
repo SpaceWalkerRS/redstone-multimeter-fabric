@@ -30,7 +30,7 @@ public abstract class HopperBlockMixin implements MeterableBlock {
 					target = "Lnet/minecraft/block/HopperBlock;ENABLED:Lnet/minecraft/state/property/BooleanProperty;"
 			)
 	)
-	private void onUpdateEnabled(World world, BlockPos pos, BlockState state, CallbackInfo ci, boolean shouldBeEnabled) {
+	private void onUpdateEnabled(World world, BlockPos pos, BlockState state, int flags, CallbackInfo ci, boolean shouldBeEnabled) {
 		logPoweredRSMM(world, pos, !shouldBeEnabled);
 	}
 	
