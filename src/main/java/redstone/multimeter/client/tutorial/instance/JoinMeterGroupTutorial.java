@@ -20,6 +20,11 @@ public class JoinMeterGroupTutorial extends TutorialInstance {
 	public void onJoinMeterGroup() {
 		completed = true;
 	}
+
+	@Override
+	public void onMeterGroupRefreshed() {
+		completed = true;
+	}
 	
 	@Override
 	protected TutorialToast createToast() {
