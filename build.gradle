@@ -31,8 +31,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	modImplementation "de.siphalor:amecsapi-1.18:1+"
-	include "de.siphalor:amecsapi-1.18:1+"
+	modImplementation "de.siphalor:amecsapi-1.18:1.3.6+mc22w06a"
+	include "de.siphalor:amecsapi-1.18:1.3.6+mc22w06a"
 }
 
 processResources {
