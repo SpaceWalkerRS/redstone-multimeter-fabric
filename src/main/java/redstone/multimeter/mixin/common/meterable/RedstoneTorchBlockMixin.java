@@ -6,47 +6,46 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.RedstoneTorchBlock;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.RedstoneTorchBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.block.PowerSource;
 
 @Mixin(RedstoneTorchBlock.class)
-public abstract class RedstoneTorchBlockMixin implements MeterableBlock, PowerSource {
-	
-	@Shadow protected abstract boolean shouldUnpower(World world, BlockPos pos, BlockState state);
-	
+public class RedstoneTorchBlockMixin implements MeterableBlock, PowerSource {
+
+	@Shadow private boolean hasNeighborSignal(Level level, BlockPos pos, BlockState state) { return false; }
+
 	@Inject(
-			method = "shouldUnpower",
-			at = @At(
-					value = "RETURN"
-			)
+		method = "hasNeighborSignal",
+		at = @At(
+			value = "RETURN"
+		)
 	)
-	private void onPowerCheck(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		logPoweredRSMM(world, pos, cir.getReturnValue()); // floor redstone torches only
+	private void logPowered(Level level, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+		rsmm$logPowered(level, pos, cir.getReturnValue()); // floor redstone torches only
 	}
-	
+
 	@Override
-	public boolean logPoweredOnBlockUpdateRSMM() {
+	public boolean rsmm$logPoweredOnBlockUpdate() {
 		return false;
 	}
-	
+
 	@Override
-	public boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
-		return shouldUnpower(world, pos, state);
+	public boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
+		return hasNeighborSignal(level, pos, state);
 	}
-	
+
 	@Override
-	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.LIT);
+	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
+		return state.getValue(RedstoneTorchBlock.LIT);
 	}
-	
+
 	@Override
-	public int getPowerLevelRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.LIT) ? MAX_POWER : MIN_POWER;
+	public int rsmm$getPowerLevel(Level level, BlockPos pos, BlockState state) {
+		return state.getValue(RedstoneTorchBlock.LIT) ? MAX_POWER : MIN_POWER;
 	}
 }

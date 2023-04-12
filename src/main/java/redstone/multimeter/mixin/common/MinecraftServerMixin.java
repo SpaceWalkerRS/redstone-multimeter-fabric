@@ -17,191 +17,201 @@ import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin implements IMinecraftServer {
-	
+public class MinecraftServerMixin implements IMinecraftServer {
+
 	private MultimeterServer multimeterServer;
-	
+
 	@Inject(
-			method = "<init>",
-			at = @At(
-					value = "RETURN"
-			)
+		method = "<init>",
+		at = @At(
+			value = "TAIL"
+		)
 	)
-	private void onInit(CallbackInfo ci) {
+	private void init(CallbackInfo ci) {
 		this.multimeterServer = new MultimeterServer((MinecraftServer)(Object)this);
 	}
-	
+
 	@Inject(
-			method = "runTasksTillTickEnd",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "loadLevel",
+		at = @At(
+			value = "TAIL"
+		)
+	)
+	private void levelLoaded(CallbackInfo ci) {
+		multimeterServer.levelLoaded();
+	}
+
+	@Inject(
+		method = "waitUntilNextTick",
+		at = @At(
+			value = "HEAD"
+		)
 	)
 	private void startTickTaskPackets(CallbackInfo ci) {
-		startTickTaskRSMM(TickTask.PACKETS);
+		rsmm$startTickTask(TickTask.PACKETS);
 	}
-	
+
 	@Inject(
-			method = "runTasksTillTickEnd",
-			at = @At(
-					value = "RETURN"
-			)
+		method = "waitUntilNextTick",
+		at = @At(
+			value = "TAIL"
+		)
 	)
 	private void endTickTaskPackets(CallbackInfo ci) {
-		endTickTaskRSMM();
+		rsmm$endTickTask();
 	}
-	
+
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "tickServer",
+		at = @At(
+			value = "HEAD"
+		)
 	)
-	private void startTickTaskTick(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		startTickTaskRSMM(TickTask.TICK);
+	private void startTickTaskTick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$startTickTask(TickTask.TICK);
 	}
-	
+
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
-					args = "ldc=Autosave started"
-			)
+		method = "tickServer",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
+			args = "ldc=Autosave started"
+		)
 	)
-	private void startTickTaskAutosave(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		startTickTaskRSMM(TickTask.AUTOSAVE);
+	private void startTickTaskAutosave(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$startTickTask(TickTask.AUTOSAVE);
 	}
-	
+
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
-					args = "ldc=Autosave finished"
-			)
+		method = "tickServer",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
+			args = "ldc=Autosave finished"
+		)
 	)
-	private void endTickTaskAutosave(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		endTickTaskRSMM();
+	private void endTickTaskAutosave(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$endTickTask();
 	}
-	
+
 	@Inject(
-			method = "tick",
-			at = @At(
-					value = "RETURN"
-			)
+		method = "tickServer",
+		at = @At(
+			value = "TAIL"
+		)
 	)
-	private void endTickTaskTick(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		endTickTaskRSMM();
+	private void endTickTaskTick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$endTickTask();
 	}
-	
+
 	@Inject(
-			method = "tickWorlds",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
-					args = "ldc=commandFunctions"
-			)
+		method = "tickChildren",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
+			args = "ldc=commandFunctions"
+		)
 	)
-	private void startTickTaskCommandFunctions(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		startTickTaskRSMM(TickTask.COMMAND_FUNCTIONS);
+	private void startTickTaskCommandFunctions(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$startTickTask(TickTask.COMMAND_FUNCTIONS);
 	}
-	
+
 	@Inject(
-			method = "tickWorlds",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=levels"
-			)
+		method = "tickChildren",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+			args = "ldc=levels"
+		)
 	)
-	private void swapTickTaskLevels(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		swapTickTaskRSMM(TickTask.LEVELS);
+	private void swapTickTaskLevels(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$swapTickTask(TickTask.LEVELS);
 	}
-	
+
 	@Inject(
-			method = "tickWorlds",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=connection"
-			)
+		method = "tickChildren",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+			args = "ldc=connection"
+		)
 	)
-	private void swapTickTaskConnections(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		swapTickTaskRSMM(TickTask.CONNECTIONS);
+	private void swapTickTaskConnections(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$swapTickTask(TickTask.CONNECTIONS);
 	}
-	
+
 	@Inject(
-			method = "tickWorlds",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=players"
-					)
+		method = "tickChildren",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+			args = "ldc=players"
 			)
-	private void swapTickTaskPlayerPing(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		swapTickTaskRSMM(TickTask.PLAYER_PING);
+		)
+	private void swapTickTaskPlayerPing(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$swapTickTask(TickTask.PLAYER_PING);
 	}
-	
+
 	@Inject(
-			method = "tickWorlds",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=server gui refresh"
-			)
+		method = "tickChildren",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+			args = "ldc=server gui refresh"
+		)
 	)
-	private void swapTickTaskServerGui(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		swapTickTaskRSMM(TickTask.SERVER_GUI);
+	private void swapTickTaskServerGui(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$swapTickTask(TickTask.SERVER_GUI);
 	}
-	
+
 	@Inject(
-			method = "tickWorlds",
-			at = @At(
-					value = "RETURN"
-			)
+		method = "tickChildren",
+		at = @At(
+			value = "TAIL"
+		)
 	)
-	private void endTickTaskServerGui(BooleanSupplier isAheadOfTime, CallbackInfo ci) {
-		endTickTaskRSMM();
+	private void endTickTaskServerGui(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$endTickTask();
 	}
-	
+
 	@Inject(
-			method = "reloadResources",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "reloadResources",
+		at = @At(
+			value = "HEAD"
+		)
 	)
 	private void onReloadResources(Collection<String> datapacks, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
 		((MinecraftServer)(Object)this).execute(() -> multimeterServer.getMultimeter().reloadOptions());
 	}
-	
+
 	@Inject(
-			method = "startTickMetrics",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "startMetricsRecordingTick",
+		at = @At(
+			value = "HEAD"
+		)
 	)
 	private void onTickStart(CallbackInfo ci) {
 		multimeterServer.tickStart();
 	}
-	
+
 	@Inject(
-			method = "endTickMetrics",
-			at = @At(
-					value = "RETURN"
-			)
+		method = "endMetricsRecordingTick",
+		at = @At(
+			value = "TAIL"
+		)
 	)
 	private void onTickEnd(CallbackInfo ci) {
 		multimeterServer.tickEnd();
 	}
-	
+
 	@Override
 	public MultimeterServer getMultimeterServer() {
 		return multimeterServer;
 	}
-	
+
 	@Override
-	public boolean isPausedRSMM() {
+	public boolean rsmm$isPaused() {
 		return false;
 	}
 }

@@ -11,11 +11,8 @@ import de.siphalor.amecs.impl.duck.IKeyBinding;
 
 import net.fabricmc.loader.api.FabricLoader;
 */
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-
-import redstone.multimeter.util.TextUtils;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.network.chat.MutableComponent;
 
 public class AmecsHelper {
 /*
@@ -47,7 +44,7 @@ public class AmecsHelper {
 		return getModifierName(modifier, Variation.NORMAL);
 	}
 */
-	public static MutableText addModifiers(MutableText text, KeyBinding keybind) {
+	public static MutableComponent addModifiers(MutableComponent text, KeyMapping keybind) {
 		/*if (isAmecsApiLoaded) {
 			for (KeyModifier modifier : getKeyModifiers(keybind)) {
 				text.

@@ -7,27 +7,27 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 
-import redstone.multimeter.interfaces.mixin.IServerWorld;
+import redstone.multimeter.interfaces.mixin.IServerLevel;
 
 @Pseudo
 @Mixin(targets = "alternate.current.wire.LevelHelper")
 public class LevelHelperMixin {
-	
+
 	@Inject(
-			method = "setWireState",
-			locals = LocalCapture.CAPTURE_FAILHARD,
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/server/world/ServerChunkManager;markForUpdate(Lnet/minecraft/util/math/BlockPos;)V"
-			)
+		method = "setWireState",
+		locals = LocalCapture.CAPTURE_FAILHARD,
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/server/level/ServerChunkCache;blockChanged(Lnet/minecraft/core/BlockPos;)V"
+		)
 	)
-	private static void onSetWireState(ServerWorld world, BlockPos pos, BlockState newState, boolean updateNeighborShapes, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, Chunk chunk, ChunkSection section, BlockState oldState) {
-		((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, newState);
+	private static void onSetWireState(ServerLevel level, BlockPos pos, BlockState state, boolean updateNeighborShapes, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, LevelChunk chunk, LevelChunkSection section, BlockState oldState) {
+		((IServerLevel)level).getMultimeter().onBlockChange(level, pos, oldState, state);
 	}
 }

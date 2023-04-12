@@ -1,24 +1,24 @@
 package redstone.multimeter.interfaces.mixin;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface IBlock {
-	
-	default boolean isMeterableRSMM() {
+
+	default boolean rsmm$isMeterable() {
 		return false;
 	}
-	
-	default boolean isPowerSourceRSMM() {
+
+	default boolean rsmm$isPowerSource() {
 		return false;
 	}
-	
-	default boolean logPoweredOnBlockUpdateRSMM() {
+
+	default boolean rsmm$logPoweredOnBlockUpdate() {
 		return true;
 	}
-	
-	default boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
-		return world.isReceivingRedstonePower(pos);
+
+	default boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
+		return level.hasNeighborSignal(pos);
 	}
 }
