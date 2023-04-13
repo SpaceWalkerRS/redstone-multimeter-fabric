@@ -2,8 +2,8 @@ package redstone.multimeter.interfaces.mixin;
 
 public interface IHopperBlockEntity {
 
-	boolean isOnCooldown();
+	boolean rsmm$isOnCooldown();
 
-	void logActiveRSMM();
+	void rsmm$logActive();
 
 }

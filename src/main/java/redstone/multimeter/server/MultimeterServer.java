@@ -1,251 +1,219 @@
 package redstone.multimeter.server;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.UUID;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickPhaseTree;
 import redstone.multimeter.common.TickTask;
-import redstone.multimeter.common.WorldPos;
 import redstone.multimeter.common.network.packets.HandshakePacket;
-import redstone.multimeter.common.network.packets.ServerTickPacket;
+import redstone.multimeter.common.network.packets.TickTimePacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
+import redstone.multimeter.server.compat.CarpetCompat;
+import redstone.multimeter.server.compat.SubTickCompat;
 
 public class MultimeterServer {
-	
+
 	private final MinecraftServer server;
 	private final ServerPacketHandler packetHandler;
 	private final PlayerList playerList;
 	private final Multimeter multimeter;
 	private final TickPhaseTree tickPhaseTree;
-	
-	private Field carpetTickSpeedProccessEntities;
+
+	private final CarpetCompat carpetCompat;
+	private final SubTickCompat subTickCompat;
+
+	private boolean loaded;
 	private TickPhase tickPhase;
-	/** true if the Overworld already ticked time */
-	private boolean tickedTime;
-	
+
 	public MultimeterServer(MinecraftServer server) {
 		this.server = server;
 		this.packetHandler = new ServerPacketHandler(this);
 		this.playerList = new PlayerList(this);
 		this.multimeter = new Multimeter(this);
 		this.tickPhaseTree = new TickPhaseTree();
-		
+
+		this.carpetCompat = new CarpetCompat();
+		this.subTickCompat = new SubTickCompat(this);
+
 		this.tickPhase = TickPhase.UNKNOWN;
-		this.tickedTime = false;
-		
-		this.detectCarpetTickSpeed();
 	}
-	
+
 	public MinecraftServer getMinecraftServer() {
 		return server;
 	}
-	
+
 	public ServerPacketHandler getPacketHandler() {
 		return packetHandler;
 	}
-	
+
 	public Multimeter getMultimeter() {
 		return multimeter;
 	}
-	
+
 	public TickPhaseTree getTickPhaseTree() {
 		return tickPhaseTree;
 	}
 
-	public long getTicks() {
-		return server.getTicks();
+	public long getTickCount() {
+		return server.getTickCount();
 	}
-	
-	/**
-	 * Carpet Mod allows players to freeze the game.
-	 * We need to detect when this is happening so
-	 * RSMM can freeze accordingly.
-	 */
-	private void detectCarpetTickSpeed() {
-		Class<?> clazzTickSpeed = null;
-		
-		try {
-			clazzTickSpeed = Class.forName("carpet.helpers.TickSpeed");
-		} catch (ClassNotFoundException e) {
-			
-		}
-		
-		if (clazzTickSpeed != null) {
-			try {
-				carpetTickSpeedProccessEntities = clazzTickSpeed.getField("process_entities");
-			} catch (NoSuchFieldException | SecurityException e) {
-				
-			}
-		}
+
+	public boolean isDedicatedServer() {
+		return server.isDedicatedServer();
 	}
-	
-	public boolean isDedicated() {
-		return server.isDedicated();
+
+	public File getConfigDirectory() {
+		return new File(server.getServerDirectory(), RedstoneMultimeterMod.CONFIG_PATH);
 	}
-	
-	public File getConfigFolder() {
-		return new File(server.getRunDirectory(), RedstoneMultimeterMod.CONFIG_PATH);
-	}
-	
+
 	public TickPhase getTickPhase() {
 		return tickPhase;
 	}
-	
+
+	public void levelLoaded() {
+		loaded = true;
+
+		carpetCompat.init();
+		subTickCompat.init();
+	}
+
 	public void startTickTask(boolean updateTree, TickTask task, String... args) {
 		tickPhase = tickPhase.startTask(task);
 		if (updateTree) {
 			tickPhaseTree.startTask(task, args);
 		}
 	}
-	
+
 	public void endTickTask(boolean updateTree) {
 		tickPhase = tickPhase.endTask();
 		if (updateTree) {
 			tickPhaseTree.endTask();
 		}
 	}
-	
+
 	public void swapTickTask(boolean updateTree, TickTask task, String... args) {
 		tickPhase = tickPhase.swapTask(task);
 		if (updateTree) {
 			tickPhaseTree.swapTask(task, args);
 		}
 	}
-	
-	public void onOverworldTickTime() {
-		tickedTime = true;
-	}
-	
-	public long getCurrentTick() {
-		long tick = server.getOverworld().getTime();
-		
-		if (!tickedTime) {
-			tick++;
-		}
-		
-		return tick;
-	}
-	
+
 	public boolean isPaused() {
-		boolean frozen = false;
-		
-		if (carpetTickSpeedProccessEntities != null) {
-			try {
-				frozen = !carpetTickSpeedProccessEntities.getBoolean(null);
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				
-			}
-		}
-		
-		return frozen || ((IMinecraftServer)server).isPausedRSMM();
+		return ((IMinecraftServer)server).rsmm$isPaused();
 	}
-	
+
+	public boolean isPausedOrFrozen() {
+		return isPaused() || carpetCompat.isFrozen() || subTickCompat.isFrozen();
+	}
+
 	public void tickStart() {
 		boolean paused = isPaused();
-		
+
 		if (!paused) {
-			tickedTime = false;
-			
 			if (shouldBuildTickPhaseTree()) {
 				tickPhaseTree.start();
 			}
 
 			playerList.tick();
 		}
-		
+
 		tickPhase = TickPhase.UNKNOWN;
 		multimeter.tickStart(paused);
 	}
-	
+
 	private boolean shouldBuildTickPhaseTree() {
-		return !tickPhaseTree.isComplete() && !tickPhaseTree.isBuilding();
+		return loaded && !tickPhaseTree.isComplete() && !tickPhaseTree.isBuilding() && !isPausedOrFrozen();
 	}
-	
+
 	public void tickEnd() {
 		boolean paused = isPaused();
-		
-		if (!paused) {
-			ServerTickPacket packet = new ServerTickPacket(getCurrentTick());
-			playerList.send(packet, player -> multimeter.hasSubscription(player));
-		}
+
 		if (tickPhaseTree.isBuilding()) {
 			tickPhaseTree.end();
 		}
-		
+
 		tickPhase = TickPhase.UNKNOWN;
 		multimeter.tickEnd(paused);
 	}
-	
-	public void onHandshake(ServerPlayerEntity player, String modVersion) {
-		if (!playerList.has(player.getUuid())) {
+
+	public void tickTime(Level level) {
+		TickTimePacket packet = new TickTimePacket(level.getGameTime());
+		playerList.send(packet, level.dimension());
+	}
+
+	public void onHandshake(ServerPlayer player, String modVersion) {
+		if (!playerList.has(player.getUUID())) {
 			playerList.add(player);
 
 			HandshakePacket packet = new HandshakePacket();
 			playerList.send(packet, player);
 		}
 	}
-	
-	public void onPlayerJoin(ServerPlayerEntity player) {
+
+	public void onPlayerJoin(ServerPlayer player) {
 		multimeter.onPlayerJoin(player);
 	}
-	
-	public void onPlayerLeave(ServerPlayerEntity player) {
+
+	public void onPlayerLeave(ServerPlayer player) {
 		multimeter.onPlayerLeave(player);
 	}
-	
-	public void refreshTickPhaseTree(ServerPlayerEntity player) {
+
+	public void refreshTickPhaseTree(ServerPlayer player) {
 		if (tickPhaseTree.isComplete()) {
 			TickPhaseTreePacket packet = new TickPhaseTreePacket(tickPhaseTree.toNbt());
 			playerList.send(packet, player);
 		}
 	}
-	
-	public ServerWorld getWorld(Identifier worldId) {
-		RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, worldId);
-		return server.getWorld(key);
+
+	public Iterable<ServerLevel> getLevels() {
+		return server.getAllLevels();
 	}
-	
-	public ServerWorld getWorldOf(WorldPos pos) {
-		return getWorld(pos.getWorldId());
+
+	public ServerLevel getLevel(ResourceLocation key) {
+		return server.getLevel(ResourceKey.create(Registries.DIMENSION, key));
 	}
-	
-	public BlockState getBlockState(WorldPos pos) {
-		World world = getWorldOf(pos);
-		
-		if (world != null) {
-			return world.getBlockState(pos.getBlockPos());
+
+	public ServerLevel getLevel(DimPos pos) {
+		return getLevel(pos.getDimension());
+	}
+
+	public BlockState getBlockState(DimPos pos) {
+		Level level = getLevel(pos);
+
+		if (level == null) {
+			return null;
 		}
-		
-		return null;
+
+		return level.getBlockState(pos.getBlockPos());
 	}
-	
+
 	public PlayerList getPlayerList() {
 		return playerList;
 	}
-	
+
 	public boolean isMultimeterClient(UUID uuid) {
 		return playerList.has(uuid);
 	}
-	
-	public boolean isMultimeterClient(ServerPlayerEntity player) {
-		return playerList.has(player.getUuid());
+
+	public boolean isMultimeterClient(ServerPlayer player) {
+		return playerList.has(player.getUUID());
 	}
-	
-	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
-		player.sendMessage(message, actionBar);
+
+	public void sendMessage(ServerPlayer player, Component message, boolean actionBar) {
+		player.sendSystemMessage(message, actionBar);
 	}
 }

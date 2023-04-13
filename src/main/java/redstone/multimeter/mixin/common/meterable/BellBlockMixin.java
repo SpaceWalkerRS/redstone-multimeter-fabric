@@ -7,44 +7,43 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.BellBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BellBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.block.MeterableBlock;
 
 @Mixin(BellBlock.class)
-public abstract class BellBlockMixin implements MeterableBlock {
-	
+public class BellBlockMixin implements MeterableBlock {
+
 	@Inject(
-			method = "neighborUpdate",
-			locals = LocalCapture.CAPTURE_FAILHARD,
-			at = @At(
-					value = "FIELD",
-					ordinal = 0,
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/BellBlock;POWERED:Lnet/minecraft/state/property/BooleanProperty;"
-			)
+		method = "neighborChanged",
+		locals = LocalCapture.CAPTURE_FAILHARD,
+		at = @At(
+			value = "FIELD",
+			ordinal = 0,
+			shift = Shift.BEFORE,
+			target = "Lnet/minecraft/world/level/block/BellBlock;POWERED:Lnet/minecraft/world/level/block/state/properties/BooleanProperty;"
+		)
 	)
-	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
-		logPoweredRSMM(world, pos, powered);
+	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston, CallbackInfo ci, boolean powered) {
+		rsmm$logPowered(level, pos, powered);
 	}
-	
+
 	@Override
-	public boolean logPoweredOnBlockUpdateRSMM() {
+	public boolean rsmm$logPoweredOnBlockUpdate() {
 		return false;
 	}
-	
+
 	@Override
-	public boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
-		return world.isReceivingRedstonePower(pos);
+	public boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
+		return level.hasNeighborSignal(pos);
 	}
-	
+
 	@Override
-	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED);
+	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
+		return state.getValue(BellBlock.POWERED);
 	}
 }

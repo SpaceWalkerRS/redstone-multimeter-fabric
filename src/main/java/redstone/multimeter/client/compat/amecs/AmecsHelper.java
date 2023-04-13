@@ -11,9 +11,9 @@ import de.siphalor.amecs.impl.duck.IKeyBinding;
 
 import net.fabricmc.loader.api.FabricLoader;
 
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import redstone.multimeter.util.TextUtils;
 
@@ -21,7 +21,7 @@ public class AmecsHelper {
 
 	private static boolean isAmecsApiLoaded = FabricLoader.getInstance().isModLoaded("amecsapi");
 
-	public static Collection<KeyModifier> getKeyModifiers(KeyBinding keybind) {
+	public static Collection<KeyModifier> getKeyModifiers(KeyMapping keybind) {
 		KeyModifiers keyModifiers = ((IKeyBinding)keybind).amecs$getKeyModifiers();
 
 		if (keyModifiers.isUnset()) {
@@ -39,15 +39,15 @@ public class AmecsHelper {
 		return modifiers;
 	}
 
-	public static Text getModifierName(KeyModifier modifier, Variation variation) {
-		return MutableText.of(variation.getTranslatableText(modifier.getTranslationKey()));
+	public static Component getModifierName(KeyModifier modifier, Variation variation) {
+		return MutableComponent.create(variation.getTranslatableText(modifier.getTranslationKey()));
 	}
 
-	public static Text getModifierName(KeyModifier modifier) {
+	public static Component getModifierName(KeyModifier modifier) {
 		return getModifierName(modifier, Variation.NORMAL);
 	}
 
-	public static MutableText addModifiers(MutableText text, KeyBinding keybind) {
+	public static MutableComponent addModifiers(MutableComponent text, KeyMapping keybind) {
 		if (isAmecsApiLoaded) {
 			for (KeyModifier modifier : getKeyModifiers(keybind)) {
 				text.
@@ -55,7 +55,7 @@ public class AmecsHelper {
 					append(" + ");
 			}
 		}
-		
+
 		return text;
 	}
 }

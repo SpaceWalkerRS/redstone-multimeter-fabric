@@ -5,130 +5,126 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil.Key;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import com.mojang.blaze3d.platform.InputConstants.Key;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import redstone.multimeter.client.compat.amecs.AmecsHelper;
 import redstone.multimeter.client.gui.Tooltip;
-import redstone.multimeter.interfaces.mixin.IKeyBinding;
+import redstone.multimeter.interfaces.mixin.IKeyMapping;
 
 public class TextUtils {
-	
+
 	private static final int MAX_WIDTH = 200;
-	
-	public static List<Text> toLines(TextRenderer font, String text) {
-		List<Text> lines = new ArrayList<>();
-		
+
+	public static List<Component> toLines(Font font, String text) {
+		List<Component> lines = new ArrayList<>();
+
 		while (!text.isEmpty()) {
 			int lastSpace = -1;
 			int length = 0;
-			
+
 			while (length++ < text.length()) {
 				if (length == text.length()) {
 					break;
 				}
-				
+
 				int index = length - 1;
-				
+
 				if (text.charAt(index) == ' ') {
 					lastSpace = index;
 				}
-				
+
 				String subString = text.substring(0, length);
-				
-				if (font.getWidth(subString) > MAX_WIDTH) {
+
+				if (font.width(subString) > MAX_WIDTH) {
 					if (lastSpace >= 0) {
 						subString = text.substring(0, lastSpace);
 						length = lastSpace + 1;
 					}
-					
-					Text line = Text.literal(subString);
+
+					Component line = Component.literal(subString);
 					lines.add(line);
-					
+
 					break;
 				}
 			}
-			
+
 			if (length == text.length()) {
 				if (length > 0) {
-					Text line = Text.literal(text);
+					Component line = Component.literal(text);
 					lines.add(line);
 				}
-				
+
 				break;
 			}
-			
+
 			text = text.substring(length);
 		}
-		
+
 		return lines;
 	}
-	
-	public static void formatKeyValue(List<Text> lines, String key, Object value) {
+
+	public static void formatKeyValue(List<Component> lines, String key, Object value) {
 		formatKeyValue(lines, key, value.toString());
 	}
-	
-	public static void formatKeyValue(List<Text> lines, String key, String value) {
+
+	public static void formatKeyValue(List<Component> lines, String key, String value) {
 		lines.add(formatKeyValue(key, value));
 	}
-	
+
 	public static void formatKeyValue(Tooltip tooltip, String key, Object value) {
 		formatKeyValue(tooltip, key, value.toString());
 	}
-	
+
 	public static void formatKeyValue(Tooltip tooltip, String key, String value) {
 		tooltip.add(formatKeyValue(key, value));
 	}
-	
-	public static Text formatKeyValue(String key, Object value) {
-		return Text.literal("").
-			append(Text.literal(key + ": ").formatted(Formatting.GOLD)).
-			append(Text.literal(value.toString()));
+
+	public static Component formatKeyValue(String key, Object value) {
+		return Component.literal("").append(Component.literal(key + ": ").withStyle(ChatFormatting.GOLD))
+			.append(Component.literal(value.toString()));
 	}
-	
-	public static MutableText formatKeybindInfo(Object... keybinds) {
-		MutableText text = Text.literal("").
-			append(Text.literal("keybind: ").formatted(Formatting.GOLD));
+
+	public static MutableComponent formatKeybindInfo(Object... keybinds) {
+		MutableComponent component = Component.literal("").append(Component.literal("keybind: ").withStyle(ChatFormatting.GOLD));
 		Collection<Object> boundKeybinds = filterUnboundKeybinds(keybinds);
 
 		if (boundKeybinds.isEmpty()) {
-			return text.append("-");
+			return component.append("-");
 		}
 
 		int i = 0;
 
 		for (Object o : boundKeybinds) {
 			if (i++ > 0) {
-				text.append(" OR ");
+				component.append(" OR ");
 			}
 
-			if (o instanceof KeyBinding) {
-				text.append(formatKeybind((KeyBinding)o));
-			} else
-			if (o instanceof Key) {
-				text.append(formatKeybind((Key)o));
-			} else
-			if (o instanceof Key[]) {
-				text.append(formatKeybind((Key[])o));
-			} else
-			if (o instanceof Object[]) {
-				text.append(formatKeybind((Object[])o));
+			if (o instanceof KeyMapping) {
+				component.append(formatKeybind((KeyMapping)o));
+			} else if (o instanceof Key) {
+				component.append(formatKeybind((Key)o));
+			} else if (o instanceof Key[]) {
+				component.append(formatKeybind((Key[])o));
+			} else if (o instanceof Object[]) {
+				component.append(formatKeybind((Object[])o));
 			}
 		}
 
-		return text;
+		return component;
 	}
 
 	private static Collection<Object> filterUnboundKeybinds(Object... keybinds) {
 		Collection<Object> boundKeybinds = new LinkedList<>();
 
 		for (Object o : keybinds) {
-			if (o instanceof KeyBinding) {
-				KeyBinding keybind = (KeyBinding)o;
+			if (o instanceof KeyMapping) {
+				KeyMapping keybind = (KeyMapping)o;
 
 				if (keybind.isUnbound()) {
 					continue;
@@ -140,57 +136,55 @@ public class TextUtils {
 
 		return boundKeybinds;
 	}
-	
-	public static MutableText formatKeybind(KeyBinding keybind) {
-		MutableText text = Text.literal("");
-		
+
+	public static MutableComponent formatKeybind(KeyMapping keybind) {
+		MutableComponent component = Component.literal("");
+
 		if (keybind.isUnbound()) {
-			return text;
+			return component;
 		}
-		
-		AmecsHelper.addModifiers(text, keybind);
-		
-		Key boundKey = ((IKeyBinding)keybind).getBoundKeyRSMM();
-		text.append(formatKey(boundKey));
-		
-		return text;
+
+		AmecsHelper.addModifiers(component, keybind);
+
+		Key boundKey = ((IKeyMapping)keybind).rsmm$getKey();
+		component.append(formatKey(boundKey));
+
+		return component;
 	}
-	
-	public static MutableText formatKeybind(Key... keys) {
-		MutableText text = Text.literal("");
-		
+
+	public static MutableComponent formatKeybind(Key... keys) {
+		MutableComponent component = Component.literal("");
+
 		for (int i = 0; i < keys.length; i++) {
 			Key key = keys[i];
-			
+
 			if (i > 0) {
-				text.append(" + ");
+				component.append(" + ");
 			}
-			
-			text.append(formatKey(key));
+
+			component.append(formatKey(key));
 		}
-		
-		return text;
+
+		return component;
 	}
 
-	public static MutableText formatKeybind(Object... keys) {
-		List<Text> formattedKeys = new ArrayList<>();
+	public static MutableComponent formatKeybind(Object... keys) {
+		List<Component> formattedKeys = new ArrayList<>();
 
 		for (Object o : keys) {
-			if (o instanceof KeyBinding) {
-				formattedKeys.add(formatKeybind((KeyBinding)o));
-			} else
-			if (o instanceof Key) {
+			if (o instanceof KeyMapping) {
+				formattedKeys.add(formatKeybind((KeyMapping)o));
+			} else if (o instanceof Key) {
 				formattedKeys.add(formatKey((Key)o));
-			} else 
-			if (o instanceof String) {
+			} else if (o instanceof String) {
 				formattedKeys.add(formatKey((String)o));
 			}
 		}
 
-		MutableText text = Text.literal("");
+		MutableComponent text = Component.literal("");
 
 		for (int i = 0; i < formattedKeys.size(); i++) {
-			Text key = formattedKeys.get(i);
+			Component key = formattedKeys.get(i);
 
 			if (i > 0) {
 				text.append(" + ");
@@ -201,16 +195,16 @@ public class TextUtils {
 
 		return text;
 	}
-	
-	public static MutableText formatKey(Key key) {
-		return key.getLocalizedText().copy().formatted(Formatting.YELLOW);
+
+	public static MutableComponent formatKey(Key key) {
+		return key.getDisplayName().copy().withStyle(ChatFormatting.YELLOW);
 	}
-	
-	public static MutableText formatKey(String key) {
-		return Text.literal(key).formatted(Formatting.YELLOW);
+
+	public static MutableComponent formatKey(String key) {
+		return Component.literal(key).withStyle(ChatFormatting.YELLOW);
 	}
-	
-	public static MutableText formatKey(Text text) {
-		return text.copy().formatted(Formatting.YELLOW);
+
+	public static MutableComponent formatKey(Component key) {
+		return key.copy().withStyle(ChatFormatting.YELLOW);
 	}
 }
