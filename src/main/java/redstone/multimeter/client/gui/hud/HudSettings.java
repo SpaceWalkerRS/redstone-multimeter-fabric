@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui.hud;
 import redstone.multimeter.client.option.Options;
 
 public class HudSettings {
-	
+
 	public final int colorBackground;
 	public final int colorGridMain;
 	public final int colorGridInterval;
@@ -12,14 +12,14 @@ public class HudSettings {
 	public final int colorHighlightSelected;
 	public final int colorTextOn;
 	public final int colorTextOff;
-	
+
 	public int columnWidth;
 	public int rowHeight;
 	public int gridSize;
 	public int colorHighlightTickMarker;
 	public boolean forceFullOpacity;
 	public boolean ignoreHiddenMeters;
-	
+
 	public HudSettings(MultimeterHud hud) {
 		this.colorBackground = 0xFF202020;
 		this.colorGridMain = 0xFF404040;
@@ -30,7 +30,7 @@ public class HudSettings {
 		this.colorTextOn = 0xFF000000;
 		this.colorTextOff = 0xFF707070;
 	}
-	
+
 	public int opacity() {
 		return forceFullOpacity ? 100 : Options.HUD.OPACITY.get();
 	}

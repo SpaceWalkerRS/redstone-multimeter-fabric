@@ -5,34 +5,34 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.TrappedChestBlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.TrappedChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.block.PowerSource;
 import redstone.multimeter.block.chest.TrappedChestHelper;
-import redstone.multimeter.interfaces.mixin.IServerWorld;
+import redstone.multimeter.interfaces.mixin.IServerLevel;
 import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(TrappedChestBlockEntity.class)
 public class TrappedChestBlockEntityMixin {
-	
+
 	@Inject(
-			method = "onInvOpenOrClose",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "signalOpenCount",
+		at = @At(
+			value = "HEAD"
+		)
 	)
-	private void onViewerCountChanged(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount, CallbackInfo ci) {
-		if (!world.isClient()) {
-			MultimeterServer server = ((IServerWorld)world).getMultimeterServer();
+	private void logPowerChangeAndActive(Level world, BlockPos pos, BlockState state, int oldOpenerCount, int newOpenerCount, CallbackInfo ci) {
+		if (!world.isClientSide()) {
+			MultimeterServer server = ((IServerLevel)world).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
-			
-			int oldPower = TrappedChestHelper.getPowerFromViewerCount(oldViewerCount);
-			int newPower = TrappedChestHelper.getPowerFromViewerCount(newViewerCount);
-			
+
+			int oldPower = TrappedChestHelper.getPowerFromOpenerCount(oldOpenerCount);
+			int newPower = TrappedChestHelper.getPowerFromOpenerCount(newOpenerCount);
+
 			multimeter.logPowerChange(world, pos, oldPower, newPower);
 			multimeter.logActive(world, pos, newPower > PowerSource.MIN_POWER);
 		}

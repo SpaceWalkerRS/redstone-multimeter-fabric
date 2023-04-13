@@ -1,7 +1,7 @@
 package redstone.multimeter.common.network.packets;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.meter.ClientMeterGroup;
@@ -11,37 +11,36 @@ import redstone.multimeter.server.MultimeterServer;
 import redstone.multimeter.server.meter.ServerMeterGroup;
 
 public class MeterGroupSubscriptionPacket implements RSMMPacket {
-	
+
 	private String name;
-	private boolean subscribed;
-	
+	private boolean subscribe;
+
 	public MeterGroupSubscriptionPacket() {
-		
 	}
-	
+
 	public MeterGroupSubscriptionPacket(String name, boolean subscribed) {
 		this.name = name;
-		this.subscribed = subscribed;
+		this.subscribe = subscribed;
 	}
-	
+
 	@Override
-	public void encode(NbtCompound data) {
+	public void encode(CompoundTag data) {
 		data.putString("name", name);
-		data.putBoolean("subscribed", subscribed);
+		data.putBoolean("subscribe", subscribe);
 	}
-	
+
 	@Override
-	public void decode(NbtCompound data) {
+	public void decode(CompoundTag data) {
 		name = data.getString("name");
-		subscribed = data.getBoolean("subscribed");
+		subscribe = data.getBoolean("subscribe");
 	}
-	
+
 	@Override
-	public void execute(MultimeterServer server, ServerPlayerEntity player) {
+	public void handle(MultimeterServer server, ServerPlayer player) {
 		Multimeter multimeter = server.getMultimeter();
 		ServerMeterGroup meterGroup = multimeter.getMeterGroup(name);
-		
-		if (subscribed) {
+
+		if (subscribe) {
 			if (meterGroup == null) {
 				multimeter.createMeterGroup(player, name);
 			} else {
@@ -55,12 +54,12 @@ public class MeterGroupSubscriptionPacket implements RSMMPacket {
 			}
 		}
 	}
-	
+
 	@Override
-	public void execute(MultimeterClient client) {
+	public void handle(MultimeterClient client) {
 		ClientMeterGroup meterGroup = client.getMeterGroup();
-		
-		if (subscribed) {
+
+		if (subscribe) {
 			meterGroup.subscribe(name);
 		} else {
 			meterGroup.unsubscribe(false);

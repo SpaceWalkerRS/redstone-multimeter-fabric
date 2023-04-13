@@ -6,47 +6,46 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.block.PowerSource;
 
-@Mixin(RedstoneWireBlock.class)
-public abstract class RedstoneWireBlockMixin implements MeterableBlock, PowerSource {
-	
-	@Shadow protected abstract int getReceivedRedstonePower(World world, BlockPos pos);
-	
+@Mixin(RedStoneWireBlock.class)
+public class RedStoneWireBlockMixin implements MeterableBlock, PowerSource {
+
+	@Shadow private int calculateTargetStrength(Level world, BlockPos pos) { return 0; }
+
 	@Inject(
-			method = "getReceivedRedstonePower",
-			at = @At(
-					value = "RETURN"
-			)
+		method = "calculateTargetStrength",
+		at = @At(
+			value = "RETURN"
+		)
 	)
-	private void onPowerCheck(World world, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
-		logPoweredRSMM(world, pos, cir.getReturnValue() > MIN_POWER);
+	private void logPowered(Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
+		rsmm$logPowered(level, pos, cir.getReturnValue() > MIN_POWER);
 	}
-	
+
 	@Override
-	public boolean logPoweredOnBlockUpdateRSMM() {
+	public boolean rsmm$logPoweredOnBlockUpdate() {
 		return false;
 	}
-	
+
 	@Override
-	public boolean isPoweredRSMM(World world, BlockPos pos, BlockState state) {
-		return getReceivedRedstonePower(world, pos) > MIN_POWER;
+	public boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
+		return calculateTargetStrength(level, pos) > MIN_POWER;
 	}
-	
+
 	@Override
-	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWER) > MIN_POWER;
+	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
+		return state.getValue(RedStoneWireBlock.POWER) > MIN_POWER;
 	}
-	
+
 	@Override
-	public int getPowerLevelRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWER);
+	public int rsmm$getPowerLevel(Level level, BlockPos pos, BlockState state) {
+		return state.getValue(RedStoneWireBlock.POWER);
 	}
 }
