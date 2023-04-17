@@ -27,6 +27,7 @@ public class Packets {
 
 		REGISTRY.register("handshake"               , HandshakePacket.class             , () -> new HandshakePacket());
 		REGISTRY.register("tick_phase_tree"         , TickPhaseTreePacket.class         , () -> new TickPhaseTreePacket());
+		REGISTRY.register("rebuild_tick_phase_tree" , RebuildTickPhaseTreePacket.class  , () -> new RebuildTickPhaseTreePacket());
 		REGISTRY.register("tick_time"               , TickTimePacket.class              , () -> new TickTimePacket());
 		REGISTRY.register("meter_group_subscription", MeterGroupSubscriptionPacket.class, () -> new MeterGroupSubscriptionPacket());
 		REGISTRY.register("meter_group_default"     , MeterGroupDefaultPacket.class     , () -> new MeterGroupDefaultPacket());

@@ -5,9 +5,12 @@ import java.util.function.Supplier;
 
 public class CarpetCompat {
 
-	private final Supplier<Boolean> frozen;
+	private Supplier<Boolean> frozen = () -> false;
 
 	public CarpetCompat() {
+	}
+
+	public void init() {
 		Class<?> TickSpeed;
 		Field TickSpeed$process_entities;
 

@@ -22,13 +22,23 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	private MultimeterServer multimeterServer;
 
 	@Inject(
+		method = "<init>",
+		at = @At(
+			value = "TAIL"
+		)
+	)
+	private void init(CallbackInfo ci) {
+		this.multimeterServer = new MultimeterServer((MinecraftServer)(Object)this);
+	}
+
+	@Inject(
 		method = "loadLevel",
 		at = @At(
 			value = "TAIL"
 		)
 	)
-	private void postInit(CallbackInfo ci) {
-		this.multimeterServer = new MultimeterServer((MinecraftServer)(Object)this);
+	private void levelLoaded(CallbackInfo ci) {
+		multimeterServer.levelLoaded();
 	}
 
 	@Inject(

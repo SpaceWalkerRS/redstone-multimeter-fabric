@@ -23,7 +23,7 @@ public class NaturalSpawnerMixin {
 		)
 	)
 	private static void startTickTaskMobSpawning(ServerLevel level, LevelChunk chunk, SpawnState state, boolean spawnFriendlies, boolean spawnEnemies, boolean spawnPersistents, CallbackInfo ci) {
-		((IServerLevel)level).rsmm$startTickTask(false, TickTask.MOB_SPAWNING);
+		((IServerLevel)level).rsmm$startTickTask(TickTask.MOB_SPAWNING);
 	}
 
 	@Inject(
@@ -33,6 +33,6 @@ public class NaturalSpawnerMixin {
 		)
 	)
 	private static void endTickTaskMobSpawning(ServerLevel level, LevelChunk chunk, SpawnState state, boolean spawnFriendlies, boolean spawnEnemies, boolean spawnPersistents, CallbackInfo ci) {
-		((IServerLevel)level).rsmm$endTickTask(false);
+		((IServerLevel)level).rsmm$endTickTask();
 	}
 }

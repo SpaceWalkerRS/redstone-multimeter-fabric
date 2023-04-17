@@ -94,8 +94,7 @@ public class RenderHelper2D {
 		drawGradient(bufferBuilder, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1);
 	}
 
-	protected void drawGradient(BufferBuilder bufferBuilder, Matrix4f pose, int x0, int y0, int x1, int y1, int a0, int r0, int g0, int b0,
-		int a1, int r1, int g1, int b1) {
+	protected void drawGradient(BufferBuilder bufferBuilder, Matrix4f pose, int x0, int y0, int x1, int y1, int a0, int r0, int g0, int b0, int a1, int r1, int g1, int b1) {
 		int z = 0;
 
 		bufferBuilder.vertex(pose, x0, y0, z).color(r0, g0, b0, a0).endVertex();
@@ -146,8 +145,7 @@ public class RenderHelper2D {
 		renderTexture(poses, texture, (bufferBuilder, pose) -> drawTexture(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1));
 	}
 
-	protected void drawTextureRegion(BufferBuilder bufferBuilder, Matrix4f pose, TextureRegion region, int x, int y, int width,
-		int height) {
+	protected void drawTextureRegion(BufferBuilder bufferBuilder, Matrix4f pose, TextureRegion region, int x, int y, int width, int height) {
 		int x0 = x;
 		int y0 = y;
 		int x1 = x + width;
@@ -161,8 +159,7 @@ public class RenderHelper2D {
 		drawTexture(bufferBuilder, pose, region.texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
 	}
 
-	protected void drawTexture(BufferBuilder bufferBuilder, Matrix4f pose, Texture texture, int x0, int y0, int x1, int y1, int tx0,
-		int ty0, int tx1, int ty1) {
+	protected void drawTexture(BufferBuilder bufferBuilder, Matrix4f pose, Texture texture, int x0, int y0, int x1, int y1, int tx0, int ty0, int tx1, int ty1) {
 		int z = 0;
 
 		float u0 = (float)tx0 / texture.width;
@@ -200,8 +197,7 @@ public class RenderHelper2D {
 		renderTextureColor(poses, texture, (bufferBuilder, pose) -> drawTextureColor(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1, a, r, g, b));
 	}
 
-	protected void drawTextureRegionColor(BufferBuilder bufferBuilder, Matrix4f pose, TextureRegion region, int x, int y, int width,
-		int height, int color) {
+	protected void drawTextureRegionColor(BufferBuilder bufferBuilder, Matrix4f pose, TextureRegion region, int x, int y, int width, int height, int color) {
 		int x0 = x;
 		int y0 = y;
 		int x1 = x + width;

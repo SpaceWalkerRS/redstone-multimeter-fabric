@@ -81,11 +81,23 @@ public class ServerChunkCacheMixin {
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+			args = "ldc=customSpawners"
+		)
+	)
+	private void startTickTaskCustomMobSpawning(CallbackInfo ci) {
+		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.CUSTOM_MOB_SPAWNING);
+	}
+
+	@Inject(
+		method = "tickChunks",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
 			args = "ldc=broadcast"
 		)
 	)
-	private void startTickTaskBroadcastChunks(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.BROADCAST_CHUNKS);
+	private void swapTickTaskBroadcastChunks(CallbackInfo ci) {
+		((TickTaskExecutor)level).rsmm$swapTickTask(TickTask.BROADCAST_CHUNKS);
 	}
 
 	@Inject(

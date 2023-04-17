@@ -35,7 +35,7 @@ public class PlayerList {
 	}
 
 	public void tick() {
-		if (server.getTicks() % 72000 == 0) {
+		if (server.getTickCount() % 72000 == 0) {
 			cleanNameCache();
 		}
 	}

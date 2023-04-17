@@ -210,7 +210,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 			args = "ldc=blockEvents"
 		)
 	)
-	private void swapTickTaskBlockEventDatas(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void swapTickTaskBlockEvents(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
 		rsmm$swapTickTask(TickTask.BLOCK_EVENTS);
 	}
 
@@ -229,7 +229,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 			target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V"
 		)
 	)
-	private void endTickTaskBlockEventDatas(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void endTickTaskBlockEvents(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
 		rsmm$endTickTask();
 	}
 
@@ -303,28 +303,8 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 			value = "HEAD"
 		)
 	)
-	private void postTickTime(CallbackInfo ci) {
+	private void tickTime(CallbackInfo ci) {
 		getMultimeterServer().tickTime(this);
-	}
-
-	@Inject(
-		method = "tickCustomSpawners",
-		at = @At(
-			value = "HEAD"
-		)
-	)
-	private void startTickTaskCustomMobSpawning(boolean spawnEnemies, boolean spawnFriendlies, CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.CUSTOM_MOB_SPAWNING);
-	}
-
-	@Inject(
-		method = "tickCustomSpawners",
-		at = @At(
-			value = "TAIL"
-		)
-	)
-	private void endTickTaskCustomMobSpawning(boolean spawnEnemies, boolean spawnFriendlies, CallbackInfo ci) {
-		rsmm$endTickTask();
 	}
 
 	@Inject(
@@ -354,7 +334,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void startTickTaskTickChunk(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$startTickTask(false, TickTask.TICK_CHUNK);
+		rsmm$startTickTask(TickTask.TICK_CHUNK);
 	}
 
 	@Inject(
@@ -366,7 +346,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void startTickTaskThunder(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$startTickTask(false, TickTask.THUNDER);
+		rsmm$startTickTask(TickTask.THUNDER);
 	}
 
 	@Inject(
@@ -378,7 +358,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void swapTickTaskPrecipitation(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$swapTickTask(false, TickTask.PRECIPITATION);
+		rsmm$swapTickTask(TickTask.PRECIPITATION);
 	}
 
 	@Inject(
@@ -390,7 +370,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void swapTickTaskRandomTicks(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$swapTickTask(false, TickTask.RANDOM_TICKS);
+		rsmm$swapTickTask(TickTask.RANDOM_TICKS);
 	}
 
 	@Inject(
@@ -400,8 +380,8 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void endTickTaskRandomTicksAndTickChunk(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$endTickTask(false);
-		rsmm$endTickTask(false);
+		rsmm$endTickTask();
+		rsmm$endTickTask();
 	}
 
 	@Inject(

@@ -12,9 +12,15 @@ import redstone.multimeter.server.MultimeterServer;
 
 public class SubTickCompat {
 
-	private final Supplier<Boolean> frozen;
+	private final MultimeterServer server;
+
+	private Supplier<Boolean> frozen = () -> false;
 
 	public SubTickCompat(MultimeterServer server) {
+		this.server = server;
+	}
+
+	public void init() {
 		Class<?> SubTick;
 		Class<?> TickHandler;
 		Method SubTick$getTickHandler;
@@ -28,7 +34,7 @@ public class SubTickCompat {
 			TickHandler = Class.forName("subtick.TickHandler");
 			TickHandler$frozen = TickHandler.getField("frozen");
 
-			for (ServerLevel level : server.getMinecraftServer().getAllLevels()) {
+			for (ServerLevel level : server.getLevels()) {
 				Object tickHandler = SubTick$getTickHandler.invoke(null, level);
 
 				Supplier<Boolean> frozenChain = frozen;

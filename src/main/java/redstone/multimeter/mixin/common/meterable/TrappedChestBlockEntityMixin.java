@@ -14,7 +14,6 @@ import redstone.multimeter.block.PowerSource;
 import redstone.multimeter.block.chest.TrappedChestHelper;
 import redstone.multimeter.interfaces.mixin.IServerLevel;
 import redstone.multimeter.server.Multimeter;
-import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(TrappedChestBlockEntity.class)
 public class TrappedChestBlockEntityMixin {
@@ -25,16 +24,15 @@ public class TrappedChestBlockEntityMixin {
 			value = "HEAD"
 		)
 	)
-	private void logPowerChangeAndActive(Level world, BlockPos pos, BlockState state, int oldOpenerCount, int newOpenerCount, CallbackInfo ci) {
-		if (!world.isClientSide()) {
-			MultimeterServer server = ((IServerLevel)world).getMultimeterServer();
-			Multimeter multimeter = server.getMultimeter();
+	private void logPowerChangeAndActive(Level level, BlockPos pos, BlockState state, int oldOpenerCount, int newOpenerCount, CallbackInfo ci) {
+		if (!level.isClientSide()) {
+			Multimeter multimeter = ((IServerLevel)level).getMultimeter();
 
 			int oldPower = TrappedChestHelper.getPowerFromOpenerCount(oldOpenerCount);
 			int newPower = TrappedChestHelper.getPowerFromOpenerCount(newOpenerCount);
 
-			multimeter.logPowerChange(world, pos, oldPower, newPower);
-			multimeter.logActive(world, pos, newPower > PowerSource.MIN_POWER);
+			multimeter.logPowerChange(level, pos, oldPower, newPower);
+			multimeter.logActive(level, pos, newPower > PowerSource.MIN_POWER);
 		}
 	}
 }

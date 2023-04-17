@@ -36,6 +36,7 @@ public class MultimeterServer {
 	private final CarpetCompat carpetCompat;
 	private final SubTickCompat subTickCompat;
 
+	private boolean loaded;
 	private TickPhase tickPhase;
 
 	public MultimeterServer(MinecraftServer server) {
@@ -67,7 +68,7 @@ public class MultimeterServer {
 		return tickPhaseTree;
 	}
 
-	public long getTicks() {
+	public long getTickCount() {
 		return server.getTickCount();
 	}
 
@@ -83,23 +84,30 @@ public class MultimeterServer {
 		return tickPhase;
 	}
 
-	public void startTickTask(boolean updateTree, TickTask task, String... args) {
+	public void levelLoaded() {
+		loaded = true;
+
+		carpetCompat.init();
+		subTickCompat.init();
+	}
+
+	public void startTickTask(TickTask task, String... args) {
 		tickPhase = tickPhase.startTask(task);
-		if (updateTree) {
+		if (tickPhaseTree.isBuilding()) {
 			tickPhaseTree.startTask(task, args);
 		}
 	}
 
-	public void endTickTask(boolean updateTree) {
+	public void endTickTask() {
 		tickPhase = tickPhase.endTask();
-		if (updateTree) {
+		if (tickPhaseTree.isBuilding()) {
 			tickPhaseTree.endTask();
 		}
 	}
 
-	public void swapTickTask(boolean updateTree, TickTask task, String... args) {
+	public void swapTickTask(TickTask task, String... args) {
 		tickPhase = tickPhase.swapTask(task);
-		if (updateTree) {
+		if (tickPhaseTree.isBuilding()) {
 			tickPhaseTree.swapTask(task, args);
 		}
 	}
@@ -128,7 +136,7 @@ public class MultimeterServer {
 	}
 
 	private boolean shouldBuildTickPhaseTree() {
-		return !tickPhaseTree.isComplete() && !tickPhaseTree.isBuilding() && !isPausedOrFrozen();
+		return loaded && !tickPhaseTree.isComplete() && !tickPhaseTree.isBuilding() && !isPausedOrFrozen() && !playerList.get().isEmpty();
 	}
 
 	public void tickEnd() {
@@ -168,6 +176,12 @@ public class MultimeterServer {
 		if (tickPhaseTree.isComplete()) {
 			TickPhaseTreePacket packet = new TickPhaseTreePacket(tickPhaseTree.toNbt());
 			playerList.send(packet, player);
+		}
+	}
+
+	public void rebuildTickPhaseTree(ServerPlayer player) {
+		if (tickPhaseTree.isComplete()) {
+			tickPhaseTree.reset();
 		}
 	}
 
