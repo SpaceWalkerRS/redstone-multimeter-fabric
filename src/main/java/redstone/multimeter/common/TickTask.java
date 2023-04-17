@@ -1,12 +1,12 @@
 package redstone.multimeter.common;
 
 public enum TickTask {
-	
+
 	UNKNOWN              ( 0, "unknown"),
 	TICK                 ( 1, "tick"),
 	COMMAND_FUNCTIONS    ( 2, "command functions"),
 	LEVELS               ( 3, "levels"),
-	TICK_WORLD           ( 4, "tick world"),
+	TICK_LEVEL           ( 4, "tick level"),
 	WORLD_BORDER         ( 5, "world border"),
 	WEATHER              ( 6, "weather"),
 	WAKE_SLEEPING_PLAYERS( 7, "wake sleeping players"),
@@ -42,37 +42,38 @@ public enum TickTask {
 	SERVER_GUI           (37, "server gui"),
 	AUTOSAVE             (38, "autosave"),
 	PACKETS              (39, "packets");
-	
+
 	public static final TickTask[] ALL;
-	
+
 	static {
+
 		ALL = new TickTask[values().length];
-		
+
 		for (TickTask task : values()) {
 			ALL[task.index] = task;
 		}
 	}
-	
+
 	private final int index;
 	private final String name;
-	
+
 	private TickTask(int index, String name) {
 		this.index = index;
 		this.name = name;
 	}
-	
+
 	public int getIndex() {
 		return index;
 	}
-	
-	public static TickTask fromIndex(int index) {
+
+	public static TickTask byIndex(int index) {
 		if (index > 0 && index < ALL.length) {
 			return ALL[index];
 		}
-		
+
 		return UNKNOWN;
 	}
-	
+
 	public String getName() {
 		return name;
 	}

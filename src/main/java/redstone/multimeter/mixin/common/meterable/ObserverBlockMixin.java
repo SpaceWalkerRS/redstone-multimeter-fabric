@@ -2,25 +2,24 @@ package redstone.multimeter.mixin.common.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ObserverBlock;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.ObserverBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
 
 @Mixin(ObserverBlock.class)
-public abstract class ObserverBlockMixin implements Meterable, PowerSource {
-	
+public class ObserverBlockMixin implements Meterable, PowerSource {
+
 	@Override
-	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED);
+	public boolean rsmm$isActive(Level world, BlockPos pos, BlockState state) {
+		return state.getValue(ObserverBlock.POWERED);
 	}
-	
+
 	@Override
-	public int getPowerLevelRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.POWERED) ? MAX_POWER : MIN_POWER;
+	public int rsmm$getPowerLevel(Level world, BlockPos pos, BlockState state) {
+		return state.getValue(ObserverBlock.POWERED) ? MAX_POWER : MIN_POWER;
 	}
 }
