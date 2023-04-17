@@ -7,24 +7,24 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.FluidState;
 
-import redstone.multimeter.interfaces.mixin.IServerWorld;
+import redstone.multimeter.interfaces.mixin.IServerLevel;
 
 @Mixin(FluidState.class)
 public class FluidStateMixin {
-	
+
 	@Inject(
-			method = "onRandomTick",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "randomTick",
+		at = @At(
+			value = "HEAD"
+		)
 	)
-	private void onRandomTick(World world, BlockPos pos, Random random, CallbackInfo ci) {
-		if (!world.isClient()) {
-			((IServerWorld)world).getMultimeter().logRandomTick(world, pos);
+	private void logRandomTick(Level level, BlockPos pos, Random random, CallbackInfo ci) {
+		if (!level.isClientSide()) {
+			((IServerLevel)level).getMultimeter().logRandomTick(level, pos);
 		}
 	}
 }

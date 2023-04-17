@@ -1,40 +1,47 @@
 package redstone.multimeter.mixin.common.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 
 import redstone.multimeter.interfaces.mixin.IChestBlockEntity;
 
 @Mixin(ChestBlockEntity.class)
 public class ChestBlockEntityMixin implements IChestBlockEntity {
-	
+
+	@Shadow private int openCount;
+
 	@Inject(
-			method = "onOpen",
-			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose()V"
-			)
+		method = "startOpen",
+		at = @At(
+			value = "INVOKE",
+			shift = Shift.BEFORE,
+			target = "Lnet/minecraft/world/level/block/entity/ChestBlockEntity;signalOpenCount()V"
+		)
 	)
-	private void onOpenedByPlayer(PlayerEntity player, CallbackInfo ci) {
-		invOpenOrCloseRSMM(true);
+	private void startOpen(Player player, CallbackInfo ci) {
+		signalOpenerCount(openCount - 1, openCount);
 	}
-	
+
 	@Inject(
-			method = "onClose",
-			at = @At(
-					value = "INVOKE",
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/entity/ChestBlockEntity;onInvOpenOrClose()V"
-			)
+		method = "stopOpen",
+		at = @At(
+			value = "INVOKE",
+			shift = Shift.BEFORE,
+			target = "Lnet/minecraft/world/level/block/entity/ChestBlockEntity;signalOpenCount()V"
+		)
 	)
-	private void onClosedByPlayer(PlayerEntity player, CallbackInfo ci) {
-		invOpenOrCloseRSMM(false);
+	private void stopOpen(Player player, CallbackInfo ci) {
+		signalOpenerCount(openCount + 1, openCount);
+	}
+
+	@Override
+	public void signalOpenerCount(int oldOpenerCount, int newOpenerCount) {
 	}
 }

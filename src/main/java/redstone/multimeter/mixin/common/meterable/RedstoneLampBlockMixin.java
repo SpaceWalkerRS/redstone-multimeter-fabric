@@ -7,30 +7,29 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.RedstoneLampBlock;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.RedstoneLampBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.block.MeterableBlock;
 
 @Mixin(RedstoneLampBlock.class)
 public class RedstoneLampBlockMixin implements MeterableBlock {
-	
+
 	@Inject(
-			method = "scheduledTick",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "tick",
+		at = @At(
+			value = "HEAD"
+		)
 	)
-	private void onScheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
-		logPoweredRSMM(world, pos, state);
+	private void logPowered(BlockState state, ServerLevel level, BlockPos pos, Random random, CallbackInfo ci) {
+		rsmm$logPowered(level, pos, state);
 	}
-	
+
 	@Override
-	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.LIT);
+	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
+		return state.getValue(RedstoneLampBlock.LIT);
 	}
 }
