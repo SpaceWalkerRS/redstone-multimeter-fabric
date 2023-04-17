@@ -151,7 +151,7 @@ public class Keybinds {
 		OPEN_MULTIMETER_SCREEN = registerKeybind(new KeyMapping("Open Multimeter Screen", GLFW.GLFW_KEY_G       , MAIN));
 		OPEN_METER_CONTROLS    = registerKeybind(new KeyMapping("Open Meter Controls"   , GLFW.GLFW_KEY_I       , MAIN));
 		OPEN_OPTIONS_MENU      = registerKeybind(new KeyMapping("Open Options Menu"     , GLFW.GLFW_KEY_O       , MAIN));
-		VIEW_TICK_PHASE_TREE   = registerKeybind(new KeyMapping("View Tick Phase Tree"  , GLFW.GLFW_KEY_U       , MAIN));
+		VIEW_TICK_PHASE_TREE   = registerKeybind(new KeyMapping("View Tick Phases"      , GLFW.GLFW_KEY_U       , MAIN));
 		PRINT_LOGS             = registerKeybind(new KeyMapping("Print Logs To File"    , GLFW.GLFW_KEY_P       , MAIN));
 
 		TOGGLE_EVENT_TYPES = new KeyMapping[EventType.ALL.length];

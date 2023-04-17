@@ -1,26 +1,30 @@
 package redstone.multimeter.common;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 
 public class TickPhaseTree {
 
-	public final TickTaskNode root;
+	public final Node root;
 
-	private TickTaskNode current;
+	private Node current;
 	private boolean building;
 	private boolean complete;
 
 	public TickPhaseTree() {
-		this.root = new TickTaskNode(null, TickTask.UNKNOWN);
+		this.root = new Node(null, TickTask.UNKNOWN);
 
 		this.current = root;
 		this.building = false;
@@ -33,6 +37,17 @@ public class TickPhaseTree {
 
 	public boolean isBuilding() {
 		return building;
+	}
+
+	public void reset() {
+		if (building) {
+			RedstoneMultimeterMod.LOGGER.warn("Cannot reset tick phase tree: currently building!");
+		} else {
+			root.children.clear();
+			current = root;
+			building = false;
+			complete = false;
+		}
 	}
 
 	public void start() {
@@ -50,14 +65,20 @@ public class TickPhaseTree {
 		if (building) {
 			building = false;
 			complete = true;
+
+			prune();
 		} else {
 			RedstoneMultimeterMod.LOGGER.warn("Cannot complete tick phase tree: not building!");
 		}
 	}
 
+	private void prune() {
+		new Pruner().run();
+	}
+
 	public void startTask(TickTask task, String... args) {
 		if (building) {
-			current = new TickTaskNode(current, task, args);
+			current = new Node(current, task, args);
 			current.parent.children.add(current);
 		}
 	}
@@ -92,7 +113,7 @@ public class TickPhaseTree {
 		return nbt;
 	}
 
-	private void addNode(ListTag tasks, ListTag args, TickTaskNode node, int depth) {
+	private void addNode(ListTag tasks, ListTag args, Node node, int depth) {
 		if (depth > 0) { // depth 0 is root
 			byte[] array = new byte[3];
 			array[0] = (byte)depth;
@@ -163,18 +184,72 @@ public class TickPhaseTree {
 		}
 	}
 
-	public class TickTaskNode {
+	public class Node {
 
-		public final TickTaskNode parent;
-		public final List<TickTaskNode> children;
+		public final Node parent;
+		public final List<Node> children;
 		public final TickTask task;
 		public final String[] args;
 
-		public TickTaskNode(TickTaskNode parent, TickTask task, String... args) {
+		public Node(Node parent, TickTask task, String... args) {
 			this.parent = parent;
 			this.children = new ArrayList<>();
 			this.task = task;
 			this.args = args;
+		}
+	}
+
+	private class Pruner {
+
+		private final Set<TickTask> tasks = EnumSet.noneOf(TickTask.class);
+		private final Stack<Set<TickTask>> layers = new Stack<>();
+		private final Stack<TickTask> phase = new Stack<>();
+
+		private void run() {
+			tasks.clear();
+			layers.clear();
+			phase.clear();
+
+			layers.push(EnumSet.noneOf(TickTask.class));
+
+			prune(root);
+		}
+
+		private boolean prune(Node node) {
+			TickTask task = node.task;
+			PruneType type = task.getPruneType();
+
+			if (type.is(PruneType.TREE) && tasks.contains(task)) {
+				return true;
+			}
+
+			Set<TickTask> layer = layers.peek();
+
+			if (type.is(PruneType.SIBLING) && layer.contains(task)) {
+				return true;
+			}
+			if (type.is(PruneType.BRANCH) && phase.contains(task)) {
+				return true;
+			}
+
+			tasks.add(task);
+			layer.add(task);
+
+			phase.push(task);
+			layers.push(EnumSet.noneOf(TickTask.class));
+
+			for (Iterator<Node> it = node.children.iterator(); it.hasNext(); ) {
+				Node child = it.next();
+
+				if (prune(child)) {
+					it.remove();
+				}
+			}
+
+			phase.pop();
+			layers.pop();
+
+			return false;
 		}
 	}
 }
