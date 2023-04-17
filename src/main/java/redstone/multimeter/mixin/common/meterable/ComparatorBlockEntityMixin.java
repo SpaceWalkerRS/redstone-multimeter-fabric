@@ -6,32 +6,32 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.ComparatorBlockEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.ComparatorBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
-import redstone.multimeter.interfaces.mixin.IServerWorld;
+import redstone.multimeter.interfaces.mixin.IServerLevel;
 
 @Mixin(ComparatorBlockEntity.class)
 public class ComparatorBlockEntityMixin extends BlockEntity {
-	
-	@Shadow private int outputSignal;
-	
-	public ComparatorBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+
+	@Shadow private int output;
+
+	private ComparatorBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
-	
+
 	@Inject(
-			method = "setOutputSignal",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "setOutputSignal",
+		at = @At(
+			value = "HEAD"
+		)
 	)
-	public void onPowerChange(int newPower, CallbackInfo ci) {
-		if (!world.isClient()) {
-			((IServerWorld)world).getMultimeter().logPowerChange(world, pos, outputSignal, newPower);
+	public void logPowerChange(int newOutput, CallbackInfo ci) {
+		if (!level.isClientSide()) {
+			((IServerLevel)level).getMultimeter().logPowerChange(level, worldPosition, output, newOutput);
 		}
 	}
 }
