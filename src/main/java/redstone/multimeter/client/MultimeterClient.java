@@ -38,6 +38,7 @@ import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
 import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
 import redstone.multimeter.common.network.packets.MeterUpdatePacket;
+import redstone.multimeter.common.network.packets.RebuildTickPhaseTreePacket;
 import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 
@@ -63,8 +64,9 @@ public class MultimeterClient {
 	private final ClientMeterPropertiesManager meterPropertiesManager;
 	private final Tutorial tutorial;
 
+	private final TickPhaseTree tickPhaseTree;
+
 	private ClientMeterGroup meterGroup;
-	private TickPhaseTree tickPhaseTree;
 	private boolean connected; // true if the client is connected to a MultimeterServer
 	private boolean hudEnabled;
 	private long prevGameTime;
@@ -77,6 +79,8 @@ public class MultimeterClient {
 		this.hud = new MultimeterHud(this);
 		this.meterPropertiesManager = new ClientMeterPropertiesManager(this);
 		this.tutorial = new Tutorial(this);
+
+		this.tickPhaseTree = new TickPhaseTree();
 
 		this.meterGroup = new ClientMeterGroup(this);
 		this.connected = false;
@@ -133,13 +137,22 @@ public class MultimeterClient {
 	}
 
 	public void requestTickPhaseTree() {
+		tickPhaseTree.reset();
+
 		TickPhaseTreePacket packet = new TickPhaseTreePacket(new CompoundTag());
 		sendPacket(packet);
 	}
 
+	public void rebuildTickPhaseTree() {
+		tickPhaseTree.reset();
+
+		RebuildTickPhaseTreePacket packet = new RebuildTickPhaseTreePacket();
+		sendPacket(packet);
+	}
+
 	public void refreshTickPhaseTree(CompoundTag nbt) {
-		if (tickPhaseTree == null) {
-			tickPhaseTree = new TickPhaseTree();
+		if (tickPhaseTree.isComplete()) {
+			tickPhaseTree.reset();
 		}
 
 		tickPhaseTree.fromNbt(nbt);
@@ -210,8 +223,8 @@ public class MultimeterClient {
 			connected = false;
 
 			hud.reset();
+			tickPhaseTree.reset();
 			meterGroup.unsubscribe(true);
-			tickPhaseTree = null;
 		}
 	}
 
