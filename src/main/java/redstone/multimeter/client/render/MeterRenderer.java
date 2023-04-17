@@ -3,146 +3,149 @@ package redstone.multimeter.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.math.Matrix4f;
+
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.util.ColorUtils;
 
 public class MeterRenderer {
-	
-	private final MultimeterClient multimeterClient;
-	private final MinecraftClient minecraftClient;
-	
-	public MeterRenderer(MultimeterClient multimeterClient) {
-		this.multimeterClient = multimeterClient;
-		this.minecraftClient = this.multimeterClient.getMinecraftClient();
+
+	private final MultimeterClient client;
+	private final Minecraft minecraft;
+
+	public MeterRenderer(MultimeterClient client) {
+		this.client = client;
+		this.minecraft = this.client.getMinecraft();
 	}
-	
-	public void renderMeters(MatrixStack matrices) {
+
+	public void renderMeters(PoseStack poses) {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableTexture();
 		RenderSystem.depthMask(false);
-		
-		for (Meter meter : multimeterClient.getMeterGroup().getMeters()) {
-			if (meter.isIn(minecraftClient.world)) {
-				drawMeter(matrices, meter);
+		RenderSystem.enableDepthTest();
+
+		for (Meter meter : client.getMeterGroup().getMeters()) {
+			if (meter.isIn(minecraft.level)) {
+				drawMeter(poses, meter);
 			}
 		}
-		
+
+		RenderSystem.disableDepthTest();
 		RenderSystem.depthMask(true);
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
-	
-	private void drawMeter(MatrixStack matrices, Meter meter) {
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
-		
+
+	private void drawMeter(PoseStack poses, Meter meter) {
+		Tesselator tessellator = Tesselator.getInstance();
+		BufferBuilder bufferBuilder = tessellator.getBuilder();
+
 		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
-		
-		Camera camera = minecraftClient.gameRenderer.getCamera();
-		Vec3d cameraPos = camera.getPos();
-		
-		matrices.push();
-		matrices.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
-		
-		Matrix4f model = matrices.peek().getModel();
-		
+
+		Camera camera = minecraft.gameRenderer.getMainCamera();
+		Vec3 cameraPos = camera.getPosition();
+
+		poses.pushPose();
+		poses.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
+
+		Matrix4f pose = poses.last().pose();
+
 		float r = ColorUtils.getRed(color) / 255.0F;
 		float g = ColorUtils.getGreen(color) / 255.0F;
 		float b = ColorUtils.getBlue(color) / 255.0F;
-		
-		drawFilledBox(builder, tessellator, model, r, g, b, 0.5F);
-		
+
+		drawFilledBox(bufferBuilder, tessellator, pose, r, g, b, 0.5F);
+
 		if (movable) {
-			drawBoxOutline(builder, tessellator, model, r, g, b, 1.0F);
+			drawBoxOutline(bufferBuilder, tessellator, pose, r, g, b, 1.0F);
 		}
-		
-		matrices.pop();
+
+		poses.popPose();
 	}
-	
-	private void drawFilledBox(BufferBuilder builder, Tessellator tessellator, Matrix4f model, float r, float g, float b, float a) {
-		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
-		drawBox(builder, model, r, g, b, a, false);
-		tessellator.draw();
+
+	private void drawFilledBox(BufferBuilder bufferBuilder, Tesselator tessellator, Matrix4f pose, float r, float g, float b, float a) {
+		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+		drawBox(bufferBuilder, pose, r, g, b, a, false);
+		tessellator.end();
 	}
-	
-	private void drawBoxOutline(BufferBuilder builder, Tessellator tessellator, Matrix4f model, float r, float g, float b, float a) {
-		builder.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
-		drawBox(builder, model, r, g, b, a, true);
-		tessellator.draw();
+
+	private void drawBoxOutline(BufferBuilder bufferBuilder, Tesselator tessellator, Matrix4f pose, float r, float g, float b, float a) {
+		bufferBuilder.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
+		drawBox(bufferBuilder, pose, r, g, b, a, true);
+		tessellator.end();
 	}
-	
-	private void drawBox(BufferBuilder builder, Matrix4f model, float r, float g, float b, float a, boolean outline) {
+
+	private void drawBox(BufferBuilder bufferBuilder, Matrix4f pose, float r, float g, float b, float a, boolean outline) {
 		// The box is slightly larger than 1x1 to prevent z-fighting
 		float c0 = -0.002F;
 		float c1 = 1.002F;
-		
+
 		// West face
-		builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
-		builder.vertex(model, c0, c0, c1).color(r, g, b, a).next();
-		builder.vertex(model, c0, c1, c1).color(r, g, b, a).next();
-		builder.vertex(model, c0, c1, c0).color(r, g, b, a).next();
+		bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
 		if (outline) {
-			builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
+			bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
 		}
-		
+
 		// East face
-		builder.vertex(model, c1, c0, c0).color(r, g, b, a).next();
-		builder.vertex(model, c1, c1, c0).color(r, g, b, a).next();
-		builder.vertex(model, c1, c1, c1).color(r, g, b, a).next();
-		builder.vertex(model, c1, c0, c1).color(r, g, b, a).next();
+		bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
 		if (outline) {
-			builder.vertex(model, c1, c0, c0).color(r, g, b, a).next();
+			bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
 		}
-		
+
 		// North face
-		builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
-		builder.vertex(model, c0, c1, c0).color(r, g, b, a).next();
-		builder.vertex(model, c1, c1, c0).color(r, g, b, a).next();
-		builder.vertex(model, c1, c0, c0).color(r, g, b, a).next();
+		bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
 		if (outline) {
-			builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
+			bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
 		}
-		
+
 		// South face
-		builder.vertex(model, c0, c0, c1).color(r, g, b, a).next();
-		builder.vertex(model, c1, c0, c1).color(r, g, b, a).next();
-		builder.vertex(model, c1, c1, c1).color(r, g, b, a).next();
-		builder.vertex(model, c0, c1, c1).color(r, g, b, a).next();
+		bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
 		if (outline) {
-			builder.vertex(model, c0, c0, c1).color(r, g, b, a).next();
+			bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
 		}
-		
+
 		// Bottom face
-		builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
-		builder.vertex(model, c1, c0, c0).color(r, g, b, a).next();
-		builder.vertex(model, c1, c0, c1).color(r, g, b, a).next();
-		builder.vertex(model, c0, c0, c1).color(r, g, b, a).next();
+		bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
 		if (outline) {
-			builder.vertex(model, c0, c0, c0).color(r, g, b, a).next();
+			bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
 		}
-		
+
 		// Top face
-		builder.vertex(model, c0, c1, c0).color(r, g, b, a).next();
-		builder.vertex(model, c0, c1, c1).color(r, g, b, a).next();
-		builder.vertex(model, c1, c1, c1).color(r, g, b, a).next();
-		builder.vertex(model, c1, c1, c0).color(r, g, b, a).next();
+		bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
 		if (outline) {
-			builder.vertex(model, c0, c1, c0).color(r, g, b, a).next();
+			bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
 		}
 	}
 }

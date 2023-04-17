@@ -23,20 +23,20 @@ import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ColorUtils;
 
 public class Options {
-	
+
 	public static class RedstoneMultimeter {
-		
+
 		public static final BooleanOption                NUMBERED_NAMES       = new BooleanOption("Numbered Meter Names", "Add a number at the end of meter names that increments with each meter you add.", true);
 		public static final EnumOption<ColorPicker>      COLOR_PICKER         = new EnumOption<>("Color Picker", "The algorithm used to pick colors for new meters", ColorPicker.class, ColorPicker.RANDOM);
 		public static final BooleanOption                SHIFTY_METERS        = new BooleanOption("Shifty Meters", "Use the shift key to control whether a new meter is movable or not.", true);
 		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("Auto Random Ticks", String.format("Automatically enable the \'%s\' event type when placing a meter on a block that accepts random ticks.", EventType.RANDOM_TICK.getName()), true);
 		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("Create Group On Join", "Automatically create a new meter group upon joining a world or server.", true);
 		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption("Default Meter Group", "The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used instead.", "", MeterGroup.getMaxNameLength());
-		
+
 	}
-	
+
 	public static class HUD {
-		
+
 		public static final IntegerOption                SCREEN_POS_X         = new IntegerOption("Horizontal Screen Position", "The horizontal position of the HUD on the screen, as a percentage of the screen width.", 0, 0, 100);
 		public static final IntegerOption                SCREEN_POS_Y         = new IntegerOption("Vertical Screen Position", "The vertical position of the HUD on the screen, as a percantage of the screen height.", 0, 0, 100);
 		public static final EnumOption<Directionality.X> DIRECTIONALITY_X     = new EnumOption<>("Horizontal Directionality", "The direction along which the events are drawn.", Directionality.X.class, Directionality.X.LEFT_TO_RIGHT);
@@ -53,54 +53,54 @@ public class Options {
 		public static final IntegerOption                OPACITY              = new IntegerOption("Opacity", "", 100, 0, 100);
 		public static final BooleanOption                AUTO_PAUSE           = new BooleanOption("Auto Pause", "Automatically pause the HUD when opening the Multimeter screen.", true);
 		public static final BooleanOption                AUTO_UNPAUSE         = new BooleanOption("Auto Unpause", "Automatically unpause the HUD when closing the Multimeter screen.", true);
-		
+
 	}
-	
+
 	public static class LogPrinter {
-		
+
 		public static final BooleanOption                PRINT_OLD_LOGS       = new BooleanOption("Print Old Logs", "Print old logs when activating the printer.", false);
 		public static final IntegerOption                MAX_RUNTIME          = new IntegerOption("Maximum Runtime", "The limit of how long the printer can run, in ticks. The printer will automatically stop when reaching this number. Entering a value of -1 will remove the limit entirely.", -1, -1, Integer.MAX_VALUE);
-		
+
 	}
-	
+
 	public static class Miscellaneous {
-		
+
 		public static final IntegerOption                SCROLL_SPEED         = new IntegerOption("Scroll Speed", "The scroll speed in Redstone Multimeter related GUIs.", 7, 1, 69);
 		public static final IntegerOption                DOUBLE_CLICK_TIME    = new IntegerOption("Double Click Time", "The double click time in Redstone Multimeter related GUIs.", 5, 1, 500);
 		public static final BooleanOption                VERSION_WARNING      = new BooleanOption("Version Warning", "Send a warning message in chat when you join a server that has a different version of Redstone Multimeter installed.", true);
-		
+
 	}
-	
+
 	public static class Hidden {
-		
+
 		public static final EnumOption<TutorialStep>     TUTORIAL_STEP        = new EnumOption<>("Tutorial Step", "", TutorialStep.class, TutorialStep.OPEN_OPTIONS_SCREEN);
-		
+
 	}
-	
+
 	private static final Map<String, IOption> BY_NAME;
 	private static final Map<String, List<IOption>> BY_CATEGORY;
-	
+
 	private static final String FILE_NAME = "options.txt";
-	
+
 	public static Collection<IOption> all() {
 		return Collections.unmodifiableCollection(BY_NAME.values());
 	}
-	
+
 	public static Map<String, List<IOption>> byCategory() {
 		return Collections.unmodifiableMap(BY_CATEGORY);
 	}
-	
+
 	public static Collection<IOption> ofCategory(String category) {
 		return Collections.unmodifiableCollection(BY_CATEGORY.getOrDefault(category, Collections.emptyList()));
 	}
-	
+
 	public static void validate() {
 		int history = HUD.COLUMN_COUNT.get();
-		
+
 		if (HUD.SELECTED_COLUMN.get() >= history) {
 			HUD.SELECTED_COLUMN.set(history - 1);
 		}
-		
+
 		try {
 			String rawColor = Options.HUD.TICK_MARKER_COLOR.get();
 			ColorUtils.fromRGBString(rawColor);
@@ -108,90 +108,87 @@ public class Options {
 			Options.HUD.TICK_MARKER_COLOR.reset();
 		}
 	}
-	
-	public static void load(File folder) {
-		File file = new File(folder, FILE_NAME);
-		
+
+	public static void load(File dir) {
+		File file = new File(dir, FILE_NAME);
+
 		if (!file.exists()) {
-			save(folder);
+			save(dir);
 			return;
 		}
-		
+
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			String line;
-			
+
 			while ((line = br.readLine()) != null) {
 				String[] args = line.split("=", 2);
-				
+
 				if (args.length < 2) {
 					continue;
 				}
-				
+
 				String name = args[0];
 				String value = args[1];
-				
+
 				IOption option = BY_NAME.get(name);
-				
+
 				if (option != null) {
 					option.setFromString(value);
 				}
 			}
 		} catch (IOException e) {
-			
 		}
-		
+
 		validate();
 	}
-	
-	public static void save(File folder) {
-		if (!folder.exists()) {
-			folder.mkdirs();
+
+	public static void save(File dir) {
+		if (!dir.exists()) {
+			dir.mkdirs();
 		}
-		
-		File file = new File(folder, FILE_NAME);
-		
+
+		File file = new File(dir, FILE_NAME);
+
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			
 		}
-		
+
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
 			for (Entry<String, IOption> entry : BY_NAME.entrySet()) {
 				String name = entry.getKey();
 				String value = entry.getValue().getAsString();
-				
+
 				bw.write(name + "=" + value);
 				bw.newLine();
 			}
 		} catch (IOException e) {
-			
 		}
 	}
-	
+
 	private static void register(String category, IOption... options) {
 		if (category != null) {
 			if (BY_CATEGORY.containsKey(category)) {
 				throw new IllegalStateException("Cannot register a category multiple times!");
 			}
-			
+
 			BY_CATEGORY.put(category, Arrays.asList(options));
 		}
-		
+
 		for (IOption option : options) {
 			if (BY_NAME.containsKey(option.getName())) {
 				throw new IllegalStateException("Cannot register multiple options with the same name!");
 			}
-			
+
 			BY_NAME.put(option.getName(), option);
 		}
 	}
-	
+
 	static {
-		
+
 		BY_NAME = new LinkedHashMap<>();
 		BY_CATEGORY = new LinkedHashMap<>();
-		
+
 		register(RedstoneMultimeterMod.MOD_NAME,
 			RedstoneMultimeter.NUMBERED_NAMES,
 			RedstoneMultimeter.COLOR_PICKER,
