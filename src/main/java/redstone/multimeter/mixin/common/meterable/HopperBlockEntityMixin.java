@@ -6,17 +6,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 
 import redstone.multimeter.interfaces.mixin.IHopperBlockEntity;
-import redstone.multimeter.interfaces.mixin.IServerWorld;
+import redstone.multimeter.interfaces.mixin.IServerLevel;
 
 @Mixin(HopperBlockEntity.class)
 public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockEntity {
 
-	@Shadow private int transferCooldown;
+	@Shadow private int cooldownTime;
 
 	private HopperBlockEntityMixin(BlockEntityType<?> type) {
 		super(type);
@@ -26,11 +26,11 @@ public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockE
 		method = "tick",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/World;getTime()J"
+			target = "Lnet/minecraft/world/level/Level;getGameTime()J"
 		)
 	)
-	private void onTick(CallbackInfo ci) {
-		logActiveRSMM();
+	private void logActive(CallbackInfo ci) {
+		rsmm$logActive();
 	}
 
 	@Inject(
@@ -39,18 +39,18 @@ public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockE
 			value = "TAIL"
 		)
 	)
-	private void onSetCooldown(CallbackInfo ci) {
-		logActiveRSMM();
+	private void onSetTransferCooldown(CallbackInfo ci) {
+		rsmm$logActive();
 	}
 
 	@Override
-	public boolean isOnCooldown() {
-		return transferCooldown > 0;
+	public boolean rsmm$isOnCooldown() {
+		return cooldownTime > 0;
 	}
 
-	private void logActiveRSMM() {
-		if (!world.isClient()) {
-			((IServerWorld)world).getMultimeter().logActive(world, pos, !isOnCooldown());
+	private void rsmm$logActive() {
+		if (!level.isClientSide()) {
+			((IServerLevel)level).getMultimeter().logActive(level, worldPosition, !rsmm$isOnCooldown());
 		}
 	}
 }

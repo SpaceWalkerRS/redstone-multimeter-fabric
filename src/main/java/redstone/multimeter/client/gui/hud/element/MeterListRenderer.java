@@ -2,12 +2,13 @@ package redstone.multimeter.client.gui.hud.element;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import redstone.multimeter.client.KeyBindings;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+
+import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -17,44 +18,43 @@ import redstone.multimeter.util.ColorUtils;
 import redstone.multimeter.util.TextUtils;
 
 public class MeterListRenderer extends AbstractElement {
-	
+
 	private static final int MARGIN = 3;
-	
+
 	private final MultimeterHud hud;
-	
+
 	private int cursorOriginRow;
 	private int cursorRow;
 	private Meter cursorMeter;
 	private int cursorOffsetX;
 	private int cursorOffsetY;
-	
+
 	public MeterListRenderer(MultimeterHud hud) {
 		super(0, 0, 0, 0);
-		
+
 		this.hud = hud;
-		
+
 		this.cursorOriginRow = -1;
 		this.cursorRow = -1;
 	}
-	
+
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY) {
-		matrices.push();
-		drawCursorMeter(matrices, mouseX, mouseY);
-		matrices.translate(0, 0, -1);
-		drawHighlights(matrices, mouseX, mouseY);
-		matrices.translate(0, 0, -1);
-		drawNames(matrices, mouseX, mouseY);
-		matrices.translate(0, 0, -1);
-		hud.renderer.renderRect(matrices, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		matrices.pop();
+	public void render(PoseStack poses, int mouseX, int mouseY) {
+		poses.pushPose();
+		drawCursorMeter(poses, mouseX, mouseY);
+		poses.translate(0, 0, -1);
+		drawHighlights(poses, mouseX, mouseY);
+		poses.translate(0, 0, -1);
+		drawNames(poses, mouseX, mouseY);
+		poses.translate(0, 0, -1);
+		hud.renderer.renderRect(poses, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
+		poses.popPose();
 	}
-	
+
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
-		
 	}
-	
+
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
@@ -65,7 +65,7 @@ public class MeterListRenderer extends AbstractElement {
 
 		return consumed || cursorOriginRow >= 0;
 	}
-	
+
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
@@ -86,7 +86,7 @@ public class MeterListRenderer extends AbstractElement {
 
 		return consumed;
 	}
-	
+
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		cursorRow = isHovered(mouseX, mouseY) ? hud.getHoveredRow(mouseY) : -1;
@@ -99,40 +99,38 @@ public class MeterListRenderer extends AbstractElement {
 
 		return false;
 	}
-	
+
 	@Override
 	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
 		return false;
 	}
-	
+
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
-	
+
 	@Override
 	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
-	
+
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
 		return false;
 	}
-	
+
 	@Override
 	public void onRemoved() {
-		
 	}
-	
+
 	@Override
 	public void tick() {
-		
 	}
-	
+
 	@Override
 	public Tooltip getTooltip(int mouseX, int mouseY) {
-		if (KeyBindings.OPEN_METER_CONTROLS.isNotBound() || cursorMeter != null) {
+		if (Keybinds.OPEN_METER_CONTROLS.isUnbound() || cursorMeter != null) {
 			return super.getTooltip(mouseX, mouseY);
 		}
 
@@ -142,17 +140,16 @@ public class MeterListRenderer extends AbstractElement {
 			return super.getTooltip(mouseX, mouseY);
 		}
 
-		return Tooltip.of(TextUtils.formatKeybindInfo(KeyBindings.OPEN_METER_CONTROLS));
+		return Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.OPEN_METER_CONTROLS));
 	}
-	
+
 	@Override
 	public void update() {
-		
 	}
-	
-	private void drawCursorMeter(MatrixStack matrices, int mouseX, int mouseY) {
+
+	private void drawCursorMeter(PoseStack poses, int mouseX, int mouseY) {
 		if (cursorMeter != null) {
-			matrices.push();
+			poses.pushPose();
 
 			int startX = mouseX + cursorOffsetX;
 			int startY = mouseY + cursorOffsetY;
@@ -162,17 +159,17 @@ public class MeterListRenderer extends AbstractElement {
 			int y = startY;
 
 			if (cursorOriginRow == hud.getSelectedRow()) {
-				drawHighlight(matrices, x, y, true);
+				drawHighlight(poses, x, y, true);
 
-				matrices.translate(0, 0, -0.1);
+				poses.translate(0, 0, -0.1);
 			}
 
 			x = startX + hud.settings.gridSize + 1;
-			y = startY + hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
+			y = startY + hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.lineHeight) / 2;
 
-			drawName(matrices, cursorMeter, x, y, ColorUtils.setAlpha(0xFFFFFF, alpha));
+			drawName(poses, cursorMeter, x, y, ColorUtils.setAlpha(0xFFFFFF, alpha));
 
-			matrices.translate(0, 0, -0.1);
+			poses.translate(0, 0, -0.1);
 
 			x = startX;
 			y = startY;
@@ -180,20 +177,20 @@ public class MeterListRenderer extends AbstractElement {
 			int h = hud.settings.rowHeight + 2 * hud.settings.gridSize;
 			int color = ColorUtils.setAlpha(hud.settings.colorBackground, alpha);
 
-			hud.renderer.renderRect(matrices, x, y, w, h, color);
+			hud.renderer.renderRect(poses, x, y, w, h, color);
 
-			matrices.pop();
+			poses.popPose();
 		}
 	}
-	
-	private void drawHighlights(MatrixStack matrices, int mouseX, int mouseY) {
+
+	private void drawHighlights(PoseStack poses, int mouseX, int mouseY) {
 		if (hud.isOnScreen()) {
 			if (cursorMeter == null && isHovered(mouseX, mouseY)) {
-				drawHighlight(matrices, hud.getHoveredRow(mouseY), false);
+				drawHighlight(poses, hud.getHoveredRow(mouseY), false);
 			}
-			
+
 			int selectedRow = hud.getSelectedRow();
-			
+
 			if ((cursorMeter == null || selectedRow != cursorOriginRow) && selectedRow >= 0) {
 				int highlightRow = selectedRow;
 
@@ -206,37 +203,37 @@ public class MeterListRenderer extends AbstractElement {
 					}
 				}
 
-				drawHighlight(matrices, highlightRow, true);
+				drawHighlight(poses, highlightRow, true);
 			}
 		}
 	}
-	
-	private void drawHighlight(MatrixStack matrices, int row, boolean selection) {
+
+	private void drawHighlight(PoseStack poses, int row, boolean selection) {
 		int x = 0;
 		int y = row * (hud.settings.rowHeight + hud.settings.gridSize);
 
-		drawHighlight(matrices, x, y, selection);
+		drawHighlight(poses, x, y, selection);
 	}
 
-	private void drawHighlight(MatrixStack matrices, int x, int y, boolean selection) {
+	private void drawHighlight(PoseStack poses, int x, int y, boolean selection) {
 		int width = getWidth() - hud.settings.gridSize;
 		int height = hud.settings.rowHeight + hud.settings.gridSize;
 		int color = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
 
-		hud.renderer.renderHighlight(matrices, x, y, width, height, color);
+		hud.renderer.renderHighlight(poses, x, y, width, height, color);
 	}
-	
-	private void drawNames(MatrixStack matrices, int mouseX, int mouseY) {
-		if (hud.settings.rowHeight < hud.font.fontHeight) {
+
+	private void drawNames(PoseStack poses, int mouseX, int mouseY) {
+		if (hud.settings.rowHeight < hud.font.lineHeight) {
 			return;
 		}
-		
+
 		int startX = hud.settings.gridSize + 1;
-		int startY = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.fontHeight) / 2;
-		
+		int startY = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.lineHeight) / 2;
+
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);
-			
+
 			if (meter != cursorMeter) {
 				int offset = index;
 
@@ -252,39 +249,39 @@ public class MeterListRenderer extends AbstractElement {
 				int x = startX;
 				int y = startY + offset * (hud.settings.rowHeight + hud.settings.gridSize);
 
-				drawName(matrices, meter, x, y, 0xFFFFFFFF);
+				drawName(poses, meter, x, y, 0xFFFFFFFF);
 			}
 		}
 	}
-	
-	private void drawName(MatrixStack matrices, Meter meter, int x, int y, int color) {
-		Text name = new LiteralText(meter.getName());
+
+	private void drawName(PoseStack poses, Meter meter, int x, int y, int color) {
+		Component name = new TextComponent(meter.getName());
 
 		if (meter.isHidden()) {
-			name.formatted(Formatting.GRAY, Formatting.ITALIC);
+			name.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
 		}
 
-		hud.renderer.renderText(matrices, name, x, y, color);
+		hud.renderer.renderText(poses, name, x, y, color);
 	}
-	
+
 	public void updateWidth() {
 		int width = 0;
-		
+
 		for (Meter meter : hud.meters) {
-			int nameWidth = hud.font.getStringWidth(meter.getName());
-			
+			int nameWidth = hud.font.width(meter.getName());
+
 			if (nameWidth > width) {
 				width = nameWidth;
 			}
 		}
-		
+
 		setWidth(width + MARGIN);
 	}
-	
+
 	public void updateHeight() {
 		setHeight(hud.meters.size() * (hud.settings.rowHeight + hud.settings.gridSize) + hud.settings.gridSize);
 	}
-	
+
 	private boolean changeMeterIndex(Meter meter, int oldIndex, int index) {
 		if (meter == null || oldIndex < 0 || index < 0) {
 			return false;
@@ -294,7 +291,7 @@ public class MeterListRenderer extends AbstractElement {
 		hud.meters.add(index, meter);
 
 		MeterIndexPacket packet = new MeterIndexPacket(meter.getId(), index);
-		hud.client.getPacketHandler().send(packet);
+		hud.client.sendPacket(packet);
 
 		return true;
 	}

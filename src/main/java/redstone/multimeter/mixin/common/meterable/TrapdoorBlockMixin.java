@@ -7,39 +7,38 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.TrapdoorBlock;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.block.MeterableBlock;
 
-@Mixin(TrapdoorBlock.class)
-public class TrapdoorBlockMixin implements MeterableBlock {
-	
+@Mixin(TrapDoorBlock.class)
+public class TrapDoorBlockMixin implements MeterableBlock {
+
 	@Inject(
-			method = "neighborUpdate",
-			locals = LocalCapture.CAPTURE_FAILHARD,
-			at = @At(
-					value = "FIELD",
-					ordinal = 0,
-					shift = Shift.BEFORE,
-					target = "Lnet/minecraft/block/TrapdoorBlock;POWERED:Lnet/minecraft/state/property/BooleanProperty;"
-			)
+		method = "neighborChanged",
+		locals = LocalCapture.CAPTURE_FAILHARD,
+		at = @At(
+			value = "FIELD",
+			ordinal = 0,
+			shift = Shift.BEFORE,
+			target = "Lnet/minecraft/world/level/block/TrapDoorBlock;POWERED:Lnet/minecraft/world/level/block/state/properties/BooleanProperty;"
+		)
 	)
-	private void onNeighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify, CallbackInfo ci, boolean powered) {
-		logPoweredRSMM(world, pos, powered);
+	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPos, CallbackInfo ci, boolean powered) {
+		rsmm$logPowered(level, pos, powered);
 	}
-	
+
 	@Override
-	public boolean logPoweredOnBlockUpdateRSMM() {
+	public boolean rsmm$logPoweredOnBlockUpdate() {
 		return false;
 	}
-	
+
 	@Override
-	public boolean isActiveRSMM(World world, BlockPos pos, BlockState state) {
-		return state.get(Properties.OPEN);
+	public boolean rsmm$isActive(Level world, BlockPos pos, BlockState state) {
+		return state.getValue(TrapDoorBlock.OPEN);
 	}
 }

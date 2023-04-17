@@ -1,7 +1,7 @@
 package redstone.multimeter.common.network.packets;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
@@ -13,7 +13,6 @@ public class MeterIndexPacket implements RSMMPacket {
 	private int index;
 
 	public MeterIndexPacket() {
-
 	}
 
 	public MeterIndexPacket(long id, int index) {
@@ -34,12 +33,11 @@ public class MeterIndexPacket implements RSMMPacket {
 	}
 
 	@Override
-	public void execute(MultimeterServer server, ServerPlayerEntity player) {
+	public void handle(MultimeterServer server, ServerPlayer player) {
 		server.getMultimeter().setMeterIndex(player, id, index);
 	}
 
 	@Override
-	public void execute(MultimeterClient client) {
-
+	public void handle(MultimeterClient client) {
 	}
 }
