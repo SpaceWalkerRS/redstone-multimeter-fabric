@@ -116,7 +116,7 @@ public class ServerChunkCacheMixin {
 		)
 	)
 	private void startTickTaskBroadcastChunks(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$startTickTask(false, TickTask.BROADCAST_CHUNKS);
+		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.BROADCAST_CHUNKS);
 	}
 
 	@Inject(
@@ -135,6 +135,6 @@ public class ServerChunkCacheMixin {
 		)
 	)
 	private void endTickTaskBroadcastChunks(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$endTickTask(false);
+		((TickTaskExecutor)level).rsmm$endTickTask();
 	}
 }
