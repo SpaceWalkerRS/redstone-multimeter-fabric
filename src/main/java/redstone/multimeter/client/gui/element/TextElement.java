@@ -40,8 +40,7 @@ public class TextElement extends AbstractElement {
 		this(client, x, y, updater, tooltipSupplier, textElement -> false);
 	}
 
-	public TextElement(MultimeterClient client, int x, int y, Consumer<TextElement> updater, Supplier<Tooltip> tooltipSupplier,
-		MousePress<TextElement> mousePress) {
+	public TextElement(MultimeterClient client, int x, int y, Consumer<TextElement> updater, Supplier<Tooltip> tooltipSupplier, MousePress<TextElement> mousePress) {
 		super(x, y, 0, 0);
 
 		Minecraft minecraft = client.getMinecraft();

@@ -252,7 +252,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void startTickTaskTickChunk(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$startTickTask(false, TickTask.TICK_CHUNK);
+		rsmm$startTickTask(TickTask.TICK_CHUNK);
 	}
 
 	@Inject(
@@ -264,7 +264,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void startTickTaskThunder(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$startTickTask(false, TickTask.THUNDER);
+		rsmm$startTickTask(TickTask.THUNDER);
 	}
 
 	@Inject(
@@ -276,7 +276,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void swapTickTaskPrecipitation(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$swapTickTask(false, TickTask.PRECIPITATION);
+		rsmm$swapTickTask(TickTask.PRECIPITATION);
 	}
 
 	@Inject(
@@ -288,7 +288,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void swapTickTaskRandomTicks(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$swapTickTask(false, TickTask.RANDOM_TICKS);
+		rsmm$swapTickTask(TickTask.RANDOM_TICKS);
 	}
 
 	@Inject(
@@ -310,8 +310,8 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void endTickTaskRandomTicksAndTickChunk(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$endTickTask(false);
-		rsmm$endTickTask(false);
+		rsmm$endTickTask();
+		rsmm$endTickTask();
 	}
 
 	@Inject(
