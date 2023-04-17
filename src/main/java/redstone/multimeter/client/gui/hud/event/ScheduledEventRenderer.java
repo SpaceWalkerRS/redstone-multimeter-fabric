@@ -6,31 +6,31 @@ import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.event.MeterEvent;
 
 public class ScheduledEventRenderer extends BasicEventRenderer {
-	
+
 	public ScheduledEventRenderer(MultimeterHud hud, EventType type) {
 		super(hud);
-		
+
 		this.setType(type);
 	}
-	
+
 	@Override
 	protected void drawEdges(int x, int y, Meter meter, MeterEvent event) {
 		if (scheduling(event)) {
 			if (hud.settings.columnWidth < 3) {
 				return;
 			}
-			
+
 			int width = hud.settings.columnWidth;
 			int half = hud.settings.rowHeight / 2;
 			int height = (2 * half < hud.settings.rowHeight) ? 5 : 6;
 			int color = edgeColorProvider.apply(meter, event);
-			
+
 			hud.renderer.renderRect(x, y + half - (height / 2), width, height, color);
 		} else {
 			super.drawEdges(x, y, meter, event);
 		}
 	}
-	
+
 	@Override
 	protected void drawCenter(int x, int y, Meter meter, MeterEvent event) {
 		if (scheduling(event)) {
@@ -39,14 +39,14 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 			int halfHeight = hud.settings.rowHeight / 2;
 			int height = (2 * halfHeight < hud.settings.rowHeight) ? 3 : 4;
 			int color = centerColorProvider.apply(meter, event);
-			
+
 			hud.renderer.renderRect(x + halfWidth - (width / 2), y + halfHeight - (height / 2), width, height, color);
 		} else {
 			super.drawCenter(x, y, meter, event);
 		}
 	}
-	
+
 	protected boolean scheduling(MeterEvent event) {
-		return (event.getMetadata() >> 30) == 1; 
+		return (event.getMetadata() >> 30) == 1;
 	}
 }

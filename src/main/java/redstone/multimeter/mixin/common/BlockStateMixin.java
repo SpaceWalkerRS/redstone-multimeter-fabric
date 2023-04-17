@@ -8,56 +8,56 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
-import redstone.multimeter.interfaces.mixin.IServerWorld;
+import redstone.multimeter.interfaces.mixin.IServerLevel;
 
 @Mixin(BlockState.class)
 public class BlockStateMixin {
-	
+
 	@Inject(
-			method = "onRandomTick",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "randomTick",
+		at = @At(
+			value = "HEAD"
+		)
 	)
-	private void onRandomTick(World world, BlockPos pos, Random random, CallbackInfo ci) {
-		if (!world.isClient()) {
-			((IServerWorld)world).getMultimeter().logRandomTick(world, pos);
+	private void logRandomTick(Level level, BlockPos pos, Random random, CallbackInfo ci) {
+		if (!level.isClientSide()) {
+			((IServerLevel)level).getMultimeter().logRandomTick(level, pos);
 		}
 	}
-	
+
 	@Inject(
-			method = "activate",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "use",
+		at = @At(
+			value = "HEAD"
+		)
 	)
-	private void onInteractBlock(World world, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
-		if (!world.isClient()) {
-			((IServerWorld)world).getMultimeter().logInteractBlock(world, hit.getBlockPos());
+	private void logInteractBlock(Level level, Player player, InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
+		if (!level.isClientSide()) {
+			((IServerLevel)level).getMultimeter().logInteractBlock(level, hit.getBlockPos());
 		}
 	}
-	
+
 	@Inject(
-			method = "getStateForNeighborUpdate",
-			at = @At(
-					value = "HEAD"
-			)
+		method = "updateShape",
+		at = @At(
+			value = "HEAD"
+		)
 	)
-	private void onShapeUpdate(Direction direction, BlockState neighborState, IWorld iworld, BlockPos pos, BlockPos neighborPos, CallbackInfoReturnable<BlockState> ci) {
-		if (iworld instanceof ServerWorld) {
-			ServerWorld world = (ServerWorld)iworld;
-			((IServerWorld)world).getMultimeter().logShapeUpdate(world, pos, direction);
+	private void logShapeUpdate(Direction dir, BlockState neighborState, LevelAccessor levelAccess, BlockPos pos, BlockPos neighborPos, CallbackInfoReturnable<BlockState> cir) {
+		if (levelAccess instanceof ServerLevel) {
+			ServerLevel level = (ServerLevel)levelAccess;
+			((IServerLevel)level).getMultimeter().logShapeUpdate(level, pos, dir);
 		}
 	}
 }

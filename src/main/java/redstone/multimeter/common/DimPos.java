@@ -1,115 +1,116 @@
 package redstone.multimeter.common;
 
+import com.google.common.base.Objects;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
 
 import redstone.multimeter.util.NbtUtils;
 
 public class DimPos {
-	
-	private final Identifier dimensionId;
-	private final BlockPos blockPos;
-	
-	public DimPos(Identifier dimensionId, BlockPos blockPos) {
-		this.dimensionId = dimensionId;
-		this.blockPos = blockPos.toImmutable();
+
+	private final ResourceLocation dimension;
+	private final BlockPos pos;
+
+	public DimPos(ResourceLocation dimension, BlockPos pos) {
+		this.dimension = dimension;
+		this.pos = pos.immutable();
 	}
-	
-	public DimPos(Identifier dimensionId, int x, int y, int z) {
-		this(dimensionId, new BlockPos(x, y, z));
+
+	public DimPos(ResourceLocation dimension, int x, int y, int z) {
+		this(dimension, new BlockPos(x, y, z));
 	}
-	
-	public DimPos(World world, BlockPos pos) {
-		this(DimensionType.getId(world.dimension.getType()), pos);
+
+	public DimPos(Level level, BlockPos pos) {
+		this(DimensionType.getName(level.dimension.getType()), pos);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof DimPos) {
-			DimPos pos = (DimPos)obj;
-			return pos.dimensionId.equals(dimensionId) && pos.blockPos.equals(blockPos);
+			DimPos other = (DimPos)obj;
+			return other.dimension.equals(dimension) && other.pos.equals(pos);
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
-		return blockPos.hashCode() + 31 * dimensionId.hashCode();
+		return Objects.hashCode(dimension, pos);
 	}
-	
+
 	@Override
 	public String toString() {
-		return String.format("%s[%d, %d, %d]", dimensionId.toString(), blockPos.getX(), blockPos.getY(), blockPos.getZ());
+		return String.format("%s[%d, %d, %d]", dimension.toString(), pos.getX(), pos.getY(), pos.getZ());
 	}
-	
-	public Identifier getDimensionId() {
-		return dimensionId;
+
+	public ResourceLocation getDimension() {
+		return dimension;
 	}
-	
-	public boolean isOf(World world) {
-		return DimensionType.getId(world.dimension.getType()).equals(dimensionId);
+
+	public boolean is(Level level) {
+		return DimensionType.getName(level.dimension.getType()).equals(dimension);
 	}
-	
-	public DimPos offset(Identifier dimensionId) {
-		return new DimPos(dimensionId, blockPos);
+
+	public DimPos relative(ResourceLocation dimension) {
+		return new DimPos(dimension, pos);
 	}
-	
+
 	public BlockPos getBlockPos() {
-		return blockPos;
+		return pos;
 	}
-	
-	public DimPos offset(Direction dir) {
-		return offset(dir, 1);
+
+	public boolean is(BlockPos pos) {
+		return pos.equals(this.pos);
 	}
-	
-	public DimPos offset(Direction dir, int distance) {
-		return new DimPos(dimensionId, blockPos.offset(dir, distance));
+
+	public DimPos relative(Direction dir) {
+		return relative(dir, 1);
 	}
-	
-	public DimPos offset(Axis axis) {
-		return offset(axis, 1);
+
+	public DimPos relative(Direction dir, int distance) {
+		return new DimPos(dimension, pos.relative(dir, distance));
 	}
-	
-	public DimPos offset(Axis axis, int distance) {
+
+	public DimPos relative(Axis axis) {
+		return relative(axis, 1);
+	}
+
+	public DimPos relative(Axis axis, int distance) {
 		int dx = axis.choose(distance, 0, 0);
 		int dy = axis.choose(0, distance, 0);
 		int dz = axis.choose(0, 0, distance);
-		
-		return offset(dx, dy, dz);
+
+		return new DimPos(dimension, pos.offset(dx, dy, dz));
 	}
-	
+
 	public DimPos offset(int dx, int dy, int dz) {
-		return new DimPos(dimensionId, blockPos.add(dx, dy, dz));
+		return new DimPos(dimension, pos.offset(dx, dy, dz));
 	}
-	
+
 	public CompoundTag toNbt() {
 		CompoundTag nbt = new CompoundTag();
-		
-		// The key is "world id" to match RSMM for 1.16+
-		// Keeping this key consistent between versions
-		// allows clients and servers of different versions
-		// to communicate effectively through the use of
-		// mods like ViaVersion or multiconnect
-		nbt.put("world id", NbtUtils.identifierToNbt(dimensionId));
-		nbt.putInt("x", blockPos.getX());
-		nbt.putInt("y", blockPos.getY());
-		nbt.putInt("z", blockPos.getZ());
-		
+
+		nbt.put("dim", NbtUtils.resourceLocationToNbt(dimension));
+		nbt.putInt("x", pos.getX());
+		nbt.putInt("y", pos.getY());
+		nbt.putInt("z", pos.getZ());
+
 		return nbt;
 	}
-	
+
 	public static DimPos fromNbt(CompoundTag nbt) {
-		Identifier dimensionId = NbtUtils.nbtToIdentifier(nbt.getCompound("world id"));
+		ResourceLocation dimension = NbtUtils.nbtToResourceLocation(nbt.getCompound("dim"));
 		int x = nbt.getInt("x");
 		int y = nbt.getInt("y");
 		int z = nbt.getInt("z");
-		
-		return new DimPos(dimensionId, x, y, z);
+
+		return new DimPos(dimension, x, y, z);
 	}
 }

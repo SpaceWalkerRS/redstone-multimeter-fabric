@@ -7,25 +7,25 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 
-import redstone.multimeter.interfaces.mixin.IMinecraftClient;
+import redstone.multimeter.interfaces.mixin.IMinecraft;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
-	
-	@Shadow @Final private MinecraftClient client;
-	
+
+	@Shadow @Final private Minecraft minecraft;
+
 	@Inject(
-			method = "renderCenter",
-			at = @At(
-					value = "INVOKE_STRING",
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-					args = "ldc=hand"
-			)
+		method = "render(FJ)V",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+			args = "ldc=hand"
+		)
 	)
-	private void renderMeters(float tickDelta, long endTime, CallbackInfo ci) {
-		((IMinecraftClient)client).getMultimeterClient().getMeterRenderer().renderMeters();
+	private void renderMeterHighlights(float partialTick, long timeNanos, CallbackInfo ci) {
+		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters();
 	}
 }

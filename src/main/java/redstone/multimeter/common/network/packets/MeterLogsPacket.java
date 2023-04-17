@@ -1,41 +1,41 @@
 package redstone.multimeter.common.network.packets;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.level.ServerPlayer;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.MultimeterServer;
+import redstone.multimeter.util.NbtUtils;
 
 public class MeterLogsPacket implements RSMMPacket {
-	
-	private CompoundTag logsData;
-	
+
+	private ListTag logsData;
+
 	public MeterLogsPacket() {
-		
 	}
-	
-	public MeterLogsPacket(CompoundTag data) {
-		this.logsData = data;
+
+	public MeterLogsPacket(ListTag logsData) {
+		this.logsData = logsData;
 	}
-	
+
 	@Override
 	public void encode(CompoundTag data) {
 		data.put("logs", logsData);
 	}
-	
+
 	@Override
 	public void decode(CompoundTag data) {
-		logsData = data.getCompound("logs");
+		logsData = data.getList("logs", NbtUtils.TYPE_COMPOUND);
 	}
-	
+
 	@Override
-	public void execute(MultimeterServer server, ServerPlayerEntity player) {
-		
+	public void handle(MultimeterServer server, ServerPlayer player) {
 	}
-	
+
 	@Override
-	public void execute(MultimeterClient client) {
+	public void handle(MultimeterClient client) {
 		client.getMeterGroup().getLogManager().updateMeterLogs(logsData);
 	}
 }
