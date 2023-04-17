@@ -116,7 +116,7 @@ public class ServerChunkCacheMixin {
 		)
 	)
 	private void startTickTaskBroadcastChunks(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$startTickTask(false, TickTask.BROADCAST_CHUNKS);
+		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.BROADCAST_CHUNKS);
 	}
 
 	@Inject(
@@ -135,7 +135,7 @@ public class ServerChunkCacheMixin {
 		)
 	)
 	private void endTickTaskBroadcastChunks(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$endTickTask(false);
+		((TickTaskExecutor)level).rsmm$endTickTask();
 	}
 
 	@Inject(
@@ -147,7 +147,7 @@ public class ServerChunkCacheMixin {
 		)
 	)
 	private void startTickTaskMobSpawning(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$startTickTask(false, TickTask.MOB_SPAWNING);
+		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.MOB_SPAWNING);
 	}
 
 	@Inject(
@@ -166,6 +166,6 @@ public class ServerChunkCacheMixin {
 		)
 	)
 	private void endTickTaskMobSpawning(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$endTickTask(false);
+		((TickTaskExecutor)level).rsmm$endTickTask();
 	}
 }
