@@ -31,13 +31,15 @@ import net.minecraft.world.ticks.LevelTicks;
 import net.minecraft.world.ticks.ScheduledTick;
 
 import redstone.multimeter.common.TickTask;
+import redstone.multimeter.interfaces.mixin.BlockEventListener;
 import redstone.multimeter.interfaces.mixin.ILevelTicks;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.interfaces.mixin.IServerLevel;
+import redstone.multimeter.interfaces.mixin.ScheduledTickListener;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(ServerLevel.class)
-public abstract class ServerLevelMixin extends Level implements IServerLevel {
+public abstract class ServerLevelMixin extends Level implements IServerLevel, ScheduledTickListener, BlockEventListener {
 
 	@Shadow @Final private MinecraftServer server;
 	@Shadow @Final private LevelTicks<Block> blockTicks;
@@ -61,18 +63,8 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void setScheduledTickListeners(CallbackInfo ci) {
-		((ILevelTicks)blockTicks).rsmm$setScheduleListener(scheduledTick -> {
-			getMultimeter().logScheduledTick(this, scheduledTick.pos(), scheduledTick.priority(), true);
-		});
-		((ILevelTicks)blockTicks).rsmm$setTickListener(scheduledTick -> {
-			this.rsmm$nextScheduledTick = scheduledTick;
-		});
-		((ILevelTicks)fluidTicks).rsmm$setScheduleListener(scheduledTick -> {
-			getMultimeter().logScheduledTick(this, scheduledTick.pos(), scheduledTick.priority(), true);
-		});
-		((ILevelTicks)fluidTicks).rsmm$setTickListener(scheduledTick -> {
-			this.rsmm$nextScheduledTick = scheduledTick;
-		});
+		((ILevelTicks)this.blockTicks).rsmm$setListener(this);
+		((ILevelTicks)this.fluidTicks).rsmm$setListener(this);
 	}
 
 	@Inject(
@@ -448,8 +440,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void onRunBlockEvents(CallbackInfo ci) {
-		rsmm$currentDepth = 0;
-		rsmm$currentBatch = blockEvents.size();
+		rsmm$startBlockEvents();
 	}
 
 	@Inject(
@@ -460,12 +451,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void onRunBlockEvent(CallbackInfo ci) {
-		if (rsmm$currentBatch == 0) {
-			rsmm$currentDepth++;
-			rsmm$currentBatch = blockEvents.size();
-		}
-
-		rsmm$currentBatch--;
+		rsmm$nextBlockEvent();
 	}
 
 	@Inject(
@@ -475,8 +461,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void postRunBlockEvents(CallbackInfo ci) {
-		rsmm$currentDepth = -1;
-		rsmm$currentBatch = 0;
+		rsmm$endBlockEvents();
 	}
 
 	@Inject(
@@ -493,6 +478,41 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 	@Override
 	public MultimeterServer getMultimeterServer() {
 		return ((IMinecraftServer)server).getMultimeterServer();
+	}
+
+	@Override
+	public void rsmm$scheduleTick(ScheduledTick<?> scheduledTick) {
+		getMultimeter().logScheduledTick(this, scheduledTick.pos(), scheduledTick.priority(), true);
+	}
+
+	@Override
+	public void rsmm$runTick(ScheduledTick<?> scheduledTick) {
+		// there is an extra check for the correct block/fluid state
+		// that is run after this method is called, so we cache this
+		// scheduled tick and log it if that check is successful
+		rsmm$nextScheduledTick = scheduledTick;
+	}
+
+	@Override
+	public void rsmm$startBlockEvents() {
+		rsmm$currentDepth = 0;
+		rsmm$currentBatch = blockEvents.size();
+	}
+
+	@Override
+	public void rsmm$nextBlockEvent() {
+		if (rsmm$currentBatch == 0) {
+			rsmm$currentDepth++;
+			rsmm$currentBatch = blockEvents.size();
+		}
+
+		rsmm$currentBatch--;
+	}
+
+	@Override
+	public void rsmm$endBlockEvents() {
+		rsmm$currentDepth = -1;
+		rsmm$currentBatch = 0;
 	}
 
 	private void rsmm$logNextScheduledTick() {
