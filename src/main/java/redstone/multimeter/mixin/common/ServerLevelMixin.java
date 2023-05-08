@@ -31,12 +31,13 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.WritableLevelData;
 
 import redstone.multimeter.common.TickTask;
+import redstone.multimeter.interfaces.mixin.BlockEventListener;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.interfaces.mixin.IServerLevel;
 import redstone.multimeter.server.MultimeterServer;
 
 @Mixin(ServerLevel.class)
-public abstract class ServerLevelMixin extends Level implements IServerLevel {
+public abstract class ServerLevelMixin extends Level implements IServerLevel, BlockEventListener {
 
 	@Shadow @Final private MinecraftServer server;
 	@Shadow @Final private ObjectLinkedOpenHashSet<BlockEventData> blockEvents;
@@ -421,8 +422,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void onRunBlockEvents(CallbackInfo ci) {
-		rsmm$currentDepth = 0;
-		rsmm$currentBatch = blockEvents.size();
+		rsmm$startBlockEvents();
 	}
 
 	@Inject(
@@ -433,12 +433,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void onRunBlockEvent(CallbackInfo ci) {
-		if (rsmm$currentBatch == 0) {
-			rsmm$currentDepth++;
-			rsmm$currentBatch = blockEvents.size();
-		}
-
-		rsmm$currentBatch--;
+		rsmm$nextBlockEvent();
 	}
 
 	@Inject(
@@ -448,8 +443,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 		)
 	)
 	private void postRunBlockEvents(CallbackInfo ci) {
-		rsmm$currentDepth = -1;
-		rsmm$currentBatch = 0;
+		rsmm$endBlockEvents();
 	}
 
 	@Inject(
@@ -466,5 +460,27 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel {
 	@Override
 	public MultimeterServer getMultimeterServer() {
 		return ((IMinecraftServer)server).getMultimeterServer();
+	}
+
+	@Override
+	public void rsmm$startBlockEvents() {
+		rsmm$currentDepth = 0;
+		rsmm$currentBatch = blockEvents.size();
+	}
+
+	@Override
+	public void rsmm$nextBlockEvent() {
+		if (rsmm$currentBatch == 0) {
+			rsmm$currentDepth++;
+			rsmm$currentBatch = blockEvents.size();
+		}
+
+		rsmm$currentBatch--;
+	}
+
+	@Override
+	public void rsmm$endBlockEvents() {
+		rsmm$currentDepth = -1;
+		rsmm$currentBatch = 0;
 	}
 }
