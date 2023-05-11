@@ -31,7 +31,7 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "reloadResourcePacks(Z)Ljava/util/concurrent/CompletableFuture;",
+		method = "reloadResourcePacks()Ljava/util/concurrent/CompletableFuture;",
 		at = @At(
 			value = "HEAD"
 		)
