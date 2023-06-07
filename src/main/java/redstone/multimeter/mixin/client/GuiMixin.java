@@ -8,10 +8,9 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -27,15 +26,15 @@ public class GuiMixin {
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.AFTER,
-			target = "Lnet/minecraft/client/gui/Gui;renderEffects(Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+			target = "Lnet/minecraft/client/gui/Gui;renderEffects(Lnet/minecraft/client/gui/GuiGraphics;)V"
 		)
 	)
-	private void renderHud(PoseStack poses, float partialTick, CallbackInfo ci) {
+	private void renderHud(GuiGraphics graphics, float partialTick, CallbackInfo ci) {
 		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
 		MultimeterHud hud = client.getHud();
 
 		if (client.isHudActive() && !hud.isOnScreen()) {
-			hud.render(poses);
+			hud.render(graphics);
 		}
 	}
 }

@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.SignalGetter;
 import net.minecraft.world.level.block.piston.PistonBaseBlock;
 import net.minecraft.world.level.block.piston.PistonStructureResolver;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,7 +26,7 @@ import redstone.multimeter.server.Multimeter;
 @Mixin(PistonBaseBlock.class)
 public class PistonBaseBlockMixin implements MeterableBlock {
 
-	@Shadow private boolean getNeighborSignal(Level level, BlockPos pos, Direction facing) { return false; }
+	@Shadow private boolean getNeighborSignal(SignalGetter level, BlockPos pos, Direction facing) { return false; }
 
 	@Inject(
 		method = "getNeighborSignal",
@@ -33,8 +34,10 @@ public class PistonBaseBlockMixin implements MeterableBlock {
 			value = "RETURN"
 		)
 	)
-	private void logPowered(Level level, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
-		rsmm$logPowered(level, pos, cir.getReturnValue());
+	private void logPowered(SignalGetter level, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
+		if (level instanceof Level) {
+			rsmm$logPowered((Level)level, pos, cir.getReturnValue());
+		}
 	}
 
 	@Inject(

@@ -8,7 +8,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.Predicate;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
@@ -53,20 +53,20 @@ public class SimpleListElement extends AbstractParentElement {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (shouldUpdateHovered) {
 			updateHoveredElement(mouseX, mouseY);
 			shouldUpdateHovered = false;
 		}
 
 		if (drawBackground) {
-			drawBackground(poses);
+			drawBackground(graphics);
 		}
 
-		renderList(poses, mouseX, mouseY);
+		renderList(graphics, mouseX, mouseY);
 
 		if (drawBackground) {
-			drawBorders(poses);
+			drawBorders(graphics);
 		}
 	}
 
@@ -99,7 +99,7 @@ public class SimpleListElement extends AbstractParentElement {
 		updateContentY();
 	}
 
-	protected void drawBackground(PoseStack poses) {
+	protected void drawBackground(GuiGraphics graphics) {
 		int x0 = getX();
 		int y0 = getY() + topBorder;
 		int x1 = getX() + getWidth();
@@ -112,10 +112,10 @@ public class SimpleListElement extends AbstractParentElement {
 		int tx1 = x1 / 2;
 		int ty1 = (y1 - offsetY) / 2;
 
-		renderTextureColor(poses, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x20, 0x20, 0x20);
+		renderTextureColor(graphics, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x20, 0x20, 0x20);
 	}
 
-	protected void renderList(PoseStack poses, int mouseX, int mouseY) {
+	protected void renderList(GuiGraphics graphics, int mouseX, int mouseY) {
 		List<Element> children = getChildren();
 
 		for (int index = 0; index < children.size(); index++) {
@@ -129,16 +129,16 @@ public class SimpleListElement extends AbstractParentElement {
 			}
 
 			if (element.isVisible()) {
-				renderElement(element, poses, mouseX, mouseY);
+				renderElement(element, graphics, mouseX, mouseY);
 			}
 		}
 	}
 
-	protected void renderElement(Element element, PoseStack poses, int mouseX, int mouseY) {
-		element.render(poses, mouseX, mouseY);
+	protected void renderElement(Element element, GuiGraphics graphics, int mouseX, int mouseY) {
+		element.render(graphics, mouseX, mouseY);
 	}
 
-	protected void drawBorders(PoseStack poses) {
+	protected void drawBorders(GuiGraphics graphics) {
 		boolean renderTop = topBorder > 0;
 		boolean renderBottom = bottomBorder > 0;
 
@@ -166,8 +166,8 @@ public class SimpleListElement extends AbstractParentElement {
 			ty0 = y0 / 2;
 			ty1 = y1 / 2;
 
-			renderTextureColor(poses, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
-			renderGradient(poses, x0, y1, width, 4, 0xFF000000, 0x00000000);
+			renderTextureColor(graphics, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
+			renderGradient(graphics, x0, y1, width, 4, 0xFF000000, 0x00000000);
 		}
 		if (renderBottom) {
 			y0 = maxY;
@@ -176,8 +176,8 @@ public class SimpleListElement extends AbstractParentElement {
 			ty0 = y0 / 2;
 			ty1 = y1 / 2;
 
-			renderTextureColor(poses, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
-			renderGradient(poses, x0, y0 - 4, width, 4, 0x00000000, 0xFF000000);
+			renderTextureColor(graphics, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
+			renderGradient(graphics, x0, y0 - 4, width, 4, 0x00000000, 0xFF000000);
 		}
 	}
 

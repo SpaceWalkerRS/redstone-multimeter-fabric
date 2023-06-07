@@ -9,8 +9,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -73,10 +75,12 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (!hasContent()) {
 			return;
 		}
+
+		PoseStack poses = graphics.pose();
 
 		poses.pushPose();
 		poses.translate(0, 0, 100);
@@ -87,7 +91,7 @@ public class MultimeterHud extends AbstractParentElement {
 			Element child = children.get(index);
 
 			if (child.isVisible()) {
-				renderer.render(child, poses, mouseX, mouseY);
+				renderer.render(child, graphics, mouseX, mouseY);
 			}
 		}
 
@@ -350,8 +354,8 @@ public class MultimeterHud extends AbstractParentElement {
 		}
 	}
 
-	public void render(PoseStack poses) {
-		render(poses, -1, -1);
+	public void render(GuiGraphics graphics) {
+		render(graphics, -1, -1);
 	}
 
 	public float getScreenPosX() {

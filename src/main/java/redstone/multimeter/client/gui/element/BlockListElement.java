@@ -4,11 +4,9 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +19,6 @@ import redstone.multimeter.util.TextUtils;
 
 public class BlockListElement extends SelectableScrollableListElement {
 
-	private final ItemRenderer itemRenderer;
 	private final Font font;
 	private final Consumer<ResourceLocation> selectionListener;
 
@@ -34,7 +31,6 @@ public class BlockListElement extends SelectableScrollableListElement {
 
 		Minecraft minecraft = this.client.getMinecraft();
 
-		this.itemRenderer = minecraft.getItemRenderer();
 		this.font = minecraft.font;
 		this.selectionListener = selectionListener;
 
@@ -101,18 +97,18 @@ public class BlockListElement extends SelectableScrollableListElement {
 		}
 
 		@Override
-		public void render(PoseStack poses, int mouseX, int mouseY) {
+		public void render(GuiGraphics graphics, int mouseX, int mouseY) {
 			int height = getHeight();
 			int x = getX() + 2;
 			int y = getY() + (height - 16) / 2;
 
-			itemRenderer.renderGuiItem(poses, stack, x, y);
+			graphics.renderFakeItem(stack, x, y);
 
 			x = getX() + 22;
 			y = getY() + height - (height + font.lineHeight) / 2;
 			String text = font.plainSubstrByWidth(key.toString(), getWidth() - 22);
 
-			renderText(font, poses, text, x, y, true, 0xFFFFFFFF);
+			renderText(font, graphics, text, x, y, true, 0xFFFFFFFF);
 		}
 
 		@Override

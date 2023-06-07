@@ -2,7 +2,7 @@ package redstone.multimeter.client.gui.element;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;
@@ -32,8 +32,8 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 
 	@Override
-	protected void renderList(PoseStack poses, int mouseX, int mouseY) {
-		super.renderList(poses, mouseX, mouseY);
+	protected void renderList(GuiGraphics graphics, int mouseX, int mouseY) {
+		super.renderList(graphics, mouseX, mouseY);
 
 		if (getMaxScrollAmount() > 0.0D) {
 			if (scrollMode == ScrollMode.PULL) {
@@ -50,7 +50,7 @@ public class ScrollableListElement extends SimpleListElement {
 				}
 			}
 
-			renderScrollBar(poses, isHovered(mouseX, mouseY));
+			renderScrollBar(graphics, isHovered(mouseX, mouseY));
 		}
 	}
 
@@ -219,8 +219,8 @@ public class ScrollableListElement extends SimpleListElement {
 		}
 	}
 
-	protected void renderScrollBar(PoseStack poses, boolean dark) {
-		renderRect(poses, scrollBarX, scrollBarY, scrollBarWidth, scrollBarHeight, 0xFF000000); // background
+	protected void renderScrollBar(GuiGraphics graphics, boolean dark) {
+		renderRect(graphics, scrollBarX, scrollBarY, scrollBarWidth, scrollBarHeight, 0xFF000000); // background
 
 		int visibleHeight = height;
 		int totalHeight = visibleHeight + (int)getMaxScrollAmount();
@@ -233,8 +233,8 @@ public class ScrollableListElement extends SimpleListElement {
 		int color0 = dark ? 0xFF555555 : 0xFF777777;
 		int color1 = dark ? 0xFF999999 : 0xFFBBBBBB;
 
-		renderRect(poses, x, y, width, height, color0);
-		renderRect(poses, x, y, width - 1, height - 1, color1);
+		renderRect(graphics, x, y, width, height, color0);
+		renderRect(graphics, x, y, width - 1, height - 1, color1);
 	}
 
 	protected enum ScrollMode {

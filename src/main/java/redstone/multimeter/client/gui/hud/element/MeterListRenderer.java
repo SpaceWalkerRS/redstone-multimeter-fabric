@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -39,15 +40,17 @@ public class MeterListRenderer extends AbstractElement {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+		PoseStack poses = graphics.pose();
+
 		poses.pushPose();
-		drawCursorMeter(poses, mouseX, mouseY);
+		drawCursorMeter(graphics, mouseX, mouseY);
 		poses.translate(0, 0, -1);
-		drawHighlights(poses, mouseX, mouseY);
+		drawHighlights(graphics, mouseX, mouseY);
 		poses.translate(0, 0, -1);
-		drawNames(poses, mouseX, mouseY);
+		drawNames(graphics, mouseX, mouseY);
 		poses.translate(0, 0, -1);
-		hud.renderer.renderRect(poses, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
+		hud.renderer.renderRect(graphics, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
 		poses.popPose();
 	}
 
@@ -147,8 +150,10 @@ public class MeterListRenderer extends AbstractElement {
 	public void update() {
 	}
 
-	private void drawCursorMeter(PoseStack poses, int mouseX, int mouseY) {
+	private void drawCursorMeter(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (cursorMeter != null) {
+			PoseStack poses = graphics.pose();
+
 			poses.pushPose();
 
 			int startX = mouseX + cursorOffsetX;
@@ -159,7 +164,7 @@ public class MeterListRenderer extends AbstractElement {
 			int y = startY;
 
 			if (cursorOriginRow == hud.getSelectedRow()) {
-				drawHighlight(poses, x, y, true);
+				drawHighlight(graphics, x, y, true);
 
 				poses.translate(0, 0, -0.1);
 			}
@@ -167,7 +172,7 @@ public class MeterListRenderer extends AbstractElement {
 			x = startX + hud.settings.gridSize + 1;
 			y = startY + hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.lineHeight) / 2;
 
-			drawName(poses, cursorMeter, x, y, ColorUtils.setAlpha(0xFFFFFF, alpha));
+			drawName(graphics, cursorMeter, x, y, ColorUtils.setAlpha(0xFFFFFF, alpha));
 
 			poses.translate(0, 0, -0.1);
 
@@ -177,16 +182,16 @@ public class MeterListRenderer extends AbstractElement {
 			int h = hud.settings.rowHeight + 2 * hud.settings.gridSize;
 			int color = ColorUtils.setAlpha(hud.settings.colorBackground, alpha);
 
-			hud.renderer.renderRect(poses, x, y, w, h, color);
+			hud.renderer.renderRect(graphics, x, y, w, h, color);
 
 			poses.popPose();
 		}
 	}
 
-	private void drawHighlights(PoseStack poses, int mouseX, int mouseY) {
+	private void drawHighlights(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (hud.isOnScreen()) {
 			if (cursorMeter == null && isHovered(mouseX, mouseY)) {
-				drawHighlight(poses, hud.getHoveredRow(mouseY), false);
+				drawHighlight(graphics, hud.getHoveredRow(mouseY), false);
 			}
 
 			int selectedRow = hud.getSelectedRow();
@@ -203,27 +208,27 @@ public class MeterListRenderer extends AbstractElement {
 					}
 				}
 
-				drawHighlight(poses, highlightRow, true);
+				drawHighlight(graphics, highlightRow, true);
 			}
 		}
 	}
 
-	private void drawHighlight(PoseStack poses, int row, boolean selection) {
+	private void drawHighlight(GuiGraphics graphics, int row, boolean selection) {
 		int x = 0;
 		int y = row * (hud.settings.rowHeight + hud.settings.gridSize);
 
-		drawHighlight(poses, x, y, selection);
+		drawHighlight(graphics, x, y, selection);
 	}
 
-	private void drawHighlight(PoseStack poses, int x, int y, boolean selection) {
+	private void drawHighlight(GuiGraphics graphics, int x, int y, boolean selection) {
 		int width = getWidth() - hud.settings.gridSize;
 		int height = hud.settings.rowHeight + hud.settings.gridSize;
 		int color = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
 
-		hud.renderer.renderHighlight(poses, x, y, width, height, color);
+		hud.renderer.renderHighlight(graphics, x, y, width, height, color);
 	}
 
-	private void drawNames(PoseStack poses, int mouseX, int mouseY) {
+	private void drawNames(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (hud.settings.rowHeight < hud.font.lineHeight) {
 			return;
 		}
@@ -249,19 +254,19 @@ public class MeterListRenderer extends AbstractElement {
 				int x = startX;
 				int y = startY + offset * (hud.settings.rowHeight + hud.settings.gridSize);
 
-				drawName(poses, meter, x, y, 0xFFFFFFFF);
+				drawName(graphics, meter, x, y, 0xFFFFFFFF);
 			}
 		}
 	}
 
-	private void drawName(PoseStack poses, Meter meter, int x, int y, int color) {
+	private void drawName(GuiGraphics graphics, Meter meter, int x, int y, int color) {
 		MutableComponent name = Component.literal(meter.getName());
 
 		if (meter.isHidden()) {
 			name.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
 		}
 
-		hud.renderer.renderText(poses, name, x, y, color);
+		hud.renderer.renderText(graphics, name, x, y, color);
 	}
 
 	public void updateWidth() {

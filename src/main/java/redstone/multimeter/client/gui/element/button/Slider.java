@@ -5,8 +5,7 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
@@ -104,8 +103,8 @@ public class Slider extends AbstractButton {
 	}
 
 	@Override
-	protected void renderButton(PoseStack poses) {
-		super.renderButton(poses);
+	protected void renderButton(GuiGraphics graphics) {
+		super.renderButton(graphics);
 
 		TextureRegion texture = getButtonTexture();
 		int x = getX() + getSliderX();
@@ -113,7 +112,7 @@ public class Slider extends AbstractButton {
 		int width = SLIDER_WIDTH;
 		int height = getHeight();
 
-		drawTexturedButton(poses, texture, x, y, width, height);
+		drawTexturedButton(graphics, texture, x, y, width, height);
 	}
 
 	@Override

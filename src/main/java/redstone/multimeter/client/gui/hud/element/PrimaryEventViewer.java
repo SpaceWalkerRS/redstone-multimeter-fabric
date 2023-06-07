@@ -4,6 +4,8 @@ import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.gui.GuiGraphics;
+
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.hud.Directionality;
@@ -98,15 +100,17 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	protected void drawHighlights(PoseStack poses, int mouseX, int mouseY) {
+	protected void drawHighlights(GuiGraphics graphics, int mouseX, int mouseY) {
+		PoseStack poses = graphics.pose();
+
 		poses.pushPose();
 
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
 			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
-				drawHighlight(poses, getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
+				drawHighlight(graphics, getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
 			}
 
-			drawHighlight(poses, Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
+			drawHighlight(graphics, Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
 		}
 
 		poses.translate(0, 0, -0.1);
@@ -116,7 +120,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			int column = hud.getColumn(tick);
 
 			if (column >= 0) {
-				drawHighlight(poses, column, 1, 0, hud.meters.size(), hud.settings.colorHighlightTickMarker);
+				drawHighlight(graphics, column, 1, 0, hud.meters.size(), hud.settings.colorHighlightTickMarker);
 			}
 		}
 
@@ -124,7 +128,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	protected void drawDecorators(PoseStack poses) {
+	protected void drawDecorators(GuiGraphics graphics) {
 		if (hud.settings.rowHeight < hud.font.lineHeight) {
 			return;
 		}
@@ -133,17 +137,17 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		long currentTick = hud.client.getPrevGameTime() + 1;
 
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderPulseLengths(poses, x, y, firstTick, currentTick, meter);
+			hud.eventRenderers.renderPulseLengths(graphics, x, y, firstTick, currentTick, meter);
 		});
 	}
 
 	@Override
-	protected void drawMeterEvents(PoseStack poses) {
+	protected void drawMeterEvents(GuiGraphics graphics) {
 		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
 		long lastTick = hud.client.getPrevGameTime() + 1;
 
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderTickLogs(poses, x, y, firstTick, lastTick, meter);
+			hud.eventRenderers.renderTickLogs(graphics, x, y, firstTick, lastTick, meter);
 		});
 	}
 

@@ -115,7 +115,7 @@ public class PlayerList {
 	}
 
 	public void send(RSMMPacket packet, ResourceKey<Level> dimension) {
-		send(packet, player -> player.level.dimension() == dimension);
+		send(packet, player -> player.level().dimension() == dimension);
 	}
 
 	public void send(RSMMPacket packet, Predicate<ServerPlayer> predicate) {

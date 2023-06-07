@@ -6,6 +6,8 @@ import java.util.function.Consumer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.gui.GuiGraphics;
+
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
@@ -41,19 +43,21 @@ public class MeterEventRenderDispatcher {
 		return eventRenderer;
 	}
 
-	public void renderTickLogs(PoseStack poses, int x, int y, long firstTick, long lastTick, Meter meter) {
-		renderMeterEvents(poses, meter, renderer -> renderer.renderTickLogs(poses, x, y, firstTick, lastTick, meter));
+	public void renderTickLogs(GuiGraphics graphics, int x, int y, long firstTick, long lastTick, Meter meter) {
+		renderMeterEvents(graphics, meter, renderer -> renderer.renderTickLogs(graphics, x, y, firstTick, lastTick, meter));
 	}
 
-	public void renderPulseLengths(PoseStack poses, int x, int y, long firstTick, long lastTick, Meter meter) {
-		renderMeterEvents(poses, meter, renderer -> renderer.renderPulseLengths(poses, x, y, firstTick, lastTick, meter));
+	public void renderPulseLengths(GuiGraphics graphics, int x, int y, long firstTick, long lastTick, Meter meter) {
+		renderMeterEvents(graphics, meter, renderer -> renderer.renderPulseLengths(graphics, x, y, firstTick, lastTick, meter));
 	}
 
-	public void renderSubtickLogs(PoseStack poses, int x, int y, long tick, int subTickCount, Meter meter) {
-		renderMeterEvents(poses, meter, renderer -> renderer.renderSubtickLogs(poses, x, y, tick, subTickCount, meter));
+	public void renderSubtickLogs(GuiGraphics graphics, int x, int y, long tick, int subTickCount, Meter meter) {
+		renderMeterEvents(graphics, meter, renderer -> renderer.renderSubtickLogs(graphics, x, y, tick, subTickCount, meter));
 	}
 
-	private void renderMeterEvents(PoseStack poses, Meter meter, Consumer<MeterEventRenderer> consumer) {
+	private void renderMeterEvents(GuiGraphics graphics, Meter meter, Consumer<MeterEventRenderer> consumer) {
+		PoseStack poses = graphics.pose();
+
 		poses.pushPose();
 
 		for (int index = EventType.ALL.length - 1; index >= 0; index--) {

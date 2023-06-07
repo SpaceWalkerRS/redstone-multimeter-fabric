@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -15,9 +15,9 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (hud.isPaused() && getColumnCount() > 0) {
-			super.render(poses, mouseX, mouseY);
+			super.render(graphics, mouseX, mouseY);
 		}
 	}
 
@@ -41,27 +41,27 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	protected void drawHighlights(PoseStack poses, int mouseX, int mouseY) {
+	protected void drawHighlights(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (isHovered(mouseX, mouseY)) {
 			int column = getHoveredColumn(mouseX);
 			int row = hud.getHoveredRow(mouseY);
 
-			drawHighlight(poses, column, 1, row, 1, false);
+			drawHighlight(graphics, column, 1, row, 1, false);
 		}
 	}
 
 	@Override
-	protected void drawDecorators(PoseStack poses) {
+	protected void drawDecorators(GuiGraphics graphics) {
 
 	}
 
 	@Override
-	protected void drawMeterEvents(PoseStack poses) {
+	protected void drawMeterEvents(GuiGraphics graphics) {
 		long tick = hud.getSelectedTick();
 		int subticks = hud.client.getMeterGroup().getLogManager().getSubtickCount(tick);
 
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderSubtickLogs(poses, x, y, tick, subticks, meter);
+			hud.eventRenderers.renderSubtickLogs(graphics, x, y, tick, subticks, meter);
 		});
 	}
 

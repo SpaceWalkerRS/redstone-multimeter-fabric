@@ -1,7 +1,6 @@
 package redstone.multimeter.client.gui.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -56,9 +55,9 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 
 	@Override
-	protected void renderContent(PoseStack poses, int mouseX, int mouseY) {
+	protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (client.getHud().hasContent()) {
-			super.renderContent(poses, mouseX, mouseY);
+			super.renderContent(graphics, mouseX, mouseY);
 		} else {
 			String text;
 
@@ -73,7 +72,7 @@ public class MultimeterScreen extends RSMMScreen {
 			int x = getX() + (getWidth() - textWidth) / 2;
 			int y = getY() + (getHeight() - textHeight) / 2;
 
-			renderText(font, poses, text, x, y, true, 0xFFFFFFFF);
+			renderText(font, graphics, text, x, y, true, 0xFFFFFFFF);
 		}
 	}
 }

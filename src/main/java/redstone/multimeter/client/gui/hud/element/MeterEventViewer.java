@@ -2,6 +2,8 @@ package redstone.multimeter.client.gui.hud.element;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.gui.GuiGraphics;
+
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -18,17 +20,19 @@ public abstract class MeterEventViewer extends AbstractElement {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+		PoseStack poses = graphics.pose();
+
 		poses.pushPose();
-		drawHighlights(poses, mouseX, mouseY);
+		drawHighlights(graphics, mouseX, mouseY);
 		poses.translate(0, 0, -1);
-		drawDecorators(poses);
+		drawDecorators(graphics);
 		poses.translate(0, 0, -1);
-		drawMeterEvents(poses);
+		drawMeterEvents(graphics);
 		poses.translate(0, 0, -1);
-		drawGridLines(poses);
+		drawGridLines(graphics);
 		poses.translate(0, 0, -1);
-		hud.renderer.renderRect(poses, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
+		hud.renderer.renderRect(graphics, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
 		poses.popPose();
 	}
 
@@ -85,14 +89,14 @@ public abstract class MeterEventViewer extends AbstractElement {
 		}
 	}
 
-	protected abstract void drawHighlights(PoseStack poses, int mouseX, int mouseY);
+	protected abstract void drawHighlights(GuiGraphics graphics, int mouseX, int mouseY);
 
-	protected void drawHighlight(PoseStack poses, int column, int columnCount, int row, int rowCount, boolean selection) {
+	protected void drawHighlight(GuiGraphics graphics, int column, int columnCount, int row, int rowCount, boolean selection) {
 		int color = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
-		drawHighlight(poses, column, columnCount, row, rowCount, color);
+		drawHighlight(graphics, column, columnCount, row, rowCount, color);
 	}
 
-	protected void drawHighlight(PoseStack poses, int column, int columnCount, int row, int rowCount, int color) {
+	protected void drawHighlight(GuiGraphics graphics, int column, int columnCount, int row, int rowCount, int color) {
 		int w = hud.settings.columnWidth + hud.settings.gridSize;
 		int h = hud.settings.rowHeight + hud.settings.gridSize;
 		int x = column * w;
@@ -100,14 +104,16 @@ public abstract class MeterEventViewer extends AbstractElement {
 		int width = columnCount * w;
 		int height = rowCount * h;
 
-		hud.renderer.renderHighlight(poses, x, y, width, height, color);
+		hud.renderer.renderHighlight(graphics, x, y, width, height, color);
 	}
 
-	protected abstract void drawDecorators(PoseStack poses);
+	protected abstract void drawDecorators(GuiGraphics graphics);
 
-	protected abstract void drawMeterEvents(PoseStack poses);
+	protected abstract void drawMeterEvents(GuiGraphics graphics);
 
-	private void drawGridLines(PoseStack poses) {
+	private void drawGridLines(GuiGraphics graphics) {
+		PoseStack poses = graphics.pose();
+
 		poses.pushPose();
 
 		int columns = getColumnCount();
@@ -128,7 +134,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			lineHeight = getHeight() - 2 * hud.settings.gridSize;
 			color = hud.settings.colorGridMarker;
 
-			hud.renderer.renderRect(poses, lineX, lineY, lineWidth, lineHeight, color);
+			hud.renderer.renderRect(graphics, lineX, lineY, lineWidth, lineHeight, color);
 		}
 
 		poses.translate(0, 0, -0.1);
@@ -141,7 +147,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			lineHeight = hud.settings.gridSize;
 			color = hud.settings.colorGridMain;
 
-			hud.renderer.renderRect(poses, lineX, lineY, lineWidth, lineHeight, color);
+			hud.renderer.renderRect(graphics, lineX, lineY, lineWidth, lineHeight, color);
 		}
 
 		poses.translate(0, 0, -0.1);
@@ -154,7 +160,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			lineHeight = getHeight();
 			color = (i > 0 && i < columns && i % 5 == 0) ? hud.settings.colorGridInterval : hud.settings.colorGridMain;
 
-			hud.renderer.renderRect(poses, lineX, lineY, lineWidth, lineHeight, color);
+			hud.renderer.renderRect(graphics, lineX, lineY, lineWidth, lineHeight, color);
 		}
 
 		poses.popPose();

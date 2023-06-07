@@ -10,13 +10,13 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -83,7 +83,7 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (selection == SelectType.MOUSE) {
 			if (mouseX < textX) {
 				moveCursor(-1);
@@ -92,7 +92,7 @@ public class TextField extends AbstractButton {
 			}
 		}
 
-		super.render(poses, mouseX, mouseY);
+		super.render(graphics, mouseX, mouseY);
 	}
 
 	@Override
@@ -306,7 +306,7 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	protected void renderButton(PoseStack poses) {
+	protected void renderButton(GuiGraphics graphics) {
 		int x = getX();
 		int y = getY();
 		int width = getWidth();
@@ -314,36 +314,36 @@ public class TextField extends AbstractButton {
 		int borderColor = getBorderColor();
 		int backgroundColor = 0xFF000000;
 
-		renderRect(poses, (bufferBuilder, pose) -> {
+		renderRect(graphics, (bufferBuilder, pose) -> {
 			drawRect(bufferBuilder, pose, x, y, width, height, borderColor);
 			drawRect(bufferBuilder, pose, x + 1, y + 1, width - 2, height - 2, backgroundColor);
 		});
 	}
 
 	@Override
-	protected void renderButtonMessage(PoseStack poses) {
+	protected void renderButtonMessage(GuiGraphics graphics) {
 		int color = getTextColor();
-		renderText(font, poses, visibleText, textX, textY, true, color);
+		renderText(font, graphics, visibleText, textX, textY, true, color);
 
 		if (isFocused()) {
 			if (isActive() && (cursorTicks / 6) % 2 == 0) {
 				if (cursorIndex == fullText.length()) {
 					int x = textX + font.width(visibleText);
-					renderText(font, poses, "_", x, textY, true, color);
+					renderText(font, graphics, "_", x, textY, true, color);
 				} else {
 					int width = font.width(fullText.substring(scrollIndex, cursorIndex));
 					int x = textX + width;
 
-					renderRect(poses, x, selectionY, 1, selectionHeight, color);
+					renderRect(graphics, x, selectionY, 1, selectionHeight, color);
 				}
 			}
 			if (hasSelection()) {
-				drawSelectionHighlight(poses);
+				drawSelectionHighlight(graphics);
 			}
 		}
 	}
 
-	private void drawSelectionHighlight(PoseStack poses) {
+	private void drawSelectionHighlight(GuiGraphics graphics) {
 		int start = Math.min(cursorIndex, selectionIndex);
 		int end = Math.max(cursorIndex, selectionIndex);
 
@@ -374,7 +374,7 @@ public class TextField extends AbstractButton {
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
-		Matrix4f pose = poses.last().pose();
+		Matrix4f pose = graphics.pose().last().pose();
 
 		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
 

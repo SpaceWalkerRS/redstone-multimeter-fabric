@@ -34,18 +34,20 @@ public class SubTickCompat {
 			TickHandler = Class.forName("subtick.TickHandler");
 			TickHandler$frozen = TickHandler.getField("frozen");
 
-			for (ServerLevel level : server.getLevels()) {
-				Object tickHandler = SubTick$getTickHandler.invoke(null, level);
+			if (TickHandler$frozen.getType() == boolean.class) {
+				for (ServerLevel level : server.getLevels()) {
+					Object tickHandler = SubTick$getTickHandler.invoke(null, level);
 
-				Supplier<Boolean> frozenChain = frozen;
+					Supplier<Boolean> frozenChain = frozen;
 
-				frozen = () -> {
-					try {
-						return TickHandler$frozen.getBoolean(tickHandler);
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						return frozenChain.get();
-					}
-				};
+					frozen = () -> {
+						try {
+							return TickHandler$frozen.getBoolean(tickHandler);
+						} catch (IllegalArgumentException | IllegalAccessException e) {
+							return frozenChain.get();
+						}
+					};
+				}
 			}
 		} catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 		}

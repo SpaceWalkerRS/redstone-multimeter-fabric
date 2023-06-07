@@ -1,8 +1,6 @@
 package redstone.multimeter.client.gui.element.tutorial;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -24,7 +22,7 @@ public class StagedTutorialToast extends TutorialToast {
 	}
 
 	@Override
-	protected void drawDecoration(PoseStack poses, ToastComponent toasts, long age) {
+	protected void drawDecoration(GuiGraphics graphics, ToastComponent toasts, long age) {
 		float newProgress = tutorial.getProgress();
 
 		if (newProgress != progress) {
@@ -45,7 +43,7 @@ public class StagedTutorialToast extends TutorialToast {
 		int w2 = (int)(w * renderProgress);
 		int h = 1;
 
-		GuiComponent.fill(poses, x, y, x + w, y + h, 0xFFFFFFFF);
-		GuiComponent.fill(poses, x, y, x + w2, y + h, 0xFF500050);
+		graphics.fill(x, y, x + w, y + h, 0xFFFFFFFF);
+		graphics.fill(x, y, x + w2, y + h, 0xFF500050);
 	}
 }

@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui.element;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.gui.Tooltip;
 
@@ -24,12 +24,12 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
 		for (int index = 0; index < children.size(); index++) {
 			Element child = children.get(index);
 
 			if (child.isVisible()) {
-				child.render(poses, mouseX, mouseY);
+				child.render(graphics, mouseX, mouseY);
 			}
 		}
 	}

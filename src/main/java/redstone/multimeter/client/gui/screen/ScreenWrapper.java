@@ -2,8 +2,7 @@ package redstone.multimeter.client.gui.screen;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -29,8 +28,8 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY, float delta) {
-		screen.render(poses, mouseX, mouseY);
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+		screen.render(graphics, mouseX, mouseY);
 	}
 
 	@Override

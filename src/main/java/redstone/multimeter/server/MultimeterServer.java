@@ -46,7 +46,7 @@ public class MultimeterServer {
 		this.multimeter = new Multimeter(this);
 		this.tickPhaseTree = new TickPhaseTree();
 
-		this.carpetCompat = new CarpetCompat();
+		this.carpetCompat = new CarpetCompat(this);
 		this.subTickCompat = new SubTickCompat(this);
 
 		this.tickPhase = TickPhase.UNKNOWN;

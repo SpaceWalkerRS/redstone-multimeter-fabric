@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -59,11 +58,11 @@ public class TextElement extends AbstractElement {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
 		int left = getX();
 		int right = getX() + getWidth();
 
-		renderText(poses, (immediate, model) -> {
+		renderText(graphics, (immediate, model) -> {
 			int textY = getY();
 
 			for (int index = 0; index < text.size(); index++) {

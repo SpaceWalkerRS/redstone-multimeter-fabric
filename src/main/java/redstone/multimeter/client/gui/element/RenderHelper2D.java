@@ -5,14 +5,13 @@ import org.joml.Matrix4f;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Font.DisplayMode;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.network.chat.Component;
 
@@ -22,34 +21,34 @@ import redstone.multimeter.util.ColorUtils;
 
 public class RenderHelper2D {
 
-	protected void renderRect(PoseStack poses, Drawer drawer) {
+	protected void renderRect(GuiGraphics graphics, Drawer drawer) {
 		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
-		Matrix4f pose = poses.last().pose();
+		Matrix4f pose = graphics.pose().last().pose();
 
 		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 		drawer.draw(bufferBuilder, pose);
 		tessellator.end();
 	}
 
-	protected void renderRect(PoseStack poses, int x, int y, int width, int height, int color) {
-		renderRect(poses, (bufferBuilder, pose) -> drawRect(bufferBuilder, pose, x, y, width, height, color));
+	protected void renderRect(GuiGraphics graphics, int x, int y, int width, int height, int color) {
+		renderRect(graphics, (bufferBuilder, pose) -> drawRect(bufferBuilder, pose, x, y, width, height, color));
 	}
 
-	protected void renderRect(PoseStack poses, int x0, int y0, int x1, int y1, int a, int r, int g, int b) {
-		renderRect(poses, (bufferBuilder, pose) -> drawRect(bufferBuilder, pose, x0, y0, x1, y1, a, r, g, b));
+	protected void renderRect(GuiGraphics graphics, int x0, int y0, int x1, int y1, int a, int r, int g, int b) {
+		renderRect(graphics, (bufferBuilder, pose) -> drawRect(bufferBuilder, pose, x0, y0, x1, y1, a, r, g, b));
 	}
 
-	protected void renderGradient(PoseStack poses, int x, int y, int width, int height, int color0, int color1) {
-		renderRect(poses, (bufferBuilder, pose) -> drawGradient(bufferBuilder, pose, x, y, width, height, color0, color1));
+	protected void renderGradient(GuiGraphics graphics, int x, int y, int width, int height, int color0, int color1) {
+		renderRect(graphics, (bufferBuilder, pose) -> drawGradient(bufferBuilder, pose, x, y, width, height, color0, color1));
 	}
 
-	protected void renderGradient(PoseStack poses, int x0, int y0, int x1, int y1, int a0, int r0, int g0, int b0, int a1, int r1, int g1, int b1) {
-		renderRect(poses, (bufferBuilder, pose) -> drawGradient(bufferBuilder, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1));
+	protected void renderGradient(GuiGraphics graphics, int x0, int y0, int x1, int y1, int a0, int r0, int g0, int b0, int a1, int r1, int g1, int b1) {
+		renderRect(graphics, (bufferBuilder, pose) -> drawGradient(bufferBuilder, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1));
 	}
 
 	protected void drawRect(BufferBuilder bufferBuilder, Matrix4f pose, int x, int y, int width, int height, int color) {
@@ -103,17 +102,17 @@ public class RenderHelper2D {
 		bufferBuilder.vertex(pose, x1, y0, z).color(r0, g0, b0, a0).endVertex();
 	}
 
-	protected void renderBorder(PoseStack poses, int x, int y, int width, int height, int color) {
-		renderBorder(poses, x, y, width, height, 1, color);
+	protected void renderBorder(GuiGraphics graphics, int x, int y, int width, int height, int color) {
+		renderBorder(graphics, x, y, width, height, 1, color);
 	}
 
-	protected void renderBorder(PoseStack poses, int x, int y, int width, int height, int d, int color) {
+	protected void renderBorder(GuiGraphics graphics, int x, int y, int width, int height, int d, int color) {
 		int left = x;
 		int right = x + width;
 		int top = y;
 		int bottom = y + height;
 
-		renderRect(poses, (bufferBuilder, pose) -> {
+		renderRect(graphics, (bufferBuilder, pose) -> {
 			drawRect(bufferBuilder, pose, left     , top       , d        , height - d, color); // left
 			drawRect(bufferBuilder, pose, left     , bottom - d, width - d, d         , color); // bottom
 			drawRect(bufferBuilder, pose, right - d, top    + d, d        , height - d, color); // right
@@ -121,7 +120,7 @@ public class RenderHelper2D {
 		});
 	}
 
-	protected void renderTexture(PoseStack poses, Texture texture, Drawer drawer) {
+	protected void renderTexture(GuiGraphics graphics, Texture texture, Drawer drawer) {
 		RenderSystem.setShader(() -> GameRenderer.getPositionTexShader());
 		RenderSystem.setShaderTexture(0, texture.location);
 		RenderSystem.enableBlend();
@@ -129,19 +128,19 @@ public class RenderHelper2D {
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
-		Matrix4f pose = poses.last().pose();
+		Matrix4f pose = graphics.pose().last().pose();
 
 		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 		drawer.draw(bufferBuilder, pose);
 		tessellator.end();
 	}
 
-	protected void renderTextureRegion(PoseStack poses, TextureRegion region, int x, int y, int width, int height) {
-		renderTexture(poses, region.texture, (bufferBuilder, pose) -> drawTextureRegion(bufferBuilder, pose, region, x, y, width, height));
+	protected void renderTextureRegion(GuiGraphics graphics, TextureRegion region, int x, int y, int width, int height) {
+		renderTexture(graphics, region.texture, (bufferBuilder, pose) -> drawTextureRegion(bufferBuilder, pose, region, x, y, width, height));
 	}
 
-	protected void renderTexture(PoseStack poses, Texture texture, int x0, int y0, int x1, int y1, int tx0, int ty0, int tx1, int ty1) {
-		renderTexture(poses, texture, (bufferBuilder, pose) -> drawTexture(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1));
+	protected void renderTexture(GuiGraphics graphics, Texture texture, int x0, int y0, int x1, int y1, int tx0, int ty0, int tx1, int ty1) {
+		renderTexture(graphics, texture, (bufferBuilder, pose) -> drawTexture(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1));
 	}
 
 	protected void drawTextureRegion(BufferBuilder bufferBuilder, Matrix4f pose, TextureRegion region, int x, int y, int width, int height) {
@@ -172,7 +171,7 @@ public class RenderHelper2D {
 		bufferBuilder.vertex(pose, x1, y0, z).uv(u1, v0).endVertex();
 	}
 
-	protected void renderTextureColor(PoseStack poses, Texture texture, Drawer drawer) {
+	protected void renderTextureColor(GuiGraphics graphics, Texture texture, Drawer drawer) {
 		RenderSystem.setShader(() -> GameRenderer.getPositionTexColorShader());
 		RenderSystem.setShaderTexture(0, texture.location);
 		RenderSystem.enableBlend();
@@ -180,19 +179,19 @@ public class RenderHelper2D {
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
-		Matrix4f pose = poses.last().pose();
+		Matrix4f pose = graphics.pose().last().pose();
 
 		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 		drawer.draw(bufferBuilder, pose);
 		tessellator.end();
 	}
 
-	protected void renderTextureRegionColor(PoseStack poses, TextureRegion region, int x, int y, int width, int height, int color) {
-		renderTextureColor(poses, region.texture, (bufferBuilder, pose) -> drawTextureRegionColor(bufferBuilder, pose, region, x, y, width, height, color));
+	protected void renderTextureRegionColor(GuiGraphics graphics, TextureRegion region, int x, int y, int width, int height, int color) {
+		renderTextureColor(graphics, region.texture, (bufferBuilder, pose) -> drawTextureRegionColor(bufferBuilder, pose, region, x, y, width, height, color));
 	}
 
-	protected void renderTextureColor(PoseStack poses, Texture texture, int x0, int y0, int x1, int y1, int tx0, int ty0, int tx1, int ty1, int a, int r, int g, int b) {
-		renderTextureColor(poses, texture, (bufferBuilder, pose) -> drawTextureColor(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1, a, r, g, b));
+	protected void renderTextureColor(GuiGraphics graphics, Texture texture, int x0, int y0, int x1, int y1, int tx0, int ty0, int tx1, int ty1, int a, int r, int g, int b) {
+		renderTextureColor(graphics, texture, (bufferBuilder, pose) -> drawTextureColor(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1, a, r, g, b));
 	}
 
 	protected void drawTextureRegionColor(BufferBuilder bufferBuilder, Matrix4f pose, TextureRegion region, int x, int y, int width, int height, int color) {
@@ -228,22 +227,20 @@ public class RenderHelper2D {
 		bufferBuilder.vertex(pose, x1, y0, z).uv(u1, v0).color(r, g, b, a).endVertex();
 	}
 
-	protected void renderText(PoseStack poses, TextDrawer drawer) {
-		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
-		BufferSource source = MultiBufferSource.immediate(bufferBuilder);
-		Matrix4f pose = poses.last().pose();
+	protected void renderText(GuiGraphics graphics, TextDrawer drawer) {
+		BufferSource source = graphics.bufferSource();
+		Matrix4f pose = graphics.pose().last().pose();
 
 		drawer.draw(source, pose);
 		source.endBatch();
 	}
 
-	protected void renderText(Font font, PoseStack poses, Component text, int x, int y, boolean shadow, int color) {
-		renderText(poses, (source, pose) -> drawText(source, pose, font, text, x, y, shadow, color));
+	protected void renderText(Font font, GuiGraphics graphics, Component text, int x, int y, boolean shadow, int color) {
+		renderText(graphics, (source, pose) -> drawText(source, pose, font, text, x, y, shadow, color));
 	}
 
-	protected void renderText(Font font, PoseStack poses, String text, int x, int y, boolean shadow, int color) {
-		renderText(poses, (source, pose) -> drawText(source, pose, font, text, x, y, shadow, color));
+	protected void renderText(Font font, GuiGraphics graphics, String text, int x, int y, boolean shadow, int color) {
+		renderText(graphics, (source, pose) -> drawText(source, pose, font, text, x, y, shadow, color));
 	}
 
 	protected void drawText(BufferSource source, Matrix4f pose, Font font, Component text, int x, int y, boolean shadow) {

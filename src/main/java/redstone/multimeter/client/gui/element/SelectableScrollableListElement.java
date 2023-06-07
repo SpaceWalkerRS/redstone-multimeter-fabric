@@ -4,8 +4,7 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -24,19 +23,19 @@ public class SelectableScrollableListElement extends ScrollableListElement {
 	}
 
 	@Override
-	protected void renderElement(Element element, PoseStack poses, int mouseX, int mouseY) {
+	protected void renderElement(Element element, GuiGraphics graphics, int mouseX, int mouseY) {
 		boolean selected = (element == getSelectedElement());
 		boolean hovered = (element == getHoveredElement());
 		boolean drawBackground = selected || hovered;
 
 		if (drawBackground) {
-			drawBackground(element, poses, selected);
+			drawBackground(element, graphics, selected);
 		}
 
-		super.renderElement(element, poses, mouseX, mouseY);
+		super.renderElement(element, graphics, mouseX, mouseY);
 
 		if (drawBackground) {
-			drawBorder(element, poses, selected);
+			drawBorder(element, graphics, selected);
 		}
 	}
 
@@ -131,12 +130,12 @@ public class SelectableScrollableListElement extends ScrollableListElement {
 		}
 	}
 
-	protected void drawBackground(Element element, PoseStack poses, boolean selected) {
-		renderRect(poses, element.getX(), element.getY(), element.getWidth(), element.getHeight(), getBackgroundColor(selected));
+	protected void drawBackground(Element element, GuiGraphics graphics, boolean selected) {
+		renderRect(graphics, element.getX(), element.getY(), element.getWidth(), element.getHeight(), getBackgroundColor(selected));
 	}
 
-	protected void drawBorder(Element element, PoseStack poses, boolean selected) {
-		renderBorder(poses, element.getX(), element.getY(), element.getWidth(), element.getHeight(), getBorderColor(selected));
+	protected void drawBorder(Element element, GuiGraphics graphics, boolean selected) {
+		renderBorder(graphics, element.getX(), element.getY(), element.getWidth(), element.getHeight(), getBorderColor(selected));
 	}
 
 	protected int getBackgroundColor(boolean selected) {

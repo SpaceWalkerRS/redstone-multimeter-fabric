@@ -3,11 +3,10 @@ package redstone.multimeter.client.gui.element.tutorial;
 import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
@@ -56,29 +55,29 @@ public class TutorialToast implements Toast {
 	}
 
 	@Override
-	public Visibility render(PoseStack poses, ToastComponent toasts, long age) {
-		drawBackground(poses, toasts, age);
+	public Visibility render(GuiGraphics graphics, ToastComponent toasts, long age) {
+		drawBackground(graphics, toasts, age);
 
 		Minecraft client = toasts.getMinecraft();
 		Font font = client.font;
 
-		float x = 7.0F;
-		float y = 7.0F;
+		int x = 7;
+		int y = 7;
 
-		font.draw(poses, title, x, y, 0xFF500050);
+		graphics.drawString(font, title, x, y, 0xFF500050);
 
 		y += 12.0F;
 
 		for (int i = 0; i < description.size(); i++, y += 10.0F) {
-			font.draw(poses, description.get(i), x, y, 0xFF000000);
+			graphics.drawString(font, description.get(i), x, y, 0xFF000000);
 		}
 
-		drawDecoration(poses, toasts, age);
+		drawDecoration(graphics, toasts, age);
 
 		return visibility;
 	}
 
-	protected void drawBackground(PoseStack poses, ToastComponent toasts, long age) {
+	protected void drawBackground(GuiGraphics graphics, ToastComponent toasts, long age) {
 		RenderSystem.setShaderTexture(0, TEXTURE);
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -86,7 +85,7 @@ public class TutorialToast implements Toast {
 		int height = height();
 
 		if (width == TEXTURE_WIDTH && height == TEXTURE_HEIGHT) {
-			GuiComponent.blit(poses, 0, 0, TEXTURE_U, TEXTURE_V, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+			graphics.blit(TEXTURE, 0, 0, TEXTURE_U, TEXTURE_V, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 		} else {
 			int x = 0;
 			int y = 0;
@@ -95,19 +94,19 @@ public class TutorialToast implements Toast {
 			int w = EDGE;
 			int h = EDGE;
 
-			GuiComponent.blit(poses, x, y, u, v, w, h); // top left corner
+			graphics.blit(TEXTURE, x, y, u, v, w, h); // top left corner
 
 			u += EDGE;
 			w = INNER_WIDTH;
 
 			for (x = EDGE; x < (width - w - EDGE); x += w) {
-				GuiComponent.blit(poses, x, y, u, v, w, h); // top edge
+				graphics.blit(TEXTURE, x, y, u, v, w, h); // top edge
 			}
 
 			w = width - x;
 			u = TEXTURE_U + TEXTURE_WIDTH - w;
 
-			GuiComponent.blit(poses, x, y, u, v, w, h); // top right corner
+			graphics.blit(TEXTURE, x, y, u, v, w, h); // top right corner
 
 			v += EDGE;
 			h = INNER_HEIGHT;
@@ -117,19 +116,19 @@ public class TutorialToast implements Toast {
 				u = TEXTURE_U;
 				w = EDGE;
 
-				GuiComponent.blit(poses, x, y, u, v, w, h); // left edge
+				graphics.blit(TEXTURE, x, y, u, v, w, h); // left edge
 
 				u += EDGE;
 				w = INNER_WIDTH;
 
 				for (x = EDGE; x < (width - w - EDGE); x += w) {
-					GuiComponent.blit(poses, x, y, u, v, w, h); // middle
+					graphics.blit(TEXTURE, x, y, u, v, w, h); // middle
 				}
 
 				w = width - x;
 				u = TEXTURE_U + TEXTURE_WIDTH - w;
 
-				GuiComponent.blit(poses, x, y, u, v, w, h); // right edge
+				graphics.blit(TEXTURE, x, y, u, v, w, h); // right edge
 			}
 
 			h = height - y;
@@ -139,23 +138,23 @@ public class TutorialToast implements Toast {
 			u = TEXTURE_U;
 			w = EDGE;
 
-			GuiComponent.blit(poses, x, y, u, v, w, h); // bottom left corner
+			graphics.blit(TEXTURE, x, y, u, v, w, h); // bottom left corner
 
 			u += EDGE;
 			w = INNER_WIDTH;
 
 			for (x = EDGE; x < (width - w - EDGE); x += w) {
-				GuiComponent.blit(poses, x, y, u, v, w, h); // bottom edge
+				graphics.blit(TEXTURE, x, y, u, v, w, h); // bottom edge
 			}
 
 			w = width - x;
 			u = TEXTURE_U + TEXTURE_WIDTH - w;
 
-			GuiComponent.blit(poses, x, y, u, v, w, h); // bottom right corner
+			graphics.blit(TEXTURE, x, y, u, v, w, h); // bottom right corner
 		}
 	}
 
-	protected void drawDecoration(PoseStack poses, ToastComponent toasts, long age) {
+	protected void drawDecoration(GuiGraphics graphics, ToastComponent toasts, long age) {
 	}
 
 	public void hide() {

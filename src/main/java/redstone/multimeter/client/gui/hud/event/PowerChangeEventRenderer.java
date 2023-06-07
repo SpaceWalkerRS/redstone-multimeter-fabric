@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
@@ -16,7 +16,7 @@ public class PowerChangeEventRenderer extends BasicEventRenderer {
 	}
 
 	@Override
-	protected void drawCenter(PoseStack poses, int x, int y, Meter meter, MeterEvent event) {
+	protected void drawCenter(GuiGraphics graphics, int x, int y, Meter meter, MeterEvent event) {
 		int metaData = event.getMetadata();
 		int oldPower = (metaData >> 8) & 0xFF;
 		int newPower = metaData & 0xFF;
@@ -32,6 +32,6 @@ public class PowerChangeEventRenderer extends BasicEventRenderer {
 			x += 1;
 		}
 
-		hud.renderer.renderRect(poses, x, y + half - (height / 2), width, height, color);
+		hud.renderer.renderRect(graphics, x, y + half - (height / 2), width, height, color);
 	}
 }

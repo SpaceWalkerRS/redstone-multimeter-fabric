@@ -2,10 +2,9 @@ package redstone.multimeter.client.gui.element.button;
 
 import java.util.function.Supplier;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -47,14 +46,14 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (moved) {
 			moved = false;
 			updateHovered(mouseX, mouseY);
 		}
 
-		renderButton(poses);
-		renderButtonMessage(poses);
+		renderButton(graphics);
+		renderButtonMessage(graphics);
 	}
 
 	@Override
@@ -121,11 +120,11 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 		setMessage(messageSupplier.get());
 	}
 
-	protected void renderButton(PoseStack poses) {
+	protected void renderButton(GuiGraphics graphics) {
 		TextureRegion texture = getBackgroundTexture();
 
 		if (texture != null) {
-			drawTexturedButton(poses, texture, getX(), getY(), getWidth(), getHeight());
+			drawTexturedButton(graphics, texture, getX(), getY(), getWidth(), getHeight());
 		}
 	}
 
@@ -144,12 +143,12 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 		return TextureRegion.BASIC_BUTTON;
 	}
 
-	protected void drawTexturedButton(PoseStack poses, TextureRegion region, int x, int y, int width, int height) {
+	protected void drawTexturedButton(GuiGraphics graphics, TextureRegion region, int x, int y, int width, int height) {
 		boolean matchWidth = (width == region.width);
 		boolean matchHeight = (height == region.height);
 
 		if (matchWidth && matchHeight) {
-			renderTextureRegion(poses, region, x, y, width, height);
+			renderTextureRegion(graphics, region, x, y, width, height);
 		} else {
 			Texture texture = region.texture;
 
@@ -178,7 +177,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 			int ty2 = region.y + region.height - bottomHeight;
 			int ty3 = region.y + region.height;
 
-			renderTexture(poses, texture, (bufferBuilder, pose) -> {
+			renderTexture(graphics, texture, (bufferBuilder, pose) -> {
 				drawTexture(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
 				drawTexture(bufferBuilder, pose, texture, x0, y2, x1, y3, tx0, ty2, tx1, ty3);
 				drawTexture(bufferBuilder, pose, texture, x2, y2, x3, y3, tx2, ty2, tx3, ty3);
@@ -187,7 +186,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 		}
 	}
 
-	protected void renderButtonMessage(PoseStack poses) {
+	protected void renderButtonMessage(GuiGraphics graphics) {
 		Component message = getMessage();
 
 		if (message != null) {
@@ -195,7 +194,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 			int y = getMessageY();
 			int color = getMessageColor();
 
-			renderText(font, poses, message, x, y, true, color);
+			renderText(font, graphics, message, x, y, true, color);
 		}
 	}
 
@@ -210,5 +209,4 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	protected int getMessageColor() {
 		return isActive() ? 0xFFFFFFFF : 0xFFA0A0A0;
 	}
-
 }

@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
@@ -16,7 +16,7 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 	}
 
 	@Override
-	protected void drawEdges(PoseStack poses, int x, int y, Meter meter, MeterEvent event) {
+	protected void drawEdges(GuiGraphics graphics, int x, int y, Meter meter, MeterEvent event) {
 		if (scheduling(event)) {
 			if (hud.settings.columnWidth < 3) {
 				return;
@@ -27,14 +27,14 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 			int height = (2 * half < hud.settings.rowHeight) ? 5 : 6;
 			int color = edgeColorProvider.apply(meter, event);
 
-			hud.renderer.renderRect(poses, x, y + half - (height / 2), width, height, color);
+			hud.renderer.renderRect(graphics, x, y + half - (height / 2), width, height, color);
 		} else {
-			super.drawEdges(poses, x, y, meter, event);
+			super.drawEdges(graphics, x, y, meter, event);
 		}
 	}
 
 	@Override
-	protected void drawCenter(PoseStack poses, int x, int y, Meter meter, MeterEvent event) {
+	protected void drawCenter(GuiGraphics graphics, int x, int y, Meter meter, MeterEvent event) {
 		if (scheduling(event)) {
 			int halfWidth = hud.settings.columnWidth / 2;
 			int width = hud.settings.columnWidth - 2;
@@ -42,9 +42,9 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 			int height = (2 * halfHeight < hud.settings.rowHeight) ? 3 : 4;
 			int color = centerColorProvider.apply(meter, event);
 
-			hud.renderer.renderRect(poses, x + halfWidth - (width / 2), y + halfHeight - (height / 2), width, height, color);
+			hud.renderer.renderRect(graphics, x + halfWidth - (width / 2), y + halfHeight - (height / 2), width, height, color);
 		} else {
-			super.drawCenter(poses, x, y, meter, event);
+			super.drawCenter(graphics, x, y, meter, event);
 		}
 	}
 

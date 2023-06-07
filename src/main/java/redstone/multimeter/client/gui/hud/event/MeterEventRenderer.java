@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
@@ -22,12 +22,12 @@ public abstract class MeterEventRenderer {
 		return type;
 	}
 
-	public abstract void renderTickLogs(PoseStack poses, int x, int y, long firstTick, long lastTick, Meter meter);
+	public abstract void renderTickLogs(GuiGraphics graphics, int x, int y, long firstTick, long lastTick, Meter meter);
 
-	public void renderPulseLengths(PoseStack poses, int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderPulseLengths(GuiGraphics graphics, int x, int y, long firstTick, long lastTick, Meter meter) {
 
 	}
 
-	public abstract void renderSubtickLogs(PoseStack poses, int x, int y, long tick, int subtickCount, Meter meter);
+	public abstract void renderSubtickLogs(GuiGraphics graphics, int x, int y, long tick, int subtickCount, Meter meter);
 
 }

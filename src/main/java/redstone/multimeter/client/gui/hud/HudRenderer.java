@@ -4,9 +4,9 @@ import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.network.chat.Component;
 
@@ -25,8 +25,8 @@ public class HudRenderer extends RenderHelper2D {
 		this.target = hud;
 	}
 
-	public void render(Element element, PoseStack poses, int mouseX, int mouseY) {
-		(target = element).render(poses, mouseX, mouseY);
+	public void render(Element element, GuiGraphics graphics, int mouseX, int mouseY) {
+		(target = element).render(graphics, mouseX, mouseY);
 	}
 
 	private int translateX(int x, int width) {
@@ -49,21 +49,21 @@ public class HudRenderer extends RenderHelper2D {
 		}
 	}
 
-	public void renderHighlight(PoseStack poses, int x, int y, int width, int height, int color) {
+	public void renderHighlight(GuiGraphics graphics, int x, int y, int width, int height, int color) {
 		int d = hud.settings.gridSize;
-		renderBorder(poses, x, y, width + d, height + d, d, color);
+		renderBorder(graphics, x, y, width + d, height + d, d, color);
 	}
 
-	public void renderRect(PoseStack poses, int x, int y, int width, int height, int color) {
-		super.renderRect(poses, x, y, width, height, color);
+	public void renderRect(GuiGraphics graphics, int x, int y, int width, int height, int color) {
+		super.renderRect(graphics, x, y, width, height, color);
 	}
 
-	public void renderText(PoseStack poses, String text, int x, int y, int color) {
-		super.renderText(hud.font, poses, text, x, y, false, color);
+	public void renderText(GuiGraphics graphics, String text, int x, int y, int color) {
+		super.renderText(hud.font, graphics, text, x, y, false, color);
 	}
 
-	public void renderText(PoseStack poses, Component text, int x, int y, int color) {
-		super.renderText(hud.font, poses, text, x, y, false, color);
+	public void renderText(GuiGraphics graphics, Component text, int x, int y, int color) {
+		super.renderText(hud.font, graphics, text, x, y, false, color);
 	}
 
 	@Override

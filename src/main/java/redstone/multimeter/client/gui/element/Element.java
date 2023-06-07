@@ -2,16 +2,15 @@ package redstone.multimeter.client.gui.element;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.Tooltip;
 
 public interface Element {
 
-	public void render(PoseStack poses, int mouseX, int mouseY);
+	public void render(GuiGraphics graphics, int mouseX, int mouseY);
 
 	public void mouseMove(double mouseX, double mouseY);
 

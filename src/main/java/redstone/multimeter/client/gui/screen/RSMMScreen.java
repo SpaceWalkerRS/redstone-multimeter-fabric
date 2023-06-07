@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -37,22 +38,22 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
-		renderBackground(poses);
-		renderContent(poses, mouseX, mouseY);
+	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+		renderBackground(graphics);
+		renderContent(graphics, mouseX, mouseY);
 
 		if (drawTitle) {
 			int width = font.width(title);
 			int x = getX() + (getWidth() - width) / 2;
 			int y = getY() + 6;
 
-			renderText(font, poses, title, x, y, true, 0xFFFFFFFF);
+			renderText(font, graphics, title, x, y, true, 0xFFFFFFFF);
 		}
 
 		Tooltip tooltip = getTooltip(mouseX, mouseY);
 
 		if (!tooltip.isEmpty()) {
-			drawTooltip(poses, tooltip, mouseX, mouseY);
+			drawTooltip(graphics, tooltip, mouseX, mouseY);
 		}
 	}
 
@@ -123,11 +124,11 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		minecraft.setScreen(wrapper.getParent());
 	}
 
-	protected void renderBackground(PoseStack poses) {
+	protected void renderBackground(GuiGraphics graphics) {
 		if (hasTransparentBackground()) {
-			renderGradient(poses, getX(), getY(), getWidth(), getHeight(), 0xC0101010, 0xD0101010);
+			renderGradient(graphics, getX(), getY(), getWidth(), getHeight(), 0xC0101010, 0xD0101010);
 		} else {
-			renderBackgroundTexture(poses);
+			renderBackgroundTexture(graphics);
 		}
 	}
 
@@ -135,7 +136,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		return minecraft.level != null;
 	}
 
-	protected void renderBackgroundTexture(PoseStack poses) {
+	protected void renderBackgroundTexture(GuiGraphics graphics) {
 		int x0 = getX();
 		int y0 = getY();
 		int x1 = x0 + getWidth();
@@ -146,14 +147,14 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		int tx1 = x1 / 2;
 		int ty1 = y1 / 2;
 
-		renderTextureColor(poses, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
+		renderTextureColor(graphics, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
 	}
 
-	protected void renderContent(PoseStack poses, int mouseX, int mouseY) {
-		super.render(poses, mouseX, mouseY);
+	protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY) {
+		super.render(graphics, mouseX, mouseY);
 	}
 
-	protected void drawTooltip(PoseStack poses, Tooltip tooltip, int mouseX, int mouseY) {
+	protected void drawTooltip(GuiGraphics graphics, Tooltip tooltip, int mouseX, int mouseY) {
 		List<Component> lines = tooltip.getLines();
 
 		int lineHeight = font.lineHeight;
@@ -184,18 +185,20 @@ public abstract class RSMMScreen extends AbstractParentElement {
 			y = mouseY - height;
 		}
 
-		drawTooltip(poses, lines, x, y, width, height);
+		drawTooltip(graphics, lines, x, y, width, height);
 	}
 
-	private void drawTooltip(PoseStack poses, List<Component> lines, int x, int y, int width, int height) {
+	private void drawTooltip(GuiGraphics graphics, List<Component> lines, int x, int y, int width, int height) {
 		int backgroundColor = 0xF0100010;
 		int borderColor0 = 0x505000FF;
 		int borderColor1 = 0x5028007F;
 
+		PoseStack poses = graphics.pose();
+
 		poses.pushPose();
 		poses.translate(0, 0, 400);
 
-		renderRect(poses, (bufferBuilder, pose) -> {
+		renderRect(graphics, (bufferBuilder, pose) -> {
 			// background
 			drawRect(bufferBuilder, pose, x    , y + 1         , width    , height - 2, backgroundColor); // center, left/right outer borders
 			drawRect(bufferBuilder, pose, x + 1, y             , width - 2, 1         , backgroundColor); // top outer border
@@ -208,7 +211,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 			drawRect    (bufferBuilder, pose, x + 1        , y + 1         , width - 2, 1         , borderColor0);               // top
 		});
 
-		renderText(poses, (immediate, model) -> {
+		renderText(graphics, (immediate, model) -> {
 			int textX = x + 4;
 			int textY = y + 4;
 

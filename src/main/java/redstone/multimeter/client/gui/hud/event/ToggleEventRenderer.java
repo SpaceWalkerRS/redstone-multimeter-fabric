@@ -2,6 +2,8 @@ package redstone.multimeter.client.gui.hud.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.gui.GuiGraphics;
+
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
@@ -18,7 +20,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 
 	@Override
-	public void renderTickLogs(PoseStack poses, int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderTickLogs(GuiGraphics graphics, int x, int y, long firstTick, long lastTick, Meter meter) {
 		updateMode(meter);
 
 		y += hud.settings.gridSize;
@@ -37,7 +39,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 
 		if (nextLog == null) {
 			if (isToggled(meter)) {
-				draw(poses, x + hud.settings.gridSize, y, color, (int)(lastHudTick - firstTick));
+				draw(graphics, x + hud.settings.gridSize, y, color, (int)(lastHudTick - firstTick));
 			}
 
 			return;
@@ -56,9 +58,9 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 
 				if (wasToggled(log)) {
-					drawOn(poses, columnX, y, color);
+					drawOn(graphics, columnX, y, color);
 				} else {
-					drawOff(poses, columnX, y, color);
+					drawOff(graphics, columnX, y, color);
 				}
 			}
 
@@ -69,7 +71,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int column = (int)(start - firstTick);
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 
-				draw(poses, columnX, y, color, (int)(end - start));
+				draw(graphics, columnX, y, color, (int)(end - start));
 			}
 
 			do {
@@ -84,7 +86,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 
 	@Override
-	public void renderPulseLengths(PoseStack poses, int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderPulseLengths(GuiGraphics graphics, int x, int y, long firstTick, long lastTick, Meter meter) {
 		updateMode(meter);
 
 		if (mode != Mode.ALL) {
@@ -137,10 +139,12 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 						int bgColor = toggled ? color : hud.settings.colorBackground;
 						int textColor = toggled ? hud.settings.colorTextOn : hud.settings.colorTextOff;
 
+						PoseStack poses = graphics.pose();
+
 						poses.pushPose();
-						hud.renderer.renderText(poses, text, startX + 1, textY + 1, textColor);
+						hud.renderer.renderText(graphics, text, startX + 1, textY + 1, textColor);
 						poses.translate(0, 0, -0.01);
-						hud.renderer.renderRect(poses, startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
+						hud.renderer.renderRect(graphics, startX, y, requiredWidth, hud.settings.rowHeight, bgColor);
 						poses.popPose();
 					}
 				}
@@ -158,7 +162,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 
 	@Override
-	public void renderSubtickLogs(PoseStack poses, int x, int y, long tick, int subtickCount, Meter meter) {
+	public void renderSubtickLogs(GuiGraphics graphics, int x, int y, long tick, int subtickCount, Meter meter) {
 		updateMode(meter);
 
 		y += hud.settings.gridSize;
@@ -171,7 +175,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 
 		if (nextLog == null) {
 			if (isToggled(meter)) {
-				draw(poses, x + hud.settings.gridSize, y, color, subtickCount);
+				draw(graphics, x + hud.settings.gridSize, y, color, subtickCount);
 			}
 
 			return;
@@ -186,9 +190,9 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 
 				if (wasToggled(log)) {
-					drawOn(poses, columnX, y, color);
+					drawOn(graphics, columnX, y, color);
 				} else {
-					drawOff(poses, columnX, y, color);
+					drawOff(graphics, columnX, y, color);
 				}
 			}
 
@@ -198,7 +202,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			if (log == null ? !wasToggled(nextLog) : wasToggled(log)) {
 				int columnX = x + start * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 
-				draw(poses, columnX, y, color, end - start);
+				draw(graphics, columnX, y, color, end - start);
 			}
 
 			log = nextLog;
@@ -218,7 +222,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 
 	protected abstract boolean isToggled(Meter meter);
 
-	private void draw(PoseStack poses, int x, int y, int color) {
+	private void draw(GuiGraphics graphics, int x, int y, int color) {
 		int width = hud.settings.columnWidth;
 		int height = hud.settings.rowHeight;
 
@@ -230,16 +234,16 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			}
 		}
 
-		hud.renderer.renderRect(poses, x, y, width, height, color);
+		hud.renderer.renderRect(graphics, x, y, width, height, color);
 	}
 
-	private void draw(PoseStack poses, int x, int y, int color, int count) {
+	private void draw(GuiGraphics graphics, int x, int y, int color, int count) {
 		for (int i = 0; i < count; i++) {
-			draw(poses, x + i * (hud.settings.columnWidth + hud.settings.gridSize), y, color);
+			draw(graphics, x + i * (hud.settings.columnWidth + hud.settings.gridSize), y, color);
 		}
 	}
 
-	private void drawOn(PoseStack poses, int x, int y, int color) {
+	private void drawOn(GuiGraphics graphics, int x, int y, int color) {
 		x += 1;
 		y += 1;
 		int width = hud.settings.columnWidth - 2;
@@ -253,14 +257,16 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 			}
 		}
 
-		hud.renderer.renderRect(poses, x, y, width, height, color);
+		hud.renderer.renderRect(graphics, x, y, width, height, color);
 	}
 
-	private void drawOff(PoseStack poses, int x, int y, int color) {
+	private void drawOff(GuiGraphics graphics, int x, int y, int color) {
+		PoseStack poses = graphics.pose();
+
 		poses.pushPose();
-		drawOn(poses, x, y, hud.settings.colorBackground);
+		drawOn(graphics, x, y, hud.settings.colorBackground);
 		poses.translate(0, 0, -0.01);
-		draw(poses, x, y, color);
+		draw(graphics, x, y, color);
 		poses.popPose();
 	}
 
