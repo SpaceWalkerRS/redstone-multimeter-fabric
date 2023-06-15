@@ -1,0 +1,7 @@
+{
+	"name": "calibrated_sculk_sensor",
+	"event_types": [
+		"active",
+		"power_change"
+	]
+}
