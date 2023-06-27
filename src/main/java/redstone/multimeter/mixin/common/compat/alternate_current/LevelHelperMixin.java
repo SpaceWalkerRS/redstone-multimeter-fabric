@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 
 import redstone.multimeter.interfaces.mixin.IServerLevel;
@@ -27,7 +27,7 @@ public class LevelHelperMixin {
 			target = "Lnet/minecraft/server/level/ServerChunkCache;blockChanged(Lnet/minecraft/core/BlockPos;)V"
 		)
 	)
-	private static void onSetWireState(ServerLevel level, BlockPos pos, BlockState state, boolean updateNeighborShapes, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, LevelChunk chunk, LevelChunkSection section, BlockState oldState) {
+	private static void onSetWireState(ServerLevel level, BlockPos pos, BlockState state, boolean updateNeighborShapes, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, ChunkAccess chunk, LevelChunkSection section, BlockState oldState) {
 		((IServerLevel)level).getMultimeter().onBlockChange(level, pos, oldState, state);
 	}
 }
