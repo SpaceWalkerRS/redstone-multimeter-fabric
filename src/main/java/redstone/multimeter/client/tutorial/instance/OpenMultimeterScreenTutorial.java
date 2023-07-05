@@ -1,7 +1,7 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
@@ -13,8 +13,8 @@ import redstone.multimeter.util.TextUtils;
 
 public class OpenMultimeterScreenTutorial extends TutorialInstance {
 
-	private static final Component TITLE = new TextComponent("Open The Multimeter Screen");
-	private static final Component DESCRIPTION = new TextComponent("").
+	private static final Text TITLE = new LiteralText("Open The Multimeter Screen");
+	private static final Text DESCRIPTION = new LiteralText("").
 													append("Press ").
 													append(TextUtils.formatKeybind(Keybinds.OPEN_MULTIMETER_SCREEN)).
 													append(" to open the Multimeter screen.");

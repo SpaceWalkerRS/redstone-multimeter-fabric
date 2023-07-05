@@ -1,7 +1,7 @@
 package redstone.multimeter.common.network.packets;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
@@ -13,15 +13,15 @@ public class RebuildTickPhaseTreePacket implements RSMMPacket {
 	}
 
 	@Override
-	public void encode(CompoundTag data) {
+	public void encode(NbtCompound data) {
 	}
 
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NbtCompound data) {
 	}
 
 	@Override
-	public void handle(MultimeterServer server, ServerPlayer player) {
+	public void handle(MultimeterServer server, ServerPlayerEntity player) {
 		server.rebuildTickPhaseTree(player);
 	}
 

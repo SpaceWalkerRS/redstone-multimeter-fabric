@@ -1,7 +1,7 @@
 package redstone.multimeter.client.gui.screen;
 
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
@@ -16,9 +16,9 @@ public class MultimeterScreen extends RSMMScreen {
 	private ScrollableListElement list;
 
 	public MultimeterScreen(MultimeterClient client) {
-		super(client, new TextComponent(RedstoneMultimeterMod.MOD_NAME), false);
+		super(client, new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
 
-		this.isPauseScreen = !Screen.hasShiftDown();
+		this.isPauseScreen = !Screen.isShiftDown();
 	}
 
 	@Override
@@ -69,12 +69,12 @@ public class MultimeterScreen extends RSMMScreen {
 				text = "Nothing to see here! Subscribe to a meter group to get started.";
 			}
 
-			int textWidth = font.width(text);
-			int textHeight = font.lineHeight;
+			int textWidth = textRenderer.getWidth(text);
+			int textHeight = textRenderer.fontHeight;
 			int x = getX() + (getWidth() - textWidth) / 2;
 			int y = getY() + (getHeight() - textHeight) / 2;
 
-			renderText(font, text, x, y, true, 0xFFFFFFFF);
+			renderText(textRenderer, text, x, y, true, 0xFFFFFFFF);
 		}
 	}
 }

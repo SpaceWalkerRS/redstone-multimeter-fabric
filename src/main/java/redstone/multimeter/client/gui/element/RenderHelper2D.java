@@ -7,11 +7,11 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.Tessellator;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.render.TextRenderer;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
@@ -25,7 +25,7 @@ public class RenderHelper2D {
 		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-		Tesselator tessellator = Tesselator.getInstance();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
 
 		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
@@ -66,10 +66,10 @@ public class RenderHelper2D {
 	protected void drawRect(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int a, int r, int g, int b) {
 		int z = 0;
 
-		bufferBuilder.vertex(x0, y0, z).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(x0, y1, z).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(x1, y1, z).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(x1, y0, z).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(x0, y0, z).color(r, g, b, a).nextVertex();
+		bufferBuilder.vertex(x0, y1, z).color(r, g, b, a).nextVertex();
+		bufferBuilder.vertex(x1, y1, z).color(r, g, b, a).nextVertex();
+		bufferBuilder.vertex(x1, y0, z).color(r, g, b, a).nextVertex();
 	}
 
 	protected void drawGradient(BufferBuilder bufferBuilder, int x, int y, int width, int height, int color0, int color1) {
@@ -94,10 +94,10 @@ public class RenderHelper2D {
 	protected void drawGradient(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int a0, int r0, int g0, int b0, int a1, int r1, int g1, int b1) {
 		int z = 0;
 
-		bufferBuilder.vertex(x0, y0, z).color(r0, g0, b0, a0).endVertex();
-		bufferBuilder.vertex(x0, y1, z).color(r1, g1, b1, a1).endVertex();
-		bufferBuilder.vertex(x1, y1, z).color(r1, g1, b1, a1).endVertex();
-		bufferBuilder.vertex(x1, y0, z).color(r0, g0, b0, a0).endVertex();
+		bufferBuilder.vertex(x0, y0, z).color(r0, g0, b0, a0).nextVertex();
+		bufferBuilder.vertex(x0, y1, z).color(r1, g1, b1, a1).nextVertex();
+		bufferBuilder.vertex(x1, y1, z).color(r1, g1, b1, a1).nextVertex();
+		bufferBuilder.vertex(x1, y0, z).color(r0, g0, b0, a0).nextVertex();
 	}
 
 	protected void renderBorder(int x, int y, int width, int height, int color) {
@@ -124,7 +124,7 @@ public class RenderHelper2D {
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
 
-		Tesselator tessellator = Tesselator.getInstance();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
 
 		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX);
@@ -162,10 +162,10 @@ public class RenderHelper2D {
 		float u1 = (float)tx1 / texture.width;
 		float v1 = (float)ty1 / texture.height;
 
-		bufferBuilder.vertex(x0, y0, z).uv(u0, v0).endVertex();
-		bufferBuilder.vertex(x0, y1, z).uv(u0, v1).endVertex();
-		bufferBuilder.vertex(x1, y1, z).uv(u1, v1).endVertex();
-		bufferBuilder.vertex(x1, y0, z).uv(u1, v0).endVertex();
+		bufferBuilder.vertex(x0, y0, z).texture(u0, v0).nextVertex();
+		bufferBuilder.vertex(x0, y1, z).texture(u0, v1).nextVertex();
+		bufferBuilder.vertex(x1, y1, z).texture(u1, v1).nextVertex();
+		bufferBuilder.vertex(x1, y0, z).texture(u1, v0).nextVertex();
 	}
 
 	protected void renderTextureColor(Texture texture, Drawer drawer) {
@@ -174,7 +174,7 @@ public class RenderHelper2D {
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
 
-		Tesselator tessellator = Tesselator.getInstance();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
 
 		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
@@ -217,33 +217,33 @@ public class RenderHelper2D {
 		float u1 = (float)tx1 / texture.width;
 		float v1 = (float)ty1 / texture.height;
 
-		bufferBuilder.vertex(x0, y0, z).uv(u0, v0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(x0, y1, z).uv(u0, v1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(x1, y1, z).uv(u1, v1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(x1, y0, z).uv(u1, v0).color(r, g, b, a).endVertex();
+		bufferBuilder.vertex(x0, y0, z).texture(u0, v0).color(r, g, b, a).nextVertex();
+		bufferBuilder.vertex(x0, y1, z).texture(u0, v1).color(r, g, b, a).nextVertex();
+		bufferBuilder.vertex(x1, y1, z).texture(u1, v1).color(r, g, b, a).nextVertex();
+		bufferBuilder.vertex(x1, y0, z).texture(u1, v0).color(r, g, b, a).nextVertex();
 	}
 
-	protected int textWidth(Font font, Component text) {
-		return font.width(text.getColoredString());
+	protected int textWidth(TextRenderer textRenderer, Text text) {
+		return textRenderer.getWidth(text.getFormattedString());
 	}
 
-	protected void renderText(Font font, Component text, int x, int y, boolean shadow, int color) {
+	protected void renderText(TextRenderer textRenderer, Text text, int x, int y, boolean shadow, int color) {
 		GlStateManager.enableTexture();
 
 		if (shadow) {
-			font.drawShadow(text.getColoredString(), x, y, color);
+			textRenderer.drawWithShadow(text.getFormattedString(), x, y, color);
 		} else {
-			font.draw(text.getColoredString(), x, y, color);
+			textRenderer.draw(text.getFormattedString(), x, y, color);
 		}
 	}
 
-	protected void renderText(Font font, String text, int x, int y, boolean shadow, int color) {
+	protected void renderText(TextRenderer textRenderer, String text, int x, int y, boolean shadow, int color) {
 		GlStateManager.enableTexture();
 
 		if (shadow) {
-			font.drawShadow(text, x, y, color);
+			textRenderer.drawWithShadow(text, x, y, color);
 		} else {
-			font.draw(text, x, y, color);
+			textRenderer.draw(text, x, y, color);
 		}
 	}
 

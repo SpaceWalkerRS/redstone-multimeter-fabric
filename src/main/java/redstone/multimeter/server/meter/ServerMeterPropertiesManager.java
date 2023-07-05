@@ -1,7 +1,7 @@
 package redstone.multimeter.server.meter;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.ColorPicker;
@@ -19,12 +19,12 @@ public class ServerMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	@Override
-	protected Level getLevel(DimPos pos) {
-		return multimeter.getServer().getLevel(pos);
+	protected World getWorld(DimPos pos) {
+		return multimeter.getServer().getWorld(pos);
 	}
 
 	@Override
-	protected void postValidation(MutableMeterProperties properties, Level level, BlockPos pos) {
+	protected void postValidation(MutableMeterProperties properties, World world, BlockPos pos) {
 		// These are the backup values for if the saved defaults
 		// do not fully populate the meter settings.
 

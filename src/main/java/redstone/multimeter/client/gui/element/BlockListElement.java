@@ -4,13 +4,13 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.client.render.TextRenderer;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.resource.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -20,20 +20,20 @@ import redstone.multimeter.util.TextUtils;
 public class BlockListElement extends SelectableScrollableListElement {
 
 	private final ItemRenderer itemRenderer;
-	private final Font font;
-	private final Consumer<ResourceLocation> selectionListener;
+	private final TextRenderer textRenderer;
+	private final Consumer<Identifier> selectionListener;
 
-	public BlockListElement(MultimeterClient client, int width, int height, Consumer<ResourceLocation> selector) {
+	public BlockListElement(MultimeterClient client, int width, int height, Consumer<Identifier> selector) {
 		this(client, width, height, 0, 0, selector);
 	}
 
-	public BlockListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder, Consumer<ResourceLocation> selectionListener) {
+	public BlockListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder, Consumer<Identifier> selectionListener) {
 		super(client, width, height, topBorder, bottomBorder);
 
 		Minecraft minecraft = this.client.getMinecraft();
 
 		this.itemRenderer = minecraft.getItemRenderer();
-		this.font = minecraft.font;
+		this.textRenderer = minecraft.textRenderer;
 		this.selectionListener = selectionListener;
 
 		setSorter((o1, o2) -> {
@@ -58,17 +58,17 @@ public class BlockListElement extends SelectableScrollableListElement {
 		}
 	}
 
-	public void add(ResourceLocation key) {
+	public void add(Identifier key) {
 		addChild(new BlockListEntry(getEffectiveWidth(), IButton.DEFAULT_HEIGHT, key));
 	}
 
-	public void add(Collection<ResourceLocation> keys) {
-		for (ResourceLocation key : keys) {
+	public void add(Collection<Identifier> keys) {
+		for (Identifier key : keys) {
 			add(key);
 		}
 	}
 
-	public void setBlockFilter(Predicate<ResourceLocation> filter) {
+	public void setBlockFilter(Predicate<Identifier> filter) {
 		setFilter(e -> {
 			if (e instanceof BlockListEntry) {
 				BlockListEntry entry = (BlockListEntry)e;
@@ -81,11 +81,11 @@ public class BlockListElement extends SelectableScrollableListElement {
 
 	private class BlockListEntry extends AbstractElement {
 
-		private final ResourceLocation key;
+		private final Identifier key;
 		private final Block block;
 		private final ItemStack stack;
 
-		protected BlockListEntry(int width, int height, ResourceLocation key) {
+		protected BlockListEntry(int width, int height, Identifier key) {
 			super(0, 0, width, height);
 
 			this.key = key;
@@ -104,13 +104,15 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int x = getX() + 2;
 			int y = getY() + (height - 16) / 2;
 
-			itemRenderer.renderGuiItem(stack, x, y);
+			if (stack != null) {
+				itemRenderer.renderGuiItem(stack, x, y);
+			}
 
 			x = getX() + 22;
-			y = getY() + height - (height + font.lineHeight) / 2;
-			String text = font.substrByWidth(key.toString(), getWidth() - 22);
+			y = getY() + height - (height + textRenderer.fontHeight) / 2;
+			String text = textRenderer.trimToWidth(key.toString(), getWidth() - 22);
 
-			renderText(font, text, x, y, true, 0xFFFFFFFF);
+			renderText(textRenderer, text, x, y, true, 0xFFFFFFFF);
 		}
 
 		@Override
@@ -157,8 +159,8 @@ public class BlockListElement extends SelectableScrollableListElement {
 			if (tooltip.isEmpty()) {
 				String keyString = key.toString();
 
-				if (font.width(keyString) > (getWidth() - 22)) {
-					tooltip = Tooltip.of(TextUtils.toLines(font, keyString));
+				if (textRenderer.getWidth(keyString) > (getWidth() - 22)) {
+					tooltip = Tooltip.of(TextUtils.toLines(textRenderer, keyString));
 				}
 			}
 

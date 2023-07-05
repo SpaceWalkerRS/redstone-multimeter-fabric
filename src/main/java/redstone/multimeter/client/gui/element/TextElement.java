@@ -7,9 +7,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.client.render.TextRenderer;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -19,12 +19,12 @@ import redstone.multimeter.client.gui.element.button.IButton;
 public class TextElement extends AbstractElement {
 
 	private final MultimeterClient client;
-	private final Font font;
+	private final TextRenderer textRenderer;
 	private final Consumer<TextElement> updater;
 	private final Supplier<Tooltip> tooltipSupplier;
 	private final MousePress<TextElement> mousePress;
 
-	private List<Component> text;
+	private List<Text> text;
 	private int spacing;
 	private boolean rightAligned;
 	private boolean withShadow;
@@ -44,7 +44,7 @@ public class TextElement extends AbstractElement {
 		Minecraft minecraft = client.getMinecraft();
 
 		this.client = client;
-		this.font = minecraft.font;
+		this.textRenderer = minecraft.textRenderer;
 		this.updater = updater;
 		this.tooltipSupplier = tooltipSupplier;
 		this.mousePress = mousePress;
@@ -65,11 +65,11 @@ public class TextElement extends AbstractElement {
 		int textY = getY();
 
 		for (int i = 0; i < text.size(); i++) {
-			Component t = text.get(i);
-			int textX = rightAligned ? right - textWidth(font, t) : left;
-			renderText(font, t, textX, textY, withShadow, color);
+			Text t = text.get(i);
+			int textX = rightAligned ? right - textWidth(textRenderer, t) : left;
+			renderText(textRenderer, t, textX, textY, withShadow, color);
 
-			textY += font.lineHeight + spacing;
+			textY += textRenderer.fontHeight + spacing;
 		}
 	}
 
@@ -137,25 +137,25 @@ public class TextElement extends AbstractElement {
 	}
 
 	public TextElement add(String text) {
-		return add(new TextComponent(text));
+		return add(new LiteralText(text));
 	}
 
-	public TextElement add(Component text) {
+	public TextElement add(Text text) {
 		this.text.add(text);
 		return this;
 	}
 
-	public TextElement setText(List<Component> text) {
+	public TextElement setText(List<Text> text) {
 		this.text = text;
 		return this;
 	}
 
 	public TextElement setText(String text) {
-		this.text = Arrays.asList(new TextComponent(text));
+		this.text = Arrays.asList(new LiteralText(text));
 		return this;
 	}
 
-	public TextElement setText(Component text) {
+	public TextElement setText(Text text) {
 		this.text = Arrays.asList(text);
 		return this;
 	}
@@ -184,8 +184,8 @@ public class TextElement extends AbstractElement {
 		int width = 0;
 
 		for (int index = 0; index < text.size(); index++) {
-			Component t = text.get(index);
-			int textWidth = textWidth(font, t);
+			Text t = text.get(index);
+			int textWidth = textWidth(textRenderer, t);
 
 			if (textWidth > width) {
 				width = textWidth;
@@ -196,6 +196,6 @@ public class TextElement extends AbstractElement {
 	}
 
 	protected void updateHeight() {
-		setHeight((text.size() - 1) * (font.lineHeight + spacing) + font.lineHeight);
+		setHeight((text.size() - 1) * (textRenderer.fontHeight + spacing) + textRenderer.fontHeight);
 	}
 }

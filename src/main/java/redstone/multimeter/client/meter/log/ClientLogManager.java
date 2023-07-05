@@ -3,8 +3,8 @@ package redstone.multimeter.client.meter.log;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.meter.ClientMeterGroup;
@@ -72,15 +72,15 @@ public class ClientLogManager extends LogManager {
 	/**
 	 * Log all events from the past server tick
 	 */
-	public void updateMeterLogs(ListTag data) {
+	public void updateMeterLogs(NbtList data) {
 		for (int index = 0; index < data.size(); index++) {
-			CompoundTag nbt = data.getCompound(index);
+			NbtCompound nbt = data.getCompound(index);
 
 			long id = nbt.getLong("id");
 			Meter meter = meterGroup.getMeter(id);
 
 			if (meter != null) {
-				CompoundTag logs = nbt.getCompound("logs");
+				NbtCompound logs = nbt.getCompound("logs");
 				boolean powered = nbt.getBoolean("powered");
 				boolean active = nbt.getBoolean("active");
 

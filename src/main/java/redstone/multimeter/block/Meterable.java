@@ -1,8 +1,8 @@
 package redstone.multimeter.block;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.interfaces.mixin.IBlock;
 
@@ -13,6 +13,6 @@ public interface Meterable extends IBlock {
 		return true;
 	}
 
-	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state);
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state);
 
 }

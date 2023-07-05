@@ -5,7 +5,7 @@ import java.util.List;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.meter.log.ClientLogManager;
@@ -146,7 +146,7 @@ public class ClientMeterGroup extends MeterGroup {
 		client.getTutorial().onLeaveMeterGroup();
 	}
 
-	public void refresh(CompoundTag nbt) {
+	public void refresh(NbtCompound nbt) {
 		updateFromNbt(nbt);
 		client.getHud().updateMeterList();
 		client.getTutorial().onMeterGroupRefreshed();

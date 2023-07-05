@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class Tooltip {
 
 	public static final Tooltip EMPTY = new Tooltip();
 
-	private final List<Component> lines;
+	private final List<Text> lines;
 
-	public Tooltip(Component... lines) {
+	public Tooltip(Text... lines) {
 		this.lines = new ArrayList<>();
 
 		if (lines != null && lines.length > 0) {
-			for (Component line : lines) {
+			for (Text line : lines) {
 				this.lines.add(line);
 			}
 		}
@@ -27,16 +27,16 @@ public class Tooltip {
 		return this == EMPTY || lines.isEmpty();
 	}
 
-	public List<Component> getLines() {
+	public List<Text> getLines() {
 		return Collections.unmodifiableList(lines);
 	}
 
 	public Tooltip add(String line) {
-		add(new TextComponent(line));
+		add(new LiteralText(line));
 		return this;
 	}
 
-	public Tooltip add(Component line) {
+	public Tooltip add(Text line) {
 		if (this == EMPTY) {
 			throw new UnsupportedOperationException("cannot add more lines to the EMPTY tooltip!");
 		}
@@ -49,16 +49,16 @@ public class Tooltip {
 			return EMPTY;
 		}
 
-		Component[] lines = new Component[strings.length];
+		Text[] lines = new Text[strings.length];
 
 		for (int index = 0; index < strings.length; index++) {
-			lines[index] = new TextComponent(strings[index]);
+			lines[index] = new LiteralText(strings[index]);
 		}
 
 		return new Tooltip(lines);
 	}
 
-	public static Tooltip of(Component... lines) {
+	public static Tooltip of(Text... lines) {
 		if (lines == null || lines.length == 0) {
 			return EMPTY;
 		}
@@ -66,15 +66,15 @@ public class Tooltip {
 		return new Tooltip(lines);
 	}
 
-	public static Tooltip of(List<Component> components) {
-		if (components == null || components.isEmpty()) {
+	public static Tooltip of(List<Text> text) {
+		if (text == null || text.isEmpty()) {
 			return EMPTY;
 		}
 
-		Component[] lines = new Component[components.size()];
+		Text[] lines = new Text[text.size()];
 
-		for (int index = 0; index < components.size(); index++) {
-			lines[index] = components.get(index);
+		for (int index = 0; index < text.size(); index++) {
+			lines[index] = text.get(index);
 		}
 
 		return new Tooltip(lines);

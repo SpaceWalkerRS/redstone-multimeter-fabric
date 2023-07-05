@@ -10,13 +10,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.brigadier.CommandDispatcher;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
+import net.minecraft.server.command.handler.CommandManager;
+import net.minecraft.server.command.source.CommandSourceStack;
 
 import redstone.multimeter.command.MeterGroupCommand;
 
-@Mixin(Commands.class)
-public class CommandsMixin {
+@Mixin(CommandManager.class)
+public class CommandManagerMixin {
 
 	@Shadow @Final private CommandDispatcher<CommandSourceStack> dispatcher;
 

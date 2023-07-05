@@ -9,14 +9,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.server.PlayerManager;
+import net.minecraft.server.entity.living.player.ServerPlayerEntity;
+import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 
-@Mixin(PlayerList.class)
-public class PlayerListMixin {
+@Mixin(PlayerManager.class)
+public class PlayerManagerMixin {
 
 	@Shadow @Final private MinecraftServer server;
 
@@ -26,7 +26,7 @@ public class PlayerListMixin {
 			value = "TAIL"
 		)
 	)
-	private void onPlayerRespawn(ServerPlayer player, DimensionType dimension, boolean alive, CallbackInfoReturnable<ServerPlayer> cir) {
+	private void onPlayerRespawn(ServerPlayerEntity player, DimensionType dimension, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
 		((IMinecraftServer)server).getMultimeterServer().getPlayerList().respawn(cir.getReturnValue());
 	}
 
@@ -36,7 +36,7 @@ public class PlayerListMixin {
 			value = "HEAD"
 		)
 	)
-	private void onPlayerLeave(ServerPlayer player, CallbackInfo ci) {
+	private void onPlayerLeave(ServerPlayerEntity player, CallbackInfo ci) {
 		((IMinecraftServer)server).getMultimeterServer().getPlayerList().remove(player);
 	}
 }

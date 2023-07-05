@@ -7,13 +7,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.block.Block;
+import net.minecraft.block.DoorBlock;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.property.Half;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 
@@ -27,12 +27,12 @@ public class DoorBlockMixin implements MeterableBlock {
 			value = "FIELD",
 			ordinal = 0,
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/world/level/block/DoorBlock;POWERED:Lnet/minecraft/world/level/block/state/properties/BooleanProperty;"
+			target = "Lnet/minecraft/block/DoorBlock;POWERED:Lnet/minecraft/state/property/BooleanProperty;"
 		)
 	)
-	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston, CallbackInfo ci, boolean powered) {
-		rsmm$logPowered(level, pos, powered);
-		rsmm$logPowered(level, rsmm$getOtherHalf(pos, state), powered);
+	private void logPowered(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, boolean powered) {
+		rsmm$logPowered(world, pos, powered);
+		rsmm$logPowered(world, rsmm$getOtherHalf(pos, state), powered);
 	}
 
 	@Override
@@ -41,19 +41,19 @@ public class DoorBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
-		return level.hasNeighborSignal(pos) || level.hasNeighborSignal(rsmm$getOtherHalf(pos, state));
+	public boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
+		return world.hasNeighborSignal(pos) || world.hasNeighborSignal(rsmm$getOtherHalf(pos, state));
 	}
 
 	@Override
-	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(DoorBlock.OPEN);
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(DoorBlock.OPEN);
 	}
 
 	private BlockPos rsmm$getOtherHalf(BlockPos pos, BlockState state) {
-		DoubleBlockHalf half = state.getValue(DoorBlock.HALF);
-		Direction dir = (half == DoubleBlockHalf.LOWER) ? Direction.UP : Direction.DOWN;
+		Half half = state.get(DoorBlock.HALF);
+		Direction dir = (half == Half.LOWER) ? Direction.UP : Direction.DOWN;
 
-		return pos.relative(dir);
+		return pos.offset(dir);
 	}
 }

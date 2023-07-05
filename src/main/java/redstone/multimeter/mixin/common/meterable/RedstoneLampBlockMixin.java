@@ -7,10 +7,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.RedstoneLampBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.RedstoneLampBlock;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 
@@ -23,12 +23,12 @@ public class RedstoneLampBlockMixin implements MeterableBlock {
 			value = "HEAD"
 		)
 	)
-	private void logPowered(BlockState state, Level level, BlockPos pos, Random random, CallbackInfo ci) {
-		rsmm$logPowered(level, pos, state);
+	private void logPowered(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
+		rsmm$logPowered(world, pos, state);
 	}
 
 	@Override
-	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(RedstoneLampBlock.LIT);
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(RedstoneLampBlock.LIT);
 	}
 }

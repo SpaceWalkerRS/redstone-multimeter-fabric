@@ -4,15 +4,14 @@ import java.io.File;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Formatting;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.HitResult;
+import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -101,7 +100,7 @@ public class MultimeterClient {
 	}
 
 	public void sendPacket(RSMMPacket packet) {
-		minecraft.getConnection().send(packetHandler.encode(packet));
+		minecraft.getNetworkHandler().sendPacket(packetHandler.encode(packet));
 	}
 
 	public InputHandler getInputHandler() {
@@ -139,7 +138,7 @@ public class MultimeterClient {
 	public void requestTickPhaseTree() {
 		tickPhaseTree.reset();
 
-		TickPhaseTreePacket packet = new TickPhaseTreePacket(new CompoundTag());
+		TickPhaseTreePacket packet = new TickPhaseTreePacket(new NbtCompound());
 		sendPacket(packet);
 	}
 
@@ -150,7 +149,7 @@ public class MultimeterClient {
 		sendPacket(packet);
 	}
 
-	public void refreshTickPhaseTree(CompoundTag nbt) {
+	public void refreshTickPhaseTree(NbtCompound nbt) {
 		if (tickPhaseTree.isComplete()) {
 			tickPhaseTree.reset();
 		}
@@ -190,7 +189,7 @@ public class MultimeterClient {
 	}
 
 	public static File getConfigDirectory(Minecraft minecraft) {
-		return new File(minecraft.gameDirectory, RedstoneMultimeterMod.CONFIG_PATH);
+		return new File(minecraft.runDir, RedstoneMultimeterMod.CONFIG_PATH);
 	}
 
 	public void reloadResources() {
@@ -233,7 +232,7 @@ public class MultimeterClient {
 			connected = true;
 
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Component warning = new TextComponent(VERSION_WARNING.apply(modVersion)).withStyle(ChatFormatting.RED);
+				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).setFormatting(Formatting.RED);
 				sendMessage(warning, false);
 			}
 
@@ -249,7 +248,7 @@ public class MultimeterClient {
 		String name = Options.RedstoneMultimeter.DEFAULT_METER_GROUP.get();
 
 		if (!MeterGroup.isValidName(name)) {
-			name = minecraft.getUser().getName();
+			name = minecraft.getSession().getUsername();
 		}
 
 		subscribeToMeterGroup(name);
@@ -349,13 +348,13 @@ public class MultimeterClient {
 	}
 
 	private void onTargetBlock(Consumer<DimPos> action) {
-		HitResult hit = minecraft.hitResult;
+		HitResult hit = minecraft.crosshairTarget;
 
-		if (hit.getType() == HitResult.Type.BLOCK) {
-			Level level = minecraft.level;
-			BlockPos pos = ((BlockHitResult)hit).getBlockPos();
+		if (hit.type == HitResult.Type.BLOCK) {
+			World world = minecraft.world;
+			BlockPos pos = hit.getPos();
 
-			action.accept(new DimPos(level, pos));
+			action.accept(new DimPos(world, pos));
 		}
 	}
 
@@ -364,7 +363,7 @@ public class MultimeterClient {
 			hudEnabled = !hudEnabled;
 
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(new TextComponent(message), true);
+			sendMessage(new LiteralText(message), true);
 
 			tutorial.onToggleHud(hudEnabled);
 		}
@@ -380,7 +379,7 @@ public class MultimeterClient {
 	}
 
 	public void openScreen(RSMMScreen screen) {
-		minecraft.setScreen(new ScreenWrapper(minecraft.screen, screen));
+		minecraft.openScreen(new ScreenWrapper(minecraft.screen, screen));
 		tutorial.onScreenOpened(screen);
 	}
 
@@ -402,7 +401,7 @@ public class MultimeterClient {
 		return screen != null && screen instanceof OptionsScreen;
 	}
 
-	public void sendMessage(Component message, boolean actionBar) {
-		minecraft.player.displayClientMessage(message, actionBar);
+	public void sendMessage(Text message, boolean actionBar) {
+		minecraft.player.addMessage(message, actionBar);
 	}
 }

@@ -1,7 +1,7 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
@@ -15,8 +15,8 @@ import redstone.multimeter.util.TextUtils;
 
 public class PlaceMeterTutorial extends StagedTutorialInstance {
 
-	private static final Component TITLE = new TextComponent("Place A Meter");
-	private static final Component DESCRIPTION = new TextComponent("").
+	private static final Text TITLE = new LiteralText("Place A Meter");
+	private static final Text DESCRIPTION = new LiteralText("").
 													append("Look at a block and press ").
 													append(TextUtils.formatKeybind(Keybinds.TOGGLE_METER)).
 													append(" to place a meter.");

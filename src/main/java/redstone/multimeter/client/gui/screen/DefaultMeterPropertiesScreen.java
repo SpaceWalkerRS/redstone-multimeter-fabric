@@ -6,11 +6,11 @@ import java.util.Map.Entry;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.ResourceLocationException;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resource.Identifier;
+import net.minecraft.resource.IdentifierException;
+import net.minecraft.text.Formatting;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -31,11 +31,11 @@ import redstone.multimeter.util.ColorUtils;
 public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 	private final ClientMeterPropertiesManager meterPropertiesManager;
-	private final Map<ResourceLocation, EditableMeterProperties> defaults;
-	private final Map<ResourceLocation, EditableMeterProperties> overrides;
+	private final Map<Identifier, EditableMeterProperties> defaults;
+	private final Map<Identifier, EditableMeterProperties> overrides;
 
 	private Tab currentTab;
-	private ResourceLocation currentBlock;
+	private Identifier currentBlock;
 
 	private BlockListElement blockList;
 	private ScrollableListElement propertiesList;
@@ -45,20 +45,20 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	private TextField create;
 
 	protected DefaultMeterPropertiesScreen(MultimeterClient client) {
-		super(client, new TextComponent("Default Meter Properties"), true);
+		super(client, new LiteralText("Default Meter Properties"), true);
 
 		this.meterPropertiesManager = this.client.getMeterPropertiesManager();
 		this.defaults = new HashMap<>();
 		this.overrides = new HashMap<>();
 
-		for (Entry<ResourceLocation, MeterProperties> entry : this.meterPropertiesManager.getDefaults().entrySet()) {
-			ResourceLocation key = entry.getKey();
+		for (Entry<Identifier, MeterProperties> entry : this.meterPropertiesManager.getDefaults().entrySet()) {
+			Identifier key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			this.defaults.put(key, new EditableMeterProperties(properties));
 		}
-		for (Entry<ResourceLocation, MeterProperties> entry : this.meterPropertiesManager.getOverrides().entrySet()) {
-			ResourceLocation key = entry.getKey();
+		for (Entry<Identifier, MeterProperties> entry : this.meterPropertiesManager.getOverrides().entrySet()) {
+			Identifier key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			this.overrides.put(key, new EditableMeterProperties(properties));
@@ -119,23 +119,23 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		width = half - (IButton.DEFAULT_HEIGHT + 2);
 
 		searchbar = new TextField(client, x, y, width, IButton.DEFAULT_HEIGHT, () -> Tooltip.EMPTY, text -> blockList.update(), null);
-		IButton clear = new Button(client, x + width + 2, y, 20, IButton.DEFAULT_HEIGHT, () -> new TextComponent("X"), () -> Tooltip.EMPTY, button -> {
+		IButton clear = new Button(client, x + width + 2, y, 20, IButton.DEFAULT_HEIGHT, () -> new LiteralText("X"), () -> Tooltip.EMPTY, button -> {
 			searchbar.clear();
 			return true;
 		});
 
 		y = getY() + getHeight() - (bottom - 6);
 
-		add = new Button(client, x, y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> new TextComponent("+").withStyle(ChatFormatting.GREEN), () -> Tooltip.EMPTY, button -> {
+		add = new Button(client, x, y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> new LiteralText("+").setFormatting(Formatting.GREEN), () -> Tooltip.EMPTY, button -> {
 			add();
 			return true;
 		});
-		remove = new Button(client, x + (IButton.DEFAULT_HEIGHT + 2), y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> new TextComponent("-").withStyle(ChatFormatting.RED), () -> Tooltip.EMPTY, button -> {
+		remove = new Button(client, x + (IButton.DEFAULT_HEIGHT + 2), y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> new LiteralText("-").setFormatting(Formatting.RED), () -> Tooltip.EMPTY, button -> {
 			remove();
 			return true;
 		});
 		create = new TextField(client, x + 2 * (IButton.DEFAULT_HEIGHT + 2), y, half - (4 + 2 * IButton.DEFAULT_HEIGHT), IButton.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltip.of("That name is not valid or that block already has an override!") : Tooltip.EMPTY, text -> {
-			ResourceLocation key = nextBlockKey();
+			Identifier key = nextBlockKey();
 			add.setActive(key != null && !key.getPath().trim().isEmpty());
 		}, null);
 
@@ -153,11 +153,11 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		x = getX() + getWidth() / 2;
 		y = getY() + getHeight() - (8 + IButton.DEFAULT_HEIGHT);
 
-		IButton cancel = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableComponent("gui.cancel"), () -> Tooltip.EMPTY, button -> {
+		IButton cancel = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("gui.cancel"), () -> Tooltip.EMPTY, button -> {
 			close();
 			return true;
 		});
-		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableComponent("gui.done"), () -> Tooltip.EMPTY, button -> {
+		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("gui.done"), () -> Tooltip.EMPTY, button -> {
 			save();
 			close();
 			return true;
@@ -185,7 +185,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	private IButton createTabButton(Tab tab, int x, int y, int width, int height) {
-		return new Button(client, x, y, width, height, () -> new TextComponent(tab.name), () -> Tooltip.EMPTY, button -> {
+		return new Button(client, x, y, width, height, () -> new LiteralText(tab.name), () -> Tooltip.EMPTY, button -> {
 			selectTab(tab);
 			selectBlock(null);
 			return true;
@@ -221,7 +221,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		create.clear();
 	}
 
-	private void selectBlock(ResourceLocation key) {
+	private void selectBlock(Identifier key) {
 		currentBlock = key;
 
 		if (currentTab == Tab.OVERRIDES) {
@@ -271,11 +271,11 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 				} catch (NumberFormatException e) {
 				}
 			}, () -> ColorUtils.toRGBString(properties.color())));
-			color.addControl("red", style -> style.setColor(ChatFormatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+			color.addControl("red", style -> style.setColor(Formatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 				int c = properties.color();
 				int red = ColorUtils.getRed(c);
 
-				return new TextComponent(String.valueOf(red));
+				return new LiteralText(String.valueOf(red));
 			}, () -> Tooltip.EMPTY, value -> {
 				int red = (int)Math.round(value * 0xFF);
 				int c = ColorUtils.setRed(properties.color(), red);
@@ -288,11 +288,11 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 				return (double)red / 0xFF;
 			}, 0xFF));
-			color.addControl("blue", style -> style.setColor(ChatFormatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+			color.addControl("blue", style -> style.setColor(Formatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 				int c = properties.color();
 				int blue = ColorUtils.getBlue(c);
 
-				return new TextComponent(String.valueOf(blue));
+				return new LiteralText(String.valueOf(blue));
 			}, () -> Tooltip.EMPTY, value -> {
 				int blue = (int)Math.round(value * 0xFF);
 				int c = ColorUtils.setBlue(properties.color(), blue);
@@ -305,11 +305,11 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 				return (double)blue / 0xFF;
 			}, 0xFF));
-			color.addControl("green", style -> style.setColor(ChatFormatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+			color.addControl("green", style -> style.setColor(Formatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 				int c = properties.color();
 				int green = ColorUtils.getGreen(c);
 
-				return new TextComponent(String.valueOf(green));
+				return new LiteralText(String.valueOf(green));
 			}, () -> Tooltip.EMPTY, value -> {
 				int green = (int)Math.round(value * 0xFF);
 				int c = ColorUtils.setGreen(properties.color(), green);
@@ -395,7 +395,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	private void add() {
-		ResourceLocation key = nextBlockKey();
+		Identifier key = nextBlockKey();
 
 		if (key != null && overrides.putIfAbsent(key, new EditableMeterProperties()) == null) {
 			selectTab(Tab.OVERRIDES);
@@ -410,15 +410,15 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		}
 	}
 
-	public ResourceLocation nextBlockKey() {
+	public Identifier nextBlockKey() {
 		try {
 			String name = create.getText();
-			ResourceLocation key = new ResourceLocation(name);
+			Identifier key = new Identifier(name);
 
 			if (!overrides.containsKey(key)) {
 				return key;
 			}
-		} catch (ResourceLocationException e) {
+		} catch (IdentifierException e) {
 		}
 
 		return null;

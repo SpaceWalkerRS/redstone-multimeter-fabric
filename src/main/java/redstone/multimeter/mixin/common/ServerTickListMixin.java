@@ -9,19 +9,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ServerTickList;
-import net.minecraft.world.level.TickNextTickData;
-import net.minecraft.world.level.TickPriority;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.tick.ScheduledTick;
+import net.minecraft.server.world.tick.ServerTickList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.tick.TickPriority;
 
-import redstone.multimeter.interfaces.mixin.IServerLevel;
+import redstone.multimeter.interfaces.mixin.IServerWorld;
 
 @Mixin(ServerTickList.class)
 public class ServerTickListMixin {
 
-	@Shadow @Final private ServerLevel level;
-	@Shadow @Final private Set<TickNextTickData<?>> tickNextTickSet;
+	@Shadow @Final private ServerWorld world;
+	@Shadow @Final private Set<ScheduledTick<?>> ticks;
 
 	private int rsmm$size;
 
@@ -32,7 +32,7 @@ public class ServerTickListMixin {
 		)
 	)
 	private void onSchedule(BlockPos pos, Object type, int delay, TickPriority priority, CallbackInfo ci) {
-		rsmm$size = tickNextTickSet.size();
+		rsmm$size = ticks.size();
 	}
 
 	@Inject(
@@ -42,8 +42,8 @@ public class ServerTickListMixin {
 		)
 	)
 	private void logSchedule(BlockPos pos, Object type, int delay, TickPriority priority, CallbackInfo ci) {
-		if (rsmm$size < tickNextTickSet.size()) {
-			((IServerLevel)level).getMultimeter().logScheduledTick(level, pos, priority, true);
+		if (rsmm$size < ticks.size()) {
+			((IServerWorld)world).getMultimeter().logScheduledTick(world, pos, priority, true);
 		}
 	}
 }

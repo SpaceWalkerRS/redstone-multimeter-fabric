@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.log.LogManager;
@@ -200,26 +200,26 @@ public abstract class MeterGroup {
 
 	public abstract LogManager getLogManager();
 
-	public CompoundTag toNbt() {
-		ListTag list = new ListTag();
+	public NbtCompound toNbt() {
+		NbtList list = new NbtList();
 
 		for (Meter meter : meters) {
 			list.add(meter.toNbt());
 		}
 
-		CompoundTag nbt = new CompoundTag();
+		NbtCompound nbt = new NbtCompound();
 		nbt.put("meters", list);
 
 		return nbt;
 	}
 
-	public void updateFromNbt(CompoundTag nbt) {
+	public void updateFromNbt(NbtCompound nbt) {
 		clear();
 
-		ListTag list = nbt.getList("meters", NbtUtils.TYPE_COMPOUND);
+		NbtList list = nbt.getList("meters", NbtUtils.TYPE_COMPOUND);
 
 		for (int index = 0; index < list.size(); index++) {
-			CompoundTag meterNbt = list.getCompound(index);
+			NbtCompound meterNbt = list.getCompound(index);
 			Meter meter = Meter.fromNbt(meterNbt);
 
 			addMeter(meter);

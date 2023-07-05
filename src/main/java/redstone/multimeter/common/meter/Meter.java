@@ -3,8 +3,8 @@ package redstone.multimeter.common.meter;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
@@ -67,8 +67,8 @@ public class Meter {
 		return properties.getPos();
 	}
 
-	public boolean isIn(Level level) {
-		return properties.getPos().is(level);
+	public boolean isIn(World world) {
+		return properties.getPos().is(world);
 	}
 
 	public String getName() {
@@ -125,8 +125,8 @@ public class Meter {
 		this.hidden = hidden;
 	}
 
-	public CompoundTag toNbt() {
-		CompoundTag nbt = new CompoundTag();
+	public NbtCompound toNbt() {
+		NbtCompound nbt = new NbtCompound();
 
 		nbt.putLong("id", id);
 		nbt.put("properties", properties.toNbt());
@@ -136,7 +136,7 @@ public class Meter {
 		return nbt;
 	}
 
-	public static Meter fromNbt(CompoundTag nbt) {
+	public static Meter fromNbt(NbtCompound nbt) {
 		long id = nbt.getLong("id");
 		MeterProperties properties = MeterProperties.fromNbt(nbt.getCompound("properties"));
 		boolean powered = nbt.getBoolean("powered");

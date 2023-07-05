@@ -7,9 +7,9 @@ import com.mojang.blaze3d.platform.Window;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.TextRenderer;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
@@ -20,17 +20,17 @@ public abstract class RSMMScreen extends AbstractParentElement {
 
 	protected final MultimeterClient client;
 	protected final Minecraft minecraft;
-	protected final Font font;
+	protected final TextRenderer textRenderer;
 
-	private final Component title;
+	private final Text title;
 	private final boolean drawTitle;
 
 	protected ScreenWrapper wrapper;
 
-	protected RSMMScreen(MultimeterClient client, Component title, boolean drawTitle) {
+	protected RSMMScreen(MultimeterClient client, Text title, boolean drawTitle) {
 		this.client = client;
 		this.minecraft = client.getMinecraft();
-		this.font = this.minecraft.font;
+		this.textRenderer = this.minecraft.textRenderer;
 
 		this.title = title;
 		this.drawTitle = drawTitle;
@@ -42,11 +42,11 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		renderContent(mouseX, mouseY);
 
 		if (drawTitle) {
-			int width = textWidth(font, title);
+			int width = textWidth(textRenderer, title);
 			int x = getX() + (getWidth() - width) / 2;
 			int y = getY() + 6;
 
-			renderText(font, title, x, y, true, 0xFFFFFFFF);
+			renderText(textRenderer, title, x, y, true, 0xFFFFFFFF);
 		}
 
 		Tooltip tooltip = getTooltip(mouseX, mouseY);
@@ -120,7 +120,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	public void close() {
-		minecraft.setScreen(wrapper.getParent());
+		minecraft.openScreen(wrapper.getParent());
 	}
 
 	protected void renderBackground() {
@@ -132,7 +132,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	protected boolean hasTransparentBackground() {
-		return minecraft.level != null;
+		return minecraft.world != null;
 	}
 
 	protected void renderBackgroundTexture() {
@@ -154,17 +154,17 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	protected void drawTooltip(Tooltip tooltip, int mouseX, int mouseY) {
-		List<Component> lines = tooltip.getLines();
+		List<Text> lines = tooltip.getLines();
 
-		int lineHeight = font.lineHeight;
+		int lineHeight = textRenderer.fontHeight;
 		int lineSpacing = 1;
 
 		int width = 0;
 		int height = (lines.size() - 1) * (lineHeight + lineSpacing) + lineHeight;
 
 		for (int index = 0; index < lines.size(); index++) {
-			Component text = lines.get(index);
-			int lineWidth = textWidth(font, text);
+			Text text = lines.get(index);
+			int lineWidth = textWidth(textRenderer, text);
 
 			if (lineWidth > width) {
 				width = lineWidth;
@@ -187,7 +187,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		drawTooltip(lines, x, y, width, height);
 	}
 
-	private void drawTooltip(List<Component> lines, int x, int y, int width, int height) {
+	private void drawTooltip(List<Text> lines, int x, int y, int width, int height) {
 		int backgroundColor = 0xF0100010;
 		int borderColor0 = 0x505000FF;
 		int borderColor1 = 0x5028007F;
@@ -212,16 +212,16 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		int textY = y + 4;
 
 		for (int i = 0; i < lines.size(); i++) {
-			Component line = lines.get(i);
-			renderText(font, line, textX, textY, true, 0xFFFFFFFF);
+			Text line = lines.get(i);
+			renderText(textRenderer, line, textX, textY, true, 0xFFFFFFFF);
 
-			textY += font.lineHeight + 1;
+			textY += textRenderer.fontHeight + 1;
 		}
 
 		GlStateManager.popMatrix();
 	}
 
-	public Component getTitle() {
+	public Text getTitle() {
 		return title;
 	}
 
@@ -230,6 +230,6 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	public static boolean isControlPressed() {
-		return Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
+		return Screen.isControlDown() && !Screen.isShiftDown() && !Screen.isAltDown();
 	}
 }

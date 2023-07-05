@@ -5,9 +5,11 @@ import java.util.function.BooleanSupplier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.integrated.IntegratedServer;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -29,61 +31,35 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 
 	@Inject(
-		method = "prepareLevels",
+		method = "prepareWorlds",
 		at = @At(
 			value = "TAIL"
 		)
 	)
-	private void levelLoaded(CallbackInfo ci) {
-		multimeterServer.levelLoaded();
+	private void worldLoaded(CallbackInfo ci) {
+		multimeterServer.worldLoaded();
 	}
 
 	@Inject(
-		method = "waitUntilNextTick",
-		at = @At(
-			value = "HEAD"
-		)
-	)
-	private void startTickTaskPackets(CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.PACKETS);
-	}
-
-	@Inject(
-		method = "waitUntilNextTick",
-		at = @At(
-			value = "TAIL"
-		)
-	)
-	private void endTickTaskPacketsAndOnTickEnd(CallbackInfo ci) {
-		rsmm$endTickTask();
-
-		// Ending the tick here is not ideal, but for the
-		// sake of Carpet mod compatibility injecting into
-		// the run loop is not an option.
-		multimeterServer.tickEnd();
-	}
-
-	@Inject(
-		method = "tickServer",
+		method = "tick",
 		at = @At(
 			value = "HEAD"
 		)
 	)
 	private void onTickStartAndStartTickTaskTick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		// Starting the tick here is not ideal, but for the
-		// sake of Carpet mod compatibility injecting into
-		// the run loop is not an option.
-		multimeterServer.tickStart();
+		if (!((Object)this instanceof IntegratedServer)) {
+			multimeterServer.tickStart();
+		}
 
 		rsmm$startTickTask(TickTask.TICK);
 	}
 
 	@Inject(
-		method = "tickServer",
+		method = "tick",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lorg/apache/logging/log4j/Logger;debug(Ljava/lang/String;)V",
-			args = "ldc=Autosave started"
+			target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+			args = "ldc=save"
 		)
 	)
 	private void startTickTaskAutosave(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
@@ -91,11 +67,18 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 
 	@Inject(
-		method = "tickServer",
+		method = "tick",
+		slice = @Slice(
+			from = @At(
+				value = "INVOKE_STRING",
+				target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+				args = "ldc=save"
+			)
+		),
 		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lorg/apache/logging/log4j/Logger;debug(Ljava/lang/String;)V",
-			args = "ldc=Autosave finished"
+			value = "INVOKE",
+			ordinal = 0,
+			target = "Lnet/minecraft/util/profiler/Profiler;pop()V"
 		)
 	)
 	private void endTickTaskAutosave(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
@@ -103,32 +86,48 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 
 	@Inject(
-		method = "tickServer",
+		method = "tick",
 		at = @At(
 			value = "TAIL"
 		)
 	)
-	private void endTickTaskTick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void endTickTaskTickAndOnTickEnd(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
 		rsmm$endTickTask();
+
+		if (!((Object)this instanceof IntegratedServer)) {
+			multimeterServer.tickEnd();
+		}
 	}
 
 	@Inject(
-		method = "tickChildren",
+		method = "tickWorlds",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/GameProfiler;push(Ljava/lang/String;)V",
+			target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
+			args = "ldc=jobs"
+		)
+	)
+	private void startTickTaskPackets(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$startTickTask(TickTask.PACKETS);
+	}
+
+	@Inject(
+		method = "tickWorlds",
+		at = @At(
+			value = "INVOKE_STRING",
+			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 			args = "ldc=commandFunctions"
 		)
 	)
-	private void startTickTaskCommandFunctions(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.COMMAND_FUNCTIONS);
+	private void swapTickTaskCommandFunctions(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$swapTickTask(TickTask.COMMAND_FUNCTIONS);
 	}
 
 	@Inject(
-		method = "tickChildren",
+		method = "tickWorlds",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/GameProfiler;popPush(Ljava/lang/String;)V",
+			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 			args = "ldc=levels"
 		)
 	)
@@ -137,10 +136,10 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 
 	@Inject(
-		method = "tickChildren",
+		method = "tickWorlds",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/GameProfiler;popPush(Ljava/lang/String;)V",
+			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 			args = "ldc=connection"
 		)
 	)
@@ -149,10 +148,10 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 
 	@Inject(
-		method = "tickChildren",
+		method = "tickWorlds",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/GameProfiler;popPush(Ljava/lang/String;)V",
+			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 			args = "ldc=players"
 			)
 		)
@@ -161,11 +160,11 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 
 	@Inject(
-		method = "tickChildren",
+		method = "tickWorlds",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/GameProfiler;popPush(Ljava/lang/String;)V",
-			args = "ldc=server gui refresh"
+			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+			args = "ldc=tickables"
 		)
 	)
 	private void swapTickTaskServerGui(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
@@ -173,7 +172,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 
 	@Inject(
-		method = "tickChildren",
+		method = "tickWorlds",
 		at = @At(
 			value = "TAIL"
 		)
@@ -183,13 +182,13 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 
 	@Inject(
-		method = "reloadResources",
+		method = "reloadResources()V",
 		at = @At(
 			value = "HEAD"
 		)
 	)
 	private void onReloadResources(CallbackInfo ci) {
-		((MinecraftServer)(Object)this).execute(() -> multimeterServer.getMultimeter().reloadOptions());
+		((MinecraftServer)(Object)this).submit(() -> multimeterServer.getMultimeter().reloadOptions());
 	}
 
 	@Override

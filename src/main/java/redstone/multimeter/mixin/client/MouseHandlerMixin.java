@@ -4,13 +4,12 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
+import net.minecraft.client.gui.screen.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
@@ -21,44 +20,68 @@ public class MouseHandlerMixin {
 
 	@Shadow @Final private Minecraft minecraft;
 
+	@Shadow private double xpos;
+	@Shadow private double ypos;
+
 	@Inject(
 		method = "onScroll",
-		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/screens/Screen;mouseScrolled(DDD)Z"
+			target = "Lnet/minecraft/client/gui/screen/Screen;mouseScrolled(D)Z"
 		)
 	)
-	private void scrollOnScreen(long window, double horizontal, double vertical, CallbackInfo ci, double scrollY, double mouseX, double mouseY) {
-		MultimeterClient multimeterClient = ((IMinecraft)minecraft).getMultimeterClient();
-		RSMMScreen screen = multimeterClient.getScreen();
-		
+	private void scrollOnScreen(long window, double horizontal, double vertical, CallbackInfo ci) {
+		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
+		RSMMScreen screen = client.getScreen();
+
 		if (screen != null) {
-			boolean discrete = minecraft.options.discreteMouseScroll;
-			double sensitivity = minecraft.options.mouseWheelSensitivity;
-			double scrollX = sensitivity * (discrete ? Math.signum(horizontal) : horizontal);
-			
+			double mouseX = xpos * minecraft.window.getGuiScaledWidth() / minecraft.window.getScreenWidth();
+			double mouseY = ypos * minecraft.window.getGuiScaledHeight() / minecraft.window.getScreenHeight();
+			double discrete = minecraft.options.discreteMouseScroll;
+			double scrollX = discrete * horizontal;
+			double scrollY = discrete * vertical;
+
 			screen.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 		}
 	}
 
 	@Inject(
 		method = "onScroll",
-		locals = LocalCapture.CAPTURE_FAILHARD,
 		cancellable = true,
 		at = @At(
 			value = "INVOKE",
-			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z"
+			target = "Lnet/minecraft/client/entity/living/player/LocalClientPlayerEntity;isSpectator()Z"
 		)
 	)
-	private void scrollInGame(long window, double horizontal, double vertical, CallbackInfo ci, double scrollY, float scrollDeltaY) {
-		boolean discrete = minecraft.options.discreteMouseScroll;
-		double sensitivity = minecraft.options.mouseWheelSensitivity;
-		double scrollX = sensitivity * (discrete ? Math.signum(horizontal) : horizontal);
-		
+	private void scrollInGame(long window, double horizontal, double vertical, CallbackInfo ci) {
+		double discrete = minecraft.options.discreteMouseScroll;
+		double scrollX = discrete * horizontal;
+		double scrollY = discrete * vertical;
+
 		if (((IMinecraft)minecraft).getMultimeterClient().getInputHandler().handleMouseScroll(scrollX, scrollY)) {
 			ci.cancel();
 		}
+	}
+
+	@Inject(
+		method = "onMove",
+		at = @At(
+			value = "FIELD",
+			ordinal = 0,
+			target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screen/Screen;"
+		)
+	)
+	private void onMove(long window, double horizontal, double vertical, CallbackInfo ci) {
+		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
+		RSMMScreen screen = client.getScreen();
+
+		if (screen == null) {
+			return;
+		}
+
+		double mouseX = xpos * minecraft.window.getGuiScaledWidth() / minecraft.window.getScreenWidth();
+		double mouseY = ypos * minecraft.window.getGuiScaledHeight() / minecraft.window.getScreenHeight();
+
+		Screen.wrapScreenError(() -> screen.mouseMove(mouseX, mouseY), "mouseMoved event handler", screen.getClass().getCanonicalName());
 	}
 }

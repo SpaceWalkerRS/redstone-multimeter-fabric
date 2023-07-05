@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.server.entity.living.player.ServerPlayerEntity;
+import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.meter.ServerMeterGroup;
@@ -17,8 +17,8 @@ public class PlayerList {
 
 	private final MultimeterServer server;
 
-	private final Map<UUID, ServerPlayer> playersByUuid;
-	private final Map<String, ServerPlayer> playersByName;
+	private final Map<UUID, ServerPlayerEntity> playersByUuid;
+	private final Map<String, ServerPlayerEntity> playersByName;
 	private final Map<UUID, String> nameCache;
 
 	public PlayerList(MultimeterServer server) {
@@ -34,7 +34,7 @@ public class PlayerList {
 	}
 
 	public void tick() {
-		if (server.getTickCount() % 72000 == 0) {
+		if (server.getTicks() % 72000 == 0) {
 			cleanNameCache();
 		}
 	}
@@ -53,42 +53,42 @@ public class PlayerList {
 		});
 	}
 
-	public void add(ServerPlayer player) {
-		if (!has(player.getUUID())) {
-			playersByUuid.put(player.getUUID(), player);
+	public void add(ServerPlayerEntity player) {
+		if (!has(player.getUuid())) {
+			playersByUuid.put(player.getUuid(), player);
 			playersByName.put(player.getScoreboardName(), player);
-			nameCache.remove(player.getUUID());
+			nameCache.remove(player.getUuid());
 
 			server.onPlayerJoin(player);
 		}
 	}
 
-	public void remove(ServerPlayer player) {
-		if (has(player.getUUID())) {
-			playersByUuid.remove(player.getUUID());
+	public void remove(ServerPlayerEntity player) {
+		if (has(player.getUuid())) {
+			playersByUuid.remove(player.getUuid());
 			playersByName.remove(player.getScoreboardName());
-			nameCache.put(player.getUUID(), player.getScoreboardName());
+			nameCache.put(player.getUuid(), player.getScoreboardName());
 
 			server.onPlayerLeave(player);
 		}
 	}
 
-	public void respawn(ServerPlayer player) {
-		if (has(player.getUUID())) {
-			playersByUuid.put(player.getUUID(), player);
+	public void respawn(ServerPlayerEntity player) {
+		if (has(player.getUuid())) {
+			playersByUuid.put(player.getUuid(), player);
 			playersByName.put(player.getScoreboardName(), player);
 		}
 	}
 
-	public Collection<ServerPlayer> get() {
+	public Collection<ServerPlayerEntity> get() {
 		return playersByUuid.values();
 	}
 
-	public ServerPlayer get(UUID uuid) {
+	public ServerPlayerEntity get(UUID uuid) {
 		return playersByUuid.get(uuid);
 	}
 
-	public ServerPlayer get(String name) {
+	public ServerPlayerEntity get(String name) {
 		return playersByName.get(name);
 	}
 
@@ -101,7 +101,7 @@ public class PlayerList {
 	}
 
 	public String getName(UUID uuid) {
-		ServerPlayer player = get(uuid);
+		ServerPlayerEntity player = get(uuid);
 		return player == null ? nameCache.get(uuid) : player.getScoreboardName();
 	}
 
@@ -114,25 +114,25 @@ public class PlayerList {
 	}
 
 	public void send(RSMMPacket packet, DimensionType dimension) {
-		send(packet, player -> player.level.dimension.getType() == dimension);
+		send(packet, player -> player.world.dimension.getType() == dimension);
 	}
 
-	public void send(RSMMPacket packet, Predicate<ServerPlayer> predicate) {
+	public void send(RSMMPacket packet, Predicate<ServerPlayerEntity> predicate) {
 		Packet<?> mcPacket = server.getPacketHandler().encode(packet);
 
-		for (ServerPlayer player : playersByUuid.values()) {
+		for (ServerPlayerEntity player : playersByUuid.values()) {
 			if (predicate.test(player)) {
-				player.connection.send(mcPacket);
+				player.networkHandler.sendPacket(mcPacket);
 			}
 		}
 	}
 
-	public void send(RSMMPacket packet, ServerPlayer player) {
+	public void send(RSMMPacket packet, ServerPlayerEntity player) {
 		Packet<?> mcPacket = server.getPacketHandler().encode(packet);
-		player.connection.send(mcPacket);
+		player.networkHandler.sendPacket(mcPacket);
 	}
 
-	public void updatePermissions(ServerPlayer player) {
-		server.getMinecraftServer().getPlayerList().sendPlayerPermissionLevel(player);
+	public void updatePermissions(ServerPlayerEntity player) {
+		server.getMinecraftServer().getPlayerManager().updatePermissions(player);
 	}
 }

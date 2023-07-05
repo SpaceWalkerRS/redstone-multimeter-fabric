@@ -2,10 +2,10 @@ package redstone.multimeter.mixin.common.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.TrappedChestBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.TrappedChestBlock;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
@@ -15,8 +15,8 @@ import redstone.multimeter.block.chest.TrappedChestHelper;
 public class TrappedChestBlockMixin implements Meterable, PowerSource {
 
 	@Override
-	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
-		return TrappedChestHelper.getPower(level, pos, state) > MIN_POWER;
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return TrappedChestHelper.getPower(world, pos, state) > MIN_POWER;
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class TrappedChestBlockMixin implements Meterable, PowerSource {
 	}
 
 	@Override
-	public int rsmm$getPowerLevel(Level level, BlockPos pos, BlockState state) {
-		return TrappedChestHelper.getPower(level, pos, state);
+	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return TrappedChestHelper.getPower(world, pos, state);
 	}
 }

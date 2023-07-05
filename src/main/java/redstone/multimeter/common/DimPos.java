@@ -2,32 +2,32 @@ package redstone.multimeter.common;
 
 import com.google.common.base.Objects;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.resource.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.util.NbtUtils;
 
 public class DimPos {
 
-	private final ResourceLocation dimension;
+	private final Identifier dimension;
 	private final BlockPos pos;
 
-	public DimPos(ResourceLocation dimension, BlockPos pos) {
+	public DimPos(Identifier dimension, BlockPos pos) {
 		this.dimension = dimension;
 		this.pos = pos.immutable();
 	}
 
-	public DimPos(ResourceLocation dimension, int x, int y, int z) {
+	public DimPos(Identifier dimension, int x, int y, int z) {
 		this(dimension, new BlockPos(x, y, z));
 	}
 
-	public DimPos(Level level, BlockPos pos) {
-		this(DimensionType.getName(level.dimension.getType()), pos);
+	public DimPos(World world, BlockPos pos) {
+		this(DimensionType.getKey(world.dimension.getType()), pos);
 	}
 
 	@Override
@@ -50,15 +50,15 @@ public class DimPos {
 		return String.format("%s[%d, %d, %d]", dimension.toString(), pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	public ResourceLocation getDimension() {
+	public Identifier getDimension() {
 		return dimension;
 	}
 
-	public boolean is(Level level) {
-		return DimensionType.getName(level.dimension.getType()).equals(dimension);
+	public boolean is(World world) {
+		return DimensionType.getKey(world.dimension.getType()).equals(dimension);
 	}
 
-	public DimPos relative(ResourceLocation dimension) {
+	public DimPos offset(Identifier dimension) {
 		return new DimPos(dimension, pos);
 	}
 
@@ -70,34 +70,34 @@ public class DimPos {
 		return pos.equals(this.pos);
 	}
 
-	public DimPos relative(Direction dir) {
-		return relative(dir, 1);
+	public DimPos offset(Direction dir) {
+		return offset(dir, 1);
 	}
 
-	public DimPos relative(Direction dir, int distance) {
-		return new DimPos(dimension, pos.relative(dir, distance));
+	public DimPos offset(Direction dir, int distance) {
+		return new DimPos(dimension, pos.offset(dir, distance));
 	}
 
-	public DimPos relative(Axis axis) {
-		return relative(axis, 1);
+	public DimPos offset(Axis axis) {
+		return offset(axis, 1);
 	}
 
-	public DimPos relative(Axis axis, int distance) {
+	public DimPos offset(Axis axis, int distance) {
 		int dx = axis.choose(distance, 0, 0);
 		int dy = axis.choose(0, distance, 0);
 		int dz = axis.choose(0, 0, distance);
 
-		return new DimPos(dimension, pos.offset(dx, dy, dz));
+		return new DimPos(dimension, pos.add(dx, dy, dz));
 	}
 
 	public DimPos offset(int dx, int dy, int dz) {
-		return new DimPos(dimension, pos.offset(dx, dy, dz));
+		return new DimPos(dimension, pos.add(dx, dy, dz));
 	}
 
-	public CompoundTag toNbt() {
-		CompoundTag nbt = new CompoundTag();
+	public NbtCompound toNbt() {
+		NbtCompound nbt = new NbtCompound();
 
-		nbt.put("dim", NbtUtils.resourceLocationToNbt(dimension));
+		nbt.put("dim", NbtUtils.identifierToNbt(dimension));
 		nbt.putInt("x", pos.getX());
 		nbt.putInt("y", pos.getY());
 		nbt.putInt("z", pos.getZ());
@@ -105,8 +105,8 @@ public class DimPos {
 		return nbt;
 	}
 
-	public static DimPos fromNbt(CompoundTag nbt) {
-		ResourceLocation dimension = NbtUtils.nbtToResourceLocation(nbt.getCompound("dim"));
+	public static DimPos fromNbt(NbtCompound nbt) {
+		Identifier dimension = NbtUtils.nbtToIdentifier(nbt.getCompound("dim"));
 		int x = nbt.getInt("x");
 		int y = nbt.getInt("y");
 		int z = nbt.getInt("z");

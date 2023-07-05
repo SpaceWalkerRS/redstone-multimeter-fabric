@@ -20,6 +20,11 @@ public interface ServerTickTaskExecutor extends TickTaskExecutor {
 		getMultimeterServer().swapTickTask(task, args);
 	}
 
+	@Override
+	default TickTask getCurrentTickTask() {
+		return getMultimeterServer().getCurrentTickTask();
+	}
+
 	public MultimeterServer getMultimeterServer();
 
 }

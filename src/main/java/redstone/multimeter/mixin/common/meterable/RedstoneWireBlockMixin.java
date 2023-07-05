@@ -6,28 +6,28 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.RedStoneWireBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.RedstoneWireBlock;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.block.PowerSource;
 
-@Mixin(RedStoneWireBlock.class)
-public class RedStoneWireBlockMixin implements MeterableBlock, PowerSource {
+@Mixin(RedstoneWireBlock.class)
+public class RedstoneWireBlockMixin implements MeterableBlock, PowerSource {
 
 	@Inject(
-		method = "updatePowerStrengthImpl",
+		method = "doUpdatePower",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "FIELD",
 			ordinal = 1,
-			target = "Lnet/minecraft/world/level/block/RedStoneWireBlock;POWER:Lnet/minecraft/world/level/block/state/properties/IntegerProperty;"
+			target = "Lnet/minecraft/block/RedstoneWireBlock;POWER:Lnet/minecraft/state/property/IntegerProperty;"
 		)
 	)
-	private void logPowered(Level level, BlockPos pos, BlockState state, CallbackInfoReturnable<BlockState> cir, BlockState oldState, int oldPower, int neighborPower, int wirePower, int receivedPower) {
-		rsmm$logPowered(level, pos, receivedPower > MIN_POWER);
+	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<BlockState> cir, BlockState oldState, int oldPower, int receivedPower) {
+		rsmm$logPowered(world, pos, receivedPower > MIN_POWER);
 	}
 
 	@Override
@@ -39,17 +39,17 @@ public class RedStoneWireBlockMixin implements MeterableBlock, PowerSource {
 	// returns 'true', so it does not really matter that a potentially
 	// incorrect value is returned.
 	@Override
-	public boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
-		return rsmm$isActive(level, pos, state);
+	public boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
+		return rsmm$isActive(world, pos, state);
 	}
 
 	@Override
-	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(RedStoneWireBlock.POWER) > MIN_POWER;
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(RedstoneWireBlock.POWER) > MIN_POWER;
 	}
 
 	@Override
-	public int rsmm$getPowerLevel(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(RedStoneWireBlock.POWER);
+	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return state.get(RedstoneWireBlock.POWER);
 	}
 }

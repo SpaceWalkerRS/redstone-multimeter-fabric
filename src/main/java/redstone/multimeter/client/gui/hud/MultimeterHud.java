@@ -6,11 +6,11 @@ import java.util.List;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.TextRenderer;
+import net.minecraft.text.Formatting;
+import net.minecraft.text.LiteralText;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
@@ -31,7 +31,7 @@ import redstone.multimeter.util.TextUtils;
 public class MultimeterHud extends AbstractParentElement {
 
 	public final MultimeterClient client;
-	public final Font font;
+	public final TextRenderer textRenderer;
 	public final HudSettings settings;
 	public final HudRenderer renderer;
 	public final MeterEventRenderDispatcher eventRenderers;
@@ -64,7 +64,7 @@ public class MultimeterHud extends AbstractParentElement {
 		Minecraft minecraft = client.getMinecraft();
 
 		this.client = client;
-		this.font = minecraft.font;
+		this.textRenderer = minecraft.textRenderer;
 		this.settings = new HudSettings(this);
 		this.renderer = new HudRenderer(this);
 		this.eventRenderers = new MeterEventRenderDispatcher(this);
@@ -294,12 +294,12 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}, () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.TOGGLE_MARKER)));
 
-		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new TextComponent(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PAUSE_METERS)), button -> {
+		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PAUSE_METERS)), button -> {
 			pause();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new TextComponent(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
-			stepBackward(Screen.hasControlDown() ? 10 : 1);
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.isControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
+			stepBackward(Screen.isControlDown() ? 10 : 1);
 			return true;
 		}) {
 
@@ -308,8 +308,8 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new TextComponent(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
-			stepForward(Screen.hasControlDown() ? 10 : 1);
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.isControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
+			stepForward(Screen.isControlDown() ? 10 : 1);
 			return true;
 		}) {
 
@@ -318,7 +318,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new TextComponent("P").withStyle(ChatFormatting.BOLD)).setWithShadow(true), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PRINT_LOGS)));
+		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").setFormatting(Formatting.BOLD)).setWithShadow(true), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PRINT_LOGS)));
 
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);
@@ -679,8 +679,8 @@ public class MultimeterHud extends AbstractParentElement {
 
 		onScreen = true;
 
-		if (settings.rowHeight < font.lineHeight) {
-			settings.rowHeight = font.lineHeight;
+		if (settings.rowHeight < textRenderer.fontHeight) {
+			settings.rowHeight = textRenderer.fontHeight;
 		}
 
 		settings.forceFullOpacity = true;

@@ -1,9 +1,9 @@
 package redstone.multimeter.client;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.resource.Identifier;
 
 import redstone.multimeter.common.network.PacketHandler;
 
@@ -16,11 +16,11 @@ public class ClientPacketHandler extends PacketHandler {
 	}
 
 	@Override
-	protected Packet<?> toCustomPayload(ResourceLocation channel, FriendlyByteBuf data) {
-		return new ServerboundCustomPayloadPacket(channel, data);
+	protected Packet<?> toCustomPayload(Identifier channel, PacketByteBuf data) {
+		return new CustomPayloadC2SPacket(channel, data);
 	}
 
-	public void handlePacket(FriendlyByteBuf data) {
+	public void handlePacket(PacketByteBuf data) {
 		try {
 			decode(data).handle(client);
 		} catch (Exception e) {
