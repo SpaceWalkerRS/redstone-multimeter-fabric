@@ -26,9 +26,16 @@
 			},
 			{
 				"id": "minecraft",
-				"versions": "1.13.x"
+				"versions": "1.12.x"
 			}
 		]
 	},
-	"mixin": "rsmm_ornithe.mixins.json"
+	"mixin": "rsmm_ornithe.mixins.json",
+	"quilt_loom": {
+		"injected_interfaces": {
+			"net/minecraft/unmapped/C_9550253": [
+				"redstone/multimeter/interfaces/mixin/IText"
+			]
+		}
+	}
 }

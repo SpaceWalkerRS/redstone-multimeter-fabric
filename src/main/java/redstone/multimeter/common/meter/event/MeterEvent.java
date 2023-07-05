@@ -32,7 +32,7 @@ public class MeterEvent {
 			String[] args = new String[lines.size()];
 
 			for (int index = 0; index < lines.size(); index++) {
-				args[index] = lines.get(index).getString();
+				args[index] = lines.get(index).buildString();
 			}
 
 			string += "[" + String.join(", ", args) + "]";

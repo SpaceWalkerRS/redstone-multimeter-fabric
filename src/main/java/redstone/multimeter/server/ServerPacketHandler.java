@@ -3,7 +3,6 @@ package redstone.multimeter.server;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
-import net.minecraft.resource.Identifier;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 
 import redstone.multimeter.common.network.PacketHandler;
@@ -17,7 +16,7 @@ public class ServerPacketHandler extends PacketHandler {
 	}
 
 	@Override
-	protected Packet<?> toCustomPayload(Identifier channel, PacketByteBuf data) {
+	protected Packet<?> toCustomPayload(String channel, PacketByteBuf data) {
 		return new CustomPayloadS2CPacket(channel, data);
 	}
 

@@ -1,5 +1,7 @@
 package redstone.multimeter.client.gui.screen;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 
@@ -24,7 +26,7 @@ public class MultimeterScreen extends RSMMScreen {
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
-		minecraft.keyboardHandler.setSendRepeatsToGui(false);
+		Keyboard.enableRepeatEvents(false);
 	}
 
 	@Override
@@ -35,7 +37,7 @@ public class MultimeterScreen extends RSMMScreen {
 
 	@Override
 	protected void initScreen() {
-		minecraft.keyboardHandler.setSendRepeatsToGui(true);
+		Keyboard.enableRepeatEvents(true);
 
 		list = new ScrollableListElement(client, getWidth(), getHeight());
 		list.setX(getX());
@@ -69,7 +71,7 @@ public class MultimeterScreen extends RSMMScreen {
 				text = "Nothing to see here! Subscribe to a meter group to get started.";
 			}
 
-			int textWidth = textRenderer.getWidth(text);
+			int textWidth = textRenderer.getStringWidth(text);
 			int textHeight = textRenderer.fontHeight;
 			int x = getX() + (getWidth() - textWidth) / 2;
 			int y = getY() + (getHeight() - textHeight) / 2;

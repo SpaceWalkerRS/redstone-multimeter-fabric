@@ -23,10 +23,10 @@ public class RedstoneWireBlockMixin implements MeterableBlock, PowerSource {
 		at = @At(
 			value = "FIELD",
 			ordinal = 1,
-			target = "Lnet/minecraft/block/RedstoneWireBlock;POWER:Lnet/minecraft/state/property/IntegerProperty;"
+			target = "Lnet/minecraft/block/RedstoneWireBlock;POWER:Lnet/minecraft/block/state/property/IntegerProperty;"
 		)
 	)
-	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<BlockState> cir, BlockState oldState, int oldPower, int receivedPower) {
+	private void logPowered(World world, BlockPos pos, BlockPos self, BlockState state, CallbackInfoReturnable<BlockState> cir, BlockState oldState, int oldPower, int receivedPower) {
 		rsmm$logPowered(world, pos, receivedPower > MIN_POWER);
 	}
 

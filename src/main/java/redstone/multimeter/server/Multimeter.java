@@ -29,8 +29,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.tick.TickPriority;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
@@ -50,7 +48,6 @@ import redstone.multimeter.server.meter.ServerMeterPropertiesManager;
 import redstone.multimeter.server.meter.event.MeterEventPredicate;
 import redstone.multimeter.server.option.Options;
 import redstone.multimeter.server.option.OptionsManager;
-import redstone.multimeter.util.TextUtils;
 
 public class Multimeter {
 
@@ -426,11 +423,6 @@ public class Multimeter {
 				ServerWorld newWorld = server.getWorld(pos);
 
 				if (newWorld != null) {
-					ServerWorld oldWorld = player.getServerWorld();
-					double oldX = player.x;
-					double oldY = player.y;
-					double oldZ = player.z;
-
 					BlockPos blockPos = pos.getBlockPos();
 
 					double newX = blockPos.getX() + 0.5D;
@@ -439,41 +431,14 @@ public class Multimeter {
 					float newYaw = player.yaw;
 					float newPitch = player.pitch;
 
-					player.teleport(newWorld, newX, newY, newZ, newYaw, newPitch);
+					player.teleportToDimension(newWorld.dimension.getType().getId());
+					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
 					Text text = new LiteralText(String.format("Teleported to meter \"%s\"", meter.getName()));
 					server.sendMessage(player, text, false);
-
-					sendClickableReturnMessage(oldWorld, oldX, oldY, oldZ, newYaw, newPitch, player);
 				}
 			}
 		}
-	}
-
-	/**
-	 * Send the player a message they can click to return to the location they were
-	 * at before teleporting to a meter.
-	 */
-	private void sendClickableReturnMessage(ServerWorld world, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayerEntity player) {
-		String dimension = DimensionType.getKey(world.dimension.getType()).toString();
-		String x = NUMBER_FORMAT.format(_x);
-		String y = NUMBER_FORMAT.format(_y);
-		String z = NUMBER_FORMAT.format(_z);
-		String yaw = NUMBER_FORMAT.format(_yaw);
-		String pitch = NUMBER_FORMAT.format(_pitch);
-
-		Text message = new LiteralText("Click ").append(new LiteralText("[here]").withStyle((style) -> {
-			style
-				.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-					new LiteralText("Teleport to").append(TextUtils.formatKeyValue("\n  dimension", dimension))
-						.append(TextUtils.formatKeyValue("\n  x", x)).append(TextUtils.formatKeyValue("\n  y", y))
-						.append(TextUtils.formatKeyValue("\n  z", z))))
-				.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-					String.format("/execute in %s run tp @s %s %s %s %s %s", dimension, x, y, z, yaw, pitch)))
-				.setColor(Formatting.GREEN);
-		})).append(new LiteralText(" to return to your previous location"));
-
-		server.sendMessage(player, message, false);
 	}
 
 	public void onBlockChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
@@ -553,8 +518,8 @@ public class Multimeter {
 		tryLogEvent(world, pos, EventType.RANDOM_TICK);
 	}
 
-	public void logScheduledTick(World world, BlockPos pos, TickPriority priority, boolean scheduling) {
-		tryLogEvent(world, pos, EventType.SCHEDULED_TICK, (scheduling ? (1 << 30) : 0) | (priority.getId() + 3));
+	public void logScheduledTick(World world, BlockPos pos, int priority, boolean scheduling) {
+		tryLogEvent(world, pos, EventType.SCHEDULED_TICK, (scheduling ? (1 << 30) : 0) | (priority + 3));
 	}
 
 	public void logBlockEvent(World world, BlockPos pos, int type, int depth, boolean queueing) {

@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.DoorBlock;
+import net.minecraft.block.DoorBlock.Half;
 import net.minecraft.block.state.BlockState;
-import net.minecraft.block.state.property.Half;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -27,7 +27,7 @@ public class DoorBlockMixin implements MeterableBlock {
 			value = "FIELD",
 			ordinal = 0,
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/block/DoorBlock;POWERED:Lnet/minecraft/state/property/BooleanProperty;"
+			target = "Lnet/minecraft/block/DoorBlock;POWERED:Lnet/minecraft/block/state/property/BooleanProperty;"
 		)
 	)
 	private void logPowered(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, boolean powered) {

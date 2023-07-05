@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtLong;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -39,7 +40,13 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	@Override
 	public void encode(NbtCompound data) {
 		if (!removedMeters.isEmpty()) {
-			data.putLongArray("removed", removedMeters);
+			NbtList list = new NbtList();
+
+			for (int i = 0; i < removedMeters.size(); i++) {
+				list.add(new NbtLong(removedMeters.get(i)));
+			}
+
+			data.put("removed", list);
 		}
 		if (!meterUpdates.isEmpty()) {
 			NbtList list = new NbtList();
@@ -56,16 +63,25 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			data.put("updates", list);
 		}
 		if (!meters.isEmpty()) {
-			data.putLongArray("meters", meters);
+			NbtList list = new NbtList();
+
+			for (int i = 0; i < meters.size(); i++) {
+				list.add(new NbtLong(meters.get(i)));
+			}
+
+			data.put("meters", list);
 		}
 	}
 	
 	@Override
 	public void decode(NbtCompound data) {
 		if (data.contains("removed")) {
-			long[] removed = data.getLongArray("removed");
+			NbtList ids = data.getList("removed", NbtUtils.TYPE_LONG);
 
-			for (long id : removed) {
+			for (int i = 0; i < ids.size(); i++) {
+				NbtLong nbt = (NbtLong)ids.get(i);
+				long id = nbt.getLong();
+
 				removedMeters.add(id);
 			}
 		}
@@ -81,9 +97,12 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			}
 		}
 		if (data.contains("meters")) {
-			long[] ids = data.getLongArray("meters");
+			NbtList ids = data.getList("meters", NbtUtils.TYPE_LONG);
 
-			for (long id : ids) {
+			for (int i = 0; i < ids.size(); i++) {
+				NbtLong nbt = (NbtLong)ids.get(i);
+				long id = nbt.getLong();
+
 				meters.add(id);
 			}
 		}

@@ -2,18 +2,20 @@ package redstone.multimeter.mixin.common.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.NoteBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.NoteBlockBlockEntity;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
+import redstone.multimeter.interfaces.mixin.IServerWorld;
 
 @Mixin(NoteBlock.class)
 public class NoteBlockMixin implements MeterableBlock {
@@ -24,12 +26,26 @@ public class NoteBlockMixin implements MeterableBlock {
 		at = @At(
 			value = "FIELD",
 			ordinal = 0,
-			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/block/NoteBlock;POWERED:Lnet/minecraft/state/property/BooleanProperty;"
+			target = "Lnet/minecraft/block/entity/NoteBlockBlockEntity;powered:Z"
 		)
 	)
 	private void logPowered(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, boolean powered) {
 		rsmm$logPowered(world, pos, powered);
+	}
+
+	@Inject(
+		method = "neighborChanged",
+		locals = LocalCapture.CAPTURE_FAILHARD,
+		at = @At(
+			value = "FIELD",
+			ordinal = 1,
+			target = "Lnet/minecraft/block/entity/NoteBlockBlockEntity;powered:Z"
+		)
+	)
+	private void logActive(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, boolean powered) {
+		if (!world.isClient) {
+			((IServerWorld)world).getMultimeter().logActive(world, pos, powered);
+		}
 	}
 
 	@Override
@@ -39,6 +55,12 @@ public class NoteBlockMixin implements MeterableBlock {
 
 	@Override
 	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(NoteBlock.POWERED);
+		BlockEntity blockEntity = world.getBlockEntity(pos);
+
+		if (blockEntity instanceof NoteBlockBlockEntity) {
+			return ((NoteBlockBlockEntity)blockEntity).powered;
+		}
+
+		return false;
 	}
 }

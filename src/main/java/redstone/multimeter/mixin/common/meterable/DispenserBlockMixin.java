@@ -25,7 +25,7 @@ public class DispenserBlockMixin implements MeterableBlock {
 			value = "FIELD",
 			ordinal = 0,
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/block/DispenserBlock;TRIGGERED:Lnet/minecraft/state/property/BooleanProperty;"
+			target = "Lnet/minecraft/block/DispenserBlock;TRIGGERED:Lnet/minecraft/block/state/property/BooleanProperty;"
 		)
 	)
 	private void logPowered(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, boolean powered) {

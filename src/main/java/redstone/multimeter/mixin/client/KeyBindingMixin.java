@@ -9,18 +9,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.mojang.blaze3d.platform.InputConstants.Key;
-
 import net.minecraft.client.options.KeyBinding;
 
 import redstone.multimeter.client.Keybinds;
-import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
 @Mixin(KeyBinding.class)
-public class KeyBindingMixin implements IKeyBinding {
+public class KeyBindingMixin {
 
 	@Shadow @Final private static Map<String, Integer> CATEGORY_SORT_ORDER;
-	@Shadow private Key key;
 
 	@Inject(
 		method = "<clinit>",
@@ -32,10 +28,5 @@ public class KeyBindingMixin implements IKeyBinding {
 		for (String category : Keybinds.getCategories()) {
 			CATEGORY_SORT_ORDER.put(category, CATEGORY_SORT_ORDER.size() + 1);
 		}
-	}
-
-	@Override
-	public Key rsmm$getKey() {
-		return key;
 	}
 }

@@ -27,9 +27,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.resource.Identifier;
-import net.minecraft.resource.IdentifierException;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -107,7 +105,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 				properties.toggleEventType(type);
 			}
 		}
-		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.ticksRandomly()) {
+		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.getBlock().ticksRandomly()) {
 			if (!properties.hasEventType(EventType.RANDOM_TICK)) {
 				properties.toggleEventType(EventType.RANDOM_TICK);
 			}
@@ -144,7 +142,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	private MeterProperties getDefaultProperties(Block block) {
-		Identifier key = Registry.BLOCK.getKey(block);
+		Identifier key = Block.REGISTRY.getKey(block);
 
 		if (key == null) {
 			return null; // we should never get here
@@ -166,7 +164,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	private void initDefaults() {
 		Set<String> namespaces = new HashSet<>();
 
-		for (Identifier key : Registry.BLOCK.keySet()) {
+		for (Identifier key : Block.REGISTRY.keySet()) {
 			loadDefaultProperties(key);
 
 			if (namespaces.add(key.getNamespace())) {
@@ -217,7 +215,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 		try (FileReader fr = new FileReader(file)) {
 			loadProperties(overrides, new Identifier(namespace, path), fr);
-		} catch (IdentifierException | IOException | JsonSyntaxException | JsonIOException e) {
+		} catch (IOException | JsonSyntaxException | JsonIOException e) {
 		}
 	}
 

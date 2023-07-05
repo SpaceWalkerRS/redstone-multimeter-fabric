@@ -1,5 +1,6 @@
 package redstone.multimeter.mixin.common.meterable;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,6 +16,8 @@ import redstone.multimeter.block.MeterableBlock;
 
 @Mixin(DiodeBlock.class)
 public class DiodeBlockMixin implements MeterableBlock {
+
+	@Shadow @Final private boolean powered;
 
 	@Shadow private boolean shouldBePowered(World world, BlockPos pos, BlockState state) { return false; }
 
@@ -40,6 +43,6 @@ public class DiodeBlockMixin implements MeterableBlock {
 
 	@Override
 	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(DiodeBlock.POWERED);
+		return powered;
 	}
 }

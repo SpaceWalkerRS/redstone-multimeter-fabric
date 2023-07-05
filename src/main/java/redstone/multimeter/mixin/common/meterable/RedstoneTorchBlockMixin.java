@@ -1,5 +1,6 @@
 package redstone.multimeter.mixin.common.meterable;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +18,8 @@ import redstone.multimeter.block.PowerSource;
 @Mixin(RedstoneTorchBlock.class)
 public class RedstoneTorchBlockMixin implements MeterableBlock, PowerSource {
 
+	@Shadow @Final private boolean lit;
+
 	@Shadow private boolean hasNeighborSignal(World world, BlockPos pos, BlockState state) { return false; }
 
 	@Inject(
@@ -26,7 +29,7 @@ public class RedstoneTorchBlockMixin implements MeterableBlock, PowerSource {
 		)
 	)
 	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		rsmm$logPowered(world, pos, cir.getReturnValue()); // floor redstone torches only
+		rsmm$logPowered(world, pos, cir.getReturnValue());
 	}
 
 	@Override
@@ -41,11 +44,11 @@ public class RedstoneTorchBlockMixin implements MeterableBlock, PowerSource {
 
 	@Override
 	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(RedstoneTorchBlock.LIT);
+		return lit;
 	}
 
 	@Override
 	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
-		return state.get(RedstoneTorchBlock.LIT) ? MAX_POWER : MIN_POWER;
+		return lit ? MAX_POWER : MIN_POWER;
 	}
 }

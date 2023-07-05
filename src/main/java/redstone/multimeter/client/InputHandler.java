@@ -93,7 +93,7 @@ public class InputHandler {
 	// Methods for handling keybinds while the client has a screen open
 
 	public boolean mouseClick(RSMMScreen screen, double mouseX, double mouseY, int button) {
-		if (Keybinds.OPEN_MULTIMETER_SCREEN.matchesMouse(button)) {
+		if (Keybinds.matchesButton(Keybinds.OPEN_MULTIMETER_SCREEN, button)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
@@ -103,13 +103,13 @@ public class InputHandler {
 					client.openScreen(new MultimeterScreen(client));
 				}
 			}
-		} else if (Keybinds.OPEN_OPTIONS_MENU.matchesMouse(button)) {
+		} else if (Keybinds.matchesButton(Keybinds.OPEN_OPTIONS_MENU, button)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
 				client.openScreen(new OptionsScreen(client));
 			}
-		} else if (Keybinds.VIEW_TICK_PHASE_TREE.matchesMouse(button)) {
+		} else if (Keybinds.matchesButton(Keybinds.VIEW_TICK_PHASE_TREE, button)) {
 			if (!client.isConnected()) {
 				return false;
 			} else if (screen instanceof TickPhaseTreeScreen) {
@@ -118,13 +118,13 @@ public class InputHandler {
 				client.openScreen(new TickPhaseTreeScreen(client));
 			}
 		} else if (screen instanceof MultimeterScreen) {
-			if (Keybinds.PAUSE_METERS.matchesMouse(button)) {
+			if (Keybinds.matchesButton(Keybinds.PAUSE_METERS, button)) {
 				client.getHud().pause();
-			} else if (Keybinds.TOGGLE_MARKER.matchesMouse(button)) {
+			} else if (Keybinds.matchesButton(Keybinds.TOGGLE_MARKER, button)) {
 				client.getHud().toggleTickMarker(Screen.isControlDown());
-			} else if (Keybinds.STEP_BACKWARD.matchesMouse(button)) {
+			} else if (Keybinds.matchesButton(Keybinds.STEP_BACKWARD, button)) {
 				client.getHud().stepBackward(Screen.isControlDown() ? 10 : 1);
-			} else if (Keybinds.STEP_FORWARD.matchesMouse(button)) {
+			} else if (Keybinds.matchesButton(Keybinds.STEP_FORWARD, button)) {
 				client.getHud().stepForward(Screen.isControlDown() ? 10 : 1);
 			} else {
 				return false;
@@ -136,8 +136,8 @@ public class InputHandler {
 		return true;
 	}
 
-	public boolean keyPress(RSMMScreen screen, int keyCode, int scanCode, int modifiers) {
-		if (Keybinds.OPEN_MULTIMETER_SCREEN.matches(keyCode, scanCode)) {
+	public boolean keyPress(RSMMScreen screen, int keyCode) {
+		if (Keybinds.matchesKey(Keybinds.OPEN_MULTIMETER_SCREEN, keyCode)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
@@ -147,13 +147,13 @@ public class InputHandler {
 					client.openScreen(new MultimeterScreen(client));
 				}
 			}
-		} else if (Keybinds.OPEN_OPTIONS_MENU.matches(keyCode, scanCode)) {
+		} else if (Keybinds.matchesKey(Keybinds.OPEN_OPTIONS_MENU, keyCode)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
 				client.openScreen(new OptionsScreen(client));
 			}
-		} else if (Keybinds.VIEW_TICK_PHASE_TREE.matches(keyCode, scanCode)) {
+		} else if (Keybinds.matchesKey(Keybinds.VIEW_TICK_PHASE_TREE, keyCode)) {
 			if (!client.isConnected()) {
 				return false;
 			} else if (screen instanceof TickPhaseTreeScreen) {
@@ -162,13 +162,13 @@ public class InputHandler {
 				client.openScreen(new TickPhaseTreeScreen(client));
 			}
 		} else if (screen instanceof MultimeterScreen) {
-			if (Keybinds.PAUSE_METERS.matches(keyCode, scanCode)) {
+			if (Keybinds.matchesKey(Keybinds.PAUSE_METERS, keyCode)) {
 				client.getHud().pause();
-			} else if (Keybinds.TOGGLE_MARKER.matches(keyCode, scanCode)) {
+			} else if (Keybinds.matchesKey(Keybinds.TOGGLE_MARKER, keyCode)) {
 				client.getHud().toggleTickMarker(Screen.isControlDown());
-			} else if (Keybinds.STEP_BACKWARD.matches(keyCode, scanCode)) {
+			} else if (Keybinds.matchesKey(Keybinds.STEP_BACKWARD, keyCode)) {
 				client.getHud().stepBackward(Screen.isControlDown() ? 10 : 1);
-			} else if (Keybinds.STEP_FORWARD.matches(keyCode, scanCode)) {
+			} else if (Keybinds.matchesKey(Keybinds.STEP_FORWARD, keyCode)) {
 				client.getHud().stepForward(Screen.isControlDown() ? 10 : 1);
 			} else {
 				return false;

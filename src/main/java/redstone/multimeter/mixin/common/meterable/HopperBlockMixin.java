@@ -27,7 +27,7 @@ public class HopperBlockMixin implements MeterableBlock {
 			value = "FIELD",
 			ordinal = 0,
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/block/HopperBlock;ENABLED:Lnet/minecraft/state/property/BooleanProperty;"
+			target = "Lnet/minecraft/block/HopperBlock;ENABLED:Lnet/minecraft/block/state/property/BooleanProperty;"
 		)
 	)
 	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfo ci, boolean shouldBeEnabled) {

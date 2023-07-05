@@ -35,7 +35,7 @@ public class TutorialToast implements Toast {
 		this.toastWidth = 200;
 
 		this.title = title;
-		this.description = textRenderer.split(description.getFormattedString(), width() - 14);
+		this.description = textRenderer.wrapLines(description.getFormattedContent(), width() - 14);
 
 		this.toastHeight = 10 + 12 + 10 * this.description.size();
 
@@ -57,15 +57,15 @@ public class TutorialToast implements Toast {
 		Minecraft minecraft = toasts.getMinecraft();
 		TextRenderer textRenderer = minecraft.textRenderer;
 
-		float x = 7.0F;
-		float y = 7.0F;
+		int x = 7;
+		int y = 7;
 
-		textRenderer.draw(title.getFormattedString(), x, y, 0xFF500050);
+		textRenderer.drawWithoutShadow(title.getFormattedContent(), x, y, 0xFF500050);
 
 		y += 12.0F;
 
 		for (int i = 0; i < description.size(); i++, y += 10.0F) {
-			textRenderer.draw(description.get(i), x, y, 0xFF000000);
+			textRenderer.drawWithoutShadow(description.get(i), x, y, 0xFF000000);
 		}
 
 		drawDecoration(toasts, animationTime);

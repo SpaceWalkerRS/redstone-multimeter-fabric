@@ -1,13 +1,11 @@
 package redstone.multimeter.mixin.common;
 
 import java.util.Iterator;
-import java.util.function.BooleanSupplier;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -20,7 +18,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IBlock;
@@ -33,31 +30,8 @@ import redstone.multimeter.server.MultimeterServer;
 public class WorldMixin implements TickTaskExecutor {
 
 	@Shadow @Final private Dimension dimension;
+	@Shadow @Final private boolean isClient;
 
-	@Shadow public boolean isClient() { return false; }
-
-	@Inject(
-		method = "tick",
-		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/world/border/WorldBorder;tick()V"
-		)
-	)
-	private void startTickTaskWorldBorder(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.WORLD_BORDER);
-	}
-
-	@Inject(
-		method = "tick",
-		at = @At(
-			value = "INVOKE",
-			shift = Shift.AFTER,
-			target = "Lnet/minecraft/world/border/WorldBorder;tick()V"
-		)
-	)
-	private void endTickTaskWorldBorder(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		rsmm$endTickTask();
-	}
 
 	@Inject(
 		method = "tickEntities",
@@ -68,7 +42,7 @@ public class WorldMixin implements TickTaskExecutor {
 		)
 	)
 	private void startTickTaskEntities(CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.ENTITIES, DimensionType.getKey(dimension.getType()).toString());
+		rsmm$startTickTask(TickTask.ENTITIES, dimension.getType().getKey());
 	}
 
 	@Inject(
@@ -92,7 +66,7 @@ public class WorldMixin implements TickTaskExecutor {
 		)
 	)
 	private void logGlobalEntityTick(CallbackInfo ci, int index, Entity entity) {
-		if (!isClient()) {
+		if (!isClient) {
 			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
 		}
 	}
@@ -130,7 +104,7 @@ public class WorldMixin implements TickTaskExecutor {
 		)
 	)
 	private void logBlockEntityTick(CallbackInfo ci, Iterator<BlockEntity> it, BlockEntity blockEntity) {
-		if (!isClient()) {
+		if (!isClient) {
 			((IServerWorld)this).getMultimeter().logBlockEntityTick((World)(Object)this, blockEntity);
 		}
 	}
@@ -154,7 +128,7 @@ public class WorldMixin implements TickTaskExecutor {
 		)
 	)
 	private void logEntityTick(Entity entity, boolean requireLoaded, CallbackInfo ci) {
-		if (!isClient()) {
+		if (!isClient) {
 			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
 		}
 	}
@@ -168,7 +142,7 @@ public class WorldMixin implements TickTaskExecutor {
 		)
 	)
 	private void logBlockUpdate(BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, BlockState state) {
-		if (!isClient()) {
+		if (!isClient) {
 			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 
@@ -184,6 +158,20 @@ public class WorldMixin implements TickTaskExecutor {
 	}
 
 	@Inject(
+		method = "neighborStateChanged",
+		locals = LocalCapture.CAPTURE_FAILHARD,
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/block/ObserverBlock;neighborStateChanged(Lnet/minecraft/block/state/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+		)
+	)
+	private void logObserverUpdate(BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, BlockState state) {
+		if (!isClient) {
+			((IServerWorld)this).getMultimeterServer().getMultimeter().logObserverUpdate((World)(Object)this, pos);
+		}
+	}
+
+	@Inject(
 		method = "updateNeighborComparators",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
@@ -192,7 +180,7 @@ public class WorldMixin implements TickTaskExecutor {
 		)
 	)
 	private void logComparatorUpdate(BlockPos neighborPos, Block neighborBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {
-		if (!isClient()) {
+		if (!isClient) {
 			((IServerWorld)this).getMultimeterServer().getMultimeter().logComparatorUpdate((World)(Object)this, pos);
 		}
 	}

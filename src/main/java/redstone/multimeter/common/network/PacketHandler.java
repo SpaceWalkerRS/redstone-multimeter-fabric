@@ -5,12 +5,11 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.resource.Identifier;
 
 public abstract class PacketHandler {
 
 	public Packet<?> encode(RSMMPacket packet) {
-		Identifier key = Packets.getKey(packet);
+		String key = Packets.getKey(packet);
 
 		if (key == null) {
 			throw new IllegalStateException("Unable to encode packet: " + packet.getClass());
@@ -21,16 +20,16 @@ public abstract class PacketHandler {
 
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 
-		buffer.writeIdentifier(key);
+		buffer.writeString(key);
 		buffer.writeNbtCompound(data);
 
 		return toCustomPayload(Packets.getChannel(), buffer);
 	}
 
-	protected abstract Packet<?> toCustomPayload(Identifier channel, PacketByteBuf data);
+	protected abstract Packet<?> toCustomPayload(String channel, PacketByteBuf data);
 
 	protected RSMMPacket decode(PacketByteBuf buffer) {
-		Identifier key = buffer.readIdentifier();
+		String key = buffer.readString(32767);
 		RSMMPacket packet = Packets.create(key);
 
 		if (packet == null) {

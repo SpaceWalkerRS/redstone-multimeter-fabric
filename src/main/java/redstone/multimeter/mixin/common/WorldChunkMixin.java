@@ -26,12 +26,12 @@ public class WorldChunkMixin {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/block/state/BlockState;onRemoved(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Z)V"
+			shift = Shift.AFTER,
+			target = "Lnet/minecraft/world/chunk/WorldChunkSection;setBlockState(IIILnet/minecraft/block/state/BlockState;)V"
 		)
 	)
-	private void logBlockChange(BlockPos pos, BlockState state, boolean movedByPiston, CallbackInfoReturnable<BlockState> cir, int sectionX, int y, int sectionZ, int height, BlockState prevState) {
-		if (!world.isClient()) {
+	private void logBlockChange(BlockPos pos, BlockState state, CallbackInfoReturnable<BlockState> cir, int sectionX, int y, int sectionZ, int index, int height, BlockState prevState) {
+		if (!world.isClient) {
 			((IServerWorld)world).getMultimeter().onBlockChange(world, pos, prevState, state);
 		}
 	}

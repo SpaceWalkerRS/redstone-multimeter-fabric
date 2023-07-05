@@ -99,21 +99,21 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(int keyCode) {
 		Element focused = getFocusedElement();
-		return focused != null && focused.keyPress(keyCode, scanCode, modifiers);
+		return focused != null && focused.keyPress(keyCode);
 	}
 
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(int keyCode) {
 		Element focused = getFocusedElement();
-		return focused != null && focused.keyRelease(keyCode, scanCode, modifiers);
+		return focused != null && focused.keyRelease(keyCode);
 	}
 
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		Element focused = getFocusedElement();
-		return focused != null && focused.typeChar(chr, modifiers);
+		return focused != null && focused.typeChar(chr);
 	}
 
 	@Override

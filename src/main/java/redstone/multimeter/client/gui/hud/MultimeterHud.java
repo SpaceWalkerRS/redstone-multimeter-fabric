@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.Window;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.TextRenderer;
+import net.minecraft.client.render.Window;
 import net.minecraft.text.Formatting;
 import net.minecraft.text.LiteralText;
 
@@ -576,9 +576,10 @@ public class MultimeterHud extends AbstractParentElement {
 
 	public void resetSize() {
 		Minecraft minecraft = client.getMinecraft();
-		Window window = minecraft.window;
-		int width = window.getGuiScaledWidth();
-		int height = window.getGuiScaledHeight();
+		Window window = new Window(minecraft);
+
+		int width = window.getWidth();
+		int height = window.getHeight();
 
 		resize(width, height);
 	}

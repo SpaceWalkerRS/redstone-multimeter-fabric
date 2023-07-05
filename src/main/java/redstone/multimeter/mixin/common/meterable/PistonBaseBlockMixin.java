@@ -1,7 +1,6 @@
 package redstone.multimeter.mixin.common.meterable;
 
 import java.util.List;
-import java.util.Set;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -47,8 +46,8 @@ public class PistonBaseBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
 		)
 	)
-	private void logMoved(World world, BlockPos pos, Direction facing, boolean extending, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonMoveStructureResolver structureResolver, List<BlockPos> toMove, List<BlockState> statesToMove, List<BlockPos> toDestroy, int removedIndex, BlockState[] removedStates, Direction moveDir, Set<BlockState> leftOverStates, int toMoveIndex, BlockPos posToMove, BlockState stateToMove) {
-		if (!world.isClient()) {
+	private void logMoved(World world, BlockPos pos, Direction facing, boolean extending, CallbackInfoReturnable<Boolean> cir, PistonMoveStructureResolver structureResolver, List<BlockPos> toMove, List<BlockState> statesToMove, List<BlockPos> toDestroy, int removedIndex, BlockState[] removedStates, Direction moveDir, int toMoveIndex, BlockPos posToMove, BlockState stateToMove) {
+		if (!world.isClient) {
 			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 
 			multimeter.logMoved(world, posToMove, moveDir);

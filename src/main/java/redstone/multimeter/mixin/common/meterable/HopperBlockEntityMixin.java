@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.HopperBlockEntity;
 
 import redstone.multimeter.interfaces.mixin.IHopperBlockEntity;
@@ -17,10 +16,6 @@ import redstone.multimeter.interfaces.mixin.IServerWorld;
 public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockEntity {
 
 	@Shadow private int transferCooldown;
-
-	private HopperBlockEntityMixin(BlockEntityType<?> type) {
-		super(type);
-	}
 
 	@Inject(
 		method = "tick",
@@ -49,7 +44,7 @@ public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockE
 	}
 
 	private void rsmm$logActive() {
-		if (!world.isClient()) {
+		if (!world.isClient) {
 			((IServerWorld)world).getMultimeter().logActive(world, pos, !rsmm$isOnCooldown());
 		}
 	}

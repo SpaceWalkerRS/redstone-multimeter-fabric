@@ -3,12 +3,10 @@ package redstone.multimeter.client.gui.element.meter;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.resource.Identifier;
-import net.minecraft.resource.IdentifierException;
 import net.minecraft.text.Formatting;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Direction.Axis;
@@ -94,10 +92,10 @@ public class MeterControlsElement extends AbstractParentElement {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = super.keyPress(keyCode, scanCode, modifiers);
+	public boolean keyPress(int keyCode) {
+		boolean consumed = super.keyPress(keyCode);
 
-		if (triedDeleting && keyCode == GLFW.GLFW_KEY_ESCAPE) {
+		if (triedDeleting && keyCode == Keyboard.KEY_ESCAPE) {
 			undoTryDelete();
 			consumed = true;
 		}
@@ -152,15 +150,8 @@ public class MeterControlsElement extends AbstractParentElement {
 			teleport();
 			return true;
 		});
-		pos.addControl("dimension", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
-			try {
-				Identifier dimension = new Identifier(text);
-				DimPos newPos = meter.getPos().offset(dimension);
-
-				changePos(newPos);
-			} catch (IdentifierException e) {
-
-			}
+		pos.addControl("dimension", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, dimension -> {
+			changePos(meter.getPos().offset(dimension));
 		}, () -> meter.getPos().getDimension().toString()));
 		pos.addCoordinateControl(Axis.X, () -> meter.getPos(), p -> changePos(p));
 		pos.addCoordinateControl(Axis.Y, () -> meter.getPos(), p -> changePos(p));
@@ -234,7 +225,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			KeyBinding keybind = Keybinds.TOGGLE_EVENT_TYPES[type.getIndex()];
 			Supplier<Tooltip> tooltip = () -> Tooltip.EMPTY;
 
-			if (!keybind.isUnbound()) {
+			if (keybind.getKeyCode() != Keyboard.KEY_NONE) {
 				tooltip = () -> Tooltip.of(TextUtils.formatKeybindInfo(keybind));
 			}
 

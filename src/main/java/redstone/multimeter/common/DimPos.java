@@ -3,31 +3,29 @@ package redstone.multimeter.common;
 import com.google.common.base.Objects;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.resource.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
-import redstone.multimeter.util.NbtUtils;
+import redstone.multimeter.util.AxisUtils;
 
 public class DimPos {
 
-	private final Identifier dimension;
+	private final String dimension;
 	private final BlockPos pos;
 
-	public DimPos(Identifier dimension, BlockPos pos) {
+	public DimPos(String dimension, BlockPos pos) {
 		this.dimension = dimension;
 		this.pos = pos.immutable();
 	}
 
-	public DimPos(Identifier dimension, int x, int y, int z) {
+	public DimPos(String dimension, int x, int y, int z) {
 		this(dimension, new BlockPos(x, y, z));
 	}
 
 	public DimPos(World world, BlockPos pos) {
-		this(DimensionType.getKey(world.dimension.getType()), pos);
+		this(world.dimension.getType().getKey(), pos);
 	}
 
 	@Override
@@ -50,15 +48,15 @@ public class DimPos {
 		return String.format("%s[%d, %d, %d]", dimension.toString(), pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	public Identifier getDimension() {
+	public String getDimension() {
 		return dimension;
 	}
 
 	public boolean is(World world) {
-		return DimensionType.getKey(world.dimension.getType()).equals(dimension);
+		return world.dimension.getType().getKey().equals(dimension);
 	}
 
-	public DimPos offset(Identifier dimension) {
+	public DimPos offset(String dimension) {
 		return new DimPos(dimension, pos);
 	}
 
@@ -83,9 +81,9 @@ public class DimPos {
 	}
 
 	public DimPos offset(Axis axis, int distance) {
-		int dx = axis.choose(distance, 0, 0);
-		int dy = axis.choose(0, distance, 0);
-		int dz = axis.choose(0, 0, distance);
+		int dx = AxisUtils.choose(axis, distance, 0, 0);
+		int dy = AxisUtils.choose(axis, 0, distance, 0);
+		int dz = AxisUtils.choose(axis, 0, 0, distance);
 
 		return new DimPos(dimension, pos.add(dx, dy, dz));
 	}
@@ -97,7 +95,7 @@ public class DimPos {
 	public NbtCompound toNbt() {
 		NbtCompound nbt = new NbtCompound();
 
-		nbt.put("dim", NbtUtils.identifierToNbt(dimension));
+		nbt.putString("dim", dimension);
 		nbt.putInt("x", pos.getX());
 		nbt.putInt("y", pos.getY());
 		nbt.putInt("z", pos.getZ());
@@ -106,7 +104,7 @@ public class DimPos {
 	}
 
 	public static DimPos fromNbt(NbtCompound nbt) {
-		Identifier dimension = NbtUtils.nbtToIdentifier(nbt.getCompound("dim"));
+		String dimension = nbt.getString("dim");
 		int x = nbt.getInt("x");
 		int y = nbt.getInt("y");
 		int z = nbt.getInt("z");

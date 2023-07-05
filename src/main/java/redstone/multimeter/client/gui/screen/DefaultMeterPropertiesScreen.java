@@ -4,10 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
 
 import net.minecraft.resource.Identifier;
-import net.minecraft.resource.IdentifierException;
 import net.minecraft.text.Formatting;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
@@ -66,14 +65,14 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = super.keyPress(keyCode, scanCode, modifiers) || blockList.keyPress(keyCode, scanCode, modifiers);
+	public boolean keyPress(int keyCode) {
+		boolean consumed = super.keyPress(keyCode) || blockList.keyPress(keyCode);
 
 		if (!consumed) {
-			if (remove.isActive() && keyCode == GLFW.GLFW_KEY_KP_SUBTRACT) {
+			if (remove.isActive() && keyCode == Keyboard.KEY_SUBTRACT) {
 				remove();
 				consumed = true;
-			} else if (add.isActive() && keyCode == GLFW.GLFW_KEY_KP_ADD) {
+			} else if (add.isActive() && keyCode == Keyboard.KEY_ADD) {
 				add();
 				consumed = true;
 			}
@@ -85,12 +84,12 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	@Override
 	public void onRemoved() {
 		super.onRemoved();
-		minecraft.keyboardHandler.setSendRepeatsToGui(false);
+		Keyboard.enableRepeatEvents(false);
 	}
 
 	@Override
 	protected void initScreen() {
-		minecraft.keyboardHandler.setSendRepeatsToGui(true);
+		Keyboard.enableRepeatEvents(true);
 
 		int spacing = 10;
 		int top = 10 + 3 * (IButton.DEFAULT_HEIGHT + 2);
@@ -411,14 +410,11 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	public Identifier nextBlockKey() {
-		try {
-			String name = create.getText();
-			Identifier key = new Identifier(name);
+		String name = create.getText();
+		Identifier key = new Identifier(name);
 
-			if (!overrides.containsKey(key)) {
-				return key;
-			}
-		} catch (IdentifierException e) {
+		if (!overrides.containsKey(key)) {
+			return key;
 		}
 
 		return null;

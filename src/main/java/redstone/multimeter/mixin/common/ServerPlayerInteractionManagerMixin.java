@@ -23,11 +23,11 @@ public class ServerPlayerInteractionManagerMixin {
 		method = "useBlock",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/state/BlockState;use(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/living/player/PlayerEntity;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/util/math/Direction;FFF)Z"
+			target = "Lnet/minecraft/block/Block;use(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Lnet/minecraft/entity/living/player/PlayerEntity;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/util/math/Direction;FFF)Z"
 		)
 	)
 	private void logInteractBlock(PlayerEntity player, World world, ItemStack stack, InteractionHand hand, BlockPos pos, Direction face, float dx, float dy, float dz, CallbackInfoReturnable<InteractionResult> cir) {
-		if (!world.isClient()) {
+		if (!world.isClient) {
 			((IServerWorld)world).getMultimeter().logInteractBlock(world, pos);
 		}
 	}

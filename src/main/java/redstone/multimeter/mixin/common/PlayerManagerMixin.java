@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
-import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 
@@ -26,7 +25,7 @@ public class PlayerManagerMixin {
 			value = "TAIL"
 		)
 	)
-	private void onPlayerRespawn(ServerPlayerEntity player, DimensionType dimension, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
+	private void onPlayerRespawn(ServerPlayerEntity player, int dimension, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
 		((IMinecraftServer)server).getMultimeterServer().getPlayerList().respawn(cir.getReturnValue());
 	}
 

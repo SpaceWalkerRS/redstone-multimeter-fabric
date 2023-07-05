@@ -1,15 +1,23 @@
 package redstone.multimeter.client.gui.screen;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-
-import redstone.multimeter.client.gui.CursorType;
 
 public class ScreenWrapper extends Screen {
 
 	private final Screen parent;
 	private final RSMMScreen screen;
+
+	private double prevX;
+	private double prevY;
+	private double mouseX;
+	private double mouseY;
+	private int touchEvents;
+	private int lastButton;
+	private long buttonTicks;
 
 	public ScreenWrapper(Screen parent, RSMMScreen screen) {
 		this.parent = parent;
@@ -24,55 +32,17 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public final boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return screen.mouseClick(mouseX, mouseY, button);
-	}
-
-	@Override
-	public final boolean mouseReleased(double mouseX, double mouseY, int button) {
-		return screen.mouseRelease(mouseX, mouseY, button);
-	}
-
-	@Override
-	public final boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		return screen.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
-	}
-
-	@Override
-	public final boolean mouseScrolled(double amount) {
-		return false; // scrolling is handled in MouseMixin and InputHandler
-	}
-
-	@Override
-	public final boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (screen.keyPress(keyCode, scanCode, modifiers)) {
-			return true;
+	public void handleInputs() {
+		if (Mouse.isCreated()) {
+			handleMouseEvents();
 		}
-		if (screen.shouldCloseOnEsc() && keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			screen.close();
-			return true;
+		if (Keyboard.isCreated()) {
+			handleKeyboardEvents();
 		}
-
-		return false;
 	}
 
 	@Override
-	public final boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-		return screen.keyRelease(keyCode, scanCode, modifiers);
-	}
-
-	@Override
-	public final boolean charTyped(char chr, int modifiers) {
-		return screen.typeChar(chr, modifiers);
-	}
-
-	@Override
-	public boolean shouldCloseOnEsc() {
-		return screen.shouldCloseOnEsc();
-	}
-
-	@Override
-	protected final void init() {
+	public final void init() {
 		screen.init(width, height);
 	}
 
@@ -84,7 +54,6 @@ public class ScreenWrapper extends Screen {
 	@Override
 	public void removed() {
 		screen.onRemoved();
-		screen.setCursor(minecraft, CursorType.ARROW);
 	}
 
 	public Screen getParent() {
@@ -93,5 +62,94 @@ public class ScreenWrapper extends Screen {
 
 	public RSMMScreen getScreen() {
 		return screen;
+	}
+
+	private void handleMouseEvents() {
+		updateMousePos();
+		handleScroll();
+
+		while (Mouse.next()) {
+			int button = Mouse.getEventButton();
+
+			if (Mouse.getEventButtonState()) {
+				if (minecraft.options.touchscreen && touchEvents++ > 0) {
+					continue;
+				}
+
+				lastButton = button;
+				buttonTicks = Minecraft.getTime();
+
+				screen.mouseClick(mouseX, mouseY, button);
+			} else {
+				if (minecraft.options.touchscreen && --touchEvents > 0) {
+					return;
+				}
+
+				screen.mouseRelease(mouseX, mouseY, button);
+
+				if (button == lastButton) {
+					lastButton = -1;
+				}
+			}
+		}
+
+		handleDrag();
+	}
+
+	private void updateMousePos() {
+		prevX = mouseX;
+		prevY = mouseY;
+		mouseX = (double)Mouse.getX() * width / minecraft.width;
+		mouseY = height - 1 - (double)Mouse.getY() * height / minecraft.height;
+
+		if (mouseX != prevX || mouseY != prevY) {
+			screen.mouseMove(mouseX, mouseY);
+		}
+	}
+
+	private void handleScroll() {
+		double scrollY = 0.05D * Mouse.getDWheel();
+
+		if (scrollY != 0) {
+			screen.mouseScroll(mouseX, mouseY, 0, scrollY);
+		}
+	}
+
+	private void handleDrag() {
+		if (lastButton != -1 && buttonTicks > 0L) {
+			double deltaX = mouseX - prevX;
+			double deltaY = mouseY - prevY;
+
+			if (deltaX != 0 && deltaY != 0) {
+				screen.mouseDrag(mouseX, mouseY, lastButton, deltaX, deltaY);
+			}
+		}
+	}
+
+	private void handleKeyboardEvents() {
+		while (Keyboard.next()) {
+			char chr = Keyboard.getEventCharacter();
+			int key = Keyboard.getEventKey();
+
+			boolean consumed = false;
+
+			if (key != Keyboard.CHAR_NONE) {
+				if (Keyboard.getEventKeyState()) {
+					consumed = screen.keyPress(key);
+
+					if (!consumed && key == Keyboard.KEY_ESCAPE) {
+						screen.close();
+						consumed = true;
+					}
+				} else {
+					consumed = screen.keyRelease(key);
+				}
+			}
+			if (!consumed && chr >= ' ') {
+				screen.typeChar(chr);
+			}
+
+			minecraft.handleGuiKeyBindings();
+		}
 	}
 }

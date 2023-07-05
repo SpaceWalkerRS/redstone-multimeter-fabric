@@ -2,7 +2,7 @@ package redstone.multimeter.client.gui.element;
 
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.screen.Screen;
 
@@ -42,7 +42,7 @@ public class SelectableScrollableListElement extends ScrollableListElement {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (button == MOUSE_BUTTON_LEFT) {
 			consumed |= select(getFocusedElement(), true);
 		}
 
@@ -50,20 +50,20 @@ public class SelectableScrollableListElement extends ScrollableListElement {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = super.keyPress(keyCode, scanCode, modifiers);
+	public boolean keyPress(int keyCode) {
+		boolean consumed = super.keyPress(keyCode);
 
 		if (!consumed) {
 			switch (keyCode) {
-			case GLFW.GLFW_KEY_TAB:
+			case Keyboard.KEY_TAB:
 				return moveSelection(!Screen.isShiftDown(), false);
-			case GLFW.GLFW_KEY_UP:
+			case Keyboard.KEY_UP:
 				return moveSelection(false, false);
-			case GLFW.GLFW_KEY_DOWN:
+			case Keyboard.KEY_DOWN:
 				return moveSelection(true, false);
-			case GLFW.GLFW_KEY_PAGE_UP:
+			case Keyboard.KEY_PRIOR:
 				return moveSelection(false, true);
-			case GLFW.GLFW_KEY_PAGE_DOWN:
+			case Keyboard.KEY_NEXT:
 				return moveSelection(true, true);
 			}
 		}

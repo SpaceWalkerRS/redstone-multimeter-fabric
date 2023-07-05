@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 
@@ -59,7 +59,7 @@ public class MeterListRenderer extends AbstractElement {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (button == MOUSE_BUTTON_LEFT) {
 			cursorOriginRow = hud.getHoveredRow(mouseY);
 		}
 
@@ -70,7 +70,7 @@ public class MeterListRenderer extends AbstractElement {
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (button == MOUSE_BUTTON_LEFT) {
 			if (cursorMeter == null) {
 				if (cursorRow < 0) {
 					consumed = hud.selectMeter(cursorOriginRow);
@@ -106,17 +106,17 @@ public class MeterListRenderer extends AbstractElement {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(int keyCode) {
 		return false;
 	}
 
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(int keyCode) {
 		return false;
 	}
 
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		return false;
 	}
 
@@ -130,7 +130,7 @@ public class MeterListRenderer extends AbstractElement {
 
 	@Override
 	public Tooltip getTooltip(int mouseX, int mouseY) {
-		if (Keybinds.OPEN_METER_CONTROLS.isUnbound() || cursorMeter != null) {
+		if (Keybinds.OPEN_METER_CONTROLS.getKeyCode() == Keyboard.KEY_NONE || cursorMeter != null) {
 			return super.getTooltip(mouseX, mouseY);
 		}
 
@@ -268,7 +268,7 @@ public class MeterListRenderer extends AbstractElement {
 		int width = 0;
 
 		for (Meter meter : hud.meters) {
-			int nameWidth = hud.textRenderer.getWidth(meter.getName());
+			int nameWidth = hud.textRenderer.getStringWidth(meter.getName());
 
 			if (nameWidth > width) {
 				width = nameWidth;

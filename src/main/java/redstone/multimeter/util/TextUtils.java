@@ -5,8 +5,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.mojang.blaze3d.platform.InputConstants.Key;
+import org.lwjgl.input.Keyboard;
 
+import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.text.Formatting;
@@ -14,7 +15,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.Tooltip;
-import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
 public class TextUtils {
 
@@ -40,7 +40,7 @@ public class TextUtils {
 
 				String subString = text.substring(0, length);
 
-				if (textRenderer.getWidth(subString) > MAX_WIDTH) {
+				if (textRenderer.getStringWidth(subString) > MAX_WIDTH) {
 					if (lastSpace >= 0) {
 						subString = text.substring(0, lastSpace);
 						length = lastSpace + 1;
@@ -106,10 +106,10 @@ public class TextUtils {
 
 			if (o instanceof KeyBinding) {
 				component.append(formatKeybind((KeyBinding)o));
-			} else if (o instanceof Key) {
-				component.append(formatKeybind((Key)o));
-			} else if (o instanceof Key[]) {
-				component.append(formatKeybind((Key[])o));
+			} else if (o instanceof Integer) {
+				component.append(formatKeybind((int)o));
+			} else if (o instanceof Integer[]) {
+				component.append(formatKeybind((int[])o));
 			} else if (o instanceof Object[]) {
 				component.append(formatKeybind((Object[])o));
 			}
@@ -125,7 +125,7 @@ public class TextUtils {
 			if (o instanceof KeyBinding) {
 				KeyBinding keybind = (KeyBinding)o;
 
-				if (keybind.isUnbound()) {
+				if (keybind.getKeyCode() == Keyboard.KEY_NONE) {
 					continue;
 				}
 			}
@@ -138,22 +138,22 @@ public class TextUtils {
 
 	public static Text formatKeybind(KeyBinding keybind) {
 		Text component = new LiteralText("");
+		int boundKey = keybind.getKeyCode();
 
-		if (keybind.isUnbound()) {
+		if (boundKey == Keyboard.KEY_NONE) {
 			return component;
 		}
 
-		Key boundKey = ((IKeyBinding)keybind).rsmm$getKey();
 		component.append(formatKey(boundKey));
 
 		return component;
 	}
 
-	public static Text formatKeybind(Key... keys) {
+	public static Text formatKeybind(Integer... keys) {
 		Text component = new LiteralText("");
 
 		for (int i = 0; i < keys.length; i++) {
-			Key key = keys[i];
+			int key = keys[i];
 
 			if (i > 0) {
 				component.append(" + ");
@@ -171,8 +171,8 @@ public class TextUtils {
 		for (Object o : keys) {
 			if (o instanceof KeyBinding) {
 				formattedKeys.add(formatKeybind((KeyBinding)o));
-			} else if (o instanceof Key) {
-				formattedKeys.add(formatKey((Key)o));
+			} else if (o instanceof Integer) {
+				formattedKeys.add(formatKey((int)o));
 			} else if (o instanceof String) {
 				formattedKeys.add(formatKey((String)o));
 			}
@@ -193,8 +193,8 @@ public class TextUtils {
 		return text;
 	}
 
-	public static Text formatKey(Key key) {
-		return formatKey(key.getDisplayName());
+	public static Text formatKey(int key) {
+		return formatKey(GameOptions.getKeyName(key));
 	}
 
 	public static Text formatKey(String key) {

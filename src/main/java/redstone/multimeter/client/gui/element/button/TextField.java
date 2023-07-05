@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -12,13 +12,11 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tessellator;
 
 import net.minecraft.SharedConstants;
-import net.minecraft.client.KeyboardHandler;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.client.option.Options;
@@ -26,7 +24,6 @@ import redstone.multimeter.util.TextUtils;
 
 public class TextField extends AbstractButton {
 
-	private final KeyboardHandler keyboard;
 	private final Consumer<String> listener;
 	private final Supplier<String> textSupplier;
 
@@ -54,9 +51,6 @@ public class TextField extends AbstractButton {
 	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text) {
 		super(client, x, y, width, height, () -> new LiteralText(""), tooltip);
 
-		Minecraft minecraft = this.client.getMinecraft();
-
-		this.keyboard = minecraft.keyboardHandler;
 		this.listener = listener;
 		this.textSupplier = text;
 
@@ -92,22 +86,10 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public void mouseMove(double mouseX, double mouseY) {
-		boolean wasHovered = isHovered();
-		super.mouseMove(mouseX, mouseY);
-
-		if (isHovered()) {
-			setCursor(client.getMinecraft(), CursorType.IBEAM);
-		} else if (wasHovered) {
-			setCursor(client.getMinecraft(), CursorType.ARROW);
-		}
-	}
-
-	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
-		if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (!consumed && button == MOUSE_BUTTON_LEFT) {
 			if (!isFocused()) {
 				setFocused(true);
 			}
@@ -134,7 +116,7 @@ public class TextField extends AbstractButton {
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (button == MOUSE_BUTTON_LEFT) {
 			stopSelecting(SelectType.MOUSE);
 		}
 
@@ -143,7 +125,7 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (selection == SelectType.MOUSE && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (selection == SelectType.MOUSE && button == MOUSE_BUTTON_LEFT) {
 			setCursorFromMouse(mouseX);
 			return true;
 		}
@@ -157,35 +139,35 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_ENTER) {
+	public boolean keyPress(int keyCode) {
+		if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_RETURN) {
 			setFocused(false);
 			return true;
 		}
 
 		switch (keyCode) {
-		case GLFW.GLFW_KEY_LEFT_SHIFT:
-		case GLFW.GLFW_KEY_RIGHT_SHIFT:
+		case Keyboard.KEY_LSHIFT:
+		case Keyboard.KEY_RSHIFT:
 			startSelecting(SelectType.KEYBOARD);
 			break;
-		case GLFW.GLFW_KEY_LEFT:
+		case Keyboard.KEY_LEFT:
 			moveCursorFromKeyboard(-1);
 			break;
-		case GLFW.GLFW_KEY_RIGHT:
+		case Keyboard.KEY_RIGHT:
 			moveCursorFromKeyboard(1);
 			break;
-		case GLFW.GLFW_KEY_UP:
-		case GLFW.GLFW_KEY_PAGE_UP:
+		case Keyboard.KEY_UP:
+		case Keyboard.KEY_PRIOR:
 			setCursorFromKeyboard(0);
 			break;
-		case GLFW.GLFW_KEY_DOWN:
-		case GLFW.GLFW_KEY_PAGE_DOWN:
+		case Keyboard.KEY_DOWN:
+		case Keyboard.KEY_NEXT:
 			setCursorFromKeyboard(fullText.length());
 			break;
-		case GLFW.GLFW_KEY_BACKSPACE:
+		case Keyboard.KEY_BACK:
 			erase(false);
 			break;
-		case GLFW.GLFW_KEY_DELETE:
+		case Keyboard.KEY_DELETE:
 			erase(true);
 			break;
 		default:
@@ -193,18 +175,18 @@ public class TextField extends AbstractButton {
 				break;
 			}
 			switch (keyCode) {
-			case GLFW.GLFW_KEY_A:
+			case Keyboard.KEY_A:
 				if (selection != SelectType.MOUSE) {
 					selectAll();
 				}
 				break;
-			case GLFW.GLFW_KEY_C:
+			case Keyboard.KEY_C:
 				copyTextToClipboard(false);
 				break;
-			case GLFW.GLFW_KEY_X:
+			case Keyboard.KEY_X:
 				copyTextToClipboard(true);
 				break;
-			case GLFW.GLFW_KEY_V:
+			case Keyboard.KEY_V:
 				pasteClipboard();
 				break;
 			default:
@@ -215,8 +197,8 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+	public boolean keyRelease(int keyCode) {
+		if (keyCode == Keyboard.KEY_LSHIFT || keyCode == Keyboard.KEY_RSHIFT) {
 			stopSelecting(SelectType.KEYBOARD);
 		}
 
@@ -224,7 +206,7 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(char chr) {
 		if (isActive() && SharedConstants.isValidChatChar(chr)) {
 			write(String.valueOf(chr));
 			return true;
@@ -324,10 +306,10 @@ public class TextField extends AbstractButton {
 		if (isFocused()) {
 			if (isActive() && (cursorTicks / 6) % 2 == 0) {
 				if (cursorIndex == fullText.length()) {
-					int x = textX + textRenderer.getWidth(visibleText);
+					int x = textX + textRenderer.getStringWidth(visibleText);
 					renderText(textRenderer, "_", x, textY, true, color);
 				} else {
-					int width = textRenderer.getWidth(fullText.substring(scrollIndex, cursorIndex));
+					int width = textRenderer.getStringWidth(fullText.substring(scrollIndex, cursorIndex));
 					int x = textX + width;
 
 					renderRect(x, selectionY, 1, selectionHeight, color);
@@ -348,11 +330,11 @@ public class TextField extends AbstractButton {
 
 		if (start >= scrollIndex) {
 			String t = fullText.substring(scrollIndex, start);
-			x0 = textX + textRenderer.getWidth(t);
+			x0 = textX + textRenderer.getStringWidth(t);
 		}
 		if (end <= scrollIndex + visibleText.length()) {
 			String t = fullText.substring(scrollIndex, end);
-			x1 = textX + textRenderer.getWidth(t);
+			x1 = textX + textRenderer.getStringWidth(t);
 		}
 
 		if (x0 >= x1) {
@@ -478,7 +460,7 @@ public class TextField extends AbstractButton {
 			String text = getSelection();
 
 			if (!text.isEmpty()) {
-				keyboard.setClipboard(text);
+				Screen.setClipboard(text);
 
 				if (erase) {
 					erase(false);
@@ -488,7 +470,7 @@ public class TextField extends AbstractButton {
 	}
 
 	private void pasteClipboard() {
-		String text = keyboard.getClipboard();
+		String text = Screen.getClipboard();
 
 		if (!text.isEmpty()) {
 			write(text);

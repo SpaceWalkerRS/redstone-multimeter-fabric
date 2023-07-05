@@ -25,7 +25,7 @@ public class GameGuiMixin {
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.AFTER,
-			target = "Lnet/minecraft/client/gui/GameGui;renderStatusEffects()V"
+			target = "Lnet/minecraft/client/gui/GameGui;renderStatusEffects(Lnet/minecraft/client/render/Window;)V"
 		)
 	)
 	private void renderHud(float tickDelta, CallbackInfo ci) {

@@ -18,14 +18,14 @@ public class GameRendererMixin {
 	@Shadow @Final private Minecraft minecraft;
 
 	@Inject(
-		method = "render(FJ)V",
+		method = "render(IFJ)V",
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 			args = "ldc=hand"
 		)
 	)
-	private void renderMeterHighlights(float tickDelta, long timeNanos, CallbackInfo ci) {
+	private void renderMeterHighlights(int anaglyphRenderPass, float tickDelta, long renderTimeLimit, CallbackInfo ci) {
 		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters(tickDelta);
 	}
 }

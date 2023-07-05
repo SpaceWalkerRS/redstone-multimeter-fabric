@@ -23,6 +23,7 @@ public class RenderHelper2D {
 		GlStateManager.enableBlend();
 		GlStateManager.disableTexture();
 		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
 		Tessellator tessellator = Tessellator.getInstance();
@@ -123,6 +124,7 @@ public class RenderHelper2D {
 		GlStateManager.enableTexture();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
 
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
@@ -173,6 +175,7 @@ public class RenderHelper2D {
 		GlStateManager.enableTexture();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
 
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
@@ -224,16 +227,16 @@ public class RenderHelper2D {
 	}
 
 	protected int textWidth(TextRenderer textRenderer, Text text) {
-		return textRenderer.getWidth(text.getFormattedString());
+		return textRenderer.getStringWidth(text.getFormattedContent());
 	}
 
 	protected void renderText(TextRenderer textRenderer, Text text, int x, int y, boolean shadow, int color) {
 		GlStateManager.enableTexture();
 
 		if (shadow) {
-			textRenderer.drawWithShadow(text.getFormattedString(), x, y, color);
+			textRenderer.drawWithShadow(text.getFormattedContent(), x, y, color);
 		} else {
-			textRenderer.draw(text.getFormattedString(), x, y, color);
+			textRenderer.drawWithoutShadow(text.getFormattedContent(), x, y, color);
 		}
 	}
 
@@ -243,7 +246,7 @@ public class RenderHelper2D {
 		if (shadow) {
 			textRenderer.drawWithShadow(text, x, y, color);
 		} else {
-			textRenderer.draw(text, x, y, color);
+			textRenderer.drawWithoutShadow(text, x, y, color);
 		}
 	}
 

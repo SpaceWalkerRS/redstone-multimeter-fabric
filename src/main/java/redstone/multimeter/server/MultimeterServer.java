@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.UUID;
 
 import net.minecraft.block.state.BlockState;
-import net.minecraft.resource.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -184,12 +183,12 @@ public class MultimeterServer {
 		}
 	}
 
-	public Iterable<ServerWorld> getWorlds() {
-		return server.getWorlds();
+	public ServerWorld[] getWorlds() {
+		return server.worlds;
 	}
 
-	public ServerWorld getWorld(Identifier key) {
-		return server.getWorld(DimensionType.byKey(key));
+	public ServerWorld getWorld(String key) {
+		return server.getWorld(DimensionType.byKey(key).getId());
 	}
 
 	public ServerWorld getWorld(DimPos pos) {

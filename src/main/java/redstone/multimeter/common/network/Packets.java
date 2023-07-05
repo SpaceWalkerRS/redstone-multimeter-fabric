@@ -1,7 +1,5 @@
 package redstone.multimeter.common.network;
 
-import net.minecraft.resource.Identifier;
-
 import redstone.multimeter.common.network.packets.*;
 import redstone.multimeter.registry.SupplierRegistry;
 
@@ -9,21 +7,21 @@ public class Packets {
 
 	private static final SupplierRegistry<RSMMPacket> REGISTRY;
 
-	public static Identifier getChannel() {
+	public static String getChannel() {
 		return REGISTRY.getRegistryKey();
 	}
 
-	public static Identifier getKey(RSMMPacket packet) {
+	public static String getKey(RSMMPacket packet) {
 		return REGISTRY.getKey(packet);
 	}
 
-	public static RSMMPacket create(Identifier key) {
+	public static RSMMPacket create(String key) {
 		return REGISTRY.get(key);
 	}
 
 	static {
 
-		REGISTRY = new SupplierRegistry<>("network");
+		REGISTRY = new SupplierRegistry<>();
 
 		REGISTRY.register("handshake"               , HandshakePacket.class             , () -> new HandshakePacket());
 		REGISTRY.register("tick_phase_tree"         , TickPhaseTreePacket.class         , () -> new TickPhaseTreePacket());

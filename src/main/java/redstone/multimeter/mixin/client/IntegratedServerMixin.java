@@ -1,7 +1,5 @@
 package redstone.multimeter.mixin.client;
 
-import java.util.function.BooleanSupplier;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +21,7 @@ public abstract class IntegratedServerMixin implements IMinecraftServer {
 			value = "HEAD"
 		)
 	)
-	private void onTickStart(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void onTickStart(CallbackInfo ci) {
 		getMultimeterServer().tickStart();
 	}
 
@@ -33,7 +31,7 @@ public abstract class IntegratedServerMixin implements IMinecraftServer {
 			value = "TAIL"
 		)
 	)
-	private void onTickEnd(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void onTickEnd(CallbackInfo ci) {
 		getMultimeterServer().tickEnd();
 	}
 

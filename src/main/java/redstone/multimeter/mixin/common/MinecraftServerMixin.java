@@ -1,7 +1,5 @@
 package redstone.multimeter.mixin.common;
 
-import java.util.function.BooleanSupplier;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,7 +21,8 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	@Inject(
 		method = "<init>",
 		at = @At(
-			value = "TAIL"
+			value = "INVOKE",
+			target = "Lnet/minecraft/server/MinecraftServer;createCommandHandler()Lnet/minecraft/server/command/handler/CommandManager;"
 		)
 	)
 	private void init(CallbackInfo ci) {
@@ -46,7 +45,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			value = "HEAD"
 		)
 	)
-	private void onTickStartAndStartTickTaskTick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void onTickStartAndStartTickTaskTick(CallbackInfo ci) {
 		if (!((Object)this instanceof IntegratedServer)) {
 			multimeterServer.tickStart();
 		}
@@ -62,7 +61,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			args = "ldc=save"
 		)
 	)
-	private void startTickTaskAutosave(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void startTickTaskAutosave(CallbackInfo ci) {
 		rsmm$startTickTask(TickTask.AUTOSAVE);
 	}
 
@@ -81,7 +80,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			target = "Lnet/minecraft/util/profiler/Profiler;pop()V"
 		)
 	)
-	private void endTickTaskAutosave(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void endTickTaskAutosave(CallbackInfo ci) {
 		rsmm$endTickTask();
 	}
 
@@ -91,7 +90,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			value = "TAIL"
 		)
 	)
-	private void endTickTaskTickAndOnTickEnd(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void endTickTaskTickAndOnTickEnd(CallbackInfo ci) {
 		rsmm$endTickTask();
 
 		if (!((Object)this instanceof IntegratedServer)) {
@@ -107,7 +106,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			args = "ldc=jobs"
 		)
 	)
-	private void startTickTaskPackets(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void startTickTaskPackets(CallbackInfo ci) {
 		rsmm$startTickTask(TickTask.PACKETS);
 	}
 
@@ -119,7 +118,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			args = "ldc=commandFunctions"
 		)
 	)
-	private void swapTickTaskCommandFunctions(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void swapTickTaskCommandFunctions(CallbackInfo ci) {
 		rsmm$swapTickTask(TickTask.COMMAND_FUNCTIONS);
 	}
 
@@ -131,7 +130,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			args = "ldc=levels"
 		)
 	)
-	private void swapTickTaskLevels(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void swapTickTaskLevels(CallbackInfo ci) {
 		rsmm$swapTickTask(TickTask.LEVELS);
 	}
 
@@ -143,7 +142,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			args = "ldc=connection"
 		)
 	)
-	private void swapTickTaskConnections(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void swapTickTaskConnections(CallbackInfo ci) {
 		rsmm$swapTickTask(TickTask.CONNECTIONS);
 	}
 
@@ -155,7 +154,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			args = "ldc=players"
 			)
 		)
-	private void swapTickTaskPlayerPing(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void swapTickTaskPlayerPing(CallbackInfo ci) {
 		rsmm$swapTickTask(TickTask.PLAYER_PING);
 	}
 
@@ -167,7 +166,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			args = "ldc=tickables"
 		)
 	)
-	private void swapTickTaskServerGui(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void swapTickTaskServerGui(CallbackInfo ci) {
 		rsmm$swapTickTask(TickTask.SERVER_GUI);
 	}
 
@@ -177,7 +176,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 			value = "TAIL"
 		)
 	)
-	private void endTickTaskServerGui(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+	private void endTickTaskServerGui(CallbackInfo ci) {
 		rsmm$endTickTask();
 	}
 

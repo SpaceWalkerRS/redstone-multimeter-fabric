@@ -3,6 +3,8 @@ package redstone.multimeter.client.gui.screen;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
@@ -28,13 +30,13 @@ public class OptionsScreen extends RSMMScreen {
 		super.onRemoved();
 		Options.validate();
 		minecraft.options.save();
-		minecraft.keyboardHandler.setSendRepeatsToGui(false);
+		Keyboard.enableRepeatEvents(false);
 		client.getHud().onOptionsChanged();
 	}
 
 	@Override
 	protected void initScreen() {
-		minecraft.keyboardHandler.setSendRepeatsToGui(true);
+		Keyboard.enableRepeatEvents(true);
 
 		ScrollableListElement list = new ScrollableListElement(client, getWidth(), getHeight(), 52, 36);
 

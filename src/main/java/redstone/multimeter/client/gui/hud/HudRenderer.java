@@ -81,7 +81,7 @@ public class HudRenderer extends RenderHelper2D {
 
 	@Override
 	protected void renderText(TextRenderer textRenderer, String text, int x, int y, boolean shadow, int color) {
-		x = translateX(x, textRenderer.getWidth(text) - 1);
+		x = translateX(x, textRenderer.getStringWidth(text) - 1);
 		y = translateY(y, textRenderer.fontHeight - 2);
 
 		int alpha = Math.round(ColorUtils.getAlpha(color) * hud.settings.opacity() / 100.0F);

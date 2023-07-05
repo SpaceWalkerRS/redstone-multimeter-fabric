@@ -10,7 +10,6 @@ import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -89,12 +88,12 @@ public class BlockListElement extends SelectableScrollableListElement {
 			super(0, 0, width, height);
 
 			this.key = key;
-			this.block = Registry.BLOCK.get(key);
+			this.block = Block.REGISTRY.get(key);
 
 			if (this.block == null) {
 				this.stack = null;
 			} else {
-				this.stack = new ItemStack(this.block.asItem());
+				this.stack = new ItemStack(this.block);
 			}
 		}
 
@@ -130,17 +129,17 @@ public class BlockListElement extends SelectableScrollableListElement {
 		}
 
 		@Override
-		public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+		public boolean keyPress(int keyCode) {
 			return false;
 		}
 
 		@Override
-		public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+		public boolean keyRelease(int keyCode) {
 			return false;
 		}
 
 		@Override
-		public boolean typeChar(char chr, int modifiers) {
+		public boolean typeChar(char chr) {
 			return false;
 		}
 
@@ -159,7 +158,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 			if (tooltip.isEmpty()) {
 				String keyString = key.toString();
 
-				if (textRenderer.getWidth(keyString) > (getWidth() - 22)) {
+				if (textRenderer.getStringWidth(keyString) > (getWidth() - 22)) {
 					tooltip = Tooltip.of(TextUtils.toLines(textRenderer, keyString));
 				}
 			}

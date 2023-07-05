@@ -2,11 +2,11 @@ package redstone.multimeter.client.gui.screen;
 
 import java.util.List;
 
+import org.lwjgl.input.Mouse;
+
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.Window;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.text.Text;
@@ -62,8 +62,8 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		return super.keyPress(keyCode, scanCode, modifiers) || client.getInputHandler().keyPress(this, keyCode, scanCode, modifiers);
+	public boolean keyPress(int keyCode) {
+		return super.keyPress(keyCode) || client.getInputHandler().keyPress(this, keyCode);
 	}
 
 	@Override
@@ -105,10 +105,8 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		initScreen();
 		update();
 
-		Window window = minecraft.window;
-		MouseHandler mouse = minecraft.mouseHandler;
-		double mouseX = (double)mouse.xpos() * window.getGuiScaledWidth() / window.getWidth();
-		double mouseY = (double)mouse.ypos() * window.getGuiScaledHeight() / window.getHeight();
+		double mouseX = (double)Mouse.getX() * width / minecraft.width;
+		double mouseY = (double)Mouse.getY() * height / minecraft.height;
 
 		updateHoveredElement(mouseX, mouseY);
 	}
