@@ -1,11 +1,11 @@
 package redstone.multimeter.client.gui.element.button;
 
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.client.sound.instance.SimpleSoundInstance;
+import net.minecraft.client.sound.instance.SoundInstance;
+import net.minecraft.client.sound.system.SoundManager;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.Element;
@@ -21,17 +21,17 @@ public interface IButton extends Element {
 
 	public boolean isHovered();
 
-	public Component getMessage();
+	public Text getMessage();
 
-	public void setMessage(Component message);
+	public void setMessage(Text message);
 
 	default void setMessage(String message) {
-		setMessage(new TextComponent(message));
+		setMessage(new LiteralText(message));
 	}
 
 	public static void playClickSound(MultimeterClient client) {
 		SoundManager soundManager = client.getMinecraft().getSoundManager();
-		SoundInstance sound = SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F);
+		SoundInstance sound = SimpleSoundInstance.of(SoundEvents.UI_BUTTON_CLICK, 1.0F);
 
 		soundManager.play(sound);
 	}

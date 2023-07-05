@@ -21,16 +21,16 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
-import net.minecraft.ResourceLocationException;
-import net.minecraft.client.KeyMapping;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.resource.Identifier;
+import net.minecraft.resource.IdentifierException;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.Keybinds;
@@ -52,9 +52,9 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 	private final MultimeterClient client;
 	private final File dir;
-	private final Map<ResourceLocation, MeterProperties> defaults;
-	private final Map<ResourceLocation, MeterProperties> overrides;
-	private final Map<ResourceLocation, MeterProperties> cache;
+	private final Map<Identifier, MeterProperties> defaults;
+	private final Map<Identifier, MeterProperties> overrides;
+	private final Map<Identifier, MeterProperties> cache;
 
 	public ClientMeterPropertiesManager(MultimeterClient client) {
 		this.client = client;
@@ -71,14 +71,14 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	@Override
-	protected Level getLevel(DimPos pos) {
+	protected World getWorld(DimPos pos) {
 		Minecraft minecraft = client.getMinecraft();
-		return pos.is(minecraft.level) ? minecraft.level : null;
+		return pos.is(minecraft.world) ? minecraft.world : null;
 	}
 
 	@Override
-	protected void postValidation(MutableMeterProperties properties, Level level, BlockPos pos) {
-		BlockState state = level.getBlockState(pos);
+	protected void postValidation(MutableMeterProperties properties, World world, BlockPos pos) {
+		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 
 		MeterProperties defaultProperties = getDefaultProperties(block);
@@ -97,39 +97,39 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			properties.setColor(Options.RedstoneMultimeter.COLOR_PICKER.get().next());
 		}
 		if (Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
-			properties.setMovable(!Screen.hasShiftDown());
+			properties.setMovable(!Screen.isShiftDown());
 		}
 		for (int index = 0; index < EventType.ALL.length; index++) {
-			KeyMapping keybind = Keybinds.TOGGLE_EVENT_TYPES[index];
+			KeyBinding keybind = Keybinds.TOGGLE_EVENT_TYPES[index];
 
-			if (keybind.isDown()) {
+			if (keybind.isPressed()) {
 				EventType type = EventType.ALL[index];
 				properties.toggleEventType(type);
 			}
 		}
-		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.isRandomlyTicking()) {
+		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.ticksRandomly()) {
 			if (!properties.hasEventType(EventType.RANDOM_TICK)) {
 				properties.toggleEventType(EventType.RANDOM_TICK);
 			}
 		}
 	}
 
-	public Map<ResourceLocation, MeterProperties> getDefaults() {
+	public Map<Identifier, MeterProperties> getDefaults() {
 		return Collections.unmodifiableMap(defaults);
 	}
 
-	public Map<ResourceLocation, MeterProperties> getOverrides() {
+	public Map<Identifier, MeterProperties> getOverrides() {
 		return Collections.unmodifiableMap(overrides);
 	}
 
-	public <T extends MeterProperties> void update(Map<ResourceLocation, T> newOverrides) {
-		Map<ResourceLocation, MeterProperties> prev = new HashMap<>(overrides);
+	public <T extends MeterProperties> void update(Map<Identifier, T> newOverrides) {
+		Map<Identifier, MeterProperties> prev = new HashMap<>(overrides);
 
 		overrides.clear();
 		cache.clear();
 
-		for (Entry<ResourceLocation, T> entry : newOverrides.entrySet()) {
-			ResourceLocation key = entry.getKey();
+		for (Entry<Identifier, T> entry : newOverrides.entrySet()) {
+			Identifier key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			prev.remove(key);
@@ -138,13 +138,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 		save();
 
-		for (ResourceLocation key : prev.keySet()) {
+		for (Identifier key : prev.keySet()) {
 			deleteOverrideFile(key);
 		}
 	}
 
 	private MeterProperties getDefaultProperties(Block block) {
-		ResourceLocation key = Registry.BLOCK.getKey(block);
+		Identifier key = Registry.BLOCK.getKey(block);
 
 		if (key == null) {
 			return null; // we should never get here
@@ -152,7 +152,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 		return cache.computeIfAbsent(key, _key -> {
 			String namespace = key.getNamespace();
-			ResourceLocation defaultKey = new ResourceLocation(namespace, DEFAULT_KEY);
+			Identifier defaultKey = new Identifier(namespace, DEFAULT_KEY);
 
 			return new MutableMeterProperties().
 				fill(overrides.get(key)).
@@ -166,16 +166,16 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	private void initDefaults() {
 		Set<String> namespaces = new HashSet<>();
 
-		for (ResourceLocation key : Registry.BLOCK.keySet()) {
+		for (Identifier key : Registry.BLOCK.keySet()) {
 			loadDefaultProperties(key);
 
 			if (namespaces.add(key.getNamespace())) {
-				loadDefaultProperties(new ResourceLocation(key.getNamespace(), DEFAULT_KEY));
+				loadDefaultProperties(new Identifier(key.getNamespace(), DEFAULT_KEY));
 			}
 		}
 	}
 
-	private void loadDefaultProperties(ResourceLocation key) {
+	private void loadDefaultProperties(Identifier key) {
 		String path = String.format("%s/%s/%s%s", RESOURCES_PATH, key.getNamespace(), key.getPath(), FILE_EXTENSION);
 		InputStream resource = getClass().getResourceAsStream(path);
 
@@ -216,12 +216,12 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		path = path.substring(0, path.length() - FILE_EXTENSION.length());
 
 		try (FileReader fr = new FileReader(file)) {
-			loadProperties(overrides, new ResourceLocation(namespace, path), fr);
-		} catch (ResourceLocationException | IOException | JsonSyntaxException | JsonIOException e) {
+			loadProperties(overrides, new Identifier(namespace, path), fr);
+		} catch (IdentifierException | IOException | JsonSyntaxException | JsonIOException e) {
 		}
 	}
 
-	private static void loadProperties(Map<ResourceLocation, MeterProperties> map, ResourceLocation key, Reader reader) {
+	private static void loadProperties(Map<Identifier, MeterProperties> map, Identifier key, Reader reader) {
 		JsonElement rawJson = GSON.fromJson(reader, JsonElement.class);
 
 		if (rawJson.isJsonObject()) {
@@ -233,15 +233,15 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	public void save() {
-		for (Entry<ResourceLocation, MeterProperties> entry : overrides.entrySet()) {
-			ResourceLocation key = entry.getKey();
+		for (Entry<Identifier, MeterProperties> entry : overrides.entrySet()) {
+			Identifier key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			saveUserOverrides(key, properties);
 		}
 	}
 
-	private void saveUserOverrides(ResourceLocation key, MeterProperties properties) {
+	private void saveUserOverrides(Identifier key, MeterProperties properties) {
 		String namespace = key.getNamespace();
 		String path = key.getPath();
 
@@ -276,7 +276,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	private void deleteOverrideFile(ResourceLocation key) {
+	private void deleteOverrideFile(Identifier key) {
 		String namespace = key.getNamespace();
 		String path = key.getPath();
 

@@ -8,43 +8,42 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.options.KeyBinding;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;
 
-@Mixin(net.minecraft.client.Options.class)
-public class OptionsMixin {
+@Mixin(GameOptions.class)
+public class GameOptionsMixin {
 
-	@Shadow @Final @Mutable private KeyMapping[] keyMappings;
+	@Shadow @Final @Mutable private KeyBinding[] keyBindings;
 	@Shadow private Minecraft minecraft;
 
 	@Inject(
 		method = "<init>",
 		at = @At(
 			value = "INVOKE",
-			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/client/Options;load()V"
+			target = "Lnet/minecraft/client/options/GameOptions;load()V"
 		)
 	)
 	private void init(Minecraft minecraft, File file, CallbackInfo ci) {
-		Collection<KeyMapping> rsmmKeys = Keybinds.getKeybinds();
+		Collection<KeyBinding> rsmmKeys = Keybinds.getKeybinds();
 
-		KeyMapping[] mcKeys = keyMappings;
-		keyMappings = new KeyMapping[mcKeys.length + rsmmKeys.size()];
+		KeyBinding[] mcKeys = keyBindings;
+		keyBindings = new KeyBinding[mcKeys.length + rsmmKeys.size()];
 
 		int index = 0;
 		for (int i = 0; i < mcKeys.length; i++) {
-			keyMappings[index++] = mcKeys[i];
+			keyBindings[index++] = mcKeys[i];
 		}
-		for (KeyMapping key : rsmmKeys) {
-			keyMappings[index++] = key;
+		for (KeyBinding key : rsmmKeys) {
+			keyBindings[index++] = key;
 		}
 	}
 

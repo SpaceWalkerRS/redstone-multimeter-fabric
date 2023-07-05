@@ -7,16 +7,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.network.protocol.PacketUtils;
-import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.game.ClientboundLoginPacket;
+import net.minecraft.client.network.handler.ClientPlayNetworkHandler;
+import net.minecraft.network.PacketUtils;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.play.LoginS2CPacket;
 
 import redstone.multimeter.common.network.Packets;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
-@Mixin(ClientPacketListener.class)
-public class ClientPacketListenerMixin {
+@Mixin(ClientPlayNetworkHandler.class)
+public class ClientPlayNetworkHandlerMixin {
 
 	@Shadow private Minecraft minecraft;
 
@@ -26,7 +26,7 @@ public class ClientPacketListenerMixin {
 			value = "RETURN"
 		)
 	)
-	private void handleLogin(ClientboundLoginPacket packet, CallbackInfo ci) {
+	private void handleLogin(LoginS2CPacket packet, CallbackInfo ci) {
 		((IMinecraft)minecraft).getMultimeterClient().onConnect();
 
 	}
@@ -38,9 +38,9 @@ public class ClientPacketListenerMixin {
 			value = "HEAD"
 		)
 	)
-	private void handleCustomPayload(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
-		if (Packets.getChannel().equals(packet.getIdentifier())) {
-			PacketUtils.ensureRunningOnSameThread(packet, (ClientPacketListener)(Object)this, minecraft);
+	private void handleCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
+		if (Packets.getChannel().equals(packet.getChannel())) {
+			PacketUtils.ensureOnSameThread(packet, (ClientPlayNetworkHandler)(Object)this, minecraft);
 			((IMinecraft)minecraft).getMultimeterClient().getPacketHandler().handlePacket(packet.getData());
 
 			ci.cancel();

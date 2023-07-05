@@ -4,9 +4,9 @@ import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.Formatting;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.Tooltip;
@@ -165,7 +165,7 @@ public class MeterListRenderer extends AbstractElement {
 			}
 
 			x = startX + hud.settings.gridSize + 1;
-			y = startY + hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.lineHeight) / 2;
+			y = startY + hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.textRenderer.fontHeight) / 2;
 
 			drawName(cursorMeter, x, y, ColorUtils.setAlpha(0xFFFFFF, alpha));
 
@@ -224,12 +224,12 @@ public class MeterListRenderer extends AbstractElement {
 	}
 
 	private void drawNames(int mouseX, int mouseY) {
-		if (hud.settings.rowHeight < hud.font.lineHeight) {
+		if (hud.settings.rowHeight < hud.textRenderer.fontHeight) {
 			return;
 		}
 
 		int startX = hud.settings.gridSize + 1;
-		int startY = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.lineHeight) / 2;
+		int startY = hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.textRenderer.fontHeight) / 2;
 
 		for (int index = 0; index < hud.meters.size(); index++) {
 			Meter meter = hud.meters.get(index);
@@ -255,10 +255,10 @@ public class MeterListRenderer extends AbstractElement {
 	}
 
 	private void drawName(Meter meter, int x, int y, int color) {
-		Component name = new TextComponent(meter.getName());
+		Text name = new LiteralText(meter.getName());
 
 		if (meter.isHidden()) {
-			name.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+			name.setFormatting(Formatting.GRAY, Formatting.ITALIC);
 		}
 
 		hud.renderer.renderText(name, x, y, color);
@@ -268,7 +268,7 @@ public class MeterListRenderer extends AbstractElement {
 		int width = 0;
 
 		for (Meter meter : hud.meters) {
-			int nameWidth = hud.font.width(meter.getName());
+			int nameWidth = hud.textRenderer.getWidth(meter.getName());
 
 			if (nameWidth > width) {
 				width = nameWidth;

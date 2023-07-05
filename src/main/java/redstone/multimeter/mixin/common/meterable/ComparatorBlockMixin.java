@@ -5,12 +5,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.ComparatorBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ComparatorBlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.ComparatorBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ComparatorBlockEntity;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.block.PowerSource;
@@ -24,8 +24,8 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 			value = "RETURN"
 		)
 	)
-	private void logPowered(Level level, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
-		rsmm$logPowered(level, pos, cir.getReturnValue() > MIN_POWER);
+	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
+		rsmm$logPowered(world, pos, cir.getReturnValue() > MIN_POWER);
 	}
 
 	@Override
@@ -34,8 +34,8 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 	}
 
 	@Override
-	public int rsmm$getPowerLevel(Level level, BlockPos pos, BlockState state) {
-		BlockEntity blockEntity = level.getBlockEntity(pos);
+	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
+		BlockEntity blockEntity = world.getBlockEntity(pos);
 
 		if (blockEntity instanceof ComparatorBlockEntity) {
 			return ((ComparatorBlockEntity)blockEntity).getOutputSignal();

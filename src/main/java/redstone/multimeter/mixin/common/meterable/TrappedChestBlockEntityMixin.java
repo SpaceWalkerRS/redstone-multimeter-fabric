@@ -2,14 +2,14 @@ package redstone.multimeter.mixin.common.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.TrappedChestBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.TrappedChestBlockEntity;
 
 import redstone.multimeter.block.PowerSource;
 import redstone.multimeter.block.chest.TrappedChestHelper;
 import redstone.multimeter.interfaces.mixin.IChestBlockEntity;
-import redstone.multimeter.interfaces.mixin.IServerLevel;
+import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.server.Multimeter;
 
 @Mixin(TrappedChestBlockEntity.class)
@@ -20,15 +20,15 @@ public class TrappedChestBlockEntityMixin extends BlockEntity implements IChestB
 	}
 
 	@Override
-	public void signalOpenerCount(int oldOpenerCount, int newOpenerCount) {
-		if (!level.isClientSide()) {
-			Multimeter multimeter = ((IServerLevel)level).getMultimeter();
+	public void signalViewerCount(int oldViewerCount, int newViewerCount) {
+		if (!world.isClient()) {
+			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 
-			int oldPower = TrappedChestHelper.getPowerFromOpenerCount(oldOpenerCount);
-			int newPower = TrappedChestHelper.getPowerFromOpenerCount(newOpenerCount);
+			int oldPower = TrappedChestHelper.getPowerFromViewerCount(oldViewerCount);
+			int newPower = TrappedChestHelper.getPowerFromViewerCount(newViewerCount);
 
-			multimeter.logPowerChange(level, worldPosition, oldPower, newPower);
-			multimeter.logActive(level, worldPosition, newPower > PowerSource.MIN_POWER);
+			multimeter.logPowerChange(world, pos, oldPower, newPower);
+			multimeter.logActive(world, pos, newPower > PowerSource.MIN_POWER);
 		}
 	}
 }

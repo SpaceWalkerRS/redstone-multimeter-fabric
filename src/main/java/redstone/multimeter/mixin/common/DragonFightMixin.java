@@ -7,16 +7,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.dimension.end.EndDragonFight;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.dimension.end.DragonFight;
 
 import redstone.multimeter.common.TickTask;
-import redstone.multimeter.interfaces.mixin.IServerLevel;
+import redstone.multimeter.interfaces.mixin.IServerWorld;
 
-@Mixin(EndDragonFight.class)
-public class EndDragonFightMixin {
+@Mixin(DragonFight.class)
+public class DragonFightMixin {
 
-	@Shadow @Final private ServerLevel level;
+	@Shadow @Final private ServerWorld world;
 
 	@Inject(
 		method = "tick",
@@ -25,7 +25,7 @@ public class EndDragonFightMixin {
 		)
 	)
 	private void startTickTaskDragonFight(CallbackInfo ci) {
-		((IServerLevel)level).rsmm$startTickTask(TickTask.DRAGON_FIGHT);
+		((IServerWorld)world).rsmm$startTickTask(TickTask.DRAGON_FIGHT);
 	}
 
 	@Inject(
@@ -35,6 +35,6 @@ public class EndDragonFightMixin {
 		)
 	)
 	private void endTickTaskDragonFight(CallbackInfo ci) {
-		((IServerLevel)level).rsmm$endTickTask();
+		((IServerWorld)world).rsmm$endTickTask();
 	}
 }

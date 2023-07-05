@@ -3,14 +3,14 @@ package redstone.multimeter.server;
 import java.io.File;
 import java.util.UUID;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.resource.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.server.entity.living.player.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.DimPos;
@@ -21,7 +21,7 @@ import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.TickTimePacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
-import redstone.multimeter.server.compat.CarpetCompat;
+//import redstone.multimeter.server.compat.CarpetCompat;
 
 public class MultimeterServer {
 
@@ -31,7 +31,7 @@ public class MultimeterServer {
 	private final Multimeter multimeter;
 	private final TickPhaseTree tickPhaseTree;
 
-	private final CarpetCompat carpetCompat;
+//	private final CarpetCompat carpetCompat;
 
 	private boolean loaded;
 	private TickPhase tickPhase;
@@ -43,7 +43,7 @@ public class MultimeterServer {
 		this.multimeter = new Multimeter(this);
 		this.tickPhaseTree = new TickPhaseTree();
 
-		this.carpetCompat = new CarpetCompat();
+//		this.carpetCompat = new CarpetCompat();
 
 		this.tickPhase = TickPhase.UNKNOWN;
 	}
@@ -64,26 +64,26 @@ public class MultimeterServer {
 		return tickPhaseTree;
 	}
 
-	public long getTickCount() {
-		return server.getTickCount();
+	public long getTicks() {
+		return server.getTicks();
 	}
 
-	public boolean isDedicatedServer() {
-		return server.isDedicatedServer();
+	public boolean isDedicated() {
+		return server.isDedicated();
 	}
 
 	public File getConfigDirectory() {
-		return new File(server.getServerDirectory(), RedstoneMultimeterMod.CONFIG_PATH);
+		return new File(server.getRunDir(), RedstoneMultimeterMod.CONFIG_PATH);
 	}
 
 	public TickPhase getTickPhase() {
 		return tickPhase;
 	}
 
-	public void levelLoaded() {
+	public void worldLoaded() {
 		loaded = true;
 
-		carpetCompat.init();
+//		carpetCompat.init();
 	}
 
 	public void startTickTask(TickTask task, String... args) {
@@ -107,12 +107,16 @@ public class MultimeterServer {
 		}
 	}
 
+	public TickTask getCurrentTickTask() {
+		return tickPhase.peekTask();
+	}
+
 	public boolean isPaused() {
 		return ((IMinecraftServer)server).rsmm$isPaused();
 	}
 
 	public boolean isPausedOrFrozen() {
-		return isPaused() || carpetCompat.isFrozen();
+		return isPaused()/* || carpetCompat.isFrozen()*/;
 	}
 
 	public void tickStart() {
@@ -145,13 +149,13 @@ public class MultimeterServer {
 		multimeter.tickEnd(paused);
 	}
 
-	public void tickTime(Level level) {
-		TickTimePacket packet = new TickTimePacket(level.getGameTime());
-		playerList.send(packet, level.dimension.getType());
+	public void tickTime(World world) {
+		TickTimePacket packet = new TickTimePacket(world.getTime());
+		playerList.send(packet, world.dimension.getType());
 	}
 
-	public void onHandshake(ServerPlayer player, String modVersion) {
-		if (!playerList.has(player.getUUID())) {
+	public void onHandshake(ServerPlayerEntity player, String modVersion) {
+		if (!playerList.has(player.getUuid())) {
 			playerList.add(player);
 
 			HandshakePacket packet = new HandshakePacket();
@@ -159,47 +163,47 @@ public class MultimeterServer {
 		}
 	}
 
-	public void onPlayerJoin(ServerPlayer player) {
+	public void onPlayerJoin(ServerPlayerEntity player) {
 		multimeter.onPlayerJoin(player);
 	}
 
-	public void onPlayerLeave(ServerPlayer player) {
+	public void onPlayerLeave(ServerPlayerEntity player) {
 		multimeter.onPlayerLeave(player);
 	}
 
-	public void refreshTickPhaseTree(ServerPlayer player) {
+	public void refreshTickPhaseTree(ServerPlayerEntity player) {
 		if (tickPhaseTree.isComplete()) {
 			TickPhaseTreePacket packet = new TickPhaseTreePacket(tickPhaseTree.toNbt());
 			playerList.send(packet, player);
 		}
 	}
 
-	public void rebuildTickPhaseTree(ServerPlayer player) {
+	public void rebuildTickPhaseTree(ServerPlayerEntity player) {
 		if (tickPhaseTree.isComplete()) {
 			tickPhaseTree.reset();
 		}
 	}
 
-	public Iterable<ServerLevel> getLevels() {
-		return server.getAllLevels();
+	public Iterable<ServerWorld> getWorlds() {
+		return server.getWorlds();
 	}
 
-	public ServerLevel getLevel(ResourceLocation key) {
-		return server.getLevel(DimensionType.getByName(key));
+	public ServerWorld getWorld(Identifier key) {
+		return server.getWorld(DimensionType.byKey(key));
 	}
 
-	public ServerLevel getLevel(DimPos pos) {
-		return getLevel(pos.getDimension());
+	public ServerWorld getWorld(DimPos pos) {
+		return getWorld(pos.getDimension());
 	}
 
 	public BlockState getBlockState(DimPos pos) {
-		Level level = getLevel(pos);
+		World world = getWorld(pos);
 
-		if (level == null) {
+		if (world == null) {
 			return null;
 		}
 
-		return level.getBlockState(pos.getBlockPos());
+		return world.getBlockState(pos.getBlockPos());
 	}
 
 	public PlayerList getPlayerList() {
@@ -210,11 +214,11 @@ public class MultimeterServer {
 		return playerList.has(uuid);
 	}
 
-	public boolean isMultimeterClient(ServerPlayer player) {
-		return playerList.has(player.getUUID());
+	public boolean isMultimeterClient(ServerPlayerEntity player) {
+		return playerList.has(player.getUuid());
 	}
 
-	public void sendMessage(ServerPlayer player, Component message, boolean actionBar) {
-		player.displayClientMessage(message, actionBar);
+	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
+		player.addMessage(message, actionBar);
 	}
 }

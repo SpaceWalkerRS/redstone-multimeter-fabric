@@ -7,11 +7,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 
@@ -25,11 +25,11 @@ public class DispenserBlockMixin implements MeterableBlock {
 			value = "FIELD",
 			ordinal = 0,
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/world/level/block/DispenserBlock;TRIGGERED:Lnet/minecraft/world/level/block/state/properties/BooleanProperty;"
+			target = "Lnet/minecraft/block/DispenserBlock;TRIGGERED:Lnet/minecraft/state/property/BooleanProperty;"
 		)
 	)
-	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston, CallbackInfo ci, boolean powered) {
-		rsmm$logPowered(level, pos, powered);
+	private void logPowered(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, boolean powered) {
+		rsmm$logPowered(world, pos, powered);
 	}
 
 	@Override
@@ -38,12 +38,12 @@ public class DispenserBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
-		return level.hasNeighborSignal(pos) || level.hasNeighborSignal(pos.above());
+	public boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
+		return world.hasNeighborSignal(pos) || world.hasNeighborSignal(pos.up());
 	}
 
 	@Override
-	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(DispenserBlock.TRIGGERED);
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(DispenserBlock.TRIGGERED);
 	}
 }

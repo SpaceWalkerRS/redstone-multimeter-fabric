@@ -6,16 +6,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.ComparatorBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.ComparatorBlockEntity;
 
-import redstone.multimeter.interfaces.mixin.IServerLevel;
+import redstone.multimeter.interfaces.mixin.IServerWorld;
 
 @Mixin(ComparatorBlockEntity.class)
 public class ComparatorBlockEntityMixin extends BlockEntity {
 
-	@Shadow private int output;
+	@Shadow private int outputSignal;
 
 	private ComparatorBlockEntityMixin(BlockEntityType<?> type) {
 		super(type);
@@ -27,9 +27,9 @@ public class ComparatorBlockEntityMixin extends BlockEntity {
 			value = "HEAD"
 		)
 	)
-	public void logPowerChange(int newOutput, CallbackInfo ci) {
-		if (!level.isClientSide()) {
-			((IServerLevel)level).getMultimeter().logPowerChange(level, worldPosition, output, newOutput);
+	public void logPowerChange(int newOutputSignal, CallbackInfo ci) {
+		if (!world.isClient()) {
+			((IServerWorld)world).getMultimeter().logPowerChange(world, pos, outputSignal, newOutputSignal);
 		}
 	}
 }

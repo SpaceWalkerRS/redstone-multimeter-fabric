@@ -3,9 +3,9 @@ package redstone.multimeter.server.meter.log;
 import it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.world.level.Level;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.world.World;
 
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.Meter;
@@ -48,8 +48,8 @@ public class ServerLogManager extends LogManager {
 	public void tick() {
 		cutoff = Long.MAX_VALUE;
 
-		for (Level level : meterGroup.getMultimeter().getServer().getLevels()) {
-			long gameTime = level.getGameTime();
+		for (World world : meterGroup.getMultimeter().getServer().getWorlds()) {
+			long gameTime = world.getTime();
 
 			if (gameTime < cutoff) {
 				cutoff = gameTime;
@@ -65,8 +65,8 @@ public class ServerLogManager extends LogManager {
 		});
 	}
 
-	public void logEvent(Level level, Meter meter, MeterEvent event) {
-		long tick = level.getGameTime();
+	public void logEvent(World world, Meter meter, MeterEvent event) {
+		long tick = world.getTime();
 		int subtick = nextSubtick(tick);
 		TickPhase phase = meterGroup.getMultimeter().getServer().getTickPhase();
 
@@ -80,7 +80,7 @@ public class ServerLogManager extends LogManager {
 			return;
 		}
 
-		ListTag list = new ListTag();
+		NbtList list = new NbtList();
 
 		for (Meter meter : meterGroup.getMeters()) {
 			if (meter.getLogs().isEmpty()) {
@@ -88,9 +88,9 @@ public class ServerLogManager extends LogManager {
 			}
 
 			long id = meter.getId();
-			CompoundTag logs = meter.getLogs().toNbt();
+			NbtCompound logs = meter.getLogs().toNbt();
 
-			CompoundTag nbt = new CompoundTag();
+			NbtCompound nbt = new NbtCompound();
 			nbt.putLong("id", id);
 			nbt.put("logs", logs);
 			nbt.putBoolean("powered", meter.isPowered());

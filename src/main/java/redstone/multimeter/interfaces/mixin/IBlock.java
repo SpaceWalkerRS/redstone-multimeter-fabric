@@ -1,8 +1,8 @@
 package redstone.multimeter.interfaces.mixin;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public interface IBlock {
 
@@ -18,7 +18,7 @@ public interface IBlock {
 		return true;
 	}
 
-	default boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
-		return level.hasNeighborSignal(pos);
+	default boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
+		return world.hasNeighborSignal(pos);
 	}
 }

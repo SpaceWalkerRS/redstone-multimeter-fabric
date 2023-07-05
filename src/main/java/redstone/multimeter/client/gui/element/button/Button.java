@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.network.chat.Component;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -14,11 +14,11 @@ public class Button extends AbstractButton {
 
 	private final MousePress<Button> onPress;
 
-	public Button(MultimeterClient client, int x, int y, Supplier<Component> message, Supplier<Tooltip> tooltip, MousePress<Button> onPress) {
+	public Button(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip, MousePress<Button> onPress) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip, onPress);
 	}
 
-	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Component> message, Supplier<Tooltip> tooltip, MousePress<Button> onPress) {
+	public Button(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip, MousePress<Button> onPress) {
 		super(client, x, y, width, height, message, tooltip);
 
 		this.onPress = onPress;

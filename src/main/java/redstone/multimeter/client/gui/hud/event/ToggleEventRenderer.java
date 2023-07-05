@@ -92,7 +92,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 		}
 
 		y += hud.settings.gridSize;
-		int textY = y + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.lineHeight) / 2;
+		int textY = y + hud.settings.rowHeight - (hud.settings.rowHeight + hud.textRenderer.fontHeight) / 2;
 		int color = meter.getColor();
 
 		MeterLogs logs = meter.getLogs();
@@ -129,7 +129,7 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 					String text = String.valueOf(pulseLength);
 
 					int availableWidth = endX - startX;
-					int requiredWidth = hud.font.width(text) + 1;
+					int requiredWidth = hud.textRenderer.getWidth(text) + 1;
 
 					if (requiredWidth < availableWidth) {
 						boolean toggled = wasToggled(log);

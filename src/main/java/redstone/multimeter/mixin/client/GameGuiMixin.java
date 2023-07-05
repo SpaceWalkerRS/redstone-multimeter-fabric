@@ -9,14 +9,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GameGui;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
-@Mixin(Gui.class)
-public class GuiMixin {
+@Mixin(GameGui.class)
+public class GameGuiMixin {
 
 	@Shadow @Final private Minecraft minecraft;
 
@@ -25,10 +25,10 @@ public class GuiMixin {
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.AFTER,
-			target = "Lnet/minecraft/client/gui/Gui;renderEffects()V"
+			target = "Lnet/minecraft/client/gui/GameGui;renderStatusEffects()V"
 		)
 	)
-	private void renderHud(float partialTick, CallbackInfo ci) {
+	private void renderHud(float tickDelta, CallbackInfo ci) {
 		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
 		MultimeterHud hud = client.getHud();
 

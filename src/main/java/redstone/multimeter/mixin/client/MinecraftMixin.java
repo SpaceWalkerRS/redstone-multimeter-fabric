@@ -1,16 +1,14 @@
 package redstone.multimeter.mixin.client;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.world.ClientWorld;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
@@ -31,26 +29,14 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "reloadResourcePacks()Ljava/util/concurrent/CompletableFuture;",
+		method = "reloadResources()V",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void reloadResources(CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-		multimeterClient.reloadResources();
-	}
-
-	@Inject(
-		method = "resizeDisplay",
-		at = @At(
-			value = "INVOKE",
-			shift = Shift.AFTER,
-			target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"
-		)
-	)
-	private void resizeDisplay(CallbackInfo ci) {
+	private void reloadResources(CallbackInfo ci) {
 		if (multimeterClient != null) {
-			multimeterClient.getHud().resetSize();
+			multimeterClient.reloadResources();
 		}
 	}
 
@@ -67,7 +53,7 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "handleKeybinds",
+		method = "handleKeyBindings",
 		at = @At(
 			value = "HEAD"
 		)
@@ -77,17 +63,19 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V",
+		method = "setWorld(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/gui/screen/Screen;)V",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void clearLevel(Screen screen, CallbackInfo ci) {
-		multimeterClient.onDisconnect();
+	private void setWorld(ClientWorld world, Screen screen, CallbackInfo ci) {
+		if (world == null) {
+			multimeterClient.onDisconnect();
+		}
 	}
 
 	@Inject(
-		method = "close",
+		method = "stop",
 		at = @At(
 			value = "HEAD"
 		)

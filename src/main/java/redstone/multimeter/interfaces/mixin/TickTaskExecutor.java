@@ -12,4 +12,8 @@ public interface TickTaskExecutor {
 
 	default void rsmm$swapTickTask(TickTask task, String... args) {
 	}
+
+	default TickTask getCurrentTickTask() {
+		return TickTask.UNKNOWN;
+	}
 }

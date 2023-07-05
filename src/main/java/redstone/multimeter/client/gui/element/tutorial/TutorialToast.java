@@ -5,10 +5,10 @@ import java.util.List;
 import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.components.toasts.ToastComponent;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.toast.Toast;
+import net.minecraft.client.gui.toast.ToastGui;
+import net.minecraft.client.render.TextRenderer;
+import net.minecraft.text.Text;
 
 public class TutorialToast implements Toast {
 
@@ -20,7 +20,7 @@ public class TutorialToast implements Toast {
 	protected static final int INNER_WIDTH = TEXTURE_WIDTH - 2 * EDGE;
 	protected static final int INNER_HEIGHT = TEXTURE_HEIGHT - 2 * EDGE;
 
-	private final Component title;
+	private final Text title;
 	private final List<String> description;
 
 	private final int toastWidth;
@@ -28,14 +28,14 @@ public class TutorialToast implements Toast {
 
 	private Visibility visibility;
 
-	public TutorialToast(Component title, Component description) {
+	public TutorialToast(Text title, Text description) {
 		Minecraft client = Minecraft.getInstance();
-		Font font = client.font;
+		TextRenderer textRenderer = client.textRenderer;
 
 		this.toastWidth = 200;
 
 		this.title = title;
-		this.description = font.split(description.getColoredString(), width() - 14);
+		this.description = textRenderer.split(description.getFormattedString(), width() - 14);
 
 		this.toastHeight = 10 + 12 + 10 * this.description.size();
 
@@ -51,37 +51,37 @@ public class TutorialToast implements Toast {
 	}
 
 	@Override
-	public Visibility render(ToastComponent toasts, long age) {
-		drawBackground(toasts, age);
+	public Visibility render(ToastGui toasts, long animationTime) {
+		drawBackground(toasts, animationTime);
 
-		Minecraft client = toasts.getMinecraft();
-		Font font = client.font;
+		Minecraft minecraft = toasts.getMinecraft();
+		TextRenderer textRenderer = minecraft.textRenderer;
 
 		float x = 7.0F;
 		float y = 7.0F;
 
-		font.draw(title.getColoredString(), x, y, 0xFF500050);
+		textRenderer.draw(title.getFormattedString(), x, y, 0xFF500050);
 
 		y += 12.0F;
 
 		for (int i = 0; i < description.size(); i++, y += 10.0F) {
-			font.draw(description.get(i), x, y, 0xFF000000);
+			textRenderer.draw(description.get(i), x, y, 0xFF000000);
 		}
 
-		drawDecoration(toasts, age);
+		drawDecoration(toasts, animationTime);
 
 		return visibility;
 	}
 
-	protected void drawBackground(ToastComponent toasts, long age) {
-		toasts.getMinecraft().getTextureManager().bind(TEXTURE);
+	protected void drawBackground(ToastGui toasts, long animationTime) {
+		toasts.getMinecraft().getTextureManager().bind(TOASTS_LOCATION);
 		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 		int width = width();
 		int height = height();
 
 		if (width == TEXTURE_WIDTH && height == TEXTURE_HEIGHT) {
-			toasts.blit(0, 0, TEXTURE_U, TEXTURE_V, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+			toasts.drawTexture(0, 0, TEXTURE_U, TEXTURE_V, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 		} else {
 			int x = 0;
 			int y = 0;
@@ -90,19 +90,19 @@ public class TutorialToast implements Toast {
 			int w = EDGE;
 			int h = EDGE;
 
-			toasts.blit(x, y, u, v, w, h); // top left corner
+			toasts.drawTexture(x, y, u, v, w, h); // top left corner
 
 			u += EDGE;
 			w = INNER_WIDTH;
 
 			for (x = EDGE; x < (width - w - EDGE); x += w) {
-				toasts.blit(x, y, u, v, w, h); // top edge
+				toasts.drawTexture(x, y, u, v, w, h); // top edge
 			}
 
 			w = width - x;
 			u = TEXTURE_U + TEXTURE_WIDTH - w;
 
-			toasts.blit(x, y, u, v, w, h); // top right corner
+			toasts.drawTexture(x, y, u, v, w, h); // top right corner
 
 			v += EDGE;
 			h = INNER_HEIGHT;
@@ -112,19 +112,19 @@ public class TutorialToast implements Toast {
 				u = TEXTURE_U;
 				w = EDGE;
 
-				toasts.blit(x, y, u, v, w, h); // left edge
+				toasts.drawTexture(x, y, u, v, w, h); // left edge
 
 				u += EDGE;
 				w = INNER_WIDTH;
 
 				for (x = EDGE; x < (width - w - EDGE); x += w) {
-					toasts.blit(x, y, u, v, w, h); // middle
+					toasts.drawTexture(x, y, u, v, w, h); // middle
 				}
 
 				w = width - x;
 				u = TEXTURE_U + TEXTURE_WIDTH - w;
 
-				toasts.blit(x, y, u, v, w, h); // right edge
+				toasts.drawTexture(x, y, u, v, w, h); // right edge
 			}
 
 			h = height - y;
@@ -134,23 +134,23 @@ public class TutorialToast implements Toast {
 			u = TEXTURE_U;
 			w = EDGE;
 
-			toasts.blit(x, y, u, v, w, h); // bottom left corner
+			toasts.drawTexture(x, y, u, v, w, h); // bottom left corner
 
 			u += EDGE;
 			w = INNER_WIDTH;
 
 			for (x = EDGE; x < (width - w - EDGE); x += w) {
-				toasts.blit(x, y, u, v, w, h); // bottom edge
+				toasts.drawTexture(x, y, u, v, w, h); // bottom edge
 			}
 
 			w = width - x;
 			u = TEXTURE_U + TEXTURE_WIDTH - w;
 
-			toasts.blit(x, y, u, v, w, h); // bottom right corner
+			toasts.drawTexture(x, y, u, v, w, h); // bottom right corner
 		}
 	}
 
-	protected void drawDecoration(ToastComponent toasts, long age) {
+	protected void drawDecoration(ToastGui toasts, long animationTime) {
 	}
 
 	public void hide() {

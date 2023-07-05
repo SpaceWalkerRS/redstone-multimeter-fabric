@@ -1,6 +1,6 @@
 package redstone.multimeter.common.network;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resource.Identifier;
 
 import redstone.multimeter.common.network.packets.*;
 import redstone.multimeter.registry.SupplierRegistry;
@@ -9,15 +9,15 @@ public class Packets {
 
 	private static final SupplierRegistry<RSMMPacket> REGISTRY;
 
-	public static ResourceLocation getChannel() {
+	public static Identifier getChannel() {
 		return REGISTRY.getRegistryKey();
 	}
 
-	public static ResourceLocation getKey(RSMMPacket packet) {
+	public static Identifier getKey(RSMMPacket packet) {
 		return REGISTRY.getKey(packet);
 	}
 
-	public static RSMMPacket create(ResourceLocation key) {
+	public static RSMMPacket create(Identifier key) {
 		return REGISTRY.get(key);
 	}
 

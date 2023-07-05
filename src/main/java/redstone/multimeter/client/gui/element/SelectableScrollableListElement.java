@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screen.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.button.IButton;
@@ -56,7 +56,7 @@ public class SelectableScrollableListElement extends ScrollableListElement {
 		if (!consumed) {
 			switch (keyCode) {
 			case GLFW.GLFW_KEY_TAB:
-				return moveSelection(!Screen.hasShiftDown(), false);
+				return moveSelection(!Screen.isShiftDown(), false);
 			case GLFW.GLFW_KEY_UP:
 				return moveSelection(false, false);
 			case GLFW.GLFW_KEY_DOWN:

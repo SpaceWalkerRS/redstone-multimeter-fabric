@@ -1,6 +1,6 @@
 package redstone.multimeter.common.meter.log;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.common.TickPhase;
@@ -96,8 +96,8 @@ public class EventLog {
 		return tooltip;
 	}
 
-	public CompoundTag toNbt() {
-		CompoundTag nbt = new CompoundTag();
+	public NbtCompound toNbt() {
+		NbtCompound nbt = new NbtCompound();
 
 		nbt.put("meter event", event.toNbt());
 		nbt.putLong("tick", tick);
@@ -107,7 +107,7 @@ public class EventLog {
 		return nbt;
 	}
 
-	public static EventLog fromNbt(CompoundTag nbt) {
+	public static EventLog fromNbt(NbtCompound nbt) {
 		EventLog log = new EventLog();
 
 		log.event = MeterEvent.fromNbt(nbt.getCompound("meter event"));

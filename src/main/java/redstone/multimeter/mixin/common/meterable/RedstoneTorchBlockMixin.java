@@ -6,10 +6,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.RedstoneTorchBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.RedstoneTorchBlock;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.block.PowerSource;
@@ -17,7 +17,7 @@ import redstone.multimeter.block.PowerSource;
 @Mixin(RedstoneTorchBlock.class)
 public class RedstoneTorchBlockMixin implements MeterableBlock, PowerSource {
 
-	@Shadow private boolean hasNeighborSignal(Level level, BlockPos pos, BlockState state) { return false; }
+	@Shadow private boolean hasNeighborSignal(World world, BlockPos pos, BlockState state) { return false; }
 
 	@Inject(
 		method = "hasNeighborSignal",
@@ -25,8 +25,8 @@ public class RedstoneTorchBlockMixin implements MeterableBlock, PowerSource {
 			value = "RETURN"
 		)
 	)
-	private void logPowered(Level level, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		rsmm$logPowered(level, pos, cir.getReturnValue()); // floor redstone torches only
+	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+		rsmm$logPowered(world, pos, cir.getReturnValue()); // floor redstone torches only
 	}
 
 	@Override
@@ -35,17 +35,17 @@ public class RedstoneTorchBlockMixin implements MeterableBlock, PowerSource {
 	}
 
 	@Override
-	public boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
-		return hasNeighborSignal(level, pos, state);
+	public boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
+		return hasNeighborSignal(world, pos, state);
 	}
 
 	@Override
-	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(RedstoneTorchBlock.LIT);
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(RedstoneTorchBlock.LIT);
 	}
 
 	@Override
-	public int rsmm$getPowerLevel(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(RedstoneTorchBlock.LIT) ? MAX_POWER : MIN_POWER;
+	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return state.get(RedstoneTorchBlock.LIT) ? MAX_POWER : MIN_POWER;
 	}
 }

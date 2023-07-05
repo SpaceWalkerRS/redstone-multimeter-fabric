@@ -11,13 +11,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.platform.InputConstants.Key;
 
-import net.minecraft.client.KeyMapping;
+import net.minecraft.client.options.KeyBinding;
 
 import redstone.multimeter.client.Keybinds;
-import redstone.multimeter.interfaces.mixin.IKeyMapping;
+import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
-@Mixin(KeyMapping.class)
-public class KeyMappingMixin implements IKeyMapping {
+@Mixin(KeyBinding.class)
+public class KeyBindingMixin implements IKeyBinding {
 
 	@Shadow @Final private static Map<String, Integer> CATEGORY_SORT_ORDER;
 	@Shadow private Key key;

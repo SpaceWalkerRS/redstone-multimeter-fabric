@@ -5,8 +5,8 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.TextureRegion;
@@ -22,11 +22,11 @@ public class Slider extends AbstractButton {
 
 	private double value;
 
-	public Slider(MultimeterClient client, int x, int y, Supplier<Component> message, Supplier<Tooltip> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
+	public Slider(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip, onSlide, valueSupplier, steps);
 	}
 
-	public Slider(MultimeterClient client, int x, int y, int width, int height, Supplier<Component> message, Supplier<Tooltip> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
+	public Slider(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
 		super(client, x, y, width, height, message, tooltip);
 
 		this.valueConsumer = valueConsumer;
@@ -136,7 +136,7 @@ public class Slider extends AbstractButton {
 	}
 
 	private void setValue(double newValue, boolean updateListener) {
-		value = Mth.clamp(newValue, 0.0D, 1.0D);
+		value = MathHelper.clamp(newValue, 0.0D, 1.0D);
 		value = Math.round(steps * value) / steps;
 
 		if (updateListener) {

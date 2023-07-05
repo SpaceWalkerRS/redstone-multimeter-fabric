@@ -1,8 +1,8 @@
 package redstone.multimeter.client;
 
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.options.KeyBinding;
 
 import redstone.multimeter.client.gui.screen.MultimeterScreen;
 import redstone.multimeter.client.gui.screen.OptionsScreen;
@@ -55,7 +55,7 @@ public class InputHandler {
 			client.openMeterControls();
 		}
 		for (int index = 0; index < Keybinds.TOGGLE_EVENT_TYPES.length; index++) {
-			KeyMapping keybind = Keybinds.TOGGLE_EVENT_TYPES[index];
+			KeyBinding keybind = Keybinds.TOGGLE_EVENT_TYPES[index];
 
 			while (keybind.consumeClick()) {
 				client.toggleEventType(EventType.byIndex(index));
@@ -70,18 +70,18 @@ public class InputHandler {
 			client.getHud().pause();
 		}
 		while (Keybinds.TOGGLE_MARKER.consumeClick()) {
-			client.getHud().toggleTickMarker(Screen.hasControlDown());
+			client.getHud().toggleTickMarker(Screen.isControlDown());
 		}
 		while (Keybinds.STEP_BACKWARD.consumeClick()) {
-			client.getHud().stepBackward(Screen.hasControlDown() ? 10 : 1);
+			client.getHud().stepBackward(Screen.isControlDown() ? 10 : 1);
 		}
 		while (Keybinds.STEP_FORWARD.consumeClick()) {
-			client.getHud().stepForward(Screen.hasControlDown() ? 10 : 1);
+			client.getHud().stepForward(Screen.isControlDown() ? 10 : 1);
 		}
 	}
 
 	public boolean handleMouseScroll(double scrollX, double scrollY) {
-		if (Keybinds.SCROLL_HUD.isDown() && client.isHudActive()) {
+		if (Keybinds.SCROLL_HUD.isPressed() && client.isHudActive()) {
 			client.getHud().stepBackward((int)Math.round(scrollY));
 		} else {
 			return false;
@@ -121,11 +121,11 @@ public class InputHandler {
 			if (Keybinds.PAUSE_METERS.matchesMouse(button)) {
 				client.getHud().pause();
 			} else if (Keybinds.TOGGLE_MARKER.matchesMouse(button)) {
-				client.getHud().toggleTickMarker(Screen.hasControlDown());
+				client.getHud().toggleTickMarker(Screen.isControlDown());
 			} else if (Keybinds.STEP_BACKWARD.matchesMouse(button)) {
-				client.getHud().stepBackward(Screen.hasControlDown() ? 10 : 1);
+				client.getHud().stepBackward(Screen.isControlDown() ? 10 : 1);
 			} else if (Keybinds.STEP_FORWARD.matchesMouse(button)) {
-				client.getHud().stepForward(Screen.hasControlDown() ? 10 : 1);
+				client.getHud().stepForward(Screen.isControlDown() ? 10 : 1);
 			} else {
 				return false;
 			}
@@ -165,11 +165,11 @@ public class InputHandler {
 			if (Keybinds.PAUSE_METERS.matches(keyCode, scanCode)) {
 				client.getHud().pause();
 			} else if (Keybinds.TOGGLE_MARKER.matches(keyCode, scanCode)) {
-				client.getHud().toggleTickMarker(Screen.hasControlDown());
+				client.getHud().toggleTickMarker(Screen.isControlDown());
 			} else if (Keybinds.STEP_BACKWARD.matches(keyCode, scanCode)) {
-				client.getHud().stepBackward(Screen.hasControlDown() ? 10 : 1);
+				client.getHud().stepBackward(Screen.isControlDown() ? 10 : 1);
 			} else if (Keybinds.STEP_FORWARD.matches(keyCode, scanCode)) {
-				client.getHud().stepForward(Screen.hasControlDown() ? 10 : 1);
+				client.getHud().stepForward(Screen.isControlDown() ? 10 : 1);
 			} else {
 				return false;
 			}
@@ -194,7 +194,7 @@ public class InputHandler {
 		return true;
 	}
 
-	private boolean isPressed(KeyMapping keybind) {
+	private boolean isPressed(KeyBinding keybind) {
 		return Keybinds.isPressed(client.getMinecraft(), keybind);
 	}
 }

@@ -1,0 +1,34 @@
+{
+	"schema_version": 1,
+	"quilt_loader": {
+		"group": "redstone.multimeter",
+		"id": "rsmm_ornithe",
+		"version": "${version}",
+		"metadata": {
+			"name": "Redstone Multimeter Ornithe",
+			"description": "An Ornithe port of NarcolepticFrog's Redstone Multimeter Mod",
+			"contributors": {
+				"Space Walker": "Owner",
+				"NarcolepticFrog": "Contributor"
+			},
+			"contact": {
+				"homepage": "https://modrinth.com/mod/redstone-multimeter",
+				"sources": "https://github.com/SpaceWalkerRS/redstone-multimeter-fabric",
+				"issues": "https://github.com/SpaceWalkerRS/redstone-multimeter-fabric/issues"
+			},
+			"icon": "assets/redstone_multimeter/icon.png"
+		},
+		"intermediate_mappings": "net.fabricmc:intermediary",
+		"depends": [
+			{
+				"id": "quilt_loader",
+				"versions": ">=0.17.6-"
+			},
+			{
+				"id": "minecraft",
+				"versions": "1.13.x"
+			}
+		]
+	},
+	"mixin": "rsmm_ornithe.mixins.json"
+}

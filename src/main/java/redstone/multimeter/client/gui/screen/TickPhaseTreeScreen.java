@@ -1,7 +1,7 @@
 package redstone.multimeter.client.gui.screen;
 
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -19,7 +19,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 	private long lastRequestTime;
 
 	public TickPhaseTreeScreen(MultimeterClient client) {
-		super(client, new TextComponent("Tick Phases"), true);
+		super(client, new LiteralText("Tick Phases"), true);
 
 		this.tickPhaseTree = this.client.getTickPhaseTree();
 		this.lastRequestTime = -1;
@@ -42,8 +42,8 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			request();
 
 			String text = "Requesting tick phase tree from server...";
-			int x = getX() + (getWidth() - font.width(text)) / 2;
-			int y = getY() + (getHeight() - font.lineHeight) / 2;
+			int x = getX() + (getWidth() - textRenderer.getWidth(text)) / 2;
+			int y = getY() + (getHeight() - textRenderer.fontHeight) / 2;
 			TextElement textElement = new TextElement(client, x, y, t -> t.add(text).setWithShadow(true), () -> {
 				if (lastRequestTime > 0) {
 					long time = System.currentTimeMillis();
@@ -61,7 +61,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			x = getX() + (getWidth() - IButton.DEFAULT_WIDTH) / 2;
 			y = getY() + getHeight() - (8 + IButton.DEFAULT_HEIGHT);
 
-			IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableComponent("gui.done"), () -> Tooltip.EMPTY, button -> {
+			IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("gui.done"), () -> Tooltip.EMPTY, button -> {
 				close();
 				return true;
 			});
@@ -86,11 +86,11 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			x = getX() + getWidth() / 2;
 			y = getY() + getHeight() - (IButton.DEFAULT_HEIGHT + 8);
 
-			IButton rebuild = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TextComponent("Refresh"), () -> Tooltip.EMPTY, button -> {
+			IButton rebuild = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new LiteralText("Refresh"), () -> Tooltip.EMPTY, button -> {
 				rebuild();
 				return true;
 			});
-			IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableComponent("gui.done"), () -> Tooltip.EMPTY, button -> {
+			IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("gui.done"), () -> Tooltip.EMPTY, button -> {
 				close();
 				return true;
 			});

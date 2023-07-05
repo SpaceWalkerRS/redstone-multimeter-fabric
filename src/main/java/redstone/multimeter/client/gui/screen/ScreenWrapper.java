@@ -2,8 +2,7 @@ package redstone.multimeter.client.gui.screen;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.screen.Screen;
 
 import redstone.multimeter.client.gui.CursorType;
 
@@ -13,8 +12,6 @@ public class ScreenWrapper extends Screen {
 	private final RSMMScreen screen;
 
 	public ScreenWrapper(Screen parent, RSMMScreen screen) {
-		super(screen.getTitle());
-
 		this.parent = parent;
 		this.screen = screen;
 
@@ -22,18 +19,8 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public Component getTitle() {
-		return screen.getTitle();
-	}
-
-	@Override
 	public void render(int mouseX, int mouseY, float delta) {
 		screen.render(mouseX, mouseY);
-	}
-
-	@Override
-	public final void mouseMoved(double mouseX, double mouseY) {
-		screen.mouseMove(mouseX, mouseY);
 	}
 
 	@Override
@@ -52,7 +39,7 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public final boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public final boolean mouseScrolled(double amount) {
 		return false; // scrolling is handled in MouseMixin and InputHandler
 	}
 

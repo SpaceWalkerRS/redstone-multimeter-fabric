@@ -7,41 +7,41 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.entity.living.player.PlayerEntity;
 
 import redstone.multimeter.interfaces.mixin.IChestBlockEntity;
 
 @Mixin(ChestBlockEntity.class)
 public class ChestBlockEntityMixin implements IChestBlockEntity {
 
-	@Shadow private int openCount;
+	@Shadow private int viewerCount;
 
 	@Inject(
-		method = "startOpen",
+		method = "onOpen",
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/world/level/block/entity/ChestBlockEntity;signalOpenCount()V"
+			target = "Lnet/minecraft/block/entity/ChestBlockEntity;notifyViewerCountChange()V"
 		)
 	)
-	private void startOpen(Player player, CallbackInfo ci) {
-		signalOpenerCount(openCount - 1, openCount);
+	private void onOpen(PlayerEntity player, CallbackInfo ci) {
+		signalViewerCount(viewerCount - 1, viewerCount);
 	}
 
 	@Inject(
-		method = "stopOpen",
+		method = "onClose",
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/world/level/block/entity/ChestBlockEntity;signalOpenCount()V"
+			target = "Lnet/minecraft/block/entity/ChestBlockEntity;notifyViewerCountChange()V"
 		)
 	)
-	private void stopOpen(Player player, CallbackInfo ci) {
-		signalOpenerCount(openCount + 1, openCount);
+	private void onClose(PlayerEntity player, CallbackInfo ci) {
+		signalViewerCount(viewerCount + 1, viewerCount);
 	}
 
 	@Override
-	public void signalOpenerCount(int oldOpenerCount, int newOpenerCount) {
+	public void signalViewerCount(int oldViewerCount, int newViewerCount) {
 	}
 }

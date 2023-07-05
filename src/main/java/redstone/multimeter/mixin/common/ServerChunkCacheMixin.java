@@ -7,11 +7,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Slice;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.server.level.ServerChunkCache;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.chunk.ServerChunkCache;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.TickTaskExecutor;
@@ -19,153 +18,25 @@ import redstone.multimeter.interfaces.mixin.TickTaskExecutor;
 @Mixin(ServerChunkCache.class)
 public class ServerChunkCacheMixin {
 
-	@Shadow @Final private ServerLevel level;
+	@Shadow @Final private ServerWorld world;
 
 	@Inject(
-		method = "tick(Ljava/util/function/BooleanSupplier;)V",
+		method = "tick(Ljava/util/function/BooleanSupplier;)Z",
 		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-			args = "ldc=purge"
+			value = "HEAD"
 		)
 	)
-	private void startTickTaskPurgeUnloadedChunks(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.PURGE_UNLOADED_CHUNKS);
+	private void startTickTaskUnloadChunks(BooleanSupplier hasTimeLeft, CallbackInfoReturnable<Boolean> ci) {
+		((TickTaskExecutor)world).rsmm$startTickTask(TickTask.UNLOAD_CHUNKS);
 	}
 
 	@Inject(
-		method = "tick(Ljava/util/function/BooleanSupplier;)V",
+		method = "tick(Ljava/util/function/BooleanSupplier;)Z",
 		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
-			args = "ldc=chunks"
+			value = "TAIL"
 		)
 	)
-	private void swapTickTaskTickChunks(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$swapTickTask(TickTask.TICK_CHUNKS);
-	}
-
-	@Inject(
-		method = "tick(Ljava/util/function/BooleanSupplier;)V",
-		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
-			args = "ldc=unload"
-		)
-	)
-	private void swapTickTaskUnloadChunks(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$swapTickTask(TickTask.UNLOAD_CHUNKS);
-	}
-
-	@Inject(
-		method = "tick(Ljava/util/function/BooleanSupplier;)V",
-		slice = @Slice(
-			from = @At(
-				value = "INVOKE_STRING",
-				target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
-				args = "ldc=unload"
-			)
-		),
-		at = @At(
-			value = "INVOKE",
-			ordinal = 0,
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V"
-		)
-	)
-	private void endTickTaskUnloadChunks(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$endTickTask();
-	}
-
-	@Inject(
-		method = "tickChunks",
-		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-			args = "ldc=customSpawners"
-		)
-	)
-	private void startTickTaskCustomMobSpawning(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.CUSTOM_MOB_SPAWNING);
-	}
-
-	@Inject(
-		method = "tickChunks",
-		slice = @Slice(
-			from = @At(
-				value = "INVOKE_STRING",
-				target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-				args = "ldc=customSpawners"
-			)
-		),
-		at = @At(
-			value = "INVOKE",
-			ordinal = 0,
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V"
-		)
-	)
-	private void endTickTaskCustomMobSpawning(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$endTickTask();
-	}
-
-	@Inject(
-		method = "method_20801",
-		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-			args = "ldc=broadcast"
-		)
-	)
-	private void startTickTaskBroadcastChunks(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.BROADCAST_CHUNKS);
-	}
-
-	@Inject(
-		method = "method_20801",
-		slice = @Slice(
-			from = @At(
-				value = "INVOKE_STRING",
-				target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-				args = "ldc=broadcast"
-			)
-		),
-		at = @At(
-			value = "INVOKE",
-			ordinal = 0,
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V"
-		)
-	)
-	private void endTickTaskBroadcastChunks(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$endTickTask();
-	}
-
-	@Inject(
-		method = "method_20801",
-		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-			args = "ldc=spawner"
-		)
-	)
-	private void startTickTaskMobSpawning(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.MOB_SPAWNING);
-	}
-
-	@Inject(
-		method = "method_20801",
-		slice = @Slice(
-			from = @At(
-				value = "INVOKE_STRING",
-				target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-				args = "ldc=spawner"
-			)
-		),
-		at = @At(
-			value = "INVOKE",
-			ordinal = 0,
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V"
-		)
-	)
-	private void endTickTaskMobSpawning(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$endTickTask();
+	private void endTickTaskUnloadChunks(BooleanSupplier hasTimeLeft, CallbackInfoReturnable<Boolean> ci) {
+		((TickTaskExecutor)world).rsmm$endTickTask();
 	}
 }

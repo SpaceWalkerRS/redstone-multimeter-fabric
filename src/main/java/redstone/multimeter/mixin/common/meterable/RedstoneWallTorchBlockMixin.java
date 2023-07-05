@@ -5,10 +5,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.RedstoneWallTorchBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.RedstoneWallTorchBlock;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 
@@ -21,7 +21,7 @@ public abstract class RedstoneWallTorchBlockMixin implements MeterableBlock {
 			value = "RETURN"
 		)
 	)
-	private void logPowered(Level world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
 		rsmm$logPowered(world, pos, cir.getReturnValue());
 	}
 }

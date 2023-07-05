@@ -11,48 +11,48 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.piston.PistonBaseBlock;
-import net.minecraft.world.level.block.piston.PistonStructureResolver;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.PistonBaseBlock;
+import net.minecraft.block.piston.PistonMoveStructureResolver;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
-import redstone.multimeter.interfaces.mixin.IServerLevel;
+import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.server.Multimeter;
 
 @Mixin(PistonBaseBlock.class)
 public class PistonBaseBlockMixin implements MeterableBlock {
 
-	@Shadow private boolean getNeighborSignal(Level level, BlockPos pos, Direction facing) { return false; }
+	@Shadow private boolean shouldExtend(World world, BlockPos pos, Direction facing) { return false; }
 
 	@Inject(
-		method = "getNeighborSignal",
+		method = "shouldExtend",
 		at = @At(
 			value = "RETURN"
 		)
 	)
-	private void logPowered(Level level, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
-		rsmm$logPowered(level, pos, cir.getReturnValue());
+	private void logPowered(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
+		rsmm$logPowered(world, pos, cir.getReturnValue());
 	}
 
 	@Inject(
-		method = "moveBlocks",
+		method = "move",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
 			ordinal = 1,
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/core/BlockPos;relative(Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos;"
+			target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
 		)
 	)
-	private void logMoved(Level level, BlockPos pos, Direction facing, boolean extending, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonStructureResolver structureResolver, List<BlockPos> toMove, List<BlockState> statesToMove, List<BlockPos> toDestroy, int removedIndex, BlockState[] removedStates, Direction moveDir, Set<BlockState> leftOverStates, int toMoveIndex, BlockPos posToMove, BlockState stateToMove) {
-		if (!level.isClientSide()) {
-			Multimeter multimeter = ((IServerLevel)level).getMultimeter();
+	private void logMoved(World world, BlockPos pos, Direction facing, boolean extending, CallbackInfoReturnable<Boolean> cir, BlockPos headPos, PistonMoveStructureResolver structureResolver, List<BlockPos> toMove, List<BlockState> statesToMove, List<BlockPos> toDestroy, int removedIndex, BlockState[] removedStates, Direction moveDir, Set<BlockState> leftOverStates, int toMoveIndex, BlockPos posToMove, BlockState stateToMove) {
+		if (!world.isClient()) {
+			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 
-			multimeter.logMoved(level, posToMove, moveDir);
-			multimeter.moveMeters(level, posToMove, moveDir);
+			multimeter.logMoved(world, posToMove, moveDir);
+			multimeter.moveMeters(world, posToMove, moveDir);
 		}
 	}
 
@@ -62,12 +62,12 @@ public class PistonBaseBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isPowered(Level level, BlockPos pos, BlockState state) {
-		return getNeighborSignal(level, pos, state.getValue(PistonBaseBlock.FACING));
+	public boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
+		return shouldExtend(world, pos, state.get(PistonBaseBlock.FACING));
 	}
 
 	@Override
-	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(PistonBaseBlock.EXTENDED);
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(PistonBaseBlock.EXTENDED);
 	}
 }

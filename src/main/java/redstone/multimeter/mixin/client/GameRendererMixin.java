@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.render.GameRenderer;
 
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
@@ -21,11 +21,11 @@ public class GameRendererMixin {
 		method = "render(FJ)V",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 			args = "ldc=hand"
 		)
 	)
-	private void renderMeterHighlights(float partialTick, long timeNanos, CallbackInfo ci) {
-		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters();
+	private void renderMeterHighlights(float tickDelta, long timeNanos, CallbackInfo ci) {
+		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters(tickDelta);
 	}
 }

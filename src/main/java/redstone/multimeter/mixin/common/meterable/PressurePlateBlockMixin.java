@@ -2,10 +2,10 @@ package redstone.multimeter.mixin.common.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.PressurePlateBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.PressurePlateBlock;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
@@ -14,12 +14,12 @@ import redstone.multimeter.block.PowerSource;
 public class PressurePlateBlockMixin implements Meterable, PowerSource {
 
 	@Override
-	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(PressurePlateBlock.POWERED);
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(PressurePlateBlock.POWERED);
 	}
 
 	@Override
-	public int rsmm$getPowerLevel(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(PressurePlateBlock.POWERED) ? MAX_POWER : MIN_POWER;
+	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return state.get(PressurePlateBlock.POWERED) ? MAX_POWER : MIN_POWER;
 	}
 }

@@ -7,16 +7,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.TrapDoorBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.TrapdoorBlock;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 
-@Mixin(TrapDoorBlock.class)
-public class TrapDoorBlockMixin implements MeterableBlock {
+@Mixin(TrapdoorBlock.class)
+public class TrapdoorBlockMixin implements MeterableBlock {
 
 	@Inject(
 		method = "neighborChanged",
@@ -25,11 +25,11 @@ public class TrapDoorBlockMixin implements MeterableBlock {
 			value = "FIELD",
 			ordinal = 0,
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/world/level/block/TrapDoorBlock;POWERED:Lnet/minecraft/world/level/block/state/properties/BooleanProperty;"
+			target = "Lnet/minecraft/block/TrapdoorBlock;POWERED:Lnet/minecraft/state/property/BooleanProperty;"
 		)
 	)
-	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPos, CallbackInfo ci, boolean powered) {
-		rsmm$logPowered(level, pos, powered);
+	private void logPowered(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, boolean powered) {
+		rsmm$logPowered(world, pos, powered);
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class TrapDoorBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isActive(Level world, BlockPos pos, BlockState state) {
-		return state.getValue(TrapDoorBlock.OPEN);
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return state.get(TrapdoorBlock.OPEN);
 	}
 }

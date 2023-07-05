@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ListUtils;
@@ -133,11 +133,11 @@ public class MeterLogs {
 		return log != null && log.isAt(tick, subtick) ? log : null;
 	}
 
-	public CompoundTag toNbt() {
-		CompoundTag nbt = new CompoundTag();
+	public NbtCompound toNbt() {
+		NbtCompound nbt = new NbtCompound();
 
 		for (EventType type : EventType.ALL) {
-			ListTag logs = toNbt(type);
+			NbtList logs = toNbt(type);
 
 			if (!logs.isEmpty()) {
 				nbt.put(type.getName(), logs);
@@ -147,8 +147,8 @@ public class MeterLogs {
 		return nbt;
 	}
 
-	private ListTag toNbt(EventType type) {
-		ListTag list = new ListTag();
+	private NbtList toNbt(EventType type) {
+		NbtList list = new NbtList();
 
 		for (EventLog log : getLogs(type)) {
 			list.add(log.toNbt());
@@ -157,10 +157,10 @@ public class MeterLogs {
 		return list;
 	}
 
-	public static Collection<EventLog> fromNbt(CompoundTag nbt) {
+	public static Collection<EventLog> fromNbt(NbtCompound nbt) {
 		Collection<EventLog> logs = new ArrayList<>();
 
-		for (String key : nbt.getAllKeys()) {
+		for (String key : nbt.getKeys()) {
 			EventType type = EventType.byName(key);
 
 			if (type != null) {
@@ -171,7 +171,7 @@ public class MeterLogs {
 		return logs;
 	}
 
-	public static Collection<EventLog> fromNbt(EventType type, ListTag nbt) {
+	public static Collection<EventLog> fromNbt(EventType type, NbtList nbt) {
 		Collection<EventLog> logs = new ArrayList<>();
 
 		for (int i = 0; i < nbt.size(); i++) {

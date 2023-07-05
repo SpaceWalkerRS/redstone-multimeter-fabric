@@ -1,7 +1,7 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
@@ -15,8 +15,8 @@ import redstone.multimeter.util.TextUtils;
 
 public class ScrollHudTutorial extends StagedTutorialInstance {
 
-	private static final Component TITLE = new TextComponent("Scroll The HUD");
-	private static final Component DESCRIPTION = new TextComponent("").
+	private static final Text TITLE = new LiteralText("Scroll The HUD");
+	private static final Text DESCRIPTION = new LiteralText("").
 													append("Use the ").
 													append(TextUtils.formatKeybind(Keybinds.STEP_BACKWARD)).
 													append(" and ").

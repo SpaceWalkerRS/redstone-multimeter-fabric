@@ -5,13 +5,13 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.ResourceLocationException;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.Direction.Axis;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.resource.Identifier;
+import net.minecraft.resource.IdentifierException;
+import net.minecraft.text.Formatting;
+import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.Direction.Axis;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
@@ -55,21 +55,21 @@ public class MeterControlsElement extends AbstractParentElement {
 
 		this.client = client;
 
-		this.title = new TextElement(this.client, 0, 0, t -> t.add(new TextComponent(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).withStyle(ChatFormatting.UNDERLINE)).setWithShadow(true));
-		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> new TextComponent(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltip.of(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide")), button -> {
+		this.title = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).setFormatting(Formatting.UNDERLINE)).setWithShadow(true));
+		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltip.of(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide")), button -> {
 			this.client.getMeterGroup().toggleHidden(meter);
 			return true;
 		});
-		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new TextComponent("X").withStyle(triedDeleting ? ChatFormatting.RED : ChatFormatting.WHITE), () -> Tooltip.of("Delete Meter").add(TextUtils.formatKeybindInfo(Keybinds.TOGGLE_METER)), button -> {
+		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").setFormatting(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltip.of("Delete Meter").add(TextUtils.formatKeybindInfo(Keybinds.TOGGLE_METER)), button -> {
 			tryDelete();
 
-			if (triedDeleting && Screen.hasShiftDown()) {
+			if (triedDeleting && Screen.isShiftDown()) {
 				tryDelete(); // delete without asking for confirmation first
 			}
 
 			return true;
 		});
-		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(new TextComponent("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").withStyle(ChatFormatting.ITALIC)).setWithShadow(true));
+		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").setFormatting(Formatting.ITALIC)).setWithShadow(true));
 		this.controls = new SimpleListElement(this.client, getWidth());
 
 		this.deleteConfirm.setVisible(false);
@@ -154,11 +154,11 @@ public class MeterControlsElement extends AbstractParentElement {
 		});
 		pos.addControl("dimension", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
 			try {
-				ResourceLocation dimension = new ResourceLocation(text);
-				DimPos newPos = meter.getPos().relative(dimension);
+				Identifier dimension = new Identifier(text);
+				DimPos newPos = meter.getPos().offset(dimension);
 
 				changePos(newPos);
-			} catch (ResourceLocationException e) {
+			} catch (IdentifierException e) {
 
 			}
 		}, () -> meter.getPos().getDimension().toString()));
@@ -177,11 +177,11 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			}
 		}, () -> ColorUtils.toRGBString(meter.getColor())));
-		color.addControl("red", style -> style.setColor(ChatFormatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		color.addControl("red", style -> style.setColor(Formatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int red = ColorUtils.getRed(c);
 
-			return new TextComponent(String.valueOf(red));
+			return new LiteralText(String.valueOf(red));
 		}, () -> Tooltip.EMPTY, value -> {
 			int red = (int)Math.round(value * 0xFF);
 			int c = ColorUtils.setRed(meter.getColor(), red);
@@ -193,11 +193,11 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			return (double)red / 0xFF;
 		}, 0xFF));
-		color.addControl("blue", style -> style.setColor(ChatFormatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		color.addControl("blue", style -> style.setColor(Formatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int blue = ColorUtils.getBlue(c);
 
-			return new TextComponent(String.valueOf(blue));
+			return new LiteralText(String.valueOf(blue));
 		}, () -> Tooltip.EMPTY, value -> {
 			int blue = (int)Math.round(value * 0xFF);
 			int c = ColorUtils.setBlue(meter.getColor(), blue);
@@ -209,11 +209,11 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			return (double)blue / 0xFF;
 		}, 0xFF));
-		color.addControl("green", style -> style.setColor(ChatFormatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		color.addControl("green", style -> style.setColor(Formatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int green = ColorUtils.getGreen(c);
 
-			return new TextComponent(String.valueOf(green));
+			return new LiteralText(String.valueOf(green));
 		}, () -> Tooltip.EMPTY, value -> {
 			int green = (int)Math.round(value * 0xFF);
 			int c = ColorUtils.setGreen(meter.getColor(), green);
@@ -231,7 +231,7 @@ public class MeterControlsElement extends AbstractParentElement {
 
 		MeterPropertyElement eventTypes = new MeterPropertyElement(client, totalWidth, buttonWidth, "Event Types");
 		for (EventType type : EventType.ALL) {
-			KeyMapping keybind = Keybinds.TOGGLE_EVENT_TYPES[type.getIndex()];
+			KeyBinding keybind = Keybinds.TOGGLE_EVENT_TYPES[type.getIndex()];
 			Supplier<Tooltip> tooltip = () -> Tooltip.EMPTY;
 
 			if (!keybind.isUnbound()) {

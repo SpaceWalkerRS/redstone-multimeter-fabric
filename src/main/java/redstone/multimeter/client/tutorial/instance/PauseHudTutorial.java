@@ -1,7 +1,7 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
@@ -15,8 +15,8 @@ import redstone.multimeter.util.TextUtils;
 
 public class PauseHudTutorial extends StagedTutorialInstance {
 
-	private static final Component TITLE = new TextComponent("Pause The HUD");
-	private static final Component DESCRIPTION = new TextComponent("").
+	private static final Text TITLE = new LiteralText("Pause The HUD");
+	private static final Text DESCRIPTION = new LiteralText("").
 													append("Press ").
 													append(TextUtils.formatKeybind(Keybinds.PAUSE_METERS)).
 													append(" to pause the primary overview of the Multimeter HUD.");

@@ -125,7 +125,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 
 	@Override
 	protected void drawDecorators() {
-		if (hud.settings.rowHeight < hud.font.lineHeight) {
+		if (hud.settings.rowHeight < hud.textRenderer.fontHeight) {
 			return;
 		}
 

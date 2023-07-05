@@ -8,9 +8,9 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.MeterProperties;
@@ -37,18 +37,18 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void encode(CompoundTag data) {
+	public void encode(NbtCompound data) {
 		if (!removedMeters.isEmpty()) {
 			data.putLongArray("removed", removedMeters);
 		}
 		if (!meterUpdates.isEmpty()) {
-			ListTag list = new ListTag();
+			NbtList list = new NbtList();
 
 			for (Entry<MeterProperties> entry : meterUpdates.long2ObjectEntrySet()) {
 				long id = entry.getLongKey();
 				MeterProperties update = entry.getValue();
 
-				CompoundTag nbt = update.toNbt();
+				NbtCompound nbt = update.toNbt();
 				nbt.putLong("id", id);
 				list.add(nbt);
 			}
@@ -61,7 +61,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void decode(CompoundTag data) {
+	public void decode(NbtCompound data) {
 		if (data.contains("removed")) {
 			long[] removed = data.getLongArray("removed");
 
@@ -70,10 +70,10 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			}
 		}
 		if (data.contains("updates")) {
-			ListTag updates = data.getList("updates", NbtUtils.TYPE_COMPOUND);
+			NbtList updates = data.getList("updates", NbtUtils.TYPE_COMPOUND);
 
 			for (int i = 0; i < updates.size(); i++) {
-				CompoundTag nbt = updates.getCompound(i);
+				NbtCompound nbt = updates.getCompound(i);
 				long id = nbt.getLong("id");
 				MeterProperties update = MeterProperties.fromNbt(nbt);
 
@@ -90,7 +90,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	}
 	
 	@Override
-	public void handle(MultimeterServer server, ServerPlayer player) {
+	public void handle(MultimeterServer server, ServerPlayerEntity player) {
 	}
 	
 	@Override

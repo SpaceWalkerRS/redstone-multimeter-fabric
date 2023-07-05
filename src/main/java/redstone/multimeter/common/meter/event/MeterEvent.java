@@ -2,8 +2,8 @@ package redstone.multimeter.common.meter.event;
 
 import java.util.List;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.Tooltip;
 
@@ -28,7 +28,7 @@ public class MeterEvent {
 		type.addTextToTooltip(tooltip, metadata);
 
 		if (!tooltip.isEmpty()) {
-			List<Component> lines = tooltip.getLines();
+			List<Text> lines = tooltip.getLines();
 			String[] args = new String[lines.size()];
 
 			for (int index = 0; index < lines.size(); index++) {
@@ -49,8 +49,8 @@ public class MeterEvent {
 		return metadata;
 	}
 
-	public CompoundTag toNbt() {
-		CompoundTag nbt = new CompoundTag();
+	public NbtCompound toNbt() {
+		NbtCompound nbt = new NbtCompound();
 
 		nbt.put("type", type.toNbt());
 		nbt.putInt("metadata", metadata);
@@ -58,7 +58,7 @@ public class MeterEvent {
 		return nbt;
 	}
 
-	public static MeterEvent fromNbt(CompoundTag nbt) {
+	public static MeterEvent fromNbt(NbtCompound nbt) {
 		MeterEvent event = new MeterEvent();
 
 		event.type = EventType.fromNbt(nbt.get("type"));

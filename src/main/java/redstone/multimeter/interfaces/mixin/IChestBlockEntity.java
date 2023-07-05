@@ -2,6 +2,6 @@ package redstone.multimeter.interfaces.mixin;
 
 public interface IChestBlockEntity {
 
-	void signalOpenerCount(int oldOpenerCount, int newOpenerCount);
+	void signalViewerCount(int oldViewerCount, int newViewerCount);
 
 }

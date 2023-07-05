@@ -1,7 +1,7 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
@@ -14,8 +14,8 @@ import redstone.multimeter.util.TextUtils;
 
 public class OpenMeterControlsTutorial extends StagedTutorialInstance {
 
-	private static final Component TITLE = new TextComponent("Open Meter Controls");
-	private static final Component DESCRIPTION = new TextComponent("").
+	private static final Text TITLE = new LiteralText("Open Meter Controls");
+	private static final Text DESCRIPTION = new LiteralText("").
 													append("Open a meter's controls through the Multimeter screen or by looking at it and pressing ").
 													append(TextUtils.formatKeybind(Keybinds.OPEN_METER_CONTROLS));
 

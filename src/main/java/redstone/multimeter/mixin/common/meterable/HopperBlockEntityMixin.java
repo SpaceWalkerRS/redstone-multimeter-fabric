@@ -6,17 +6,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.HopperBlockEntity;
 
 import redstone.multimeter.interfaces.mixin.IHopperBlockEntity;
-import redstone.multimeter.interfaces.mixin.IServerLevel;
+import redstone.multimeter.interfaces.mixin.IServerWorld;
 
 @Mixin(HopperBlockEntity.class)
 public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockEntity {
 
-	@Shadow private int cooldownTime;
+	@Shadow private int transferCooldown;
 
 	private HopperBlockEntityMixin(BlockEntityType<?> type) {
 		super(type);
@@ -26,7 +26,7 @@ public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockE
 		method = "tick",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/level/Level;getGameTime()J"
+			target = "Lnet/minecraft/world/World;getTime()J"
 		)
 	)
 	private void logActive(CallbackInfo ci) {
@@ -45,12 +45,12 @@ public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockE
 
 	@Override
 	public boolean rsmm$isOnCooldown() {
-		return cooldownTime > 0;
+		return transferCooldown > 0;
 	}
 
 	private void rsmm$logActive() {
-		if (!level.isClientSide()) {
-			((IServerLevel)level).getMultimeter().logActive(level, worldPosition, !rsmm$isOnCooldown());
+		if (!world.isClient()) {
+			((IServerWorld)world).getMultimeter().logActive(world, pos, !rsmm$isOnCooldown());
 		}
 	}
 }

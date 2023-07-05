@@ -161,7 +161,7 @@ public class Tutorial implements TutorialListener {
 	}
 
 	private boolean canDoTutorial() {
-		return client.isConnected() && minecraft.level != null && minecraft.options.tutorialStep == net.minecraft.client.tutorial.TutorialSteps.NONE;
+		return client.isConnected() && minecraft.world != null && minecraft.options.tutorialStep == net.minecraft.client.tutorial.TutorialSteps.NONE;
 	}
 
 	private void start() {

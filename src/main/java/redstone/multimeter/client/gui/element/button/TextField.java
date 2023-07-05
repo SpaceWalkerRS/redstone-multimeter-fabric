@@ -9,13 +9,13 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.Tessellator;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.util.Mth;
+import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
@@ -52,7 +52,7 @@ public class TextField extends AbstractButton {
 	}
 
 	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text) {
-		super(client, x, y, width, height, () -> new TextComponent(""), tooltip);
+		super(client, x, y, width, height, () -> new LiteralText(""), tooltip);
 
 		Minecraft minecraft = this.client.getMinecraft();
 
@@ -63,9 +63,9 @@ public class TextField extends AbstractButton {
 		this.fullText = "";
 		this.visibleText = "";
 		this.textX = getX() + 4;
-		this.textY = getY() + (getHeight() - this.font.lineHeight) / 2;
+		this.textY = getY() + (getHeight() - this.textRenderer.fontHeight) / 2;
 		this.textWidth = getWidth() - 8;
-		this.textHeight = this.font.lineHeight;
+		this.textHeight = this.textRenderer.fontHeight;
 		this.selectionY = this.textY - 1;
 		this.selectionHeight = this.textHeight + 2;
 
@@ -225,7 +225,7 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
-		if (isActive() && SharedConstants.isAllowedChatCharacter(chr)) {
+		if (isActive() && SharedConstants.isValidChatChar(chr)) {
 			write(String.valueOf(chr));
 			return true;
 		}
@@ -265,7 +265,7 @@ public class TextField extends AbstractButton {
 	@Override
 	public void setY(int y) {
 		super.setY(y);
-		textY = y + getHeight() - (getHeight() + font.lineHeight) / 2;
+		textY = y + getHeight() - (getHeight() + textRenderer.fontHeight) / 2;
 		selectionY = textY - 1;
 	}
 
@@ -274,7 +274,7 @@ public class TextField extends AbstractButton {
 		Tooltip tooltip = super.getTooltip(mouseX, mouseY);
 
 		if (tooltip.isEmpty() && !isFocused() && visibleText.length() < fullText.length()) {
-			tooltip = Tooltip.of(TextUtils.toLines(font, fullText));
+			tooltip = Tooltip.of(TextUtils.toLines(textRenderer, fullText));
 		}
 
 		return tooltip;
@@ -297,7 +297,7 @@ public class TextField extends AbstractButton {
 	@Override
 	public void setHeight(int height) {
 		super.setHeight(height);
-		textHeight = font.lineHeight;
+		textHeight = textRenderer.fontHeight;
 		selectionHeight = textHeight + 2;
 	}
 
@@ -319,15 +319,15 @@ public class TextField extends AbstractButton {
 	@Override
 	protected void renderButtonMessage() {
 		int color = getTextColor();
-		renderText(font, visibleText, textX, textY, true, color);
+		renderText(textRenderer, visibleText, textX, textY, true, color);
 
 		if (isFocused()) {
 			if (isActive() && (cursorTicks / 6) % 2 == 0) {
 				if (cursorIndex == fullText.length()) {
-					int x = textX + font.width(visibleText);
-					renderText(font, "_", x, textY, true, color);
+					int x = textX + textRenderer.getWidth(visibleText);
+					renderText(textRenderer, "_", x, textY, true, color);
 				} else {
-					int width = font.width(fullText.substring(scrollIndex, cursorIndex));
+					int width = textRenderer.getWidth(fullText.substring(scrollIndex, cursorIndex));
 					int x = textX + width;
 
 					renderRect(x, selectionY, 1, selectionHeight, color);
@@ -348,11 +348,11 @@ public class TextField extends AbstractButton {
 
 		if (start >= scrollIndex) {
 			String t = fullText.substring(scrollIndex, start);
-			x0 = textX + font.width(t);
+			x0 = textX + textRenderer.getWidth(t);
 		}
 		if (end <= scrollIndex + visibleText.length()) {
 			String t = fullText.substring(scrollIndex, end);
-			x1 = textX + font.width(t);
+			x1 = textX + textRenderer.getWidth(t);
 		}
 
 		if (x0 >= x1) {
@@ -368,15 +368,15 @@ public class TextField extends AbstractButton {
 		GlStateManager.enableColorLogicOp();
 		GlStateManager.logicOp(GlStateManager.LogicOp.OR_REVERSE);
 
-		Tesselator tessellator = Tesselator.getInstance();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
 
 		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION);
 
-		bufferBuilder.vertex(x0, y0, z).endVertex();
-		bufferBuilder.vertex(x0, y1, z).endVertex();
-		bufferBuilder.vertex(x1, y1, z).endVertex();
-		bufferBuilder.vertex(x1, y0, z).endVertex();
+		bufferBuilder.vertex(x0, y0, z).nextVertex();
+		bufferBuilder.vertex(x0, y1, z).nextVertex();
+		bufferBuilder.vertex(x1, y1, z).nextVertex();
+		bufferBuilder.vertex(x1, y0, z).nextVertex();
 
 		tessellator.end();
 
@@ -496,7 +496,7 @@ public class TextField extends AbstractButton {
 	}
 
 	private void updateVisibleText() {
-		visibleText = font.substrByWidth(fullText.substring(scrollIndex), textWidth, false);
+		visibleText = textRenderer.trimToWidth(fullText.substring(scrollIndex), textWidth, false);
 	}
 
 	public int getMaxLength() {
@@ -511,7 +511,7 @@ public class TextField extends AbstractButton {
 		maxScroll = 0;
 
 		if (!fullText.isEmpty()) {
-			String text = font.substrByWidth(fullText + "_", textWidth + 1, true);
+			String text = textRenderer.trimToWidth(fullText + "_", textWidth + 1, true);
 
 			if (text.length() <= fullText.length()) {
 				maxScroll = fullText.length() - text.length() + 1;
@@ -527,7 +527,7 @@ public class TextField extends AbstractButton {
 
 	private void setScroll(int scroll) {
 		int prevScroll = scrollIndex;
-		scrollIndex = Mth.clamp(scroll, 0, maxScroll);
+		scrollIndex = MathHelper.clamp(scroll, 0, maxScroll);
 
 		if (scrollIndex != prevScroll) {
 			updateVisibleText();
@@ -536,7 +536,7 @@ public class TextField extends AbstractButton {
 
 	private void setCursorFromMouse(double mouseX) {
 		if (selection != SelectType.KEYBOARD) {
-			String text = font.substrByWidth(visibleText, (int)mouseX - textX);
+			String text = textRenderer.trimToWidth(visibleText, (int)mouseX - textX);
 			setCursor(scrollIndex + text.length());
 		}
 	}
@@ -556,7 +556,7 @@ public class TextField extends AbstractButton {
 	}
 
 	private void setCursor(int index) {
-		cursorIndex = Mth.clamp(index, 0, fullText.length());
+		cursorIndex = MathHelper.clamp(index, 0, fullText.length());
 		onCursorMoved();
 	}
 

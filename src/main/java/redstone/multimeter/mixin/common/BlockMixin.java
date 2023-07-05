@@ -2,7 +2,7 @@ package redstone.multimeter.mixin.common;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.world.level.block.Block;
+import net.minecraft.block.Block;
 
 import redstone.multimeter.interfaces.mixin.IBlock;
 

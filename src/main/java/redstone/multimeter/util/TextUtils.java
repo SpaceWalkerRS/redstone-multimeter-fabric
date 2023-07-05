@@ -4,28 +4,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.InputConstants.Key;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.render.TextRenderer;
+import net.minecraft.text.Formatting;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
-import redstone.multimeter.client.compat.amecs.AmecsHelper;
 import redstone.multimeter.client.gui.Tooltip;
-import redstone.multimeter.interfaces.mixin.IKeyMapping;
+import redstone.multimeter.interfaces.mixin.IKeyBinding;
 
 public class TextUtils {
 
 	private static final int MAX_WIDTH = 200;
 
-	public static List<Component> toLines(Font font, String text) {
-		List<Component> lines = new ArrayList<>();
+	public static List<Text> toLines(TextRenderer textRenderer, String text) {
+		List<Text> lines = new ArrayList<>();
 
 		while (!text.isEmpty()) {
 			int lastSpace = -1;
@@ -44,13 +40,13 @@ public class TextUtils {
 
 				String subString = text.substring(0, length);
 
-				if (font.width(subString) > MAX_WIDTH) {
+				if (textRenderer.getWidth(subString) > MAX_WIDTH) {
 					if (lastSpace >= 0) {
 						subString = text.substring(0, lastSpace);
 						length = lastSpace + 1;
 					}
 
-					Component line = new TextComponent(subString);
+					Text line = new LiteralText(subString);
 					lines.add(line);
 
 					break;
@@ -59,7 +55,7 @@ public class TextUtils {
 
 			if (length == text.length()) {
 				if (length > 0) {
-					Component line = new TextComponent(text);
+					Text line = new LiteralText(text);
 					lines.add(line);
 				}
 
@@ -72,11 +68,11 @@ public class TextUtils {
 		return lines;
 	}
 
-	public static void formatKeyValue(List<Component> lines, String key, Object value) {
+	public static void formatKeyValue(List<Text> lines, String key, Object value) {
 		formatKeyValue(lines, key, value.toString());
 	}
 
-	public static void formatKeyValue(List<Component> lines, String key, String value) {
+	public static void formatKeyValue(List<Text> lines, String key, String value) {
 		lines.add(formatKeyValue(key, value));
 	}
 
@@ -88,13 +84,13 @@ public class TextUtils {
 		tooltip.add(formatKeyValue(key, value));
 	}
 
-	public static Component formatKeyValue(String key, Object value) {
-		return new TextComponent("").append(new TextComponent(key + ": ").withStyle(ChatFormatting.GOLD))
-			.append(new TextComponent(value.toString()));
+	public static Text formatKeyValue(String key, Object value) {
+		return new LiteralText("").append(new LiteralText(key + ": ").setFormatting(Formatting.GOLD))
+			.append(new LiteralText(value.toString()));
 	}
 
-	public static Component formatKeybindInfo(Object... keybinds) {
-		Component component = new TextComponent("").append(new TextComponent("keybind: ").withStyle(ChatFormatting.GOLD));
+	public static Text formatKeybindInfo(Object... keybinds) {
+		Text component = new LiteralText("").append(new LiteralText("keybind: ").setFormatting(Formatting.GOLD));
 		Collection<Object> boundKeybinds = filterUnboundKeybinds(keybinds);
 
 		if (boundKeybinds.isEmpty()) {
@@ -108,8 +104,8 @@ public class TextUtils {
 				component.append(" OR ");
 			}
 
-			if (o instanceof KeyMapping) {
-				component.append(formatKeybind((KeyMapping)o));
+			if (o instanceof KeyBinding) {
+				component.append(formatKeybind((KeyBinding)o));
 			} else if (o instanceof Key) {
 				component.append(formatKeybind((Key)o));
 			} else if (o instanceof Key[]) {
@@ -126,8 +122,8 @@ public class TextUtils {
 		Collection<Object> boundKeybinds = new LinkedList<>();
 
 		for (Object o : keybinds) {
-			if (o instanceof KeyMapping) {
-				KeyMapping keybind = (KeyMapping)o;
+			if (o instanceof KeyBinding) {
+				KeyBinding keybind = (KeyBinding)o;
 
 				if (keybind.isUnbound()) {
 					continue;
@@ -140,23 +136,21 @@ public class TextUtils {
 		return boundKeybinds;
 	}
 
-	public static Component formatKeybind(KeyMapping keybind) {
-		Component component = new TextComponent("");
+	public static Text formatKeybind(KeyBinding keybind) {
+		Text component = new LiteralText("");
 
 		if (keybind.isUnbound()) {
 			return component;
 		}
 
-		AmecsHelper.addModifiers(component, keybind);
-
-		Key boundKey = ((IKeyMapping)keybind).rsmm$getKey();
+		Key boundKey = ((IKeyBinding)keybind).rsmm$getKey();
 		component.append(formatKey(boundKey));
 
 		return component;
 	}
 
-	public static Component formatKeybind(Key... keys) {
-		Component component = new TextComponent("");
+	public static Text formatKeybind(Key... keys) {
+		Text component = new LiteralText("");
 
 		for (int i = 0; i < keys.length; i++) {
 			Key key = keys[i];
@@ -171,12 +165,12 @@ public class TextUtils {
 		return component;
 	}
 
-	public static Component formatKeybind(Object... keys) {
-		List<Component> formattedKeys = new ArrayList<>();
+	public static Text formatKeybind(Object... keys) {
+		List<Text> formattedKeys = new ArrayList<>();
 
 		for (Object o : keys) {
-			if (o instanceof KeyMapping) {
-				formattedKeys.add(formatKeybind((KeyMapping)o));
+			if (o instanceof KeyBinding) {
+				formattedKeys.add(formatKeybind((KeyBinding)o));
 			} else if (o instanceof Key) {
 				formattedKeys.add(formatKey((Key)o));
 			} else if (o instanceof String) {
@@ -184,10 +178,10 @@ public class TextUtils {
 			}
 		}
 
-		Component text = new TextComponent("");
+		Text text = new LiteralText("");
 
 		for (int i = 0; i < formattedKeys.size(); i++) {
-			Component key = formattedKeys.get(i);
+			Text key = formattedKeys.get(i);
 
 			if (i > 0) {
 				text.append(" + ");
@@ -199,42 +193,15 @@ public class TextUtils {
 		return text;
 	}
 
-	public static Component formatKey(Key key) {
-		int code = key.getValue();
-		String translationKey = key.getName();
-
-		String keyName = null;
-
-		switch (key.getType()) {
-		case KEYSYM:
-			keyName = InputConstants.translateKeyCode(code);
-			break;
-		case SCANCODE:
-			keyName = InputConstants.translateScanCode(code);
-			break;
-		case MOUSE:
-			String buttonName = I18n.get(translationKey);
-
-			if (Objects.equals(translationKey, buttonName)) {
-				keyName = I18n.get(InputConstants.Type.MOUSE.getDefaultPrefix(), code + 1);
-			} else {
-				keyName = buttonName;
-			}
-
-			break;
-		}
-		if (keyName == null) {
-			keyName = I18n.get(translationKey);
-		}
-
-		return formatKey(keyName);
+	public static Text formatKey(Key key) {
+		return formatKey(key.getDisplayName());
 	}
 
-	public static Component formatKey(String key) {
-		return new TextComponent(key).withStyle(ChatFormatting.YELLOW);
+	public static Text formatKey(String key) {
+		return new LiteralText(key).setFormatting(Formatting.YELLOW);
 	}
 
-	public static Component formatKey(Component key) {
-		return key.copy().withStyle(ChatFormatting.YELLOW);
+	public static Text formatKey(Text key) {
+		return key.copy().setFormatting(Formatting.YELLOW);
 	}
 }

@@ -3,8 +3,8 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.render.TextRenderer;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
@@ -15,27 +15,27 @@ import redstone.multimeter.client.gui.element.AbstractElement;
 public abstract class AbstractButton extends AbstractElement implements IButton {
 
 	protected final MultimeterClient client;
-	protected final Font font;
-	private final Supplier<Component> messageSupplier;
+	protected final TextRenderer textRenderer;
+	private final Supplier<Text> messageSupplier;
 	private final Supplier<Tooltip> tooltipSupplier;
 
 	private boolean active;
 	private boolean hovered;
-	private Component message;
+	private Text message;
 
 	private boolean moved;
 
-	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<Component> message, Supplier<Tooltip> tooltip) {
+	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip);
 	}
 
-	protected AbstractButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Component> message, Supplier<Tooltip> tooltip) {
+	protected AbstractButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip) {
 		super(x, y, width, height);
 
 		Minecraft minecraft = client.getMinecraft();
 
 		this.client = client;
-		this.font = minecraft.font;
+		this.textRenderer = minecraft.textRenderer;
 		this.messageSupplier = message;
 		this.tooltipSupplier = tooltip;
 
@@ -98,12 +98,12 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 
 	@Override
-	public Component getMessage() {
+	public Text getMessage() {
 		return message;
 	}
 
 	@Override
-	public void setMessage(Component message) {
+	public void setMessage(Text message) {
 		this.message = message;
 	}
 
@@ -186,23 +186,23 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 
 	protected void renderButtonMessage() {
-		Component message = getMessage();
+		Text message = getMessage();
 
 		if (message != null) {
 			int x = getMessageX(message);
 			int y = getMessageY();
 			int color = getMessageColor();
 
-			renderText(font, message, x, y, true, color);
+			renderText(textRenderer, message, x, y, true, color);
 		}
 	}
 
-	protected int getMessageX(Component message) {
-		return getX() + getWidth() - (getWidth() + textWidth(font, message)) / 2;
+	protected int getMessageX(Text message) {
+		return getX() + getWidth() - (getWidth() + textWidth(textRenderer, message)) / 2;
 	}
 
 	public int getMessageY() {
-		return getY() + getHeight() - (getHeight() + font.lineHeight) / 2;
+		return getY() + getHeight() - (getHeight() + textRenderer.fontHeight) / 2;
 	}
 
 	protected int getMessageColor() {

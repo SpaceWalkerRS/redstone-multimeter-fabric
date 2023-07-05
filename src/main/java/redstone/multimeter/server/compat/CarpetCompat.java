@@ -1,10 +1,10 @@
 package redstone.multimeter.server.compat;
 
-import java.lang.reflect.Field;
-import java.util.function.Supplier;
+//import java.lang.reflect.Field;
+//import java.util.function.Supplier;
 
 public class CarpetCompat {
-
+/*
 	private Supplier<Boolean> frozen = () -> false;
 
 	public CarpetCompat() {
@@ -35,5 +35,5 @@ public class CarpetCompat {
 
 	public boolean isFrozen() {
 		return frozen.get();
-	}
+	}*/
 }
