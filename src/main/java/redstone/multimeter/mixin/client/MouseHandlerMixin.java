@@ -32,6 +32,11 @@ public class MouseHandlerMixin {
 	)
 	private void scrollOnScreen(long window, double horizontal, double vertical, CallbackInfo ci) {
 		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
+
+		if (client == null) {
+			return;
+		}
+
 		RSMMScreen screen = client.getScreen();
 
 		if (screen != null) {
@@ -54,11 +59,17 @@ public class MouseHandlerMixin {
 		)
 	)
 	private void scrollInGame(long window, double horizontal, double vertical, CallbackInfo ci) {
+		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
+
+		if (client == null) {
+			return;
+		}
+
 		double discrete = minecraft.options.discreteMouseScroll;
 		double scrollX = discrete * horizontal;
 		double scrollY = discrete * vertical;
 
-		if (((IMinecraft)minecraft).getMultimeterClient().getInputHandler().handleMouseScroll(scrollX, scrollY)) {
+		if (client.getInputHandler().handleMouseScroll(scrollX, scrollY)) {
 			ci.cancel();
 		}
 	}
@@ -73,6 +84,11 @@ public class MouseHandlerMixin {
 	)
 	private void onMove(long window, double horizontal, double vertical, CallbackInfo ci) {
 		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
+
+		if (client == null) {
+			return;
+		}
+
 		RSMMScreen screen = client.getScreen();
 
 		if (screen == null) {
