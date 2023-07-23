@@ -1,0 +1,49 @@
+{
+	"schemaVersion": 1,
+	"id": "rsmm_ornithe",
+	"version": "${version}",
+
+	"name": "Redstone Multimeter Ornithe",
+	"description": "An Ornithe port of NarcolepticFrog's Redstone Multimeter Mod",
+	"authors": [
+		"Space Walker"
+	],
+	"contributors": [
+		"NarcolepticFrog"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/redstone-multimeter",
+		"sources": "https://github.com/SpaceWalkerRS/redstone-multimeter-fabric",
+		"issues": "https://github.com/SpaceWalkerRS/redstone-multimeter-fabric/issues"
+	},
+
+	"license": "MIT Licence",
+	"icon": "assets/redstone_multimeter/icon.png",
+
+	"environment": "*",
+	"entrypoints": {
+		"modmenu": [
+			"redstone.multimeter.modmenu.RedstoneMultimeterMod"
+		]
+	},
+	"mixins": [
+		"rsmm_ornithe.mixins.json"
+	],
+
+	"depends": {
+		"minecraft": "1.12.x"
+	},
+
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/unmapped/C_9550253": [
+				"redstone/multimeter/interfaces/mixin/IText"
+			]
+		},
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/EJC9zkX"
+			}
+		}
+	}
+}

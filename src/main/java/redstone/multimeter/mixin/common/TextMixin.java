@@ -31,23 +31,22 @@ public interface TextMixin extends IText {
 			if (f.isColor()) {
 				style.setColor(f);
 			} else {
-				switch (f) {
-				case BOLD:
+				if (f == Formatting.BOLD) {
 					style.setBold(true);
 					break;
-				case ITALIC:
+				} else if (f == Formatting.ITALIC) {
 					style.setItalic(true);
 					break;
-				case OBFUSCATED:
+				} else if (f == Formatting.OBFUSCATED) {
 					style.setObfuscated(true);
 					break;
-				case STRIKETHROUGH:
+				} else if (f == Formatting.STRIKETHROUGH) {
 					style.setStrikethrough(true);
 					break;
-				case UNDERLINE:
+				} else if (f == Formatting.UNDERLINE) {
 					style.setUnderlined(true);
 					break;
-				case RESET:
+				} else if (f == Formatting.RESET) {
 					setStyle(style = new Style());
 					break;
 				}

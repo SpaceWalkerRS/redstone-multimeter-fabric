@@ -347,7 +347,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			target = "Lnet/minecraft/block/Block;tick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Ljava/util/Random;)V"
 		)
 	)
-	private void logScheduledTick(boolean debug, CallbackInfoReturnable<Boolean> cir, int scheduledTicksThisTickCount, Iterator<ScheduledTick> scheduledTicksThisTick, ScheduledTick scheduledTick) {
+	private void logScheduledTick(boolean debug, CallbackInfoReturnable<Boolean> cir, Iterator<ScheduledTick> scheduledTicksThisTick, ScheduledTick scheduledTick) {
 		getMultimeter().logScheduledTick(this, scheduledTick.pos, scheduledTick.priority, false);
 	}
 
