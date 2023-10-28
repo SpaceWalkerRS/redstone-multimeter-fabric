@@ -7,10 +7,12 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
+import redstone.multimeter.common.network.PacketWrapper;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.meter.ServerMeterGroup;
 
@@ -119,7 +121,7 @@ public class PlayerList {
 	}
 
 	public void send(RSMMPacket packet, Predicate<ServerPlayer> predicate) {
-		Packet<?> mcPacket = server.getPacketHandler().encode(packet);
+		Packet<?> mcPacket = wrap(packet);
 
 		for (ServerPlayer player : playersByUuid.values()) {
 			if (predicate.test(player)) {
@@ -129,8 +131,11 @@ public class PlayerList {
 	}
 
 	public void send(RSMMPacket packet, ServerPlayer player) {
-		Packet<?> mcPacket = server.getPacketHandler().encode(packet);
-		player.connection.send(mcPacket);
+		player.connection.send(wrap(packet));
+	}
+
+	private Packet<?> wrap(RSMMPacket packet) {
+		return new ClientboundCustomPayloadPacket(new PacketWrapper(packet));
 	}
 
 	public void updatePermissions(ServerPlayer player) {

@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.main.GameConfig;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
@@ -27,17 +26,17 @@ public class MinecraftMixin implements IMinecraft {
 			value = "TAIL"
 		)
 	)
-	private void init(GameConfig config, CallbackInfo ci) {
+	private void init(CallbackInfo ci) {
 		this.multimeterClient = new MultimeterClient((Minecraft)(Object)this);
 	}
 
 	@Inject(
-		method = "reloadResourcePacks(Z)Ljava/util/concurrent/CompletableFuture;",
+		method = "reloadResourcePacks(ZLnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/util/concurrent/CompletableFuture;",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void reloadResources(boolean force, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+	private void reloadResources(CallbackInfoReturnable<CompletableFuture<Void>> cir) {
 		multimeterClient.reloadResources();
 	}
 
@@ -78,12 +77,12 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V",
+		method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;)V",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void clearLevel(Screen screen, CallbackInfo ci) {
+	private void disconnect(Screen screen, CallbackInfo ci) {
 		multimeterClient.onDisconnect();
 	}
 

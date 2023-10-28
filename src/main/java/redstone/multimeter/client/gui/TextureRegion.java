@@ -3,9 +3,9 @@ package redstone.multimeter.client.gui;
 public class TextureRegion {
 
 	public static final TextureRegion OPTIONS_BACKGROUND    = new TextureRegion(Texture.OPTIONS_BACKGROUND);
-	public static final TextureRegion BASIC_BUTTON_INACTIVE = new TextureRegion(Texture.OPTIONS_WIDGETS, 0, 46, 200, 20);
-	public static final TextureRegion BASIC_BUTTON          = new TextureRegion(Texture.OPTIONS_WIDGETS, 0, 66, 200, 20);
-	public static final TextureRegion BASIC_BUTTON_HOVERED  = new TextureRegion(Texture.OPTIONS_WIDGETS, 0, 86, 200, 20);
+	public static final TextureRegion BASIC_BUTTON_INACTIVE = new TextureRegion(Texture.BASIC_BUTTON_INACTIVE);
+	public static final TextureRegion BASIC_BUTTON          = new TextureRegion(Texture.BASIC_BUTTON);
+	public static final TextureRegion BASIC_BUTTON_HOVERED  = new TextureRegion(Texture.BASIC_BUTTON_HOVERED);
 
 	public final Texture texture;
 	public final int x;

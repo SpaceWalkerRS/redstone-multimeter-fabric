@@ -10,10 +10,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
 public class TutorialToast implements Toast {
 
+	protected static final ResourceLocation TEXTURE = new ResourceLocation("toast/tutorial");
 	protected static final int TEXTURE_U = 0;
 	protected static final int TEXTURE_V = 96;
 	protected static final int TEXTURE_WIDTH = 160;

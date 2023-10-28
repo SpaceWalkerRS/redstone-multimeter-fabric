@@ -53,8 +53,8 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public final boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		return false; // scrolling is handled in MouseMixin and InputHandler
+	public final boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
+		return screen.mouseScroll(mouseX, mouseY, amountX, amountY);
 	}
 
 	@Override

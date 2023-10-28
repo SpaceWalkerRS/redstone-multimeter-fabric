@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -31,6 +32,7 @@ import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
+import redstone.multimeter.common.network.PacketWrapper;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.common.network.packets.AddMeterPacket;
 import redstone.multimeter.common.network.packets.HandshakePacket;
@@ -100,7 +102,7 @@ public class MultimeterClient {
 	}
 
 	public void sendPacket(RSMMPacket packet) {
-		minecraft.getConnection().send(packetHandler.encode(packet));
+		minecraft.getConnection().send(new ServerboundCustomPayloadPacket(new PacketWrapper(packet)));
 	}
 
 	public InputHandler getInputHandler() {
