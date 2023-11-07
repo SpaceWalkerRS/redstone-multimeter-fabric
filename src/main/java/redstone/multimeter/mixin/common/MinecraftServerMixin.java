@@ -59,6 +59,13 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void endTickTaskPackets(CallbackInfo ci) {
 		rsmm$endTickTask();
+
+		// Ending the tick here is not ideal, but for the
+		// sake of Carpet mod compatibility injecting into
+		// the run loop is not an option, and neither is
+		// injecting is endProfilerTick, since carpet does
+		// not invoke that method.
+		multimeterServer.tickEnd();
 	}
 
 	@Inject(
@@ -193,16 +200,6 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void onTickStart(CallbackInfo ci) {
 		multimeterServer.tickStart();
-	}
-
-	@Inject(
-		method = "endProfilerTick",
-		at = @At(
-			value = "TAIL"
-		)
-	)
-	private void onTickEnd(CallbackInfo ci) {
-		multimeterServer.tickEnd();
 	}
 
 	@Override
