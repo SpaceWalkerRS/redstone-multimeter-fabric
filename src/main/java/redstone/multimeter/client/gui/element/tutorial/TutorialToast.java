@@ -2,8 +2,6 @@ package redstone.multimeter.client.gui.element.tutorial;
 
 import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,13 +14,7 @@ import net.minecraft.util.FormattedCharSequence;
 public class TutorialToast implements Toast {
 
 	protected static final ResourceLocation TEXTURE = new ResourceLocation("toast/tutorial");
-	protected static final int TEXTURE_U = 0;
-	protected static final int TEXTURE_V = 96;
-	protected static final int TEXTURE_WIDTH = 160;
-	protected static final int TEXTURE_HEIGHT = 32;
 	protected static final int EDGE = 4;
-	protected static final int INNER_WIDTH = TEXTURE_WIDTH - 2 * EDGE;
-	protected static final int INNER_HEIGHT = TEXTURE_HEIGHT - 2 * EDGE;
 
 	private final Component title;
 	private final List<FormattedCharSequence> description;
@@ -80,80 +72,7 @@ public class TutorialToast implements Toast {
 	}
 
 	protected void drawBackground(GuiGraphics graphics, ToastComponent toasts, long age) {
-		RenderSystem.setShaderTexture(0, TEXTURE);
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-		int width = width();
-		int height = height();
-
-		if (width == TEXTURE_WIDTH && height == TEXTURE_HEIGHT) {
-			graphics.blit(TEXTURE, 0, 0, TEXTURE_U, TEXTURE_V, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-		} else {
-			int x = 0;
-			int y = 0;
-			int u = TEXTURE_U;
-			int v = TEXTURE_V;
-			int w = EDGE;
-			int h = EDGE;
-
-			graphics.blit(TEXTURE, x, y, u, v, w, h); // top left corner
-
-			u += EDGE;
-			w = INNER_WIDTH;
-
-			for (x = EDGE; x < (width - w - EDGE); x += w) {
-				graphics.blit(TEXTURE, x, y, u, v, w, h); // top edge
-			}
-
-			w = width - x;
-			u = TEXTURE_U + TEXTURE_WIDTH - w;
-
-			graphics.blit(TEXTURE, x, y, u, v, w, h); // top right corner
-
-			v += EDGE;
-			h = INNER_HEIGHT;
-
-			for (y = EDGE; y < (height - h - EDGE); y += h) {
-				x = 0;
-				u = TEXTURE_U;
-				w = EDGE;
-
-				graphics.blit(TEXTURE, x, y, u, v, w, h); // left edge
-
-				u += EDGE;
-				w = INNER_WIDTH;
-
-				for (x = EDGE; x < (width - w - EDGE); x += w) {
-					graphics.blit(TEXTURE, x, y, u, v, w, h); // middle
-				}
-
-				w = width - x;
-				u = TEXTURE_U + TEXTURE_WIDTH - w;
-
-				graphics.blit(TEXTURE, x, y, u, v, w, h); // right edge
-			}
-
-			h = height - y;
-			v = TEXTURE_V + TEXTURE_HEIGHT - h;
-
-			x = 0;
-			u = TEXTURE_U;
-			w = EDGE;
-
-			graphics.blit(TEXTURE, x, y, u, v, w, h); // bottom left corner
-
-			u += EDGE;
-			w = INNER_WIDTH;
-
-			for (x = EDGE; x < (width - w - EDGE); x += w) {
-				graphics.blit(TEXTURE, x, y, u, v, w, h); // bottom edge
-			}
-
-			w = width - x;
-			u = TEXTURE_U + TEXTURE_WIDTH - w;
-
-			graphics.blit(TEXTURE, x, y, u, v, w, h); // bottom right corner
-		}
+		graphics.blitSprite(TEXTURE, 0 ,0, width(), height());
 	}
 
 	protected void drawDecoration(GuiGraphics graphics, ToastComponent toasts, long age) {
