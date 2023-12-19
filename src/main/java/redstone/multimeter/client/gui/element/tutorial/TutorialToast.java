@@ -58,12 +58,12 @@ public class TutorialToast implements Toast {
 		int x = 7;
 		int y = 7;
 
-		graphics.drawString(font, title, x, y, 0xFF500050);
+		graphics.drawString(font, title, x, y, 0xFF500050, false);
 
 		y += 12.0F;
 
 		for (int i = 0; i < description.size(); i++, y += 10.0F) {
-			graphics.drawString(font, description.get(i), x, y, 0xFF000000);
+			graphics.drawString(font, description.get(i), x, y, 0xFF000000, false);
 		}
 
 		drawDecoration(graphics, toasts, age);
