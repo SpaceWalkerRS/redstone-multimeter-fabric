@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.1-SNAPSHOT'
+	id 'fabric-loom' version '1.5-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -23,6 +23,15 @@ repositories {
 	maven {
 		url "https://jitpack.io"
 	}
+	maven {
+		url "https://masa.dy.fi/maven"
+	}
+	maven {
+		url "https://api.modrinth.com/maven"
+		content {
+			includeGroup "maven.modrinth"
+		}
+	}
 }
 
 dependencies {
@@ -37,6 +46,7 @@ dependencies {
 	include "net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}"
 	modImplementation "de.siphalor:amecsapi-1.16:1+"
 	include "de.siphalor:amecsapi-1.16:1+"
+	modImplementation "carpet:fabric-carpet:${project.carpet_version}"
 }
 
 processResources {
