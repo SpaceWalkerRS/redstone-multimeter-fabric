@@ -44,7 +44,7 @@ public class MultimeterServer {
 		this.multimeter = new Multimeter(this);
 		this.tickPhaseTree = new TickPhaseTree();
 
-		this.carpetCompat = new CarpetCompat();
+		this.carpetCompat = new CarpetCompat(this);
 
 		this.tickPhase = TickPhase.UNKNOWN;
 	}
@@ -83,8 +83,6 @@ public class MultimeterServer {
 
 	public void levelLoaded() {
 		loaded = true;
-
-		carpetCompat.init();
 	}
 
 	public void startTickTask(TickTask task, String... args) {
