@@ -86,9 +86,6 @@ public class MultimeterServer {
 
 	public void levelLoaded() {
 		loaded = true;
-
-		carpetCompat.init();
-		subTickCompat.init();
 	}
 
 	public void startTickTask(TickTask task, String... args) {
