@@ -21,8 +21,6 @@
 		"common.ServerLevelMixin",
 		"common.compat.alternate_current.LevelHelperMixin",
 		"common.compat.alternate_current_plus.LevelHelperMixin",
-		"common.compat.subtick.BlockEventQueueMixin",
-		"common.compat.subtick.ScheduledTickQueueMixin",
 		"common.meterable.BellBlockMixin",
 		"common.meterable.ButtonBlockMixin",
 		"common.meterable.ComparatorBlockEntityMixin",
