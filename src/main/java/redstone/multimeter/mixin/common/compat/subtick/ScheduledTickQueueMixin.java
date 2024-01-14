@@ -1,6 +1,7 @@
 package redstone.multimeter.mixin.common.compat.subtick;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -17,21 +18,24 @@ import net.minecraft.world.ticks.ScheduledTick;
 import redstone.multimeter.interfaces.mixin.ILevelTicks;
 import redstone.multimeter.interfaces.mixin.ScheduledTickListener;
 
+import subtick.queues.ScheduledTickQueue;
+
 @Pseudo
-@Mixin(targets = "subtick.queues.ScheduledTickQueue")
+@Mixin(ScheduledTickQueue.class)
 public class ScheduledTickQueueMixin {
 
 	@Shadow @Final private LevelTicks<?> levelTicks;
 
 	@Inject(
 		method = "step",
+		remap = false,
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
 			target = "Ljava/util/function/BiConsumer;accept(Ljava/lang/Object;Ljava/lang/Object;)V"
 		)
 	)
-	private void logTick(int count, BlockPos pos, int range, CallbackInfoReturnable<Pair<Integer, Boolean>> cir, int executed_steps, ScheduledTick<?> scheduledTick) {
+	private void logTick(int count, BlockPos pos, int range, CallbackInfoReturnable<Triple<Integer, Integer, Boolean>> cir, int executed_steps, int success_steps, ScheduledTick<?> scheduledTick) {
 		ScheduledTickListener listener = ((ILevelTicks)levelTicks).rsmm$getListener();
 
 		if (listener != null) {
