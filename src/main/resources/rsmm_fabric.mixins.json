@@ -19,6 +19,7 @@
 		"common.ServerTickListMixin",
 		"common.compat.alternate_current.LevelHelperMixin",
 		"common.compat.alternate_current_plus.LevelHelperMixin",
+		"common.compat.carpet.RedstoneWireTurboMixin",
 		"common.meterable.ButtonBlockMixin",
 		"common.meterable.ChestBlockEntityMixin",
 		"common.meterable.ComparatorBlockEntityMixin",
