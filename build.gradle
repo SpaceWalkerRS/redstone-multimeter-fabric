@@ -34,10 +34,6 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	modImplementation("net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}") {
-		transitive = false
-	}
-	include "net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}"
 	modImplementation "de.siphalor:amecsapi-1.18:1.3.6+mc1.18-pre1"
 	include "de.siphalor:amecsapi-1.18:1.3.6+mc1.18-pre1"
 	modImplementation "carpet:fabric-carpet:${project.carpet_version}"
