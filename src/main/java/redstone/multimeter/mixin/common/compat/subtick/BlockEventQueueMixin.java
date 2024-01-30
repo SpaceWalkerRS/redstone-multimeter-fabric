@@ -23,24 +23,15 @@ public class BlockEventQueueMixin {
 	private BlockEventListener rsmm$listener;
 
 	@Inject(
-		method = "<init>",
-		remap = false,
-		at = @At(
-			value = "TAIL"
-		)
-	)
-	private void init(ServerLevel level, CallbackInfo ci) {
-		this.rsmm$listener = (BlockEventListener)level;
-	}
-
-	@Inject(
 		method = "start",
 		remap = false,
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void start(CallbackInfo ci) {
+	private void start(ServerLevel level, CallbackInfo ci) {
+		this.rsmm$listener = (BlockEventListener)level;
+
 		if (rsmm$listener != null) {
 			rsmm$listener.rsmm$startBlockEvents();
 		}
@@ -71,5 +62,7 @@ public class BlockEventQueueMixin {
 		if (rsmm$listener != null) {
 			rsmm$listener.rsmm$endBlockEvents();
 		}
+
+		rsmm$listener = null;
 	}
 }
