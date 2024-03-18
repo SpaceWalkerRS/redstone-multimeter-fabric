@@ -19,8 +19,10 @@ public class ServerboundCustomPayloadPacketMixin {
 		method = "readPayload",
 		cancellable = true,
 		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/network/protocol/common/ServerboundCustomPayloadPacket;readUnknownPayload(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/network/FriendlyByteBuf;)Lnet/minecraft/network/protocol/common/custom/DiscardedPayload;"
+			value = "HEAD"
+//			can't use this target since FAPI uses it and unconditionally cancels
+//			value = "INVOKE",
+//			target = "Lnet/minecraft/network/protocol/common/ServerboundCustomPayloadPacket;readUnknownPayload(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/network/FriendlyByteBuf;)Lnet/minecraft/network/protocol/common/custom/DiscardedPayload;"
 		)
 	)
 	private static void rsmm$readPayload(ResourceLocation channel, FriendlyByteBuf buffer, CallbackInfoReturnable<CustomPacketPayload> cir) {
