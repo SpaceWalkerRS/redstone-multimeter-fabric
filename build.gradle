@@ -39,7 +39,7 @@ dependencies {
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 	modImplementation "de.siphalor:amecsapi-1.20:${project.amecs_version}"
 	include "de.siphalor:amecsapi-1.20:${project.amecs_version}"
-	modImplementation "carpet:fabric-carpet:${project.carpet_version}"
+	// modImplementation "carpet:fabric-carpet:${project.carpet_version}"
 	modImplementation "maven.modrinth:subtick:${project.subtick_version}"
 
 	// subtick depends on malilib
