@@ -28,6 +28,8 @@
 		"common.meterable.ButtonBlockMixin",
 		"common.meterable.ComparatorBlockEntityMixin",
 		"common.meterable.ComparatorBlockMixin",
+		"common.meterable.CopperBulbBlockMixin",
+		"common.meterable.CrafterBlockMixin",
 		"common.meterable.DaylightDetectorBlockMixin",
 		"common.meterable.DetectorRailBlockMixin",
 		"common.meterable.DiodeBlockMixin",

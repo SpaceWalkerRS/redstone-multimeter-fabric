@@ -1,0 +1,8 @@
+{
+	"name": "copper_bulb",
+	"event_types": [
+		"powered",
+		"active",
+		"moved"
+	]
+}

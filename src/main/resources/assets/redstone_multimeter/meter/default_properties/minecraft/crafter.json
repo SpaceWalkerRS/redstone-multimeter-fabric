@@ -1,0 +1,6 @@
+{
+	"name": "crafter",
+	"event_types": [
+		"powered"
+	]
+}
