@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
 
 public class RedstoneMultimeterMod implements ModInitializer {
 
@@ -15,26 +14,8 @@ public class RedstoneMultimeterMod implements ModInitializer {
 	public static final String CONFIG_PATH = "config/" + NAMESPACE;
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
-	private static Boolean subtick;
-
 	@Override
 	public void onInitialize() {
 		LOGGER.info(String.format("%s %s has been initialized!", MOD_NAME, MOD_VERSION));
-	}
-
-	// public static boolean isCarpetPreset() {
-	// 	if (carpet == null) {
-	// 		carpet = FabricLoader.getInstance().isModLoaded("carpet");
-	// 	}
-
-	// 	return carpet;
-	// }
-
-	public static boolean isSubtickPreset() {
-		if (subtick == null) {
-			subtick = FabricLoader.getInstance().isModLoaded("subtick");
-		}
-
-		return subtick;
 	}
 }

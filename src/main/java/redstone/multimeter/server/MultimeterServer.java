@@ -22,7 +22,6 @@ import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.TickTimePacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
-import redstone.multimeter.server.compat.SubTickCompat;
 
 public class MultimeterServer {
 
@@ -31,8 +30,6 @@ public class MultimeterServer {
 	private final PlayerList playerList;
 	private final Multimeter multimeter;
 	private final TickPhaseTree tickPhaseTree;
-
-	private final SubTickCompat subTickCompat;
 
 	private boolean loaded;
 	private TickPhase tickPhase;
@@ -43,8 +40,6 @@ public class MultimeterServer {
 		this.playerList = new PlayerList(this);
 		this.multimeter = new Multimeter(this);
 		this.tickPhaseTree = new TickPhaseTree();
-
-		this.subTickCompat = new SubTickCompat(this);
 
 		this.tickPhase = TickPhase.UNKNOWN;
 	}
@@ -111,13 +106,11 @@ public class MultimeterServer {
 	}
 
 	public boolean isFrozen() {
-		return !this.getMinecraftServer()
-					.tickRateManager()
-					.runsNormally();
+		return !server.tickRateManager().runsNormally();
 	}
 
 	public boolean isPausedOrFrozen() {
-		return isPaused() || isFrozen() || subTickCompat.isFrozen();
+		return isPaused() || isFrozen();
 	}
 
 	public void tickStart() {
