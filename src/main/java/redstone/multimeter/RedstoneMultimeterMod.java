@@ -15,7 +15,6 @@ public class RedstoneMultimeterMod implements ModInitializer {
 	public static final String CONFIG_PATH = "config/" + NAMESPACE;
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
-	private static Boolean carpet;
 	private static Boolean subtick;
 
 	@Override
@@ -23,13 +22,13 @@ public class RedstoneMultimeterMod implements ModInitializer {
 		LOGGER.info(String.format("%s %s has been initialized!", MOD_NAME, MOD_VERSION));
 	}
 
-	public static boolean isCarpetPreset() {
-		if (carpet == null) {
-			carpet = FabricLoader.getInstance().isModLoaded("carpet");
-		}
+	// public static boolean isCarpetPreset() {
+	// 	if (carpet == null) {
+	// 		carpet = FabricLoader.getInstance().isModLoaded("carpet");
+	// 	}
 
-		return carpet;
-	}
+	// 	return carpet;
+	// }
 
 	public static boolean isSubtickPreset() {
 		if (subtick == null) {
