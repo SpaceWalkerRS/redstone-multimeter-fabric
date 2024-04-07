@@ -1,13 +1,13 @@
 package redstone.multimeter.mixin.common;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.integrated.IntegratedServer;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -17,6 +17,9 @@ import redstone.multimeter.server.MultimeterServer;
 public class MinecraftServerMixin implements IMinecraftServer {
 
 	private MultimeterServer multimeterServer;
+
+	@Shadow
+	private boolean isDedicated() { return false; }
 
 	@Inject(
 		method = "<init>",
@@ -46,7 +49,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 		)
 	)
 	private void onTickStartAndStartTickTaskTick(CallbackInfo ci) {
-		if (!((Object)this instanceof IntegratedServer)) {
+		if (isDedicated()) {
 			multimeterServer.tickStart();
 		}
 
@@ -93,7 +96,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	private void endTickTaskTickAndOnTickEnd(CallbackInfo ci) {
 		rsmm$endTickTask();
 
-		if (!((Object)this instanceof IntegratedServer)) {
+		if (isDedicated()) {
 			multimeterServer.tickEnd();
 		}
 	}
