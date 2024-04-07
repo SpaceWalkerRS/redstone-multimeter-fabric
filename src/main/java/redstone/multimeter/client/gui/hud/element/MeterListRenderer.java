@@ -268,7 +268,7 @@ public class MeterListRenderer extends AbstractElement {
 		int width = 0;
 
 		for (Meter meter : hud.meters) {
-			int nameWidth = hud.textRenderer.getStringWidth(meter.getName());
+			int nameWidth = hud.textRenderer.getWidth(meter.getName());
 
 			if (nameWidth > width) {
 				width = nameWidth;

@@ -42,7 +42,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			request();
 
 			String text = "Requesting tick phase tree from server...";
-			int x = getX() + (getWidth() - textRenderer.getStringWidth(text)) / 2;
+			int x = getX() + (getWidth() - textRenderer.getWidth(text)) / 2;
 			int y = getY() + (getHeight() - textRenderer.fontHeight) / 2;
 			TextElement textElement = new TextElement(client, x, y, t -> t.add(text).setWithShadow(true), () -> {
 				if (lastRequestTime > 0) {

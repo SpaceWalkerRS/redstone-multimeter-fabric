@@ -121,7 +121,7 @@ public class WorldMixin implements TickTaskExecutor {
 	}
 
 	@Inject(
-		method = "tickEntity(Lnet/minecraft/entity/Entity;Z)V",
+		method = "updateEntity(Lnet/minecraft/entity/Entity;Z)V",
 		at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/entity/Entity;tick()V"

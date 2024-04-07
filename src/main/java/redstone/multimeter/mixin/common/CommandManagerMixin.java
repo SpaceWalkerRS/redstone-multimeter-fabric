@@ -18,7 +18,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
 		method="<init>",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/server/command/Command;setListener(Lnet/minecraft/server/command/handler/CommandListener;)V"
+			target = "Lnet/minecraft/server/command/AbstractCommand;setListener(Lnet/minecraft/server/command/handler/CommandListener;)V"
 		)
 	)
 	private void registerCommands(MinecraftServer server, CallbackInfo ci) {

@@ -13,7 +13,7 @@ import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.Command;
+import net.minecraft.server.command.AbstractCommand;
 import net.minecraft.server.command.exception.CommandException;
 import net.minecraft.server.command.exception.CommandNotFoundException;
 import net.minecraft.server.command.exception.IncorrectUsageException;
@@ -29,7 +29,7 @@ import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.MultimeterServer;
 import redstone.multimeter.server.meter.ServerMeterGroup;
 
-public class MeterGroupCommand extends Command {
+public class MeterGroupCommand extends AbstractCommand {
 
 	private static final String COMMAND_NAME = "metergroup";
 	

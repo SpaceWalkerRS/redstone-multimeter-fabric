@@ -40,7 +40,7 @@ public class TextUtils {
 
 				String subString = text.substring(0, length);
 
-				if (textRenderer.getStringWidth(subString) > MAX_WIDTH) {
+				if (textRenderer.getWidth(subString) > MAX_WIDTH) {
 					if (lastSpace >= 0) {
 						subString = text.substring(0, lastSpace);
 						length = lastSpace + 1;

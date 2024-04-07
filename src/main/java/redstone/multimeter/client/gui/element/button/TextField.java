@@ -306,10 +306,10 @@ public class TextField extends AbstractButton {
 		if (isFocused()) {
 			if (isActive() && (cursorTicks / 6) % 2 == 0) {
 				if (cursorIndex == fullText.length()) {
-					int x = textX + textRenderer.getStringWidth(visibleText);
+					int x = textX + textRenderer.getWidth(visibleText);
 					renderText(textRenderer, "_", x, textY, true, color);
 				} else {
-					int width = textRenderer.getStringWidth(fullText.substring(scrollIndex, cursorIndex));
+					int width = textRenderer.getWidth(fullText.substring(scrollIndex, cursorIndex));
 					int x = textX + width;
 
 					renderRect(x, selectionY, 1, selectionHeight, color);
@@ -330,11 +330,11 @@ public class TextField extends AbstractButton {
 
 		if (start >= scrollIndex) {
 			String t = fullText.substring(scrollIndex, start);
-			x0 = textX + textRenderer.getStringWidth(t);
+			x0 = textX + textRenderer.getWidth(t);
 		}
 		if (end <= scrollIndex + visibleText.length()) {
 			String t = fullText.substring(scrollIndex, end);
-			x1 = textX + textRenderer.getStringWidth(t);
+			x1 = textX + textRenderer.getWidth(t);
 		}
 
 		if (x0 >= x1) {
@@ -478,7 +478,7 @@ public class TextField extends AbstractButton {
 	}
 
 	private void updateVisibleText() {
-		visibleText = textRenderer.trimToWidth(fullText.substring(scrollIndex), textWidth, false);
+		visibleText = textRenderer.trim(fullText.substring(scrollIndex), textWidth, false);
 	}
 
 	public int getMaxLength() {
@@ -493,7 +493,7 @@ public class TextField extends AbstractButton {
 		maxScroll = 0;
 
 		if (!fullText.isEmpty()) {
-			String text = textRenderer.trimToWidth(fullText + "_", textWidth + 1, true);
+			String text = textRenderer.trim(fullText + "_", textWidth + 1, true);
 
 			if (text.length() <= fullText.length()) {
 				maxScroll = fullText.length() - text.length() + 1;
@@ -518,7 +518,7 @@ public class TextField extends AbstractButton {
 
 	private void setCursorFromMouse(double mouseX) {
 		if (selection != SelectType.KEYBOARD) {
-			String text = textRenderer.trimToWidth(visibleText, (int)mouseX - textX);
+			String text = textRenderer.trim(visibleText, (int)mouseX - textX);
 			setCursor(scrollIndex + text.length());
 		}
 	}

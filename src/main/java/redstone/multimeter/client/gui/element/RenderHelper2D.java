@@ -227,16 +227,16 @@ public class RenderHelper2D {
 	}
 
 	protected int textWidth(TextRenderer textRenderer, Text text) {
-		return textRenderer.getStringWidth(text.getFormattedContent());
+		return textRenderer.getWidth(text.getFormattedString());
 	}
 
 	protected void renderText(TextRenderer textRenderer, Text text, int x, int y, boolean shadow, int color) {
 		GlStateManager.enableTexture();
 
 		if (shadow) {
-			textRenderer.drawWithShadow(text.getFormattedContent(), x, y, color);
+			textRenderer.drawWithShadow(text.getFormattedString(), x, y, color);
 		} else {
-			textRenderer.drawWithoutShadow(text.getFormattedContent(), x, y, color);
+			textRenderer.draw(text.getFormattedString(), x, y, color);
 		}
 	}
 
@@ -246,7 +246,7 @@ public class RenderHelper2D {
 		if (shadow) {
 			textRenderer.drawWithShadow(text, x, y, color);
 		} else {
-			textRenderer.drawWithoutShadow(text, x, y, color);
+			textRenderer.draw(text, x, y, color);
 		}
 	}
 

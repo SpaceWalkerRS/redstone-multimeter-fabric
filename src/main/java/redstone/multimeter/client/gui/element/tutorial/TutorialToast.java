@@ -35,7 +35,7 @@ public class TutorialToast implements Toast {
 		this.toastWidth = 200;
 
 		this.title = title;
-		this.description = textRenderer.wrapLines(description.getFormattedContent(), width() - 14);
+		this.description = textRenderer.split(description.getFormattedString(), width() - 14);
 
 		this.toastHeight = 10 + 12 + 10 * this.description.size();
 
@@ -60,12 +60,12 @@ public class TutorialToast implements Toast {
 		int x = 7;
 		int y = 7;
 
-		textRenderer.drawWithoutShadow(title.getFormattedContent(), x, y, 0xFF500050);
+		textRenderer.draw(title.getFormattedString(), x, y, 0xFF500050);
 
 		y += 12.0F;
 
 		for (int i = 0; i < description.size(); i++, y += 10.0F) {
-			textRenderer.drawWithoutShadow(description.get(i), x, y, 0xFF000000);
+			textRenderer.draw(description.get(i), x, y, 0xFF000000);
 		}
 
 		drawDecoration(toasts, animationTime);
