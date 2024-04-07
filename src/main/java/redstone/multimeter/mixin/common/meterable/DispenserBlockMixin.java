@@ -28,7 +28,7 @@ public class DispenserBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/block/DispenserBlock;TRIGGERED:Lnet/minecraft/block/state/property/BooleanProperty;"
 		)
 	)
-	private void logPowered(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, boolean powered) {
+	private void logPowered(BlockState state, World world, BlockPos pos, Block neighborBlock, CallbackInfo ci, boolean powered) {
 		rsmm$logPowered(world, pos, powered);
 	}
 

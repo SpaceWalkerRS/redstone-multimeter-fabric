@@ -21,7 +21,7 @@ public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockE
 		method = "tick",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/World;getTime()J"
+			target = "Lnet/minecraft/block/entity/HopperBlockEntity;isOnCooldown()Z"
 		)
 	)
 	private void logActive(CallbackInfo ci) {

@@ -33,7 +33,6 @@
 		"common.meterable.HopperBlockEntityMixin",
 		"common.meterable.LeverBlockMixin",
 		"common.meterable.NoteBlockMixin",
-		"common.meterable.ObserverBlockMixin",
 		"common.meterable.PistonBaseBlockMixin",
 		"common.meterable.PoweredRailBlockMixin",
 		"common.meterable.PressurePlateBlockMixin",

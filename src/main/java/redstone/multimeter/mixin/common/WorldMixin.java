@@ -139,10 +139,10 @@ public class WorldMixin implements TickTaskExecutor {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/state/BlockState;neighborChanged(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+			target = "Lnet/minecraft/block/state/BlockState;neighborChanged(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;)V"
 		)
 	)
-	private void logBlockUpdate(BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, BlockState state) {
+	private void logBlockUpdate(BlockPos pos, Block neighborBlock, CallbackInfo ci, BlockState state) {
 		if (!isClient) {
 			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
@@ -159,25 +159,11 @@ public class WorldMixin implements TickTaskExecutor {
 	}
 
 	@Inject(
-		method = "neighborStateChanged",
-		locals = LocalCapture.CAPTURE_FAILHARD,
-		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/block/ObserverBlock;neighborStateChanged(Lnet/minecraft/block/state/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
-		)
-	)
-	private void logObserverUpdate(BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci, BlockState state) {
-		if (!isClient) {
-			((IServerWorld)this).getMultimeterServer().getMultimeter().logObserverUpdate((World)(Object)this, pos);
-		}
-	}
-
-	@Inject(
 		method = "updateNeighborComparators",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/state/BlockState;neighborChanged(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;)V"
+			target = "Lnet/minecraft/block/state/BlockState;neighborChanged(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;)V"
 		)
 	)
 	private void logComparatorUpdate(BlockPos neighborPos, Block neighborBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {

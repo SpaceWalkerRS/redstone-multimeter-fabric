@@ -217,7 +217,7 @@ public class MultimeterServer {
 		return playerList.has(player.getUuid());
 	}
 
-	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
-		player.addMessage(message, actionBar);
+	public void sendMessage(ServerPlayerEntity player, Text message) {
+		player.addMessage(message);
 	}
 }
