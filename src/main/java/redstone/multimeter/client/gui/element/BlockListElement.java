@@ -110,7 +110,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 
 			x = getX() + 22;
 			y = getY() + height - (height + textRenderer.fontHeight) / 2;
-			String text = textRenderer.trimToWidth(key.toString(), getWidth() - 22);
+			String text = textRenderer.trim(key.toString(), getWidth() - 22);
 
 			renderText(textRenderer, text, x, y, true, 0xFFFFFFFF);
 		}

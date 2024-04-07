@@ -496,7 +496,7 @@ public class TextField extends AbstractButton {
 	}
 
 	private void updateVisibleText() {
-		visibleText = textRenderer.trimToWidth(fullText.substring(scrollIndex), textWidth, false);
+		visibleText = textRenderer.trim(fullText.substring(scrollIndex), textWidth, false);
 	}
 
 	public int getMaxLength() {
@@ -511,7 +511,7 @@ public class TextField extends AbstractButton {
 		maxScroll = 0;
 
 		if (!fullText.isEmpty()) {
-			String text = textRenderer.trimToWidth(fullText + "_", textWidth + 1, true);
+			String text = textRenderer.trim(fullText + "_", textWidth + 1, true);
 
 			if (text.length() <= fullText.length()) {
 				maxScroll = fullText.length() - text.length() + 1;
@@ -536,7 +536,7 @@ public class TextField extends AbstractButton {
 
 	private void setCursorFromMouse(double mouseX) {
 		if (selection != SelectType.KEYBOARD) {
-			String text = textRenderer.trimToWidth(visibleText, (int)mouseX - textX);
+			String text = textRenderer.trim(visibleText, (int)mouseX - textX);
 			setCursor(scrollIndex + text.length());
 		}
 	}

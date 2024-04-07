@@ -181,7 +181,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 		protected Text formatName(String name, Consumer<Style> formatter) {
 			int width = controls.getWidth() - (4 + buttonWidth + 10);
-			Text text = new LiteralText(textRenderer.trimToWidth(name, width, true));
+			Text text = new LiteralText(textRenderer.trim(name, width, true));
 			return active ? text.withStyle(formatter) : text.setFormatting(Formatting.GRAY);
 		}
 	}
