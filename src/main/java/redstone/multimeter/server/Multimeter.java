@@ -11,8 +11,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
 
+import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
 import net.minecraft.block.Block;

@@ -1,6 +1,7 @@
 package redstone.multimeter.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.AbstractCommand;
+import net.minecraft.server.command.TargetSelector;
 import net.minecraft.server.command.exception.CommandException;
 import net.minecraft.server.command.exception.CommandNotFoundException;
 import net.minecraft.server.command.exception.IncorrectUsageException;
@@ -451,6 +453,16 @@ public class MeterGroupCommand extends AbstractCommand {
 		} catch (CommandException e) {
 			return false;
 		}
+	}
+
+	private static List<ServerPlayerEntity> parsePlayers(MinecraftServer server, CommandSource source, String arg) throws CommandException {
+		List<ServerPlayerEntity> players = TargetSelector.select(source, arg, ServerPlayerEntity.class);
+
+		if (players.isEmpty()) {
+			return Arrays.asList(AbstractCommand.parsePlayer(server, source, arg));
+		}
+
+		return players;
 	}
 
 	@FunctionalInterface

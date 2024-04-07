@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
+
+import com.google.common.base.Supplier;
 
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;

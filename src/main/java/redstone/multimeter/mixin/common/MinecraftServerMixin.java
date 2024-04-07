@@ -118,18 +118,6 @@ public class MinecraftServerMixin implements IMinecraftServer {
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-			args = "ldc=commandFunctions"
-		)
-	)
-	private void swapTickTaskCommandFunctions(CallbackInfo ci) {
-		rsmm$swapTickTask(TickTask.COMMAND_FUNCTIONS);
-	}
-
-	@Inject(
-		method = "tickWorlds",
-		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 			args = "ldc=levels"
 		)
 	)
@@ -181,16 +169,6 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void endTickTaskServerGui(CallbackInfo ci) {
 		rsmm$endTickTask();
-	}
-
-	@Inject(
-		method = "reloadResources()V",
-		at = @At(
-			value = "HEAD"
-		)
-	)
-	private void onReloadResources(CallbackInfo ci) {
-		((MinecraftServer)(Object)this).submit(() -> multimeterServer.getMultimeter().reloadOptions());
 	}
 
 	@Override

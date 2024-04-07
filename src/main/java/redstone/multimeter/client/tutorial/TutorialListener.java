@@ -1,10 +1,15 @@
 package redstone.multimeter.client.tutorial;
 
+import net.minecraft.client.gui.screen.Screen;
+
 import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 
 public interface TutorialListener {
+
+	default void onScreenOpened(Screen screen) {
+	}
 
 	default void onScreenOpened(RSMMScreen screen) {
 	}

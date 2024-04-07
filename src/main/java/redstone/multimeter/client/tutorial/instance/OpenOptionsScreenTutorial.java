@@ -1,31 +1,22 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.block.Blocks;
+import net.minecraft.stat.achievement.AchievementStat;
 
-import redstone.multimeter.client.Keybinds;
-import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.screen.OptionsScreen;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
-import redstone.multimeter.util.TextUtils;
 
 public class OpenOptionsScreenTutorial extends TutorialInstance {
-
-	private static final Text TITLE = new LiteralText("Open The Options Screen");
-	private static final Text DESCRIPTION = new LiteralText("").
-													append("Press ").
-													append(TextUtils.formatKeybind(Keybinds.OPEN_OPTIONS_MENU)).
-													append(" to open the options menu, or access it through Mod Menu.");
 
 	public OpenOptionsScreenTutorial(Tutorial tutorial) {
 		super(tutorial);
 	}
 
 	@Override
-	protected TutorialToast createToast() {
-		return new TutorialToast(TITLE, DESCRIPTION);
+	protected AchievementStat createAchievement() {
+		return new AchievementStat("stats.rsmm.open_options_screen", "rsmm.open_options_screen", -1, -1, Blocks.CRAFTING_TABLE, null);
 	}
 
 	@Override

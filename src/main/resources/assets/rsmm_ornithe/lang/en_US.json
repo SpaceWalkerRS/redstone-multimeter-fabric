@@ -1,0 +1,37 @@
+{
+	"stat.rsmm.join_meter_group": "Join A Meter Group",
+	"achievement.rsmm.join_meter_group": "Join A Meter Group",
+	"achievement.rsmm.join_meter_group.desc": "Use the /metergroup command to subscribe to a meter group.",
+
+	"stat.rsmm.open_keybinds_screen": "Open Keybinds Screen",
+	"achievement.rsmm.open_keybinds_screen": "Open Keybinds Screen",
+	"achievement.rsmm.open_keybinds_screen.desc": "Open the Controls screen from the options menu and scroll down to the Redstone Multimeter section.",
+
+	"stat.rsmm.open_meter_controls": "Open Meter Controls",
+	"achievement.rsmm.open_meter_controls": "Open Meter Controls",
+	"achievement.rsmm.open_meter_controls.desc": "Open a meter's controls through the Multimeter screen or by looking at it and pressing the keybind",
+
+	"stat.rsmm.open_multimeter_screen": "Open Multimeter Screen",
+	"achievement.rsmm.open_multimeter_screen": "Open Multimeter Screen",
+	"achievement.rsmm.open_multimeter_screen.desc": "Open the Multimeter screen by pressing the keybind.",
+
+	"stat.rsmm.open_options_screen": "Open Options Screen",
+	"achievement.rsmm.open_options_screen": "Open Options Screen",
+	"achievement.rsmm.open_options_screen.desc": "Open the options screen by pressing the keybind.",
+
+	"stat.rsmm.pause_hud": "Pause The HUD",
+	"achievement.rsmm.pause_hud": "Pause The HUD",
+	"achievement.rsmm.pause_hud.desc": "Pause the primary overview of the Multimeter HUD by pressing the keybind.",
+
+	"stat.rsmm.place_meter": "Place A Meter",
+	"achievement.rsmm.place_meter": "Place A Meter",
+	"achievement.rsmm.place_meter.desc": "Look at a block and place a meter by pressing the keybind.",
+
+	"stat.rsmm.remove_meter": "Remove A Meter",
+	"achievement.rsmm.remove_meter": "Remove A Meter",
+	"achievement.rsmm.remove_meter.desc": "Look at a meter and remove it by pressing the keybind.",
+
+	"stat.rsmm.scroll_hud": "Scroll The HUD",
+	"achievement.rsmm.scroll_hud": "Scroll The HUD",
+	"achievement.rsmm.scroll_hud.desc": "Use the Step Backwards and Step Forwards keybinds to scroll through the primary overview of the Multimeter HUD."
+}

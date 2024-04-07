@@ -30,6 +30,7 @@ import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.server.MultimeterServer;
+import redstone.multimeter.util.DimensionUtils;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin extends World implements IServerWorld {
@@ -51,7 +52,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		)
 	)
 	private void startTickTaskTickLevel(CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.TICK_LEVEL, dimension.getType().getKey());
+		rsmm$startTickTask(TickTask.TICK_LEVEL, DimensionUtils.getKey(dimension));
 	}
 
 	@Inject(

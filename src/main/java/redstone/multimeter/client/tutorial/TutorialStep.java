@@ -7,6 +7,7 @@ import redstone.multimeter.client.tutorial.instance.*;
 
 public enum TutorialStep implements Cyclable<TutorialStep> {
 
+	OPEN_KEYBINDS_SCREEN("open keybinds screen", OpenKeybindsScreenTutorial::new),
 	OPEN_OPTIONS_SCREEN("open options screen", OpenOptionsScreenTutorial::new),
 	JOIN_METER_GROUP("join meter group", JoinMeterGroupTutorial::new),
 	PLACE_METER("place meter", PlaceMeterTutorial::new),

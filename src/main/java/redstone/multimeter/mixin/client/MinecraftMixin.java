@@ -2,20 +2,25 @@ package redstone.multimeter.mixin.client;
 
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.screen.ScreenWrapper;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
 @Mixin(Minecraft.class)
 public class MinecraftMixin implements IMinecraft {
+
+	@Shadow
+	private Screen screen;
 
 	private MultimeterClient multimeterClient;
 
@@ -58,8 +63,7 @@ public class MinecraftMixin implements IMinecraft {
 		method = "tick()V",
 		at = @At(
 			value = "INVOKE",
-			shift = Shift.AFTER,
-			target = "Lnet/minecraft/client/tutorial/Tutorial;tick()V"
+			target = "Lnet/minecraft/client/world/ClientWorld;tick()V"
 		)
 	)
 	private void tickTutorial(CallbackInfo ci) {
@@ -103,6 +107,18 @@ public class MinecraftMixin implements IMinecraft {
 	private void setWorld(ClientWorld world, String message, CallbackInfo ci) {
 		if (world == null) {
 			multimeterClient.onDisconnect();
+		}
+	}
+
+	@Inject(
+		method = "openScreen",
+		at = @At(
+			value = "TAIL"
+		)
+	)
+	private void openScreen(Screen screen, CallbackInfo ci) {
+		if (this.screen != null && !(this.screen instanceof ScreenWrapper)) {
+			multimeterClient.getTutorial().onScreenOpened(this.screen);
 		}
 	}
 

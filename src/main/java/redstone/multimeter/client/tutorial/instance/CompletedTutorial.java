@@ -1,6 +1,7 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
+import net.minecraft.stat.achievement.AchievementStat;
+
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 
@@ -13,7 +14,7 @@ public class CompletedTutorial extends TutorialInstance {
 	}
 
 	@Override
-	protected TutorialToast createToast() {
+	protected AchievementStat createAchievement() {
 		return null;
 	}
 

@@ -1,6 +1,7 @@
 package redstone.multimeter.client.tutorial;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
@@ -34,6 +35,13 @@ public class Tutorial implements TutorialListener {
 
 	public MultimeterClient getClient() {
 		return client;
+	}
+
+	@Override
+	public void onScreenOpened(Screen screen) {
+		if (instance != null && !instance.isCompleted()) {
+			instance.onScreenOpened(screen);
+		}
 	}
 
 	@Override
@@ -161,7 +169,7 @@ public class Tutorial implements TutorialListener {
 	}
 
 	private boolean canDoTutorial() {
-		return client.isConnected() && minecraft.world != null && minecraft.options.tutorialStep == net.minecraft.client.tutorial.TutorialSteps.NONE;
+		return client.isConnected() && minecraft.world != null;
 	}
 
 	private void start() {

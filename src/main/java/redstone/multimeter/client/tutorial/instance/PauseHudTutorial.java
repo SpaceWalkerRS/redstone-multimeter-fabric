@@ -1,25 +1,15 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.block.Blocks;
+import net.minecraft.stat.achievement.AchievementStat;
 
-import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
-import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
-import redstone.multimeter.util.TextUtils;
 
 public class PauseHudTutorial extends StagedTutorialInstance {
-
-	private static final Text TITLE = new LiteralText("Pause The HUD");
-	private static final Text DESCRIPTION = new LiteralText("").
-													append("Press ").
-													append(TextUtils.formatKeybind(Keybinds.PAUSE_METERS)).
-													append(" to pause the primary overview of the Multimeter HUD.");
 
 	private Stage stage;
 
@@ -30,8 +20,8 @@ public class PauseHudTutorial extends StagedTutorialInstance {
 	}
 
 	@Override
-	protected TutorialToast createToast() {
-		return new StagedTutorialToast(this, TITLE, DESCRIPTION);
+	protected AchievementStat createAchievement() {
+		return new AchievementStat("stats.rsmm.pause_hud", "rsmm.pause_hud", -1, -1, Blocks.CRAFTING_TABLE, null);
 	}
 
 	@Override

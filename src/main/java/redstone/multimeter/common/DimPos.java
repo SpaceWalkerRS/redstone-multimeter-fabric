@@ -9,6 +9,7 @@ import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 
 import redstone.multimeter.util.AxisUtils;
+import redstone.multimeter.util.DimensionUtils;
 
 public class DimPos {
 
@@ -25,7 +26,7 @@ public class DimPos {
 	}
 
 	public DimPos(World world, BlockPos pos) {
-		this(world.dimension.getType().getKey(), pos);
+		this(DimensionUtils.getKey(world.dimension), pos);
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class DimPos {
 	}
 
 	public boolean is(World world) {
-		return world.dimension.getType().getKey().equals(dimension);
+		return DimensionUtils.getKey(world.dimension).equals(dimension);
 	}
 
 	public DimPos offset(String dimension) {

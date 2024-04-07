@@ -1,25 +1,15 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.block.Blocks;
+import net.minecraft.stat.achievement.AchievementStat;
 
-import redstone.multimeter.client.Keybinds;
-import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
-import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
-import redstone.multimeter.util.TextUtils;
 
 public class RemoveMeterTutorial extends StagedTutorialInstance {
-
-	private static final Text TITLE = new LiteralText("Remove A Meter");
-	private static final Text DESCRIPTION = new LiteralText("").
-													append("Look at a meter and press ").
-													append(TextUtils.formatKeybind(Keybinds.TOGGLE_METER)).
-													append(" to remove it.");
 
 	private Stage stage;
 	private DimPos lastRequest;
@@ -31,8 +21,8 @@ public class RemoveMeterTutorial extends StagedTutorialInstance {
 	}
 
 	@Override
-	protected TutorialToast createToast() {
-		return new StagedTutorialToast(this, TITLE, DESCRIPTION);
+	protected AchievementStat createAchievement() {
+		return new AchievementStat("stats.rsmm.remove_meter", "rsmm.remove_meter", -1, -1, Blocks.CRAFTING_TABLE, null);
 	}
 
 	@Override
