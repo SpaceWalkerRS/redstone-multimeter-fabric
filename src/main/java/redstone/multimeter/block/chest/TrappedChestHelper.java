@@ -11,6 +11,8 @@ import redstone.multimeter.block.PowerSource;
 
 public class TrappedChestHelper {
 
+	public static int TYPE = 1;
+
 	public static int getPower(World world, BlockPos pos, BlockState state) {
 		BlockEntity blockEntity = world.getBlockEntity(pos);
 

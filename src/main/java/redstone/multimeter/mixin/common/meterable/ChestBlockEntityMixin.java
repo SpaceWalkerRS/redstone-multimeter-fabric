@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.ChestBlock.Type;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.entity.living.player.PlayerEntity;
@@ -21,7 +20,7 @@ public class ChestBlockEntityMixin extends BlockEntity {
 
 	@Shadow private int viewerCount;
 
-	@Shadow private Type getType() { return null; }
+	@Shadow private int getChestType() { return 0; }
 
 	@Inject(
 		method = "onOpen",
@@ -46,7 +45,7 @@ public class ChestBlockEntityMixin extends BlockEntity {
 	}
 
 	private void signalViewerCount(int oldViewerCount, int newViewerCount) {
-		if (!world.isClient && getType() == Type.TRAP) {
+		if (!world.isClient && getChestType() == TrappedChestHelper.TYPE) {
 			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 
 			int oldPower = TrappedChestHelper.getPowerFromViewerCount(oldViewerCount);

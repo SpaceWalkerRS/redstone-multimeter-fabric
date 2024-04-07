@@ -29,7 +29,7 @@ public class NoteBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/block/entity/NoteBlockBlockEntity;powered:Z"
 		)
 	)
-	private void logPowered(BlockState state, World world, BlockPos pos, Block neighborBlock, CallbackInfo ci, boolean powered) {
+	private void logPowered(World world, BlockPos pos, BlockState state, Block neighborBlock, CallbackInfo ci, boolean powered) {
 		rsmm$logPowered(world, pos, powered);
 	}
 
@@ -42,7 +42,7 @@ public class NoteBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/block/entity/NoteBlockBlockEntity;powered:Z"
 		)
 	)
-	private void logActive(BlockState state, World world, BlockPos pos, Block neighborBlock, CallbackInfo ci, boolean powered) {
+	private void logActive(World world, BlockPos pos, BlockState state, Block neighborBlock, CallbackInfo ci, boolean powered) {
 		if (!world.isClient) {
 			((IServerWorld)world).getMultimeter().logActive(world, pos, powered);
 		}

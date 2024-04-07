@@ -85,7 +85,7 @@ public class MeterGroupCommand extends AbstractCommand {
 	}
 
 	@Override
-	public List<String> getSuggestions(MinecraftServer server, CommandSource source, String[] args, @Nullable BlockPos pos) {
+	public List<String> getSuggestions(CommandSource source, String[] args, @Nullable BlockPos pos) {
 		boolean isOwner = isOwnerOfSubscription(source);
 
 		switch (args.length) {
@@ -118,7 +118,7 @@ public class MeterGroupCommand extends AbstractCommand {
 			if (isOwner && args[0].equals("members")) {
 				switch (args[1]) {
 				case "add":
-					return suggestMatching(args, server.getPlayerNames());
+					return suggestMatching(args, server.getMinecraftServer().getPlayerNames());
 				case "remove":
 					return suggestMatching(args, listMembers(source).keySet());
 				}
@@ -131,7 +131,7 @@ public class MeterGroupCommand extends AbstractCommand {
 	}
 
 	@Override
-	public void run(MinecraftServer server, CommandSource source, String[] args) throws CommandException {
+	public void run(CommandSource source, String[] args) throws CommandException {
 		if (!isMultimeterClient(source)) {
 			throw new CommandNotFoundException();
 		}
@@ -205,7 +205,7 @@ public class MeterGroupCommand extends AbstractCommand {
 						throw new IncorrectUsageException(USAGE_MEMBERS_LIST);
 					case "add":
 						if (args.length == 3) {
-							membersAdd(source, parsePlayers(server, source, args[2]));
+							membersAdd(source, parsePlayers(source, args[2]));
 							return;
 						}
 
@@ -363,12 +363,12 @@ public class MeterGroupCommand extends AbstractCommand {
 				if (player == owner) {
 					source.sendMessage(new LiteralText("You cannot add yourself as a member!"));
 				} else if (meterGroup.hasMember(player)) {
-					source.sendMessage(new LiteralText(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getScoreboardName(), meterGroup.getName())));
+					source.sendMessage(new LiteralText(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getName(), meterGroup.getName())));
 				} else if (!multimeter.getServer().isMultimeterClient(player)) {
-					source.sendMessage(new LiteralText(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getScoreboardName(), RedstoneMultimeterMod.MOD_NAME)));
+					source.sendMessage(new LiteralText(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getName(), RedstoneMultimeterMod.MOD_NAME)));
 				} else {
 					multimeter.addMemberToMeterGroup(meterGroup, player.getUuid());
-					source.sendMessage(new LiteralText(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getScoreboardName(), meterGroup.getName())));
+					source.sendMessage(new LiteralText(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getName(), meterGroup.getName())));
 				}
 			}
 		});
@@ -455,11 +455,11 @@ public class MeterGroupCommand extends AbstractCommand {
 		}
 	}
 
-	private static List<ServerPlayerEntity> parsePlayers(MinecraftServer server, CommandSource source, String arg) throws CommandException {
+	private static List<ServerPlayerEntity> parsePlayers(CommandSource source, String arg) throws CommandException {
 		List<ServerPlayerEntity> players = TargetSelector.select(source, arg, ServerPlayerEntity.class);
 
 		if (players.isEmpty()) {
-			return Arrays.asList(AbstractCommand.parsePlayer(server, source, arg));
+			return Arrays.asList(AbstractCommand.parsePlayer(source, arg));
 		}
 
 		return players;

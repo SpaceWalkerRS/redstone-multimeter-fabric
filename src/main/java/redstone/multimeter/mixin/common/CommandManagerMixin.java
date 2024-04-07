@@ -21,7 +21,7 @@ public abstract class CommandManagerMixin extends CommandRegistry {
 			target = "Lnet/minecraft/server/command/AbstractCommand;setListener(Lnet/minecraft/server/command/handler/CommandListener;)V"
 		)
 	)
-	private void registerCommands(MinecraftServer server, CallbackInfo ci) {
-		register(new MeterGroupCommand(server));
+	private void registerCommands(CallbackInfo ci) {
+		register(new MeterGroupCommand(MinecraftServer.getInstance()));
 	}
 }

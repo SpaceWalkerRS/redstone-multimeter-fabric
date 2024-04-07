@@ -18,7 +18,7 @@ public class DimPos {
 
 	public DimPos(String dimension, BlockPos pos) {
 		this.dimension = dimension;
-		this.pos = pos.immutable();
+		this.pos = pos;
 	}
 
 	public DimPos(String dimension, int x, int y, int z) {

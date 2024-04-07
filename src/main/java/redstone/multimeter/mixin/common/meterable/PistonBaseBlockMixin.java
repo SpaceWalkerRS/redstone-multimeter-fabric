@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.PistonBaseBlock;
 import net.minecraft.block.piston.PistonMoveStructureResolver;
 import net.minecraft.block.state.BlockState;
@@ -46,7 +47,7 @@ public class PistonBaseBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
 		)
 	)
-	private void logMoved(World world, BlockPos pos, Direction facing, boolean extending, CallbackInfoReturnable<Boolean> cir, PistonMoveStructureResolver structureResolver, List<BlockPos> toMove, List<BlockState> statesToMove, List<BlockPos> toDestroy, int removedIndex, BlockState[] removedStates, Direction moveDir, int toMoveIndex, BlockPos posToMove, BlockState stateToMove) {
+	private void logMoved(World world, BlockPos pos, Direction facing, boolean extending, CallbackInfoReturnable<Boolean> cir, PistonMoveStructureResolver structureResolver, List<BlockPos> toMove, List<BlockPos> toDestroy, int removedIndex, Block[] removedBlocks, Direction moveDir, int toMoveIndex, BlockPos posToMove, BlockState stateToMove) {
 		if (!world.isClient) {
 			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 

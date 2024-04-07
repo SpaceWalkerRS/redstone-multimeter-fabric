@@ -150,7 +150,7 @@ public class MultimeterServer {
 
 	public void tickTime(World world) {
 		TickTimePacket packet = new TickTimePacket(world.getTime());
-		playerList.send(packet, world.dimension.getType());
+		playerList.send(packet, world.dimension.getId());
 	}
 
 	public void onHandshake(ServerPlayerEntity player, String modVersion) {

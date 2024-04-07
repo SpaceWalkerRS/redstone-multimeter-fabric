@@ -3,8 +3,6 @@ package redstone.multimeter.client.gui.element;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tessellator;
@@ -22,7 +20,7 @@ public class RenderHelper2D {
 	protected void renderRect(Drawer drawer) {
 		GlStateManager.enableBlend();
 		GlStateManager.disableTexture();
-		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
@@ -123,7 +121,7 @@ public class RenderHelper2D {
 		Minecraft.getInstance().getTextureManager().bind(texture.location);
 		GlStateManager.enableTexture();
 		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
 
 		Tessellator tessellator = Tessellator.getInstance();
@@ -174,7 +172,7 @@ public class RenderHelper2D {
 		Minecraft.getInstance().getTextureManager().bind(texture.location);
 		GlStateManager.enableTexture();
 		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
 
 		Tessellator tessellator = Tessellator.getInstance();

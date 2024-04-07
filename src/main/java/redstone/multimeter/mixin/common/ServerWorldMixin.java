@@ -18,6 +18,7 @@ import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ScheduledTick;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldData;
@@ -199,7 +200,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		method = "tickChunks",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/server/ChunkMap;getTickingChunks()Ljava/util/Iterator;"
+			target = "Ljava/util/Set;iterator()Ljava/util/Iterator;"
 		)
 	)
 	private void pollTickingChunks(CallbackInfo ci) {
@@ -228,7 +229,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			target = "Ljava/util/Iterator;hasNext()Z"
 		)
 	)
-	private void startOrSwapOrEndTickTaskTickChunk(CallbackInfo ci, int randomTicks, boolean isRaining, boolean isThundering, Iterator<WorldChunk> it) {
+	private void startOrSwapOrEndTickTaskTickChunk(CallbackInfo ci, int attempts, int succeeded, Iterator<WorldChunk> it) {
 		startOrSwapOrEndTickTaskTickChunk(it);
 	}
 
@@ -294,28 +295,8 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			target = "Lnet/minecraft/block/Block;randomTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Ljava/util/Random;)V"
 		)
 	)
-	private void logRandomTick(CallbackInfo ci, int randomTicks, boolean isRaining, boolean isThundering, Iterator<WorldChunk> it, WorldChunk chunk, int minX, int minZ, WorldChunkSection[] sections, int sectionIndex, int maxSectionIndex, WorldChunkSection section, int attempt, int randomNumber, int localX, int localZ, int localY) {
-		getMultimeter().logRandomTick(this, new BlockPos(minX + localX, section.getOffsetY() + localY, minZ + localZ));
-	}
-
-	@Inject(
-		method = "tickPlayers",
-		at = @At(
-			value = "HEAD"
-		)
-	)
-	private void startTickTaskPlayers(CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.PLAYERS);
-	}
-
-	@Inject(
-		method = "tickPlayers",
-		at = @At(
-			value = "TAIL"
-		)
-	)
-	private void endTickTaskPlayers(CallbackInfo ci) {
-		rsmm$endTickTask();
+	private void logRandomTick(CallbackInfo ci, int attempts, int succeeded, Iterator<WorldChunk> it, ChunkPos chunkPos, int chunkX, int chunkZ, WorldChunk chunk, int o, WorldChunkSection[] sections, int sectionIndex, int maxSectionIndex, WorldChunkSection section, int attempt, int randomNumber, int localX, int localZ, int localY) {
+		getMultimeter().logRandomTick(this, new BlockPos(chunkX + localX, section.getOffsetY() + localY, chunkZ + localZ));
 	}
 
 	@Inject(
@@ -417,7 +398,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		method = "doBlockEvent",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/state/BlockState;doEvent(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;II)Z"
+			target = "Lnet/minecraft/block/Block;doEvent(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;II)Z"
 		)
 	)
 	private void logBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {

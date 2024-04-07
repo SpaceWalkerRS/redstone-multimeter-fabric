@@ -1,25 +1,33 @@
 package redstone.multimeter.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.dimension.DimensionType;
 
 public class DimensionUtils {
 
-	public static String getKey(Dimension dimension) {
-		return getKey(dimension.getType());
-	}
+	public static Map<String, Dimension> BY_KEY;
 
-	public static String getKey(DimensionType dimension) {
+	public static String getKey(Dimension dimension) {
 		return dimension.getName().toLowerCase().replace(' ', '_');
 	}
 
-	public static DimensionType byKey(String key) {
-		for (DimensionType dimension : DimensionType.values()) {
-			if (getKey(dimension).equals(key)) {
-				return dimension;
-			}
-		}
+	public static Dimension byKey(String key) {
+		return BY_KEY.get(key);
+	}
 
-		throw new RuntimeException("unknown dimension: " + key);
+	public static void setUp() {
+		BY_KEY = new HashMap<>();
+	}
+
+	public static void register(Dimension dimension) {
+		if (BY_KEY != null) {
+			BY_KEY.put(getKey(dimension), dimension);
+		}
+	}
+
+	public static void destroy() {
+		BY_KEY = null;
 	}
 }

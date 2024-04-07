@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.block.ChestBlock;
-import net.minecraft.block.ChestBlock.Type;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -17,21 +16,21 @@ import redstone.multimeter.block.chest.TrappedChestHelper;
 @Mixin(ChestBlock.class)
 public class ChestBlockMixin implements Meterable, PowerSource {
 
-	@Shadow @Final private Type type;
+	@Shadow @Final private int type;
 
 	@Override
 	public boolean rsmm$isMeterable() {
-		return type == Type.TRAP;
+		return type == TrappedChestHelper.TYPE;
 	}
 
 	@Override
 	public boolean rsmm$isPowerSource() {
-		return type == Type.TRAP;
+		return type == TrappedChestHelper.TYPE;
 	}
 
 	@Override
 	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return type == Type.TRAP && TrappedChestHelper.getPower(world, pos, state) > MIN_POWER;
+		return type == TrappedChestHelper.TYPE && TrappedChestHelper.getPower(world, pos, state) > MIN_POWER;
 	}
 
 	@Override
@@ -41,6 +40,6 @@ public class ChestBlockMixin implements Meterable, PowerSource {
 
 	@Override
 	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
-		return type == Type.TRAP ? TrappedChestHelper.getPower(world, pos, state) : MIN_POWER;
+		return type == TrappedChestHelper.TYPE ? TrappedChestHelper.getPower(world, pos, state) : MIN_POWER;
 	}
 }

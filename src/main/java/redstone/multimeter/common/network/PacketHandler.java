@@ -1,5 +1,7 @@
 package redstone.multimeter.common.network;
 
+import java.io.IOException;
+
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.nbt.NbtCompound;
@@ -28,7 +30,7 @@ public abstract class PacketHandler {
 
 	protected abstract Packet<?> toCustomPayload(String channel, PacketByteBuf data);
 
-	protected RSMMPacket decode(PacketByteBuf buffer) {
+	protected RSMMPacket decode(PacketByteBuf buffer) throws IOException {
 		String key = buffer.readString(32767);
 		RSMMPacket packet = Packets.create(key);
 

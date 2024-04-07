@@ -348,7 +348,7 @@ public class TextField extends AbstractButton {
 		GlStateManager.color4f(0.0F, 0.0F, 1.0F, 1.0F);
 		GlStateManager.disableTexture();
 		GlStateManager.enableColorLogicOp();
-		GlStateManager.logicOp(GlStateManager.LogicOp.OR_REVERSE);
+		GlStateManager.logicOp(GL11.GL_OR_REVERSE);
 
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();

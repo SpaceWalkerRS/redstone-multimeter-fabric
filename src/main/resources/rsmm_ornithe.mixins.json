@@ -6,7 +6,7 @@
 	"mixins": [
 		"common.BlockMixin",
 		"common.CommandManagerMixin",
-		"common.DragonFightMixin",
+		"common.DimensionMixin",
 		"common.MinecraftServerMixin",
 		"common.PlayerManagerMixin",
 		"common.ServerChunkCacheMixin",
@@ -53,6 +53,9 @@
 		"client.GameRendererMixin",
 		"client.IntegratedServerMixin",
 		"client.MinecraftMixin"
+	],
+	"server": [
+		"server.DedicatedServerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

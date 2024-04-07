@@ -12,6 +12,7 @@ import net.minecraft.server.MinecraftServer;
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.MultimeterServer;
+import redstone.multimeter.util.DimensionUtils;
 
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin implements IMinecraftServer {
@@ -22,7 +23,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	private boolean isDedicated() { return false; }
 
 	@Inject(
-		method = "<init>",
+		method = "<init>(Ljava/io/File;Ljava/net/Proxy;Ljava/io/File;)V",
 		at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/server/MinecraftServer;createCommandHandler()Lnet/minecraft/server/command/handler/CommandManager;"
@@ -169,6 +170,16 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void endTickTaskServerGui(CallbackInfo ci) {
 		rsmm$endTickTask();
+	}
+
+	@Inject(
+		method = "stop",
+		at = @At(
+			value = "HEAD"
+		)
+	)
+	private void stop(CallbackInfo ci) {
+		DimensionUtils.destroy();
 	}
 
 	@Override

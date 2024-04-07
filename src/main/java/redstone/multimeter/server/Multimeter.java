@@ -178,7 +178,6 @@ public class Multimeter {
 
 	public void onPlayerJoin(ServerPlayerEntity player) {
 		server.refreshTickPhaseTree(player);
-		server.getPlayerList().updatePermissions(player);
 	}
 
 	public void onPlayerLeave(ServerPlayerEntity player) {
@@ -339,7 +338,6 @@ public class Multimeter {
 		}
 
 		server.getPlayerList().send(packet, player);
-		server.getPlayerList().updatePermissions(player);
 	}
 
 	public void clearMembersOfMeterGroup(ServerMeterGroup meterGroup) {
@@ -431,7 +429,7 @@ public class Multimeter {
 					float newYaw = player.yaw;
 					float newPitch = player.pitch;
 
-					player.teleportToDimension(newWorld.dimension.getType().getId());
+					player.teleportToDimension(newWorld.dimension.getId());
 					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
 					Text text = new LiteralText(String.format("Teleported to meter \"%s\"", meter.getName()));

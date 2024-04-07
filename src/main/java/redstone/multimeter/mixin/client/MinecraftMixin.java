@@ -71,9 +71,11 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "handleKeyBindings",
+		method = "tick()V",
 		at = @At(
-			value = "HEAD"
+			value = "INVOKE_STRING",
+			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+			args = "ldc=mouse"
 		)
 	)
 	private void handleKeybinds(CallbackInfo ci) {
@@ -81,7 +83,7 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Redirect(
-		method = "handleMouseEvents",
+		method = "tick()V",
 		at = @At(
 			value = "INVOKE",
 			remap = false,

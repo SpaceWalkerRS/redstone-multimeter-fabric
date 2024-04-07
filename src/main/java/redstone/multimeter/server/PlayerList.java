@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
-import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.meter.ServerMeterGroup;
@@ -56,7 +55,7 @@ public class PlayerList {
 	public void add(ServerPlayerEntity player) {
 		if (!has(player.getUuid())) {
 			playersByUuid.put(player.getUuid(), player);
-			playersByName.put(player.getScoreboardName(), player);
+			playersByName.put(player.getName(), player);
 			nameCache.remove(player.getUuid());
 
 			server.onPlayerJoin(player);
@@ -66,8 +65,8 @@ public class PlayerList {
 	public void remove(ServerPlayerEntity player) {
 		if (has(player.getUuid())) {
 			playersByUuid.remove(player.getUuid());
-			playersByName.remove(player.getScoreboardName());
-			nameCache.put(player.getUuid(), player.getScoreboardName());
+			playersByName.remove(player.getName());
+			nameCache.put(player.getUuid(), player.getName());
 
 			server.onPlayerLeave(player);
 		}
@@ -76,7 +75,7 @@ public class PlayerList {
 	public void respawn(ServerPlayerEntity player) {
 		if (has(player.getUuid())) {
 			playersByUuid.put(player.getUuid(), player);
-			playersByName.put(player.getScoreboardName(), player);
+			playersByName.put(player.getName(), player);
 		}
 	}
 
@@ -102,7 +101,7 @@ public class PlayerList {
 
 	public String getName(UUID uuid) {
 		ServerPlayerEntity player = get(uuid);
-		return player == null ? nameCache.get(uuid) : player.getScoreboardName();
+		return player == null ? nameCache.get(uuid) : player.getName();
 	}
 
 	public void send(RSMMPacket packet) {
@@ -113,8 +112,8 @@ public class PlayerList {
 		send(packet, player -> meterGroup.hasSubscriber(player));
 	}
 
-	public void send(RSMMPacket packet, DimensionType dimension) {
-		send(packet, player -> player.world.dimension.getType() == dimension);
+	public void send(RSMMPacket packet, int dimension) {
+		send(packet, player -> player.world.dimension.getId() == dimension);
 	}
 
 	public void send(RSMMPacket packet, Predicate<ServerPlayerEntity> predicate) {
@@ -130,9 +129,5 @@ public class PlayerList {
 	public void send(RSMMPacket packet, ServerPlayerEntity player) {
 		Packet<?> mcPacket = server.getPacketHandler().encode(packet);
 		player.networkHandler.sendPacket(mcPacket);
-	}
-
-	public void updatePermissions(ServerPlayerEntity player) {
-		server.getMinecraftServer().getPlayerManager().updatePermissions(player);
 	}
 }
