@@ -27,7 +27,7 @@ public class WorldHelperMixin {
 			target = "Lnet/minecraft/server/ChunkMap;onBlockChanged(Lnet/minecraft/util/math/BlockPos;)V"
 		)
 	)
-	private static void onSetWireState(ServerWorld world, BlockPos pos, BlockState state, boolean updateNeighborShapes, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, int index, WorldChunk chunk, WorldChunkSection section, BlockState oldState) {
+	private static void onSetWireState(ServerWorld world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir, int y, int x, int z, WorldChunk chunk, WorldChunkSection section, BlockState oldState) {
 		((IServerWorld)world).getMultimeter().onBlockChange(world, pos, oldState, state);
 	}
 }
