@@ -14,7 +14,7 @@ public class ServerPacketHandler  {
 
 	public void handlePacket(PacketWrapper wrapper, ServerPlayer player) {
 		try {
-			wrapper.packet.handle(server, player);
+			wrapper.packet().handle(server, player);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

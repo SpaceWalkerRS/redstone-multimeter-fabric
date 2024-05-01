@@ -2,9 +2,12 @@ package redstone.multimeter.mixin.common;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
@@ -13,10 +16,9 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import redstone.multimeter.common.network.PacketWrapper;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
-import redstone.multimeter.interfaces.mixin.IServerPacketListener;
 
 @Mixin(ServerGamePacketListenerImpl.class)
-public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPacketListenerImpl implements IServerPacketListener {
+public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPacketListenerImpl {
 
 	@Shadow private ServerPlayer player;
 
@@ -24,13 +26,17 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
 		super(server, connection, cookie);
 	}
 
-	@Override
-	public boolean rsmm$handleCustomPayload(CustomPacketPayload packet) {
-		if (packet instanceof PacketWrapper p) {
+	@Inject(
+		method = "handleCustomPayload",
+		cancellable = true,
+		at = @At(
+			value = "HEAD"
+		)
+	)
+	public void rsmm$handleCustomPayload(ServerboundCustomPayloadPacket packet, CallbackInfo ci) {
+		if (packet.payload() instanceof PacketWrapper p) {
 			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().handlePacket(p, player);
-			return true;
+			ci.cancel();
 		}
-
-		return false;
 	}
 }

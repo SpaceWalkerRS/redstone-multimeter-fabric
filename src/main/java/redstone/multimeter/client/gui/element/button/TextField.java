@@ -13,13 +13,13 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
-import net.minecraft.SharedConstants;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.util.StringUtil;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
@@ -229,7 +229,7 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
-		if (isActive() && SharedConstants.isAllowedChatCharacter(chr)) {
+		if (isActive() && StringUtil.isAllowedChatCharacter(chr)) {
 			write(String.valueOf(chr));
 			return true;
 		}

@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -28,11 +27,13 @@ public class LevelRendererMixin {
 		method = "renderLevel",
 		at = @At(
 			value = "INVOKE",
-			shift = Shift.BEFORE,
 			target = "Lnet/minecraft/client/renderer/FogRenderer;setupNoFog()V"
 		)
 	)
-	private void renderMeterHighlights(PoseStack poses, float partialTick, long timeNanos, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+	private void renderMeterHighlights(float partialTick, long timeNanos, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f cameraPose, Matrix4f projectionPose, CallbackInfo ci) {
+		PoseStack poses = new PoseStack();
+		poses.mulPose(cameraPose);
+
 		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters(poses);
 	}
 }

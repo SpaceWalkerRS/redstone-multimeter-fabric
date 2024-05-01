@@ -1,32 +1,32 @@
 plugins {
-	id 'fabric-loom' version '1.5-SNAPSHOT'
 	id 'maven-publish'
+	id 'fabric-loom' version '1.6-SNAPSHOT'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
 
-archivesBaseName = "${project.archives_base_name}-mc${project.minecraft_version}"
+base {
+	archivesName = "${project.archives_base_name}-mc${project.minecraft_version}"
+}
 version = project.mod_version
 group = project.maven_group
 
 repositories {
 	mavenCentral()
 	maven {
-		name = "TerraformersMC"
-		url = "https://maven.terraformersmc.com/releases/"
+		name 'TerraformersMC'
+		url 'https://maven.terraformersmc.com/releases/'
 	}
 	maven {
-		url "https://maven.siphalor.de/"
-		name "Siphalor's Maven"
+		name 'Siphalor'
+		url 'https://maven.siphalor.de/'
 	}
 	maven {
-		url "https://masa.dy.fi/maven"
-	}
-	maven {
-		url "https://api.modrinth.com/maven"
+		name 'Modrinth'
+		url 'https://api.modrinth.com/maven'
 		content {
-			includeGroup "maven.modrinth"
+			includeGroup 'maven.modrinth'
 		}
 	}
 }
@@ -37,45 +37,30 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	modImplementation "de.siphalor:amecsapi-1.20:${project.amecs_version}"
-	include "de.siphalor:amecsapi-1.20:${project.amecs_version}"
+//	modImplementation "de.siphalor:amecsapi-1.20:${project.amecs_version}"
+//	include "de.siphalor:amecsapi-1.20:${project.amecs_version}"
+
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
 processResources {
-	inputs.property "version", project.version
+	inputs.property 'version', project.version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+	filesMatching('fabric.mod.json') {
+		expand 'version': project.version
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
+	it.options.release = 21
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 }
 
 jar {
-	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
+	from('LICENSE') {
+		rename { "${it}_${project.base.archivesName.get()}"}
 	}
 }

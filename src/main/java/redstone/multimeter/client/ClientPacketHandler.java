@@ -12,7 +12,7 @@ public class ClientPacketHandler {
 
 	public void handlePacket(PacketWrapper wrapper) {
 		try {
-			wrapper.packet.handle(client);
+			wrapper.packet().handle(client);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

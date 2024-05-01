@@ -1,33 +1,28 @@
 package redstone.multimeter.mixin.common;
 
+import java.util.ArrayList;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 
-import redstone.multimeter.common.network.Packets;
+import redstone.multimeter.common.network.PacketWrapper;
 
 @Mixin(ClientboundCustomPayloadPacket.class)
 public class ClientboundCustomPayloadPacketMixin {
 
 	@Inject(
-		method = "readPayload",
-		cancellable = true,
+		method = "method_58270",
 		at = @At(
 			value = "HEAD"
-//			can't use this target since FAPI uses it and unconditionally cancels
-//			value = "INVOKE",
-//			target = "Lnet/minecraft/network/protocol/common/ClientboundCustomPayloadPacket;readUnknownPayload(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/network/FriendlyByteBuf;)Lnet/minecraft/network/protocol/common/custom/DiscardedPayload;"
 		)
 	)
-	private static void rsmm$readPayload(ResourceLocation channel, FriendlyByteBuf buffer, CallbackInfoReturnable<CustomPacketPayload> cir) {
-		if (Packets.getChannel().equals(channel)) {
-			cir.setReturnValue(Packets.READER.apply(buffer));
-		}
+	private static void rsmm$registerRsmmPayloads(ArrayList<CustomPacketPayload.TypeAndCodec<? super RegistryFriendlyByteBuf, ?>> typesAndCodecs, CallbackInfo ci) {
+		typesAndCodecs.add(new CustomPacketPayload.TypeAndCodec<>(PacketWrapper.TYPE, PacketWrapper.STREAM_CODEC));
 	}
 }

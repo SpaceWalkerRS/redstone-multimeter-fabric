@@ -2,7 +2,7 @@
 	"required": true,
 	"minVersion": "0.8",
 	"package": "redstone.multimeter.mixin",
-	"compatibilityLevel": "JAVA_16",
+	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"common.BlockMixin",
 		"common.BlockStateBaseMixin",
@@ -19,7 +19,6 @@
 		"common.PlayerListMixin",
 		"common.ServerboundCustomPayloadPacketMixin",
 		"common.ServerChunkCacheMixin",
-		"common.ServerCommonPacketListenerImplMixin",
 		"common.ServerGamePacketListenerImplMixin",
 		"common.ServerLevelMixin",
 		"common.compat.alternate_current.LevelHelperMixin",

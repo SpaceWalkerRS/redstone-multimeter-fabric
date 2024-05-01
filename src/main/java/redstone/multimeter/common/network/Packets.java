@@ -1,43 +1,13 @@
 package redstone.multimeter.common.network;
 
-import java.util.function.BiConsumer;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.FriendlyByteBuf.Reader;
 import net.minecraft.resources.ResourceLocation;
 
 import redstone.multimeter.common.network.packets.*;
 import redstone.multimeter.registry.SupplierRegistry;
 
 public class Packets {
-
-	public static final Reader<PacketWrapper> READER = buffer -> {
-		ResourceLocation key = buffer.readResourceLocation();
-		RSMMPacket packet = Packets.create(key);
-
-		if (packet == null) {
-			throw new IllegalStateException("Unable to decode packet: " + key);
-		}
-
-		CompoundTag data = buffer.readNbt();
-		packet.decode(data);
-
-		return new PacketWrapper(packet);
-	};
-	public static final BiConsumer<RSMMPacket, FriendlyByteBuf> WRITER = (packet, buffer) -> {
-		ResourceLocation key = Packets.getKey(packet);
-
-		if (key == null) {
-			throw new IllegalStateException("Unable to encode packet: " + packet.getClass());
-		}
-
-		CompoundTag data = new CompoundTag();
-		packet.encode(data);
-
-		buffer.writeResourceLocation(key);
-		buffer.writeNbt(data);
-	};
 
 	private static final SupplierRegistry<RSMMPacket> REGISTRY;
 
@@ -51,6 +21,34 @@ public class Packets {
 
 	public static RSMMPacket create(ResourceLocation key) {
 		return REGISTRY.get(key);
+	}
+
+	public static void encode(PacketWrapper wrapper, FriendlyByteBuf buffer) {
+		RSMMPacket packet = wrapper.packet();
+		ResourceLocation key = Packets.getKey(wrapper.packet());
+
+		if (key == null) {
+			throw new IllegalStateException("Unable to encode packet: " + packet.getClass());
+		}
+
+		CompoundTag data = new CompoundTag();
+		packet.encode(data);
+
+		buffer.writeResourceLocation(key);
+		buffer.writeNbt(data);
+	}
+	public static PacketWrapper decode(FriendlyByteBuf buffer) {
+		ResourceLocation key = buffer.readResourceLocation();
+		RSMMPacket packet = Packets.create(key);
+
+		if (packet == null) {
+			throw new IllegalStateException("Unable to decode packet: " + key);
+		}
+
+		CompoundTag data = buffer.readNbt();
+		packet.decode(data);
+
+		return new PacketWrapper(packet);
 	}
 
 	static {
