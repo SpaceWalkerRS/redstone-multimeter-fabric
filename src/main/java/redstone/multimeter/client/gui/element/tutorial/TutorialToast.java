@@ -13,7 +13,7 @@ import net.minecraft.util.FormattedCharSequence;
 
 public class TutorialToast implements Toast {
 
-	protected static final ResourceLocation TEXTURE = new ResourceLocation("toast/tutorial");
+	protected static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("toast/tutorial");
 	protected static final int EDGE = 4;
 
 	private final Component title;

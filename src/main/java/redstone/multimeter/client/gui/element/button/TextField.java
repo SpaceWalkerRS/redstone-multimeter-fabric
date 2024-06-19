@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -372,18 +373,16 @@ public class TextField extends AbstractButton {
 		RenderSystem.enableColorLogicOp();
 		RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
 
-		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
+		Tesselator tesselator = Tesselator.getInstance();
+		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
 		Matrix4f pose = graphics.pose().last().pose();
 
-		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+		bufferBuilder.addVertex(pose, x0, y0, z);
+		bufferBuilder.addVertex(pose, x0, y1, z);
+		bufferBuilder.addVertex(pose, x1, y1, z);
+		bufferBuilder.addVertex(pose, x1, y0, z);
 
-		bufferBuilder.vertex(pose, x0, y0, z).endVertex();
-		bufferBuilder.vertex(pose, x0, y1, z).endVertex();
-		bufferBuilder.vertex(pose, x1, y1, z).endVertex();
-		bufferBuilder.vertex(pose, x1, y0, z).endVertex();
-
-		tessellator.end();
+		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 
 		RenderSystem.disableColorLogicOp();
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

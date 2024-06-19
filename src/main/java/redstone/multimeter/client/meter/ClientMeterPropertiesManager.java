@@ -152,7 +152,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 		return cache.computeIfAbsent(key, _key -> {
 			String namespace = key.getNamespace();
-			ResourceLocation defaultKey = new ResourceLocation(namespace, DEFAULT_KEY);
+			ResourceLocation defaultKey = ResourceLocation.fromNamespaceAndPath(namespace, DEFAULT_KEY);
 
 			return new MutableMeterProperties().
 				fill(overrides.get(key)).
@@ -170,7 +170,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			loadDefaultProperties(key);
 
 			if (namespaces.add(key.getNamespace())) {
-				loadDefaultProperties(new ResourceLocation(key.getNamespace(), DEFAULT_KEY));
+				loadDefaultProperties(ResourceLocation.fromNamespaceAndPath(key.getNamespace(), DEFAULT_KEY));
 			}
 		}
 	}
@@ -216,7 +216,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		path = path.substring(0, path.length() - FILE_EXTENSION.length());
 
 		try (FileReader fr = new FileReader(file)) {
-			loadProperties(overrides, new ResourceLocation(namespace, path), fr);
+			loadProperties(overrides, ResourceLocation.fromNamespaceAndPath(namespace, path), fr);
 		} catch (ResourceLocationException | IOException | JsonSyntaxException | JsonIOException e) {
 		}
 	}

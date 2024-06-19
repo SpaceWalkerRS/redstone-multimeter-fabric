@@ -154,7 +154,7 @@ public class MeterControlsElement extends AbstractParentElement {
 		});
 		pos.addControl("dimension", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
 			try {
-				ResourceLocation dimension = new ResourceLocation(text);
+				ResourceLocation dimension = ResourceLocation.parse(text);
 				DimPos newPos = meter.getPos().relative(dimension);
 
 				changePos(newPos);

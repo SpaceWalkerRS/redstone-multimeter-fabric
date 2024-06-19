@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -46,8 +47,7 @@ public class MeterRenderer {
 	}
 
 	private void drawMeter(PoseStack poses, Meter meter) {
-		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
+		Tesselator tesselator = Tesselator.getInstance();
 
 		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
@@ -65,25 +65,25 @@ public class MeterRenderer {
 		float g = ColorUtils.getGreen(color) / 255.0F;
 		float b = ColorUtils.getBlue(color) / 255.0F;
 
-		drawFilledBox(bufferBuilder, tessellator, pose, r, g, b, 0.5F);
+		drawFilledBox(tesselator, pose, r, g, b, 0.5F);
 
 		if (movable) {
-			drawBoxOutline(bufferBuilder, tessellator, pose, r, g, b, 1.0F);
+			drawBoxOutline(tesselator, pose, r, g, b, 1.0F);
 		}
 
 		poses.popPose();
 	}
 
-	private void drawFilledBox(BufferBuilder bufferBuilder, Tesselator tessellator, Matrix4f pose, float r, float g, float b, float a) {
-		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+	private void drawFilledBox(Tesselator tesselator, Matrix4f pose, float r, float g, float b, float a) {
+		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 		drawBox(bufferBuilder, pose, r, g, b, a, false);
-		tessellator.end();
+		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 	}
 
-	private void drawBoxOutline(BufferBuilder bufferBuilder, Tesselator tessellator, Matrix4f pose, float r, float g, float b, float a) {
-		bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+	private void drawBoxOutline(Tesselator tesselator, Matrix4f pose, float r, float g, float b, float a) {
+		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
 		drawBox(bufferBuilder, pose, r, g, b, a, true);
-		tessellator.end();
+		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 	}
 
 	private void drawBox(BufferBuilder bufferBuilder, Matrix4f pose, float r, float g, float b, float a, boolean outline) {
@@ -92,57 +92,57 @@ public class MeterRenderer {
 		float c1 = 1.002F;
 
 		// West face
-		bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.addVertex(pose, c0, c0, c0).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c0, c0, c1).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c0, c1, c1).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c0, c1, c0).setColor(r, g, b, a);
 		if (outline) {
-			bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
+			bufferBuilder.addVertex(pose, c0, c0, c0).setColor(r, g, b, a);
 		}
 
 		// East face
-		bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.addVertex(pose, c1, c0, c0).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c1, c0).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c1, c1).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c0, c1).setColor(r, g, b, a);
 		if (outline) {
-			bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
+			bufferBuilder.addVertex(pose, c1, c0, c0).setColor(r, g, b, a);
 		}
 
 		// North face
-		bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.addVertex(pose, c0, c0, c0).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c0, c1, c0).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c1, c0).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c0, c0).setColor(r, g, b, a);
 		if (outline) {
-			bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
+			bufferBuilder.addVertex(pose, c0, c0, c0).setColor(r, g, b, a);
 		}
 
 		// South face
-		bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.addVertex(pose, c0, c0, c1).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c0, c1).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c1, c1).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c0, c1, c1).setColor(r, g, b, a);
 		if (outline) {
-			bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
+			bufferBuilder.addVertex(pose, c0, c0, c1).setColor(r, g, b, a);
 		}
 
 		// Bottom face
-		bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
+		bufferBuilder.addVertex(pose, c0, c0, c0).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c0, c0).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c0, c1).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c0, c0, c1).setColor(r, g, b, a);
 		if (outline) {
-			bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
+			bufferBuilder.addVertex(pose, c0, c0, c0).setColor(r, g, b, a);
 		}
 
 		// Top face
-		bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
+		bufferBuilder.addVertex(pose, c0, c1, c0).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c0, c1, c1).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c1, c1).setColor(r, g, b, a);
+		bufferBuilder.addVertex(pose, c1, c1, c0).setColor(r, g, b, a);
 		if (outline) {
-			bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
+			bufferBuilder.addVertex(pose, c0, c1, c0).setColor(r, g, b, a);
 		}
 	}
 }
