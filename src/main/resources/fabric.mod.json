@@ -42,18 +42,6 @@
 			"links": {
 				"modmenu.discord": "https://discord.gg/EJC9zkX"
 			}
-		},
-		"multiconnect": {
-			"custom_payloads": {
-				"allowed_clientbound": "redstone_multimeter:network",
-				"allowed_serverbound": "redstone_multimeter:network",
-				"clientbound_112_names": {
-					"redstone_multimeter:network": "redstone_multimeter"
-				},
-				"serverbound_112_names": {
-					"redstone_multimeter:network": "redstone_multimeter"
-				}
-			}
 		}
 	}
 }
