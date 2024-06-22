@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fabricmc.api.ModInitializer;
-import redstone.multimeter.common.network.PacketWrapper;
 
 public class RedstoneMultimeterMod implements ModInitializer {
 
@@ -18,6 +17,5 @@ public class RedstoneMultimeterMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info(String.format("%s %s has been initialized!", MOD_NAME, MOD_VERSION));
-		PacketWrapper.register();
 	}
 }
