@@ -2,10 +2,9 @@ package redstone.multimeter.client.option;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -109,15 +108,15 @@ public class Options {
 		}
 	}
 
-	public static void load(File dir) {
-		File file = new File(dir, FILE_NAME);
+	public static void load(Path dir) {
+		Path file = dir.resolve(FILE_NAME);
 
-		if (!file.exists()) {
+		if (!Files.exists(file)) {
 			save(dir);
 			return;
 		}
 
-		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+		try (BufferedReader br = Files.newBufferedReader(file)) {
 			String line;
 
 			while ((line = br.readLine()) != null) {
@@ -137,24 +136,24 @@ public class Options {
 				}
 			}
 		} catch (IOException e) {
+			RedstoneMultimeterMod.LOGGER.warn("exception while loading options", e);
 		}
 
 		validate();
 	}
 
-	public static void save(File dir) {
-		if (!dir.exists()) {
-			dir.mkdirs();
+	public static void save(Path dir) {
+		if (!Files.exists(dir)) {
+			try {
+				Files.createDirectories(dir);
+			} catch (IOException e) {
+				throw new RuntimeException("unable to create parent directories of options file");
+			}
 		}
 
-		File file = new File(dir, FILE_NAME);
+		Path file = dir.resolve(FILE_NAME);
 
-		try {
-			file.createNewFile();
-		} catch (IOException e) {
-		}
-
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+		try (BufferedWriter bw = Files.newBufferedWriter(file)) {
 			for (Entry<String, IOption> entry : BY_NAME.entrySet()) {
 				String name = entry.getKey();
 				String value = entry.getValue().getAsString();
@@ -163,6 +162,7 @@ public class Options {
 				bw.newLine();
 			}
 		} catch (IOException e) {
+			RedstoneMultimeterMod.LOGGER.warn("exception while saving options", e);
 		}
 	}
 
