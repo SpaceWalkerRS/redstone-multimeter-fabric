@@ -1,12 +1,13 @@
 package redstone.multimeter.client.meter;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +22,6 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
-import net.minecraft.ResourceLocationException;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -51,22 +51,26 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 	private final MultimeterClient client;
-	private final File dir;
+	private final Path dir;
 	private final Map<ResourceLocation, MeterProperties> defaults;
 	private final Map<ResourceLocation, MeterProperties> overrides;
 	private final Map<ResourceLocation, MeterProperties> cache;
 
 	public ClientMeterPropertiesManager(MultimeterClient client) {
 		this.client = client;
-		this.dir = new File(this.client.getConfigDirectory(), PROPERTIES_PATH);
+		this.dir = this.client.getConfigDirectory().resolve(PROPERTIES_PATH);
 		this.defaults = new HashMap<>();
 		this.overrides = new HashMap<>();
 		this.cache = new HashMap<>();
 
 		initDefaults();
 
-		if (!dir.exists()) {
-			dir.mkdirs();
+		if (!Files.exists(this.dir)) {
+			try {
+				Files.createDirectories(this.dir);
+			} catch (IOException e) {
+				throw new RuntimeException("unable to create parent directories of meter properties file", e);
+			}
 		}
 	}
 
@@ -186,6 +190,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		try (InputStreamReader isr = new InputStreamReader(resource)) {
 			loadProperties(defaults, key, isr);
 		} catch (IOException | JsonSyntaxException | JsonIOException e) {
+			RedstoneMultimeterMod.LOGGER.warn("exception while loading default meter properties", e);
 		}
 	}
 
@@ -193,21 +198,21 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		overrides.clear();
 		cache.clear();
 
-		for (File dirForNamespace : dir.listFiles()) {
-			if (dirForNamespace.isDirectory()) {
-				String namespace = dirForNamespace.getName();
+		try {
+			for (Path dirForNamespace : Files.newDirectoryStream(this.dir, f -> Files.isDirectory(f))) {
+				String namespace = dirForNamespace.getFileName().toString();
 
-				for (File file : dirForNamespace.listFiles()) {
-					if (file.isFile()) {
-						loadUserOverrides(namespace, file);
-					}
+				for (Path file : Files.newDirectoryStream(dirForNamespace, f -> Files.isRegularFile(f))) {
+					loadUserOverrides(namespace, file);
 				}
 			}
+		} catch (Exception e) {
+			RedstoneMultimeterMod.LOGGER.warn("exception while reloading meter properties", e);
 		}
 	}
 
-	private void loadUserOverrides(String namespace, File file) {
-		String path = file.getName();
+	private void loadUserOverrides(String namespace, Path file) throws Exception {
+		String path = file.getFileName().toString();
 
 		if (!path.endsWith(FILE_EXTENSION)) {
 			return;
@@ -215,9 +220,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 		path = path.substring(0, path.length() - FILE_EXTENSION.length());
 
-		try (FileReader fr = new FileReader(file)) {
-			loadProperties(overrides, new ResourceLocation(namespace, path), fr);
-		} catch (ResourceLocationException | IOException | JsonSyntaxException | JsonIOException e) {
+		try (BufferedReader br = Files.newBufferedReader(file)) {
+			loadProperties(overrides, new ResourceLocation(namespace, path), br);
 		}
 	}
 
@@ -233,46 +237,42 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	public void save() {
-		for (Entry<ResourceLocation, MeterProperties> entry : overrides.entrySet()) {
-			ResourceLocation key = entry.getKey();
-			MeterProperties properties = entry.getValue();
+		try {
+			for (Entry<ResourceLocation, MeterProperties> entry : overrides.entrySet()) {
+				ResourceLocation key = entry.getKey();
+				MeterProperties properties = entry.getValue();
 
-			saveUserOverrides(key, properties);
+				saveUserOverrides(key, properties);
+			}
+		} catch (Exception e) {
+			RedstoneMultimeterMod.LOGGER.warn("exception while saving meter properties", e);
 		}
 	}
 
-	private void saveUserOverrides(ResourceLocation key, MeterProperties properties) {
+	private void saveUserOverrides(ResourceLocation key, MeterProperties properties) throws Exception {
 		String namespace = key.getNamespace();
 		String path = key.getPath();
 
-		File dirForNamespace = new File(dir, namespace);
+		Path dirForNamespace = dir.resolve(namespace);
 
-		if (!dirForNamespace.exists()) {
-			dirForNamespace.mkdirs();
+		if (!Files.exists(dirForNamespace)) {
+			Files.createDirectories(dirForNamespace);
 		}
-		if (!dirForNamespace.isDirectory()) {
-			RedstoneMultimeterMod.LOGGER.warn("Unable to save properties for \'" + key.toString() + "\' - the \'" + namespace + "\' folder does not exist and cannot be created!");
-			return;
+		if (!Files.isDirectory(dirForNamespace)) {
+			throw new IOException("Unable to save properties for \'" + key.toString() + "\' - the \'" + namespace + "\' folder does not exist and cannot be created!");
 		}
 
-		File file = new File(dirForNamespace, String.format("%s%s", path, FILE_EXTENSION));
+		Path file = dirForNamespace.resolve(String.format("%s%s", path, FILE_EXTENSION));
 
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-			}
-		}
-		if (!file.isFile()) {
+		if (Files.exists(file) && !Files.isRegularFile(file)) {
 			RedstoneMultimeterMod.LOGGER.warn("Unable to save properties for \'" + key.toString() + "\' - the \'" + path + "\' file does not exist and cannot be created!");
 			return;
 		}
 
 		JsonObject json = properties.toJson();
 
-		try (FileWriter fw = new FileWriter(file)) {
-			fw.write(GSON.toJson(json));
-		} catch (IOException | JsonSyntaxException | JsonIOException e) {
+		try (BufferedWriter bw = Files.newBufferedWriter(file)) {
+			bw.write(GSON.toJson(json));
 		}
 	}
 
@@ -280,18 +280,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		String namespace = key.getNamespace();
 		String path = key.getPath();
 
-		File subFolder = new File(dir, namespace);
+		try {
+			Path folder = dir.resolve(namespace);
+			Path file = folder.resolve(String.format("%s%s", path, FILE_EXTENSION));
 
-		if (!subFolder.exists() || !subFolder.isDirectory()) {
-			return;
+			Files.deleteIfExists(file);
+		} catch (IOException e) {
+			RedstoneMultimeterMod.LOGGER.warn("exception while deleting meter properties override file", e);
 		}
-
-		File file = new File(subFolder, String.format("%s%s", path, FILE_EXTENSION));
-
-		if (!file.exists() || !file.isFile()) {
-			return;
-		}
-
-		file.delete();
 	}
 }

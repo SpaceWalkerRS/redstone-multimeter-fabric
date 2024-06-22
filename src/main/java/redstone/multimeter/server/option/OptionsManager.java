@@ -1,13 +1,15 @@
 package redstone.multimeter.server.option;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.event.EventType;
 
 public class OptionsManager {
@@ -15,26 +17,26 @@ public class OptionsManager {
 	private static final String FILE_NAME = "options.json";
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-	public static Options load(File dir) {
-		File file = new File(dir, FILE_NAME);
-		return validate(file.exists() ? read(file) : write(file));
+	public static Options load(Path dir) {
+		Path file = dir.resolve(FILE_NAME);
+		return validate(Files.exists(file) ? read(file) : write(file));
 	}
 
-	private static Options read(File file) {
-		try (FileReader fr = new FileReader(file)) {
-			return GSON.fromJson(fr, Options.class);
+	private static Options read(Path file) {
+		try (BufferedReader br = Files.newBufferedReader(file)) {
+			return GSON.fromJson(br, Options.class);
 		} catch (IOException e) {
 			return new Options();
 		}
 	}
 
-	private static Options write(File file) {
+	private static Options write(Path file) {
 		Options options = new Options();
 
-		try (FileWriter fw = new FileWriter(file)) {
-			fw.write(GSON.toJson(options));
+		try (BufferedWriter bw = Files.newBufferedWriter(file)) {
+			bw.write(GSON.toJson(options));
 		} catch (IOException e) {
-
+			RedstoneMultimeterMod.LOGGER.warn("exception while saving options", e);
 		}
 
 		return options;
