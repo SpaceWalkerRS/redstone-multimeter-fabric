@@ -1,15 +1,16 @@
 package redstone.multimeter.client.meter.log;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -28,7 +29,7 @@ public class LogPrinter {
 
 	private final ClientLogManager logManager;
 	private final MultimeterClient client;
-	private final File folder;
+	private final Path folder;
 	private final Queue<MeterEventLog> printQueue;
 
 	private BufferedWriter writer;
@@ -38,7 +39,8 @@ public class LogPrinter {
 	public LogPrinter(ClientLogManager logManager) {
 		this.logManager = logManager;
 		this.client = this.logManager.getMeterGroup().getMultimeterClient();
-		this.folder = new File(RedstoneMultimeterMod.NAMESPACE + "/logs/");
+		Minecraft minecraft = this.client.getMinecraft();
+		this.folder = minecraft.gameDirectory.toPath().resolve(RedstoneMultimeterMod.NAMESPACE + "/logs/");
 		this.printQueue = new PriorityQueue<>();
 
 		this.writer = null;
@@ -72,10 +74,10 @@ public class LogPrinter {
 		}
 
 		try {
-			File file = createLogFile();
-			FileWriter fw = new FileWriter(file);
+			Path file = createLogFile();
+			BufferedWriter bw = Files.newBufferedWriter(file);
 
-			writer = new BufferedWriter(fw);
+			writer = new BufferedWriter(bw);
 			firstTick = getGameTime();
 
 			writer.write("Logs for meter group \'" + logManager.getMeterGroup().getName() + "\'");
@@ -126,22 +128,20 @@ public class LogPrinter {
 		}
 	}
 
-	private File createLogFile() throws IOException {
-		if (!folder.exists()) {
-			folder.mkdirs();
+	private Path createLogFile() throws IOException {
+		if (!Files.exists(folder)) {
+			Files.createDirectories(folder);
 		}
 
 		String date = DATE_FORMAT.format(new Date());
-		File file = new File(folder, date + ".txt");
+		Path file = folder.resolve(date + ".txt");
 
 		int i = 1;
 
-		while (file.exists()) {
+		while (Files.exists(file)) {
 			String fileName = String.format("%s (%d).txt", date, i++);
-			file = new File(folder, fileName);
+			file = folder.resolve(fileName);
 		}
-
-		file.createNewFile();
 
 		return file;
 	}
