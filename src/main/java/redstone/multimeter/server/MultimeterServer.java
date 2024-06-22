@@ -69,7 +69,7 @@ public class MultimeterServer {
 	}
 
 	public File getConfigDirectory() {
-		return new File(server.getServerDirectory(), RedstoneMultimeterMod.CONFIG_PATH);
+		return new File(server.getServerDirectory().toString(), RedstoneMultimeterMod.CONFIG_PATH);
 	}
 
 	public TickPhase getTickPhase() {

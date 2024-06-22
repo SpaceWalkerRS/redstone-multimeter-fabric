@@ -17,7 +17,11 @@ import redstone.multimeter.client.gui.element.AbstractElement;
 
 public abstract class AbstractButton extends AbstractElement implements IButton {
 
-	protected static final WidgetSprites SPRITES = new WidgetSprites(new ResourceLocation("widget/button"), new ResourceLocation("widget/button_disabled"), new ResourceLocation("widget/button_highlighted"));
+	protected static final WidgetSprites SPRITES = new WidgetSprites(
+		ResourceLocation.withDefaultNamespace("widget/button"),
+		ResourceLocation.withDefaultNamespace("widget/button_disabled"),
+		ResourceLocation.withDefaultNamespace("widget/button_highlighted")
+	);
 
 	protected final MultimeterClient client;
 	protected final Font font;

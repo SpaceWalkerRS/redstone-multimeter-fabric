@@ -15,7 +15,7 @@ public class SupplierRegistry<T> {
 	private final Map<ResourceLocation, Supplier<? extends T>> keys;
 
 	public SupplierRegistry(String name) {
-		this(new ResourceLocation(RedstoneMultimeterMod.NAMESPACE, name));
+		this(ResourceLocation.fromNamespaceAndPath(RedstoneMultimeterMod.NAMESPACE, name));
 	}
 
 	public SupplierRegistry(ResourceLocation key) {
@@ -40,7 +40,7 @@ public class SupplierRegistry<T> {
 	public <P extends T> void register(String name, Class<P> type, Supplier<P> supplier) {
 		String namespace = key.getNamespace();
 		String path = String.format("%s/%s", key.getPath(), name);
-		ResourceLocation key = new ResourceLocation(namespace, path);
+		ResourceLocation key = ResourceLocation.fromNamespaceAndPath(namespace, path);
 
 		if (byKey.containsKey(type)) {
 			throw new IllegalStateException("Registry " + this.key + " already registered an entry with type " + type);

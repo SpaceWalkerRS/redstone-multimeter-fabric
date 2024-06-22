@@ -410,7 +410,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	public ResourceLocation nextBlockKey() {
 		try {
 			String name = create.getText();
-			ResourceLocation key = new ResourceLocation(name);
+			ResourceLocation key = ResourceLocation.parse(name);
 
 			if (!overrides.containsKey(key)) {
 				return key;

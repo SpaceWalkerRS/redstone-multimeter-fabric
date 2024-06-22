@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui.screen;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.minecraft.client.gui.screens.controls.ControlsScreen;
+import net.minecraft.client.gui.screens.options.controls.ControlsScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 

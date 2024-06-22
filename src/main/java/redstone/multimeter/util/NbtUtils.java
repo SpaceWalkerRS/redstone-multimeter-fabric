@@ -22,6 +22,6 @@ public class NbtUtils {
 		String namespace = nbt.getString("namespace");
 		String path = nbt.getString("path");
 
-		return new ResourceLocation(namespace, path);
+		return ResourceLocation.fromNamespaceAndPath(namespace, path);
 	}
 }
