@@ -1,6 +1,6 @@
 package redstone.multimeter.client;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -186,12 +186,12 @@ public class MultimeterClient {
 		return prevGameTime;
 	}
 
-	public File getConfigDirectory() {
+	public Path getConfigDirectory() {
 		return getConfigDirectory(minecraft);
 	}
 
-	public static File getConfigDirectory(Minecraft minecraft) {
-		return new File(minecraft.gameDirectory, RedstoneMultimeterMod.CONFIG_PATH);
+	public static Path getConfigDirectory(Minecraft minecraft) {
+		return minecraft.gameDirectory.toPath().resolve(RedstoneMultimeterMod.CONFIG_PATH);
 	}
 
 	public void reloadResources() {

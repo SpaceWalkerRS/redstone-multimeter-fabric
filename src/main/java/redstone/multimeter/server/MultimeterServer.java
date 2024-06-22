@@ -1,6 +1,6 @@
 package redstone.multimeter.server;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.UUID;
 
 import net.minecraft.core.registries.Registries;
@@ -68,8 +68,8 @@ public class MultimeterServer {
 		return server.isDedicatedServer();
 	}
 
-	public File getConfigDirectory() {
-		return new File(server.getServerDirectory().toString(), RedstoneMultimeterMod.CONFIG_PATH);
+	public Path getConfigDirectory() {
+		return server.getServerDirectory().resolve(RedstoneMultimeterMod.CONFIG_PATH);
 	}
 
 	public TickPhase getTickPhase() {
