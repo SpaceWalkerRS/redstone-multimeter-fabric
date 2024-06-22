@@ -1,6 +1,7 @@
 package redstone.multimeter.mixin.client;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 
 import org.spongepowered.asm.mixin.Final;
@@ -55,7 +56,7 @@ public class OptionsMixin {
 		)
 	)
 	private void load(CallbackInfo ci) {
-		File dir = MultimeterClient.getConfigDirectory(minecraft);
+		Path dir = MultimeterClient.getConfigDirectory(minecraft);
 
 		Keybinds.load(dir);
 		Options.load(dir);
@@ -68,7 +69,7 @@ public class OptionsMixin {
 		)
 	)
 	private void save(CallbackInfo ci) {
-		File dir = MultimeterClient.getConfigDirectory(minecraft);
+		Path dir = MultimeterClient.getConfigDirectory(minecraft);
 
 		Keybinds.save(dir);
 		Options.save(dir);
