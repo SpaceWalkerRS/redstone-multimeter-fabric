@@ -33,6 +33,8 @@ public class Keybinds {
 
 	public static final KeyBinding TOGGLE_METER;
 	public static final KeyBinding RESET_METER;
+	public static final KeyBinding LOAD_METER_GROUP;
+	public static final KeyBinding SAVE_METER_GROUP;
 	public static final KeyBinding PAUSE_METERS;
 	public static final KeyBinding TOGGLE_MARKER;
 	public static final KeyBinding STEP_BACKWARD;
@@ -154,6 +156,8 @@ public class Keybinds {
 
 		TOGGLE_METER           = registerKeybind(new KeyBinding("Toggle Meter"          , Keyboard.KEY_M       , MAIN));
 		RESET_METER            = registerKeybind(new KeyBinding("Reset Meter"           , Keyboard.KEY_B       , MAIN));
+		LOAD_METER_GROUP       = registerKeybind(new KeyBinding("Load Meter Group"      , Keyboard.KEY_MINUS   , MAIN));
+		SAVE_METER_GROUP       = registerKeybind(new KeyBinding("Save Meter Group"      , Keyboard.KEY_EQUALS  , MAIN));
 		PAUSE_METERS           = registerKeybind(new KeyBinding("Pause Meters"          , Keyboard.KEY_N       , MAIN));
 		TOGGLE_MARKER          = registerKeybind(new KeyBinding("Toggle Tick Marker"    , Keyboard.KEY_Y       , MAIN));
 		STEP_BACKWARD          = registerKeybind(new KeyBinding("Step Backward"         , Keyboard.KEY_COMMA   , MAIN));
