@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -260,6 +261,27 @@ public class Multimeter {
 
 		ClearMeterGroupPacket packet = new ClearMeterGroupPacket();
 		server.getPlayerList().send(packet, meterGroup);
+	}
+
+	public void setMeters(ServerPlayerEntity player, List<MeterProperties> meters) {
+		ServerMeterGroup meterGroup = getSubscription(player);
+
+		if (meterGroup != null) {
+			if (meterGroup.isOwnedBy(player)) {
+				setMeters(meterGroup, meters);
+			} else {
+				Text message = new LiteralText(String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName()));
+				server.sendMessage(player, message, false);
+			}
+		}
+	}
+
+	public void setMeters(ServerMeterGroup meterGroup, List<MeterProperties> meters) {
+		clearMeterGroup(meterGroup);
+
+		for (MeterProperties meter : meters) {
+			addMeter(meterGroup, meter);
+		}
 	}
 
 	public void createMeterGroup(ServerPlayerEntity player, String name) {
