@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.event.EventType;
 
 public class OptionsManager {
@@ -31,12 +30,22 @@ public class OptionsManager {
 	}
 
 	private static Options write(Path file) {
+		Path dir = file.getParent();
+
+		if (!Files.exists(dir)) {
+			try {
+				Files.createDirectories(dir);
+			} catch (IOException e) {
+				throw new RuntimeException("unable to create config directory", e);
+			}
+		}
+
 		Options options = new Options();
 
 		try (BufferedWriter bw = Files.newBufferedWriter(file)) {
 			bw.write(GSON.toJson(options));
 		} catch (IOException e) {
-			RedstoneMultimeterMod.LOGGER.warn("exception while saving options", e);
+			throw new RuntimeException("exception while saving options", e);
 		}
 
 		return options;
