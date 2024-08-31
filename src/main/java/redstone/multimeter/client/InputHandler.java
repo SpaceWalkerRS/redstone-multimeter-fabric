@@ -80,6 +80,24 @@ public class InputHandler {
 		}
 	}
 
+	public boolean handleHotbarKeybinds(int slot) {
+		if (!client.isConnected()) {
+			return false;
+		}
+
+		slot++; // slots are 1-indexed
+
+		if (Keybinds.LOAD_METER_GROUP.isDown()) {
+			client.getSavedMeterGroupsManager().loadSlot(slot);
+			return true;
+		} else if (Keybinds.SAVE_METER_GROUP.isDown()) {
+			client.getSavedMeterGroupsManager().saveSlot(slot);
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean handleMouseScroll(double scrollX, double scrollY) {
 		if (Keybinds.SCROLL_HUD.isDown() && client.isHudActive()) {
 			client.getHud().stepBackward((int)Math.round(scrollY));
