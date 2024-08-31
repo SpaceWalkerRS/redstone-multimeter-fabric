@@ -32,6 +32,7 @@ public class Packets {
 		REGISTRY.register("meter_group_subscription", MeterGroupSubscriptionPacket.class, () -> new MeterGroupSubscriptionPacket());
 		REGISTRY.register("meter_group_default"     , MeterGroupDefaultPacket.class     , () -> new MeterGroupDefaultPacket());
 		REGISTRY.register("meter_group_refresh"     , MeterGroupRefreshPacket.class     , () -> new MeterGroupRefreshPacket());
+		REGISTRY.register("set_meters"              , SetMetersPacket.class             , () -> new SetMetersPacket());
 		REGISTRY.register("meter_updates"           , MeterUpdatesPacket.class          , () -> new MeterUpdatesPacket());
 		REGISTRY.register("meter_logs"              , MeterLogsPacket.class             , () -> new MeterLogsPacket());
 		REGISTRY.register("clear_meter_group"       , ClearMeterGroupPacket.class       , () -> new ClearMeterGroupPacket());
