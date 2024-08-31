@@ -62,6 +62,7 @@ public class MultimeterClient {
 	private final InputHandler inputHandler;
 	private final MeterRenderer meterRenderer;
 	private final MultimeterHud hud;
+	private final SavedMeterGroupsManager savedMeterGroupsManager;
 	private final ClientMeterPropertiesManager meterPropertiesManager;
 	private final Tutorial tutorial;
 
@@ -78,6 +79,7 @@ public class MultimeterClient {
 		this.inputHandler = new InputHandler(this);
 		this.meterRenderer = new MeterRenderer(this);
 		this.hud = new MultimeterHud(this);
+		this.savedMeterGroupsManager = new SavedMeterGroupsManager(this);
 		this.meterPropertiesManager = new ClientMeterPropertiesManager(this);
 		this.tutorial = new Tutorial(this);
 
@@ -115,6 +117,10 @@ public class MultimeterClient {
 
 	public MultimeterHud getHud() {
 		return hud;
+	}
+
+	public SavedMeterGroupsManager getSavedMeterGroupsManager() {
+		return savedMeterGroupsManager;
 	}
 
 	public ClientMeterPropertiesManager getMeterPropertiesManager() {
@@ -206,9 +212,15 @@ public class MultimeterClient {
 
 		meterGroup.tick();
 		hud.tickTime();
+		savedMeterGroupsManager.tick();
+	}
+
+	public void onStartup() {
+		savedMeterGroupsManager.load();
 	}
 
 	public void onShutdown() {
+		savedMeterGroupsManager.save();
 		meterGroup.getLogManager().getPrinter().stop(false);
 	}
 
