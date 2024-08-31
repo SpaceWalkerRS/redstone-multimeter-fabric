@@ -6,9 +6,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.sugar.Local;
+
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 
@@ -28,6 +33,8 @@ public class MinecraftMixin implements IMinecraft {
 	)
 	private void init(CallbackInfo ci) {
 		this.multimeterClient = new MultimeterClient((Minecraft)(Object)this);
+		// all initialization happens in the constructor
+		this.multimeterClient.onStartup();
 	}
 
 	@Inject(
@@ -74,6 +81,24 @@ public class MinecraftMixin implements IMinecraft {
 	)
 	private void handleKeybinds(CallbackInfo ci) {
 		multimeterClient.getInputHandler().handleKeybinds();
+	}
+
+	@Redirect(
+		method = "handleKeybinds",
+		slice = @Slice(
+			from = @At(
+				value = "FIELD",
+				target = "Lnet/minecraft/client/Options;keyHotbarSlots:[Lnet/minecraft/client/KeyMapping;"
+			)
+		),
+		at = @At(
+			value = "INVOKE",
+			ordinal = 0,
+			target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z"
+		)
+	)
+	private boolean handleHotbarKeybinds(KeyMapping keybind, @Local int slot) {
+		return keybind.consumeClick() && !multimeterClient.getInputHandler().handleHotbarKeybinds(slot);
 	}
 
 	@Inject(
