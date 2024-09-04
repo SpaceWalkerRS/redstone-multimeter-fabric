@@ -50,6 +50,10 @@ public class SavedMeterGroupsManager {
 		try {
 			NbtCompound nbt = NbtIo.read(file.toFile());
 
+			if (nbt == null) {
+				return;
+			}
+
 			for (int i = 0; i < meterGroups.length; i++) {
 				int slot = i - SLOT_OFFSET;
 				String key = "slot_" + slot;
