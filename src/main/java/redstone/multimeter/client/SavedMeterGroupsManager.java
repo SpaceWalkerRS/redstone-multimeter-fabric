@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.Component;
+
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.option.Options;
@@ -47,6 +48,10 @@ public class SavedMeterGroupsManager {
 	public void load() {
 		try {
 			CompoundTag nbt = NbtIo.read(file.toFile());
+
+			if (nbt == null) {
+				return;
+			}
 
 			for (int i = 0; i < meterGroups.length; i++) {
 				int slot = i - SLOT_OFFSET;
