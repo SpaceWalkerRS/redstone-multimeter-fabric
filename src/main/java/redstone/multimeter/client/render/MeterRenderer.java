@@ -32,9 +32,17 @@ public class MeterRenderer {
 		GlStateManager.depthMask(false);
 		GlStateManager.enableDepthTest();
 
-		for (Meter meter : client.getMeterGroup().getMeters()) {
-			if (meter.isIn(minecraft.world)) {
-				drawMeter(meter, tickDelta);
+		Meter focussed = client.getHud().getFocussedMeter();
+
+		if (focussed != null) {
+			if (focussed.isIn(minecraft.world)) {
+				drawMeter(focussed, tickDelta);
+			}
+		} else {
+			for (Meter meter : client.getMeterGroup().getMeters()) {
+				if (meter.isIn(minecraft.world)) {
+					drawMeter(meter, tickDelta);
+				}
 			}
 		}
 
