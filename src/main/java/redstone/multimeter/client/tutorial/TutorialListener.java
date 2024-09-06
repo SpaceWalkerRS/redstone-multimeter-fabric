@@ -17,6 +17,9 @@ public interface TutorialListener {
 	default void onToggleHud(boolean enabled) {
 	}
 
+	default void onToggleFocusMode(boolean enabled) {
+	}
+
 	default void onPauseHud(boolean paused) {
 	}
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.minecraft.client.render.TextRenderer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
@@ -42,6 +43,25 @@ public class Tooltip {
 		}
 		lines.add(line);
 		return this;
+	}
+
+	public int getWidth(TextRenderer textRenderer) {
+		int width = 0;
+
+		for (int index = 0; index < lines.size(); index++) {
+			Text text = lines.get(index);
+			int lineWidth = textRenderer.getWidth(text.getFormattedString());
+
+			if (lineWidth > width) {
+				width = lineWidth;
+			}
+		}
+
+		return width;
+	}
+
+	public int getHeight(TextRenderer textRenderer) {
+		return (lines.size() - 1) * (textRenderer.fontHeight + 1) + textRenderer.fontHeight;
 	}
 
 	public static Tooltip of(String... strings) {

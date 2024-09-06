@@ -128,6 +128,53 @@ public class MeterLogs {
 		return lastLog;
 	}
 
+	public int getFirstLogAfter(EventType type, long tick) {
+		return getFirstLogAfter(type, tick, Integer.MAX_VALUE);
+	}
+
+	public int getFirstLogAfter(EventType type, long tick, int subtick) {
+		List<EventLog> logs = getLogs(type);
+
+		if (logs.isEmpty() || !logs.get(logs.size() - 1).isAfter(tick, subtick)) {
+			return -1;
+		}
+		if (logs.get(0).isAfter(tick, subtick)) {
+			return 0;
+		}
+
+		int index = ListUtils.binarySearch(logs, event -> event.isBefore(tick, subtick));
+		EventLog log = logs.get(index);
+
+		while (!log.isAfter(tick, subtick)) {
+			if (index == logs.size() - 1) {
+				return -1;
+			}
+
+			log = logs.get(++index);
+		}
+
+		return index;
+	}
+
+	public EventLog getFirstLogAfter(long tick) {
+		return getFirstLogAfter(tick, 0);
+	}
+
+	public EventLog getFirstLogAfter(long tick, int subtick) {
+		EventLog firstLog = null;
+
+		for (EventType type : EventType.ALL) {
+			int index = getFirstLogAfter(type, tick, subtick);
+			EventLog log = getLog(type, index);
+
+			if (firstLog == null || (log != null && log.isBefore(firstLog))) {
+				firstLog = log;
+			}
+		}
+
+		return firstLog;
+	}
+
 	public EventLog getLogAt(long tick, int subtick) {
 		EventLog log = getLastLogBefore(tick, subtick + 1);
 		return log != null && log.isAt(tick, subtick) ? log : null;

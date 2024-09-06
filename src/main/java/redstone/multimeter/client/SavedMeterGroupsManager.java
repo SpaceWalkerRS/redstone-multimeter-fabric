@@ -158,6 +158,7 @@ public class SavedMeterGroupsManager {
 			SetMetersPacket packet = new SetMetersPacket(meters);
 			client.sendPacket(packet);
 
+
 			Text message = new LiteralText("Loaded meter group from slot " + slot);
 			client.sendMessage(message, true);
 		}
@@ -184,6 +185,7 @@ public class SavedMeterGroupsManager {
 			if (bypassWarnings) {
 				meterGroups[slot + SLOT_OFFSET] = null;
 
+
 				Text message = new LiteralText("Cleared saved meter group slot " + slot);
 				client.sendMessage(message, true);
 			} else {
@@ -199,6 +201,7 @@ public class SavedMeterGroupsManager {
 			}
 
 			meterGroups[slot + SLOT_OFFSET] = new SavedMeterGroup(name, meters);
+
 
 			Text message = new LiteralText("Saved meter group to slot " + slot);
 			client.sendMessage(message, true);
