@@ -35,9 +35,17 @@ public class MeterRenderer {
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.depthMask(false);
 
-		for (Meter meter : client.getMeterGroup().getMeters()) {
-			if (meter.isIn(minecraft.level)) {
-				drawMeter(poses, meter);
+		Meter focussed = client.getHud().getFocussedMeter();
+
+		if (focussed != null) {
+			if (focussed.isIn(minecraft.level)) {
+				drawMeter(poses, focussed);
+			}
+		} else {
+			for (Meter meter : client.getMeterGroup().getMeters()) {
+				if (meter.isIn(minecraft.level)) {
+					drawMeter(poses, meter);
+				}
 			}
 		}
 
