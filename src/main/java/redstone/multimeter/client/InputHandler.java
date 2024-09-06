@@ -67,16 +67,19 @@ public class InputHandler {
 		}
 
 		while (Keybinds.PAUSE_METERS.consumeClick()) {
-			client.getHud().pause();
+			client.getHud().togglePaused();
+		}
+		while (Keybinds.TOGGLE_FOCUS_MODE.consumeClick()) {
+			client.getHud().toggleFocusMode();
 		}
 		while (Keybinds.TOGGLE_MARKER.consumeClick()) {
 			client.getHud().toggleTickMarker(Screen.isControlDown());
 		}
 		while (Keybinds.STEP_BACKWARD.consumeClick()) {
-			client.getHud().stepBackward(Screen.isControlDown() ? 10 : 1);
+			client.getHud().stepBackward(Screen.isControlDown());
 		}
 		while (Keybinds.STEP_FORWARD.consumeClick()) {
-			client.getHud().stepForward(Screen.isControlDown() ? 10 : 1);
+			client.getHud().stepForward(Screen.isControlDown());
 		}
 	}
 
@@ -100,7 +103,7 @@ public class InputHandler {
 
 	public boolean handleMouseScroll(double scrollX, double scrollY) {
 		if (Keybinds.SCROLL_HUD.isPressed() && client.isHudActive()) {
-			client.getHud().stepBackward((int)Math.round(scrollY));
+			client.getHud().scroll((int)Math.round(scrollY), true);
 		} else {
 			return false;
 		}
@@ -137,13 +140,15 @@ public class InputHandler {
 			}
 		} else if (screen instanceof MultimeterScreen) {
 			if (Keybinds.PAUSE_METERS.matchesMouse(button)) {
-				client.getHud().pause();
+				client.getHud().togglePaused();
+			} else if (Keybinds.TOGGLE_FOCUS_MODE.matchesMouse(button)) {
+				client.getHud().toggleFocusMode();
 			} else if (Keybinds.TOGGLE_MARKER.matchesMouse(button)) {
 				client.getHud().toggleTickMarker(Screen.isControlDown());
 			} else if (Keybinds.STEP_BACKWARD.matchesMouse(button)) {
-				client.getHud().stepBackward(Screen.isControlDown() ? 10 : 1);
+				client.getHud().stepBackward(Screen.isControlDown());
 			} else if (Keybinds.STEP_FORWARD.matchesMouse(button)) {
-				client.getHud().stepForward(Screen.isControlDown() ? 10 : 1);
+				client.getHud().stepForward(Screen.isControlDown());
 			} else {
 				return false;
 			}
@@ -181,13 +186,15 @@ public class InputHandler {
 			}
 		} else if (screen instanceof MultimeterScreen) {
 			if (Keybinds.PAUSE_METERS.matches(keyCode, scanCode)) {
-				client.getHud().pause();
+				client.getHud().togglePaused();
+			} else if (Keybinds.TOGGLE_FOCUS_MODE.matches(keyCode, scanCode)) {
+				client.getHud().toggleFocusMode();
 			} else if (Keybinds.TOGGLE_MARKER.matches(keyCode, scanCode)) {
 				client.getHud().toggleTickMarker(Screen.isControlDown());
 			} else if (Keybinds.STEP_BACKWARD.matches(keyCode, scanCode)) {
-				client.getHud().stepBackward(Screen.isControlDown() ? 10 : 1);
+				client.getHud().stepBackward(Screen.isControlDown());
 			} else if (Keybinds.STEP_FORWARD.matches(keyCode, scanCode)) {
-				client.getHud().stepForward(Screen.isControlDown() ? 10 : 1);
+				client.getHud().stepForward(Screen.isControlDown());
 			} else {
 				return false;
 			}
@@ -201,7 +208,7 @@ public class InputHandler {
 	public boolean mouseScroll(RSMMScreen screen, double scrollX, double scrollY) {
 		if (screen instanceof MultimeterScreen) {
 			if (isPressed(Keybinds.SCROLL_HUD)) {
-				client.getHud().stepBackward((int)Math.round(scrollY));
+				client.getHud().scroll((int)Math.round(scrollY), true);
 			} else {
 				return false;
 			}

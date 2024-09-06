@@ -156,23 +156,8 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	protected void drawTooltip(Tooltip tooltip, int mouseX, int mouseY) {
 		List<Text> lines = tooltip.getLines();
 
-		int lineHeight = textRenderer.fontHeight;
-		int lineSpacing = 1;
-
-		int width = 0;
-		int height = (lines.size() - 1) * (lineHeight + lineSpacing) + lineHeight;
-
-		for (int index = 0; index < lines.size(); index++) {
-			Text text = lines.get(index);
-			int lineWidth = textWidth(textRenderer, text);
-
-			if (lineWidth > width) {
-				width = lineWidth;
-			}
-		}
-
-		width += 8;
-		height += 8;
+		int width = tooltip.getWidth(textRenderer) + 8;
+		int height = tooltip.getHeight(textRenderer) + 8;
 
 		int x = mouseX + 15;
 		int y = mouseY;

@@ -21,7 +21,7 @@ public class SecondaryEventViewer extends MeterEventViewer {
 
 	@Override
 	public Tooltip getTooltip(int mouseX, int mouseY) {
-		if (isHovered(mouseX, mouseY)) {
+		if (!hud.isFocusMode() && isHovered(mouseX, mouseY)) {
 			int row = hud.getHoveredRow(mouseY);
 			Meter meter = hud.meters.get(row);
 			long tick = hud.getSelectedTick();
@@ -40,6 +40,13 @@ public class SecondaryEventViewer extends MeterEventViewer {
 
 	@Override
 	protected void drawHighlights(int mouseX, int mouseY) {
+		if (hud.isFocusMode()) {
+			EventLog highlight = hud.getFocussedEvent();
+
+			if (highlight != null) {
+				drawHighlight(highlight.getSubtick(), 1, 0, hud.meters.size(), true);
+			}
+		}
 		if (isHovered(mouseX, mouseY)) {
 			int column = getHoveredColumn(mouseX);
 			int row = hud.getHoveredRow(mouseY);

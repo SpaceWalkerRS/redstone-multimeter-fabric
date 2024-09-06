@@ -39,6 +39,7 @@ public class Keybinds {
 	public static final KeyBinding LOAD_METER_GROUP;
 	public static final KeyBinding SAVE_METER_GROUP;
 	public static final KeyBinding PAUSE_METERS;
+	public static final KeyBinding TOGGLE_FOCUS_MODE;
 	public static final KeyBinding TOGGLE_MARKER;
 	public static final KeyBinding STEP_BACKWARD;
 	public static final KeyBinding STEP_FORWARD;
@@ -147,6 +148,7 @@ public class Keybinds {
 		LOAD_METER_GROUP       = registerKeybind(new KeyBinding("Load Meter Group"      , GLFW.GLFW_KEY_MINUS   , MAIN));
 		SAVE_METER_GROUP       = registerKeybind(new KeyBinding("Save Meter Group"      , GLFW.GLFW_KEY_EQUAL   , MAIN));
 		PAUSE_METERS           = registerKeybind(new KeyBinding("Pause Meters"          , GLFW.GLFW_KEY_N       , MAIN));
+		TOGGLE_FOCUS_MODE      = registerKeybind(new KeyBinding("Toggle Focus Mode"     , GLFW.GLFW_KEY_F       , MAIN));
 		TOGGLE_MARKER          = registerKeybind(new KeyBinding("Toggle Tick Marker"    , GLFW.GLFW_KEY_Y       , MAIN));
 		STEP_BACKWARD          = registerKeybind(new KeyBinding("Step Backward"         , GLFW.GLFW_KEY_COMMA   , MAIN));
 		STEP_FORWARD           = registerKeybind(new KeyBinding("Step Forward"          , GLFW.GLFW_KEY_PERIOD  , MAIN));
