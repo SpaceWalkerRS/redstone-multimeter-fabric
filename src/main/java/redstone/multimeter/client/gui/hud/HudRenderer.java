@@ -58,6 +58,10 @@ public class HudRenderer extends RenderHelper2D {
 		super.renderRect(poses, x, y, width, height, color);
 	}
 
+	public void renderGradient(PoseStack poses, int x, int y, int width, int height, int color0, int color1) {
+		super.renderGradient(poses, x, y, width, height, color0, color1);
+	}
+
 	public void renderText(PoseStack poses, String text, int x, int y, int color) {
 		super.renderText(hud.font, poses, text, x, y, false, color);
 	}
@@ -81,6 +85,28 @@ public class HudRenderer extends RenderHelper2D {
 		int b = ColorUtils.getBlue(color);
 
 		drawRect(bufferBuilder, pose, x0, y0, x1, y1, a, r, g, b);
+	}
+
+	@Override
+	protected void drawGradient(BufferBuilder bufferBuilder, Matrix4f pose, int x, int y, int width, int height, int color0, int color1) {
+		RenderSystem.enableDepthTest();
+
+		int x0 = translateX(x, width);
+		int y0 = translateY(y, height);
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
+		int a0 = Math.round(ColorUtils.getAlpha(color0) * hud.settings.opacity() / 100.0F);
+		int r0 = ColorUtils.getRed(color0);
+		int g0 = ColorUtils.getGreen(color0);
+		int b0 = ColorUtils.getBlue(color0);
+
+		int a1 = Math.round(ColorUtils.getAlpha(color1) * hud.settings.opacity() / 100.0F);
+		int r1 = ColorUtils.getRed(color1);
+		int g1 = ColorUtils.getGreen(color1);
+		int b1 = ColorUtils.getBlue(color1);
+
+		drawGradient(bufferBuilder, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1);
 	}
 
 	@Override
