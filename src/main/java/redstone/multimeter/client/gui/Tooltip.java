@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
@@ -42,6 +43,25 @@ public class Tooltip {
 		}
 		lines.add(line);
 		return this;
+	}
+
+	public int getWidth(Font font) {
+		int width = 0;
+
+		for (int index = 0; index < lines.size(); index++) {
+			Component text = lines.get(index);
+			int lineWidth = font.width(text.getColoredString());
+
+			if (lineWidth > width) {
+				width = lineWidth;
+			}
+		}
+
+		return width;
+	}
+
+	public int getHeight(Font font) {
+		return (lines.size() - 1) * (font.lineHeight + 1) + font.lineHeight;
 	}
 
 	public static Tooltip of(String... strings) {

@@ -51,7 +51,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 
 				consumed = true;
 			}
-			if (hud.isPaused() && button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+			if (hud.isPaused() && !hud.isFocusMode() && button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
 				int column = getHoveredColumn(mouseX);
 				int max = getColumnCount() - 1;
 
@@ -81,20 +81,20 @@ public class PrimaryEventViewer extends MeterEventViewer {
 
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (!isDraggingMouse()) {
+		if (hud.isFocusMode() || !isDraggingMouse()) {
 			return false;
 		}
 
-		return drag(deltaX);
+		return stepAndResize(deltaX);
 	}
 
 	@Override
 	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (isDraggingMouse() || Math.abs(scrollX) < 1.0D) {
+		if (hud.isFocusMode() || isDraggingMouse() || Math.abs(scrollX) < 1.0D) {
 			return false;
 		}
 
-		return drag(scrollX);
+		return stepAndResize(scrollX);
 	}
 
 	@Override
@@ -169,7 +169,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		}
 	}
 
-	private boolean drag(double deltaX) {
+	private boolean stepAndResize(double deltaX) {
 		dx += deltaX;
 
 		int width = hud.settings.columnWidth + hud.settings.gridSize;
@@ -196,7 +196,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				Options.validate();
 				hud.updateWidth();
 			} else {
-				hud.stepBackward(c);
+				hud.scroll(c, false);
 			}
 		}
 
