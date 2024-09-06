@@ -33,6 +33,7 @@ public class SavedMeterGroupsManager {
 	private int bypassLoadWarningTicks;
 	private int lastSaveWarningSlot;
 	private int bypassSaveWarningTicks;
+	private int previewSlot;
 
 	public SavedMeterGroupsManager(MultimeterClient client) {
 		this.client = client;
@@ -189,6 +190,9 @@ public class SavedMeterGroupsManager {
 				Component warning = Component.literal("You are not subscribed to a meter group! Are you sure you want to clear that slot?");
 				saveSlotWarning(slot, warning);
 			}
+		} else if (!meterGroup.hasMeters() && !bypassWarnings) {
+			Component warning = Component.literal("Your current meter group is empty! Are you sure you want to save it?");
+			saveSlotWarning(slot, warning);
 		} else {
 			String name = meterGroup.getName();
 			List<MeterProperties> meters = new ArrayList<>();
@@ -209,5 +213,52 @@ public class SavedMeterGroupsManager {
 		bypassSaveWarningTicks = WARNING_TIME;
 
 		client.sendMessage(warning, true);
+	}
+
+	public void previewSlot(int slot) {
+		SavedMeterGroup meterGroup = meterGroups[slot + SLOT_OFFSET];
+
+		if (meterGroup == null) {
+			Component warning = Component.literal("That slot is empty!");
+			client.sendMessage(warning, true);
+		} else {
+			String name = meterGroup.getName();
+			List<MeterProperties> meters = meterGroup.getMeters();
+
+			client.previewMeterGroup(name, meters);
+
+			Component message = Component.literal("Previewing meter group \'" + name + "\' from slot " + slot);
+			client.sendMessage(message, true);
+
+			previewSlot = slot;
+		}
+	}
+
+	public void loadPreviewSlot() {
+		if (previewSlot == -1) {
+			Component message = Component.literal("Not previewing any meter group!");
+			client.sendMessage(message, true);
+		} else {
+			loadSlot(previewSlot);
+		}
+
+		previewSlot = -1;
+	}
+
+	public void stopPreviewing() {
+		if (previewSlot != -1) {
+			SavedMeterGroup meterGroup = meterGroups[previewSlot + SLOT_OFFSET];
+
+			if (meterGroup != null) {
+				Component message = Component.literal("Stopped previewing meter group \'" + meterGroup.getName() + "\' from slot " + previewSlot);
+				client.sendMessage(message, true);
+			}
+
+			previewSlot = -1;
+		}
+	}
+
+	public boolean isPreviewing(int slot) {
+		return slot != -1 && slot == previewSlot;
 	}
 }
