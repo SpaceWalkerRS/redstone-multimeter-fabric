@@ -59,7 +59,6 @@ public class SecondaryEventViewer extends MeterEventViewer {
 
 	@Override
 	protected void drawDecorators(PoseStack poses) {
-
 	}
 
 	@Override
