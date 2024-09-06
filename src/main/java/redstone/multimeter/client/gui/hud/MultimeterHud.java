@@ -852,6 +852,10 @@ public class MultimeterHud extends AbstractParentElement {
 		meterGroupName.update();
 		playPauseButton.setVisible(onScreen || Options.HUD.PAUSE_INDICATOR.get());
 		onResized();
+
+		if (!paused) {
+			resetOffset();
+		}
 	}
 
 	public void updateTickMarkerColor() {
