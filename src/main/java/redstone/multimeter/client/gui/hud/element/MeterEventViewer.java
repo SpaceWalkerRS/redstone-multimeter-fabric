@@ -20,12 +20,14 @@ public abstract class MeterEventViewer extends AbstractElement {
 	@Override
 	public void render(int mouseX, int mouseY) {
 		GlStateManager.pushMatrix();
-		drawHighlights(mouseX, mouseY);
-		GlStateManager.translated(0, 0, -1);
-		drawDecorators();
-		GlStateManager.translated(0, 0, -1);
-		drawMeterEvents();
-		GlStateManager.translated(0, 0, -1);
+		if (!hud.client.isPreviewing()) {
+			drawHighlights(mouseX, mouseY);
+			GlStateManager.translated(0, 0, -1);
+			drawDecorators();
+			GlStateManager.translated(0, 0, -1);
+			drawMeterEvents();
+			GlStateManager.translated(0, 0, -1);
+		}
 		drawGridLines();
 		GlStateManager.translated(0, 0, -1);
 		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
