@@ -24,12 +24,14 @@ public abstract class MeterEventViewer extends AbstractElement {
 		PoseStack poses = graphics.pose();
 
 		poses.pushPose();
-		drawHighlights(graphics, mouseX, mouseY);
-		poses.translate(0, 0, -1);
-		drawDecorators(graphics);
-		poses.translate(0, 0, -1);
-		drawMeterEvents(graphics);
-		poses.translate(0, 0, -1);
+		if (!hud.client.isPreviewing()) {
+			drawHighlights(graphics, mouseX, mouseY);
+			poses.translate(0, 0, -1);
+			drawDecorators(graphics);
+			poses.translate(0, 0, -1);
+			drawMeterEvents(graphics);
+			poses.translate(0, 0, -1);
+		}
 		drawGridLines(graphics);
 		poses.translate(0, 0, -1);
 		hud.renderer.renderRect(graphics, 0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
