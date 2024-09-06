@@ -143,22 +143,22 @@ public class Keybinds {
 		MAIN        = registerCategory(RedstoneMultimeterMod.MOD_NAME);
 		EVENT_TYPES = registerCategory("Event Types");
 
-		TOGGLE_METER           = registerKeybind(new KeyBinding("Toggle Meter"          , GLFW.GLFW_KEY_M       , MAIN));
-		RESET_METER            = registerKeybind(new KeyBinding("Reset Meter"           , GLFW.GLFW_KEY_B       , MAIN));
-		LOAD_METER_GROUP       = registerKeybind(new KeyBinding("Load Meter Group"      , GLFW.GLFW_KEY_MINUS   , MAIN));
-		SAVE_METER_GROUP       = registerKeybind(new KeyBinding("Save Meter Group"      , GLFW.GLFW_KEY_EQUAL   , MAIN));
-		PAUSE_METERS           = registerKeybind(new KeyBinding("Pause Meters"          , GLFW.GLFW_KEY_N       , MAIN));
-		TOGGLE_FOCUS_MODE      = registerKeybind(new KeyBinding("Toggle Focus Mode"     , GLFW.GLFW_KEY_F       , MAIN));
-		TOGGLE_MARKER          = registerKeybind(new KeyBinding("Toggle Tick Marker"    , GLFW.GLFW_KEY_Y       , MAIN));
-		STEP_BACKWARD          = registerKeybind(new KeyBinding("Step Backward"         , GLFW.GLFW_KEY_COMMA   , MAIN));
-		STEP_FORWARD           = registerKeybind(new KeyBinding("Step Forward"          , GLFW.GLFW_KEY_PERIOD  , MAIN));
-		SCROLL_HUD             = registerKeybind(new KeyBinding("Scroll HUD"            , GLFW.GLFW_KEY_LEFT_ALT, MAIN));
-		TOGGLE_HUD             = registerKeybind(new KeyBinding("Toggle HUD"            , GLFW.GLFW_KEY_H       , MAIN));
-		OPEN_MULTIMETER_SCREEN = registerKeybind(new KeyBinding("Open Multimeter Screen", GLFW.GLFW_KEY_G       , MAIN));
-		OPEN_METER_CONTROLS    = registerKeybind(new KeyBinding("Open Meter Controls"   , GLFW.GLFW_KEY_I       , MAIN));
-		OPEN_OPTIONS_MENU      = registerKeybind(new KeyBinding("Open Options Menu"     , GLFW.GLFW_KEY_O       , MAIN));
-		VIEW_TICK_PHASE_TREE   = registerKeybind(new KeyBinding("View Tick Phases"      , GLFW.GLFW_KEY_U       , MAIN));
-		PRINT_LOGS             = registerKeybind(new KeyBinding("Print Logs To File"    , GLFW.GLFW_KEY_P       , MAIN));
+		TOGGLE_METER           = registerKeybind(new KeyBinding("Toggle Meter"          , GLFW.GLFW_KEY_M            , MAIN));
+		RESET_METER            = registerKeybind(new KeyBinding("Reset Meter"           , GLFW.GLFW_KEY_B            , MAIN));
+		LOAD_METER_GROUP       = registerKeybind(new KeyBinding("Load Meter Group"      , GLFW.GLFW_KEY_LEFT_BRACKET , MAIN));
+		SAVE_METER_GROUP       = registerKeybind(new KeyBinding("Save Meter Group"      , GLFW.GLFW_KEY_RIGHT_BRACKET, MAIN));
+		PAUSE_METERS           = registerKeybind(new KeyBinding("Pause Meters"          , GLFW.GLFW_KEY_N            , MAIN));
+		TOGGLE_FOCUS_MODE      = registerKeybind(new KeyBinding("Toggle Focus Mode"     , GLFW.GLFW_KEY_F            , MAIN));
+		TOGGLE_MARKER          = registerKeybind(new KeyBinding("Toggle Tick Marker"    , GLFW.GLFW_KEY_Y            , MAIN));
+		STEP_BACKWARD          = registerKeybind(new KeyBinding("Step Backward"         , GLFW.GLFW_KEY_COMMA        , MAIN));
+		STEP_FORWARD           = registerKeybind(new KeyBinding("Step Forward"          , GLFW.GLFW_KEY_PERIOD       , MAIN));
+		SCROLL_HUD             = registerKeybind(new KeyBinding("Scroll HUD"            , GLFW.GLFW_KEY_LEFT_ALT     , MAIN));
+		TOGGLE_HUD             = registerKeybind(new KeyBinding("Toggle HUD"            , GLFW.GLFW_KEY_H            , MAIN));
+		OPEN_MULTIMETER_SCREEN = registerKeybind(new KeyBinding("Open Multimeter Screen", GLFW.GLFW_KEY_G            , MAIN));
+		OPEN_METER_CONTROLS    = registerKeybind(new KeyBinding("Open Meter Controls"   , GLFW.GLFW_KEY_I            , MAIN));
+		OPEN_OPTIONS_MENU      = registerKeybind(new KeyBinding("Open Options Menu"     , GLFW.GLFW_KEY_O            , MAIN));
+		VIEW_TICK_PHASE_TREE   = registerKeybind(new KeyBinding("View Tick Phases"      , GLFW.GLFW_KEY_U            , MAIN));
+		PRINT_LOGS             = registerKeybind(new KeyBinding("Print Logs To File"    , GLFW.GLFW_KEY_P            , MAIN));
 
 		TOGGLE_EVENT_TYPES = new KeyBinding[EventType.ALL.length];
 

@@ -58,11 +58,14 @@ public class MeterGroupSubscriptionPacket implements RSMMPacket {
 	@Override
 	public void handle(MultimeterClient client) {
 		ClientMeterGroup meterGroup = client.getMeterGroup();
+		ClientMeterGroup meterGroupPreview = client.getMeterGroupPreview();
 
 		if (subscribe) {
 			meterGroup.subscribe(name);
 		} else {
 			meterGroup.unsubscribe(false);
 		}
+
+		meterGroupPreview.stopPreviewing();
 	}
 }
