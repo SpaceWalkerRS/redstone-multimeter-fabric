@@ -34,6 +34,7 @@ public class SavedMeterGroupsManager {
 	private int bypassLoadWarningTicks;
 	private int lastSaveWarningSlot;
 	private int bypassSaveWarningTicks;
+	private int previewSlot;
 
 	public SavedMeterGroupsManager(MultimeterClient client) {
 		this.client = client;
@@ -191,6 +192,9 @@ public class SavedMeterGroupsManager {
 				Text warning = new LiteralText("You are not subscribed to a meter group! Are you sure you want to clear that slot?");
 				saveSlotWarning(slot, warning);
 			}
+		} else if (!meterGroup.hasMeters() && !bypassWarnings) {
+			Text warning = new LiteralText("Your current meter group is empty! Are you sure you want to save it?");
+			saveSlotWarning(slot, warning);
 		} else {
 			String name = meterGroup.getName();
 			List<MeterProperties> meters = new ArrayList<>();
@@ -211,5 +215,52 @@ public class SavedMeterGroupsManager {
 		bypassSaveWarningTicks = WARNING_TIME;
 
 		client.sendMessage(warning, true);
+	}
+
+	public void previewSlot(int slot) {
+		SavedMeterGroup meterGroup = meterGroups[slot + SLOT_OFFSET];
+
+		if (meterGroup == null) {
+			Text warning = new LiteralText("That slot is empty!");
+			client.sendMessage(warning, true);
+		} else {
+			String name = meterGroup.getName();
+			List<MeterProperties> meters = meterGroup.getMeters();
+
+			client.previewMeterGroup(name, meters);
+
+			Text message = new LiteralText("Previewing meter group \'" + name + "\' from slot " + slot);
+			client.sendMessage(message, true);
+
+			previewSlot = slot;
+		}
+	}
+
+	public void loadPreviewSlot() {
+		if (previewSlot == -1) {
+			Text message = new LiteralText("Not previewing any meter group!");
+			client.sendMessage(message, true);
+		} else {
+			loadSlot(previewSlot);
+		}
+
+		previewSlot = -1;
+	}
+
+	public void stopPreviewing() {
+		if (previewSlot != -1) {
+			SavedMeterGroup meterGroup = meterGroups[previewSlot + SLOT_OFFSET];
+
+			if (meterGroup != null) {
+				Text message = new LiteralText("Stopped previewing meter group \'" + meterGroup.getName() + "\' from slot " + previewSlot);
+				client.sendMessage(message, true);
+			}
+
+			previewSlot = -1;
+		}
+	}
+
+	public boolean isPreviewing(int slot) {
+		return slot != -1 && slot == previewSlot;
 	}
 }

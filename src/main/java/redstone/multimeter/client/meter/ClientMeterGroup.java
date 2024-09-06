@@ -19,6 +19,7 @@ public class ClientMeterGroup extends MeterGroup {
 	private final ClientLogManager logManager;
 
 	private boolean subscribed;
+	private boolean previewing;
 	private String name;
 	private int nextIndex;
 
@@ -84,6 +85,10 @@ public class ClientMeterGroup extends MeterGroup {
 		return subscribed;
 	}
 
+	public boolean isPreviewing() {
+		return previewing;
+	}
+
 	public int getNextMeterIndex() {
 		return nextIndex;
 	}
@@ -129,8 +134,10 @@ public class ClientMeterGroup extends MeterGroup {
 
 	public void subscribe(String newName) {
 		subscribed = true;
+		previewing = false;
 		name = newName;
 		logManager.getPrinter().onNewMeterGroup();
+
 		clear();
 
 		client.refreshMeterGroup();
@@ -139,8 +146,10 @@ public class ClientMeterGroup extends MeterGroup {
 
 	public void unsubscribe(boolean disconnect) {
 		subscribed = false;
+		previewing = false;
 		name = super.getName();
 		logManager.getPrinter().stop(!disconnect);
+
 		clear();
 
 		client.getTutorial().onLeaveMeterGroup();
@@ -152,8 +161,31 @@ public class ClientMeterGroup extends MeterGroup {
 		client.getTutorial().onMeterGroupRefreshed();
 	}
 
+	public void preview(String newName, List<MeterProperties> meters) {
+		subscribed = false;
+		previewing = true;
+		name = newName;
+
+		clear();
+
+		for (MeterProperties meter : meters) {
+			addMeter(new Meter(meter.mutable()));
+		}
+
+		client.getHud().updateMeterList();
+	}
+
+	public void stopPreviewing() {
+		subscribed = false;
+		previewing = false;
+		name = super.getName();
+
+		clear();
+
+		client.getHud().updateMeterList();
+	}
+
 	public void tick() {
 		logManager.tick();
 	}
-
 }
