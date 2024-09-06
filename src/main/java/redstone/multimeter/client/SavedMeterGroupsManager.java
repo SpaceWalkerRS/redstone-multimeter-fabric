@@ -158,8 +158,7 @@ public class SavedMeterGroupsManager {
 			SetMetersPacket packet = new SetMetersPacket(meters);
 			client.sendPacket(packet);
 
-
-			Text message = new LiteralText("Loaded meter group from slot " + slot);
+			Text message = new LiteralText("Loaded meter group \'" + name + "\' from slot " + slot);
 			client.sendMessage(message, true);
 		}
 	}
@@ -202,8 +201,7 @@ public class SavedMeterGroupsManager {
 
 			meterGroups[slot + SLOT_OFFSET] = new SavedMeterGroup(name, meters);
 
-
-			Text message = new LiteralText("Saved meter group to slot " + slot);
+			Text message = new LiteralText("Saved meter group \'" + name + "\'to slot " + slot);
 			client.sendMessage(message, true);
 		}
 	}
