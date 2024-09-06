@@ -10,6 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.meter.ClientMeterGroup;
@@ -144,11 +145,11 @@ public class SavedMeterGroupsManager {
 				if (bypassWarnings) {
 					client.unsubscribeFromMeterGroup();
 				} else {
-					Component warning = Component.literal("That slot is empty! Are you sure you want to unsubscribe from your current meter group?");
+					Component warning = new TextComponent("That slot is empty! Are you sure you want to unsubscribe from your current meter group?");
 					loadSlotWarning(slot, warning);
 				}
 			} else {
-				Component warning = Component.literal(String.format("Could not load meter group from slot %d: that slot is empty!", slot));
+				Component warning = new TextComponent(String.format("Could not load meter group from slot %d: that slot is empty!", slot));
 				client.sendMessage(warning, true);
 			}
 		} else {
@@ -157,7 +158,7 @@ public class SavedMeterGroupsManager {
 			SetMetersPacket packet = new SetMetersPacket(meters);
 			client.sendPacket(packet);
 
-			Component message = Component.literal("Loaded meter group from slot " + slot);
+			Component message = new TextComponent("Loaded meter group from slot " + slot);
 			client.sendMessage(message, true);
 		}
 	}
@@ -183,10 +184,10 @@ public class SavedMeterGroupsManager {
 			if (bypassWarnings) {
 				meterGroups[slot + SLOT_OFFSET] = null;
 
-				Component message = Component.literal("Cleared saved meter group slot " + slot);
+				Component message = new TextComponent("Cleared saved meter group slot " + slot);
 				client.sendMessage(message, true);
 			} else {
-				Component warning = Component.literal("You are not subscribed to a meter group! Are you sure you want to clear that slot?");
+				Component warning = new TextComponent("You are not subscribed to a meter group! Are you sure you want to clear that slot?");
 				saveSlotWarning(slot, warning);
 			}
 		} else {
@@ -199,7 +200,7 @@ public class SavedMeterGroupsManager {
 
 			meterGroups[slot + SLOT_OFFSET] = new SavedMeterGroup(name, meters);
 
-			Component message = Component.literal("Saved meter group to slot " + slot);
+			Component message = new TextComponent("Saved meter group to slot " + slot);
 			client.sendMessage(message, true);
 		}
 	}
