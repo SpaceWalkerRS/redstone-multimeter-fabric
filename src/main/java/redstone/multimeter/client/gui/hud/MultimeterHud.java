@@ -18,12 +18,14 @@ import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.Element;
 import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
+import redstone.multimeter.client.gui.hud.element.MeterEventDetails;
 import redstone.multimeter.client.gui.hud.element.MeterListRenderer;
 import redstone.multimeter.client.gui.hud.element.PrimaryEventViewer;
 import redstone.multimeter.client.gui.hud.element.SecondaryEventViewer;
 import redstone.multimeter.client.gui.hud.event.MeterEventRenderDispatcher;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
+import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.util.ColorUtils;
 import redstone.multimeter.util.TextUtils;
 
@@ -39,6 +41,7 @@ public class MultimeterHud extends AbstractParentElement {
 	private MeterListRenderer names;
 	private PrimaryEventViewer ticks;
 	private SecondaryEventViewer subticks;
+	private MeterEventDetails details;
 	private TextElement meterGroupName;
 	private TextElement tickMarkerCounter;
 
@@ -53,10 +56,14 @@ public class MultimeterHud extends AbstractParentElement {
 	private int hudHeight;
 
 	private boolean paused;
+	private boolean wasPaused;
 	/** The offset between the last server tick and the first tick to be displayed in the ticks table. */
 	private int offset;
 	private boolean onScreen;
 	private Meter selectedMeter;
+	private boolean focusMode;
+	private Meter focussedMeter;
+	private EventLog focussedEvent;
 	private long tickMarker;
 
 	public MultimeterHud(MultimeterClient client) {
@@ -142,7 +149,7 @@ public class MultimeterHud extends AbstractParentElement {
 		updateMeterList();
 
 		if (paused && Options.HUD.AUTO_UNPAUSE.get()) {
-			pause();
+			togglePaused();
 		}
 	}
 
@@ -191,6 +198,9 @@ public class MultimeterHud extends AbstractParentElement {
 			subticks.setX(x);
 			tickMarkerCounter.setX(x);
 
+			x += subticks.getWidth() + settings.columnWidth + settings.gridSize;
+			details.setX(x);
+
 			break;
 		case RIGHT_TO_LEFT:
 			hudX = x + pos + effectiveWidth - getWidth();
@@ -214,6 +224,9 @@ public class MultimeterHud extends AbstractParentElement {
 			x -= (settings.gridSize + subticks.getWidth());
 			subticks.setX(x);
 
+			x -= (settings.columnWidth + settings.gridSize + details.getWidth());
+			details.setX(x);
+
 			break;
 		}
 	}
@@ -231,6 +244,7 @@ public class MultimeterHud extends AbstractParentElement {
 			names.setY(y);
 			ticks.setY(y);
 			subticks.setY(y);
+			details.setY(y);
 
 			y += names.getHeight();
 			meterGroupName.setY(y + settings.gridSize);
@@ -246,6 +260,7 @@ public class MultimeterHud extends AbstractParentElement {
 			names.setY(y);
 			ticks.setY(y);
 			subticks.setY(y);
+			details.setY(y - (details.getHeight() - names.getHeight()));
 			meterGroupName.setY(y - meterGroupName.getHeight());
 
 			y -= playPauseButton.getHeight();
@@ -265,6 +280,7 @@ public class MultimeterHud extends AbstractParentElement {
 		this.names = new MeterListRenderer(this);
 		this.ticks = new PrimaryEventViewer(this);
 		this.subticks = new SecondaryEventViewer(this);
+		this.details = new MeterEventDetails(this);
 		this.meterGroupName = new TextElement(this.client, 0, 0, t -> {
 			String text = this.client.getMeterGroup().getName();
 
@@ -294,11 +310,11 @@ public class MultimeterHud extends AbstractParentElement {
 		}, () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.TOGGLE_MARKER)));
 
 		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Component.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PAUSE_METERS)), button -> {
-			pause();
+			togglePaused();
 			return true;
 		});
 		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Component.literal(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
-			stepBackward(Screen.hasControlDown() ? 10 : 1);
+			stepBackward(Screen.hasControlDown());
 			return true;
 		}) {
 
@@ -308,7 +324,7 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		};
 		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Component.literal(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
-			stepForward(Screen.hasControlDown() ? 10 : 1);
+			stepForward(Screen.hasControlDown());
 			return true;
 		}) {
 
@@ -329,6 +345,7 @@ public class MultimeterHud extends AbstractParentElement {
 		addChild(this.names);
 		addChild(this.ticks);
 		addChild(this.subticks);
+		addChild(this.details);
 		addChild(this.meterGroupName);
 		addChild(this.tickMarkerCounter);
 		addChild(this.playPauseButton);
@@ -374,12 +391,22 @@ public class MultimeterHud extends AbstractParentElement {
 		return paused;
 	}
 
-	public void pause() {
-		if (!hasContent()) {
-			return;
+	public void togglePaused() {
+		if (!focusMode && hasContent()) {
+			boolean pause = !paused;
+
+			if (setPaused(pause)) {
+				client.getTutorial().onPauseHud(pause);
+			}
+		}
+	}
+
+	public boolean setPaused(boolean pause) {
+		if (paused == pause) {
+			return false;
 		}
 
-		paused = !paused;
+		paused = pause;
 
 		meterGroupName.update();
 		playPauseButton.update();
@@ -396,7 +423,7 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}
 
-		client.getTutorial().onPauseHud(paused);
+		return true;
 	}
 
 	public int getColumn(long tick) {
@@ -425,18 +452,51 @@ public class MultimeterHud extends AbstractParentElement {
 		setOffset(1 - Options.HUD.COLUMN_COUNT.get());
 	}
 
-	public void stepBackward(int amount) {
-		if (paused) {
-			setOffset(offset - amount);
-			client.getTutorial().onScrollHud(-amount);
+	public void stepBackward(boolean jump) {
+		if (focusMode) {
+			moveFocus(focussedEvent.getTick(), jump ? 0 : focussedEvent.getSubtick(), false);
+		} else if (paused) {
+			scroll(jump ? 10 : 1, false);
 		}
 	}
 
-	public void stepForward(int amount) {
-		if (paused) {
-			setOffset(offset + amount);
-			client.getTutorial().onScrollHud(amount);
+	public void stepForward(boolean jump) {
+		if (focusMode) {
+			moveFocus(focussedEvent.getTick(), jump ? client.getMeterGroup().getLogManager().getSubtickCount(focussedEvent.getTick()) : focussedEvent.getSubtick(), true);
+		} else if (paused) {
+			scroll(jump ? 10 : 1, true);
 		}
+	}
+
+	public void scroll(int amount, boolean forward) {
+		if (!forward) amount *= -1;
+		setOffset(offset + amount);
+		client.getTutorial().onScrollHud(amount);
+	}
+
+	public boolean moveFocus(long tick, int subtick, boolean forward) {
+		Meter closestMeter = null;
+		EventLog closestEvent = null;
+
+		for (Meter meter : meters) {
+			EventLog event = forward
+				? meter.getLogs().getFirstLogAfter(tick, subtick)
+				: meter.getLogs().getLastLogBefore(tick, subtick);
+
+			if (event != null && (closestEvent == null || (forward ? event.isBefore(closestEvent) : event.isAfter(closestEvent)))) {
+				closestMeter = meter;
+				closestEvent = event;
+			}
+		}
+
+		if (closestEvent != null) {
+			focussedMeter = closestMeter;
+			focussedEvent = closestEvent;
+
+			setOffset(offset + (int)(focussedEvent.getTick() - getSelectedTick()));
+		}
+
+		return focussedEvent != null;
 	}
 
 	public boolean hasContent() {
@@ -471,6 +531,66 @@ public class MultimeterHud extends AbstractParentElement {
 		}
 
 		return true;
+	}
+
+	public boolean isFocusMode() {
+		return focusMode;
+	}
+
+	public void toggleFocusMode() {
+		if (hasContent()) {
+			boolean enable = !focusMode;
+
+			if (setFocusMode(enable)) {
+				String message = String.format("%s Focus Mode", enable ? "Enabled" : "Disabled");
+				client.sendMessage(Component.literal(message), true);
+
+				client.getTutorial().onToggleFocusMode(enable);
+			} else {
+				String message = "No meter event logs available to focus on...";
+				client.sendMessage(Component.literal(message), true);
+			}
+		}
+	}
+
+	public boolean setFocusMode(boolean enabled) {
+		if (focusMode == enabled) {
+			return false;
+		}
+		if (enabled) {
+			// first attempt to find focus point after the selected tick
+			// then look prior to the selected tick
+			if (!moveFocus(getSelectedTick(), 0, true) && !moveFocus(getSelectedTick(), Integer.MAX_VALUE, false)) {
+				return false;
+			}
+		}
+
+		focusMode = enabled;
+
+		if (focusMode) {
+			wasPaused = paused;
+
+			if (!wasPaused) {
+				setPaused(true);
+			}
+		} else {
+			if (!wasPaused) {
+				setPaused(false);
+			}
+
+			focussedMeter = null;
+			focussedEvent = null;
+		}
+
+		return true;
+	}
+
+	public Meter getFocussedMeter() {
+		return focussedMeter;
+	}
+
+	public EventLog getFocussedEvent() {
+		return focussedEvent;
 	}
 
 	public boolean hasTickMarker() {
@@ -585,6 +705,7 @@ public class MultimeterHud extends AbstractParentElement {
 		names.updateWidth();
 		ticks.updateWidth();
 		subticks.updateWidth();
+		details.updateWidth();
 		onWidthUpdated();
 	}
 
@@ -596,6 +717,7 @@ public class MultimeterHud extends AbstractParentElement {
 	public void updateEventViewersWidth() {
 		ticks.updateWidth();
 		subticks.updateWidth();
+		details.updateWidth();
 		onWidthUpdated();
 	}
 
@@ -604,6 +726,7 @@ public class MultimeterHud extends AbstractParentElement {
 
 		if (subticks.getWidth() > 0) {
 			hudWidth += subticks.getWidth() + settings.columnWidth + settings.gridSize;
+			hudWidth += details.getWidth() + settings.columnWidth + settings.gridSize;
 		}
 
 		validateHudWidth();
@@ -618,11 +741,12 @@ public class MultimeterHud extends AbstractParentElement {
 		names.updateHeight();
 		ticks.updateHeight();
 		subticks.updateHeight();
+		details.updateHeight();
 		onHeightUpdated();
 	}
 
 	private void onHeightUpdated() {
-		hudHeight = names.getHeight() + settings.rowHeight + settings.gridSize;
+		hudHeight = Math.max(names.getHeight(), details.getHeight()) + settings.rowHeight + settings.gridSize;
 
 		validateHudHeight();
 		onChangedY(getY());
@@ -647,9 +771,12 @@ public class MultimeterHud extends AbstractParentElement {
 		if (selectedMeter != null && !client.getMeterGroup().hasMeter(selectedMeter)) {
 			selectMeter(null);
 		}
+		if (focusMode && focussedMeter != null && !client.getMeterGroup().hasMeter(focussedMeter)) {
+			toggleFocusMode();
+		}
 
 		if (paused && !hasContent()) {
-			pause();
+			togglePaused();
 		}
 	}
 
@@ -694,7 +821,7 @@ public class MultimeterHud extends AbstractParentElement {
 		updateMeterList();
 
 		if (hasContent() && !paused && Options.HUD.AUTO_PAUSE.get()) {
-			pause();
+			togglePaused();
 		}
 	}
 
