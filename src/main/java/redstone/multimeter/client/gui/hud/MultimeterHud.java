@@ -23,6 +23,7 @@ import redstone.multimeter.client.gui.hud.element.MeterListRenderer;
 import redstone.multimeter.client.gui.hud.element.PrimaryEventViewer;
 import redstone.multimeter.client.gui.hud.element.SecondaryEventViewer;
 import redstone.multimeter.client.gui.hud.event.MeterEventRenderDispatcher;
+import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.log.EventLog;
@@ -282,7 +283,9 @@ public class MultimeterHud extends AbstractParentElement {
 		this.subticks = new SecondaryEventViewer(this);
 		this.details = new MeterEventDetails(this);
 		this.meterGroupName = new TextElement(this.client, 0, 0, t -> {
-			String text = this.client.getMeterGroup().getName();
+			String text = this.client.isPreviewing()
+				? this.client.getMeterGroupPreview().getName()
+				: this.client.getMeterGroup().getName();
 
 			int a = Math.round(0xFF * settings.opacity() / 100.0F);
 			int rgb = onScreen ? 0xD0D0D0 : 0x202020;
@@ -392,7 +395,7 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 
 	public void togglePaused() {
-		if (!focusMode && hasContent()) {
+		if (!client.isPreviewing() && !focusMode && hasContent()) {
 			boolean pause = !paused;
 
 			if (setPaused(pause)) {
@@ -453,18 +456,22 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 
 	public void stepBackward(boolean jump) {
-		if (focusMode) {
-			moveFocus(focussedEvent.getTick(), jump ? 0 : focussedEvent.getSubtick(), false);
-		} else if (paused) {
-			scroll(jump ? 10 : 1, false);
+		if (!client.isPreviewing()) {
+			if (focusMode) {
+				moveFocus(focussedEvent.getTick(), jump ? 0 : focussedEvent.getSubtick(), false);
+			} else if (paused) {
+				scroll(jump ? 10 : 1, false);
+			}
 		}
 	}
 
 	public void stepForward(boolean jump) {
-		if (focusMode) {
-			moveFocus(focussedEvent.getTick(), jump ? client.getMeterGroup().getLogManager().getSubtickCount(focussedEvent.getTick()) : focussedEvent.getSubtick(), true);
-		} else if (paused) {
-			scroll(jump ? 10 : 1, true);
+		if (!client.isPreviewing()) {
+			if (focusMode) {
+				moveFocus(focussedEvent.getTick(), jump ? client.getMeterGroup().getLogManager().getSubtickCount(focussedEvent.getTick()) : focussedEvent.getSubtick(), true);
+			} else if (paused) {
+				scroll(jump ? 10 : 1, true);
+			}
 		}
 	}
 
@@ -538,7 +545,7 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 
 	public void toggleFocusMode() {
-		if (hasContent()) {
+		if (!client.isPreviewing() && hasContent()) {
 			boolean enable = !focusMode;
 
 			if (setFocusMode(enable)) {
@@ -759,7 +766,11 @@ public class MultimeterHud extends AbstractParentElement {
 	public void updateMeterList() {
 		meters.clear();
 
-		for (Meter meter : client.getMeterGroup().getMeters()) {
+		ClientMeterGroup meterGroup = client.isPreviewing()
+			? client.getMeterGroupPreview()
+			: client.getMeterGroup();
+
+		for (Meter meter : meterGroup.getMeters()) {
 			if (!settings.ignoreHiddenMeters || !meter.isHidden()) {
 				meters.add(meter);
 			}
@@ -768,10 +779,10 @@ public class MultimeterHud extends AbstractParentElement {
 		meterGroupName.update();
 		onResized();
 
-		if (selectedMeter != null && !client.getMeterGroup().hasMeter(selectedMeter)) {
+		if (selectedMeter != null && !meterGroup.hasMeter(selectedMeter)) {
 			selectMeter(null);
 		}
-		if (focusMode && focussedMeter != null && !client.getMeterGroup().hasMeter(focussedMeter)) {
+		if (focusMode && focussedMeter != null && !meterGroup.hasMeter(focussedMeter)) {
 			toggleFocusMode();
 		}
 
@@ -800,6 +811,9 @@ public class MultimeterHud extends AbstractParentElement {
 	public void onInitScreen(int width, int height) {
 		if (!client.hasMultimeterScreenOpen()) {
 			return; // we should never get here
+		}
+		if (client.isPreviewing()) {
+			client.stopPreviewingMeterGroup();
 		}
 
 		onScreen = true;
