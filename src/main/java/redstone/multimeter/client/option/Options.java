@@ -31,6 +31,7 @@ public class Options {
 		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("Auto Random Ticks", String.format("Automatically enable the \'%s\' event type when placing a meter on a block that accepts random ticks.", EventType.RANDOM_TICK.getName()), true);
 		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("Create Group On Join", "Automatically create a new meter group upon joining a world or server.", true);
 		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption("Default Meter Group", "The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used instead.", "", MeterGroup.getMaxNameLength());
+		public static final BooleanOption                PREVIEW_METER_GROUPS = new BooleanOption("Preview Meter Groups", "Preview meter groups before loading them from the saved meter group slot. This preview will appear as long as the Load Meter Group keybind is pressed. Pressing the slot key again will stop previewing and load the meter group from that slot.", true);
 		public static final BooleanOption                BYPASS_WARNINGS      = new BooleanOption("Bypass Meter Group Warnings", "Bypass warnings when trying to load a meter group from an empty slot or trying to save a meter group to a slot when not subscribed to one. Otherwise you will have to press the keybind again to confirm the action.", false);
 
 	}
@@ -197,6 +198,7 @@ public class Options {
 			RedstoneMultimeter.AUTO_RANDOM_TICKS,
 			RedstoneMultimeter.CREATE_GROUP_ON_JOIN,
 			RedstoneMultimeter.DEFAULT_METER_GROUP,
+			RedstoneMultimeter.PREVIEW_METER_GROUPS,
 			RedstoneMultimeter.BYPASS_WARNINGS
 		);
 		register("HUD",

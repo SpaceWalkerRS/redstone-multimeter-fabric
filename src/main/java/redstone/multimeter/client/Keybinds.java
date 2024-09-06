@@ -157,8 +157,8 @@ public class Keybinds {
 
 		TOGGLE_METER           = registerKeybind(new KeyBinding("Toggle Meter"          , Keyboard.KEY_M       , MAIN));
 		RESET_METER            = registerKeybind(new KeyBinding("Reset Meter"           , Keyboard.KEY_B       , MAIN));
-		LOAD_METER_GROUP       = registerKeybind(new KeyBinding("Load Meter Group"      , Keyboard.KEY_MINUS   , MAIN));
-		SAVE_METER_GROUP       = registerKeybind(new KeyBinding("Save Meter Group"      , Keyboard.KEY_EQUALS  , MAIN));
+		LOAD_METER_GROUP       = registerKeybind(new KeyBinding("Load Meter Group"      , Keyboard.KEY_LBRACKET, MAIN));
+		SAVE_METER_GROUP       = registerKeybind(new KeyBinding("Save Meter Group"      , Keyboard.KEY_RBRACKET, MAIN));
 		PAUSE_METERS           = registerKeybind(new KeyBinding("Pause Meters"          , Keyboard.KEY_N       , MAIN));
 		TOGGLE_FOCUS_MODE      = registerKeybind(new KeyBinding("Toggle Focus Mode"     , Keyboard.KEY_F       , MAIN));
 		TOGGLE_MARKER          = registerKeybind(new KeyBinding("Toggle Tick Marker"    , Keyboard.KEY_Y       , MAIN));
