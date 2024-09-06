@@ -158,7 +158,7 @@ public class SavedMeterGroupsManager {
 			SetMetersPacket packet = new SetMetersPacket(meters);
 			client.sendPacket(packet);
 
-			Component message = new TextComponent("Loaded meter group from slot " + slot);
+			Component message = new TextComponent("Loaded meter group \'" + name + "\' from slot " + slot);
 			client.sendMessage(message, true);
 		}
 	}
@@ -200,7 +200,7 @@ public class SavedMeterGroupsManager {
 
 			meterGroups[slot + SLOT_OFFSET] = new SavedMeterGroup(name, meters);
 
-			Component message = new TextComponent("Saved meter group to slot " + slot);
+			Component message = new TextComponent("Saved meter group \'" + name + "\'to slot " + slot);
 			client.sendMessage(message, true);
 		}
 	}
