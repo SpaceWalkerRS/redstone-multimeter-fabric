@@ -23,7 +23,6 @@ import redstone.multimeter.common.network.packets.TickTimePacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.compat.CarpetCompat;
-import redstone.multimeter.server.compat.SubTickCompat;
 
 public class MultimeterServer {
 
@@ -34,7 +33,6 @@ public class MultimeterServer {
 	private final TickPhaseTree tickPhaseTree;
 
 	private final CarpetCompat carpetCompat;
-	private final SubTickCompat subTickCompat;
 
 	private boolean loaded;
 	private TickPhase tickPhase;
@@ -47,7 +45,6 @@ public class MultimeterServer {
 		this.tickPhaseTree = new TickPhaseTree();
 
 		this.carpetCompat = new CarpetCompat(this);
-		this.subTickCompat = new SubTickCompat(this);
 
 		this.tickPhase = TickPhase.UNKNOWN;
 	}
@@ -114,7 +111,7 @@ public class MultimeterServer {
 	}
 
 	public boolean isPausedOrFrozen() {
-		return isPaused() || carpetCompat.isFrozen() || subTickCompat.isFrozen();
+		return isPaused() || carpetCompat.isFrozen();
 	}
 
 	public void tickStart() {
