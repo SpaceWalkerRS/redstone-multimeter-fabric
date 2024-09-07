@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.util.ColorUtils;
 
@@ -35,16 +36,20 @@ public class MeterRenderer {
 		GlStateManager.depthMask(false);
 		GlStateManager.enableDepthTest();
 
-		Meter focussed = client.getHud().getFocussedMeter();
+		if (client.isPreviewing() || !client.getHud().isFocusMode()) {
+			ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
 
-		if (focussed != null) {
-			if (focussed.isIn(minecraft.level)) {
-				drawMeter(focussed);
-			}
-		} else {
-			for (Meter meter : client.getMeterGroup().getMeters()) {
+			for (Meter meter : meterGroup.getMeters()) {
 				if (meter.isIn(minecraft.level)) {
 					drawMeter(meter);
+				}
+			}
+		} else {
+			Meter focussed = client.getHud().getFocussedMeter();
+
+			if (focussed != null) {
+				if (focussed.isIn(minecraft.level)) {
+					drawMeter(focussed);
 				}
 			}
 		}
