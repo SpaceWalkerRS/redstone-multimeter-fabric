@@ -672,6 +672,10 @@ public class MultimeterHud extends AbstractParentElement {
 		return selectedMeter == null ? -1 : meters.indexOf(selectedMeter);
 	}
 
+	public int getFocussedRow() {
+		return focussedMeter == null ? -1 : meters.indexOf(focussedMeter);
+	}
+
 	public long getSelectedTick() {
 		return client.getPrevGameTime() + offset + Options.HUD.SELECTED_COLUMN.get();
 	}
