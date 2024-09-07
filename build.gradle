@@ -42,11 +42,17 @@ dependencies {
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 	modImplementation "de.siphalor:amecsapi-1.19:${project.amecs_version}"
 	include "de.siphalor:amecsapi-1.19:${project.amecs_version}"
-	modImplementation "carpet:fabric-carpet:${project.carpet_version}"
+	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
+		// eclipse gets confused and puts two versions of loader on the classpath...
+		exclude group: 'net.fabricmc'
+	}
 	modImplementation "maven.modrinth:subtick:${project.subtick_version}"
 
 	// subtick depends on malilib
-	modRuntimeOnly "fi.dy.masa.malilib:malilib-fabric-${project.malilib_version}"
+	modRuntimeOnly("fi.dy.masa.malilib:malilib-fabric-${project.malilib_version}") {
+		// eclipse gets confused and puts two versions of loader on the classpath...
+		exclude group: 'net.fabricmc'
+	}
 }
 
 processResources {
