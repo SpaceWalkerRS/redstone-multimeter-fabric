@@ -205,6 +205,12 @@ public class MeterListRenderer extends AbstractElement {
 
 				drawHighlight(poses, highlightRow, true);
 			}
+		} else if (hud.isFocusMode()) {
+			int focussedRow = hud.getFocussedRow();
+
+			if (focussedRow != -1) {
+				drawHighlight(poses, focussedRow, true);
+			}
 		}
 	}
 
