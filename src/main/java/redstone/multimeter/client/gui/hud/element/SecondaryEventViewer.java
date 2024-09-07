@@ -16,7 +16,7 @@ public class SecondaryEventViewer extends MeterEventViewer {
 
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
-		if (hud.isPaused() && getColumnCount() > 0) {
+		if (!hud.client.isPreviewing() && hud.isPaused() && getColumnCount() > 0) {
 			super.render(graphics, mouseX, mouseY);
 		}
 	}
