@@ -14,6 +14,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.util.ColorUtils;
 
@@ -34,16 +35,20 @@ public class MeterRenderer {
 		GlStateManager.depthMask(false);
 		GlStateManager.enableDepthTest();
 
-		Meter focussed = client.getHud().getFocussedMeter();
+		if (client.isPreviewing() || !client.getHud().isFocusMode()) {
+			ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
 
-		if (focussed != null) {
-			if (focussed.isIn(minecraft.world)) {
-				drawMeter(focussed, tickDelta);
-			}
-		} else {
-			for (Meter meter : client.getMeterGroup().getMeters()) {
+			for (Meter meter : meterGroup.getMeters()) {
 				if (meter.isIn(minecraft.world)) {
 					drawMeter(meter, tickDelta);
+				}
+			}
+		} else {
+			Meter focussed = client.getHud().getFocussedMeter();
+
+			if (focussed != null) {
+				if (focussed.isIn(minecraft.world)) {
+					drawMeter(focussed, tickDelta);
 				}
 			}
 		}
