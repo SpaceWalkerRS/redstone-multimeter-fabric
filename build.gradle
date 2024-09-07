@@ -44,20 +44,20 @@ dependencies {
 		transitive = false
 	}
 	include "net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}"
-	modImplementation "de.siphalor:amecsapi-1.17:1+"
+	modImplementation("de.siphalor:amecsapi-1.17:1+") {
+		exclude module: 'nmuk-1.17'
+	}
 	include "de.siphalor:amecsapi-1.17:1+"
-	modImplementation "carpet:fabric-carpet:${project.carpet_version}"
+	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
+		// eclipse gets confused and puts two versions of loader on the classpath...
+		exclude group: 'net.fabricmc'
+	}
 	modImplementation "maven.modrinth:subtick:${project.subtick_version}"
 
 	// subtick depends on malilib
-	modRuntimeOnly "fi.dy.masa.malilib:malilib-fabric-${project.malilib_version}"
-}
-
-configurations.all {
-	resolutionStrategy {
-		dependencySubstitution {
-			substitute module("de.siphalor:nmuk-1.17:1.0.0+mc+") using module("de.siphalor:nmuk-1.17:1+")
-		}
+	modRuntimeOnly("fi.dy.masa.malilib:malilib-fabric-${project.malilib_version}") {
+		// eclipse gets confused and puts two versions of loader on the classpath...
+		exclude group: 'net.fabricmc'
 	}
 }
 
