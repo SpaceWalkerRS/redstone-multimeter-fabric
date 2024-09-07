@@ -25,7 +25,7 @@ public class MeterEventDetails extends AbstractElement {
 	}
 
 	private EventLog getEvent() {
-		if (hud.isFocusMode()) {
+		if (!hud.client.isPreviewing() && hud.isFocusMode()) {
 			EventLog event = hud.getFocussedEvent();
 
 			if (event != null) {
