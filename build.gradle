@@ -45,11 +45,15 @@ dependencies {
 		transitive = false
 	}
 	include "net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}"
-	modImplementation ("de.siphalor:amecsapi-1.16:1.3.2+mc1.16.5") {
+	modImplementation ("de.siphalor:amecsapi-1.16:1.1.2+mc1.16-rc1") {
 		exclude group: "net.fabricmc.fabric-api"
+		exclude group: "de.siphalor", module: "nmuk-1.15"
 	}
-	include "de.siphalor:amecsapi-1.16:1.3.2+mc1.16.5"
-	modImplementation "carpet:fabric-carpet:${project.carpet_version}"
+	include "de.siphalor:amecsapi-1.16:1.1.2+mc1.16-rc1"
+	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
+		// eclipse gets confused and puts two versions of loader on the classpath...
+		exclude group: 'net.fabricmc'
+	}
 }
 
 processResources {
