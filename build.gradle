@@ -46,7 +46,10 @@ dependencies {
 	include "net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}"
 	modImplementation "de.siphalor:amecsapi-1.16:1+"
 	include "de.siphalor:amecsapi-1.16:1+"
-	modImplementation "carpet:fabric-carpet:${project.carpet_version}"
+	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
+		// eclipse gets confused and puts two versions of loader on the classpath...
+		exclude group: 'net.fabricmc'
+	}
 }
 
 processResources {
