@@ -67,5 +67,9 @@ public class MeterGroupSubscriptionPacket implements RSMMPacket {
 		}
 
 		meterGroupPreview.stopPreviewing();
+
+		if (client.getHud().isFocusMode()) {
+			client.getHud().setFocusMode(false);
+		}
 	}
 }
