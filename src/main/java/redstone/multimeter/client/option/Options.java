@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.hud.Directionality;
+import redstone.multimeter.client.render.MeterNameMode;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.ColorPicker;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -29,6 +30,8 @@ public class Options {
 		public static final EnumOption<ColorPicker>      COLOR_PICKER         = new EnumOption<>("Color Picker", "The algorithm used to pick colors for new meters", ColorPicker.class, ColorPicker.RANDOM);
 		public static final BooleanOption                SHIFTY_METERS        = new BooleanOption("Shifty Meters", "Use the shift key to control whether a new meter is movable or not.", true);
 		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("Auto Random Ticks", String.format("Automatically enable the \'%s\' event type when placing a meter on a block that accepts random ticks.", EventType.RANDOM_TICK.getName()), true);
+		public static final EnumOption<MeterNameMode>    RENDER_METER_NAMES   = new EnumOption<>("Render Meter Names", "Render meter name tags inside the meter highlights in the world.", MeterNameMode.class, MeterNameMode.IN_FOCUS_MODE);
+		public static final IntegerOption                METER_NAME_RANGE     = new IntegerOption("Meter Name Range", "The range within which meter names will be rendered.", 16, 0, 64);
 		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("Create Group On Join", "Automatically create a new meter group upon joining a world or server.", true);
 		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption("Default Meter Group", "The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used instead.", "", MeterGroup.getMaxNameLength());
 		public static final BooleanOption                PREVIEW_METER_GROUPS = new BooleanOption("Preview Meter Groups", "Preview meter groups before loading them from the saved meter group slot. This preview will appear as long as the Load Meter Group keybind is pressed. Pressing the slot key again will stop previewing and load the meter group from that slot.", true);
@@ -196,6 +199,8 @@ public class Options {
 			RedstoneMultimeter.COLOR_PICKER,
 			RedstoneMultimeter.SHIFTY_METERS,
 			RedstoneMultimeter.AUTO_RANDOM_TICKS,
+			RedstoneMultimeter.RENDER_METER_NAMES,
+			RedstoneMultimeter.METER_NAME_RANGE,
 			RedstoneMultimeter.CREATE_GROUP_ON_JOIN,
 			RedstoneMultimeter.DEFAULT_METER_GROUP,
 			RedstoneMultimeter.PREVIEW_METER_GROUPS,
