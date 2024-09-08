@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.mojang.math.Matrix4f;
@@ -17,6 +18,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderBuffers;
 
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
@@ -24,6 +27,7 @@ import redstone.multimeter.interfaces.mixin.IMinecraft;
 public class LevelRendererMixin {
 
 	@Shadow @Final private Minecraft minecraft;
+	@Shadow @Final private RenderBuffers renderBuffers;
 
 	@Inject(
 		method = "renderLevel",
@@ -33,7 +37,19 @@ public class LevelRendererMixin {
 			target = "Lnet/minecraft/client/renderer/FogRenderer;setupNoFog()V"
 		)
 	)
-	private void renderMeterHighlights(PoseStack poses, float partialTick, long timeNanos, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+	private void renderMeterHighlights(PoseStack poses, float partialTick, long timeNanos, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionPose, CallbackInfo ci) {
 		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters(poses);
+	}
+
+	@Inject(
+		method = "renderLevel",
+		at = @At(
+			value = "INVOKE",
+			shift = Shift.AFTER,
+			target = "Lnet/minecraft/client/renderer/debug/DebugRenderer;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;DDD)V"
+		)
+	)
+	private void renderMeterNames(PoseStack poses, float partialTick, long timeNanos, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionPose, CallbackInfo ci, @Local MultiBufferSource.BufferSource bufferSource) {
+		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeterNames(poses, bufferSource);
 	}
 }
