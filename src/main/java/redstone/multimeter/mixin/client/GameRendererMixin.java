@@ -28,4 +28,15 @@ public class GameRendererMixin {
 	private void renderMeterHighlights(int anaglyphRenderPass, float tickDelta, long renderTimeLimit, CallbackInfo ci) {
 		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters(tickDelta);
 	}
+
+	@Inject(
+		method = "render(IFJ)V",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/client/render/GameRenderer;enableLightMap()V"
+		)
+	)
+	private void renderMeterNames(int anaglyphRenderPass, float tickDelta, long renderTimeLimit, CallbackInfo ci) {
+		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeterNames(tickDelta);
+	}
 }
