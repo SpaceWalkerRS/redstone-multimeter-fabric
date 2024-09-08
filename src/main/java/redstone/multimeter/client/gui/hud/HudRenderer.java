@@ -59,11 +59,11 @@ public class HudRenderer extends RenderHelper2D {
 	}
 
 	public void renderText(String text, int x, int y, int color) {
-		super.renderText(hud.font, text, x, y, false, color);
+		renderText(hud.font, text, x, y, false, color);
 	}
 
 	public void renderText(Component text, int x, int y, int color) {
-		super.renderText(hud.font, text, x, y, false, color);
+		renderText(hud.font, text, x, y, false, color);
 	}
 
 	@Override
