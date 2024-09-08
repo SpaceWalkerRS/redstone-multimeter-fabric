@@ -28,4 +28,15 @@ public class GameRendererMixin {
 	private void renderMeterHighlights(float partialTick, long timeNanos, CallbackInfo ci) {
 		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters();
 	}
+
+	@Inject(
+		method = "render(FJ)V",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/GameRenderer;turnOnLightLayer()V"
+		)
+	)
+	private void renderMeterNames(float partialTick, long timeNanos, CallbackInfo ci) {
+		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeterNames();
+	}
 }
