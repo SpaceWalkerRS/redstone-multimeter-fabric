@@ -28,4 +28,15 @@ public class GameRendererMixin {
 	private void renderMeterHighlights(float tickDelta, long timeNanos, CallbackInfo ci) {
 		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters(tickDelta);
 	}
+
+	@Inject(
+		method = "render(FJ)V",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/client/render/GameRenderer;enableLightMap()V"
+		)
+	)
+	private void renderMeterNames(float tickDelta, long timeNanos, CallbackInfo ci) {
+		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeterNames(tickDelta);
+	}
 }
