@@ -551,12 +551,12 @@ public class MultimeterHud extends AbstractParentElement {
 
 			if (setFocusMode(enable)) {
 				String message = String.format("%s Focus Mode", enable ? "Enabled" : "Disabled");
-				client.sendMessage(new LiteralText(message), true);
+				client.sendMessage(new LiteralText(message));
 
 				client.getTutorial().onToggleFocusMode(enable);
 			} else {
 				String message = "No meter event logs available to focus on...";
-				client.sendMessage(new LiteralText(message), true);
+				client.sendMessage(new LiteralText(message));
 			}
 		}
 	}
