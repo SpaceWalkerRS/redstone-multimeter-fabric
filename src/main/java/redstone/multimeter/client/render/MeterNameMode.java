@@ -6,7 +6,8 @@ public enum MeterNameMode implements Cyclable<MeterNameMode> {
 
 	NEVER("Never"),
 	ALWAYS("Always"),
-	IN_FOCUS_MODE("In Focus Mode");
+	IN_FOCUS_MODE("In Focus Mode"),
+	WHEN_PREVIEWING("When Previewing");
 
 	private final String name;
 
