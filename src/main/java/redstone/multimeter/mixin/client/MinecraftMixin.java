@@ -119,7 +119,7 @@ public class MinecraftMixin implements IMinecraft {
 		)
 	)
 	private void openScreen(Screen screen, CallbackInfo ci) {
-		if (this.screen != null && !(this.screen instanceof ScreenWrapper)) {
+		if (this.screen != null && !(this.screen instanceof ScreenWrapper) && multimeterClient != null) {
 			multimeterClient.getTutorial().onScreenOpened(this.screen);
 		}
 	}
