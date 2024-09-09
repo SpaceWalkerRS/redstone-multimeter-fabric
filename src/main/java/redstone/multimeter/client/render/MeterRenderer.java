@@ -50,7 +50,9 @@ public class MeterRenderer {
 	public void renderMeterNames(Matrix4f cameraPose, MultiBufferSource.BufferSource bufferSource) {
 		MeterNameMode mode = Options.RedstoneMultimeter.RENDER_METER_NAMES.get();
 
-		if (mode == MeterNameMode.ALWAYS || (mode == MeterNameMode.IN_FOCUS_MODE && client.getHud().isFocusMode())) {
+		if (mode == MeterNameMode.ALWAYS
+			|| (mode == MeterNameMode.WHEN_PREVIEWING && client.isPreviewing())
+			|| (mode == MeterNameMode.IN_FOCUS_MODE && client.getHud().isFocusMode() && !client.isPreviewing())) {
 			renderMeters(cameraPose, bufferSource, this::renderMeterName);
 		}
 	}
