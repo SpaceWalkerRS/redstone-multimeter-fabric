@@ -4,7 +4,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -23,9 +22,8 @@ public class GameGuiMixin {
 	@Inject(
 		method = "render",
 		at = @At(
-			value = "INVOKE",
-			shift = Shift.AFTER,
-			target = "Lnet/minecraft/client/gui/GameGui;renderStatusEffects(Lnet/minecraft/client/render/Window;)V"
+			value = "FIELD",
+			target = "Lnet/minecraft/client/options/GameOptions;debugEnabled:Z"
 		)
 	)
 	private void renderHud(float tickDelta, CallbackInfo ci) {
