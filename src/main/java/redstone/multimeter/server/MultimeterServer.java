@@ -9,6 +9,7 @@ import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.DimPos;
@@ -188,7 +189,8 @@ public class MultimeterServer {
 	}
 
 	public ServerWorld getWorld(String key) {
-		return server.getWorld(DimensionUtils.byKey(key).getId());
+		DimensionType dimension = DimensionUtils.byKey(key);
+		return dimension == null ? null : server.getWorld(dimension.getId());
 	}
 
 	public ServerWorld getWorld(DimPos pos) {
