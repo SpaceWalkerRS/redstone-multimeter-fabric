@@ -131,21 +131,16 @@ public class ScreenWrapper extends Screen {
 			char chr = Keyboard.getEventCharacter();
 			int key = Keyboard.getEventKey();
 
-			boolean consumed = false;
-
 			if (key != Keyboard.CHAR_NONE) {
 				if (Keyboard.getEventKeyState()) {
-					consumed = screen.keyPress(key);
-
-					if (!consumed && key == Keyboard.KEY_ESCAPE) {
+					if (!screen.keyPress(key) && key == Keyboard.KEY_ESCAPE) {
 						screen.close();
-						consumed = true;
 					}
 				} else {
-					consumed = screen.keyRelease(key);
+					screen.keyRelease(key);
 				}
 			}
-			if (!consumed && chr >= ' ') {
+			if (chr >= ' ') {
 				screen.typeChar(chr);
 			}
 
