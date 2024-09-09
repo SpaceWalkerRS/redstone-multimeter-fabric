@@ -267,7 +267,7 @@ public class Multimeter {
 				setMeters(meterGroup, meters);
 			} else {
 				Text message = new LiteralText(String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName()));
-				server.sendMessage(player, message, false);
+				server.sendMessage(player, message);
 			}
 		}
 	}

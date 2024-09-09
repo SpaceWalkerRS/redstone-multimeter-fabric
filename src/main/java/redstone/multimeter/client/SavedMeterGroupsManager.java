@@ -151,7 +151,7 @@ public class SavedMeterGroupsManager {
 				}
 			} else {
 				Text warning = new LiteralText(String.format("Could not load meter group from slot %d: that slot is empty!", slot));
-				client.sendMessage(warning, true);
+				client.sendMessage(warning);
 			}
 		} else {
 			client.subscribeToMeterGroup(name);
@@ -160,7 +160,7 @@ public class SavedMeterGroupsManager {
 			client.sendPacket(packet);
 
 			Text message = new LiteralText("Loaded meter group \'" + name + "\' from slot " + slot);
-			client.sendMessage(message, true);
+			client.sendMessage(message);
 		}
 	}
 
@@ -168,7 +168,7 @@ public class SavedMeterGroupsManager {
 		lastLoadWarningSlot = slot;
 		bypassLoadWarningTicks = WARNING_TIME;
 
-		client.sendMessage(warning, true);
+		client.sendMessage(warning);
 	}
 
 	public void saveSlot(int slot) {
@@ -187,7 +187,7 @@ public class SavedMeterGroupsManager {
 
 
 				Text message = new LiteralText("Cleared saved meter group slot " + slot);
-				client.sendMessage(message, true);
+				client.sendMessage(message);
 			} else {
 				Text warning = new LiteralText("You are not subscribed to a meter group! Are you sure you want to clear that slot?");
 				saveSlotWarning(slot, warning);
@@ -206,7 +206,7 @@ public class SavedMeterGroupsManager {
 			meterGroups[slot + SLOT_OFFSET] = new SavedMeterGroup(name, meters);
 
 			Text message = new LiteralText("Saved meter group \'" + name + "\'to slot " + slot);
-			client.sendMessage(message, true);
+			client.sendMessage(message);
 		}
 	}
 
@@ -214,7 +214,7 @@ public class SavedMeterGroupsManager {
 		lastSaveWarningSlot = slot;
 		bypassSaveWarningTicks = WARNING_TIME;
 
-		client.sendMessage(warning, true);
+		client.sendMessage(warning);
 	}
 
 	public void previewSlot(int slot) {
@@ -222,7 +222,7 @@ public class SavedMeterGroupsManager {
 
 		if (meterGroup == null) {
 			Text warning = new LiteralText("That slot is empty!");
-			client.sendMessage(warning, true);
+			client.sendMessage(warning);
 		} else {
 			String name = meterGroup.getName();
 			List<MeterProperties> meters = meterGroup.getMeters();
@@ -230,7 +230,7 @@ public class SavedMeterGroupsManager {
 			client.previewMeterGroup(name, meters);
 
 			Text message = new LiteralText("Previewing meter group \'" + name + "\' from slot " + slot);
-			client.sendMessage(message, true);
+			client.sendMessage(message);
 
 			previewSlot = slot;
 		}
@@ -239,7 +239,7 @@ public class SavedMeterGroupsManager {
 	public void loadPreviewSlot() {
 		if (previewSlot == -1) {
 			Text message = new LiteralText("Not previewing any meter group!");
-			client.sendMessage(message, true);
+			client.sendMessage(message);
 		} else {
 			loadSlot(previewSlot);
 		}
@@ -253,7 +253,7 @@ public class SavedMeterGroupsManager {
 
 			if (meterGroup != null) {
 				Text message = new LiteralText("Stopped previewing meter group \'" + meterGroup.getName() + "\' from slot " + previewSlot);
-				client.sendMessage(message, true);
+				client.sendMessage(message);
 			}
 
 			previewSlot = -1;
