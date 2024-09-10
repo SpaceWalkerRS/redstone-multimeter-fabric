@@ -212,33 +212,12 @@ public class MeterRenderer {
 		GL11.glRotatef(-yaw, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(pitch, 1.0F, 0.0F, 0.0F);
 		GL11.glScalef(-0.025F, -0.025F, 0.025F);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glDepthMask(false);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_BLEND);
-		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-
-		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
-
-		int halfWidth = textRenderer.getWidth(name) / 2;
-
-		bufferBuilder.start(GL11.GL_QUADS);
-
-		bufferBuilder.color(0.0F, 0.0F, 0.0F, 0.25F);
-		bufferBuilder.vertex(-halfWidth - 1, -1, 0.0);
-		bufferBuilder.vertex(-halfWidth - 1, 8, 0.0);
-		bufferBuilder.vertex(halfWidth + 1, 8, 0.0);
-		bufferBuilder.vertex(halfWidth + 1, -1, 0.0);
-
-		bufferBuilder.end();
-
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 553648127);
-
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDepthMask(true);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 0xFFFFFFFF);
 
