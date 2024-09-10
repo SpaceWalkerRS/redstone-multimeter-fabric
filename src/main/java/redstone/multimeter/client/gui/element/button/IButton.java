@@ -1,9 +1,9 @@
 package redstone.multimeter.client.gui.element.button;
 
+import net.minecraft.client.resource.Identifier;
 import net.minecraft.client.sound.instance.SimpleSoundInstance;
 import net.minecraft.client.sound.instance.SoundInstance;
 import net.minecraft.client.sound.system.SoundManager;
-import net.minecraft.resource.Identifier;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 

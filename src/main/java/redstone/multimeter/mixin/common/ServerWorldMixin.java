@@ -17,11 +17,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ScheduledTick;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldData;
+import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.WorldChunkSection;
 import net.minecraft.world.dimension.Dimension;
@@ -42,8 +41,8 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	private int rsmm$scheduledTicks;
 	private int rsmm$currentDepth;
 
-	private ServerWorldMixin(WorldStorage storage, WorldData data, Dimension dimension, Profiler profiler, boolean isClient) {
-		super(storage, data, dimension, profiler, isClient);
+	private ServerWorldMixin(WorldStorage storage, String name, Dimension dimension, WorldSettings settings, Profiler profiler) {
+		super(storage, name, dimension, settings, profiler);
 	}
 
 	@Inject(
@@ -212,28 +211,10 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			ordinal = 0,
 			target = "Ljava/util/Iterator;hasNext()Z"
 		)
 	)
-	private void startOrSwapOrEndTickTaskTickChunkDebug(CallbackInfo ci, Iterator<WorldChunk> it) {
-		startOrSwapOrEndTickTaskTickChunk(it);
-	}
-
-	@Inject(
-		method = "tickChunks",
-		locals = LocalCapture.CAPTURE_FAILHARD,
-		at = @At(
-			value = "INVOKE",
-			ordinal = 1,
-			target = "Ljava/util/Iterator;hasNext()Z"
-		)
-	)
-	private void startOrSwapOrEndTickTaskTickChunk(CallbackInfo ci, int attempts, int succeeded, Iterator<WorldChunk> it) {
-		startOrSwapOrEndTickTaskTickChunk(it);
-	}
-
-	private void startOrSwapOrEndTickTaskTickChunk(Iterator<WorldChunk> it) {
+	private void startOrSwapOrEndTickTaskTickChunk(CallbackInfo ci, int succeeded, int attempts, Iterator<ChunkPos> it) {
 		if (it.hasNext()) {
 			if (rsmm$firstTickingChunk) {
 				rsmm$startTickTask(TickTask.TICK_CHUNK);
@@ -292,32 +273,32 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;randomTick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Ljava/util/Random;)V"
+			target = "Lnet/minecraft/block/Block;tick(Lnet/minecraft/world/World;IIILjava/util/Random;)V"
 		)
 	)
-	private void logRandomTick(CallbackInfo ci, int attempts, int succeeded, Iterator<WorldChunk> it, ChunkPos chunkPos, int chunkX, int chunkZ, WorldChunk chunk, int o, WorldChunkSection[] sections, int sectionIndex, int maxSectionIndex, WorldChunkSection section, int attempt, int randomNumber, int localX, int localZ, int localY) {
-		getMultimeter().logRandomTick(this, new BlockPos(chunkX + localX, section.getOffsetY() + localY, chunkZ + localZ));
+	private void logRandomTick(CallbackInfo ci, int succeeded, int attempts, Iterator<ChunkPos> it, ChunkPos chunkPos, int chunkX, int chunkZ, WorldChunk chunk, WorldChunkSection[] sections, int sectionIndex, int maxSectionIndex, WorldChunkSection section, int attempt, int randomNumber, int localX, int localZ, int localY) {
+		getMultimeter().logRandomTick(this, chunkX + localX, section.getOffsetY() + localY, chunkZ + localZ);
 	}
 
 	@Inject(
-		method = "scheduleTick(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;II)V",
+		method = "scheduleTick(IIILnet/minecraft/block/Block;II)V",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void captureScheduledTicks(BlockPos pos, Block block, int delay, int priority, CallbackInfo ci) {
+	private void captureScheduledTicks(int x, int y, int z, Block block, int delay, int priority, CallbackInfo ci) {
 		rsmm$scheduledTicks = scheduledTicks.size();
 	}
 
 	@Inject(
-		method = "scheduleTick(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;II)V",
+		method = "scheduleTick(IIILnet/minecraft/block/Block;II)V",
 		at = @At(
 			value = "TAIL"
 		)
 	)
-	private void logScheduleTick(BlockPos pos, Block block, int delay, int priority, CallbackInfo ci) {
+	private void logScheduleTick(int x, int y, int z, Block block, int delay, int priority, CallbackInfo ci) {
 		if (rsmm$scheduledTicks != scheduledTicks.size()) {
-			getMultimeter().logScheduledTick(this, pos, priority, true);
+			getMultimeter().logScheduledTick(this, x, y, z, priority, true);
 		}
 	}
 
@@ -326,11 +307,11 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;tick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Ljava/util/Random;)V"
+			target = "Lnet/minecraft/block/Block;tick(Lnet/minecraft/world/World;IIILjava/util/Random;)V"
 		)
 	)
 	private void logScheduledTick(boolean debug, CallbackInfoReturnable<Boolean> cir, Iterator<ScheduledTick> scheduledTicksThisTick, ScheduledTick scheduledTick) {
-		getMultimeter().logScheduledTick(this, scheduledTick.pos, scheduledTick.priority, false);
+		getMultimeter().logScheduledTick(this, scheduledTick.x, scheduledTick.y, scheduledTick.z, scheduledTick.priority, false);
 	}
 
 	@Inject(
@@ -359,8 +340,8 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			value = "TAIL"
 		)
 	)
-	private void addBlockEvent(BlockPos pos, Block block, int type, int data, CallbackInfo ci) {
-		getMultimeter().logBlockEvent(this, pos, type, rsmm$currentDepth + 1, true);
+	private void addBlockEvent(int x, int y, int z, Block block, int type, int data, CallbackInfo ci) {
+		getMultimeter().logBlockEvent(this, x, y, z, type, rsmm$currentDepth + 1, true);
 	}
 
 	@Inject(
@@ -398,11 +379,11 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		method = "doBlockEvent",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;doEvent(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;II)Z"
+			target = "Lnet/minecraft/block/Block;doEvent(Lnet/minecraft/world/World;IIIII)Z"
 		)
 	)
 	private void logBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
-		getMultimeter().logBlockEvent(this, blockEvent.getPos(), blockEvent.getType(), rsmm$currentDepth, false);
+		getMultimeter().logBlockEvent(this, blockEvent.getX(), blockEvent.getY(), blockEvent.getZ(), blockEvent.getType(), rsmm$currentDepth, false);
 	}
 
 	@Override

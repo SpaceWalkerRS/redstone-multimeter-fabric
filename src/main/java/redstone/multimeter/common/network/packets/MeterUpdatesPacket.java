@@ -16,6 +16,7 @@ import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.network.RSMMPacket;
+import redstone.multimeter.interfaces.mixin.INbtList;
 import redstone.multimeter.server.MultimeterServer;
 import redstone.multimeter.util.NbtUtils;
 
@@ -79,7 +80,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			NbtList ids = data.getList("removed", NbtUtils.TYPE_LONG);
 
 			for (int i = 0; i < ids.size(); i++) {
-				NbtLong nbt = (NbtLong)ids.get(i);
+				NbtLong nbt = ((INbtList)ids).getLong(i);
 				long id = nbt.getLong();
 
 				removedMeters.add(id);
@@ -100,7 +101,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			NbtList ids = data.getList("meters", NbtUtils.TYPE_LONG);
 
 			for (int i = 0; i < ids.size(); i++) {
-				NbtLong nbt = (NbtLong)ids.get(i);
+				NbtLong nbt = ((INbtList)ids).getLong(i);
 				long id = nbt.getLong();
 
 				meters.add(id);

@@ -14,8 +14,6 @@ import java.util.UUID;
 import com.google.common.base.Supplier;
 
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
@@ -29,6 +27,7 @@ import redstone.multimeter.common.network.packets.MeterUpdatesPacket;
 import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.meter.event.MeterEventPredicate;
 import redstone.multimeter.server.meter.log.ServerLogManager;
+import redstone.multimeter.util.Direction;
 
 public class ServerMeterGroup extends MeterGroup {
 
@@ -284,8 +283,8 @@ public class ServerMeterGroup extends MeterGroup {
 		meterIndicesChanged = false;
 	}
 
-	public void tryLogEvent(World world, BlockPos blockPos, EventType type, Supplier<Integer> data, MeterEventPredicate predicate) {
-		DimPos pos = new DimPos(world, blockPos);
+	public void tryLogEvent(World world, int x, int y, int z, EventType type, Supplier<Integer> data, MeterEventPredicate predicate) {
+		DimPos pos = new DimPos(world, x, y, z);
 		Meter meter = getMeterAt(pos);
 
 		if (meter != null && meter.isMetering(type)) {

@@ -2,15 +2,12 @@ package redstone.multimeter.mixin.common.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -22,14 +19,12 @@ public class DispenserBlockMixin implements MeterableBlock {
 		method = "neighborChanged",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
-			value = "FIELD",
-			ordinal = 0,
-			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/block/DispenserBlock;TRIGGERED:Lnet/minecraft/block/state/property/BooleanProperty;"
+			value = "INVOKE",
+			target = "Lnet/minecraft/world/World;getBlockMetadata(III)I"
 		)
 	)
-	private void logPowered(World world, BlockPos pos, BlockState state, Block neighborBlock, CallbackInfo ci, boolean powered) {
-		rsmm$logPowered(world, pos, powered);
+	private void logPowered(World world, int x, int y, int z, Block neighborBlock, CallbackInfo ci, int powered /* the fuck? */) {
+		rsmm$logPowered(world, x, y, z, powered != 0);
 	}
 
 	@Override
@@ -38,12 +33,12 @@ public class DispenserBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
-		return world.hasNeighborSignal(pos) || world.hasNeighborSignal(pos.up());
+	public boolean rsmm$isPowered(World world, int x, int y, int z, int metadata) {
+		return world.hasNeighborSignal(x, y, z) || world.hasNeighborSignal(x, y + 1, z);
 	}
 
 	@Override
-	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(DispenserBlock.TRIGGERED);
+	public boolean rsmm$isActive(World world, int x, int y, int z, int metadata) {
+		return (metadata & 0b1000) != 0;
 	}
 }

@@ -2,7 +2,7 @@ package redstone.multimeter.client.gui.hud.element;
 
 import java.util.List;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.text.Text;
 
@@ -58,8 +58,8 @@ public class MeterEventDetails extends AbstractElement {
 		int borderColor0 = hud.isOnScreen() ? 0x505000FF : 0xFF8000FF;
 		int borderColor1 = hud.isOnScreen() ? 0x5028007F : 0xFF5000C0;
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(0, 0, 400);
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 400);
 
 		// background
 		hud.renderer.renderRect(x    , y + 1         , width    , height - 2, backgroundColor); // center, left/right outer borders
@@ -87,7 +87,7 @@ public class MeterEventDetails extends AbstractElement {
 			hud.renderer.renderText(line, lineX, lineY, 0xFFFFFFFF);
 		}
 
-		GlStateManager.popMatrix();
+		GL11.glPopMatrix();
 	}
 
 	@Override

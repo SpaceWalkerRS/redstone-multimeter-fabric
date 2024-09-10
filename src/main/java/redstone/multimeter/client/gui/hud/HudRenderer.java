@@ -1,6 +1,7 @@
 package redstone.multimeter.client.gui.hud;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
+
 import com.mojang.blaze3d.vertex.BufferBuilder;
 
 import net.minecraft.client.render.TextRenderer;
@@ -68,7 +69,7 @@ public class HudRenderer extends RenderHelper2D {
 
 	@Override
 	protected void drawRect(BufferBuilder bufferBuilder, int x, int y, int width, int height, int color) {
-		GlStateManager.enableDepthTest();
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 
 		int x0 = translateX(x, width);
 		int y0 = translateY(y, height);
@@ -85,7 +86,7 @@ public class HudRenderer extends RenderHelper2D {
 
 	@Override
 	protected void drawGradient(BufferBuilder bufferBuilder, int x, int y, int width, int height, int color0, int color1) {
-		GlStateManager.enableDepthTest();
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 
 		int x0 = translateX(x, width);
 		int y0 = translateY(y, height);

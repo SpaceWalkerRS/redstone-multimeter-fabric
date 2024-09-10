@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui;
 
-import net.minecraft.resource.Identifier;
+import net.minecraft.client.resource.Identifier;
 
 public class Texture {
 

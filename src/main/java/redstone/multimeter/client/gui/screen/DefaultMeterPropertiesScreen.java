@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import org.lwjgl.input.Keyboard;
 
-import net.minecraft.resource.Identifier;
+import net.minecraft.client.resource.Identifier;
 import net.minecraft.text.Formatting;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;

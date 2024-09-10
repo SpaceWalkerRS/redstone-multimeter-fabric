@@ -11,9 +11,8 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.Function;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.Command;
 import net.minecraft.server.command.AbstractCommand;
 import net.minecraft.server.command.TargetSelector;
 import net.minecraft.server.command.exception.CommandException;
@@ -22,7 +21,6 @@ import net.minecraft.server.command.exception.IncorrectUsageException;
 import net.minecraft.server.command.source.CommandSource;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.BlockPos;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -74,6 +72,12 @@ public class MeterGroupCommand extends AbstractCommand {
 		this.multimeter = this.server.getMultimeter();
 	}
 
+	// needed to keep the compiler happy
+	@Override
+	public int compareTo(Object o) {
+		return compareTo((Command) o);
+	}
+
 	@Override
 	public String getName() {
 		return COMMAND_NAME;
@@ -85,7 +89,7 @@ public class MeterGroupCommand extends AbstractCommand {
 	}
 
 	@Override
-	public List<String> getSuggestions(CommandSource source, String[] args, @Nullable BlockPos pos) {
+	public List<String> getSuggestions(CommandSource source, String[] args) {
 		boolean isOwner = isOwnerOfSubscription(source);
 
 		switch (args.length) {
@@ -456,13 +460,13 @@ public class MeterGroupCommand extends AbstractCommand {
 	}
 
 	private static List<ServerPlayerEntity> parsePlayers(CommandSource source, String arg) throws CommandException {
-		List<ServerPlayerEntity> players = TargetSelector.select(source, arg, ServerPlayerEntity.class);
+		ServerPlayerEntity[] players = TargetSelector.select(source, arg);
 
-		if (players.isEmpty()) {
+		if (players.length == 0) {
 			return Arrays.asList(AbstractCommand.parsePlayer(source, arg));
 		}
 
-		return players;
+		return Arrays.asList(players);
 	}
 
 	@FunctionalInterface

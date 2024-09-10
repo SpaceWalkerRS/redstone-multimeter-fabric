@@ -13,6 +13,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.interfaces.mixin.INbtList;
 import redstone.multimeter.util.NbtUtils;
 
 public class TickPhaseTree {
@@ -142,7 +143,7 @@ public class TickPhaseTree {
 		NbtList tasks = nbt.getList("tasks", NbtUtils.TYPE_BYTE_ARRAY);
 		NbtList args = nbt.getList("args", NbtUtils.TYPE_STRING);
 
-		if (!tasks.isEmpty()) {
+		if (tasks.size() > 0) {
 			start();
 			addNode(tasks, args, 0, 0, 0);
 			end();
@@ -150,7 +151,7 @@ public class TickPhaseTree {
 	}
 
 	private void addNode(NbtList tasks, NbtList args, int taskIndex, int argIndex, int lastDepth) {
-		NbtByteArray taskNbt = (NbtByteArray)tasks.get(taskIndex);
+		NbtByteArray taskNbt = ((INbtList)tasks).getByteArray(taskIndex);
 		byte[] array = taskNbt.getByteArray();
 		int depth = array[0];
 		TickTask task = TickTask.byIndex(array[1]);

@@ -3,6 +3,7 @@ package redstone.multimeter.common.meter.log;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -186,7 +187,7 @@ public class MeterLogs {
 		for (EventType type : EventType.ALL) {
 			NbtList logs = toNbt(type);
 
-			if (!logs.isEmpty()) {
+			if (logs.size() > 0) {
 				nbt.put(type.getName(), logs);
 			}
 		}
@@ -207,7 +208,7 @@ public class MeterLogs {
 	public static Collection<EventLog> fromNbt(NbtCompound nbt) {
 		Collection<EventLog> logs = new ArrayList<>();
 
-		for (String key : nbt.getKeys()) {
+		for (String key : (Set<String>) nbt.getKeys()) {
 			EventType type = EventType.byName(key);
 
 			if (type != null) {

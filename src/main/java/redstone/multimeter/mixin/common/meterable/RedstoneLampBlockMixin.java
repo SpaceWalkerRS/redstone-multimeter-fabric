@@ -9,9 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.RedstoneLampBlock;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -27,12 +26,12 @@ public class RedstoneLampBlockMixin implements MeterableBlock {
 			value = "HEAD"
 		)
 	)
-	private void logPowered(World world, BlockPos pos, BlockState state, Random random, CallbackInfo ci) {
-		rsmm$logPowered(world, pos, state);
+	private void logPowered(World world, int x, int y, int z, Random random, CallbackInfo ci) {
+		rsmm$logPowered(world, x, y, z, (Block) (Object) this, world.getBlockMetadata(x, y, z));
 	}
 
 	@Override
-	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+	public boolean rsmm$isActive(World world, int x, int y, int z, int metadata) {
 		return lit;
 	}
 }

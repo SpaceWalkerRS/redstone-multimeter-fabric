@@ -8,8 +8,9 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.texture.TextureManager;
+import net.minecraft.client.resource.Identifier;
 import net.minecraft.item.ItemStack;
-import net.minecraft.resource.Identifier;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -18,6 +19,7 @@ import redstone.multimeter.util.TextUtils;
 
 public class BlockListElement extends SelectableScrollableListElement {
 
+	private final TextureManager textureManager;
 	private final ItemRenderer itemRenderer;
 	private final TextRenderer textRenderer;
 	private final Consumer<Identifier> selectionListener;
@@ -31,7 +33,8 @@ public class BlockListElement extends SelectableScrollableListElement {
 
 		Minecraft minecraft = this.client.getMinecraft();
 
-		this.itemRenderer = minecraft.getItemRenderer();
+		this.textureManager = minecraft.getTextureManager();
+		this.itemRenderer = new ItemRenderer();
 		this.textRenderer = minecraft.textRenderer;
 		this.selectionListener = selectionListener;
 
@@ -88,7 +91,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 			super(0, 0, width, height);
 
 			this.key = key;
-			this.block = Block.REGISTRY.get(key);
+			this.block = (Block) Block.REGISTRY.get(key);
 
 			if (this.block == null) {
 				this.stack = null;
@@ -104,7 +107,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int y = getY() + (height - 16) / 2;
 
 			if (stack != null) {
-				itemRenderer.renderGuiItem(stack, x, y);
+				itemRenderer.renderGuiItem(textRenderer, textureManager, stack, x, y);
 			}
 
 			x = getX() + 22;

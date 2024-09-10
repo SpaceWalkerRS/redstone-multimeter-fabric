@@ -6,10 +6,7 @@ import java.util.function.Supplier;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tessellator;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
@@ -345,26 +342,25 @@ public class TextField extends AbstractButton {
 		int y1 = selectionY + selectionHeight;
 		int z = 0;
 
-		GlStateManager.color4f(0.0F, 0.0F, 1.0F, 1.0F);
-		GlStateManager.disableTexture();
-		GlStateManager.enableColorLogicOp();
-		GlStateManager.logicOp(GL11.GL_OR_REVERSE);
+		GL11.glColor4f(0.0F, 0.0F, 1.0F, 1.0F);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_COLOR_LOGIC_OP);
+		GL11.glLogicOp(GL11.GL_OR_REVERSE);
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
+		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
 
-		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION);
+		bufferBuilder.start(GL11.GL_QUADS);
 
-		bufferBuilder.vertex(x0, y0, z).nextVertex();
-		bufferBuilder.vertex(x0, y1, z).nextVertex();
-		bufferBuilder.vertex(x1, y1, z).nextVertex();
-		bufferBuilder.vertex(x1, y0, z).nextVertex();
+		bufferBuilder.vertex(x0, y0, z);
+		bufferBuilder.vertex(x0, y1, z);
+		bufferBuilder.vertex(x1, y1, z);
+		bufferBuilder.vertex(x1, y0, z);
 
-		tessellator.end();
+		bufferBuilder.end();
 
-		GlStateManager.disableColorLogicOp();
-		GlStateManager.enableTexture();
-		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GL11.glDisable(GL11.GL_COLOR_LOGIC_OP);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 
 	private int getBorderColor() {

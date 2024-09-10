@@ -16,7 +16,7 @@ public class ServerPacketHandler extends PacketHandler {
 	}
 
 	@Override
-	protected Packet<?> toCustomPayload(String channel, PacketByteBuf data) {
+	protected Packet toCustomPayload(String channel, PacketByteBuf data) {
 		return new CustomPayloadS2CPacket(channel, data);
 	}
 

@@ -10,7 +10,7 @@ import net.minecraft.network.packet.Packet;
 
 public abstract class PacketHandler {
 
-	public Packet<?> encode(RSMMPacket packet) {
+	public Packet encode(RSMMPacket packet) {
 		String key = Packets.getKey(packet);
 
 		if (key == null) {
@@ -28,7 +28,7 @@ public abstract class PacketHandler {
 		return toCustomPayload(Packets.getChannel(), buffer);
 	}
 
-	protected abstract Packet<?> toCustomPayload(String channel, PacketByteBuf data);
+	protected abstract Packet toCustomPayload(String channel, PacketByteBuf data);
 
 	protected RSMMPacket decode(PacketByteBuf buffer) throws IOException {
 		String key = buffer.readString(32767);

@@ -7,7 +7,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.network.PacketUtils;
+import io.netty.buffer.Unpooled;
+
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
@@ -31,8 +33,8 @@ public class ServerPlayNetworkHandlerMixin {
 	)
 	private void handleCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		if (Packets.getChannel().equals(packet.getChannel())) {
-			PacketUtils.ensureOnSameThread(packet, (ServerPlayNetworkHandler)(Object)this, server);
-			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().handlePacket(packet.getData(), player);
+			PacketByteBuf buffer = new PacketByteBuf(Unpooled.wrappedBuffer(packet.getData()));
+			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().handlePacket(buffer, player);
 
 			ci.cancel();
 		}

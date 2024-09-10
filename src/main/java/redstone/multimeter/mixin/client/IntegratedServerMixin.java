@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.server.integrated.IntegratedServer;
 
+import redstone.multimeter.interfaces.mixin.IConnection;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.util.DimensionUtils;
 
@@ -44,6 +45,10 @@ public abstract class IntegratedServerMixin implements IMinecraftServer {
 		)
 	)
 	private void onTickEnd(CallbackInfo ci) {
+		if (paused) {
+			((IConnection) ((IntegratedServer) (Object) this).getConnection()).rsmm$handleRsmmPackets();;
+		}
+
 		getMultimeterServer().tickEnd();
 	}
 

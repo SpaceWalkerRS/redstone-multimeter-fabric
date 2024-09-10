@@ -7,9 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.DiodeBlock;
 import net.minecraft.block.RepeaterBlock;
-import net.minecraft.block.state.BlockState;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
@@ -29,14 +27,14 @@ public abstract class RepeaterBlockMixin extends DiodeBlock implements Meterable
 			value = "RETURN"
 		)
 	)
-	private void logPowered(WorldView world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+	private void logPowered(WorldView world, int x, int y, int z, int metadata, CallbackInfoReturnable<Boolean> cir) {
 		if (cir.getReturnValue() && world instanceof ServerWorld) {
-			rsmm$logPowered((ServerWorld)world, pos, state);
+			rsmm$logPowered((ServerWorld)world, x, y, z, this, metadata);
 		}
 	}
 
 	@Override
-	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
+	public int rsmm$getPowerLevel(World world, int x, int y, int z, int metadata) {
 		return powered ? MAX_POWER : MIN_POWER;
 	}
 }

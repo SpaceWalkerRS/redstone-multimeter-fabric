@@ -8,8 +8,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.DiodeBlock;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -19,7 +17,7 @@ public class DiodeBlockMixin implements MeterableBlock {
 
 	@Shadow @Final private boolean powered;
 
-	@Shadow private boolean shouldBePowered(World world, BlockPos pos, BlockState state) { return false; }
+	@Shadow private boolean shouldBePowered(World world, int x, int y, int z, int metadata) { return false; }
 
 	@Inject(
 		method = "shouldBePowered",
@@ -27,8 +25,8 @@ public class DiodeBlockMixin implements MeterableBlock {
 			value = "RETURN"
 		)
 	)
-	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-		rsmm$logPowered(world, pos, cir.getReturnValue()); // repeaters
+	private void logPowered(World world, int x, int y, int z, int metadata, CallbackInfoReturnable<Boolean> cir) {
+		rsmm$logPowered(world, 0, 0, 0, cir.getReturnValue()); // repeaters
 	}
 
 	@Override
@@ -37,12 +35,12 @@ public class DiodeBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
-		return shouldBePowered(world, pos, state);
+	public boolean rsmm$isPowered(World world, int x, int y, int z, int metadata) {
+		return shouldBePowered(world, x, y, z, metadata);
 	}
 
 	@Override
-	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+	public boolean rsmm$isActive(World world, int x, int y, int z, int metadata) {
 		return powered;
 	}
 }

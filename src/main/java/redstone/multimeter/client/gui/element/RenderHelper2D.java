@@ -2,10 +2,8 @@ package redstone.multimeter.client.gui.element;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tessellator;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
@@ -18,18 +16,17 @@ import redstone.multimeter.util.ColorUtils;
 public class RenderHelper2D {
 
 	protected void renderRect(Drawer drawer) {
-		GlStateManager.enableBlend();
-		GlStateManager.disableTexture();
-		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
-		GlStateManager.shadeModel(GL11.GL_SMOOTH);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL11.glColor3f(1.0F, 1.0F, 1.0F);
+		GL11.glShadeModel(GL11.GL_SMOOTH);
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
+		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
 
-		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+		bufferBuilder.start(GL11.GL_QUADS);
 		drawer.draw(bufferBuilder);
-		tessellator.end();
+		bufferBuilder.end();
 	}
 
 	protected void renderRect(int x, int y, int width, int height, int color) {
@@ -65,10 +62,11 @@ public class RenderHelper2D {
 	protected void drawRect(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int a, int r, int g, int b) {
 		int z = 0;
 
-		bufferBuilder.vertex(x0, y0, z).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(x0, y1, z).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(x1, y1, z).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(x1, y0, z).color(r, g, b, a).nextVertex();
+		bufferBuilder.color(r, g, b, a);
+		bufferBuilder.vertex(x0, y0, z);
+		bufferBuilder.vertex(x0, y1, z);
+		bufferBuilder.vertex(x1, y1, z);
+		bufferBuilder.vertex(x1, y0, z);
 	}
 
 	protected void drawGradient(BufferBuilder bufferBuilder, int x, int y, int width, int height, int color0, int color1) {
@@ -93,10 +91,12 @@ public class RenderHelper2D {
 	protected void drawGradient(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int a0, int r0, int g0, int b0, int a1, int r1, int g1, int b1) {
 		int z = 0;
 
-		bufferBuilder.vertex(x0, y0, z).color(r0, g0, b0, a0).nextVertex();
-		bufferBuilder.vertex(x0, y1, z).color(r1, g1, b1, a1).nextVertex();
-		bufferBuilder.vertex(x1, y1, z).color(r1, g1, b1, a1).nextVertex();
-		bufferBuilder.vertex(x1, y0, z).color(r0, g0, b0, a0).nextVertex();
+		bufferBuilder.color(r0, g0, b0, a0);
+		bufferBuilder.vertex(x1, y0, z);
+		bufferBuilder.vertex(x0, y0, z);
+		bufferBuilder.color(r1, g1, b1, a1);
+		bufferBuilder.vertex(x0, y1, z);
+		bufferBuilder.vertex(x1, y1, z);
 	}
 
 	protected void renderBorder(int x, int y, int width, int height, int color) {
@@ -119,17 +119,16 @@ public class RenderHelper2D {
 
 	protected void renderTexture(Texture texture, Drawer drawer) {
 		Minecraft.getInstance().getTextureManager().bind(texture.location);
-		GlStateManager.enableTexture();
-		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
+		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL11.glColor3f(1.0F, 1.0F, 1.0F);
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
+		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
 
-		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX);
+		bufferBuilder.start(GL11.GL_QUADS);
 		drawer.draw(bufferBuilder);
-		tessellator.end();
+		bufferBuilder.end();
 	}
 
 	protected void renderTextureRegion(TextureRegion region, int x, int y, int width, int height) {
@@ -162,25 +161,24 @@ public class RenderHelper2D {
 		float u1 = (float)tx1 / texture.width;
 		float v1 = (float)ty1 / texture.height;
 
-		bufferBuilder.vertex(x0, y0, z).texture(u0, v0).nextVertex();
-		bufferBuilder.vertex(x0, y1, z).texture(u0, v1).nextVertex();
-		bufferBuilder.vertex(x1, y1, z).texture(u1, v1).nextVertex();
-		bufferBuilder.vertex(x1, y0, z).texture(u1, v0).nextVertex();
+		bufferBuilder.vertex(x0, y0, z, u0, v0);
+		bufferBuilder.vertex(x0, y1, z, u0, v1);
+		bufferBuilder.vertex(x1, y1, z, u1, v1);
+		bufferBuilder.vertex(x1, y0, z, u1, v0);
 	}
 
 	protected void renderTextureColor(Texture texture, Drawer drawer) {
 		Minecraft.getInstance().getTextureManager().bind(texture.location);
-		GlStateManager.enableTexture();
-		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
+		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL11.glColor3f(1.0F, 1.0F, 1.0F);
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
+		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
 
-		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+		bufferBuilder.start(GL11.GL_QUADS);
 		drawer.draw(bufferBuilder);
-		tessellator.end();
+		bufferBuilder.end();
 	}
 
 	protected void renderTextureRegionColor(TextureRegion region, int x, int y, int width, int height, int color) {
@@ -218,10 +216,11 @@ public class RenderHelper2D {
 		float u1 = (float)tx1 / texture.width;
 		float v1 = (float)ty1 / texture.height;
 
-		bufferBuilder.vertex(x0, y0, z).texture(u0, v0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(x0, y1, z).texture(u0, v1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(x1, y1, z).texture(u1, v1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(x1, y0, z).texture(u1, v0).color(r, g, b, a).nextVertex();
+		bufferBuilder.color(r, g, b, a);
+		bufferBuilder.vertex(x0, y0, z, u0, v0);
+		bufferBuilder.vertex(x0, y1, z, u0, v1);
+		bufferBuilder.vertex(x1, y1, z, u1, v1);
+		bufferBuilder.vertex(x1, y0, z, u1, v0);
 	}
 
 	protected int textWidth(TextRenderer textRenderer, Text text) {
@@ -229,7 +228,8 @@ public class RenderHelper2D {
 	}
 
 	protected void renderText(TextRenderer textRenderer, Text text, int x, int y, boolean shadow, int color) {
-		GlStateManager.enableTexture();
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		if (shadow) {
 			textRenderer.drawWithShadow(text.getFormattedString(), x, y, color);
@@ -239,7 +239,8 @@ public class RenderHelper2D {
 	}
 
 	protected void renderText(TextRenderer textRenderer, String text, int x, int y, boolean shadow, int color) {
-		GlStateManager.enableTexture();
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		if (shadow) {
 			textRenderer.drawWithShadow(text, x, y, color);

@@ -2,7 +2,6 @@ package redstone.multimeter.mixin.common.meterable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -10,8 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -24,14 +21,12 @@ public class HopperBlockMixin implements MeterableBlock {
 		method = "updateEnabled",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
-			value = "FIELD",
-			ordinal = 0,
-			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/block/HopperBlock;ENABLED:Lnet/minecraft/block/state/property/BooleanProperty;"
+			value = "INVOKE",
+			target = "Lnet/minecraft/block/HopperBlock;isEnabled(I)Z"
 		)
 	)
-	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfo ci, boolean shouldBeEnabled) {
-		rsmm$logPowered(world, pos, !shouldBeEnabled);
+	private void logPowered(World world, int x, int y, int z, CallbackInfo ci, int metadata, int facing, int shouldBeEnabled /* the fuck? */) {
+		rsmm$logPowered(world, x, y, z, shouldBeEnabled == 0);
 	}
 
 	@Override
@@ -40,8 +35,8 @@ public class HopperBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		BlockEntity blockEntity = world.getBlockEntity(pos);
+	public boolean rsmm$isActive(World world, int x, int y, int z, int metadata) {
+		BlockEntity blockEntity = world.getBlockEntity(x, y, z);
 
 		if (blockEntity instanceof HopperBlockEntity) {
 			return !((IHopperBlockEntity)blockEntity).rsmm$isOnCooldown();

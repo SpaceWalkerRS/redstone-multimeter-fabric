@@ -8,8 +8,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ComparatorBlockEntity;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -24,8 +22,8 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 			value = "RETURN"
 		)
 	)
-	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
-		rsmm$logPowered(world, pos, cir.getReturnValue() > MIN_POWER);
+	private void logPowered(World world, int x, int y, int z, int metadata, CallbackInfoReturnable<Integer> cir) {
+		rsmm$logPowered(world, x, y, z, cir.getReturnValue() > MIN_POWER);
 	}
 
 	@Override
@@ -34,8 +32,8 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 	}
 
 	@Override
-	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
-		BlockEntity blockEntity = world.getBlockEntity(pos);
+	public int rsmm$getPowerLevel(World world, int x, int y, int z, int metadata) {
+		BlockEntity blockEntity = world.getBlockEntity(x, y, z);
 
 		if (blockEntity instanceof ComparatorBlockEntity) {
 			return ((ComparatorBlockEntity)blockEntity).getOutputSignal();

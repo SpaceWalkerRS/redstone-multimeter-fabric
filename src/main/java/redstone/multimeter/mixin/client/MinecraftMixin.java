@@ -13,11 +13,14 @@ import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.handler.ClientPlayNetworkHandler;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.network.Connection;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.screen.ScreenWrapper;
+import redstone.multimeter.interfaces.mixin.IConnection;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
 @Mixin(Minecraft.class)
@@ -61,6 +64,21 @@ public class MinecraftMixin implements IMinecraft {
 	private void resizeDisplay(CallbackInfo ci) {
 		if (multimeterClient != null) {
 			multimeterClient.getHud().resetSize();
+		}
+	}
+
+	@Inject(
+		method = "tick()V",
+		at = @At(
+			value = "HEAD"
+		)
+	)
+	private void tickConnection(CallbackInfo ci) {
+		ClientPlayNetworkHandler networkHandler = ((Minecraft) (Object) this).getNetworkHandler();
+		Connection connection = networkHandler != null ? networkHandler.getConnection() : null;
+
+		if (connection != null && connection.isConnected()) {
+			((IConnection) connection).rsmm$handleRsmmPackets();;
 		}
 	}
 

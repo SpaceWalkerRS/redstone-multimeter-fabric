@@ -9,8 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.FenceGateBlock;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -22,14 +20,13 @@ public class FenceGateBlockMixin implements MeterableBlock {
 		method = "neighborChanged",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
-			value = "FIELD",
-			ordinal = 0,
+			value = "INVOKE",
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/block/FenceGateBlock;POWERED:Lnet/minecraft/block/state/property/BooleanProperty;"
+			target = "Lnet/minecraft/block/Block;isSignalSource()Z"
 		)
 	)
-	private void logPowered(World world, BlockPos pos, BlockState state, Block neighborBlock, CallbackInfo ci, boolean powered) {
-		rsmm$logPowered(world, pos, powered);
+	private void logPowered(World world, int x, int y, int z, Block neighborBlock, CallbackInfo ci, int metadata, int powered /* the fuck? */) {
+		rsmm$logPowered(world, x, y, z, powered != 0);
 	}
 
 	@Override
@@ -38,7 +35,7 @@ public class FenceGateBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(FenceGateBlock.OPEN);
+	public boolean rsmm$isActive(World world, int x, int y, int z, int metadata) {
+		return (metadata & 0b100) != 0;
 	}
 }

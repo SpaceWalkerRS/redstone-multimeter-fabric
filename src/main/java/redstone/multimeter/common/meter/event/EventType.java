@@ -5,9 +5,9 @@ import java.util.Map;
 
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.math.Direction;
 
 import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.util.Direction;
 import redstone.multimeter.util.NbtUtils;
 import redstone.multimeter.util.TextUtils;
 
@@ -32,7 +32,7 @@ public enum EventType {
 
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatKeyValue("direction", Direction.byId(metadata).getName()));
+			tooltip.add(TextUtils.formatKeyValue("direction", Direction.fromIndex(metadata).getName()));
 		}
 	},
 	POWER_CHANGE(3, "power_change") {
@@ -79,7 +79,7 @@ public enum EventType {
 
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatKeyValue("direction", Direction.byId(metadata).getName()));
+			tooltip.add(TextUtils.formatKeyValue("direction", Direction.fromIndex(metadata).getName()));
 		}
 	},
 	OBSERVER_UPDATE(12, "observer_update"),

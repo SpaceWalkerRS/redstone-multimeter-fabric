@@ -100,7 +100,7 @@ public class ServerLogManager extends LogManager {
 			meter.getLogs().clear();
 		}
 
-		if (list.isEmpty()) {
+		if (list.size() == 0) {
 			return;
 		}
 

@@ -73,7 +73,7 @@ public class SavedMeterGroupsManager {
 					meterGroups[i] = new SavedMeterGroup(name, meters);
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			RedstoneMultimeterMod.LOGGER.warn("failed to load saved meter groups", e);
 		}
 	}
@@ -106,7 +106,7 @@ public class SavedMeterGroupsManager {
 			}
 
 			NbtIo.write(nbt, file.toFile());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			RedstoneMultimeterMod.LOGGER.warn("failed to save saved meter groups", e);
 		}
 	}

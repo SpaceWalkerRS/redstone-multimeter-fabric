@@ -23,12 +23,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.resource.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.resource.Identifier;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -80,9 +78,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	@Override
-	protected void postValidation(MutableMeterProperties properties, World world, BlockPos pos) {
-		BlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
+	protected void postValidation(MutableMeterProperties properties, World world, int x, int y, int z) {
+		Block block = world.getBlock(x, y, z);
 
 		MeterProperties defaultProperties = getDefaultProperties(block);
 
@@ -110,7 +107,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 				properties.toggleEventType(type);
 			}
 		}
-		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && state.getBlock().ticksRandomly()) {
+		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && block.ticksRandomly()) {
 			if (!properties.hasEventType(EventType.RANDOM_TICK)) {
 				properties.toggleEventType(EventType.RANDOM_TICK);
 			}
@@ -147,11 +144,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	private MeterProperties getDefaultProperties(Block block) {
-		Identifier key = Block.REGISTRY.getKey(block);
+		String id = Block.REGISTRY.getKey(block);
 
-		if (key == null) {
+		if (id == null) {
 			return null; // we should never get here
 		}
+
+		Identifier key = new Identifier(id);
 
 		return cache.computeIfAbsent(key, _key -> {
 			String namespace = key.getNamespace();
@@ -169,7 +168,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	private void initDefaults() {
 		Set<String> namespaces = new HashSet<>();
 
-		for (Identifier key : Block.REGISTRY.keySet()) {
+		for (String id : (Set<String>)Block.REGISTRY.keySet()) {
+			Identifier key = new Identifier(id);
 			loadDefaultProperties(key);
 
 			if (namespaces.add(key.getNamespace())) {

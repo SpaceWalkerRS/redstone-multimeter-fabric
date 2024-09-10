@@ -2,9 +2,9 @@ package redstone.multimeter.client.gui.screen;
 
 import java.util.List;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -175,8 +175,8 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		int borderColor0 = 0x505000FF;
 		int borderColor1 = 0x5028007F;
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(0, 0, 400);
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 400);
 
 		renderRect(bufferBuilder -> {
 			// background
@@ -201,7 +201,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 			textY += textRenderer.fontHeight + 1;
 		}
 
-		GlStateManager.popMatrix();
+		GL11.glPopMatrix();
 	}
 
 	public Text getTitle() {
@@ -212,7 +212,11 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		return true;
 	}
 
+	public static boolean isAltDown() {
+		return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);
+	}
+
 	public static boolean isControlPressed() {
-		return Screen.isControlDown() && !Screen.isShiftDown() && !Screen.isAltDown();
+		return Screen.isControlDown() && !Screen.isShiftDown() && !isAltDown();
 	}
 }

@@ -3,7 +3,7 @@ package redstone.multimeter.server;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -73,7 +73,7 @@ public class MultimeterServer {
 	}
 
 	public Path getConfigDirectory() {
-		return server.getRunDir().toPath().resolve(RedstoneMultimeterMod.CONFIG_PATH);
+		return server.getFile(RedstoneMultimeterMod.CONFIG_PATH).toPath();
 	}
 
 	public TickPhase getTickPhase() {
@@ -151,7 +151,7 @@ public class MultimeterServer {
 
 	public void tickTime(World world) {
 		TickTimePacket packet = new TickTimePacket(world.getTime());
-		playerList.send(packet, world.dimension.getId());
+		playerList.send(packet, world.dimension.id);
 	}
 
 	public void onHandshake(ServerPlayerEntity player, String modVersion) {
@@ -190,21 +190,31 @@ public class MultimeterServer {
 
 	public ServerWorld getWorld(String key) {
 		Dimension dimension = DimensionUtils.byKey(key);
-		return dimension == null ? null : server.getWorld(dimension.getId());
+		return dimension == null ? null : server.getWorld(dimension.id);
 	}
 
 	public ServerWorld getWorld(DimPos pos) {
 		return getWorld(pos.getDimension());
 	}
 
-	public BlockState getBlockState(DimPos pos) {
+	public Block getBlock(DimPos pos) {
 		World world = getWorld(pos);
 
 		if (world == null) {
 			return null;
 		}
 
-		return world.getBlockState(pos.getBlockPos());
+		return world.getBlock(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	public int getBlockMetadata(DimPos pos) {
+		World world = getWorld(pos);
+
+		if (world == null) {
+			return 0;
+		}
+
+		return world.getBlockMetadata(pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	public PlayerList getPlayerList() {

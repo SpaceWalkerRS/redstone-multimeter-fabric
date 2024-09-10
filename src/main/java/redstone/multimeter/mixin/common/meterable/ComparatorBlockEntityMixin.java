@@ -23,8 +23,8 @@ public class ComparatorBlockEntityMixin extends BlockEntity {
 		)
 	)
 	public void logPowerChange(int newOutputSignal, CallbackInfo ci) {
-		if (!world.isClient) {
-			((IServerWorld)world).getMultimeter().logPowerChange(world, pos, outputSignal, newOutputSignal);
+		if (!world.isMultiplayer) {
+			((IServerWorld)world).getMultimeter().logPowerChange(world, x, y, z, outputSignal, newOutputSignal);
 		}
 	}
 }

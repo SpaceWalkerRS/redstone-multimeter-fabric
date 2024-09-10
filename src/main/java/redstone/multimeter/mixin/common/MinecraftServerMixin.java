@@ -23,10 +23,10 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	private boolean isDedicated() { return false; }
 
 	@Inject(
-		method = "<init>(Ljava/io/File;Ljava/net/Proxy;Ljava/io/File;)V",
+		method = "<init>(Ljava/io/File;Ljava/net/Proxy;)V",
 		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/server/MinecraftServer;createCommandHandler()Lnet/minecraft/server/command/handler/CommandManager;"
+			value = "NEW",
+			target = "Lnet/minecraft/server/command/handler/CommandManager;"
 		)
 	)
 	private void init(CallbackInfo ci) {
@@ -107,23 +107,11 @@ public class MinecraftServerMixin implements IMinecraftServer {
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V",
-			args = "ldc=jobs"
-		)
-	)
-	private void startTickTaskPackets(CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.PACKETS);
-	}
-
-	@Inject(
-		method = "tickWorlds",
-		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 			args = "ldc=levels"
 		)
 	)
-	private void swapTickTaskLevels(CallbackInfo ci) {
-		rsmm$swapTickTask(TickTask.LEVELS);
+	private void startTickTaskLevels(CallbackInfo ci) {
+		rsmm$startTickTask(TickTask.LEVELS);
 	}
 
 	@Inject(

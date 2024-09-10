@@ -26,7 +26,7 @@ public class GameGuiMixin {
 			target = "Lnet/minecraft/client/options/GameOptions;debugEnabled:Z"
 		)
 	)
-	private void renderHud(float tickDelta, CallbackInfo ci) {
+	private void renderHud(float tickDelta, boolean screenOpen, int mouseX, int mouseY, CallbackInfo ci) {
 		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
 		MultimeterHud hud = client.getHud();
 

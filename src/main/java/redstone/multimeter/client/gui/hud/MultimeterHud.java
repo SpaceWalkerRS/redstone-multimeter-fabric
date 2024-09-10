@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui.hud;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -87,8 +87,8 @@ public class MultimeterHud extends AbstractParentElement {
 			return;
 		}
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(0, 0, 100);
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 100);
 
 		List<Element> children = getChildren();
 
@@ -100,7 +100,7 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}
 
-		GlStateManager.popMatrix();
+		GL11.glPopMatrix();
 	}
 
 	@Override
@@ -707,7 +707,7 @@ public class MultimeterHud extends AbstractParentElement {
 
 	public void resetSize() {
 		Minecraft minecraft = client.getMinecraft();
-		Window window = new Window(minecraft);
+		Window window = new Window(minecraft, minecraft.width, minecraft.height);
 
 		int width = window.getWidth();
 		int height = window.getHeight();

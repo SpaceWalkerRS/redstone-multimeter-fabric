@@ -113,11 +113,11 @@ public class PlayerList {
 	}
 
 	public void send(RSMMPacket packet, int dimension) {
-		send(packet, player -> player.world.dimension.getId() == dimension);
+		send(packet, player -> player.world.dimension.id == dimension);
 	}
 
 	public void send(RSMMPacket packet, Predicate<ServerPlayerEntity> predicate) {
-		Packet<?> mcPacket = server.getPacketHandler().encode(packet);
+		Packet mcPacket = server.getPacketHandler().encode(packet);
 
 		for (ServerPlayerEntity player : playersByUuid.values()) {
 			if (predicate.test(player)) {
@@ -127,7 +127,7 @@ public class PlayerList {
 	}
 
 	public void send(RSMMPacket packet, ServerPlayerEntity player) {
-		Packet<?> mcPacket = server.getPacketHandler().encode(packet);
+		Packet mcPacket = server.getPacketHandler().encode(packet);
 		player.networkHandler.sendPacket(mcPacket);
 	}
 }

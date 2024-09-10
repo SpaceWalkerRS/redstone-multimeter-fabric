@@ -1,8 +1,7 @@
 package redstone.multimeter.client.gui.hud.element;
 
 import org.lwjgl.input.Keyboard;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.text.Formatting;
 import net.minecraft.text.LiteralText;
@@ -40,15 +39,15 @@ public class MeterListRenderer extends AbstractElement {
 
 	@Override
 	public void render(int mouseX, int mouseY) {
-		GlStateManager.pushMatrix();
+		GL11.glPushMatrix();
 		drawCursorMeter(mouseX, mouseY);
-		GlStateManager.translated(0, 0, -1);
+		GL11.glTranslated(0, 0, -1);
 		drawHighlights(mouseX, mouseY);
-		GlStateManager.translated(0, 0, -1);
+		GL11.glTranslated(0, 0, -1);
 		drawNames(mouseX, mouseY);
-		GlStateManager.translated(0, 0, -1);
+		GL11.glTranslated(0, 0, -1);
 		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		GlStateManager.popMatrix();
+		GL11.glPopMatrix();
 	}
 
 	@Override
@@ -149,7 +148,7 @@ public class MeterListRenderer extends AbstractElement {
 
 	private void drawCursorMeter(int mouseX, int mouseY) {
 		if (cursorMeter != null) {
-			GlStateManager.pushMatrix();
+			GL11.glPushMatrix();
 
 			int startX = mouseX + cursorOffsetX;
 			int startY = mouseY + cursorOffsetY;
@@ -161,7 +160,7 @@ public class MeterListRenderer extends AbstractElement {
 			if (cursorOriginRow == hud.getSelectedRow()) {
 				drawHighlight(x, y, true);
 
-				GlStateManager.translated(0, 0, -0.1);
+				GL11.glTranslated(0, 0, -0.1);
 			}
 
 			x = startX + hud.settings.gridSize + 1;
@@ -169,7 +168,7 @@ public class MeterListRenderer extends AbstractElement {
 
 			drawName(cursorMeter, x, y, ColorUtils.setAlpha(0xFFFFFF, alpha));
 
-			GlStateManager.translated(0, 0, -0.1);
+			GL11.glTranslated(0, 0, -0.1);
 
 			x = startX;
 			y = startY;
@@ -179,7 +178,7 @@ public class MeterListRenderer extends AbstractElement {
 
 			hud.renderer.renderRect(x, y, w, h, color);
 
-			GlStateManager.popMatrix();
+			GL11.glPopMatrix();
 		}
 	}
 

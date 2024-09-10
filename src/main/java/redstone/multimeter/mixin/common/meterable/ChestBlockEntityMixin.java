@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.entity.living.player.PlayerEntity;
 
 import redstone.multimeter.block.PowerSource;
 import redstone.multimeter.block.chest.TrappedChestHelper;
@@ -26,10 +25,10 @@ public class ChestBlockEntityMixin extends BlockEntity {
 		method = "onOpen",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/World;addBlockEvent(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;II)V"
+			target = "Lnet/minecraft/world/World;addBlockEvent(IIILnet/minecraft/block/Block;II)V"
 		)
 	)
-	private void onOpen(PlayerEntity player, CallbackInfo ci) {
+	private void onOpen(CallbackInfo ci) {
 		signalViewerCount(viewerCount - 1, viewerCount);
 	}
 
@@ -37,22 +36,22 @@ public class ChestBlockEntityMixin extends BlockEntity {
 		method = "onClose",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/World;addBlockEvent(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;II)V"
+			target = "Lnet/minecraft/world/World;addBlockEvent(IIILnet/minecraft/block/Block;II)V"
 		)
 	)
-	private void onClose(PlayerEntity player, CallbackInfo ci) {
+	private void onClose(CallbackInfo ci) {
 		signalViewerCount(viewerCount + 1, viewerCount);
 	}
 
 	private void signalViewerCount(int oldViewerCount, int newViewerCount) {
-		if (!world.isClient && getChestType() == TrappedChestHelper.TYPE) {
+		if (!world.isMultiplayer && getChestType() == TrappedChestHelper.TYPE) {
 			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
 
 			int oldPower = TrappedChestHelper.getPowerFromViewerCount(oldViewerCount);
 			int newPower = TrappedChestHelper.getPowerFromViewerCount(newViewerCount);
 
-			multimeter.logPowerChange(world, pos, oldPower, newPower);
-			multimeter.logActive(world, pos, newPower > PowerSource.MIN_POWER);
+			multimeter.logPowerChange(world, x, y, z, oldPower, newPower);
+			multimeter.logActive(world, x, y, z, newPower > PowerSource.MIN_POWER);
 		}
 	}
 }

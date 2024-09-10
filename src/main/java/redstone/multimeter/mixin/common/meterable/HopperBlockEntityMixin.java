@@ -44,8 +44,8 @@ public class HopperBlockEntityMixin extends BlockEntity implements IHopperBlockE
 	}
 
 	private void rsmm$logActive() {
-		if (!world.isClient) {
-			((IServerWorld)world).getMultimeter().logActive(world, pos, !rsmm$isOnCooldown());
+		if (!world.isMultiplayer) {
+			((IServerWorld)world).getMultimeter().logActive(world, x, y, z, !rsmm$isOnCooldown());
 		}
 	}
 }

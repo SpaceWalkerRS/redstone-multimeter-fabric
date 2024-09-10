@@ -10,8 +10,6 @@ import net.minecraft.text.Formatting;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.Axis;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -25,7 +23,7 @@ import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.element.button.TransparentToggleButton;
 import redstone.multimeter.common.DimPos;
-import redstone.multimeter.util.AxisUtils;
+import redstone.multimeter.util.Direction.Axis;
 
 public class MeterPropertyElement extends AbstractParentElement {
 
@@ -197,8 +195,10 @@ public class MeterPropertyElement extends AbstractParentElement {
 				return new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
 					try {
 						DimPos pos = getter.get();
-						BlockPos p = pos.getBlockPos();
-						int coord = AxisUtils.choose(axis, p.getX(), p.getY(), p.getZ());
+						int x = pos.getX();
+						int y = pos.getY();
+						int z = pos.getZ();
+						int coord = axis.choose(x, y, z);
 						int newCoord = Integer.valueOf(text);
 						DimPos newPos = pos.offset(axis, newCoord - coord);
 
@@ -208,8 +208,10 @@ public class MeterPropertyElement extends AbstractParentElement {
 					}
 				}, () -> {
 					DimPos pos = getter.get();
-					BlockPos p = pos.getBlockPos();
-					int coord = AxisUtils.choose(axis, p.getX(), p.getY(), p.getZ());
+					int x = pos.getX();
+					int y = pos.getY();
+					int z = pos.getZ();
+					int coord = axis.choose(x, y, z);
 
 					return String.valueOf(coord);
 				});

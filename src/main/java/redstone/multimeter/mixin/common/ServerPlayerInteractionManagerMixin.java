@@ -8,8 +8,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.entity.living.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.ServerPlayerInteractionManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.interfaces.mixin.IServerWorld;
@@ -21,12 +19,12 @@ public class ServerPlayerInteractionManagerMixin {
 		method = "useBlock",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;use(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Lnet/minecraft/entity/living/player/PlayerEntity;Lnet/minecraft/util/math/Direction;FFF)Z"
+			target = "Lnet/minecraft/block/Block;use(Lnet/minecraft/world/World;IIILnet/minecraft/entity/living/player/PlayerEntity;IFFF)Z"
 		)
 	)
-	private void logInteractBlock(PlayerEntity player, World world, ItemStack stack, BlockPos pos, Direction face, float dx, float dy, float dz, CallbackInfoReturnable<Boolean> cir) {
-		if (!world.isClient) {
-			((IServerWorld)world).getMultimeter().logInteractBlock(world, pos);
+	private void logInteractBlock(PlayerEntity player, World world, ItemStack stack, int x, int y, int z, int face, float dx, float dy, float dz, CallbackInfoReturnable<Boolean> cir) {
+		if (!world.isMultiplayer) {
+			((IServerWorld)world).getMultimeter().logInteractBlock(world, x, y, z);
 		}
 	}
 }

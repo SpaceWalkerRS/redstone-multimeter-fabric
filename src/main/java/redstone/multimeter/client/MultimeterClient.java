@@ -10,7 +10,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Formatting;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.HitResult;
 import net.minecraft.world.World;
 
@@ -390,9 +389,11 @@ public class MultimeterClient {
 
 		if (hit.type == HitResult.Type.BLOCK) {
 			World world = minecraft.world;
-			BlockPos pos = hit.getPos();
+			int x = hit.x;
+			int y = hit.y;
+			int z = hit.z;
 
-			action.accept(new DimPos(world, pos));
+			action.accept(new DimPos(world, x, y, z));
 		}
 	}
 

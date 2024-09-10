@@ -18,7 +18,6 @@ import com.google.common.base.Suppliers;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -27,8 +26,6 @@ import net.minecraft.text.Formatting;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
@@ -49,6 +46,7 @@ import redstone.multimeter.server.meter.ServerMeterPropertiesManager;
 import redstone.multimeter.server.meter.event.MeterEventPredicate;
 import redstone.multimeter.server.option.Options;
 import redstone.multimeter.server.option.OptionsManager;
+import redstone.multimeter.util.Direction;
 
 public class Multimeter {
 
@@ -211,11 +209,14 @@ public class Multimeter {
 
 		DimPos pos = properties.getPos();
 		World world = server.getWorld(pos);
-		BlockPos blockPos = pos.getBlockPos();
-		BlockState state = world.getBlockState(blockPos);
+		int x = pos.getX();
+		int y = pos.getY();
+		int z = pos.getZ();
+		Block block = world.getBlock(x, y, z);
+		int metadata = world.getBlockMetadata(x, y, z);
 
-		logPowered(world, blockPos, state);
-		logActive(world, blockPos, state);
+		logPowered(world, x, y, z, block, metadata);
+		logActive(world, x, y, z, block, metadata);
 
 		return true;
 	}
@@ -443,15 +444,17 @@ public class Multimeter {
 				ServerWorld newWorld = server.getWorld(pos);
 
 				if (newWorld != null) {
-					BlockPos blockPos = pos.getBlockPos();
+					int blockX = pos.getX();
+					int blockY = pos.getY();
+					int blockZ = pos.getZ();
 
-					double newX = blockPos.getX() + 0.5D;
-					double newY = blockPos.getY();
-					double newZ = blockPos.getZ() + 0.5D;
+					double newX = blockX + 0.5D;
+					double newY = blockY;
+					double newZ = blockZ + 0.5D;
 					float newYaw = player.yaw;
 					float newPitch = player.pitch;
 
-					player.teleportToDimension(newWorld.dimension.getId());
+					player.teleportToDimension(newWorld.dimension.id);
 					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
 					Text text = new LiteralText(String.format("Teleported to meter \"%s\"", meter.getName()));
@@ -461,68 +464,64 @@ public class Multimeter {
 		}
 	}
 
-	public void onBlockChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		Block oldBlock = oldState.getBlock();
-		Block newBlock = newState.getBlock();
-
+	public void onBlockChange(World world, int x, int y, int z, Block oldBlock, int oldMetadata, Block newBlock, int newMetadata) {
 		if (oldBlock == newBlock && ((IBlock)newBlock).rsmm$isPowerSource() && ((PowerSource)newBlock).rsmm$logPowerChangeOnStateChange()) {
-			logPowerChange(world, pos, oldState, newState);
+			logPowerChange(world, x, y, z, oldMetadata, newMetadata);
 		}
 
 		boolean wasMeterable = ((IBlock)oldBlock).rsmm$isMeterable();
 		boolean isMeterable = ((IBlock)newBlock).rsmm$isMeterable();
 
 		if (wasMeterable || isMeterable) {
-			logActive(world, pos, newState);
+			logActive(world, x, y, z, newBlock, newMetadata);
 		}
 	}
 
-	public void logPowered(World world, BlockPos pos, boolean powered) {
-		tryLogEvent(world, pos, EventType.POWERED, powered ? 1 : 0, (meterGroup, meter, event) -> meter.setPowered(powered));
+	public void logPowered(World world, int x, int y, int z, boolean powered) {
+		tryLogEvent(world, x, y, z, EventType.POWERED, powered ? 1 : 0, (meterGroup, meter, event) -> meter.setPowered(powered));
 	}
 
-	public void logPowered(World world, BlockPos pos, BlockState state) {
-		tryLogEvent(world, pos, EventType.POWERED, () -> {
-			return ((IBlock)state.getBlock()).rsmm$isPowered(world, pos, state) ? 1 : 0;
+	public void logPowered(World world, int x, int y, int z, Block block, int metadata) {
+		tryLogEvent(world, x, y, z, EventType.POWERED, () -> {
+			return ((IBlock)block).rsmm$isPowered(world, x, y, z, metadata) ? 1 : 0;
 		}, (meterGroup, meter, event) -> {
 			return meter.setPowered(event.getMetadata() != 0);
 		});
 	}
 
-	public void logActive(World world, BlockPos pos, boolean active) {
-		tryLogEvent(world, pos, EventType.ACTIVE, active ? 1 : 0, (meterGroup, meter, event) -> meter.setActive(active));
+	public void logActive(World world, int x, int y, int z, boolean active) {
+		tryLogEvent(world, x, y, z, EventType.ACTIVE, active ? 1 : 0, (meterGroup, meter, event) -> meter.setActive(active));
 	}
 
-	public void logActive(World world, BlockPos pos, BlockState state) {
-		tryLogEvent(world, pos, EventType.ACTIVE, () -> {
-			Block block = state.getBlock();
-			return ((IBlock)block).rsmm$isMeterable() && ((Meterable)block).rsmm$isActive(world, pos, state) ? 1 : 0;
+	public void logActive(World world, int x, int y, int z, Block block, int metadata) {
+		tryLogEvent(world, x, y, z, EventType.ACTIVE, () -> {
+			return ((IBlock)block).rsmm$isMeterable() && ((Meterable)block).rsmm$isActive(world, x, y, z, metadata) ? 1 : 0;
 		}, (meterGroup, meter, event) -> meter.setActive(event.getMetadata() != 0));
 	}
 
-	public void logMoved(World world, BlockPos blockPos, Direction dir) {
-		tryLogEvent(world, blockPos, EventType.MOVED, dir.getId());
+	public void logMoved(World world, int x, int y, int z, Direction dir) {
+		tryLogEvent(world, x, y, z, EventType.MOVED, dir.getIndex());
 	}
 
-	public void moveMeters(World world, BlockPos blockPos, Direction dir) {
-		DimPos pos = new DimPos(world, blockPos);
+	public void moveMeters(World world, int x, int y, int z, Direction dir) {
+		DimPos pos = new DimPos(world, x, y, z);
 
 		for (ServerMeterGroup meterGroup : activeMeterGroups) {
 			meterGroup.tryMoveMeter(pos, dir);
 		}
 	}
 
-	public void logPowerChange(World world, BlockPos pos, int oldPower, int newPower) {
+	public void logPowerChange(World world, int x, int y, int z, int oldPower, int newPower) {
 		if (oldPower != newPower) {
-			tryLogEvent(world, pos, EventType.POWER_CHANGE, (oldPower << 8) | newPower);
+			tryLogEvent(world, x, y, z, EventType.POWER_CHANGE, (oldPower << 8) | newPower);
 		}
 	}
 
-	public void logPowerChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		tryLogEvent(world, pos, EventType.POWER_CHANGE, () -> {
-			PowerSource block = (PowerSource)newState.getBlock();
-			int oldPower = block.rsmm$getPowerLevel(world, pos, oldState);
-			int newPower = block.rsmm$getPowerLevel(world, pos, newState);
+	public void logPowerChange(World world, int x, int y, int z, Block oldBlock, int oldMetadata, Block newBlock, int newMetadata) {
+		tryLogEvent(world, x, y, z, EventType.POWER_CHANGE, () -> {
+			PowerSource block = (PowerSource)newBlock;
+			int oldPower = block.rsmm$getPowerLevel(world, 0, 0, 0, 0);
+			int newPower = block.rsmm$getPowerLevel(world, 0, 0, 0, 0);
 
 			return (oldPower << 8) | newPower;
 		}, (meterGroup, meter, event) -> {
@@ -534,62 +533,62 @@ public class Multimeter {
 		});
 	}
 
-	public void logRandomTick(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.RANDOM_TICK);
+	public void logRandomTick(World world, int x, int y, int z) {
+		tryLogEvent(world, x, y, z, EventType.RANDOM_TICK);
 	}
 
-	public void logScheduledTick(World world, BlockPos pos, int priority, boolean scheduling) {
-		tryLogEvent(world, pos, EventType.SCHEDULED_TICK, (scheduling ? (1 << 30) : 0) | (priority + 3));
+	public void logScheduledTick(World world, int x, int y, int z, int priority, boolean scheduling) {
+		tryLogEvent(world, x, y, z, EventType.SCHEDULED_TICK, (scheduling ? (1 << 30) : 0) | (priority + 3));
 	}
 
-	public void logBlockEvent(World world, BlockPos pos, int type, int depth, boolean queueing) {
-		tryLogEvent(world, pos, EventType.BLOCK_EVENT, (queueing ? (1 << 30) : 0) | (depth << 4) | type);
+	public void logBlockEvent(World world, int x, int y, int z, int type, int depth, boolean queueing) {
+		tryLogEvent(world, x, y, z, EventType.BLOCK_EVENT, (queueing ? (1 << 30) : 0) | (depth << 4) | type);
 	}
 
 	public void logEntityTick(World world, Entity entity) {
-		tryLogEvent(world, entity.getSourceBlockPos(), EventType.ENTITY_TICK);
+		tryLogEvent(world, (int)entity.x, (int)entity.y, (int)entity.z, EventType.ENTITY_TICK);
 	}
 
 	public void logBlockEntityTick(World world, BlockEntity blockEntity) {
-		tryLogEvent(world, blockEntity.getPos(), EventType.BLOCK_ENTITY_TICK);
+		tryLogEvent(world, blockEntity.x, blockEntity.y, blockEntity.z, EventType.BLOCK_ENTITY_TICK);
 	}
 
-	public void logBlockUpdate(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.BLOCK_UPDATE);
+	public void logBlockUpdate(World world, int x, int y, int z) {
+		tryLogEvent(world, x, y, z, EventType.BLOCK_UPDATE);
 	}
 
-	public void logComparatorUpdate(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.COMPARATOR_UPDATE);
+	public void logComparatorUpdate(World world, int x, int y, int z) {
+		tryLogEvent(world, x, y, z, EventType.COMPARATOR_UPDATE);
 	}
 
-	public void logShapeUpdate(World world, BlockPos pos, Direction dir) {
-		tryLogEvent(world, pos, EventType.SHAPE_UPDATE, dir.getId());
+	public void logShapeUpdate(World world, int x, int y, int z, Direction dir) {
+		tryLogEvent(world, x, y, z, EventType.SHAPE_UPDATE, dir.getIndex());
 	}
 
-	public void logObserverUpdate(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.OBSERVER_UPDATE);
+	public void logObserverUpdate(World world, int x, int y, int z) {
+		tryLogEvent(world, x, y, z, EventType.OBSERVER_UPDATE);
 	}
 
-	public void logInteractBlock(World world, BlockPos pos) {
-		tryLogEvent(world, pos, EventType.INTERACT_BLOCK);
+	public void logInteractBlock(World world, int x, int y, int z) {
+		tryLogEvent(world, x, y, z, EventType.INTERACT_BLOCK);
 	}
 
-	private void tryLogEvent(World world, BlockPos pos, EventType type) {
-		tryLogEvent(world, pos, type, 0);
+	private void tryLogEvent(World world, int x, int y, int z, EventType type) {
+		tryLogEvent(world, x, y, z, type, 0);
 	}
 
-	private void tryLogEvent(World world, BlockPos pos, EventType type, int data) {
-		tryLogEvent(world, pos, type, data, (meterGroup, meter, event) -> true);
+	private void tryLogEvent(World world, int x, int y, int z, EventType type, int data) {
+		tryLogEvent(world, x, y, z, type, data, (meterGroup, meter, event) -> true);
 	}
 
-	private void tryLogEvent(World world, BlockPos pos, EventType type, int data, MeterEventPredicate predicate) {
-		tryLogEvent(world, pos, type, Suppliers.memoize(() -> data), predicate);
+	private void tryLogEvent(World world, int x, int y, int z, EventType type, int data, MeterEventPredicate predicate) {
+		tryLogEvent(world, x, y, z, type, Suppliers.memoize(() -> data), predicate);
 	}
 
-	private void tryLogEvent(World world, BlockPos pos, EventType type, Supplier<Integer> data, MeterEventPredicate predicate) {
+	private void tryLogEvent(World world, int x, int y, int z, EventType type, Supplier<Integer> data, MeterEventPredicate predicate) {
 		if (options.hasEventType(type)) {
 			for (ServerMeterGroup meterGroup : activeMeterGroups) {
-				meterGroup.tryLogEvent(world, pos, type, data, predicate);
+				meterGroup.tryLogEvent(world, x, y, z, type, data, predicate);
 			}
 		}
 	}

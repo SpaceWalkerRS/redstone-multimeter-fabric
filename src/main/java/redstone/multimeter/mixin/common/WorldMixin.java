@@ -12,10 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.Dimension;
 
@@ -31,8 +28,9 @@ import redstone.multimeter.util.DimensionUtils;
 public class WorldMixin implements TickTaskExecutor {
 
 	@Shadow @Final private Dimension dimension;
-	@Shadow @Final private boolean isClient;
+	@Shadow @Final private boolean isMultiplayer;
 
+	@Shadow private int getBlockMetadata(int x, int y, int z) { return 0; }
 
 	@Inject(
 		method = "tickEntities",
@@ -67,7 +65,7 @@ public class WorldMixin implements TickTaskExecutor {
 		)
 	)
 	private void logGlobalEntityTick(CallbackInfo ci, int index, Entity entity) {
-		if (!isClient) {
+		if (!isMultiplayer) {
 			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
 		}
 	}
@@ -101,11 +99,11 @@ public class WorldMixin implements TickTaskExecutor {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/util/Tickable;tick()V"
+			target = "Lnet/minecraft/block/entity/BlockEntity;tick()V"
 		)
 	)
 	private void logBlockEntityTick(CallbackInfo ci, Iterator<BlockEntity> it, BlockEntity blockEntity) {
-		if (!isClient) {
+		if (!isMultiplayer) {
 			((IServerWorld)this).getMultimeter().logBlockEntityTick((World)(Object)this, blockEntity);
 		}
 	}
@@ -129,7 +127,7 @@ public class WorldMixin implements TickTaskExecutor {
 		)
 	)
 	private void logEntityTick(Entity entity, boolean requireLoaded, CallbackInfo ci) {
-		if (!isClient) {
+		if (!isMultiplayer) {
 			((IServerWorld)this).getMultimeter().logEntityTick((World)(Object)this, entity);
 		}
 	}
@@ -139,21 +137,21 @@ public class WorldMixin implements TickTaskExecutor {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Lnet/minecraft/block/Block;)V"
+			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
 		)
 	)
-	private void logBlockUpdate(BlockPos pos, Block neighborBlock, CallbackInfo ci, BlockState state) {
-		if (!isClient) {
+	private void logBlockUpdate(int x, int y, int z, Block neighborBlock, CallbackInfo ci, Block block) {
+		if (!isMultiplayer) {
 			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
 
-			multimeter.logBlockUpdate((World)(Object)this, pos);
+			multimeter.logBlockUpdate((World)(Object)this, x, y, z);
 
 			// 'powered' changes for most meterable blocks are handled in those classes
 			// to reduce expensive calls to
 			// World.hasNeighborSignal and World.getNeighborSignal
-			if (((IBlock)state.getBlock()).rsmm$logPoweredOnBlockUpdate()) {
-				multimeter.logPowered((World)(Object)this, pos, state);
+			if (((IBlock)block).rsmm$logPoweredOnBlockUpdate()) {
+				multimeter.logPowered((World)(Object)this, x, y, z, block, getBlockMetadata(x, y, z));
 			}
 		}
 	}
@@ -163,12 +161,12 @@ public class WorldMixin implements TickTaskExecutor {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Lnet/minecraft/block/Block;)V"
+			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
 		)
 	)
-	private void logComparatorUpdate(BlockPos neighborPos, Block neighborBlock, CallbackInfo ci, Iterator<Direction> it, Direction dir, BlockPos pos) {
-		if (!isClient) {
-			((IServerWorld)this).getMultimeterServer().getMultimeter().logComparatorUpdate((World)(Object)this, pos);
+	private void logComparatorUpdate(int neighborX, int neighborY, int neighborZ, Block neighborBlock, CallbackInfo ci, int facing, int x, int z, Block block) {
+		if (!isMultiplayer) {
+			((IServerWorld)this).getMultimeterServer().getMultimeter().logComparatorUpdate((World)(Object)this, x, neighborY, z);
 		}
 	}
 }

@@ -4,15 +4,14 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.WorldChunkSection;
 
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 
@@ -20,19 +19,37 @@ import redstone.multimeter.interfaces.mixin.IServerWorld;
 public class WorldChunkMixin {
 
 	@Shadow @Final private World world;
+	@Shadow @Final public int chunkX;
+	@Shadow @Final public int chunkZ;
 
 	@Inject(
-		method = "setBlockState",
+		method = "setBlockWithMetadataAt",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			shift = Shift.AFTER,
-			target = "Lnet/minecraft/world/chunk/WorldChunkSection;setBlockState(IIILnet/minecraft/block/state/BlockState;)V"
+			target = "Lnet/minecraft/block/Block;onAdded(Lnet/minecraft/world/World;III)V"
 		)
 	)
-	private void logBlockChange(BlockPos pos, BlockState state, CallbackInfoReturnable<BlockState> cir, int sectionX, int y, int sectionZ, int index, int height, BlockState prevState) {
-		if (!world.isClient) {
-			((IServerWorld)world).getMultimeter().onBlockChange(world, pos, prevState, state);
+	private void logBlockChange(int localX, int y, int localZ, Block block, int metadata, CallbackInfoReturnable<Boolean> cir, int index, int oldHeight, Block oldBlock, int oldMetadata, WorldChunkSection section, int heightIncreased /* the fuck? */, int x, int z) {
+		((IServerWorld)world).getMultimeter().onBlockChange(world, x, y, z, oldBlock, oldMetadata, block, metadata);
+	}
+
+	@Inject(
+		method = "setBlockMetadataAt",
+		locals = LocalCapture.CAPTURE_FAILHARD,
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/world/chunk/WorldChunkSection;setBlockMetadata(IIII)V"
+		)
+	)
+	private void logBlockChange(int localX, int y, int localZ, int metadata, CallbackInfoReturnable<Boolean> cir, WorldChunkSection section) {
+		if (!world.isMultiplayer) {
+			int x = (chunkX << 4) + localX;
+			int z = (chunkZ << 4) + localZ;
+			Block block = section.getBlock(localX, y & 15, localZ);
+			int oldMetadata = section.getBlockMetadata(localX, y & 15, localZ);
+
+			((IServerWorld)world).getMultimeter().onBlockChange(world, x, y, z, block, oldMetadata, block, metadata);
 		}
 	}
 }

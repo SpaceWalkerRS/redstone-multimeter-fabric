@@ -18,25 +18,25 @@ public class GameRendererMixin {
 	@Shadow @Final private Minecraft minecraft;
 
 	@Inject(
-		method = "render(IFJ)V",
+		method = "renderWorld(FJ)V",
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 			args = "ldc=hand"
 		)
 	)
-	private void renderMeterHighlights(int anaglyphRenderPass, float tickDelta, long renderTimeLimit, CallbackInfo ci) {
+	private void renderMeterHighlights(float tickDelta, long renderTimeLimit, CallbackInfo ci) {
 		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters(tickDelta);
 	}
 
 	@Inject(
-		method = "render(IFJ)V",
+		method = "renderWorld(FJ)V",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/client/render/GameRenderer;enableLightMap()V"
+			target = "Lnet/minecraft/client/render/GameRenderer;enableLightMap(D)V"
 		)
 	)
-	private void renderMeterNames(int anaglyphRenderPass, float tickDelta, long renderTimeLimit, CallbackInfo ci) {
+	private void renderMeterNames(float tickDelta, long renderTimeLimit, CallbackInfo ci) {
 		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeterNames(tickDelta);
 	}
 }

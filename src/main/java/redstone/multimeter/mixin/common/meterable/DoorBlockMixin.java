@@ -9,10 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.DoorBlock;
-import net.minecraft.block.DoorBlock.Half;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
@@ -24,15 +20,14 @@ public class DoorBlockMixin implements MeterableBlock {
 		method = "neighborChanged",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
-			value = "FIELD",
-			ordinal = 0,
+			value = "INVOKE",
 			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/block/DoorBlock;POWERED:Lnet/minecraft/block/state/property/BooleanProperty;"
+			target = "Lnet/minecraft/block/Block;isSignalSource()Z"
 		)
 	)
-	private void logPowered(World world, BlockPos pos, BlockState state, Block neighborBlock, CallbackInfo ci, boolean powered) {
-		rsmm$logPowered(world, pos, powered);
-		rsmm$logPowered(world, rsmm$getOtherHalf(pos, state), powered);
+	private void logPowered(World world, int x, int y, int z, Block neighborBlock, CallbackInfo ci, int powered /* the fuck? */) {
+		rsmm$logPowered(world, x, y, z, powered != 0);
+		rsmm$logPowered(world, x, y + 1, z, powered != 0);
 	}
 
 	@Override
@@ -41,19 +36,16 @@ public class DoorBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
-		return world.hasNeighborSignal(pos) || world.hasNeighborSignal(rsmm$getOtherHalf(pos, state));
+	public boolean rsmm$isPowered(World world, int x, int y, int z, int metadata) {
+		return world.hasNeighborSignal(x, y, z) || world.hasNeighborSignal(x, rsmm$getOtherHalf(y, metadata), z);
 	}
 
 	@Override
-	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(DoorBlock.OPEN);
+	public boolean rsmm$isActive(World world, int x, int y, int z, int metadata) {
+		return (metadata & 0b100) != 0;
 	}
 
-	private BlockPos rsmm$getOtherHalf(BlockPos pos, BlockState state) {
-		Half half = state.get(DoorBlock.HALF);
-		Direction dir = (half == Half.LOWER) ? Direction.UP : Direction.DOWN;
-
-		return pos.offset(dir);
+	private int rsmm$getOtherHalf(int y, int metadata) {
+		return (metadata & 8) == 0 ? y + 1 : y - 1;
 	}
 }

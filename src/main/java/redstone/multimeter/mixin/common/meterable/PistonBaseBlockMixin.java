@@ -1,31 +1,27 @@
 package redstone.multimeter.mixin.common.meterable;
 
-import java.util.List;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.PistonBaseBlock;
-import net.minecraft.block.piston.PistonMoveStructureResolver;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.math.Directions;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.server.Multimeter;
+import redstone.multimeter.util.Direction;
 
 @Mixin(PistonBaseBlock.class)
 public class PistonBaseBlockMixin implements MeterableBlock {
 
-	@Shadow private boolean shouldExtend(World world, BlockPos pos, Direction facing) { return false; }
+	@Shadow private boolean shouldExtend(World world, int x, int y, int z, int facing) { return false; }
 
 	@Inject(
 		method = "shouldExtend",
@@ -33,27 +29,34 @@ public class PistonBaseBlockMixin implements MeterableBlock {
 			value = "RETURN"
 		)
 	)
-	private void logPowered(World world, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
-		rsmm$logPowered(world, pos, cir.getReturnValue());
+	private void logPowered(World world, int x, int y, int z, int facing, CallbackInfoReturnable<Boolean> cir) {
+		rsmm$logPowered(world, x, y, z, cir.getReturnValue());
 	}
 
 	@Inject(
-		method = "move",
+		method = "doEvent",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
 			ordinal = 1,
-			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/util/math/BlockPos;offset(Lnet/minecraft/util/math/Direction;)Lnet/minecraft/util/math/BlockPos;"
+			target = "Lnet/minecraft/world/World;setBlockWithMetadata(IIILnet/minecraft/block/Block;II)Z"
 		)
 	)
-	private void logMoved(World world, BlockPos pos, Direction facing, boolean extending, CallbackInfoReturnable<Boolean> cir, PistonMoveStructureResolver structureResolver, List<BlockPos> toMove, List<BlockPos> toDestroy, int removedIndex, Block[] removedBlocks, Direction moveDir, int toMoveIndex, BlockPos posToMove, BlockState stateToMove) {
-		if (!world.isClient) {
-			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
+	private void logMoved(World world, int x, int y, int z, int type, int data, CallbackInfoReturnable<Boolean> cir, BlockEntity blockEntity, int moveFromX, int moveFromY, int moveFromZ) {
+		rsmm$logMoved(world, moveFromX, moveFromY, moveFromZ, Directions.OPPOSITE[data]);
+	}
 
-			multimeter.logMoved(world, posToMove, moveDir);
-			multimeter.moveMeters(world, posToMove, moveDir);
-		}
+	@Inject(
+		method = "push",
+		locals = LocalCapture.CAPTURE_FAILHARD,
+		at = @At(
+			value = "INVOKE",
+			ordinal = 1,
+			target = "Lnet/minecraft/world/World;setBlockWithMetadata(IIILnet/minecraft/block/Block;II)Z"
+		)
+	)
+	private void logMoved(World world, int x, int y, int z, int dir, CallbackInfoReturnable<Boolean> cir, int moveToX, int moveToY, int moveToZ, int toMoveCount, int frontMostX, int frontMostY, int frontMostZ, Block[] blocksToMove, int moveFromX, int moveFromY, int moveFromZ) {
+		rsmm$logMoved(world, moveFromX, moveFromY, moveFromZ, dir);
 	}
 
 	@Override
@@ -62,12 +65,22 @@ public class PistonBaseBlockMixin implements MeterableBlock {
 	}
 
 	@Override
-	public boolean rsmm$isPowered(World world, BlockPos pos, BlockState state) {
-		return shouldExtend(world, pos, state.get(PistonBaseBlock.FACING));
+	public boolean rsmm$isPowered(World world, int x, int y, int z, int metadata) {
+		return shouldExtend(world, x, y, z, PistonBaseBlock.getFacing(metadata));
 	}
 
 	@Override
-	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return state.get(PistonBaseBlock.EXTENDED);
+	public boolean rsmm$isActive(World world, int x, int y, int z, int metadata) {
+		return PistonBaseBlock.isExtended(metadata);
+	}
+
+	private void rsmm$logMoved(World world, int x, int y, int z, int dir) {
+		if (!world.isMultiplayer) {
+			Multimeter multimeter = ((IServerWorld)world).getMultimeter();
+			Direction direction = Direction.fromIndex(dir);
+
+			multimeter.logMoved(world, x, y, z, direction);
+			multimeter.moveMeters(world, x, y, z, direction);
+		}
 	}
 }

@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
 
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.hud.Directionality;
@@ -79,7 +79,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 
 	@Override
 	protected void drawHighlights(int mouseX, int mouseY) {
-		GlStateManager.pushMatrix();
+		GL11.glPushMatrix();
 
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
 			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
@@ -89,7 +89,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			drawHighlight(Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
 		}
 
-		GlStateManager.translated(0, 0, -0.1);
+		GL11.glTranslated(0, 0, -0.1);
 
 		if (hud.hasTickMarker()) {
 			long tick = hud.getTickMarker();
@@ -100,7 +100,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			}
 		}
 
-		GlStateManager.popMatrix();
+		GL11.glPopMatrix();
 	}
 
 	@Override
