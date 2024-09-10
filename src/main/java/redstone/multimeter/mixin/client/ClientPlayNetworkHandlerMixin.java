@@ -11,11 +11,13 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.handler.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.network.packet.s2c.play.LoginS2CPacket;
 
 import redstone.multimeter.common.network.Packets;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
+import redstone.multimeter.util.TextUtils;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
@@ -31,6 +33,22 @@ public class ClientPlayNetworkHandlerMixin {
 	private void handleLogin(LoginS2CPacket packet, CallbackInfo ci) {
 		((IMinecraft)minecraft).getMultimeterClient().onConnect();
 
+	}
+
+	@Inject(
+		method = "handleChatMessage",
+		cancellable = true,
+		at = @At(
+			value = "HEAD"
+		)
+	)
+	private void handleChatMessage(ChatMessageS2CPacket packet, CallbackInfo ci) {
+		if (TextUtils.ACTION_BAR_KEY.equals(packet.getMessage().getContent())) {
+			String message = packet.getMessage().getString().substring(TextUtils.ACTION_BAR_KEY.length());
+			minecraft.gui.setOverlayMessage(message, false);
+
+			ci.cancel();
+		}
 	}
 
 	@Inject(
