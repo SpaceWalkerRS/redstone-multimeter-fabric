@@ -18,6 +18,8 @@ import redstone.multimeter.client.gui.Tooltip;
 
 public class TextUtils {
 
+	public static final String ACTION_BAR_KEY = "rsmm:action_bar|";
+
 	private static final int MAX_WIDTH = 200;
 
 	public static List<Text> toLines(TextRenderer textRenderer, String text) {
