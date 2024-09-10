@@ -11,7 +11,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
@@ -122,16 +122,7 @@ public class MeterRenderer {
 		double rangeSquared = range * range;
 
 		if (distanceSquared < rangeSquared) {
-			float x = (float)(dx + 0.5D);
-			float y = (float)(dy + 0.75D);
-			float z = (float)(dz + 0.5D);
-
-			EntityRenderDispatcher entityRenderDispatcher = minecraft.getEntityRenderDispatcher();
-
-			float rotX = entityRenderDispatcher.playerRotX;
-			float rotY = entityRenderDispatcher.playerRotY;
-
-			GameRenderer.renderNameTagInWorld(minecraft.font, name, x, y, z, 0, rotY, rotX, false);
+			renderNameTag(minecraft.font, name, dx + 0.5D, dy + 0.75D, dz + 0.5D);
 		}
 	}
 
@@ -205,6 +196,33 @@ public class MeterRenderer {
 		if (outline) {
 			bufferBuilder.vertex(c0, c1, c0).color(r, g, b, a).endVertex();
 		}
+	}
+
+	private void renderNameTag(Font font, String name, double dx, double dy, double dz) {
+		EntityRenderDispatcher entityRenderDispatcher = this.minecraft.getEntityRenderDispatcher();
+
+		float rotX = entityRenderDispatcher.playerRotX;
+		float rotY = entityRenderDispatcher.playerRotY;
+
+		GlStateManager.pushMatrix();
+		GlStateManager.translated(dx, dy, dz);
+		GlStateManager.normal3f(0.0F, 1.0F, 0.0F);
+		GlStateManager.rotatef(-rotY, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotatef(rotX, 1.0F, 0.0F, 0.0F);
+		GlStateManager.scalef(-0.025F, -0.025F, 0.025F);
+		GlStateManager.enableBlend();
+		GlStateManager.disableLighting();
+		GlStateManager.depthMask(true);
+		GlStateManager.disableDepthTest();
+		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+		GlStateManager.enableTexture();
+
+		font.draw(name, -font.width(name) / 2, 0, 0xFFFFFFFF);
+
+		GlStateManager.enableLighting();
+		GlStateManager.disableBlend();
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.popMatrix();
 	}
 
 	@FunctionalInterface
