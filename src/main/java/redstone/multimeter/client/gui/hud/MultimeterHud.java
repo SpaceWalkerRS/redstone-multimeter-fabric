@@ -707,7 +707,7 @@ public class MultimeterHud extends AbstractParentElement {
 
 	public void resetSize() {
 		Minecraft minecraft = client.getMinecraft();
-		Window window = new Window(minecraft, minecraft.width, minecraft.height);
+		Window window = new Window(minecraft.options, minecraft.width, minecraft.height);
 
 		int width = window.getWidth();
 		int height = window.getHeight();

@@ -143,8 +143,6 @@ public class ScreenWrapper extends Screen {
 			if (chr >= ' ') {
 				screen.typeChar(chr);
 			}
-
-			minecraft.handleGuiKeyBindings();
 		}
 	}
 }
