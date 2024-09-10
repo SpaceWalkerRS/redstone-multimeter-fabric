@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import net.minecraft.block.state.BlockState;
+import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -17,8 +18,8 @@ import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickPhaseTree;
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.common.network.packets.HandshakePacket;
-import redstone.multimeter.common.network.packets.TickTimePacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
+import redstone.multimeter.common.network.packets.TickTimePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.util.DimensionUtils;
 //import redstone.multimeter.server.compat.CarpetCompat;
@@ -219,7 +220,11 @@ public class MultimeterServer {
 		return playerList.has(player.getUuid());
 	}
 
-	public void sendMessage(ServerPlayerEntity player, Text message) {
-		player.addMessage(message);
+	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
+		if (actionBar) {
+			player.networkHandler.sendPacket(new ChatMessageS2CPacket(message, (byte) 2));
+		} else {
+			player.addMessage(message);
+		}
 	}
 }

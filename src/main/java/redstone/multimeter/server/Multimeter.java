@@ -161,7 +161,7 @@ public class Multimeter {
 
 		if (owner != null) {
 			Text message = new LiteralText(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
-			server.sendMessage(owner, message);
+			server.sendMessage(owner, message, false);
 		}
 	}
 
@@ -196,7 +196,7 @@ public class Multimeter {
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
 				Text message = new LiteralText(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
-				server.sendMessage(player, message);
+				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
 			}
@@ -268,7 +268,7 @@ public class Multimeter {
 				setMeters(meterGroup, meters);
 			} else {
 				Text message = new LiteralText(String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName()));
-				server.sendMessage(player, message);
+				server.sendMessage(player, message, true);
 			}
 		}
 	}
@@ -392,7 +392,7 @@ public class Multimeter {
 					.setClickEvent(
 						new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
 			})).append(new LiteralText(" to subscribe to it."));
-		server.sendMessage(player, message);
+		server.sendMessage(player, message, false);
 	}
 
 	public void removeMemberFromMeterGroup(ServerMeterGroup meterGroup, UUID playerUuid) {
@@ -409,7 +409,7 @@ public class Multimeter {
 				unsubscribeFromMeterGroup(meterGroup, player);
 
 				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
-				server.sendMessage(player, message);
+				server.sendMessage(player, message, false);
 			}
 		}
 	}
@@ -430,7 +430,7 @@ public class Multimeter {
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
 			Text message = new LiteralText("This server does not allow meter teleporting!");
-			server.sendMessage(player, message);
+			server.sendMessage(player, message, false);
 
 			return;
 		}
@@ -457,7 +457,7 @@ public class Multimeter {
 					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
 					Text text = new LiteralText(String.format("Teleported to meter \"%s\"", meter.getName()));
-					server.sendMessage(player, text);
+					server.sendMessage(player, text, false);
 				}
 			}
 		}

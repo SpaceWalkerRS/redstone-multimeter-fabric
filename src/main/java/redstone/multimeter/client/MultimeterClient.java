@@ -262,7 +262,7 @@ public class MultimeterClient {
 
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
 				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).setFormatting(Formatting.RED);
-				sendMessage(warning);
+				sendMessage(warning, false);
 			}
 
 			hud.reset();
@@ -401,7 +401,7 @@ public class MultimeterClient {
 			hudEnabled = !hudEnabled;
 
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(new LiteralText(message));
+			sendMessage(new LiteralText(message), true);
 
 			tutorial.onToggleHud(hudEnabled);
 		}
@@ -439,7 +439,11 @@ public class MultimeterClient {
 		return screen != null && screen instanceof OptionsScreen;
 	}
 
-	public void sendMessage(Text message) {
-		minecraft.player.addMessage(message);
+	public void sendMessage(Text message, boolean actionBar) {
+		if (actionBar) {
+			minecraft.gui.setOverlayMessage(message, false);
+		} else {
+			minecraft.player.addMessage(message);
+		}
 	}
 }
