@@ -33,6 +33,7 @@ public class MeterRenderer {
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.disableTexture();
+		GlStateManager.enableDepthTest();
 		GlStateManager.depthMask(false);
 
 		renderMeters(this::renderMeterHighlight, tickDelta);
