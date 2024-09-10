@@ -10,7 +10,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tessellator;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -125,16 +125,7 @@ public class MeterRenderer {
 		double rangeSquared = range * range;
 
 		if (distanceSquared < rangeSquared) {
-			float x = (float)(dx + 0.5D);
-			float y = (float)(dy + 0.75D);
-			float z = (float)(dz + 0.5D);
-
-			EntityRenderDispatcher entityRenderDispatcher = minecraft.getEntityRenderDispatcher();
-
-			float rotX = entityRenderDispatcher.cameraPitch;
-			float rotY = entityRenderDispatcher.cameraYaw;
-
-			GameRenderer.renderNameTag(minecraft.textRenderer, name, x, y, z, 0, rotY, rotX, false, false);
+			renderNameTag(minecraft.textRenderer, name, dx + 0.5D, dy + 0.75D, dz + 0.5D);
 		}
 	}
 
@@ -208,6 +199,33 @@ public class MeterRenderer {
 		if (outline) {
 			bufferBuilder.vertex(c0, c1, c0).color(r, g, b, a).nextVertex();
 		}
+	}
+
+	private void renderNameTag(TextRenderer textRenderer, String name, double dx, double dy, double dz) {
+		EntityRenderDispatcher entityRenderDispatcher = this.minecraft.getEntityRenderDispatcher();
+
+		float yaw = entityRenderDispatcher.cameraYaw;
+		float pitch = entityRenderDispatcher.cameraPitch;
+
+		GlStateManager.pushMatrix();
+		GlStateManager.translated(dx, dy, dz);
+		GlStateManager.normal3f(0.0F, 1.0F, 0.0F);
+		GlStateManager.rotatef(-yaw, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotatef(pitch, 1.0F, 0.0F, 0.0F);
+		GlStateManager.scalef(-0.025F, -0.025F, 0.025F);
+		GlStateManager.enableBlend();
+		GlStateManager.disableLighting();
+		GlStateManager.depthMask(true);
+		GlStateManager.disableDepthTest();
+		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+		GlStateManager.enableTexture();
+
+		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 0xFFFFFFFF);
+
+		GlStateManager.enableLighting();
+		GlStateManager.disableBlend();
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.popMatrix();
 	}
 
 	@FunctionalInterface
