@@ -211,33 +211,12 @@ public class MeterRenderer {
 		GlStateManager.rotatef(-yaw, 0.0F, 1.0F, 0.0F);
 		GlStateManager.rotatef(pitch, 1.0F, 0.0F, 0.0F);
 		GlStateManager.scalef(-0.025F, -0.025F, 0.025F);
-		GlStateManager.disableLighting();
-		GlStateManager.depthMask(false);
-		GlStateManager.disableDepthTest();
 		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-		GlStateManager.disableTexture();
-
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
-
-		int halfWidth = textRenderer.getWidth(name) / 2;
-
-		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
-
-		bufferBuilder.vertex(-halfWidth - 1, -1, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).nextVertex();
-		bufferBuilder.vertex(-halfWidth - 1, 8, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).nextVertex();
-		bufferBuilder.vertex(halfWidth + 1, 8, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).nextVertex();
-		bufferBuilder.vertex(halfWidth + 1, -1, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).nextVertex();
-
-		tessellator.end();
-
-		GlStateManager.enableTexture();
-
-		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 553648127);
-
-		GlStateManager.enableDepthTest();
+		GlStateManager.disableLighting();
 		GlStateManager.depthMask(true);
+		GlStateManager.disableDepthTest();
+		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GlStateManager.enableTexture();
 
 		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 0xFFFFFFFF);
 
