@@ -1,7 +1,6 @@
 package redstone.multimeter.client;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -30,7 +29,6 @@ import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhaseTree;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
-import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.RSMMPacket;
@@ -147,10 +145,6 @@ public class MultimeterClient {
 
 	public boolean isPreviewing() {
 		return meterGroupPreview.isPreviewing();
-	}
-
-	public boolean isPreviewing(int slot) {
-		return meterGroupPreview.isPreviewing() && savedMeterGroupsManager.isPreviewing(slot);
 	}
 
 	public TickPhaseTree getTickPhaseTree() {
@@ -295,15 +289,6 @@ public class MultimeterClient {
 	public void refreshMeterGroup() {
 		MeterGroupRefreshPacket packet = new MeterGroupRefreshPacket(meterGroup);
 		sendPacket(packet);
-	}
-
-	public void previewMeterGroup(String name, List<MeterProperties> meters) {
-		meterGroupPreview.preview(name, meters);
-	}
-
-	public void stopPreviewingMeterGroup() {
-		meterGroupPreview.stopPreviewing();
-		savedMeterGroupsManager.stopPreviewing();
 	}
 
 	/**
