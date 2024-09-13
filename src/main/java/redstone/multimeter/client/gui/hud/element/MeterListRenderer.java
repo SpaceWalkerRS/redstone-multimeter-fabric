@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 
@@ -107,7 +108,22 @@ public class MeterListRenderer extends AbstractElement {
 
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		return false;
+		if (!hud.hasSelectedMeter()) {
+			return false;
+		}
+
+		switch (keyCode) {
+		case GLFW.GLFW_KEY_UP:
+			moveSelection(Screen.hasControlDown() ? -hud.getSelectedRow() : -1);
+			break;
+		case GLFW.GLFW_KEY_DOWN:
+			moveSelection(Screen.hasControlDown() ? (hud.meters.size() - 1) - hud.getSelectedRow() : 1);
+			break;
+		default:
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -286,6 +302,11 @@ public class MeterListRenderer extends AbstractElement {
 
 	public void updateHeight() {
 		setHeight(hud.meters.size() * (hud.settings.rowHeight + hud.settings.gridSize) + hud.settings.gridSize);
+	}
+
+	private void moveSelection(int amount) {
+		int row = (hud.getSelectedRow() + amount) % hud.meters.size();
+		hud.selectMeter(row < 0 ? row + hud.meters.size() : row);
 	}
 
 	private boolean changeMeterIndex(Meter meter, int oldIndex, int index) {
