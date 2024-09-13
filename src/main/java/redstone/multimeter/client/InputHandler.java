@@ -8,7 +8,6 @@ import redstone.multimeter.client.gui.screen.MultimeterScreen;
 import redstone.multimeter.client.gui.screen.OptionsScreen;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.client.gui.screen.TickPhaseTreeScreen;
-import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.event.EventType;
 
 public class InputHandler {
@@ -35,8 +34,14 @@ public class InputHandler {
 		while (Keybinds.VIEW_TICK_PHASE_TREE.consumeClick()) {
 			client.openScreen(new TickPhaseTreeScreen(client));
 		}
-		if (!Keybinds.LOAD_METER_GROUP.isDown() && client.isPreviewing()) {
-			client.stopPreviewingMeterGroup();;
+		while (Keybinds.LOAD_METER_GROUP.consumeClick()) {
+			client.getSavedMeterGroupsManager().setLoading();
+		}
+		while (Keybinds.SAVE_METER_GROUP.consumeClick()) {
+			client.getSavedMeterGroupsManager().setSaving();
+		}
+		if (!Keybinds.LOAD_METER_GROUP.isDown() && !Keybinds.SAVE_METER_GROUP.isDown()) {
+			client.getSavedMeterGroupsManager().setIdle();
 		}
 
 		if (!client.hasSubscription()) {
@@ -95,17 +100,10 @@ public class InputHandler {
 		slot++; // slots are 1-indexed
 
 		if (Keybinds.LOAD_METER_GROUP.isDown()) {
-			if (client.isPreviewing(slot)) {
-				client.getSavedMeterGroupsManager().loadPreviewSlot();
-			} else if (Options.RedstoneMultimeter.PREVIEW_METER_GROUPS.get()) {
-				client.getSavedMeterGroupsManager().previewSlot(slot);
-			} else {
-				client.getSavedMeterGroupsManager().loadSlot(slot);
-			}
-			return true;
-		} else if (Keybinds.SAVE_METER_GROUP.isDown()) {
-			client.getSavedMeterGroupsManager().saveSlot(slot);
-			return true;
+			return client.getSavedMeterGroupsManager().loadSlot(slot);
+		}
+		if (Keybinds.SAVE_METER_GROUP.isDown()) {
+			return client.getSavedMeterGroupsManager().saveSlot(slot);
 		}
 
 		return false;
