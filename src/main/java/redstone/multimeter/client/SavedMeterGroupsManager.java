@@ -247,16 +247,7 @@ public class SavedMeterGroupsManager {
 	}
 
 	public void stopPreviewing() {
-		if (previewSlot != -1) {
-			SavedMeterGroup meterGroup = meterGroups[previewSlot + SLOT_OFFSET];
-
-			if (meterGroup != null) {
-				Text message = new LiteralText("Stopped previewing meter group \'" + meterGroup.getName() + "\' from slot " + previewSlot);
-				client.sendMessage(message, true);
-			}
-
-			previewSlot = -1;
-		}
+		previewSlot = -1;
 	}
 
 	public boolean isPreviewing(int slot) {
