@@ -823,7 +823,7 @@ public class MultimeterHud extends AbstractParentElement {
 			return; // we should never get here
 		}
 		if (client.isPreviewing()) {
-			client.stopPreviewingMeterGroup();
+			client.getSavedMeterGroupsManager().setIdle();
 		}
 
 		onScreen = true;
