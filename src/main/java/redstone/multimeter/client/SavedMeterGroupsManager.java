@@ -29,6 +29,7 @@ public class SavedMeterGroupsManager {
 	private final SavedMeterGroup[] meterGroups;
 	private final Path file;
 
+	private State state = State.IDLE;
 	private int lastLoadWarningSlot;
 	private int bypassLoadWarningTicks;
 	private int lastSaveWarningSlot;
@@ -119,37 +120,103 @@ public class SavedMeterGroupsManager {
 		}
 	}
 
-	public void loadSlot(int slot) {
+	// called when the Load Meter Group key is pressed
+	public void setLoading() {
+		if (state == State.LOADING) {
+			return;
+		}
+
+		state = State.LOADING;
+
+		resetLoadWarning();
+		stopPreviewing();
+
+		if (Options.RedstoneMultimeter.PREVIEW_METER_GROUPS.get()) {
+			Text message = new LiteralText("Press one of the number keys to preview the meter group from that slot!");
+			client.sendMessage(message, true);
+		} else {
+			Text message = new LiteralText("Press one of the number keys to load the meter group from that slot!");
+			client.sendMessage(message, true);
+		}
+	}
+
+	// called when a number key is pressed
+	public boolean loadSlot(int slot) {
+		if (state != State.LOADING) {
+			return false;
+		}
+
+		if (Options.RedstoneMultimeter.PREVIEW_METER_GROUPS.get()) {
+			SavedMeterGroup meterGroup = meterGroups[slot + SLOT_OFFSET];
+
+			if (slot != previewSlot) {
+				// not previewing that slot yet, start
+				if (meterGroup == null) {
+					return previewSlot(slot, null, null);
+				} else {
+					String name = meterGroup.getName();
+					List<MeterProperties> meters = meterGroup.getMeters();
+
+					return previewSlot(slot, name, meters);
+				}
+			} else {
+				// previewing that slot, load it
+				slot = previewSlot;
+			}
+		}
+
 		SavedMeterGroup meterGroup = meterGroups[slot + SLOT_OFFSET];
 
 		if (meterGroup == null) {
-			loadMeterGroup(slot, null, null);
+			return loadMeterGroup(slot, null, null);
 		} else {
 			String name = meterGroup.getName();
 			List<MeterProperties> meters = meterGroup.getMeters();
 
-			loadMeterGroup(slot, name, meters);
+			return loadMeterGroup(slot, name, meters);
 		}
 	}
 
-	private void loadMeterGroup(int slot, String name, List<MeterProperties> meters) {
+	private boolean previewSlot(int slot, String name, List<MeterProperties> meters) {
+		SavedMeterGroup meterGroup = meterGroups[slot + SLOT_OFFSET];
+
+		if (meterGroup == null) {
+			Text warning = new LiteralText(String.format("Cannot preview meter group from slot %d: that slot is empty!", slot));
+			client.sendMessage(warning, true);
+		} else {
+			client.getMeterGroupPreview().preview(name, meters);
+
+			Text message = new LiteralText("Previewing meter group \'" + name + "\' from slot " + slot);
+			client.sendMessage(message, true);
+		}
+
+		previewSlot = slot;
+
+		return true;
+	}
+
+	private boolean loadMeterGroup(int slot, String name, List<MeterProperties> meters) {
 		if (slot != lastLoadWarningSlot) {
-			lastLoadWarningSlot = -1;
-			bypassLoadWarningTicks = -1;
+			resetLoadWarning();
 		}
 
 		boolean bypassWarnings = (bypassLoadWarningTicks >= 0) || Options.RedstoneMultimeter.BYPASS_WARNINGS.get();
 
 		if (name == null) {
-			if (client.getMeterGroup().isSubscribed()) {
+			if (client.hasSubscription()) {
 				if (bypassWarnings) {
 					client.unsubscribeFromMeterGroup();
+
+					Text warning = new LiteralText(String.format("Loaded empty slot %d and unsubscribed from meter group!", slot));
+					client.sendMessage(warning, true);
+
+					setIdle();
 				} else {
 					Text warning = new LiteralText("That slot is empty! Are you sure you want to unsubscribe from your current meter group?");
-					loadSlotWarning(slot, warning);
+					sendLoadWarning(slot, warning);
 				}
 			} else {
-				Text warning = new LiteralText(String.format("Could not load meter group from slot %d: that slot is empty!", slot));
+				Text warning = new LiteralText(String.format("Could not load empty slot %d: you are not subscribed to a meter group!", slot));
 				client.sendMessage(warning, true);
 			}
 		} else {
@@ -160,27 +227,71 @@ public class SavedMeterGroupsManager {
 
 			Text message = new LiteralText("Loaded meter group \'" + name + "\' from slot " + slot);
 			client.sendMessage(message, true);
+
+			setIdle();
 		}
+
+		return true;
 	}
 
-	private void loadSlotWarning(int slot, Text warning) {
+	private void resetLoadWarning() {
+		lastLoadWarningSlot = -1;
+		bypassLoadWarningTicks = -1;
+	}
+
+	private void sendLoadWarning(int slot, Text warning) {
 		lastLoadWarningSlot = slot;
 		bypassLoadWarningTicks = WARNING_TIME;
 
 		client.sendMessage(warning, true);
 	}
 
-	public void saveSlot(int slot) {
-		ClientMeterGroup meterGroup = client.getMeterGroup();
+	// called when the Save Meter Group key is pressed
+	public void setSaving() {
+		if (state == State.SAVING) {
+			return;
+		}
 
+		state = State.SAVING;
+
+		resetSaveWarning();
+		stopPreviewing();
+
+		if (client.hasSubscription()) {
+			Text message = new LiteralText("Press one of the number keys to save this meter group to that slot!");
+			client.sendMessage(message, true);
+		} else {
+			Text message = new LiteralText("Press one of the number keys to clear that saved meter group slot!");
+			client.sendMessage(message, true);
+		}
+	}
+
+	// called when a number key is pressed
+	public boolean saveSlot(int slot) {
+		if (state != State.SAVING) {
+			return false;
+		}
+
+		if (!client.hasSubscription()) {
+			return saveMeterGroup(slot, null, null);
+		} else {
+			ClientMeterGroup meterGroup = client.getMeterGroup();
+
+			String name = meterGroup.getName();
+			List<Meter> meters = meterGroup.getMeters();
+
+			return saveMeterGroup(slot, name, meters);
+		}
+	}
+
+	private boolean saveMeterGroup(int slot, String name, List<Meter> meters) {
 		if (slot != lastSaveWarningSlot) {
-			lastSaveWarningSlot = -1;
-			bypassSaveWarningTicks = -1;
+			resetSaveWarning();
 		}
 
 		boolean bypassWarnings = (bypassSaveWarningTicks >= 0) || Options.RedstoneMultimeter.BYPASS_WARNINGS.get();
 
-		if (!meterGroup.isSubscribed()) {
+		if (name == null) {
 			if (bypassWarnings) {
 				meterGroups[slot + SLOT_OFFSET] = null;
 
@@ -189,68 +300,62 @@ public class SavedMeterGroupsManager {
 				client.sendMessage(message, true);
 			} else {
 				Text warning = new LiteralText("You are not subscribed to a meter group! Are you sure you want to clear that slot?");
-				saveSlotWarning(slot, warning);
+				sendSaveWarning(slot, warning);
 			}
-		} else if (!meterGroup.hasMeters() && !bypassWarnings) {
-			Text warning = new LiteralText("Your current meter group is empty! Are you sure you want to save it?");
-			saveSlotWarning(slot, warning);
 		} else {
-			String name = meterGroup.getName();
-			List<MeterProperties> meters = new ArrayList<>();
+			if (meters.isEmpty() && !bypassWarnings) {
+				Text warning = new LiteralText("Your current meter group is empty! Are you sure you want to save it?");
+				sendSaveWarning(slot, warning);
+			} else {
+				List<MeterProperties> savedMeters = new ArrayList<>();
 
-			for (Meter meter : meterGroup.getMeters()) {
-				meters.add(meter.getProperties());
+				for (Meter meter : meters) {
+					savedMeters.add(meter.getProperties());
+				}
+
+				meterGroups[slot + SLOT_OFFSET] = new SavedMeterGroup(name, savedMeters);
+
+				Text message = new LiteralText("Saved meter group \'" + name + "\'to slot " + slot);
+				client.sendMessage(message, true);
 			}
-
-			meterGroups[slot + SLOT_OFFSET] = new SavedMeterGroup(name, meters);
-
-			Text message = new LiteralText("Saved meter group \'" + name + "\'to slot " + slot);
-			client.sendMessage(message, true);
 		}
+
+		return true;
 	}
 
-	private void saveSlotWarning(int slot, Text warning) {
+	private void resetSaveWarning() {
+		lastSaveWarningSlot = -1;
+		bypassSaveWarningTicks = -1;
+	}
+
+	private void sendSaveWarning(int slot, Text warning) {
 		lastSaveWarningSlot = slot;
 		bypassSaveWarningTicks = WARNING_TIME;
 
 		client.sendMessage(warning, true);
 	}
 
-	public void previewSlot(int slot) {
-		SavedMeterGroup meterGroup = meterGroups[slot + SLOT_OFFSET];
-
-		if (meterGroup == null) {
-			Text warning = new LiteralText("That slot is empty!");
-			client.sendMessage(warning, true);
-		} else {
-			String name = meterGroup.getName();
-			List<MeterProperties> meters = meterGroup.getMeters();
-
-			client.previewMeterGroup(name, meters);
-
-			Text message = new LiteralText("Previewing meter group \'" + name + "\' from slot " + slot);
-			client.sendMessage(message, true);
-
-			previewSlot = slot;
+	public void setIdle() {
+		if (state == State.IDLE) {
+			return;
 		}
+
+		state = State.IDLE;
+
+		resetLoadWarning();
+		resetSaveWarning();
+		stopPreviewing();
 	}
 
-	public void loadPreviewSlot() {
-		if (previewSlot == -1) {
-			Text message = new LiteralText("Not previewing any meter group!");
-			client.sendMessage(message, true);
-		} else {
-			loadSlot(previewSlot);
+	private void stopPreviewing() {
+		if (previewSlot != -1) {
+			client.getMeterGroupPreview().stopPreviewing();
 		}
 
 		previewSlot = -1;
 	}
 
-	public void stopPreviewing() {
-		previewSlot = -1;
-	}
-
-	public boolean isPreviewing(int slot) {
-		return slot != -1 && slot == previewSlot;
+	private enum State {
+		IDLE, LOADING, SAVING
 	}
 }
