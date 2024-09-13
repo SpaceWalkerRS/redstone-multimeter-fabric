@@ -49,7 +49,9 @@ dependencies {
 		exclude group: "net.fabricmc.fabric-api"
 		exclude group: "de.siphalor", module: "nmuk-1.15"
 	}
-	include "de.siphalor:amecsapi-1.16:1.1.2+mc1.16-rc1"
+	include("de.siphalor:amecsapi-1.16:1.1.2+mc1.16-rc1") {
+		exclude group: "de.siphalor", module: "nmuk-1.15"
+	}
 	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
 		// eclipse gets confused and puts two versions of loader on the classpath...
 		exclude group: 'net.fabricmc'
