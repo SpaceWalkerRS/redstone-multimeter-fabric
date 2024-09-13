@@ -3,6 +3,7 @@ package redstone.multimeter.client.gui.hud.element;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Formatting;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -106,7 +107,22 @@ public class MeterListRenderer extends AbstractElement {
 
 	@Override
 	public boolean keyPress(int keyCode) {
-		return false;
+		if (!hud.hasSelectedMeter()) {
+			return false;
+		}
+
+		switch (keyCode) {
+		case Keyboard.KEY_UP:
+			moveSelection(Screen.isControlDown() ? -hud.getSelectedRow() : -1);
+			break;
+		case Keyboard.KEY_DOWN:
+			moveSelection(Screen.isControlDown() ? (hud.meters.size() - 1) - hud.getSelectedRow() : 1);
+			break;
+		default:
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -285,6 +301,11 @@ public class MeterListRenderer extends AbstractElement {
 
 	public void updateHeight() {
 		setHeight(hud.meters.size() * (hud.settings.rowHeight + hud.settings.gridSize) + hud.settings.gridSize);
+	}
+
+	private void moveSelection(int amount) {
+		int row = (hud.getSelectedRow() + amount) % hud.meters.size();
+		hud.selectMeter(row < 0 ? row + hud.meters.size() : row);
 	}
 
 	private boolean changeMeterIndex(Meter meter, int oldIndex, int index) {
