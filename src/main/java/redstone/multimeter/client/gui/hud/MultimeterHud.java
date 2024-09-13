@@ -518,6 +518,10 @@ public class MultimeterHud extends AbstractParentElement {
 		return selectedMeter;
 	}
 
+	public boolean hasSelectedMeter() {
+		return selectedMeter != null;
+	}
+
 	public boolean selectMeter(int row) {
 		if (row >= 0 && row < meters.size()) {
 			return selectMeter(meters.get(row));
