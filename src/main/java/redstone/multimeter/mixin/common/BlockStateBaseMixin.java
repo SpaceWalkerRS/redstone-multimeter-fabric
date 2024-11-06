@@ -16,10 +16,12 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 
 import redstone.multimeter.interfaces.mixin.IBlock;
@@ -72,7 +74,7 @@ public class BlockStateBaseMixin {
 			value = "HEAD"
 		)
 	)
-	private void logBlockUpdate(Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston, CallbackInfo ci) {
+	private void logBlockUpdate(Level level, BlockPos pos, Block neighborBlock, Orientation orientation, boolean movedByPiston, CallbackInfo ci) {
 		if (!level.isClientSide()) {
 			BlockState state = asState();
 
@@ -96,9 +98,9 @@ public class BlockStateBaseMixin {
 			value = "HEAD"
 		)
 	)
-	private void logShapeUpdate(Direction dir, BlockState neighborState, LevelAccessor levelAccess, BlockPos pos, BlockPos neighborPos, CallbackInfoReturnable<BlockState> cir) {
-		if (levelAccess instanceof ServerLevel) {
-			ServerLevel level = (ServerLevel)levelAccess;
+	private void logShapeUpdate(LevelReader levelReader, ScheduledTickAccess tickAccess, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState neighborState, RandomSource random, CallbackInfoReturnable<BlockState> cir) {
+		if (levelReader instanceof ServerLevel) {
+			ServerLevel level = (ServerLevel)levelReader;
 			((IServerLevel)level).getMultimeter().logShapeUpdate(level, pos, dir);
 		}
 	}

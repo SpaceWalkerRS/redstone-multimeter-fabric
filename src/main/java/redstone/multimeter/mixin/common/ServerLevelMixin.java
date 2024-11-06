@@ -1,7 +1,6 @@
 package redstone.multimeter.mixin.common;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +19,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockEventData;
 import net.minecraft.world.level.Level;
@@ -54,8 +52,8 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel, Sc
 	private int rsmm$currentDepth;
 	private int rsmm$currentBatch;
 
-	private ServerLevelMixin(WritableLevelData data, ResourceKey<Level> key, RegistryAccess registryAccess, Holder<DimensionType> dimension, Supplier<ProfilerFiller> profiler, boolean isClientSide, boolean isDebug, long seed, int maxChainedNeighborUpdates) {
-		super(data, key, registryAccess, dimension, profiler, isClientSide, isDebug, seed, maxChainedNeighborUpdates);
+	private ServerLevelMixin(WritableLevelData data, ResourceKey<Level> key, RegistryAccess registryAccess, Holder<DimensionType> dimension, boolean isClientSide, boolean isDebug, long seed, int maxChainedNeighborUpdates) {
+		super(data, key, registryAccess, dimension, isClientSide, isDebug, seed, maxChainedNeighborUpdates);
 	}
 
 	@Inject(
@@ -120,7 +118,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel, Sc
 		method = "tick",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
 			args = "ldc=tickPending"
 		)
 	)
@@ -381,7 +379,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel, Sc
 		method = "tickFluid",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/level/material/FluidState;tick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"
+			target = "Lnet/minecraft/world/level/material/FluidState;tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V"
 		)
 	)
 	private void logFluidTick(BlockPos pos, Fluid fluid, CallbackInfo ci) {

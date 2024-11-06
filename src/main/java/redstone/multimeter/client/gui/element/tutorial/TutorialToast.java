@@ -6,7 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.components.toasts.ToastComponent;
+import net.minecraft.client.gui.components.toasts.ToastManager;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -49,11 +50,17 @@ public class TutorialToast implements Toast {
 	}
 
 	@Override
-	public Visibility render(GuiGraphics graphics, ToastComponent toasts, long age) {
-		drawBackground(graphics, toasts, age);
+	public Visibility getWantedVisibility() {
+		return visibility;
+	}
 
-		Minecraft client = toasts.getMinecraft();
-		Font font = client.font;
+	@Override
+	public void update(ToastManager toasts, long age) {
+	}
+
+	@Override
+	public void render(GuiGraphics graphics, Font font, long age) {
+		drawBackground(graphics, font, age);
 
 		int x = 7;
 		int y = 7;
@@ -66,16 +73,14 @@ public class TutorialToast implements Toast {
 			graphics.drawString(font, description.get(i), x, y, 0xFF000000, false);
 		}
 
-		drawDecoration(graphics, toasts, age);
-
-		return visibility;
+		drawDecoration(graphics, font, age);
 	}
 
-	protected void drawBackground(GuiGraphics graphics, ToastComponent toasts, long age) {
-		graphics.blitSprite(TEXTURE, 0 ,0, width(), height());
+	protected void drawBackground(GuiGraphics graphics, Font toasts, long age) {
+		graphics.blitSprite(RenderType::guiTextured, TEXTURE, 0 ,0, width(), height());
 	}
 
-	protected void drawDecoration(GuiGraphics graphics, ToastComponent toasts, long age) {
+	protected void drawDecoration(GuiGraphics graphics, Font toasts, long age) {
 	}
 
 	public void hide() {

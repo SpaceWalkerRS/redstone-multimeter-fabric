@@ -12,18 +12,19 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
+import redstone.multimeter.mixin.client.GuiGraphicsAccessor;
 import redstone.multimeter.util.ColorUtils;
 
 public class RenderHelper2D {
 
 	protected void renderRect(GuiGraphics graphics, Drawer drawer) {
-		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
+		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 
@@ -121,7 +122,7 @@ public class RenderHelper2D {
 	}
 
 	protected void renderTexture(GuiGraphics graphics, Texture texture, Drawer drawer) {
-		RenderSystem.setShader(() -> GameRenderer.getPositionTexShader());
+		RenderSystem.setShader(CoreShaders.POSITION_TEX);
 		RenderSystem.setShaderTexture(0, texture.location);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -171,7 +172,7 @@ public class RenderHelper2D {
 	}
 
 	protected void renderTextureColor(GuiGraphics graphics, Texture texture, Drawer drawer) {
-		RenderSystem.setShader(() -> GameRenderer.getPositionTexColorShader());
+		RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
 		RenderSystem.setShaderTexture(0, texture.location);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -226,7 +227,7 @@ public class RenderHelper2D {
 	}
 
 	protected void renderText(GuiGraphics graphics, TextDrawer drawer) {
-		BufferSource source = graphics.bufferSource();
+		BufferSource source = ((GuiGraphicsAccessor) graphics).rsmm$getBufferSource();
 		Matrix4f pose = graphics.pose().last().pose();
 
 		drawer.draw(source, pose);

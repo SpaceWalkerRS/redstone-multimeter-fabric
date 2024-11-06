@@ -17,7 +17,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
@@ -368,7 +368,7 @@ public class TextField extends AbstractButton {
 		int y1 = selectionY + selectionHeight;
 		int z = 0;
 
-		RenderSystem.setShader(() -> GameRenderer.getPositionShader());
+		RenderSystem.setShader(CoreShaders.POSITION);
 		RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
 		RenderSystem.enableColorLogicOp();
 		RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);

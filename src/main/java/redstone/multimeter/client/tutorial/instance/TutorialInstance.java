@@ -23,7 +23,7 @@ public abstract class TutorialInstance implements TutorialListener {
 
 	public void start() {
 		if (toast != null) {
-			tutorial.getMinecraft().getToasts().addToast(toast);
+			tutorial.getMinecraft().getToastManager().addToast(toast);
 		}
 	}
 

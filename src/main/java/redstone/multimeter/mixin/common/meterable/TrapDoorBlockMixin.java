@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 
 import redstone.multimeter.block.MeterableBlock;
 
@@ -28,7 +29,7 @@ public class TrapDoorBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/world/level/block/TrapDoorBlock;POWERED:Lnet/minecraft/world/level/block/state/properties/BooleanProperty;"
 		)
 	)
-	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPos, CallbackInfo ci, boolean powered) {
+	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, Orientation orientation, boolean movedByPos, CallbackInfo ci, boolean powered) {
 		rsmm$logPowered(level, pos, powered);
 	}
 

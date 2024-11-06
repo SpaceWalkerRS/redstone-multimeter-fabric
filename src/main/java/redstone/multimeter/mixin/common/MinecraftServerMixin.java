@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.profiling.ProfilerFiller;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -74,34 +75,30 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	@Inject(
 		method = "tickServer",
 		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
-			args = "ldc=Autosave started"
-		)
-	)
-	private void startTickTaskAutosave(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.AUTOSAVE);
-	}
-
-	@Inject(
-		method = "tickServer",
-		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
-			args = "ldc=Autosave finished"
-		)
-	)
-	private void endTickTaskAutosave(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		rsmm$endTickTask();
-	}
-
-	@Inject(
-		method = "tickServer",
-		at = @At(
 			value = "TAIL"
 		)
 	)
 	private void endTickTaskTick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+		rsmm$endTickTask();
+	}
+
+	@Inject(
+		method = "autoSave",
+		at = @At(
+			value = "HEAD"
+		)
+	)
+	private void startTickTaskAutosave(CallbackInfo ci) {
+		rsmm$startTickTask(TickTask.AUTOSAVE);
+	}
+
+	@Inject(
+		method = "autoSave",
+		at = @At(
+			value = "TAIL"
+		)
+	)
+	private void endTickTaskAutosave(CallbackInfo ci) {
 		rsmm$endTickTask();
 	}
 
@@ -186,12 +183,12 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	}
 
 	@Inject(
-		method = "startMetricsRecordingTick",
+		method = "createProfiler",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void onTickStart(CallbackInfo ci) {
+	private void onTickStart(CallbackInfoReturnable<ProfilerFiller> cir) {
 		multimeterServer.tickStart();
 	}
 

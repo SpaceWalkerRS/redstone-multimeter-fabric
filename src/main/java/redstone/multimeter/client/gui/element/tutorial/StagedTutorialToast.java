@@ -1,7 +1,7 @@
 package redstone.multimeter.client.gui.element.tutorial;
 
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
@@ -22,7 +22,7 @@ public class StagedTutorialToast extends TutorialToast {
 	}
 
 	@Override
-	protected void drawDecoration(GuiGraphics graphics, ToastComponent toasts, long age) {
+	protected void drawDecoration(GuiGraphics graphics, Font font, long age) {
 		float newProgress = tutorial.getProgress();
 
 		if (newProgress != progress) {

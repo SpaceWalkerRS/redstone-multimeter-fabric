@@ -460,7 +460,7 @@ public class Multimeter {
 					float newYRot = player.getYRot();
 					float newXRot = player.getXRot();
 
-					player.teleportTo(newLevel, newX, newY, newZ, newYRot, newXRot);
+					player.teleportTo(newLevel, newX, newY, newZ, Collections.emptySet(), newYRot, newXRot, true);
 
 					Component text = Component.literal(String.format("Teleported to meter \"%s\"", meter.getName()));
 					server.sendMessage(player, text, false);

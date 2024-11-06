@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CrafterBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 
 import redstone.multimeter.block.MeterableBlock;
 
@@ -28,7 +29,7 @@ public class CrafterBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/world/level/block/CrafterBlock;TRIGGERED:Lnet/minecraft/world/level/block/state/properties/BooleanProperty;"
 		)
 	)
-	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston, CallbackInfo ci, boolean powered) {
+	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, Orientation orientation, boolean movedByPiston, CallbackInfo ci, boolean powered) {
 		rsmm$logPowered(level, pos, powered);
 	}
 

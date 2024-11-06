@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.redstone.Orientation;
 
 import redstone.multimeter.block.MeterableBlock;
 
@@ -30,7 +31,7 @@ public class DoorBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/world/level/block/DoorBlock;POWERED:Lnet/minecraft/world/level/block/state/properties/BooleanProperty;"
 		)
 	)
-	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston, CallbackInfo ci, boolean powered) {
+	private void logPowered(BlockState state, Level level, BlockPos pos, Block neighborBlock, Orientation orientation, boolean movedByPiston, CallbackInfo ci, boolean powered) {
 		rsmm$logPowered(level, pos, powered);
 		rsmm$logPowered(level, rsmm$getOtherHalf(pos, state), powered);
 	}

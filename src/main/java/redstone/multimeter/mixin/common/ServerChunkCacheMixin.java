@@ -77,7 +77,27 @@ public class ServerChunkCacheMixin {
 	}
 
 	@Inject(
-		method = "tickChunks",
+		method = "broadcastChangedChunks",
+		at = @At(
+			value = "HEAD"
+		)
+	)
+	private void startTickTaskBroadcastChunks(CallbackInfo ci) {
+		((TickTaskExecutor)level).rsmm$startTickTask(TickTask.BROADCAST_CHUNKS);
+	}
+
+	@Inject(
+		method = "broadcastChangedChunks",
+		at = @At(
+			value = "TAIL"
+		)
+	)
+	private void endTickTaskBroadcastChunks(CallbackInfo ci) {
+		((TickTaskExecutor)level).rsmm$endTickTask();
+	}
+
+	@Inject(
+		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;JLjava/util/List;)V",
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
@@ -89,33 +109,12 @@ public class ServerChunkCacheMixin {
 	}
 
 	@Inject(
-		method = "tickChunks",
+		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;JLjava/util/List;)V",
 		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
-			args = "ldc=broadcast"
+			value = "TAIL"
 		)
 	)
-	private void swapTickTaskBroadcastChunks(CallbackInfo ci) {
-		((TickTaskExecutor)level).rsmm$swapTickTask(TickTask.BROADCAST_CHUNKS);
-	}
-
-	@Inject(
-		method = "tickChunks",
-		slice = @Slice(
-			from = @At(
-				value = "INVOKE_STRING",
-				target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
-				args = "ldc=broadcast"
-			)
-		),
-		at = @At(
-			value = "INVOKE",
-			ordinal = 0,
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V"
-		)
-	)
-	private void endTickTaskBroadcastChunks(CallbackInfo ci) {
+	private void endTickTaskCustomMobSpawning(CallbackInfo ci) {
 		((TickTaskExecutor)level).rsmm$endTickTask();
 	}
 }
