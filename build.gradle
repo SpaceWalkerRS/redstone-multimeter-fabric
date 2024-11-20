@@ -1,7 +1,7 @@
 plugins {
 	id 'maven-publish'
-	id 'fabric-loom' version '1.6-SNAPSHOT'
-	id 'ploceus' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
+	id 'ploceus' version '1.8-SNAPSHOT'
 }
 
 base {
@@ -16,12 +16,13 @@ repositories {
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings ploceus.featherMappings(project.feather_build)
+	exceptions ploceus.raven(project.raven_build)
+	signatures ploceus.sparrow(project.sparrow_build)
 	nests ploceus.nests(project.nests_build)
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	ploceus.addCommonLibraries()
-	ploceus.dependOsl(project.osl_version)
+//	ploceus.dependOsl(project.osl_version)
 }
 
 processResources {
