@@ -21,10 +21,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.Formatting;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
@@ -158,7 +154,7 @@ public class Multimeter {
 		ServerPlayerEntity owner = server.getPlayerList().get(ownerUuid);
 
 		if (owner != null) {
-			Text message = new LiteralText(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
+			Text message = Text.literal(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
 			server.sendMessage(owner, message, false);
 		}
 	}
@@ -192,7 +188,7 @@ public class Multimeter {
 
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
-				Text message = new LiteralText(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
+				Text message = Text.literal(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
 				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
@@ -212,7 +208,7 @@ public class Multimeter {
 		int x = pos.getX();
 		int y = pos.getY();
 		int z = pos.getZ();
-		Block block = world.getBlock(x, y, z);
+		int block = world.getBlock(x, y, z);
 		int metadata = world.getBlockMetadata(x, y, z);
 
 		logPowered(world, x, y, z, block, metadata);
@@ -267,7 +263,7 @@ public class Multimeter {
 			if (meterGroup.isOwnedBy(player)) {
 				setMeters(meterGroup, meters);
 			} else {
-				Text message = new LiteralText(String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName()));
+				Text message = Text.literal(String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName()));
 				server.sendMessage(player, message, true);
 			}
 		}
@@ -382,15 +378,7 @@ public class Multimeter {
 
 		meterGroup.addMember(playerUuid);
 
-		Text message = new LiteralText("")
-			.append(new LiteralText(String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName())))
-			.append(new LiteralText("[here]").withStyle(style -> {
-				style.setColor(Formatting.GREEN)
-					.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-						new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName()))))
-					.setClickEvent(
-						new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
-			})).append(new LiteralText(" to subscribe to it."));
+		Text message = Text.literal(String.format("You have been invited to meter group \'%s\' - run \'/metergroup subscribe %s\' to subscribe to it.", meterGroup.getName(), meterGroup.getName()));
 		server.sendMessage(player, message, false);
 	}
 
@@ -407,7 +395,7 @@ public class Multimeter {
 			if (player != null && meterGroup.hasSubscriber(playerUuid)) {
 				unsubscribeFromMeterGroup(meterGroup, player);
 
-				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
+				Text message = Text.literal(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
 				server.sendMessage(player, message, false);
 			}
 		}
@@ -428,7 +416,7 @@ public class Multimeter {
 
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
-			Text message = new LiteralText("This server does not allow meter teleporting!");
+			Text message = Text.literal("This server does not allow meter teleporting!");
 			server.sendMessage(player, message, false);
 
 			return;
@@ -457,20 +445,20 @@ public class Multimeter {
 					player.teleportToDimension(newWorld.dimension.id);
 					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
-					Text text = new LiteralText(String.format("Teleported to meter \"%s\"", meter.getName()));
+					Text text = Text.literal(String.format("Teleported to meter \"%s\"", meter.getName()));
 					server.sendMessage(player, text, false);
 				}
 			}
 		}
 	}
 
-	public void onBlockChange(World world, int x, int y, int z, Block oldBlock, int oldMetadata, Block newBlock, int newMetadata) {
-		if (oldBlock == newBlock && ((IBlock)newBlock).rsmm$isPowerSource() && ((PowerSource)newBlock).rsmm$logPowerChangeOnStateChange()) {
+	public void onBlockChange(World world, int x, int y, int z, int oldBlock, int oldMetadata, int newBlock, int newMetadata) {
+		if (oldBlock != 0 && newBlock != 0 && oldBlock == newBlock && ((IBlock)Block.BY_ID[oldBlock]).rsmm$isPowerSource() && ((PowerSource)Block.BY_ID[newBlock]).rsmm$logPowerChangeOnStateChange()) {
 			logPowerChange(world, x, y, z, oldMetadata, newMetadata);
 		}
 
-		boolean wasMeterable = ((IBlock)oldBlock).rsmm$isMeterable();
-		boolean isMeterable = ((IBlock)newBlock).rsmm$isMeterable();
+		boolean wasMeterable = oldBlock != 0 && ((IBlock)Block.BY_ID[oldBlock]).rsmm$isMeterable();
+		boolean isMeterable = newBlock != 0 && ((IBlock)Block.BY_ID[newBlock]).rsmm$isMeterable();
 
 		if (wasMeterable || isMeterable) {
 			logActive(world, x, y, z, newBlock, newMetadata);
@@ -481,9 +469,9 @@ public class Multimeter {
 		tryLogEvent(world, x, y, z, EventType.POWERED, powered ? 1 : 0, (meterGroup, meter, event) -> meter.setPowered(powered));
 	}
 
-	public void logPowered(World world, int x, int y, int z, Block block, int metadata) {
+	public void logPowered(World world, int x, int y, int z, int block, int metadata) {
 		tryLogEvent(world, x, y, z, EventType.POWERED, () -> {
-			return ((IBlock)block).rsmm$isPowered(world, x, y, z, metadata) ? 1 : 0;
+			return ((IBlock)Block.BY_ID[block]).rsmm$isPowered(world, x, y, z, metadata) ? 1 : 0;
 		}, (meterGroup, meter, event) -> {
 			return meter.setPowered(event.getMetadata() != 0);
 		});
@@ -493,9 +481,9 @@ public class Multimeter {
 		tryLogEvent(world, x, y, z, EventType.ACTIVE, active ? 1 : 0, (meterGroup, meter, event) -> meter.setActive(active));
 	}
 
-	public void logActive(World world, int x, int y, int z, Block block, int metadata) {
+	public void logActive(World world, int x, int y, int z, int block, int metadata) {
 		tryLogEvent(world, x, y, z, EventType.ACTIVE, () -> {
-			return ((IBlock)block).rsmm$isMeterable() && ((Meterable)block).rsmm$isActive(world, x, y, z, metadata) ? 1 : 0;
+			return ((IBlock)Block.BY_ID[block]).rsmm$isMeterable() && ((Meterable)Block.BY_ID[block]).rsmm$isActive(world, x, y, z, metadata) ? 1 : 0;
 		}, (meterGroup, meter, event) -> meter.setActive(event.getMetadata() != 0));
 	}
 
@@ -517,9 +505,9 @@ public class Multimeter {
 		}
 	}
 
-	public void logPowerChange(World world, int x, int y, int z, Block oldBlock, int oldMetadata, Block newBlock, int newMetadata) {
+	public void logPowerChange(World world, int x, int y, int z, int oldBlock, int oldMetadata, int newBlock, int newMetadata) {
 		tryLogEvent(world, x, y, z, EventType.POWER_CHANGE, () -> {
-			PowerSource block = (PowerSource)newBlock;
+			PowerSource block = (PowerSource)Block.BY_ID[newBlock];
 			int oldPower = block.rsmm$getPowerLevel(world, 0, 0, 0, 0);
 			int newPower = block.rsmm$getPowerLevel(world, 0, 0, 0, 0);
 

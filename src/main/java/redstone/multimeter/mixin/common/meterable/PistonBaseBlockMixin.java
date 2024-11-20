@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.PistonBaseBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.Directions;
@@ -39,7 +38,7 @@ public class PistonBaseBlockMixin implements MeterableBlock {
 		at = @At(
 			value = "INVOKE",
 			ordinal = 1,
-			target = "Lnet/minecraft/world/World;setBlockWithMetadata(IIILnet/minecraft/block/Block;II)Z"
+			target = "Lnet/minecraft/world/World;setBlockWithMetadata(IIIIII)Z"
 		)
 	)
 	private void logMoved(World world, int x, int y, int z, int type, int data, CallbackInfoReturnable<Boolean> cir, BlockEntity blockEntity, int moveFromX, int moveFromY, int moveFromZ) {
@@ -52,10 +51,10 @@ public class PistonBaseBlockMixin implements MeterableBlock {
 		at = @At(
 			value = "INVOKE",
 			ordinal = 1,
-			target = "Lnet/minecraft/world/World;setBlockWithMetadata(IIILnet/minecraft/block/Block;II)Z"
+			target = "Lnet/minecraft/world/World;setBlockWithMetadata(IIIIII)Z"
 		)
 	)
-	private void logMoved(World world, int x, int y, int z, int dir, CallbackInfoReturnable<Boolean> cir, int moveToX, int moveToY, int moveToZ, int toMoveCount, int frontMostX, int frontMostY, int frontMostZ, Block[] blocksToMove, int moveFromX, int moveFromY, int moveFromZ) {
+	private void logMoved(World world, int x, int y, int z, int dir, CallbackInfoReturnable<Boolean> cir, int moveToX, int moveToY, int moveToZ, int toMoveCount, int frontMostX, int frontMostY, int frontMostZ, int[] blocksToMove, int moveFromX, int moveFromY, int moveFromZ) {
 		rsmm$logMoved(world, moveFromX, moveFromY, moveFromZ, dir);
 	}
 

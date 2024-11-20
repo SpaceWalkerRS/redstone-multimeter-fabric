@@ -16,7 +16,6 @@ import java.util.Map.Entry;
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.render.MeterNameMode;
-import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.ColorPicker;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.event.EventType;
@@ -72,12 +71,6 @@ public class Options {
 		public static final IntegerOption                SCROLL_SPEED         = new IntegerOption("Scroll Speed", "The scroll speed in Redstone Multimeter related GUIs.", 7, 1, 69);
 		public static final IntegerOption                DOUBLE_CLICK_TIME    = new IntegerOption("Double Click Time", "The double click time in Redstone Multimeter related GUIs.", 5, 1, 500);
 		public static final BooleanOption                VERSION_WARNING      = new BooleanOption("Version Warning", "Send a warning message in chat when you join a server that has a different version of Redstone Multimeter installed.", true);
-
-	}
-
-	public static class Hidden {
-
-		public static final EnumOption<TutorialStep>     TUTORIAL_STEP        = new EnumOption<>("Tutorial Step", "", TutorialStep.class, TutorialStep.OPEN_KEYBINDS_SCREEN);
 
 	}
 
@@ -232,9 +225,6 @@ public class Options {
 			Miscellaneous.SCROLL_SPEED,
 			Miscellaneous.DOUBLE_CLICK_TIME,
 			Miscellaneous.VERSION_WARNING
-		);
-		register(null,
-			Hidden.TUTORIAL_STEP
 		);
 	}
 }

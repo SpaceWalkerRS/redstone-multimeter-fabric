@@ -2,7 +2,6 @@ package redstone.multimeter.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 
 import net.minecraft.client.Minecraft;
@@ -16,6 +15,7 @@ import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.GL;
 
 public class MeterRenderer {
 
@@ -29,7 +29,7 @@ public class MeterRenderer {
 
 	public void renderMeters(float tickDelta) {
 		GL11.glEnable(GL11.GL_BLEND);
-		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -216,7 +216,7 @@ public class MeterRenderer {
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDepthMask(true);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 0xFFFFFFFF);

@@ -7,7 +7,6 @@ import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.MultimeterServer;
-import redstone.multimeter.util.NbtUtils;
 
 public class MeterLogsPacket implements RSMMPacket {
 
@@ -27,7 +26,7 @@ public class MeterLogsPacket implements RSMMPacket {
 
 	@Override
 	public void decode(NbtCompound data) {
-		logsData = data.getList("logs", NbtUtils.TYPE_COMPOUND);
+		logsData = data.getList("logs");
 	}
 
 	@Override

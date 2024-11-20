@@ -110,7 +110,7 @@ public class TickPhase {
 			array[index] = (byte)tasks[index].getIndex();
 		}
 
-		return new NbtByteArray(array);
+		return new NbtByteArray(null, array);
 	}
 
 	public static TickPhase fromNbt(NbtElement nbt) {
@@ -119,7 +119,7 @@ public class TickPhase {
 		}
 
 		NbtByteArray nbtArray = (NbtByteArray)nbt;
-		byte[] array = nbtArray.getByteArray();
+		byte[] array = nbtArray.value;
 		TickTask[] tasks = new TickTask[array.length];
 
 		for (int index = 0; index < tasks.length; index++) {

@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui.screen;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
@@ -18,7 +18,7 @@ public class MultimeterScreen extends RSMMScreen {
 	private ScrollableListElement list;
 
 	public MultimeterScreen(MultimeterClient client) {
-		super(client, new LiteralText(RedstoneMultimeterMod.MOD_NAME), false);
+		super(client, Text.literal(RedstoneMultimeterMod.MOD_NAME), false);
 
 		this.isPauseScreen = !Screen.isShiftDown();
 	}

@@ -139,7 +139,7 @@ public enum EventType {
 	}
 
 	public NbtElement toNbt() {
-		return new NbtByte((byte)index);
+		return new NbtByte(null, (byte)index);
 	}
 
 	public static EventType fromNbt(NbtElement nbt) {
@@ -148,7 +148,7 @@ public enum EventType {
 		}
 
 		NbtByte nbtByte = (NbtByte)nbt;
-		int index = nbtByte.getByte();
+		int index = nbtByte.value;
 
 		return byIndex(index);
 	}

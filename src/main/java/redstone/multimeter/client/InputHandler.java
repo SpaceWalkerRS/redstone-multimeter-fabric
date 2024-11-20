@@ -40,7 +40,7 @@ public class InputHandler {
 		while (Keybinds.SAVE_METER_GROUP.consumeClick()) {
 			client.getSavedMeterGroupsManager().setSaving();
 		}
-		if (!Keybinds.LOAD_METER_GROUP.isPressed() && !Keybinds.SAVE_METER_GROUP.isPressed()) {
+		if (!Keybinds.LOAD_METER_GROUP.pressed && !Keybinds.SAVE_METER_GROUP.pressed) {
 			client.getSavedMeterGroupsManager().setIdle();
 		}
 
@@ -99,10 +99,10 @@ public class InputHandler {
 
 		slot++; // slots are 1-indexed
 
-		if (Keybinds.LOAD_METER_GROUP.isPressed()) {
+		if (Keybinds.LOAD_METER_GROUP.pressed) {
 			return client.getSavedMeterGroupsManager().loadSlot(slot);
 		}
-		if (Keybinds.SAVE_METER_GROUP.isPressed()) {
+		if (Keybinds.SAVE_METER_GROUP.pressed) {
 			return client.getSavedMeterGroupsManager().saveSlot(slot);
 		}
 
@@ -110,7 +110,7 @@ public class InputHandler {
 	}
 
 	public boolean handleMouseScroll(double scrollX, double scrollY) {
-		if (Keybinds.SCROLL_HUD.isPressed() && client.isHudActive()) {
+		if (Keybinds.SCROLL_HUD.pressed && client.isHudActive()) {
 			client.getHud().scroll((int)Math.round(scrollY), true);
 		} else {
 			return false;

@@ -4,11 +4,11 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.TextureRegion;
 import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.util.MathUtils;
 
 public class Slider extends AbstractButton {
 
@@ -134,7 +134,7 @@ public class Slider extends AbstractButton {
 	}
 
 	private void setValue(double newValue, boolean updateListener) {
-		value = MathHelper.clamp(newValue, 0.0D, 1.0D);
+		value = MathUtils.clamp(newValue, 0.0D, 1.0D);
 		value = Math.round(steps * value) / steps;
 
 		if (updateListener) {

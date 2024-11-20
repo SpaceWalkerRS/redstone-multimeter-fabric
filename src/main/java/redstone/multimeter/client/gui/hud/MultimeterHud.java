@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.Window;
 import net.minecraft.text.Formatting;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
@@ -313,11 +313,11 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}, () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.TOGGLE_MARKER)));
 
-		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PAUSE_METERS)), button -> {
+		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Text.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PAUSE_METERS)), button -> {
 			togglePaused();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(false, Screen.isControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
+		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Text.literal(getStepSymbol(false, Screen.isControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
 			stepBackward(Screen.isControlDown());
 			return true;
 		}) {
@@ -327,7 +327,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> new LiteralText(getStepSymbol(true, Screen.isControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
+		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Text.literal(getStepSymbol(true, Screen.isControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
 			stepForward(Screen.isControlDown());
 			return true;
 		}) {
@@ -337,7 +337,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("P").setFormatting(Formatting.BOLD)).setWithShadow(true), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PRINT_LOGS)));
+		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(Text.literal("P").setFormatting(Formatting.BOLD)).setWithShadow(true), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PRINT_LOGS)));
 
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);
@@ -400,7 +400,6 @@ public class MultimeterHud extends AbstractParentElement {
 			boolean pause = !paused;
 
 			if (setPaused(pause)) {
-				client.getTutorial().onPauseHud(pause);
 			}
 		}
 	}
@@ -479,7 +478,6 @@ public class MultimeterHud extends AbstractParentElement {
 	public void scroll(int amount, boolean forward) {
 		if (!forward) amount *= -1;
 		setOffset(offset + amount);
-		client.getTutorial().onScrollHud(amount);
 	}
 
 	public boolean moveFocus(long tick, int subtick, boolean forward) {
@@ -555,12 +553,10 @@ public class MultimeterHud extends AbstractParentElement {
 
 			if (setFocusMode(enable)) {
 				String message = String.format("%s Focus Mode", enable ? "Enabled" : "Disabled");
-				client.sendMessage(new LiteralText(message), true);
-
-				client.getTutorial().onToggleFocusMode(enable);
+				client.sendMessage(Text.literal(message), true);
 			} else {
 				String message = "No meter event logs available to focus on...";
-				client.sendMessage(new LiteralText(message), true);
+				client.sendMessage(Text.literal(message), true);
 			}
 		}
 	}

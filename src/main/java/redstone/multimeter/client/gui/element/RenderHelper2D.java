@@ -2,7 +2,6 @@ package redstone.multimeter.client.gui.element;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 
 import net.minecraft.client.Minecraft;
@@ -12,13 +11,14 @@ import net.minecraft.text.Text;
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.GL;
 
 public class RenderHelper2D {
 
 	protected void renderRect(Drawer drawer) {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glColor3f(1.0F, 1.0F, 1.0F);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 
@@ -121,7 +121,7 @@ public class RenderHelper2D {
 		Minecraft.getInstance().getTextureManager().bind(texture.location);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
-		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glColor3f(1.0F, 1.0F, 1.0F);
 
 		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
@@ -171,7 +171,7 @@ public class RenderHelper2D {
 		Minecraft.getInstance().getTextureManager().bind(texture.location);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
-		GLX.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glColor3f(1.0F, 1.0F, 1.0F);
 
 		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
@@ -224,7 +224,7 @@ public class RenderHelper2D {
 	}
 
 	protected int textWidth(TextRenderer textRenderer, Text text) {
-		return textRenderer.getWidth(text.getFormattedString());
+		return textRenderer.getWidth(text.buildString(true));
 	}
 
 	protected void renderText(TextRenderer textRenderer, Text text, int x, int y, boolean shadow, int color) {
@@ -232,9 +232,9 @@ public class RenderHelper2D {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		if (shadow) {
-			textRenderer.drawWithShadow(text.getFormattedString(), x, y, color);
+			textRenderer.drawWithShadow(text.buildString(true), x, y, color);
 		} else {
-			textRenderer.draw(text.getFormattedString(), x, y, color);
+			textRenderer.draw(text.buildString(true), x, y, color);
 		}
 	}
 

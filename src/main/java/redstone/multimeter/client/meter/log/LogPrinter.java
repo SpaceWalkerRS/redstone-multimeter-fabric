@@ -12,7 +12,6 @@ import java.util.Queue;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -95,7 +94,7 @@ public class LogPrinter {
 			}
 
 			if (notifyPlayer) {
-				Text message = new LiteralText("Started printing logs to file...");
+				Text message = Text.literal("Started printing logs to file...");
 				client.sendMessage(message, false);
 			}
 
@@ -121,7 +120,7 @@ public class LogPrinter {
 			writer = null;
 
 			if (notifyPlayer) {
-				Text message = new LiteralText("Stopped printing logs to file");
+				Text message = Text.literal("Stopped printing logs to file");
 				client.sendMessage(message, false);
 			}
 
@@ -153,7 +152,7 @@ public class LogPrinter {
 			long runtime = getGameTime() - firstTick;
 
 			if (limit >= 0 && runtime > limit) {
-				Text message = new LiteralText("Printer exceeded maximum runtime!");
+				Text message = Text.literal("Printer exceeded maximum runtime!");
 				client.sendMessage(message, false);
 
 				stop(true);
@@ -221,7 +220,7 @@ public class LogPrinter {
 				writer.newLine();
 			}
 		} catch (IOException e) {
-			Text message = new LiteralText("Printer encountered issues!");
+			Text message = Text.literal("Printer encountered issues!");
 			client.sendMessage(message, false);
 
 			stop(true);

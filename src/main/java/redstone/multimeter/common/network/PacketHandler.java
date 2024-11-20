@@ -1,12 +1,13 @@
 package redstone.multimeter.common.network;
 
+import java.io.DataInput;
 import java.io.IOException;
 
-import io.netty.buffer.Unpooled;
-
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.Packet;
+import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.mixin.common.PacketAccess;
+import redstone.multimeter.util.DataStreams;
 
 public abstract class PacketHandler {
 
@@ -20,25 +21,30 @@ public abstract class PacketHandler {
 		NbtCompound data = new NbtCompound();
 		packet.encode(data);
 
-		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
+		try {
+			byte[] buffer = DataStreams.output(output -> {
+				Packet.writeString(key, output);
+				PacketAccess.rsmm$writeCompound(data, output);
+			}).toByteArray();
 
-		buffer.writeString(key);
-		buffer.writeNbtCompound(data);
-
-		return toCustomPayload(Packets.getChannel(), buffer);
+			return toCustomPayload(Packets.getChannel(), buffer);
+		} catch (IOException e) {
+			RedstoneMultimeterMod.LOGGER.warn("unable to encode packet " + key, e);
+			return toCustomPayload("", new byte[0]);
+		}
 	}
 
-	protected abstract Packet toCustomPayload(String channel, PacketByteBuf data);
+	protected abstract Packet toCustomPayload(String channel, byte[] data);
 
-	protected RSMMPacket decode(PacketByteBuf buffer) throws IOException {
-		String key = buffer.readString(32767);
+	protected RSMMPacket decode(DataInput input) throws IOException {
+		String key = Packet.readString(input, 32767);
 		RSMMPacket packet = Packets.create(key);
 
 		if (packet == null) {
 			throw new IllegalStateException("Unable to decode packet: " + key);
 		}
 
-		NbtCompound data = buffer.readNbtCompound();
+		NbtCompound data = Packet.readCompound(input);
 		packet.decode(data);
 
 		return packet;

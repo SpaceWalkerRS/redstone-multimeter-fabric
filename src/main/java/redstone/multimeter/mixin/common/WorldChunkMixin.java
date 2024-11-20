@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.WorldChunkSection;
@@ -30,7 +29,7 @@ public class WorldChunkMixin {
 			target = "Lnet/minecraft/block/Block;onAdded(Lnet/minecraft/world/World;III)V"
 		)
 	)
-	private void logBlockChange(int localX, int y, int localZ, Block block, int metadata, CallbackInfoReturnable<Boolean> cir, int index, int oldHeight, Block oldBlock, int oldMetadata, WorldChunkSection section, int heightIncreased /* the fuck? */, int x, int z) {
+	private void logBlockChange(int localX, int y, int localZ, int block, int metadata, CallbackInfoReturnable<Boolean> cir, int index, int oldHeight, int oldBlock, int oldMetadata, WorldChunkSection section, int heightIncreased /* the fuck? */, int x, int z) {
 		((IServerWorld)world).getMultimeter().onBlockChange(world, x, y, z, oldBlock, oldMetadata, block, metadata);
 	}
 
@@ -46,7 +45,7 @@ public class WorldChunkMixin {
 		if (!world.isMultiplayer) {
 			int x = (chunkX << 4) + localX;
 			int z = (chunkZ << 4) + localZ;
-			Block block = section.getBlock(localX, y & 15, localZ);
+			int block = section.getBlock(localX, y & 15, localZ);
 			int oldMetadata = section.getBlockMetadata(localX, y & 15, localZ);
 
 			((IServerWorld)world).getMultimeter().onBlockChange(world, x, y, z, block, oldMetadata, block, metadata);

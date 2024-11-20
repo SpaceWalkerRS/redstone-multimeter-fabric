@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public class Tooltip {
@@ -33,7 +32,7 @@ public class Tooltip {
 	}
 
 	public Tooltip add(String line) {
-		add(new LiteralText(line));
+		add(Text.literal(line));
 		return this;
 	}
 
@@ -50,7 +49,7 @@ public class Tooltip {
 
 		for (int index = 0; index < lines.size(); index++) {
 			Text text = lines.get(index);
-			int lineWidth = textRenderer.getWidth(text.getFormattedString());
+			int lineWidth = textRenderer.getWidth(text.buildString(true));
 
 			if (lineWidth > width) {
 				width = lineWidth;
@@ -72,7 +71,7 @@ public class Tooltip {
 		Text[] lines = new Text[strings.length];
 
 		for (int index = 0; index < strings.length; index++) {
-			lines[index] = new LiteralText(strings[index]);
+			lines[index] = Text.literal(strings[index]);
 		}
 
 		return new Tooltip(lines);

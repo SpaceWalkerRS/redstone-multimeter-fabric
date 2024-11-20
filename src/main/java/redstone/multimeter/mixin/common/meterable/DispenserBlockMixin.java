@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.world.World;
 
@@ -23,7 +22,7 @@ public class DispenserBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/world/World;getBlockMetadata(III)I"
 		)
 	)
-	private void logPowered(World world, int x, int y, int z, Block neighborBlock, CallbackInfo ci, int powered /* the fuck? */) {
+	private void logPowered(World world, int x, int y, int z, int neighborBlock, CallbackInfo ci, int powered /* the fuck? */) {
 		rsmm$logPowered(world, x, y, z, powered != 0);
 	}
 

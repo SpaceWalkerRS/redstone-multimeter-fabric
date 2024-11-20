@@ -3,14 +3,13 @@ package redstone.multimeter.common.meter.log;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 
 import redstone.multimeter.common.meter.event.EventType;
+import redstone.multimeter.mixin.common.NbtCompoundAccess;
 import redstone.multimeter.util.ListUtils;
-import redstone.multimeter.util.NbtUtils;
 
 public class MeterLogs {
 
@@ -208,11 +207,11 @@ public class MeterLogs {
 	public static Collection<EventLog> fromNbt(NbtCompound nbt) {
 		Collection<EventLog> logs = new ArrayList<>();
 
-		for (String key : (Set<String>) nbt.getKeys()) {
+		for (String key : ((NbtCompoundAccess)nbt).rsmm$getElements().keySet()) {
 			EventType type = EventType.byName(key);
 
 			if (type != null) {
-				logs.addAll(fromNbt(type, nbt.getList(key, NbtUtils.TYPE_COMPOUND)));
+				logs.addAll(fromNbt(type, nbt.getList(key)));
 			}
 		}
 
@@ -223,7 +222,7 @@ public class MeterLogs {
 		Collection<EventLog> logs = new ArrayList<>();
 
 		for (int i = 0; i < nbt.size(); i++) {
-			logs.add(EventLog.fromNbt(nbt.getCompound(i)));
+			logs.add(EventLog.fromNbt((NbtCompound)nbt.get(i)));
 		}
 
 		return logs;

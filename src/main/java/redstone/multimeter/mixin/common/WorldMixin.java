@@ -87,7 +87,7 @@ public class WorldMixin implements TickTaskExecutor {
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-			args = "ldc=blockEntities"
+			args = "ldc=tileEntities"
 		)
 	)
 	private void swapTickTaskBlockEntities(CallbackInfo ci) {
@@ -137,10 +137,10 @@ public class WorldMixin implements TickTaskExecutor {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
+			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;IIII)V"
 		)
 	)
-	private void logBlockUpdate(int x, int y, int z, Block neighborBlock, CallbackInfo ci, Block block) {
+	private void logBlockUpdate(int x, int y, int z, int neighborBlock, CallbackInfo ci, int block) {
 		if (!isMultiplayer) {
 			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
@@ -150,7 +150,7 @@ public class WorldMixin implements TickTaskExecutor {
 			// 'powered' changes for most meterable blocks are handled in those classes
 			// to reduce expensive calls to
 			// World.hasNeighborSignal and World.getNeighborSignal
-			if (((IBlock)block).rsmm$logPoweredOnBlockUpdate()) {
+			if (((IBlock)Block.BY_ID[block]).rsmm$logPoweredOnBlockUpdate()) {
 				multimeter.logPowered((World)(Object)this, x, y, z, block, getBlockMetadata(x, y, z));
 			}
 		}
@@ -161,10 +161,10 @@ public class WorldMixin implements TickTaskExecutor {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
+			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;IIII)V"
 		)
 	)
-	private void logComparatorUpdate(int neighborX, int neighborY, int neighborZ, Block neighborBlock, CallbackInfo ci, int facing, int x, int z, Block block) {
+	private void logComparatorUpdate(int neighborX, int neighborY, int neighborZ, int neighborBlock, CallbackInfo ci, int facing, int x, int z, int block) {
 		if (!isMultiplayer) {
 			((IServerWorld)this).getMultimeterServer().getMultimeter().logComparatorUpdate((World)(Object)this, x, neighborY, z);
 		}

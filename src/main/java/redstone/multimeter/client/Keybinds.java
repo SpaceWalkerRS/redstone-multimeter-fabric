@@ -28,8 +28,8 @@ public class Keybinds {
 	private static final Set<String> CATEGORIES = new LinkedHashSet<>();
 	private static final Map<String, KeyBinding> KEYBINDS = new LinkedHashMap<>();
 
-	public static final String MAIN;
-	public static final String EVENT_TYPES;
+//	public static final String MAIN;
+//	public static final String EVENT_TYPES;
 
 	public static final KeyBinding TOGGLE_METER;
 	public static final KeyBinding RESET_METER;
@@ -51,7 +51,7 @@ public class Keybinds {
 	public static final KeyBinding[] TOGGLE_EVENT_TYPES;
 
 	private static final int MOUSE_BUTTON_OFFSET = 100;
-
+/*
 	private static String registerCategory(String category) {
 		if (!CATEGORIES.add(category)) {
 			throw new IllegalStateException("Cannot register multiple keybind categories with the same name!");
@@ -59,9 +59,9 @@ public class Keybinds {
 
 		return category;
 	}
-
+*/
 	private static KeyBinding registerKeybind(KeyBinding keybind) {
-		if (KEYBINDS.putIfAbsent(keybind.getName(), keybind) != null) {
+		if (KEYBINDS.putIfAbsent(keybind.name, keybind) != null) {
 			throw new IllegalStateException("Cannot register multiple keybinds with the same name!");
 		}
 
@@ -100,7 +100,7 @@ public class Keybinds {
 				KeyBinding keybind = KEYBINDS.get(name);
 
 				if (keybind != null) {
-					keybind.setKeyCode(Integer.parseInt(key));
+					keybind.keyCode = Integer.parseInt(key);
 				}
 			}
 		} catch (IOException e) {
@@ -121,8 +121,8 @@ public class Keybinds {
 
 		try (BufferedWriter bw = Files.newBufferedWriter(file)) {
 			for (KeyBinding keybind : KEYBINDS.values()) {
-				String name = keybind.getName();
-				int key = keybind.getKeyCode();
+				String name = keybind.name;
+				int key = keybind.keyCode;
 
 				bw.write(name + "=" + key);
 				bw.newLine();
@@ -133,15 +133,15 @@ public class Keybinds {
 	}
 
 	public static boolean matchesButton(KeyBinding keybind, int button) {
-		return button == keybind.getKeyCode() + MOUSE_BUTTON_OFFSET;
+		return button == keybind.keyCode + MOUSE_BUTTON_OFFSET;
 	}
 
 	public static boolean matchesKey(KeyBinding keybind, int key) {
-		return key == keybind.getKeyCode();
+		return key == keybind.keyCode;
 	}
 
 	public static boolean isPressed(Minecraft minecraft, KeyBinding keybind) {
-		int key = keybind.getKeyCode();
+		int key = keybind.keyCode;
 
 		if (key < 0) {
 			return Mouse.isButtonDown(key + MOUSE_BUTTON_OFFSET);
@@ -152,30 +152,30 @@ public class Keybinds {
 
 	static {
 
-		MAIN        = registerCategory(RedstoneMultimeterMod.MOD_NAME);
-		EVENT_TYPES = registerCategory("Event Types");
+//		MAIN        = registerCategory(RedstoneMultimeterMod.MOD_NAME);
+//		EVENT_TYPES = registerCategory("Event Types");
 
-		TOGGLE_METER           = registerKeybind(new KeyBinding("Toggle Meter"          , Keyboard.KEY_M       , MAIN));
-		RESET_METER            = registerKeybind(new KeyBinding("Reset Meter"           , Keyboard.KEY_B       , MAIN));
-		LOAD_METER_GROUP       = registerKeybind(new KeyBinding("Load Meter Group"      , Keyboard.KEY_LBRACKET, MAIN));
-		SAVE_METER_GROUP       = registerKeybind(new KeyBinding("Save Meter Group"      , Keyboard.KEY_RBRACKET, MAIN));
-		PAUSE_METERS           = registerKeybind(new KeyBinding("Pause Meters"          , Keyboard.KEY_N       , MAIN));
-		TOGGLE_FOCUS_MODE      = registerKeybind(new KeyBinding("Toggle Focus Mode"     , Keyboard.KEY_F       , MAIN));
-		TOGGLE_MARKER          = registerKeybind(new KeyBinding("Toggle Tick Marker"    , Keyboard.KEY_Y       , MAIN));
-		STEP_BACKWARD          = registerKeybind(new KeyBinding("Step Backward"         , Keyboard.KEY_COMMA   , MAIN));
-		STEP_FORWARD           = registerKeybind(new KeyBinding("Step Forward"          , Keyboard.KEY_PERIOD  , MAIN));
-		SCROLL_HUD             = registerKeybind(new KeyBinding("Scroll HUD"            , Keyboard.KEY_LMENU   , MAIN));
-		TOGGLE_HUD             = registerKeybind(new KeyBinding("Toggle HUD"            , Keyboard.KEY_H       , MAIN));
-		OPEN_MULTIMETER_SCREEN = registerKeybind(new KeyBinding("Open Multimeter Screen", Keyboard.KEY_G       , MAIN));
-		OPEN_METER_CONTROLS    = registerKeybind(new KeyBinding("Open Meter Controls"   , Keyboard.KEY_I       , MAIN));
-		OPEN_OPTIONS_MENU      = registerKeybind(new KeyBinding("Open Options Menu"     , Keyboard.KEY_O       , MAIN));
-		VIEW_TICK_PHASE_TREE   = registerKeybind(new KeyBinding("View Tick Phases"      , Keyboard.KEY_U       , MAIN));
-		PRINT_LOGS             = registerKeybind(new KeyBinding("Print Logs To File"    , Keyboard.KEY_P       , MAIN));
+		TOGGLE_METER           = registerKeybind(new KeyBinding("Toggle Meter"          , Keyboard.KEY_M));
+		RESET_METER            = registerKeybind(new KeyBinding("Reset Meter"           , Keyboard.KEY_B));
+		LOAD_METER_GROUP       = registerKeybind(new KeyBinding("Load Meter Group"      , Keyboard.KEY_LBRACKET));
+		SAVE_METER_GROUP       = registerKeybind(new KeyBinding("Save Meter Group"      , Keyboard.KEY_RBRACKET));
+		PAUSE_METERS           = registerKeybind(new KeyBinding("Pause Meters"          , Keyboard.KEY_N));
+		TOGGLE_FOCUS_MODE      = registerKeybind(new KeyBinding("Toggle Focus Mode"     , Keyboard.KEY_F));
+		TOGGLE_MARKER          = registerKeybind(new KeyBinding("Toggle Tick Marker"    , Keyboard.KEY_Y));
+		STEP_BACKWARD          = registerKeybind(new KeyBinding("Step Backward"         , Keyboard.KEY_COMMA));
+		STEP_FORWARD           = registerKeybind(new KeyBinding("Step Forward"          , Keyboard.KEY_PERIOD));
+		SCROLL_HUD             = registerKeybind(new KeyBinding("Scroll HUD"            , Keyboard.KEY_LMENU));
+		TOGGLE_HUD             = registerKeybind(new KeyBinding("Toggle HUD"            , Keyboard.KEY_H));
+		OPEN_MULTIMETER_SCREEN = registerKeybind(new KeyBinding("Open Multimeter Screen", Keyboard.KEY_G));
+		OPEN_METER_CONTROLS    = registerKeybind(new KeyBinding("Open Meter Controls"   , Keyboard.KEY_I));
+		OPEN_OPTIONS_MENU      = registerKeybind(new KeyBinding("Open Options Menu"     , Keyboard.KEY_O));
+		VIEW_TICK_PHASE_TREE   = registerKeybind(new KeyBinding("View Tick Phases"      , Keyboard.KEY_U));
+		PRINT_LOGS             = registerKeybind(new KeyBinding("Print Logs To File"    , Keyboard.KEY_P));
 
 		TOGGLE_EVENT_TYPES = new KeyBinding[EventType.ALL.length];
 
 		for (int index = 0; index < EventType.ALL.length; index++) {
-			TOGGLE_EVENT_TYPES[index] = registerKeybind(new KeyBinding(String.format("Toggle \'%s\'", EventType.byIndex(index).getName()), Keyboard.KEY_NONE, EVENT_TYPES));
+			TOGGLE_EVENT_TYPES[index] = registerKeybind(new KeyBinding(String.format("Toggle \'%s\'", EventType.byIndex(index).getName()), Keyboard.KEY_NONE));
 		}
 	}
 }

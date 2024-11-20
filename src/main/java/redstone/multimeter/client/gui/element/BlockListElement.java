@@ -90,8 +90,20 @@ public class BlockListElement extends SelectableScrollableListElement {
 		protected BlockListEntry(int width, int height, Identifier key) {
 			super(0, 0, width, height);
 
+			Block block = null;
+
+			for (Block b : Block.BY_ID) {
+				if (b != null) {
+					String id = b.getTranslationKey().substring("tile.".length());
+
+					if (id.equals(key.getPath())) {
+						block = b;
+					}
+				}
+			}
+
 			this.key = key;
-			this.block = (Block) Block.REGISTRY.get(key);
+			this.block = block;
 
 			if (this.block == null) {
 				this.stack = null;

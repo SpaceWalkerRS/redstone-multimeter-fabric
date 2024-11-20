@@ -11,7 +11,6 @@ import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.text.Formatting;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.Tooltip;
@@ -48,7 +47,7 @@ public class TextUtils {
 						length = lastSpace + 1;
 					}
 
-					Text line = new LiteralText(subString);
+					Text line = Text.literal(subString);
 					lines.add(line);
 
 					break;
@@ -57,7 +56,7 @@ public class TextUtils {
 
 			if (length == text.length()) {
 				if (length > 0) {
-					Text line = new LiteralText(text);
+					Text line = Text.literal(text);
 					lines.add(line);
 				}
 
@@ -87,23 +86,23 @@ public class TextUtils {
 	}
 
 	public static Text formatKeyValue(String key, Object value) {
-		return new LiteralText("").append(new LiteralText(key + ": ").setFormatting(Formatting.GOLD))
-			.append(new LiteralText(value.toString()));
+		return Text.literal("").append(Text.literal(key + ": ").setFormatting(Formatting.GOLD))
+			.append(Text.literal(value.toString()));
 	}
 
 	public static Text formatKeybindInfo(Object... keybinds) {
-		Text component = new LiteralText("").append(new LiteralText("keybind: ").setFormatting(Formatting.GOLD));
+		Text component = Text.literal("").append(Text.literal("keybind: ").setFormatting(Formatting.GOLD));
 		Collection<Object> boundKeybinds = filterUnboundKeybinds(keybinds);
 
 		if (boundKeybinds.isEmpty()) {
-			return component.append("-");
+			return component.appendLiteral("-");
 		}
 
 		int i = 0;
 
 		for (Object o : boundKeybinds) {
 			if (i++ > 0) {
-				component.append(" OR ");
+				component.appendLiteral(" OR ");
 			}
 
 			if (o instanceof KeyBinding) {
@@ -127,7 +126,7 @@ public class TextUtils {
 			if (o instanceof KeyBinding) {
 				KeyBinding keybind = (KeyBinding)o;
 
-				if (keybind.getKeyCode() == Keyboard.KEY_NONE) {
+				if (keybind.keyCode == Keyboard.KEY_NONE) {
 					continue;
 				}
 			}
@@ -139,8 +138,8 @@ public class TextUtils {
 	}
 
 	public static Text formatKeybind(KeyBinding keybind) {
-		Text component = new LiteralText("");
-		int boundKey = keybind.getKeyCode();
+		Text component = Text.literal("");
+		int boundKey = keybind.keyCode;
 
 		if (boundKey == Keyboard.KEY_NONE) {
 			return component;
@@ -152,13 +151,13 @@ public class TextUtils {
 	}
 
 	public static Text formatKeybind(Integer... keys) {
-		Text component = new LiteralText("");
+		Text component = Text.literal("");
 
 		for (int i = 0; i < keys.length; i++) {
 			int key = keys[i];
 
 			if (i > 0) {
-				component.append(" + ");
+				component.appendLiteral(" + ");
 			}
 
 			component.append(formatKey(key));
@@ -180,13 +179,13 @@ public class TextUtils {
 			}
 		}
 
-		Text text = new LiteralText("");
+		Text text = Text.literal("");
 
 		for (int i = 0; i < formattedKeys.size(); i++) {
 			Text key = formattedKeys.get(i);
 
 			if (i > 0) {
-				text.append(" + ");
+				text.appendLiteral(" + ");
 			}
 
 			text.append(key);
@@ -200,10 +199,10 @@ public class TextUtils {
 	}
 
 	public static Text formatKey(String key) {
-		return new LiteralText(key).setFormatting(Formatting.YELLOW);
+		return Text.literal(key).setFormatting(Formatting.YELLOW);
 	}
 
 	public static Text formatKey(Text key) {
-		return key.copy().setFormatting(Formatting.YELLOW);
+		return key.setFormatting(Formatting.YELLOW);
 	}
 }

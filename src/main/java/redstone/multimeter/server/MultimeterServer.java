@@ -3,11 +3,9 @@ package redstone.multimeter.server;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.Dimension;
@@ -199,11 +197,11 @@ public class MultimeterServer {
 		return getWorld(pos.getDimension());
 	}
 
-	public Block getBlock(DimPos pos) {
+	public int getBlock(DimPos pos) {
 		World world = getWorld(pos);
 
 		if (world == null) {
-			return null;
+			return -1;
 		}
 
 		return world.getBlock(pos.getX(), pos.getY(), pos.getZ());
@@ -233,9 +231,9 @@ public class MultimeterServer {
 
 	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
 		if (actionBar) {
-			message = new LiteralText(TextUtils.ACTION_BAR_KEY).append(message);
+			message = Text.literal(TextUtils.ACTION_BAR_KEY).append(message);
 		}
 
-		player.addMessage(message);
+		player.sendMessage(message);
 	}
 }

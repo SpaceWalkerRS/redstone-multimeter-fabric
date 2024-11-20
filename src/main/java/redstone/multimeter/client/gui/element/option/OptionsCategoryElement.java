@@ -5,8 +5,7 @@ import java.util.Collection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.text.Formatting;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -31,7 +30,7 @@ public class OptionsCategoryElement extends AbstractParentElement {
 
 		this.client = client;
 		this.textRenderer = minecraft.textRenderer;
-		this.category = new TextElement(this.client, 0, 0, t -> t.setText(new LiteralText(category).setFormatting(Formatting.ITALIC)).setWithShadow(true));
+		this.category = new TextElement(this.client, 0, 0, t -> t.setText(Text.literal(category).setFormatting(Formatting.ITALIC)).setWithShadow(true));
 		this.options = new SimpleListElement(this.client, width);
 
 		for (IOption option : options) {
@@ -72,7 +71,7 @@ public class OptionsCategoryElement extends AbstractParentElement {
 			this.option = option;
 			this.name = new TextElement(client, 0, 0, t -> t.setText(this.option.getName()).setWithShadow(true), () -> tooltip, t -> false);
 			this.control = this.option.createControl(client, 100, IButton.DEFAULT_HEIGHT);
-			this.reset = new Button(client, 0, 0, 50, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), () -> Tooltip.EMPTY, button -> {
+			this.reset = new Button(client, 0, 0, 50, IButton.DEFAULT_HEIGHT, () -> Text.literal("Reset"), () -> Tooltip.EMPTY, button -> {
 				this.option.reset();
 				return true;
 			});

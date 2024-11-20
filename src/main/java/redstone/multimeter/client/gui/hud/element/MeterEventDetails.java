@@ -81,7 +81,7 @@ public class MeterEventDetails extends AbstractElement {
 		for (int index = 0; index < lines.size(); index++) {
 			Text line = lines.get(index);
 
-			int lineX = textX + (leftToRight ? 0 : (width - 8) - hud.textRenderer.getWidth(line.getFormattedString()));
+			int lineX = textX + (leftToRight ? 0 : (width - 8) - hud.textRenderer.getWidth(line.buildString(true)));
 			int lineY = textY + (topToBottom ? 1 : -1) * (index + (topToBottom ? 0 : 1)) * (hud.textRenderer.fontHeight + 1) + (topToBottom ? 0 : (height - 4));
 
 			hud.renderer.renderText(line, lineX, lineY, 0xFFFFFFFF);

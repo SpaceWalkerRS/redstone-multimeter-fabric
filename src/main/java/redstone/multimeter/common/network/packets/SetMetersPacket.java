@@ -11,7 +11,6 @@ import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.MultimeterServer;
-import redstone.multimeter.util.NbtUtils;
 
 public class SetMetersPacket implements RSMMPacket {
 
@@ -41,10 +40,10 @@ public class SetMetersPacket implements RSMMPacket {
 	@Override
 	public void decode(NbtCompound data) {
 		meters = new ArrayList<>();
-		NbtList list = data.getList("meters", NbtUtils.TYPE_COMPOUND);
+		NbtList list = data.getList("meters");
 
 		for (int i = 0; i < list.size(); i++) {
-			NbtCompound meterNbt = list.getCompound(i);
+			NbtCompound meterNbt = (NbtCompound)list.get(i);
 			MeterProperties meter = MeterProperties.fromNbt(meterNbt);
 
 			meters.add(meter);

@@ -79,7 +79,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 	@Override
 	protected void postValidation(MutableMeterProperties properties, World world, int x, int y, int z) {
-		Block block = world.getBlock(x, y, z);
+		int block = world.getBlock(x, y, z);
 
 		MeterProperties defaultProperties = getDefaultProperties(block);
 
@@ -102,12 +102,12 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		for (int index = 0; index < EventType.ALL.length; index++) {
 			KeyBinding keybind = Keybinds.TOGGLE_EVENT_TYPES[index];
 
-			if (keybind.isPressed()) {
+			if (keybind.pressed) {
 				EventType type = EventType.ALL[index];
 				properties.toggleEventType(type);
 			}
 		}
-		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && block.ticksRandomly()) {
+		if (Options.RedstoneMultimeter.AUTO_RANDOM_TICKS.get() && block != 0 && Block.BY_ID[block].ticksRandomly()) {
 			if (!properties.hasEventType(EventType.RANDOM_TICK)) {
 				properties.toggleEventType(EventType.RANDOM_TICK);
 			}
@@ -143,8 +143,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	private MeterProperties getDefaultProperties(Block block) {
-		String id = Block.REGISTRY.getKey(block);
+	private MeterProperties getDefaultProperties(int block) {
+		String id = (block == 0) ? "air" : Block.BY_ID[block].getTranslationKey().substring("tile.".length());
 
 		if (id == null) {
 			return null; // we should never get here
@@ -168,12 +168,15 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	private void initDefaults() {
 		Set<String> namespaces = new HashSet<>();
 
-		for (String id : (Set<String>)Block.REGISTRY.keySet()) {
-			Identifier key = new Identifier(id);
-			loadDefaultProperties(key);
+		for (Block block : Block.BY_ID) {
+			if (block != null) {
+				String id = block.getTranslationKey().substring("tile.".length());
+				Identifier key = new Identifier(id);
+				loadDefaultProperties(key);
 
-			if (namespaces.add(key.getNamespace())) {
-				loadDefaultProperties(new Identifier(key.getNamespace(), DEFAULT_KEY));
+				if (namespaces.add(key.getNamespace())) {
+					loadDefaultProperties(new Identifier(key.getNamespace(), DEFAULT_KEY));
+				}
 			}
 		}
 	}

@@ -8,7 +8,7 @@ import org.lwjgl.input.Keyboard;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.text.Formatting;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
@@ -53,12 +53,12 @@ public class MeterControlsElement extends AbstractParentElement {
 
 		this.client = client;
 
-		this.title = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).setFormatting(Formatting.UNDERLINE)).setWithShadow(true));
-		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltip.of(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide")), button -> {
+		this.title = new TextElement(this.client, 0, 0, t -> t.add(Text.literal(String.format("Edit Meter \'%s\'", meter == null ? "" : meter.getName())).setFormatting(Formatting.UNDERLINE)).setWithShadow(true));
+		this.hideButton = new Button(this.client, 0, 0, 18, 18, () -> Text.literal(meter != null && meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltip.of(String.format("%s Meter", meter == null || meter.isHidden() ? "Unhide" : "Hide")), button -> {
 			this.client.getMeterGroup().toggleHidden(meter);
 			return true;
 		});
-		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> new LiteralText("X").setFormatting(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltip.of("Delete Meter").add(TextUtils.formatKeybindInfo(Keybinds.TOGGLE_METER)), button -> {
+		this.deleteButton = new Button(this.client, 0, 0, 18, 18, () -> Text.literal("X").setFormatting(triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltip.of("Delete Meter").add(TextUtils.formatKeybindInfo(Keybinds.TOGGLE_METER)), button -> {
 			tryDelete();
 
 			if (triedDeleting && Screen.isShiftDown()) {
@@ -67,7 +67,7 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			return true;
 		});
-		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(new LiteralText("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").setFormatting(Formatting.ITALIC)).setWithShadow(true));
+		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(Text.literal("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").setFormatting(Formatting.ITALIC)).setWithShadow(true));
 		this.controls = new SimpleListElement(this.client, getWidth());
 
 		this.deleteConfirm.setVisible(false);
@@ -168,11 +168,11 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			}
 		}, () -> ColorUtils.toRGBString(meter.getColor())));
-		color.addControl("red", style -> style.setColor(Formatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		color.addControl("red", text -> text.setColor(Formatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int red = ColorUtils.getRed(c);
 
-			return new LiteralText(String.valueOf(red));
+			return Text.literal(String.valueOf(red));
 		}, () -> Tooltip.EMPTY, value -> {
 			int red = (int)Math.round(value * 0xFF);
 			int c = ColorUtils.setRed(meter.getColor(), red);
@@ -184,11 +184,11 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			return (double)red / 0xFF;
 		}, 0xFF));
-		color.addControl("blue", style -> style.setColor(Formatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		color.addControl("blue", text -> text.setColor(Formatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int blue = ColorUtils.getBlue(c);
 
-			return new LiteralText(String.valueOf(blue));
+			return Text.literal(String.valueOf(blue));
 		}, () -> Tooltip.EMPTY, value -> {
 			int blue = (int)Math.round(value * 0xFF);
 			int c = ColorUtils.setBlue(meter.getColor(), blue);
@@ -200,11 +200,11 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			return (double)blue / 0xFF;
 		}, 0xFF));
-		color.addControl("green", style -> style.setColor(Formatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+		color.addControl("green", text -> text.setColor(Formatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int green = ColorUtils.getGreen(c);
 
-			return new LiteralText(String.valueOf(green));
+			return Text.literal(String.valueOf(green));
 		}, () -> Tooltip.EMPTY, value -> {
 			int green = (int)Math.round(value * 0xFF);
 			int c = ColorUtils.setGreen(meter.getColor(), green);
@@ -225,7 +225,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			KeyBinding keybind = Keybinds.TOGGLE_EVENT_TYPES[type.getIndex()];
 			Supplier<Tooltip> tooltip = () -> Tooltip.EMPTY;
 
-			if (keybind.getKeyCode() != Keyboard.KEY_NONE) {
+			if (keybind.keyCode != Keyboard.KEY_NONE) {
 				tooltip = () -> Tooltip.of(TextUtils.formatKeybindInfo(keybind));
 			}
 
@@ -237,8 +237,6 @@ public class MeterControlsElement extends AbstractParentElement {
 		controls.add(color);
 		controls.add(movable);
 		controls.add(eventTypes);
-
-		client.getTutorial().onMeterControlsOpened();
 	}
 
 	private void updateCoords() {

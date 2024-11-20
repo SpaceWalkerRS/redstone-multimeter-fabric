@@ -18,7 +18,6 @@ import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.interfaces.mixin.INbtList;
 import redstone.multimeter.server.MultimeterServer;
-import redstone.multimeter.util.NbtUtils;
 
 public class MeterUpdatesPacket implements RSMMPacket {
 	
@@ -44,7 +43,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			NbtList list = new NbtList();
 
 			for (int i = 0; i < removedMeters.size(); i++) {
-				list.add(new NbtLong(removedMeters.get(i)));
+				list.add(new NbtLong(null, removedMeters.get(i)));
 			}
 
 			data.put("removed", list);
@@ -67,7 +66,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			NbtList list = new NbtList();
 
 			for (int i = 0; i < meters.size(); i++) {
-				list.add(new NbtLong(meters.get(i)));
+				list.add(new NbtLong(null, meters.get(i)));
 			}
 
 			data.put("meters", list);
@@ -77,20 +76,20 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	@Override
 	public void decode(NbtCompound data) {
 		if (data.contains("removed")) {
-			NbtList ids = data.getList("removed", NbtUtils.TYPE_LONG);
+			NbtList ids = data.getList("removed");
 
 			for (int i = 0; i < ids.size(); i++) {
 				NbtLong nbt = ((INbtList)ids).getLong(i);
-				long id = nbt.getLong();
+				long id = nbt.value;
 
 				removedMeters.add(id);
 			}
 		}
 		if (data.contains("updates")) {
-			NbtList updates = data.getList("updates", NbtUtils.TYPE_COMPOUND);
+			NbtList updates = data.getList("updates");
 
 			for (int i = 0; i < updates.size(); i++) {
-				NbtCompound nbt = updates.getCompound(i);
+				NbtCompound nbt = (NbtCompound)updates.get(i);
 				long id = nbt.getLong("id");
 				MeterProperties update = MeterProperties.fromNbt(nbt);
 
@@ -98,11 +97,11 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			}
 		}
 		if (data.contains("meters")) {
-			NbtList ids = data.getList("meters", NbtUtils.TYPE_LONG);
+			NbtList ids = data.getList("meters");
 
 			for (int i = 0; i < ids.size(); i++) {
 				NbtLong nbt = ((INbtList)ids).getLong(i);
-				long id = nbt.getLong();
+				long id = nbt.value;
 
 				meters.add(id);
 			}

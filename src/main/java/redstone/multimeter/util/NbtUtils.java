@@ -19,6 +19,6 @@ public class NbtUtils {
 	public static final byte TYPE_INT_ARRAY  = 11;
 	public static final byte TYPE_LONG_ARRAY = 12;
 
-	public static final NbtElement NULL = new NbtByte((byte)0);
+	public static final NbtElement NULL = new NbtByte(null, (byte)0);
 
 }

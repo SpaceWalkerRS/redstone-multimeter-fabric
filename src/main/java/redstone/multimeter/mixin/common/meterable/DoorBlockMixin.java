@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.world.World;
 
@@ -25,7 +24,7 @@ public class DoorBlockMixin implements MeterableBlock {
 			target = "Lnet/minecraft/block/Block;isSignalSource()Z"
 		)
 	)
-	private void logPowered(World world, int x, int y, int z, Block neighborBlock, CallbackInfo ci, int powered /* the fuck? */) {
+	private void logPowered(World world, int x, int y, int z, int neighborBlock, CallbackInfo ci, int powered /* the fuck? */) {
 		rsmm$logPowered(world, x, y, z, powered != 0);
 		rsmm$logPowered(world, x, y + 1, z, powered != 0);
 	}

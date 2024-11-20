@@ -6,8 +6,7 @@ import java.util.Map.Entry;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
@@ -22,7 +21,7 @@ import redstone.multimeter.client.option.Options;
 public class OptionsScreen extends RSMMScreen {
 
 	public OptionsScreen(MultimeterClient client) {
-		super(client, new LiteralText(String.format("%s Options", RedstoneMultimeterMod.MOD_NAME)), true);
+		super(client, Text.literal(String.format("%s Options", RedstoneMultimeterMod.MOD_NAME)), true);
 	}
 
 	@Override
@@ -57,18 +56,18 @@ public class OptionsScreen extends RSMMScreen {
 		int x = getX() + getWidth() / 2;
 		int y = getY() + 22;
 
-		IButton properties = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new LiteralText("Default Meter Properties"), () -> Tooltip.EMPTY, button -> {
+		IButton properties = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> Text.literal("Default Meter Properties"), () -> Tooltip.EMPTY, button -> {
 			client.openScreen(new DefaultMeterPropertiesScreen(client));
 			return true;
 		});
-		IButton controls = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("options.controls"), () -> Tooltip.EMPTY, button -> {
+		IButton controls = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> Text.translatable("options.controls"), () -> Tooltip.EMPTY, button -> {
 			minecraft.openScreen(new ControlsOptionsScreen(wrapper, minecraft.options));
 			return true;
 		});
 
 		y = getY() + getHeight() - (IButton.DEFAULT_HEIGHT + 8);
 
-		IButton reset = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("controls.reset"), () -> Tooltip.EMPTY, button -> {
+		IButton reset = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> Text.translatable("controls.reset"), () -> Tooltip.EMPTY, button -> {
 			for (IOption option : Options.all()) {
 				option.reset();
 			}
@@ -76,7 +75,7 @@ public class OptionsScreen extends RSMMScreen {
 
 			return true;
 		});
-		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> new TranslatableText("gui.done"), () -> Tooltip.EMPTY, button -> {
+		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> Text.translatable("gui.done"), () -> Tooltip.EMPTY, button -> {
 			close();
 			return true;
 		});

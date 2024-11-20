@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -137,7 +136,7 @@ public class TextElement extends AbstractElement {
 	}
 
 	public TextElement add(String text) {
-		return add(new LiteralText(text));
+		return add(Text.literal(text));
 	}
 
 	public TextElement add(Text text) {
@@ -151,7 +150,7 @@ public class TextElement extends AbstractElement {
 	}
 
 	public TextElement setText(String text) {
-		this.text = Arrays.asList(new LiteralText(text));
+		this.text = Arrays.asList(Text.literal(text));
 		return this;
 	}
 

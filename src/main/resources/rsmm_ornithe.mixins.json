@@ -8,7 +8,9 @@
 		"common.CommandManagerMixin",
 		"common.DimensionMixin",
 		"common.MinecraftServerMixin",
+		"common.NbtCompoundAccess",
 		"common.NbtListMixin",
+		"common.PacketAccess",
 		"common.PlayerManagerMixin",
 		"common.ServerChunkCacheMixin",
 		"common.ServerPlayNetworkHandlerMixin",
@@ -49,11 +51,12 @@
 	"client": [
 		"client.ClientPlayNetworkHandlerMixin",
 		"client.ConnectionListenerMixin",
-		"client.ConnectionMixin",
 		"client.GameGuiMixin",
 		"client.GameOptionsMixin",
 		"client.GameRendererMixin",
+		"client.GLXMixin",
 		"client.IntegratedServerMixin",
+		"client.LocalConnectionMixin",
 		"client.MinecraftMixin"
 	],
 	"server": [

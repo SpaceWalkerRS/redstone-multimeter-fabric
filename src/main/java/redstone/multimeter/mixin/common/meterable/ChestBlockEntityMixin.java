@@ -25,7 +25,7 @@ public class ChestBlockEntityMixin extends BlockEntity {
 		method = "onOpen",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/World;addBlockEvent(IIILnet/minecraft/block/Block;II)V"
+			target = "Lnet/minecraft/world/World;addBlockEvent(IIIIII)V"
 		)
 	)
 	private void onOpen(CallbackInfo ci) {
@@ -36,7 +36,7 @@ public class ChestBlockEntityMixin extends BlockEntity {
 		method = "onClose",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/World;addBlockEvent(IIILnet/minecraft/block/Block;II)V"
+			target = "Lnet/minecraft/world/World;addBlockEvent(IIIIII)V"
 		)
 	)
 	private void onClose(CallbackInfo ci) {

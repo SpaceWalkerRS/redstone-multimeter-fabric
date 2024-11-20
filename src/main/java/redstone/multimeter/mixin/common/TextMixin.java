@@ -1,58 +1,51 @@
 package redstone.multimeter.mixin.common;
 
-import java.util.function.Consumer;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.text.Formatting;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.interfaces.mixin.IText;
 
 @Mixin(Text.class)
-public interface TextMixin extends IText {
+public class TextMixin implements IText {
 
-	@Shadow Text setStyle(Style style);
-	@Shadow Style getStyle();
-
-	@Override
-	default Text withStyle(Consumer<Style> style) {
-		style.accept(getStyle());
-		return (Text)this;
-	}
+	@Shadow private Formatting color;
+	@Shadow private Boolean bold;
+	@Shadow private Boolean italic;
+	@Shadow private Boolean underlined;
+	@Shadow private Boolean obfuscated;
 
 	@Override
-	default Text setFormatting(Formatting... formatting) {
-		Style style = getStyle();
-
+	public Text setFormatting(Formatting... formatting) {
 		for (Formatting f : formatting) {
 			if (f.isColor()) {
-				style.setColor(f);
+				color = f;
 			} else {
 				if (f == Formatting.BOLD) {
-					style.setBold(true);
+					bold = true;
 					break;
 				} else if (f == Formatting.ITALIC) {
-					style.setItalic(true);
+					italic = true;
 					break;
 				} else if (f == Formatting.OBFUSCATED) {
-					style.setObfuscated(true);
+					obfuscated = true;
 					break;
 				} else if (f == Formatting.STRIKETHROUGH) {
-					style.setStrikethrough(true);
+//					rsmm$setStrikethrough(true);
 					break;
 				} else if (f == Formatting.UNDERLINE) {
-					style.setUnderlined(true);
+					underlined = true;
 					break;
 				} else if (f == Formatting.RESET) {
-					setStyle(style = new Style());
+					color = null;
+					bold = italic = underlined = obfuscated = null;
 					break;
 				}
 			}
 		}
 
-		return (Text)this;
+		return (Text)(Object)this;
 	}
 }

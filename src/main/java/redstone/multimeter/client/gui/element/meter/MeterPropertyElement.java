@@ -1,14 +1,13 @@
 package redstone.multimeter.client.gui.element.meter;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.text.Formatting;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -48,7 +47,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 		this.client = client;
 		this.textRenderer = minecraft.textRenderer;
-		this.property = new TextElement(this.client, 0, 0, t -> t.setText(new LiteralText(name).setFormatting(Formatting.ITALIC, this.active ? Formatting.WHITE : Formatting.GRAY)).setWithShadow(true), tooltip, onPress);
+		this.property = new TextElement(this.client, 0, 0, t -> t.setText(Text.literal(name).setFormatting(Formatting.ITALIC, this.active ? Formatting.WHITE : Formatting.GRAY)).setWithShadow(true), tooltip, onPress);
 		this.controls = new SimpleListElement(client, width);
 		this.buttonWidth = buttonWidth;
 		this.active = true;
@@ -82,7 +81,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 	public void withToggle(Consumer<Boolean> listener) {
 		if (toggle == null) {
-			addChild(0, toggle = new TransparentToggleButton(client, 0, 0, 12, 12, on -> new LiteralText(on ? "\u25A0" : "\u25A1"), () -> isActive(), button -> setActive(!active)));
+			addChild(0, toggle = new TransparentToggleButton(client, 0, 0, 12, 12, on -> Text.literal(on ? "\u25A0" : "\u25A1"), () -> isActive(), button -> setActive(!active)));
 		}
 
 		this.listener = listener;
@@ -96,18 +95,18 @@ public class MeterPropertyElement extends AbstractParentElement {
 	}
 
 	public void addControl(String name, ButtonFactory factory) {
-		addControl(name, style -> { }, factory);
+		addControl(name, text -> text, factory);
 	}
 
 	public void addControl(String name, ButtonFactory factory, Supplier<Tooltip> tooltip) {
-		addControl(name, style -> { }, factory, tooltip);
+		addControl(name, text -> text, factory, tooltip);
 	}
 
-	public void addControl(String name, Consumer<Style> formatter, ButtonFactory factory) {
+	public void addControl(String name, Function<Text, Text> formatter, ButtonFactory factory) {
 		addControl(new MeterControlElement(name, formatter, factory));
 	}
 
-	public void addControl(String name, Consumer<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+	public void addControl(String name, Function<Text, Text> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
 		addControl(new MeterControlElement(name, formatter, factory, tooltip));
 	}
 
@@ -135,14 +134,14 @@ public class MeterPropertyElement extends AbstractParentElement {
 		protected final IButton control;
 
 		public MeterControlElement(String name, ButtonFactory factory) {
-			this(name, style -> { }, factory);
+			this(name, text -> text, factory);
 		}
 
-		public MeterControlElement(String name, Consumer<Style> formatter, ButtonFactory factory) {
+		public MeterControlElement(String name, Function<Text, Text> formatter, ButtonFactory factory) {
 			this(name, formatter, factory, () -> Tooltip.EMPTY);
 		}
 
-		public MeterControlElement(String name, Consumer<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+		public MeterControlElement(String name, Function<Text, Text> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
 			this.name = new TextElement(client, 0, 0, t -> t.setText(formatName(name, formatter)).setWithShadow(true), tooltip);
 			this.control = factory.create(client, buttonWidth, IButton.DEFAULT_HEIGHT);
 
@@ -178,10 +177,10 @@ public class MeterPropertyElement extends AbstractParentElement {
 			control.setY(y);
 		}
 
-		protected Text formatName(String name, Consumer<Style> formatter) {
+		protected Text formatName(String name, Function<Text, Text> formatter) {
 			int width = controls.getWidth() - (4 + buttonWidth + 10);
-			Text text = new LiteralText(textRenderer.trim(name, width, true));
-			return active ? text.withStyle(formatter) : text.setFormatting(Formatting.GRAY);
+			Text text = Text.literal(textRenderer.trim(name, width, true));
+			return active ? formatter.apply(text) : text.setFormatting(Formatting.GRAY);
 		}
 	}
 
@@ -219,7 +218,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 			int size = getHeight() / 2 - 1;
 
-			this.increase = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("+"), () -> Tooltip.EMPTY, button -> {
+			this.increase = new TransparentButton(client, 0, 0, size, size, () -> Text.literal("+"), () -> Tooltip.EMPTY, button -> {
 				int distance = Screen.isShiftDown() ? 10 : 1;
 				DimPos pos = getter.get();
 				DimPos newPos = pos.offset(axis, distance);
@@ -228,7 +227,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 				return true;
 			});
-			this.decrease = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("-"), () -> Tooltip.EMPTY, button -> {
+			this.decrease = new TransparentButton(client, 0, 0, size, size, () -> Text.literal("-"), () -> Tooltip.EMPTY, button -> {
 				int distance = Screen.isShiftDown() ? 10 : 1;
 				DimPos pos = getter.get();
 				DimPos newPos = pos.offset(axis, -distance);

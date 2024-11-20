@@ -17,6 +17,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ScheduledTick;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ILogger;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
@@ -41,8 +42,8 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	private int rsmm$scheduledTicks;
 	private int rsmm$currentDepth;
 
-	private ServerWorldMixin(WorldStorage storage, String name, Dimension dimension, WorldSettings settings, Profiler profiler) {
-		super(storage, name, dimension, settings, profiler);
+	private ServerWorldMixin(WorldStorage storage, String name, WorldSettings settings, Dimension dimension, Profiler profiler, ILogger logger) {
+		super(storage, name, settings, dimension, profiler, logger);
 	}
 
 	@Inject(
@@ -108,7 +109,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-			args = "ldc=tickBlocks"
+			args = "ldc=tickTiles"
 		)
 	)
 	private void swapTickTaskTickChunks(CallbackInfo ci) {
@@ -261,7 +262,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-			args = "ldc=tickBlocks"
+			args = "ldc=tickTiles"
 		)
 	)
 	private void swapTickTaskRandomTicks(CallbackInfo ci) {
@@ -281,22 +282,22 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 
 	@Inject(
-		method = "scheduleTick(IIILnet/minecraft/block/Block;II)V",
+		method = "scheduleTick(IIIIII)V",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void captureScheduledTicks(int x, int y, int z, Block block, int delay, int priority, CallbackInfo ci) {
+	private void captureScheduledTicks(int x, int y, int z, int block, int delay, int priority, CallbackInfo ci) {
 		rsmm$scheduledTicks = scheduledTicks.size();
 	}
 
 	@Inject(
-		method = "scheduleTick(IIILnet/minecraft/block/Block;II)V",
+		method = "scheduleTick(IIIIII)V",
 		at = @At(
 			value = "TAIL"
 		)
 	)
-	private void logScheduleTick(int x, int y, int z, Block block, int delay, int priority, CallbackInfo ci) {
+	private void logScheduleTick(int x, int y, int z, int block, int delay, int priority, CallbackInfo ci) {
 		if (rsmm$scheduledTicks != scheduledTicks.size()) {
 			getMultimeter().logScheduledTick(this, x, y, z, priority, true);
 		}
@@ -340,7 +341,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 			value = "TAIL"
 		)
 	)
-	private void addBlockEvent(int x, int y, int z, Block block, int type, int data, CallbackInfo ci) {
+	private void addBlockEvent(int x, int y, int z, int block, int type, int data, CallbackInfo ci) {
 		getMultimeter().logBlockEvent(this, x, y, z, type, rsmm$currentDepth + 1, true);
 	}
 

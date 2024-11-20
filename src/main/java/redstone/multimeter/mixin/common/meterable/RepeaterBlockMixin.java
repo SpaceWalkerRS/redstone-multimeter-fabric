@@ -17,8 +17,8 @@ import redstone.multimeter.block.PowerSource;
 @Mixin(RepeaterBlock.class)
 public abstract class RepeaterBlockMixin extends DiodeBlock implements MeterableBlock, PowerSource {
 
-	private RepeaterBlockMixin(boolean powered) {
-		super(powered);
+	private RepeaterBlockMixin(int id, boolean powered) {
+		super(id, powered);
 	}
 
 	@Inject(
@@ -29,7 +29,7 @@ public abstract class RepeaterBlockMixin extends DiodeBlock implements Meterable
 	)
 	private void logPowered(WorldView world, int x, int y, int z, int metadata, CallbackInfoReturnable<Boolean> cir) {
 		if (cir.getReturnValue() && world instanceof ServerWorld) {
-			rsmm$logPowered((ServerWorld)world, x, y, z, this, metadata);
+			rsmm$logPowered((ServerWorld)world, x, y, z, id, metadata);
 		}
 	}
 

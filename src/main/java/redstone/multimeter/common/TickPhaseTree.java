@@ -14,7 +14,6 @@ import net.minecraft.nbt.NbtString;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.interfaces.mixin.INbtList;
-import redstone.multimeter.util.NbtUtils;
 
 public class TickPhaseTree {
 
@@ -120,13 +119,13 @@ public class TickPhaseTree {
 			array[0] = (byte)depth;
 			array[1] = (byte)node.task.getIndex();
 			array[2] = (byte)node.args.length;
-			NbtByteArray taskNbt = new NbtByteArray(array);
+			NbtByteArray taskNbt = new NbtByteArray(null, array);
 
 			tasks.add(taskNbt);
 
 			for (int index = 0; index < node.args.length; index++) {
 				String arg = node.args[index];
-				NbtString argNbt = new NbtString(arg);
+				NbtString argNbt = new NbtString(null, arg);
 
 				args.add(argNbt);
 			}
@@ -140,8 +139,8 @@ public class TickPhaseTree {
 	}
 
 	public void fromNbt(NbtCompound nbt) {
-		NbtList tasks = nbt.getList("tasks", NbtUtils.TYPE_BYTE_ARRAY);
-		NbtList args = nbt.getList("args", NbtUtils.TYPE_STRING);
+		NbtList tasks = nbt.getList("tasks");
+		NbtList args = nbt.getList("args");
 
 		if (tasks.size() > 0) {
 			start();
@@ -152,7 +151,7 @@ public class TickPhaseTree {
 
 	private void addNode(NbtList tasks, NbtList args, int taskIndex, int argIndex, int lastDepth) {
 		NbtByteArray taskNbt = ((INbtList)tasks).getByteArray(taskIndex);
-		byte[] array = taskNbt.getByteArray();
+		byte[] array = taskNbt.value;
 		int depth = array[0];
 		TickTask task = TickTask.byIndex(array[1]);
 		int argsLength = array[2];
@@ -163,7 +162,7 @@ public class TickPhaseTree {
 			taskArgs = new String[argsLength];
 
 			for (int i = 0; i < argsLength && argIndex < args.size();) {
-				taskArgs[i++] = args.getString(argIndex++);
+				taskArgs[i++] = ((NbtString)args.get(argIndex++)).value;
 			}
 		} else {
 			taskArgs = new String[0];

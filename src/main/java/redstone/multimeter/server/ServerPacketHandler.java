@@ -1,8 +1,9 @@
 package redstone.multimeter.server;
 
-import net.minecraft.network.PacketByteBuf;
+import java.io.DataInput;
+
+import net.minecraft.network.packet.CustomPayloadPacket;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 
 import redstone.multimeter.common.network.PacketHandler;
@@ -16,13 +17,13 @@ public class ServerPacketHandler extends PacketHandler {
 	}
 
 	@Override
-	protected Packet toCustomPayload(String channel, PacketByteBuf data) {
-		return new CustomPayloadS2CPacket(channel, data);
+	protected Packet toCustomPayload(String channel, byte[] data) {
+		return new CustomPayloadPacket(channel, data);
 	}
 
-	public void handlePacket(PacketByteBuf data, ServerPlayerEntity player) {
+	public void handlePacket(DataInput input, ServerPlayerEntity player) {
 		try {
-			decode(data).handle(server, player);
+			decode(input).handle(server, player);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

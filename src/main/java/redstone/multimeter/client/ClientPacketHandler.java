@@ -1,8 +1,9 @@
 package redstone.multimeter.client;
 
-import net.minecraft.network.PacketByteBuf;
+import java.io.DataInput;
+
+import net.minecraft.network.packet.CustomPayloadPacket;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 
 import redstone.multimeter.common.network.PacketHandler;
 
@@ -15,17 +16,15 @@ public class ClientPacketHandler extends PacketHandler {
 	}
 
 	@Override
-	protected Packet toCustomPayload(String channel, PacketByteBuf data) {
-		return new CustomPayloadC2SPacket(channel, data);
+	protected Packet toCustomPayload(String channel, byte[] data) {
+		return new CustomPayloadPacket(channel, data);
 	}
 
-	public void handlePacket(PacketByteBuf data) {
+	public void handlePacket(DataInput input) {
 		try {
-			decode(data).handle(client);
+			decode(input).handle(client);
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			data.release();
 		}
 	}
 }

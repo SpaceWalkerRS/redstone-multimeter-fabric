@@ -5,7 +5,6 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Formatting;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
@@ -145,7 +144,7 @@ public class MeterListRenderer extends AbstractElement {
 
 	@Override
 	public Tooltip getTooltip(int mouseX, int mouseY) {
-		if (Keybinds.OPEN_METER_CONTROLS.getKeyCode() == Keyboard.KEY_NONE || cursorMeter != null) {
+		if (Keybinds.OPEN_METER_CONTROLS.keyCode == Keyboard.KEY_NONE || cursorMeter != null) {
 			return super.getTooltip(mouseX, mouseY);
 		}
 
@@ -276,7 +275,7 @@ public class MeterListRenderer extends AbstractElement {
 	}
 
 	private void drawName(Meter meter, int x, int y, int color) {
-		Text name = new LiteralText(meter.getName());
+		Text name = Text.literal(meter.getName());
 
 		if (meter.isHidden()) {
 			name.setFormatting(Formatting.GRAY, Formatting.ITALIC);

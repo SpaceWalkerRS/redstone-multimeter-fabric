@@ -11,14 +11,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.RedstoneLampBlock;
+import net.minecraft.block.material.Material;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 
 @Mixin(RedstoneLampBlock.class)
-public class RedstoneLampBlockMixin implements MeterableBlock {
+public class RedstoneLampBlockMixin extends Block implements MeterableBlock {
 
 	@Shadow @Final private boolean lit;
+
+	private RedstoneLampBlockMixin(int id, Material material) {
+		super(id, material);
+	}
 
 	@Inject(
 		method = "tick",
@@ -27,7 +32,7 @@ public class RedstoneLampBlockMixin implements MeterableBlock {
 		)
 	)
 	private void logPowered(World world, int x, int y, int z, Random random, CallbackInfo ci) {
-		rsmm$logPowered(world, x, y, z, (Block) (Object) this, world.getBlockMetadata(x, y, z));
+		rsmm$logPowered(world, x, y, z, id, world.getBlockMetadata(x, y, z));
 	}
 
 	@Override

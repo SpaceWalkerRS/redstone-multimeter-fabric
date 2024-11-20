@@ -1,10 +1,6 @@
 package redstone.multimeter.client.gui.element.button;
 
 import net.minecraft.client.resource.Identifier;
-import net.minecraft.client.sound.instance.SimpleSoundInstance;
-import net.minecraft.client.sound.instance.SoundInstance;
-import net.minecraft.client.sound.system.SoundManager;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -28,13 +24,10 @@ public interface IButton extends Element {
 	public void setMessage(Text message);
 
 	default void setMessage(String message) {
-		setMessage(new LiteralText(message));
+		setMessage(Text.literal(message));
 	}
 
 	public static void playClickSound(MultimeterClient client) {
-		SoundManager soundManager = client.getMinecraft().getSoundManager();
-		SoundInstance sound = SimpleSoundInstance.of(CLICK_SOUND, 1.0F);
-
-		soundManager.play(sound);
+		client.getMinecraft().soundSystem.play("random.click", 1.0F, 1.0F);
 	}
 }

@@ -23,9 +23,9 @@ public class NbtListMixin implements INbtList {
 	public NbtLong getLong(int index) {
 		if (index >= 0 && index < elements.size()) {
 			NbtElement element = this.elements.get(index);
-			return element.getType() == NbtUtils.TYPE_LONG ? (NbtLong)element : new NbtLong(0L);
+			return element.getType() == NbtUtils.TYPE_LONG ? (NbtLong)element : new NbtLong(null, 0L);
 		} else {
-			return new NbtLong(0L);
+			return new NbtLong(null, 0L);
 		}
 	}
 
@@ -33,9 +33,9 @@ public class NbtListMixin implements INbtList {
 	public NbtByteArray getByteArray(int index) {
 		if (index >= 0 && index < elements.size()) {
 			NbtElement element = this.elements.get(index);
-			return element.getType() == NbtUtils.TYPE_BYTE_ARRAY ? (NbtByteArray)element : new NbtByteArray(new byte[0]);
+			return element.getType() == NbtUtils.TYPE_BYTE_ARRAY ? (NbtByteArray)element : new NbtByteArray(null, new byte[0]);
 		} else {
-			return new NbtByteArray(new byte[0]);
+			return new NbtByteArray(null, new byte[0]);
 		}
 	}
 }

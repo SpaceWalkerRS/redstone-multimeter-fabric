@@ -1,5 +1,6 @@
 package redstone.multimeter.mixin.client;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,13 +14,13 @@ import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.network.handler.ClientPlayNetworkHandler;
+import net.minecraft.client.network.handler.ClientNetworkHandler;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Connection;
+import net.minecraft.network.LocalConnection;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.screen.ScreenWrapper;
 import redstone.multimeter.interfaces.mixin.IConnection;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
@@ -28,6 +29,8 @@ public class MinecraftMixin implements IMinecraft {
 
 	@Shadow
 	private Screen screen;
+	@Shadow
+	private boolean paused;
 
 	private MultimeterClient multimeterClient;
 
@@ -57,8 +60,7 @@ public class MinecraftMixin implements IMinecraft {
 	@Inject(
 		method = "onResolutionChanged(II)V",
 		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/Minecraft;onResolutionChanged()V"
+			value = "TAIL"
 		)
 	)
 	private void resizeDisplay(CallbackInfo ci) {
@@ -74,23 +76,12 @@ public class MinecraftMixin implements IMinecraft {
 		)
 	)
 	private void tickConnection(CallbackInfo ci) {
-		ClientPlayNetworkHandler networkHandler = ((Minecraft) (Object) this).getNetworkHandler();
+		ClientNetworkHandler networkHandler = ((Minecraft) (Object) this).getNetworkHandler();
 		Connection connection = networkHandler != null ? networkHandler.getConnection() : null;
 
-		if (connection != null && connection.isConnected()) {
+		if (connection != null && connection instanceof LocalConnection && paused) {
 			((IConnection) connection).rsmm$handleRsmmPackets();;
 		}
-	}
-
-	@Inject(
-		method = "tick()V",
-		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/world/ClientWorld;tick()V"
-		)
-	)
-	private void tickTutorial(CallbackInfo ci) {
-		multimeterClient.getTutorial().tick();
 	}
 
 	@Inject(
@@ -128,18 +119,18 @@ public class MinecraftMixin implements IMinecraft {
 		slice = @Slice(
 			from = @At(
 				value = "CONSTANT",
-				ordinal = 1,
+				ordinal = 0,
 				args = "intValue=9"
 			)
 		),
 		at = @At(
 			value = "INVOKE",
 			ordinal = 0,
-			target = "Lnet/minecraft/client/options/KeyBinding;consumeClick()Z"
+			target = "Lorg/lwjgl/input/Keyboard;getEventKey()I"
 		)
 	)
-	private boolean handleHotbarKeybinds(KeyBinding keybind, @Local int slot) {
-		return keybind.consumeClick() && !multimeterClient.getInputHandler().handleHotbarKeybinds(slot);
+	private int handleHotbarKeybinds(@Local int slot) {
+		return Keyboard.getEventKey() == 2 + slot && multimeterClient.getInputHandler().handleHotbarKeybinds(slot) ? -1 : Keyboard.getEventKey();
 	}
 
 	@Inject(
@@ -151,18 +142,6 @@ public class MinecraftMixin implements IMinecraft {
 	private void setWorld(ClientWorld world, String message, CallbackInfo ci) {
 		if (world == null) {
 			multimeterClient.onDisconnect();
-		}
-	}
-
-	@Inject(
-		method = "openScreen",
-		at = @At(
-			value = "TAIL"
-		)
-	)
-	private void openScreen(Screen screen, CallbackInfo ci) {
-		if (this.screen != null && !(this.screen instanceof ScreenWrapper) && multimeterClient != null) {
-			multimeterClient.getTutorial().onScreenOpened(this.screen);
 		}
 	}
 

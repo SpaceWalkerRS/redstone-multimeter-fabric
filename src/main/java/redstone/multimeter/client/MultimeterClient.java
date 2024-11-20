@@ -7,7 +7,6 @@ import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Formatting;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.world.HitResult;
 import net.minecraft.world.World;
@@ -23,7 +22,6 @@ import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.client.render.MeterRenderer;
-import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhaseTree;
 import redstone.multimeter.common.meter.Meter;
@@ -61,7 +59,6 @@ public class MultimeterClient {
 	private final MultimeterHud hud;
 	private final SavedMeterGroupsManager savedMeterGroupsManager;
 	private final ClientMeterPropertiesManager meterPropertiesManager;
-	private final Tutorial tutorial;
 
 	private final TickPhaseTree tickPhaseTree;
 
@@ -79,7 +76,6 @@ public class MultimeterClient {
 		this.hud = new MultimeterHud(this);
 		this.savedMeterGroupsManager = new SavedMeterGroupsManager(this);
 		this.meterPropertiesManager = new ClientMeterPropertiesManager(this);
-		this.tutorial = new Tutorial(this);
 
 		this.tickPhaseTree = new TickPhaseTree();
 
@@ -124,10 +120,6 @@ public class MultimeterClient {
 
 	public ClientMeterPropertiesManager getMeterPropertiesManager() {
 		return meterPropertiesManager;
-	}
-
-	public Tutorial getTutorial() {
-		return tutorial;
 	}
 
 	public ClientMeterGroup getMeterGroup() {
@@ -254,7 +246,7 @@ public class MultimeterClient {
 			connected = true;
 
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = new LiteralText(VERSION_WARNING.apply(modVersion)).setFormatting(Formatting.RED);
+				Text warning = Text.literal(VERSION_WARNING.apply(modVersion)).setFormatting(Formatting.RED);
 				sendMessage(warning, false);
 			}
 
@@ -305,8 +297,6 @@ public class MultimeterClient {
 			} else {
 				RemoveMeterPacket packet = new RemoveMeterPacket(meter.getId());
 				sendPacket(packet);
-
-				tutorial.onMeterRemoveRequested(pos);
 			}
 		});
 	}
@@ -318,8 +308,6 @@ public class MultimeterClient {
 		if (meterPropertiesManager.validate(properties)) {
 			AddMeterPacket packet = new AddMeterPacket(properties);
 			sendPacket(packet);
-
-			tutorial.onMeterAddRequested(pos);
 		}
 	}
 
@@ -387,9 +375,7 @@ public class MultimeterClient {
 			hudEnabled = !hudEnabled;
 
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(new LiteralText(message), true);
-
-			tutorial.onToggleHud(hudEnabled);
+			sendMessage(Text.literal(message), true);
 		}
 	}
 
@@ -404,7 +390,6 @@ public class MultimeterClient {
 
 	public void openScreen(RSMMScreen screen) {
 		minecraft.openScreen(new ScreenWrapper(minecraft.screen, screen));
-		tutorial.onScreenOpened(screen);
 	}
 
 	public boolean hasScreenOpen() {
@@ -427,9 +412,9 @@ public class MultimeterClient {
 
 	public void sendMessage(Text message, boolean actionBar) {
 		if (actionBar) {
-			minecraft.gui.setOverlayMessage(message.getString(), false);
+			minecraft.gui.setOverlayMessage(message.buildString(false), false);
 		} else {
-			minecraft.player.addMessage(message);
+			minecraft.player.sendMessage(message);
 		}
 	}
 }

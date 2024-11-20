@@ -74,7 +74,7 @@ public class ClientLogManager extends LogManager {
 	 */
 	public void updateMeterLogs(NbtList data) {
 		for (int index = 0; index < data.size(); index++) {
-			NbtCompound nbt = data.getCompound(index);
+			NbtCompound nbt = (NbtCompound)data.get(index);
 
 			long id = nbt.getLong("id");
 			Meter meter = meterGroup.getMeter(id);
