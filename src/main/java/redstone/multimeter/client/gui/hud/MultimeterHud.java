@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.Window;
-import net.minecraft.text.Formatting;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
@@ -28,6 +27,7 @@ import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.Formatting;
 import redstone.multimeter.util.TextUtils;
 
 public class MultimeterHud extends AbstractParentElement {

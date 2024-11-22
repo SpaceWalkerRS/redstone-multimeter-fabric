@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.locale.LanguageManager;
-import net.minecraft.text.Formatting;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -24,6 +23,7 @@ import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.Formatting;
 
 public class DefaultMeterPropertiesScreen extends RSMMScreen {
 

@@ -20,7 +20,7 @@ public class RedstoneWireBlockMixin implements MeterableBlock, PowerSource {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/World;setBlockMetadata(IIIII)Z"
+			target = "Lnet/minecraft/world/World;setBlockMetadata(IIII)V"
 		)
 	)
 	private void logPowered(World world, int x, int y, int z, int sourceX, int sourceY, int sourceZ, CallbackInfo cir, int oldPower, int receivedPower) {

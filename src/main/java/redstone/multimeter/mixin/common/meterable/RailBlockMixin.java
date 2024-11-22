@@ -3,13 +3,13 @@ package redstone.multimeter.mixin.common.meterable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import net.minecraft.block.PoweredRailBlock;
+import net.minecraft.block.RailBlock;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
 
-@Mixin(PoweredRailBlock.class)
-public class PoweredRailBlockMixin implements MeterableBlock {
+@Mixin(RailBlock.class)
+public class RailBlockMixin implements MeterableBlock {
 
 	@Shadow private boolean isPoweredByConnectedRails(World world, int x, int y, int z, int metadata, boolean forward, int depth) { return false; }
 

@@ -4,7 +4,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Formatting;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.Tooltip;
@@ -13,6 +12,7 @@ import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.network.packets.MeterIndexPacket;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.Formatting;
 import redstone.multimeter.util.TextUtils;
 
 public class MeterListRenderer extends AbstractElement {

@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Formatting;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -15,6 +14,7 @@ import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.option.IOption;
 import redstone.multimeter.client.option.OptionListener;
+import redstone.multimeter.util.Formatting;
 import redstone.multimeter.util.TextUtils;
 
 public class OptionsCategoryElement extends AbstractParentElement {

@@ -7,7 +7,6 @@ import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.text.Formatting;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
@@ -29,6 +28,7 @@ import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 import redstone.multimeter.common.network.packets.TeleportToMeterPacket;
 import redstone.multimeter.util.ColorUtils;
 import redstone.multimeter.util.Direction.Axis;
+import redstone.multimeter.util.Formatting;
 import redstone.multimeter.util.TextUtils;
 
 public class MeterControlsElement extends AbstractParentElement {

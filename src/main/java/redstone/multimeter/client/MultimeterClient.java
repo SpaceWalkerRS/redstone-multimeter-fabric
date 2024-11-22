@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Formatting;
 import net.minecraft.world.HitResult;
 import net.minecraft.world.World;
 
@@ -36,6 +35,7 @@ import redstone.multimeter.common.network.packets.MeterUpdatePacket;
 import redstone.multimeter.common.network.packets.RebuildTickPhaseTreePacket;
 import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
+import redstone.multimeter.util.Formatting;
 
 public class MultimeterClient {
 

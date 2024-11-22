@@ -10,7 +10,6 @@ import org.lwjgl.input.Keyboard;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Formatting;
 
 import redstone.multimeter.client.gui.Tooltip;
 

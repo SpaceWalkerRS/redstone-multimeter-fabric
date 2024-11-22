@@ -14,12 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.llamalad7.mixinextras.sugar.Local;
 
-import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ScheduledTick;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ILogger;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
@@ -44,8 +42,8 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	private int rsmm$scheduledTicks;
 	private int rsmm$currentDepth;
 
-	private ServerWorldMixin(WorldStorage storage, String name, WorldSettings settings, Dimension dimension, Profiler profiler, ILogger logger) {
-		super(storage, name, settings, dimension, profiler, logger);
+	private ServerWorldMixin(WorldStorage storage, String name, WorldSettings settings, Dimension dimension, Profiler profiler) {
+		super(storage, name, settings, dimension, profiler);
 	}
 
 	@Inject(
@@ -80,6 +78,18 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	)
 	private void swapTickTaskChunkSource(CallbackInfo ci) {
 		rsmm$swapTickTask(TickTask.CHUNK_SOURCE);
+	}
+
+	@Inject(
+		method = "tick",
+		at = @At(
+			value = "INVOKE",
+			ordinal = 0,
+			target = "Lnet/minecraft/server/world/ServerWorld;doBlockEvents()V"
+		)
+	)
+	private void swapTickTaskBlockEventsEarly(CallbackInfo ci) {
+		rsmm$swapTickTask(TickTask.BLOCK_EVENTS_EARLY);
 	}
 
 	@Inject(
@@ -158,11 +168,12 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		method = "tick",
 		at = @At(
 			value = "INVOKE",
+			ordinal = 1,
 			target = "Lnet/minecraft/server/world/ServerWorld;doBlockEvents()V"
 		)
 	)
-	private void swapTickTaskBlockEvents(CallbackInfo ci) {
-		rsmm$swapTickTask(TickTask.BLOCK_EVENTS);
+	private void swapTickTaskBlockEventsLate(CallbackInfo ci) {
+		rsmm$swapTickTask(TickTask.BLOCK_EVENTS_LATE);
 	}
 
 	@Inject(
@@ -381,7 +392,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		method = "doBlockEvent",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;doEvent(Lnet/minecraft/world/World;IIIII)Z"
+			target = "Lnet/minecraft/block/Block;doEvent(Lnet/minecraft/world/World;IIIII)V"
 		)
 	)
 	private void logBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {

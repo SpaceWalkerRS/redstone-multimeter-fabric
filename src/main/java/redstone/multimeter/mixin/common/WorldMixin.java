@@ -155,18 +155,4 @@ public class WorldMixin implements TickTaskExecutor {
 			}
 		}
 	}
-
-	@Inject(
-		method = "updateNeighborComparators",
-		locals = LocalCapture.CAPTURE_FAILHARD,
-		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;IIII)V"
-		)
-	)
-	private void logComparatorUpdate(int neighborX, int neighborY, int neighborZ, int neighborBlock, CallbackInfo ci, int facing, int x, int z, int block) {
-		if (!isMultiplayer) {
-			((IServerWorld)this).getMultimeterServer().getMultimeter().logComparatorUpdate((World)(Object)this, x, neighborY, z);
-		}
-	}
 }

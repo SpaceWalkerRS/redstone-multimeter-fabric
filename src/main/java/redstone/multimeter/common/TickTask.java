@@ -41,7 +41,9 @@ public enum TickTask {
 	PLAYER_PING          (36, "player ping"          , PruneType.TREE),
 	SERVER_GUI           (37, "server gui"           , PruneType.TREE),
 	AUTOSAVE             (38, "autosave"             , PruneType.TREE),
-	PACKETS              (39, "packets"              , PruneType.TREE);
+	PACKETS              (39, "packets"              , PruneType.TREE),
+	BLOCK_EVENTS_EARLY   (40, "block events early"   , PruneType.BRANCH),
+	BLOCK_EVENTS_LATE    (41, "block events late"    , PruneType.BRANCH);
 
 	public static final TickTask[] ALL;
 

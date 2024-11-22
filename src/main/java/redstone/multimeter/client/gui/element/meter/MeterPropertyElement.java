@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Formatting;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -22,6 +21,7 @@ import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.element.button.TransparentToggleButton;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.util.Direction.Axis;
+import redstone.multimeter.util.Formatting;
 
 public class MeterPropertyElement extends AbstractParentElement {
 

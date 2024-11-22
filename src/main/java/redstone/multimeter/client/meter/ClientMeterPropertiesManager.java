@@ -164,7 +164,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		loadDefaultProperties(new String(DEFAULT_KEY));
 
 		for (Block block : Block.BY_ID) {
-			if (block != null) {
+			if (block != null && block.getTranslationKey() != null) {
 				String id = block.getTranslationKey().substring("tile.".length());
 				loadDefaultProperties(id);
 			}

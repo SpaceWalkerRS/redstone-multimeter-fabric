@@ -4,10 +4,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import net.minecraft.text.Formatting;
-
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.util.Formatting;
 
 public class ToggleButton extends Button {
 
