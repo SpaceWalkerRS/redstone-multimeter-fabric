@@ -1,7 +1,5 @@
 package redstone.multimeter.client.option;
 
-import net.minecraft.text.Text;
-
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.button.IButton;
@@ -49,7 +47,7 @@ public class IntegerOption extends Option<Integer> {
 		}
 
 		return new Slider(client, 0, 0, width, height, () -> {
-			return Text.literal(get().toString());
+			return get().toString();
 		}, () -> Tooltip.EMPTY, value -> {
 			set(min + (int)Math.round(range * value));
 		}, () -> {

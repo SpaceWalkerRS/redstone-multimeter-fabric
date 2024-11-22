@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -21,7 +20,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
@@ -50,7 +48,7 @@ public class Multimeter {
 
 	private final MultimeterServer server;
 	private final Map<String, ServerMeterGroup> meterGroups;
-	private final Map<UUID, ServerMeterGroup> subscriptions;
+	private final Map<String, ServerMeterGroup> subscriptions;
 	private final Set<ServerMeterGroup> activeMeterGroups;
 	private final Set<ServerMeterGroup> idleMeterGroups;
 	private final ServerMeterPropertiesManager meterPropertiesManager;
@@ -85,11 +83,11 @@ public class Multimeter {
 	}
 
 	public ServerMeterGroup getSubscription(ServerPlayerEntity player) {
-		return subscriptions.get(player.getUuid());
+		return subscriptions.get(player.getDisplayName());
 	}
 
 	public boolean hasSubscription(ServerPlayerEntity player) {
-		return subscriptions.containsKey(player.getUuid());
+		return subscriptions.containsKey(player.getDisplayName());
 	}
 
 	public boolean isOwnerOfSubscription(ServerPlayerEntity player) {
@@ -150,11 +148,11 @@ public class Multimeter {
 	}
 
 	private void notifyOwnerOfRemoval(ServerMeterGroup meterGroup) {
-		UUID ownerUuid = meterGroup.getOwner();
-		ServerPlayerEntity owner = server.getPlayerList().get(ownerUuid);
+		String ownerName = meterGroup.getOwner();
+		ServerPlayerEntity owner = server.getPlayerList().get(ownerName);
 
 		if (owner != null) {
-			Text message = Text.literal(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
+			String message = String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time);
 			server.sendMessage(owner, message, false);
 		}
 	}
@@ -188,7 +186,7 @@ public class Multimeter {
 
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
-				Text message = Text.literal(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
+				String message = String.format("meter limit (%d) reached!", options.meter_group.meter_limit);
 				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
@@ -263,7 +261,7 @@ public class Multimeter {
 			if (meterGroup.isOwnedBy(player)) {
 				setMeters(meterGroup, meters);
 			} else {
-				Text message = Text.literal(String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName()));
+				String message = String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName());
 				server.sendMessage(player, message, true);
 			}
 		}
@@ -309,10 +307,10 @@ public class Multimeter {
 	}
 
 	private void addSubscriberToMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
-		UUID playerUuid = player.getUuid();
+		String playerName = player.getDisplayName();
 
-		subscriptions.put(playerUuid, meterGroup);
-		meterGroup.addSubscriber(playerUuid);
+		subscriptions.put(playerName, meterGroup);
+		meterGroup.addSubscriber(playerName);
 
 		if (meterGroup.updateIdleState()) {
 			activeMeterGroups.add(meterGroup);
@@ -336,10 +334,10 @@ public class Multimeter {
 	}
 
 	private void removeSubscriberFromMeterGroup(ServerMeterGroup meterGroup, ServerPlayerEntity player) {
-		UUID playerUuid = player.getUuid();
+		String playerName = player.getDisplayName();
 
-		subscriptions.remove(playerUuid, meterGroup);
-		meterGroup.removeSubscriber(playerUuid);
+		subscriptions.remove(playerName, meterGroup);
+		meterGroup.removeSubscriber(playerName);
 
 		if (meterGroup.updateIdleState()) {
 			activeMeterGroups.remove(meterGroup);
@@ -360,42 +358,42 @@ public class Multimeter {
 	}
 
 	public void clearMembersOfMeterGroup(ServerMeterGroup meterGroup) {
-		for (UUID playerUuid : meterGroup.getMembers()) {
-			removeMemberFromMeterGroup(meterGroup, playerUuid);
+		for (String playerName : meterGroup.getMembers()) {
+			removeMemberFromMeterGroup(meterGroup, playerName);
 		}
 	}
 
-	public void addMemberToMeterGroup(ServerMeterGroup meterGroup, UUID playerUuid) {
-		if (meterGroup.hasMember(playerUuid) || meterGroup.isOwnedBy(playerUuid)) {
+	public void addMemberToMeterGroup(ServerMeterGroup meterGroup, String playerName) {
+		if (meterGroup.hasMember(playerName) || meterGroup.isOwnedBy(playerName)) {
 			return;
 		}
 
-		ServerPlayerEntity player = server.getPlayerList().get(playerUuid);
+		ServerPlayerEntity player = server.getPlayerList().get(playerName);
 
 		if (player == null) {
 			return;
 		}
 
-		meterGroup.addMember(playerUuid);
+		meterGroup.addMember(playerName);
 
-		Text message = Text.literal(String.format("You have been invited to meter group \'%s\' - run \'/metergroup subscribe %s\' to subscribe to it.", meterGroup.getName(), meterGroup.getName()));
+		String message = String.format("You have been invited to meter group \'%s\' - run \'/metergroup subscribe %s\' to subscribe to it.", meterGroup.getName(), meterGroup.getName());
 		server.sendMessage(player, message, false);
 	}
 
-	public void removeMemberFromMeterGroup(ServerMeterGroup meterGroup, UUID playerUuid) {
-		if (!meterGroup.hasMember(playerUuid)) {
+	public void removeMemberFromMeterGroup(ServerMeterGroup meterGroup, String playerName) {
+		if (!meterGroup.hasMember(playerName)) {
 			return;
 		}
 
-		meterGroup.removeMember(playerUuid);
+		meterGroup.removeMember(playerName);
 
 		if (meterGroup.isPrivate()) {
-			ServerPlayerEntity player = server.getPlayerList().get(playerUuid);
+			ServerPlayerEntity player = server.getPlayerList().get(playerName);
 
-			if (player != null && meterGroup.hasSubscriber(playerUuid)) {
+			if (player != null && meterGroup.hasSubscriber(playerName)) {
 				unsubscribeFromMeterGroup(meterGroup, player);
 
-				Text message = Text.literal(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
+				String message = String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName());
 				server.sendMessage(player, message, false);
 			}
 		}
@@ -416,7 +414,7 @@ public class Multimeter {
 
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
-			Text message = Text.literal("This server does not allow meter teleporting!");
+			String message = "This server does not allow meter teleporting!";
 			server.sendMessage(player, message, false);
 
 			return;
@@ -445,7 +443,7 @@ public class Multimeter {
 					player.teleportToDimension(newWorld.dimension.id);
 					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
-					Text text = Text.literal(String.format("Teleported to meter \"%s\"", meter.getName()));
+					String text = String.format("Teleported to meter \"%s\"", meter.getName());
 					server.sendMessage(player, text, false);
 				}
 			}

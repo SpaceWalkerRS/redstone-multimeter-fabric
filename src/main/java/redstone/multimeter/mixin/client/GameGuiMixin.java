@@ -9,15 +9,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GameGui;
-
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
+import redstone.multimeter.interfaces.mixin.IGameGui;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
 @Mixin(GameGui.class)
-public class GameGuiMixin {
+public class GameGuiMixin implements IGameGui {
 
 	@Shadow @Final private Minecraft minecraft;
+	@Shadow private String overlayMessage;
+	@Shadow private int overlayMessageTimer;
+	@Shadow private boolean overlayMessageTinted;
 
 	@Inject(
 		method = "render",
@@ -33,5 +36,12 @@ public class GameGuiMixin {
 		if (client.isHudActive() && !hud.isOnScreen()) {
 			hud.render();
 		}
+	}
+
+	@Override
+	public void setOverlayMessage(String message, boolean tinted) {
+		overlayMessage = message;
+		overlayMessageTimer = 60;
+		overlayMessageTinted = tinted;
 	}
 }

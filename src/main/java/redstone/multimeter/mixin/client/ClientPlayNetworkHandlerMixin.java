@@ -1,6 +1,6 @@
 package redstone.multimeter.mixin.client;
 
-import java.io.DataInput;
+import java.io.DataInputStream;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -60,7 +60,7 @@ public class ClientPlayNetworkHandlerMixin {
 	)
 	private void handleCustomPayload(CustomPayloadPacket packet, CallbackInfo ci) {
 		if (Packets.getChannel().equals(packet.channel)) {
-			DataInput input = DataStreams.input(packet.data);
+			DataInputStream input = DataStreams.input(packet.data);
 			((IMinecraft)minecraft).getMultimeterClient().getPacketHandler().handlePacket(input);
 
 			ci.cancel();

@@ -5,7 +5,6 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Formatting;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.Tooltip;
@@ -275,10 +274,10 @@ public class MeterListRenderer extends AbstractElement {
 	}
 
 	private void drawName(Meter meter, int x, int y, int color) {
-		Text name = Text.literal(meter.getName());
+		String name = meter.getName();
 
 		if (meter.isHidden()) {
-			name.setFormatting(Formatting.GRAY, Formatting.ITALIC);
+			name = "" + Formatting.GRAY + Formatting.ITALIC + name;
 		}
 
 		hud.renderer.renderText(name, x, y, color);

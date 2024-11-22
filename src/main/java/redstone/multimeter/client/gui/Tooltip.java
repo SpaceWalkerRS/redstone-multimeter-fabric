@@ -5,19 +5,18 @@ import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Text;
 
 public class Tooltip {
 
 	public static final Tooltip EMPTY = new Tooltip();
 
-	private final List<Text> lines;
+	private final List<String> lines;
 
-	public Tooltip(Text... lines) {
+	public Tooltip(String... lines) {
 		this.lines = new ArrayList<>();
 
 		if (lines != null && lines.length > 0) {
-			for (Text line : lines) {
+			for (String line : lines) {
 				this.lines.add(line);
 			}
 		}
@@ -27,16 +26,11 @@ public class Tooltip {
 		return this == EMPTY || lines.isEmpty();
 	}
 
-	public List<Text> getLines() {
+	public List<String> getLines() {
 		return Collections.unmodifiableList(lines);
 	}
 
 	public Tooltip add(String line) {
-		add(Text.literal(line));
-		return this;
-	}
-
-	public Tooltip add(Text line) {
 		if (this == EMPTY) {
 			throw new UnsupportedOperationException("cannot add more lines to the EMPTY tooltip!");
 		}
@@ -48,8 +42,8 @@ public class Tooltip {
 		int width = 0;
 
 		for (int index = 0; index < lines.size(); index++) {
-			Text text = lines.get(index);
-			int lineWidth = textRenderer.getWidth(text.buildString(true));
+			String text = lines.get(index);
+			int lineWidth = textRenderer.getWidth(text);
 
 			if (lineWidth > width) {
 				width = lineWidth;
@@ -63,21 +57,7 @@ public class Tooltip {
 		return (lines.size() - 1) * (textRenderer.fontHeight + 1) + textRenderer.fontHeight;
 	}
 
-	public static Tooltip of(String... strings) {
-		if (strings == null || strings.length == 0) {
-			return EMPTY;
-		}
-
-		Text[] lines = new Text[strings.length];
-
-		for (int index = 0; index < strings.length; index++) {
-			lines[index] = Text.literal(strings[index]);
-		}
-
-		return new Tooltip(lines);
-	}
-
-	public static Tooltip of(Text... lines) {
+	public static Tooltip of(String... lines) {
 		if (lines == null || lines.length == 0) {
 			return EMPTY;
 		}
@@ -85,12 +65,12 @@ public class Tooltip {
 		return new Tooltip(lines);
 	}
 
-	public static Tooltip of(List<Text> text) {
+	public static Tooltip of(List<String> text) {
 		if (text == null || text.isEmpty()) {
 			return EMPTY;
 		}
 
-		Text[] lines = new Text[text.size()];
+		String[] lines = new String[text.size()];
 
 		for (int index = 0; index < text.size(); index++) {
 			lines[index] = text.get(index);

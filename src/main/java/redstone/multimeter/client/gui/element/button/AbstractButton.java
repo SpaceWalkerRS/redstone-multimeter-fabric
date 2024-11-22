@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
@@ -16,20 +15,20 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 
 	protected final MultimeterClient client;
 	protected final TextRenderer textRenderer;
-	private final Supplier<Text> messageSupplier;
+	private final Supplier<String> messageSupplier;
 	private final Supplier<Tooltip> tooltipSupplier;
 
 	private boolean active;
 	private boolean hovered;
-	private Text message;
+	private String message;
 
 	private boolean moved;
 
-	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip) {
+	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<String> message, Supplier<Tooltip> tooltip) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip);
 	}
 
-	protected AbstractButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip) {
+	protected AbstractButton(MultimeterClient client, int x, int y, int width, int height, Supplier<String> message, Supplier<Tooltip> tooltip) {
 		super(x, y, width, height);
 
 		Minecraft minecraft = client.getMinecraft();
@@ -98,12 +97,12 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 
 	@Override
-	public Text getMessage() {
+	public String getMessage() {
 		return message;
 	}
 
 	@Override
-	public void setMessage(Text message) {
+	public void setMessage(String message) {
 		this.message = message;
 	}
 
@@ -186,7 +185,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 
 	protected void renderButtonMessage() {
-		Text message = getMessage();
+		String message = getMessage();
 
 		if (message != null) {
 			int x = getMessageX(message);
@@ -197,7 +196,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 		}
 	}
 
-	protected int getMessageX(Text message) {
+	protected int getMessageX(String message) {
 		return getX() + getWidth() - (getWidth() + textWidth(textRenderer, message)) / 2;
 	}
 

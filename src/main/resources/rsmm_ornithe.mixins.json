@@ -16,7 +16,6 @@
 		"common.ServerPlayNetworkHandlerMixin",
 		"common.ServerPlayerInteractionManagerMixin",
 		"common.ServerWorldMixin",
-		"common.TextMixin",
 		"common.WorldChunkMixin",
 		"common.WorldMixin",
 		"common.meterable.ButtonBlockMixin",

@@ -1,14 +1,11 @@
 package redstone.multimeter.client.gui.element.button;
 
-import net.minecraft.client.resource.Identifier;
-import net.minecraft.text.Text;
-
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.Element;
 
 public interface IButton extends Element {
 
-	public static final Identifier CLICK_SOUND = new Identifier("gui.button.press");
+	public static final String CLICK_SOUND = "random.click";
 
 	public static final int DEFAULT_WIDTH = 150;
 	public static final int DEFAULT_HEIGHT = 20;
@@ -19,15 +16,11 @@ public interface IButton extends Element {
 
 	public boolean isHovered();
 
-	public Text getMessage();
+	public String getMessage();
 
-	public void setMessage(Text message);
-
-	default void setMessage(String message) {
-		setMessage(Text.literal(message));
-	}
+	public void setMessage(String message);
 
 	public static void playClickSound(MultimeterClient client) {
-		client.getMinecraft().soundSystem.play("random.click", 1.0F, 1.0F);
+		client.getMinecraft().soundSystem.play(CLICK_SOUND, 1.0F, 1.0F);
 	}
 }

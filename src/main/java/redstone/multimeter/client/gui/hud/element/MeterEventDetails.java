@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.text.Text;
-
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.Directionality;
@@ -46,7 +44,7 @@ public class MeterEventDetails extends AbstractElement {
 
 	private void renderEventDetails(EventLog event) {
 		Tooltip tooltip = event.getTooltip();
-		List<Text> lines = tooltip.getLines();
+		List<String> lines = tooltip.getLines();
 
 		int x = 0;
 		int y = 0;
@@ -79,9 +77,9 @@ public class MeterEventDetails extends AbstractElement {
 		int textY = y + 4;
 
 		for (int index = 0; index < lines.size(); index++) {
-			Text line = lines.get(index);
+			String line = lines.get(index);
 
-			int lineX = textX + (leftToRight ? 0 : (width - 8) - hud.textRenderer.getWidth(line.buildString(true)));
+			int lineX = textX + (leftToRight ? 0 : (width - 8) - hud.textRenderer.getWidth(line));
 			int lineY = textY + (topToBottom ? 1 : -1) * (index + (topToBottom ? 0 : 1)) * (hud.textRenderer.fontHeight + 1) + (topToBottom ? 0 : (height - 4));
 
 			hud.renderer.renderText(line, lineX, lineY, 0xFFFFFFFF);

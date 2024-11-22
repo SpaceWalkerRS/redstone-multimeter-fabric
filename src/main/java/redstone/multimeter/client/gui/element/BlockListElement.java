@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.texture.TextureManager;
-import net.minecraft.client.resource.Identifier;
 import net.minecraft.item.ItemStack;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -22,18 +21,18 @@ public class BlockListElement extends SelectableScrollableListElement {
 	private final TextureManager textureManager;
 	private final ItemRenderer itemRenderer;
 	private final TextRenderer textRenderer;
-	private final Consumer<Identifier> selectionListener;
+	private final Consumer<String> selectionListener;
 
-	public BlockListElement(MultimeterClient client, int width, int height, Consumer<Identifier> selector) {
+	public BlockListElement(MultimeterClient client, int width, int height, Consumer<String> selector) {
 		this(client, width, height, 0, 0, selector);
 	}
 
-	public BlockListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder, Consumer<Identifier> selectionListener) {
+	public BlockListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder, Consumer<String> selectionListener) {
 		super(client, width, height, topBorder, bottomBorder);
 
 		Minecraft minecraft = this.client.getMinecraft();
 
-		this.textureManager = minecraft.getTextureManager();
+		this.textureManager = minecraft.textureManager;
 		this.itemRenderer = new ItemRenderer();
 		this.textRenderer = minecraft.textRenderer;
 		this.selectionListener = selectionListener;
@@ -60,17 +59,17 @@ public class BlockListElement extends SelectableScrollableListElement {
 		}
 	}
 
-	public void add(Identifier key) {
+	public void add(String key) {
 		addChild(new BlockListEntry(getEffectiveWidth(), IButton.DEFAULT_HEIGHT, key));
 	}
 
-	public void add(Collection<Identifier> keys) {
-		for (Identifier key : keys) {
+	public void add(Collection<String> keys) {
+		for (String key : keys) {
 			add(key);
 		}
 	}
 
-	public void setBlockFilter(Predicate<Identifier> filter) {
+	public void setBlockFilter(Predicate<String> filter) {
 		setFilter(e -> {
 			if (e instanceof BlockListEntry) {
 				BlockListEntry entry = (BlockListEntry)e;
@@ -83,11 +82,11 @@ public class BlockListElement extends SelectableScrollableListElement {
 
 	private class BlockListEntry extends AbstractElement {
 
-		private final Identifier key;
+		private final String key;
 		private final Block block;
 		private final ItemStack stack;
 
-		protected BlockListEntry(int width, int height, Identifier key) {
+		protected BlockListEntry(int width, int height, String key) {
 			super(0, 0, width, height);
 
 			Block block = null;
@@ -96,7 +95,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 				if (b != null) {
 					String id = b.getTranslationKey().substring("tile.".length());
 
-					if (id.equals(key.getPath())) {
+					if (id.equals(key)) {
 						block = b;
 					}
 				}

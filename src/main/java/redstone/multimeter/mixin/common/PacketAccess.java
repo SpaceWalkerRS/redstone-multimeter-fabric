@@ -1,6 +1,6 @@
 package redstone.multimeter.mixin.common;
 
-import java.io.DataOutput;
+import java.io.DataOutputStream;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -12,7 +12,7 @@ import net.minecraft.network.packet.Packet;
 public interface PacketAccess {
 
 	@Invoker("writeCompound")
-	static void rsmm$writeCompound(NbtCompound nbt, DataOutput output) {
+	static void rsmm$writeCompound(NbtCompound nbt, DataOutputStream output) {
 		throw new UnsupportedOperationException();
 	}
 }

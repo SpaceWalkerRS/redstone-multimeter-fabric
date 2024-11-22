@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -23,7 +22,7 @@ public class TextElement extends AbstractElement {
 	private final Supplier<Tooltip> tooltipSupplier;
 	private final MousePress<TextElement> mousePress;
 
-	private List<Text> text;
+	private List<String> text;
 	private int spacing;
 	private boolean rightAligned;
 	private boolean withShadow;
@@ -64,7 +63,7 @@ public class TextElement extends AbstractElement {
 		int textY = getY();
 
 		for (int i = 0; i < text.size(); i++) {
-			Text t = text.get(i);
+			String t = text.get(i);
 			int textX = rightAligned ? right - textWidth(textRenderer, t) : left;
 			renderText(textRenderer, t, textX, textY, withShadow, color);
 
@@ -136,25 +135,16 @@ public class TextElement extends AbstractElement {
 	}
 
 	public TextElement add(String text) {
-		return add(Text.literal(text));
-	}
-
-	public TextElement add(Text text) {
 		this.text.add(text);
 		return this;
 	}
 
-	public TextElement setText(List<Text> text) {
+	public TextElement setText(List<String> text) {
 		this.text = text;
 		return this;
 	}
 
 	public TextElement setText(String text) {
-		this.text = Arrays.asList(Text.literal(text));
-		return this;
-	}
-
-	public TextElement setText(Text text) {
 		this.text = Arrays.asList(text);
 		return this;
 	}
@@ -183,7 +173,7 @@ public class TextElement extends AbstractElement {
 		int width = 0;
 
 		for (int index = 0; index < text.size(); index++) {
-			Text t = text.get(index);
+			String t = text.get(index);
 			int textWidth = textWidth(textRenderer, t);
 
 			if (textWidth > width) {

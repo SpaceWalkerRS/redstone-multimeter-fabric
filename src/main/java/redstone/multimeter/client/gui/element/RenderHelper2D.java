@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
@@ -118,7 +117,7 @@ public class RenderHelper2D {
 	}
 
 	protected void renderTexture(Texture texture, Drawer drawer) {
-		Minecraft.getInstance().getTextureManager().bind(texture.location);
+		Minecraft.getInstance().textureManager.bind(texture.location);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
@@ -168,7 +167,7 @@ public class RenderHelper2D {
 	}
 
 	protected void renderTextureColor(Texture texture, Drawer drawer) {
-		Minecraft.getInstance().getTextureManager().bind(texture.location);
+		Minecraft.getInstance().textureManager.bind(texture.location);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
@@ -223,19 +222,8 @@ public class RenderHelper2D {
 		bufferBuilder.vertex(x1, y0, z, u1, v0);
 	}
 
-	protected int textWidth(TextRenderer textRenderer, Text text) {
-		return textRenderer.getWidth(text.buildString(true));
-	}
-
-	protected void renderText(TextRenderer textRenderer, Text text, int x, int y, boolean shadow, int color) {
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-		if (shadow) {
-			textRenderer.drawWithShadow(text.buildString(true), x, y, color);
-		} else {
-			textRenderer.draw(text.buildString(true), x, y, color);
-		}
+	protected int textWidth(TextRenderer textRenderer, String text) {
+		return textRenderer.getWidth(text);
 	}
 
 	protected void renderText(TextRenderer textRenderer, String text, int x, int y, boolean shadow, int color) {

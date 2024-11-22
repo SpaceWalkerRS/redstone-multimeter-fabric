@@ -1,12 +1,10 @@
 package redstone.multimeter.server;
 
 import java.nio.file.Path;
-import java.util.UUID;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.Dimension;
 
@@ -126,8 +124,6 @@ public class MultimeterServer {
 			if (shouldBuildTickPhaseTree()) {
 				tickPhaseTree.start();
 			}
-
-			playerList.tick();
 		}
 
 		tickPhase = TickPhase.UNKNOWN;
@@ -155,7 +151,7 @@ public class MultimeterServer {
 	}
 
 	public void onHandshake(ServerPlayerEntity player, String modVersion) {
-		if (!playerList.has(player.getUuid())) {
+		if (!playerList.has(player.getDisplayName())) {
 			playerList.add(player);
 
 			HandshakePacket packet = new HandshakePacket();
@@ -221,17 +217,17 @@ public class MultimeterServer {
 		return playerList;
 	}
 
-	public boolean isMultimeterClient(UUID uuid) {
-		return playerList.has(uuid);
+	public boolean isMultimeterClient(String playerName) {
+		return playerList.has(playerName);
 	}
 
 	public boolean isMultimeterClient(ServerPlayerEntity player) {
-		return playerList.has(player.getUuid());
+		return playerList.has(player.getDisplayName());
 	}
 
-	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
+	public void sendMessage(ServerPlayerEntity player, String message, boolean actionBar) {
 		if (actionBar) {
-			message = Text.literal(TextUtils.ACTION_BAR_KEY).append(message);
+			message = TextUtils.ACTION_BAR_KEY + message;
 		}
 
 		player.sendMessage(message);

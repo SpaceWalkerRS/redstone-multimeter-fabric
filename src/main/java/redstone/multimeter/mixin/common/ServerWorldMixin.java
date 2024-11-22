@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import com.llamalad7.mixinextras.sugar.Local;
+
 import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockEvent;
@@ -305,13 +307,12 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 
 	@Inject(
 		method = "doScheduledTicks",
-		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/block/Block;tick(Lnet/minecraft/world/World;IIILjava/util/Random;)V"
 		)
 	)
-	private void logScheduledTick(boolean debug, CallbackInfoReturnable<Boolean> cir, Iterator<ScheduledTick> scheduledTicksThisTick, ScheduledTick scheduledTick) {
+	private void logScheduledTick(boolean debug, CallbackInfoReturnable<Boolean> cir, @Local ScheduledTick scheduledTick) {
 		getMultimeter().logScheduledTick(this, scheduledTick.x, scheduledTick.y, scheduledTick.z, scheduledTick.priority, false);
 	}
 

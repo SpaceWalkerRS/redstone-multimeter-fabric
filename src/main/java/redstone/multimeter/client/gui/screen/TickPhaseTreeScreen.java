@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.screen;
 
-import net.minecraft.text.Text;
+import net.minecraft.locale.LanguageManager;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -18,7 +18,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 	private long lastRequestTime;
 
 	public TickPhaseTreeScreen(MultimeterClient client) {
-		super(client, Text.literal("Tick Phases"), true);
+		super(client, "Tick Phases", true);
 
 		this.tickPhaseTree = this.client.getTickPhaseTree();
 		this.lastRequestTime = -1;
@@ -60,7 +60,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			x = getX() + (getWidth() - IButton.DEFAULT_WIDTH) / 2;
 			y = getY() + getHeight() - (8 + IButton.DEFAULT_HEIGHT);
 
-			IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> Text.translatable("gui.done"), () -> Tooltip.EMPTY, button -> {
+			IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> LanguageManager.getInstance().translate("gui.done"), () -> Tooltip.EMPTY, button -> {
 				close();
 				return true;
 			});
@@ -85,11 +85,11 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			x = getX() + getWidth() / 2;
 			y = getY() + getHeight() - (IButton.DEFAULT_HEIGHT + 8);
 
-			IButton rebuild = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> Text.literal("Refresh"), () -> Tooltip.EMPTY, button -> {
+			IButton rebuild = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> "Refresh", () -> Tooltip.EMPTY, button -> {
 				rebuild();
 				return true;
 			});
-			IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> Text.translatable("gui.done"), () -> Tooltip.EMPTY, button -> {
+			IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> LanguageManager.getInstance().translate("gui.done"), () -> Tooltip.EMPTY, button -> {
 				close();
 				return true;
 			});

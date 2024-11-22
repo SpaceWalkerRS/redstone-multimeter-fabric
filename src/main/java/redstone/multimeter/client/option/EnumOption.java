@@ -1,7 +1,6 @@
 package redstone.multimeter.client.option;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
@@ -29,7 +28,7 @@ public class EnumOption<T extends Enum<T> & Cyclable<T>> extends Option<T> {
 
 	@Override
 	public IButton createControl(MultimeterClient client, int width, int height) {
-		return new Button(client, 0, 0, width, height, () -> Text.literal(get().getName()), () -> Tooltip.EMPTY, button -> {
+		return new Button(client, 0, 0, width, height, () -> get().getName(), () -> Tooltip.EMPTY, button -> {
 			cycle(!Screen.isShiftDown());
 			return true;
 		});

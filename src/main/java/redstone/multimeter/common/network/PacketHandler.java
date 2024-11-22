@@ -1,6 +1,6 @@
 package redstone.multimeter.common.network;
 
-import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 import net.minecraft.nbt.NbtCompound;
@@ -36,7 +36,7 @@ public abstract class PacketHandler {
 
 	protected abstract Packet toCustomPayload(String channel, byte[] data);
 
-	protected RSMMPacket decode(DataInput input) throws IOException {
+	protected RSMMPacket decode(DataInputStream input) throws IOException {
 		String key = Packet.readString(input, 32767);
 		RSMMPacket packet = Packets.create(key);
 

@@ -9,7 +9,6 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
@@ -22,12 +21,12 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	protected final Minecraft minecraft;
 	protected final TextRenderer textRenderer;
 
-	private final Text title;
+	private final String title;
 	private final boolean drawTitle;
 
 	protected ScreenWrapper wrapper;
 
-	protected RSMMScreen(MultimeterClient client, Text title, boolean drawTitle) {
+	protected RSMMScreen(MultimeterClient client, String title, boolean drawTitle) {
 		this.client = client;
 		this.minecraft = client.getMinecraft();
 		this.textRenderer = this.minecraft.textRenderer;
@@ -152,7 +151,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	protected void drawTooltip(Tooltip tooltip, int mouseX, int mouseY) {
-		List<Text> lines = tooltip.getLines();
+		List<String> lines = tooltip.getLines();
 
 		int width = tooltip.getWidth(textRenderer) + 8;
 		int height = tooltip.getHeight(textRenderer) + 8;
@@ -170,7 +169,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		drawTooltip(lines, x, y, width, height);
 	}
 
-	private void drawTooltip(List<Text> lines, int x, int y, int width, int height) {
+	private void drawTooltip(List<String> lines, int x, int y, int width, int height) {
 		int backgroundColor = 0xF0100010;
 		int borderColor0 = 0x505000FF;
 		int borderColor1 = 0x5028007F;
@@ -195,7 +194,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		int textY = y + 4;
 
 		for (int i = 0; i < lines.size(); i++) {
-			Text line = lines.get(i);
+			String line = lines.get(i);
 			renderText(textRenderer, line, textX, textY, true, 0xFFFFFFFF);
 
 			textY += textRenderer.fontHeight + 1;
@@ -204,7 +203,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		GL11.glPopMatrix();
 	}
 
-	public Text getTitle() {
+	public String getTitle() {
 		return title;
 	}
 

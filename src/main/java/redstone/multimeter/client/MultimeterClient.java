@@ -7,7 +7,6 @@ import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Formatting;
-import net.minecraft.text.Text;
 import net.minecraft.world.HitResult;
 import net.minecraft.world.World;
 
@@ -246,7 +245,7 @@ public class MultimeterClient {
 			connected = true;
 
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = Text.literal(VERSION_WARNING.apply(modVersion)).setFormatting(Formatting.RED);
+				String warning = Formatting.RED + VERSION_WARNING.apply(modVersion);
 				sendMessage(warning, false);
 			}
 
@@ -262,7 +261,7 @@ public class MultimeterClient {
 		String name = Options.RedstoneMultimeter.DEFAULT_METER_GROUP.get();
 
 		if (!MeterGroup.isValidName(name)) {
-			name = minecraft.getSession().getUsername();
+			name = minecraft.session.username;
 		}
 
 		subscribeToMeterGroup(name);
@@ -375,7 +374,7 @@ public class MultimeterClient {
 			hudEnabled = !hudEnabled;
 
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(Text.literal(message), true);
+			sendMessage(message, true);
 		}
 	}
 
@@ -410,9 +409,9 @@ public class MultimeterClient {
 		return screen != null && screen instanceof OptionsScreen;
 	}
 
-	public void sendMessage(Text message, boolean actionBar) {
+	public void sendMessage(String message, boolean actionBar) {
 		if (actionBar) {
-			minecraft.gui.setOverlayMessage(message.buildString(false), false);
+			minecraft.gui.setOverlayMessage(message, false);
 		} else {
 			minecraft.player.sendMessage(message);
 		}

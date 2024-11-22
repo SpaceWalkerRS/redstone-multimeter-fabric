@@ -10,10 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,7 +24,6 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.client.resource.Identifier;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -44,14 +41,15 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	private static final String PROPERTIES_PATH = "meter/default_properties";
 	private static final String RESOURCES_PATH = String.format("/assets/%s/%s", RedstoneMultimeterMod.NAMESPACE, PROPERTIES_PATH);
 	private static final String FILE_EXTENSION = ".json";
+	private static final String MINECRAFT_NAMESPACE = "minecraft";
 	private static final String DEFAULT_KEY = "block";
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 	private final MultimeterClient client;
 	private final Path dir;
-	private final Map<Identifier, MeterProperties> defaults;
-	private final Map<Identifier, MeterProperties> overrides;
-	private final Map<Identifier, MeterProperties> cache;
+	private final Map<String, MeterProperties> defaults;
+	private final Map<String, MeterProperties> overrides;
+	private final Map<String, MeterProperties> cache;
 
 	public ClientMeterPropertiesManager(MultimeterClient client) {
 		this.client = client;
@@ -114,22 +112,22 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	public Map<Identifier, MeterProperties> getDefaults() {
+	public Map<String, MeterProperties> getDefaults() {
 		return Collections.unmodifiableMap(defaults);
 	}
 
-	public Map<Identifier, MeterProperties> getOverrides() {
+	public Map<String, MeterProperties> getOverrides() {
 		return Collections.unmodifiableMap(overrides);
 	}
 
-	public <T extends MeterProperties> void update(Map<Identifier, T> newOverrides) {
-		Map<Identifier, MeterProperties> prev = new HashMap<>(overrides);
+	public <T extends MeterProperties> void update(Map<String, T> newOverrides) {
+		Map<String, MeterProperties> prev = new HashMap<>(overrides);
 
 		overrides.clear();
 		cache.clear();
 
-		for (Entry<Identifier, T> entry : newOverrides.entrySet()) {
-			Identifier key = entry.getKey();
+		for (Entry<String, T> entry : newOverrides.entrySet()) {
+			String key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			prev.remove(key);
@@ -138,7 +136,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 		save();
 
-		for (Identifier key : prev.keySet()) {
+		for (String key : prev.keySet()) {
 			deleteOverrideFile(key);
 		}
 	}
@@ -150,39 +148,31 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			return null; // we should never get here
 		}
 
-		Identifier key = new Identifier(id);
-
-		return cache.computeIfAbsent(key, _key -> {
-			String namespace = key.getNamespace();
-			Identifier defaultKey = new Identifier(namespace, DEFAULT_KEY);
+		return cache.computeIfAbsent(id, _key -> {
+			String defaultId = DEFAULT_KEY;
 
 			return new MutableMeterProperties().
-				fill(overrides.get(key)).
-				fill(defaults.get(key)).
-				fill(overrides.get(defaultKey)).
-				fill(defaults.get(defaultKey)).
+				fill(overrides.get(id)).
+				fill(defaults.get(id)).
+				fill(overrides.get(defaultId)).
+				fill(defaults.get(defaultId)).
 				immutable();
 		});
 	}
 
 	private void initDefaults() {
-		Set<String> namespaces = new HashSet<>();
+		loadDefaultProperties(new String(DEFAULT_KEY));
 
 		for (Block block : Block.BY_ID) {
 			if (block != null) {
 				String id = block.getTranslationKey().substring("tile.".length());
-				Identifier key = new Identifier(id);
-				loadDefaultProperties(key);
-
-				if (namespaces.add(key.getNamespace())) {
-					loadDefaultProperties(new Identifier(key.getNamespace(), DEFAULT_KEY));
-				}
+				loadDefaultProperties(id);
 			}
 		}
 	}
 
-	private void loadDefaultProperties(Identifier key) {
-		String path = String.format("%s/%s/%s%s", RESOURCES_PATH, key.getNamespace(), key.getPath(), FILE_EXTENSION);
+	private void loadDefaultProperties(String key) {
+		String path = String.format("%s/%s/%s%s", RESOURCES_PATH, MINECRAFT_NAMESPACE, key, FILE_EXTENSION);
 		InputStream resource = getClass().getResourceAsStream(path);
 
 		if (resource == null) {
@@ -220,14 +210,14 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			return;
 		}
 
-		path = path.substring(0, path.length() - FILE_EXTENSION.length());
+		String id = path.substring(0, path.length() - FILE_EXTENSION.length());
 
 		try (BufferedReader br = Files.newBufferedReader(file)) {
-			loadProperties(overrides, new Identifier(namespace, path), br);
+			loadProperties(overrides, id, br);
 		}
 	}
 
-	private static void loadProperties(Map<Identifier, MeterProperties> map, Identifier key, Reader reader) {
+	private static void loadProperties(Map<String, MeterProperties> map, String key, Reader reader) {
 		JsonElement rawJson = GSON.fromJson(reader, JsonElement.class);
 
 		if (rawJson.isJsonObject()) {
@@ -240,8 +230,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 	public void save() {
 		try {
-			for (Entry<Identifier, MeterProperties> entry : overrides.entrySet()) {
-				Identifier key = entry.getKey();
+			for (Entry<String, MeterProperties> entry : overrides.entrySet()) {
+				String key = entry.getKey();
 				MeterProperties properties = entry.getValue();
 
 				saveUserOverrides(key, properties);
@@ -251,9 +241,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	private void saveUserOverrides(Identifier key, MeterProperties properties) throws Exception {
-		String namespace = key.getNamespace();
-		String path = key.getPath();
+	private void saveUserOverrides(String key, MeterProperties properties) throws Exception {
+		String namespace = MINECRAFT_NAMESPACE;
 
 		Path dirForNamespace = dir.resolve(namespace);
 
@@ -264,10 +253,10 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			throw new IOException("Unable to save properties for \'" + key.toString() + "\' - the \'" + namespace + "\' folder does not exist and cannot be created!");
 		}
 
-		Path file = dirForNamespace.resolve(String.format("%s%s", path, FILE_EXTENSION));
+		Path file = dirForNamespace.resolve(String.format("%s%s", key, FILE_EXTENSION));
 
 		if (Files.exists(file) && !Files.isRegularFile(file)) {
-			RedstoneMultimeterMod.LOGGER.warn("Unable to save properties for \'" + key.toString() + "\' - the \'" + path + "\' file does not exist and cannot be created!");
+			RedstoneMultimeterMod.LOGGER.warn("Unable to save properties for \'" + key.toString() + "\' - the \'" + key + "\' file does not exist and cannot be created!");
 			return;
 		}
 
@@ -278,13 +267,12 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	private void deleteOverrideFile(Identifier key) {
-		String namespace = key.getNamespace();
-		String path = key.getPath();
+	private void deleteOverrideFile(String key) {
+		String namespace = MINECRAFT_NAMESPACE;
 
 		try {
 			Path folder = dir.resolve(namespace);
-			Path file = folder.resolve(String.format("%s%s", path, FILE_EXTENSION));
+			Path file = folder.resolve(String.format("%s%s", key, FILE_EXTENSION));
 
 			Files.deleteIfExists(file);
 		} catch (IOException e) {

@@ -15,7 +15,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.handler.ClientNetworkHandler;
-import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Connection;
 import net.minecraft.network.LocalConnection;
@@ -43,18 +42,6 @@ public class MinecraftMixin implements IMinecraft {
 	private void init(CallbackInfo ci) {
 		this.multimeterClient = new MultimeterClient((Minecraft)(Object)this);
 		this.multimeterClient.onStartup();
-	}
-
-	@Inject(
-		method = "reloadResources()V",
-		at = @At(
-			value = "HEAD"
-		)
-	)
-	private void reloadResources(CallbackInfo ci) {
-		if (multimeterClient != null) {
-			multimeterClient.reloadResources();
-		}
 	}
 
 	@Inject(
@@ -129,7 +116,7 @@ public class MinecraftMixin implements IMinecraft {
 			target = "Lorg/lwjgl/input/Keyboard;getEventKey()I"
 		)
 	)
-	private int handleHotbarKeybinds(@Local int slot) {
+	private int handleHotbarKeybinds(@Local(ordinal = 0) int slot) {
 		return Keyboard.getEventKey() == 2 + slot && multimeterClient.getInputHandler().handleHotbarKeybinds(slot) ? -1 : Keyboard.getEventKey();
 	}
 

@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import com.google.common.base.Supplier;
 
@@ -34,9 +33,9 @@ public class ServerMeterGroup extends MeterGroup {
 	private final Multimeter multimeter;
 	private final ServerLogManager logManager;
 
-	private final UUID owner;
-	private final Set<UUID> members;
-	private final Set<UUID> subscribers;
+	private final String owner;
+	private final Set<String> members;
+	private final Set<String> subscribers;
 
 	private final List<Long> removedMeters;
 	private final Map<Long, MeterProperties> meterUpdates;
@@ -52,7 +51,7 @@ public class ServerMeterGroup extends MeterGroup {
 		this.multimeter = multimeter;
 		this.logManager = new ServerLogManager(this);
 
-		this.owner = owner.getUuid();
+		this.owner = owner.getDisplayName();
 		this.members = new HashSet<>();
 		this.subscribers = new HashSet<>();
 
@@ -152,40 +151,40 @@ public class ServerMeterGroup extends MeterGroup {
 		return limit >= 0 && getMeters().size() >= limit;
 	}
 
-	public UUID getOwner() {
+	public String getOwner() {
 		return owner;
 	}
 
 	public boolean isOwnedBy(ServerPlayerEntity player) {
-		return isOwnedBy(player.getUuid());
+		return isOwnedBy(player.getDisplayName());
 	}
 
-	public boolean isOwnedBy(UUID playerUuid) {
-		return owner.equals(playerUuid);
+	public boolean isOwnedBy(String playerName) {
+		return owner.equals(playerName);
 	}
 
 	public boolean hasMembers() {
 		return !members.isEmpty();
 	}
 
-	public Collection<UUID> getMembers() {
+	public Collection<String> getMembers() {
 		return Collections.unmodifiableCollection(members);
 	}
 
 	public boolean hasMember(ServerPlayerEntity player) {
-		return hasMember(player.getUuid());
+		return hasMember(player.getDisplayName());
 	}
 
-	public boolean hasMember(UUID playerUuid) {
-		return members.contains(playerUuid);
+	public boolean hasMember(String playerName) {
+		return members.contains(playerName);
 	}
 
-	public void addMember(UUID playerUuid) {
-		members.add(playerUuid);
+	public void addMember(String playerName) {
+		members.add(playerName);
 	}
 
-	public void removeMember(UUID playerUuid) {
-		members.remove(playerUuid);
+	public void removeMember(String playerName) {
+		members.remove(playerName);
 	}
 
 	public void clearMembers() {
@@ -196,24 +195,24 @@ public class ServerMeterGroup extends MeterGroup {
 		return !subscribers.isEmpty();
 	}
 
-	public Collection<UUID> getSubscribers() {
+	public Collection<String> getSubscribers() {
 		return Collections.unmodifiableCollection(subscribers);
 	}
 
 	public boolean hasSubscriber(ServerPlayerEntity player) {
-		return hasSubscriber(player.getUuid());
+		return hasSubscriber(player.getDisplayName());
 	}
 
-	public boolean hasSubscriber(UUID playerUuid) {
-		return subscribers.contains(playerUuid);
+	public boolean hasSubscriber(String playerName) {
+		return subscribers.contains(playerName);
 	}
 
-	public void addSubscriber(UUID playerUuid) {
-		subscribers.add(playerUuid);
+	public void addSubscriber(String playerName) {
+		subscribers.add(playerName);
 	}
 
-	public void removeSubscriber(UUID playerUuid) {
-		subscribers.remove(playerUuid);
+	public void removeSubscriber(String playerName) {
+		subscribers.remove(playerName);
 	}
 
 	public boolean isPrivate() {
@@ -224,9 +223,9 @@ public class ServerMeterGroup extends MeterGroup {
 		this.isPrivate = isPrivate;
 
 		if (isPrivate) {
-			for (UUID playerUuid : subscribers) {
-				if (playerUuid != owner) {
-					addMember(playerUuid);
+			for (String playerName : subscribers) {
+				if (playerName != owner) {
+					addMember(playerName);
 				}
 			}
 		}

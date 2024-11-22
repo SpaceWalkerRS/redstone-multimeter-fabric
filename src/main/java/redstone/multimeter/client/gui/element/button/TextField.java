@@ -10,7 +10,6 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -46,7 +45,7 @@ public class TextField extends AbstractButton {
 	}
 
 	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text) {
-		super(client, x, y, width, height, () -> Text.literal(""), tooltip);
+		super(client, x, y, width, height, () -> "", tooltip);
 
 		this.listener = listener;
 		this.textSupplier = text;

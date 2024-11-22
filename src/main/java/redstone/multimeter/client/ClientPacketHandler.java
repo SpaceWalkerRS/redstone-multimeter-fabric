@@ -1,6 +1,6 @@
 package redstone.multimeter.client;
 
-import java.io.DataInput;
+import java.io.DataInputStream;
 
 import net.minecraft.network.packet.CustomPayloadPacket;
 import net.minecraft.network.packet.Packet;
@@ -20,7 +20,7 @@ public class ClientPacketHandler extends PacketHandler {
 		return new CustomPayloadPacket(channel, data);
 	}
 
-	public void handlePacket(DataInput input) {
+	public void handlePacket(DataInputStream input) {
 		try {
 			decode(input).handle(client);
 		} catch (Exception e) {

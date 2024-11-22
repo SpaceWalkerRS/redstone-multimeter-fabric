@@ -31,13 +31,13 @@
 	],
 
 	"depends": {
-		"minecraft": "1.6.x"
+		"minecraft": "1.5.x"
 	},
 
 	"custom": {
 		"loom:injected_interfaces": {
-			"net/minecraft/unmapped/C_9550253": [
-				"redstone/multimeter/interfaces/mixin/IText"
+			"net/minecraft/unmapped/C_8651652": [
+				"redstone/multimeter/interfaces/mixin/IGameGui"
 			]
 		},
 		"modmenu": {

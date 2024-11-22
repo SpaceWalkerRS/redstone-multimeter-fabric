@@ -3,7 +3,6 @@ package redstone.multimeter.common.meter.event;
 import java.util.List;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.gui.Tooltip;
 
@@ -28,11 +27,11 @@ public class MeterEvent {
 		type.addTextToTooltip(tooltip, metadata);
 
 		if (!tooltip.isEmpty()) {
-			List<Text> lines = tooltip.getLines();
+			List<String> lines = tooltip.getLines();
 			String[] args = new String[lines.size()];
 
 			for (int index = 0; index < lines.size(); index++) {
-				args[index] = lines.get(index).buildString(false);
+				args[index] = lines.get(index);
 			}
 
 			string += "[" + String.join(", ", args) + "]";

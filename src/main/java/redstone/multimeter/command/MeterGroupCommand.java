@@ -4,22 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
+import java.util.Set;
 import java.util.function.Function;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.AbstractCommand;
+import net.minecraft.server.command.Command;
 import net.minecraft.server.command.TargetSelector;
 import net.minecraft.server.command.exception.CommandException;
 import net.minecraft.server.command.exception.CommandNotFoundException;
 import net.minecraft.server.command.exception.IncorrectUsageException;
 import net.minecraft.server.command.source.CommandSource;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -72,6 +70,11 @@ public class MeterGroupCommand extends AbstractCommand {
 	}
 
 	@Override
+	public int compareTo(Object o) {
+		return compareTo((Command) o); // needed to keep the compiler happy
+	}
+
+	@Override
 	public String getName() {
 		return COMMAND_NAME;
 	}
@@ -117,7 +120,7 @@ public class MeterGroupCommand extends AbstractCommand {
 				case "add":
 					return suggestMatching(args, server.getMinecraftServer().getPlayerNames());
 				case "remove":
-					return suggestMatching(args, listMembers(source).keySet());
+					return suggestMatching(args, listMembers(source));
 				}
 			}
 
@@ -260,19 +263,15 @@ public class MeterGroupCommand extends AbstractCommand {
 		return names;
 	}
 
-	private Map<String, UUID> listMembers(CommandSource source) {
-		Map<String, UUID> names = new HashMap<>();
+	private Set<String> listMembers(CommandSource source) {
+		Set<String> names = new HashSet<>();
 
 		command(source, player -> {
 			ServerMeterGroup meterGroup = multimeter.getSubscription(player);
 
 			if (meterGroup != null && meterGroup.isOwnedBy(player)) {
-				for (UUID playerUUID : meterGroup.getMembers()) {
-					String playerName = multimeter.getServer().getPlayerList().getName(playerUUID);
-
-					if (playerName != null) {
-						names.put(playerName, playerUUID);
-					}
+				for (String playerName : meterGroup.getMembers()) {
+					names.add(playerName);
 				}
 			}
 		});
@@ -284,10 +283,10 @@ public class MeterGroupCommand extends AbstractCommand {
 		Collection<String> names = listMeterGroups(source);
 
 		if (names.isEmpty()) {
-			source.sendMessage(Text.literal("There are no meter groups yet!"));
+			source.sendMessage("There are no meter groups yet!");
 		} else {
 			String message = "Meter groups:\n  " + String.join("\n  ", names);
-			source.sendMessage(Text.literal(message));
+			source.sendMessage(message);
 		}
 	}
 
@@ -295,22 +294,22 @@ public class MeterGroupCommand extends AbstractCommand {
 		command(source, player -> {
 			if (name == null) {
 				multimeter.subscribeToDefaultMeterGroup(player);
-				source.sendMessage(Text.literal("Subscribed to default meter group"));
+				source.sendMessage("Subscribed to default meter group");
 			} else if (multimeter.hasMeterGroup(name)) {
 				ServerMeterGroup meterGroup = multimeter.getMeterGroup(name);
 
 				if (!meterGroup.isPrivate() || meterGroup.hasMember(player) || meterGroup.isOwnedBy(player)) {
 					multimeter.subscribeToMeterGroup(meterGroup, player);
-					source.sendMessage(Text.literal(String.format("Subscribed to meter group \'%s\'", name)));
+					source.sendMessage(String.format("Subscribed to meter group \'%s\'", name));
 				} else {
-					source.sendMessage(Text.literal("That meter group is private!"));
+					source.sendMessage("That meter group is private!");
 				}
 			} else {
 				if (MeterGroup.isValidName(name)) {
 					multimeter.createMeterGroup(player, name);
-					source.sendMessage(Text.literal(String.format("Created meter group \'%s\'", name)));
+					source.sendMessage(String.format("Created meter group \'%s\'", name));
 				} else {
-					source.sendMessage(Text.literal(String.format("\'%s\' is not a valid meter group name!", name)));
+					source.sendMessage(String.format("\'%s\' is not a valid meter group name!", name));
 				}
 			}
 		});
@@ -319,14 +318,14 @@ public class MeterGroupCommand extends AbstractCommand {
 	private void unsubscribe(CommandSource source) {
 		command(source, (meterGroup, player) -> {
 			multimeter.unsubscribeFromMeterGroup(meterGroup, player);
-			source.sendMessage(Text.literal(String.format("Unsubscribed from meter group \'%s\'", meterGroup.getName())));
+			source.sendMessage(String.format("Unsubscribed from meter group \'%s\'", meterGroup.getName()));
 		});
 	}
 
 	private void queryPrivate(CommandSource source) {
 		command(source, (meterGroup, player) -> {
 			String status = meterGroup.isPrivate() ? "private" : "public";
-			source.sendMessage(Text.literal(String.format("Meter group \'%s\' is %s", meterGroup.getName(), status)));
+			source.sendMessage(String.format("Meter group \'%s\' is %s", meterGroup.getName(), status));
 		});
 	}
 
@@ -334,22 +333,22 @@ public class MeterGroupCommand extends AbstractCommand {
 		command(source, (meterGroup, player) -> {
 			if (meterGroup.isOwnedBy(player)) {
 				meterGroup.setPrivate(isPrivate);
-				source.sendMessage(Text.literal(String.format("Meter group \'%s\' is now %s", meterGroup.getName(), (isPrivate ? "private" : "public"))));
+				source.sendMessage(String.format("Meter group \'%s\' is now %s", meterGroup.getName(), (isPrivate ? "private" : "public")));
 			} else {
-				source.sendMessage(Text.literal("Only the owner of a meter group can change its privacy!"));
+				source.sendMessage("Only the owner of a meter group can change its privacy!");
 			}
 		});
 	}
 
 	private void membersList(CommandSource source) {
-		Map<String, UUID> members = listMembers(source);
+		Set<String> members = listMembers(source);
 
 		commandMembers(source, (meterGroup, owner) -> {
 			if (members.isEmpty()) {
-				source.sendMessage(Text.literal(String.format("Meter group \'%s\' has no members yet!", meterGroup.getName())));
+				source.sendMessage(String.format("Meter group \'%s\' has no members yet!", meterGroup.getName()));
 			} else {
-				String message = String.format("Members of meter group \'%s\':\n  ", meterGroup.getName()) + String.join("\n  ", members.keySet());
-				source.sendMessage(Text.literal(message));
+				String message = String.format("Members of meter group \'%s\':\n  ", meterGroup.getName()) + String.join("\n  ", members);
+				source.sendMessage(message);
 			}
 		});
 	}
@@ -358,14 +357,14 @@ public class MeterGroupCommand extends AbstractCommand {
 		commandMembers(source, (meterGroup, owner) -> {
 			for (ServerPlayerEntity player : players) {
 				if (player == owner) {
-					source.sendMessage(Text.literal("You cannot add yourself as a member!"));
+					source.sendMessage("You cannot add yourself as a member!");
 				} else if (meterGroup.hasMember(player)) {
-					source.sendMessage(Text.literal(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getName(), meterGroup.getName())));
+					source.sendMessage(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getName(), meterGroup.getName()));
 				} else if (!multimeter.getServer().isMultimeterClient(player)) {
-					source.sendMessage(Text.literal(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getName(), RedstoneMultimeterMod.MOD_NAME)));
+					source.sendMessage(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getName(), RedstoneMultimeterMod.MOD_NAME));
 				} else {
-					multimeter.addMemberToMeterGroup(meterGroup, player.getUuid());
-					source.sendMessage(Text.literal(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getName(), meterGroup.getName())));
+					multimeter.addMemberToMeterGroup(meterGroup, player.getDisplayName());
+					source.sendMessage(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getName(), meterGroup.getName()));
 				}
 			}
 		});
@@ -373,39 +372,25 @@ public class MeterGroupCommand extends AbstractCommand {
 
 	private void membersRemovePlayer(CommandSource source, String playerName) {
 		commandMembers(source, (meterGroup, owner) -> {
-			Entry<String, UUID> member = findMember(listMembers(source), playerName);
-
-			if (member == null) {
+			if (!listMembers(source).contains(playerName)) {
 				ServerPlayerEntity player = multimeter.getServer().getPlayerList().get(playerName);
 
 				if (player == owner) {
-					source.sendMessage(Text.literal("You cannot remove yourself as a member!"));
+					source.sendMessage("You cannot remove yourself as a member!");
 				} else {
-					source.sendMessage(Text.literal(String.format("Meter group \'%s\' has no member with the name \'%s\'!", meterGroup.getName(), playerName)));
+					source.sendMessage(String.format("Meter group \'%s\' has no member with the name \'%s\'!", meterGroup.getName(), playerName));
 				}
 			} else {
-				multimeter.removeMemberFromMeterGroup(meterGroup, member.getValue());
-				source.sendMessage(Text.literal(String.format("Player \'%s\' is no longer a member of meter group \'%s\'", member.getKey(), meterGroup.getName())));
+				multimeter.removeMemberFromMeterGroup(meterGroup, playerName);
+				source.sendMessage(String.format("Player \'%s\' is no longer a member of meter group \'%s\'", playerName, meterGroup.getName()));
 			}
 		});
-	}
-
-	private Entry<String, UUID> findMember(Map<String, UUID> members, String playerName) {
-		String key = playerName.toLowerCase();
-
-		for (Entry<String, UUID> member : members.entrySet()) {
-			if (member.getKey().toLowerCase().equals(key)) {
-				return member;
-			}
-		}
-
-		return null;
 	}
 
 	private void membersClear(CommandSource source) {
 		commandMembers(source, (meterGroup, owner) -> {
 			multimeter.clearMembersOfMeterGroup(meterGroup);
-			source.sendMessage(Text.literal(String.format("Removed all members from meter group \'%s\'", meterGroup.getName())));
+			source.sendMessage(String.format("Removed all members from meter group \'%s\'", meterGroup.getName()));
 		});
 	}
 
@@ -415,7 +400,7 @@ public class MeterGroupCommand extends AbstractCommand {
 				command.run(meterGroup, player);
 
 				if (!meterGroup.isPrivate()) {
-					source.sendMessage(Text.literal("NOTE: this meter group is public; adding/removing members will not have any effect until you make it private!"));
+					source.sendMessage("NOTE: this meter group is public; adding/removing members will not have any effect until you make it private!");
 				}
 			}
 		});
@@ -424,7 +409,7 @@ public class MeterGroupCommand extends AbstractCommand {
 	private void clear(CommandSource source) {
 		command(source, (meterGroup, player) -> {
 			multimeter.clearMeterGroup(meterGroup);
-			source.sendMessage(Text.literal(String.format("Removed all meters in meter group \'%s\'", meterGroup.getName())));
+			source.sendMessage(String.format("Removed all meters in meter group \'%s\'", meterGroup.getName()));
 		});
 	}
 
@@ -433,7 +418,7 @@ public class MeterGroupCommand extends AbstractCommand {
 			ServerMeterGroup meterGroup = multimeter.getSubscription(player);
 
 			if (meterGroup == null) {
-				source.sendMessage(Text.literal("Please subscribe to a meter group first!"));
+				source.sendMessage("Please subscribe to a meter group first!");
 			} else {
 				command.run(meterGroup, player);
 			}
