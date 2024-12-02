@@ -39,6 +39,7 @@ public class MeterRenderer {
 	public void renderMeters(Matrix4f cameraPose) {
 		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
 		RenderSystem.enableBlend();
+		RenderSystem.enableDepthTest();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.depthMask(false);
 
