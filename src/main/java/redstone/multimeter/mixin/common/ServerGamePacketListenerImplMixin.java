@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,7 +36,9 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
 	)
 	public void rsmm$handleCustomPayload(ServerboundCustomPayloadPacket packet, CallbackInfo ci) {
 		if (packet.payload() instanceof PacketWrapper p) {
+			PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl)(Object)this, server);
 			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().handlePacket(p, player);
+
 			ci.cancel();
 		}
 	}
