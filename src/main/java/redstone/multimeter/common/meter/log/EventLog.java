@@ -110,9 +110,9 @@ public class EventLog {
 	public static EventLog fromNbt(CompoundTag nbt) {
 		EventLog log = new EventLog();
 
-		log.event = MeterEvent.fromNbt(nbt.getCompound("meter event"));
-		log.tick = nbt.getLong("tick");
-		log.subtick = nbt.getInt("subtick");
+		log.event = MeterEvent.fromNbt(nbt.getCompound("meter event").get());
+		log.tick = nbt.getLong("tick").get();
+		log.subtick = nbt.getInt("subtick").get();
 		log.tickPhase = TickPhase.fromNbt(nbt.get("tick phase"));
 
 		return log;

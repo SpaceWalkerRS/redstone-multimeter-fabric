@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
 
 import redstone.multimeter.common.meter.event.EventType;
@@ -207,11 +206,11 @@ public class MeterLogs {
 	public static Collection<EventLog> fromNbt(CompoundTag nbt) {
 		Collection<EventLog> logs = new ArrayList<>();
 
-		for (String key : nbt.getAllKeys()) {
+		for (String key : nbt.keySet()) {
 			EventType type = EventType.byName(key);
 
 			if (type != null) {
-				logs.addAll(fromNbt(type, nbt.getList(key, Tag.TAG_COMPOUND)));
+				logs.addAll(fromNbt(type, nbt.getList(key).get()));
 			}
 		}
 
@@ -222,7 +221,7 @@ public class MeterLogs {
 		Collection<EventLog> logs = new ArrayList<>();
 
 		for (int i = 0; i < nbt.size(); i++) {
-			logs.add(EventLog.fromNbt(nbt.getCompound(i)));
+			logs.add(EventLog.fromNbt(nbt.getCompound(i).get()));
 		}
 
 		return logs;

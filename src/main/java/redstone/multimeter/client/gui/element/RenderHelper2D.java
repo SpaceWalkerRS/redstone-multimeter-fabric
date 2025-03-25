@@ -2,18 +2,13 @@ package redstone.multimeter.client.gui.element;
 
 import org.joml.Matrix4f;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.client.gui.Texture;
@@ -24,16 +19,12 @@ import redstone.multimeter.util.ColorUtils;
 public class RenderHelper2D {
 
 	protected void renderRect(GuiGraphics graphics, Drawer drawer) {
-		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
+		graphics.drawSpecial(bufferSource -> {
+			VertexConsumer buffer = bufferSource.getBuffer(RenderType.gui());
+			Matrix4f pose = graphics.pose().last().pose();
 
-		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		Matrix4f pose = graphics.pose().last().pose();
-
-		drawer.draw(bufferBuilder, pose);
-		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+			drawer.draw(buffer, pose);
+		});
 	}
 
 	protected void renderRect(GuiGraphics graphics, int x, int y, int width, int height, int color) {
@@ -52,7 +43,7 @@ public class RenderHelper2D {
 		renderRect(graphics, (bufferBuilder, pose) -> drawGradient(bufferBuilder, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1));
 	}
 
-	protected void drawRect(BufferBuilder bufferBuilder, Matrix4f pose, int x, int y, int width, int height, int color) {
+	protected void drawRect(VertexConsumer buffer, Matrix4f pose, int x, int y, int width, int height, int color) {
 		int x0 = x;
 		int y0 = y;
 		int x1 = x + width;
@@ -63,19 +54,19 @@ public class RenderHelper2D {
 		int g = ColorUtils.getGreen(color);
 		int b = ColorUtils.getBlue(color);
 
-		drawRect(bufferBuilder, pose, x0, y0, x1, y1, a, r, g, b);
+		drawRect(buffer, pose, x0, y0, x1, y1, a, r, g, b);
 	}
 
-	protected void drawRect(BufferBuilder bufferBuilder, Matrix4f pose, int x0, int y0, int x1, int y1, int a, int r, int g, int b) {
+	protected void drawRect(VertexConsumer buffer, Matrix4f pose, int x0, int y0, int x1, int y1, int a, int r, int g, int b) {
 		int z = 0;
 
-		bufferBuilder.addVertex(pose, x0, y0, z).setColor(r, g, b, a);
-		bufferBuilder.addVertex(pose, x0, y1, z).setColor(r, g, b, a);
-		bufferBuilder.addVertex(pose, x1, y1, z).setColor(r, g, b, a);
-		bufferBuilder.addVertex(pose, x1, y0, z).setColor(r, g, b, a);
+		buffer.addVertex(pose, x0, y0, z).setColor(r, g, b, a);
+		buffer.addVertex(pose, x0, y1, z).setColor(r, g, b, a);
+		buffer.addVertex(pose, x1, y1, z).setColor(r, g, b, a);
+		buffer.addVertex(pose, x1, y0, z).setColor(r, g, b, a);
 	}
 
-	protected void drawGradient(BufferBuilder bufferBuilder, Matrix4f pose, int x, int y, int width, int height, int color0, int color1) {
+	protected void drawGradient(VertexConsumer buffer, Matrix4f pose, int x, int y, int width, int height, int color0, int color1) {
 		int x0 = x;
 		int y0 = y;
 		int x1 = x + width;
@@ -91,16 +82,16 @@ public class RenderHelper2D {
 		int g1 = ColorUtils.getGreen(color1);
 		int b1 = ColorUtils.getBlue(color1);
 
-		drawGradient(bufferBuilder, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1);
+		drawGradient(buffer, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1);
 	}
 
-	protected void drawGradient(BufferBuilder bufferBuilder, Matrix4f pose, int x0, int y0, int x1, int y1, int a0, int r0, int g0, int b0, int a1, int r1, int g1, int b1) {
+	protected void drawGradient(VertexConsumer buffer, Matrix4f pose, int x0, int y0, int x1, int y1, int a0, int r0, int g0, int b0, int a1, int r1, int g1, int b1) {
 		int z = 0;
 
-		bufferBuilder.addVertex(pose, x0, y0, z).setColor(r0, g0, b0, a0);
-		bufferBuilder.addVertex(pose, x0, y1, z).setColor(r1, g1, b1, a1);
-		bufferBuilder.addVertex(pose, x1, y1, z).setColor(r1, g1, b1, a1);
-		bufferBuilder.addVertex(pose, x1, y0, z).setColor(r0, g0, b0, a0);
+		buffer.addVertex(pose, x0, y0, z).setColor(r0, g0, b0, a0);
+		buffer.addVertex(pose, x0, y1, z).setColor(r1, g1, b1, a1);
+		buffer.addVertex(pose, x1, y1, z).setColor(r1, g1, b1, a1);
+		buffer.addVertex(pose, x1, y0, z).setColor(r0, g0, b0, a0);
 	}
 
 	protected void renderBorder(GuiGraphics graphics, int x, int y, int width, int height, int color) {
@@ -122,17 +113,12 @@ public class RenderHelper2D {
 	}
 
 	protected void renderTexture(GuiGraphics graphics, Texture texture, Drawer drawer) {
-		RenderSystem.setShader(CoreShaders.POSITION_TEX);
-		RenderSystem.setShaderTexture(0, texture.location);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
+		graphics.drawSpecial(bufferSource -> {
+			VertexConsumer buffer = bufferSource.getBuffer(RenderType.guiTextured(texture.location));
+			Matrix4f pose = graphics.pose().last().pose();
 
-		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-		Matrix4f pose = graphics.pose().last().pose();
-
-		drawer.draw(bufferBuilder, pose);
-		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+			drawer.draw(buffer, pose);
+		});
 	}
 
 	protected void renderTextureRegion(GuiGraphics graphics, TextureRegion region, int x, int y, int width, int height) {
@@ -143,7 +129,7 @@ public class RenderHelper2D {
 		renderTexture(graphics, texture, (bufferBuilder, pose) -> drawTexture(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1));
 	}
 
-	protected void drawTextureRegion(BufferBuilder bufferBuilder, Matrix4f pose, TextureRegion region, int x, int y, int width, int height) {
+	protected void drawTextureRegion(VertexConsumer buffer, Matrix4f pose, TextureRegion region, int x, int y, int width, int height) {
 		int x0 = x;
 		int y0 = y;
 		int x1 = x + width;
@@ -154,10 +140,10 @@ public class RenderHelper2D {
 		int tx1 = region.x + region.width;
 		int ty1 = region.y + region.height;
 
-		drawTexture(bufferBuilder, pose, region.texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
+		drawTexture(buffer, pose, region.texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
 	}
 
-	protected void drawTexture(BufferBuilder bufferBuilder, Matrix4f pose, Texture texture, int x0, int y0, int x1, int y1, int tx0, int ty0, int tx1, int ty1) {
+	protected void drawTexture(VertexConsumer buffer, Matrix4f pose, Texture texture, int x0, int y0, int x1, int y1, int tx0, int ty0, int tx1, int ty1) {
 		int z = 0;
 
 		float u0 = (float)tx0 / texture.width;
@@ -165,24 +151,19 @@ public class RenderHelper2D {
 		float u1 = (float)tx1 / texture.width;
 		float v1 = (float)ty1 / texture.height;
 
-		bufferBuilder.addVertex(pose, x0, y0, z).setUv(u0, v0);
-		bufferBuilder.addVertex(pose, x0, y1, z).setUv(u0, v1);
-		bufferBuilder.addVertex(pose, x1, y1, z).setUv(u1, v1);
-		bufferBuilder.addVertex(pose, x1, y0, z).setUv(u1, v0);
+		buffer.addVertex(pose, x0, y0, z).setUv(u0, v0).setColor(0xFFFFFFFF);
+		buffer.addVertex(pose, x0, y1, z).setUv(u0, v1).setColor(0xFFFFFFFF);
+		buffer.addVertex(pose, x1, y1, z).setUv(u1, v1).setColor(0xFFFFFFFF);
+		buffer.addVertex(pose, x1, y0, z).setUv(u1, v0).setColor(0xFFFFFFFF);
 	}
 
 	protected void renderTextureColor(GuiGraphics graphics, Texture texture, Drawer drawer) {
-		RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
-		RenderSystem.setShaderTexture(0, texture.location);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
+		graphics.drawSpecial(bufferSource -> {
+			VertexConsumer buffer = bufferSource.getBuffer(RenderType.guiTextured(texture.location));
+			Matrix4f pose = graphics.pose().last().pose();
 
-		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-		Matrix4f pose = graphics.pose().last().pose();
-
-		drawer.draw(bufferBuilder, pose);
-		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+			drawer.draw(buffer, pose);
+		});
 	}
 
 	protected void renderTextureRegionColor(GuiGraphics graphics, TextureRegion region, int x, int y, int width, int height, int color) {
@@ -193,7 +174,7 @@ public class RenderHelper2D {
 		renderTextureColor(graphics, texture, (bufferBuilder, pose) -> drawTextureColor(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1, a, r, g, b));
 	}
 
-	protected void drawTextureRegionColor(BufferBuilder bufferBuilder, Matrix4f pose, TextureRegion region, int x, int y, int width, int height, int color) {
+	protected void drawTextureRegionColor(VertexConsumer buffer, Matrix4f pose, TextureRegion region, int x, int y, int width, int height, int color) {
 		int x0 = x;
 		int y0 = y;
 		int x1 = x + width;
@@ -209,10 +190,10 @@ public class RenderHelper2D {
 		int g = ColorUtils.getGreen(color);
 		int b = ColorUtils.getBlue(color);
 
-		drawTextureColor(bufferBuilder, pose, region.texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1, a, r, g, b);
+		drawTextureColor(buffer, pose, region.texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1, a, r, g, b);
 	}
 
-	protected void drawTextureColor(BufferBuilder bufferBuilder, Matrix4f pose, Texture texture, int x0, int y0, int x1, int y1, int tx0, int ty0, int tx1, int ty1, int a, int r, int g, int b) {
+	protected void drawTextureColor(VertexConsumer buffer, Matrix4f pose, Texture texture, int x0, int y0, int x1, int y1, int tx0, int ty0, int tx1, int ty1, int a, int r, int g, int b) {
 		int z = 0;
 
 		float u0 = (float)tx0 / texture.width;
@@ -220,10 +201,10 @@ public class RenderHelper2D {
 		float u1 = (float)tx1 / texture.width;
 		float v1 = (float)ty1 / texture.height;
 
-		bufferBuilder.addVertex(pose, x0, y0, z).setUv(u0, v0).setColor(r, g, b, a);
-		bufferBuilder.addVertex(pose, x0, y1, z).setUv(u0, v1).setColor(r, g, b, a);
-		bufferBuilder.addVertex(pose, x1, y1, z).setUv(u1, v1).setColor(r, g, b, a);
-		bufferBuilder.addVertex(pose, x1, y0, z).setUv(u1, v0).setColor(r, g, b, a);
+		buffer.addVertex(pose, x0, y0, z).setUv(u0, v0).setColor(r, g, b, a);
+		buffer.addVertex(pose, x0, y1, z).setUv(u0, v1).setColor(r, g, b, a);
+		buffer.addVertex(pose, x1, y1, z).setUv(u1, v1).setColor(r, g, b, a);
+		buffer.addVertex(pose, x1, y0, z).setUv(u1, v0).setColor(r, g, b, a);
 	}
 
 	protected void renderText(GuiGraphics graphics, TextDrawer drawer) {
@@ -261,7 +242,7 @@ public class RenderHelper2D {
 	@FunctionalInterface
 	protected interface Drawer {
 
-		public void draw(BufferBuilder bufferBuilder, Matrix4f pose);
+		public void draw(VertexConsumer buffer, Matrix4f pose);
 
 	}
 

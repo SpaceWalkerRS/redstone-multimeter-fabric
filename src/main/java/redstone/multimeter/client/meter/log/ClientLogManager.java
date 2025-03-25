@@ -74,15 +74,15 @@ public class ClientLogManager extends LogManager {
 	 */
 	public void updateMeterLogs(ListTag data) {
 		for (int index = 0; index < data.size(); index++) {
-			CompoundTag nbt = data.getCompound(index);
+			CompoundTag nbt = data.getCompound(index).get();
 
-			long id = nbt.getLong("id");
+			long id = nbt.getLong("id").get();
 			Meter meter = meterGroup.getMeter(id);
 
 			if (meter != null) {
-				CompoundTag logs = nbt.getCompound("logs");
-				boolean powered = nbt.getBoolean("powered");
-				boolean active = nbt.getBoolean("active");
+				CompoundTag logs = nbt.getCompound("logs").get();
+				boolean powered = nbt.getBoolean("powered").get();
+				boolean active = nbt.getBoolean("active").get();
 
 				meter.setPowered(powered);
 				meter.setActive(active);

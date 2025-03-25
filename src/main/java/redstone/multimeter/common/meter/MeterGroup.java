@@ -8,7 +8,6 @@ import java.util.Map;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.log.LogManager;
@@ -216,10 +215,10 @@ public abstract class MeterGroup {
 	public void updateFromNbt(CompoundTag nbt) {
 		clear();
 
-		ListTag list = nbt.getList("meters", Tag.TAG_COMPOUND);
+		ListTag list = nbt.getList("meters").get();
 
 		for (int index = 0; index < list.size(); index++) {
-			CompoundTag meterNbt = list.getCompound(index);
+			CompoundTag meterNbt = list.getCompound(index).get();
 			Meter meter = Meter.fromNbt(meterNbt);
 
 			addMeter(meter);

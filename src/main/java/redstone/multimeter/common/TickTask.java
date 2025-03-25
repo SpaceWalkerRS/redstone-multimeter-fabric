@@ -15,7 +15,7 @@ public enum TickTask {
 	TICK_CHUNKS          (10, "tick chunks"          , PruneType.BRANCH),
 	MOB_SPAWNING         (11, "mob spawning"         , PruneType.SIBLING),
 	TICK_CHUNK           (12, "tick chunk"           , PruneType.SIBLING),
-	THUNDER              (13, "thunder"              , PruneType.BRANCH),
+	THUNDER              (13, "thunder"              , PruneType.SIBLING),
 	PRECIPITATION        (14, "precipitation"        , PruneType.BRANCH),
 	RANDOM_TICKS         (15, "random ticks"         , PruneType.BRANCH),
 	CUSTOM_MOB_SPAWNING  (16, "custom mob spawning"  , PruneType.BRANCH),

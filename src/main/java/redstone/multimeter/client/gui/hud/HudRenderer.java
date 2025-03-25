@@ -2,8 +2,7 @@ package redstone.multimeter.client.gui.hud;
 
 import org.joml.Matrix4f;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -71,9 +70,7 @@ public class HudRenderer extends RenderHelper2D {
 	}
 
 	@Override
-	protected void drawRect(BufferBuilder bufferBuilder, Matrix4f pose, int x, int y, int width, int height, int color) {
-		RenderSystem.enableDepthTest();
-
+	protected void drawRect(VertexConsumer buffer, Matrix4f pose, int x, int y, int width, int height, int color) {
 		int x0 = translateX(x, width);
 		int y0 = translateY(y, height);
 		int x1 = x0 + width;
@@ -84,13 +81,11 @@ public class HudRenderer extends RenderHelper2D {
 		int g = ColorUtils.getGreen(color);
 		int b = ColorUtils.getBlue(color);
 
-		drawRect(bufferBuilder, pose, x0, y0, x1, y1, a, r, g, b);
+		drawRect(buffer, pose, x0, y0, x1, y1, a, r, g, b);
 	}
 
 	@Override
-	protected void drawGradient(BufferBuilder bufferBuilder, Matrix4f pose, int x, int y, int width, int height, int color0, int color1) {
-		RenderSystem.enableDepthTest();
-
+	protected void drawGradient(VertexConsumer buffer, Matrix4f pose, int x, int y, int width, int height, int color0, int color1) {
 		int x0 = translateX(x, width);
 		int y0 = translateY(y, height);
 		int x1 = x0 + width;
@@ -106,7 +101,7 @@ public class HudRenderer extends RenderHelper2D {
 		int g1 = ColorUtils.getGreen(color1);
 		int b1 = ColorUtils.getBlue(color1);
 
-		drawGradient(bufferBuilder, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1);
+		drawGradient(buffer, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1);
 	}
 
 	@Override

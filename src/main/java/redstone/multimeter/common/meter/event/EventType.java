@@ -147,7 +147,7 @@ public enum EventType {
 		}
 
 		ByteTag nbtByte = (ByteTag)nbt;
-		int index = nbtByte.getAsByte();
+		int index = nbtByte.asByte().get();
 
 		return byIndex(index);
 	}

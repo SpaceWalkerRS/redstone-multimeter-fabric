@@ -93,19 +93,19 @@ public class MeterProperties {
 		MeterProperties properties = new MeterProperties();
 
 		if (nbt.contains("pos")) {
-			properties.pos = DimPos.fromNbt(nbt.getCompound("pos"));
+			properties.pos = DimPos.fromNbt(nbt.getCompound("pos").get());
 		}
 		if (nbt.contains("name")) {
-			properties.name = nbt.getString("name");
+			properties.name = nbt.getString("name").get();
 		}
 		if (nbt.contains("color")) {
-			properties.color = nbt.getInt("color");
+			properties.color = nbt.getInt("color").get();
 		}
 		if (nbt.contains("movable")) {
-			properties.movable = nbt.getBoolean("movable");
+			properties.movable = nbt.getBoolean("movable").get();
 		}
 		if (nbt.contains("event types")) {
-			properties.eventTypes = nbt.getInt("event types");
+			properties.eventTypes = nbt.getInt("event types").get();
 		}
 
 		return properties;

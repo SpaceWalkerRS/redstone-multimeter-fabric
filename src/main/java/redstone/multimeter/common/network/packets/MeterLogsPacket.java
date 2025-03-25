@@ -2,7 +2,6 @@ package redstone.multimeter.common.network.packets;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -27,7 +26,7 @@ public class MeterLogsPacket implements RSMMPacket {
 
 	@Override
 	public void decode(CompoundTag data) {
-		logsData = data.getList("logs", Tag.TAG_COMPOUND);
+		logsData = data.getList("logs").get();
 	}
 
 	@Override

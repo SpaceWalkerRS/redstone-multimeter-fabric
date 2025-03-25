@@ -333,23 +333,11 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel, Sc
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-			args = "ldc=thunder"
-		)
-	)
-	private void startTickTaskThunder(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.THUNDER);
-	}
-
-	@Inject(
-		method = "tickChunk",
-		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
 			args = "ldc=iceandsnow"
 		)
 	)
-	private void swapTickTaskPrecipitation(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
-		rsmm$swapTickTask(TickTask.PRECIPITATION);
+	private void startTickTaskPrecipitation(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
+		rsmm$startTickTask(TickTask.PRECIPITATION);
 	}
 
 	@Inject(
@@ -372,6 +360,26 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel, Sc
 	)
 	private void endTickTaskRandomTicksAndTickChunk(LevelChunk chunk, int randomTicks, CallbackInfo ci) {
 		rsmm$endTickTask();
+		rsmm$endTickTask();
+	}
+
+	@Inject(
+		method = "tickThunder",
+		at = @At(
+			value = "HEAD"
+		)
+	)
+	private void startTickTaskThunder(LevelChunk chunk, CallbackInfo ci) {
+		rsmm$startTickTask(TickTask.THUNDER);
+	}
+
+	@Inject(
+		method = "tickThunder",
+		at = @At(
+			value = "TAIL"
+		)
+	)
+	private void endTickTaskThunder(LevelChunk chunk, CallbackInfo ci) {
 		rsmm$endTickTask();
 	}
 

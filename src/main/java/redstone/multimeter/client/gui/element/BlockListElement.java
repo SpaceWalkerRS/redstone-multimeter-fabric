@@ -102,7 +102,9 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int x = getX() + 2;
 			int y = getY() + (height - 16) / 2;
 
-			graphics.renderFakeItem(stack, x, y);
+			if (stack != null) {
+				graphics.renderFakeItem(stack, x, y);
+			}
 
 			x = getX() + 22;
 			y = getY() + height - (height + font.lineHeight) / 2;

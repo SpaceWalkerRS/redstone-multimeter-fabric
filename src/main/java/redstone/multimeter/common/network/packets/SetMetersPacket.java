@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -41,10 +40,10 @@ public class SetMetersPacket implements RSMMPacket {
 	@Override
 	public void decode(CompoundTag data) {
 		meters = new ArrayList<>();
-		ListTag list = data.getList("meters", Tag.TAG_COMPOUND);
+		ListTag list = data.getList("meters").get();
 
 		for (int i = 0; i < list.size(); i++) {
-			CompoundTag meterNbt = list.getCompound(i);
+			CompoundTag meterNbt = list.getCompound(i).get();
 			MeterProperties meter = MeterProperties.fromNbt(meterNbt);
 
 			meters.add(meter);

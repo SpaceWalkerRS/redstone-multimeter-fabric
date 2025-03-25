@@ -101,10 +101,10 @@ public class DimPos {
 	}
 
 	public static DimPos fromNbt(CompoundTag nbt) {
-		ResourceLocation dimension = NbtUtils.nbtToResourceLocation(nbt.getCompound("dim"));
-		int x = nbt.getInt("x");
-		int y = nbt.getInt("y");
-		int z = nbt.getInt("z");
+		ResourceLocation dimension = NbtUtils.nbtToResourceLocation(nbt.getCompound("dim").get());
+		int x = nbt.getInt("x").get();
+		int y = nbt.getInt("y").get();
+		int z = nbt.getInt("z").get();
 
 		return new DimPos(dimension, x, y, z);
 	}

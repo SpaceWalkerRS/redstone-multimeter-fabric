@@ -31,8 +31,8 @@ public class MeterGroupSubscriptionPacket implements RSMMPacket {
 
 	@Override
 	public void decode(CompoundTag data) {
-		name = data.getString("name");
-		subscribe = data.getBoolean("subscribe");
+		name = data.getString("name").get();
+		subscribe = data.getBoolean("subscribe").get();
 	}
 
 	@Override

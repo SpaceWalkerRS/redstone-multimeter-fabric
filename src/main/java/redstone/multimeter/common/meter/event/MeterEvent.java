@@ -62,7 +62,7 @@ public class MeterEvent {
 		MeterEvent event = new MeterEvent();
 
 		event.type = EventType.fromNbt(nbt.get("type"));
-		event.metadata = nbt.getInt("metadata");
+		event.metadata = nbt.getInt("metadata").get();
 
 		return event;
 	}

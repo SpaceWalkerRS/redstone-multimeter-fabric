@@ -3,21 +3,12 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
@@ -366,26 +357,8 @@ public class TextField extends AbstractButton {
 
 		int y0 = selectionY;
 		int y1 = selectionY + selectionHeight;
-		int z = 0;
 
-		RenderSystem.setShader(CoreShaders.POSITION);
-		RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
-		RenderSystem.enableColorLogicOp();
-		RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
-
-		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-		Matrix4f pose = graphics.pose().last().pose();
-
-		bufferBuilder.addVertex(pose, x0, y0, z);
-		bufferBuilder.addVertex(pose, x0, y1, z);
-		bufferBuilder.addVertex(pose, x1, y1, z);
-		bufferBuilder.addVertex(pose, x1, y0, z);
-
-		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
-
-		RenderSystem.disableColorLogicOp();
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		graphics.fill(RenderType.guiTextHighlight(), x0, y0, x1, y1, 0xFF0000FF);
 	}
 
 	private int getBorderColor() {

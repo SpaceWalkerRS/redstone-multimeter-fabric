@@ -11,7 +11,6 @@ import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 
@@ -139,8 +138,8 @@ public class TickPhaseTree {
 	}
 
 	public void fromNbt(CompoundTag nbt) {
-		ListTag tasks = nbt.getList("tasks", Tag.TAG_BYTE_ARRAY);
-		ListTag args = nbt.getList("args", Tag.TAG_STRING);
+		ListTag tasks = nbt.getList("tasks").get();
+		ListTag args = nbt.getList("args").get();
 
 		if (!tasks.isEmpty()) {
 			start();
@@ -162,7 +161,7 @@ public class TickPhaseTree {
 			taskArgs = new String[argsLength];
 
 			for (int i = 0; i < argsLength && argIndex < args.size();) {
-				taskArgs[i++] = args.getString(argIndex++);
+				taskArgs[i++] = args.getString(argIndex++).get();
 			}
 		} else {
 			taskArgs = new String[0];

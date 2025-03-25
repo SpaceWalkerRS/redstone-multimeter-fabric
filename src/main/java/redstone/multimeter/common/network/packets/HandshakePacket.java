@@ -23,7 +23,7 @@ public class HandshakePacket implements RSMMPacket {
 
 	@Override
 	public void decode(CompoundTag data) {
-		modVersion = data.getString("mod version");
+		modVersion = data.getString("mod version").get();
 	}
 
 	@Override

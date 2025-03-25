@@ -31,8 +31,8 @@ public class MeterGroupRefreshPacket implements RSMMPacket {
 
 	@Override
 	public void decode(CompoundTag data) {
-		name = data.getString("name");
-		meterGroupData = data.getCompound("data");
+		name = data.getString("name").get();
+		meterGroupData = data.getCompound("data").get();
 	}
 
 	@Override

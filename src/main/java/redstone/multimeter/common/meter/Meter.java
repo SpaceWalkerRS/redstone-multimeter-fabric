@@ -137,10 +137,10 @@ public class Meter {
 	}
 
 	public static Meter fromNbt(CompoundTag nbt) {
-		long id = nbt.getLong("id");
-		MeterProperties properties = MeterProperties.fromNbt(nbt.getCompound("properties"));
-		boolean powered = nbt.getBoolean("powered");
-		boolean active = nbt.getBoolean("active");
+		long id = nbt.getLong("id").get();
+		MeterProperties properties = MeterProperties.fromNbt(nbt.getCompound("properties").get());
+		boolean powered = nbt.getBoolean("powered").get();
+		boolean active = nbt.getBoolean("active").get();
 
 		Meter meter = new Meter(id, properties.mutable());
 		meter.setPowered(powered);

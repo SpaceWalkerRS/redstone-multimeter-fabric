@@ -25,7 +25,7 @@ public class TickTimePacket implements RSMMPacket {
 
 	@Override
 	public void decode(CompoundTag data) {
-		gameTime = data.getLong("game time");
+		gameTime = data.getLong("game time").get();
 	}
 
 	@Override

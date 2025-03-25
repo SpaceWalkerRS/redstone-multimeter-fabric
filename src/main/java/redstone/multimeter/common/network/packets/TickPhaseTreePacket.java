@@ -25,7 +25,7 @@ public class TickPhaseTreePacket implements RSMMPacket {
 
 	@Override
 	public void decode(CompoundTag data) {
-		nbt = data.getCompound("tick phase tree");
+		nbt = data.getCompound("tick phase tree").get();
 	}
 
 	@Override

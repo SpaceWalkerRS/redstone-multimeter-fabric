@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -59,15 +59,17 @@ public class SavedMeterGroupsManager {
 				int slot = i - SLOT_OFFSET;
 				String key = "slot_" + slot;
 
-				if (nbt.contains(key)) {
-					CompoundTag meterGroupNbt = nbt.getCompound(key);
+				Optional<CompoundTag> meterGroupNbtMaybe = nbt.getCompound(key);
 
-					String name = meterGroupNbt.getString("name");
-					ListTag metersNbt = meterGroupNbt.getList("meters", Tag.TAG_COMPOUND);
+				if (meterGroupNbtMaybe.isPresent()) {
+					CompoundTag meterGroupNbt = meterGroupNbtMaybe.get();
+
+					String name = meterGroupNbt.getStringOr("name", "");
+					ListTag metersNbt = meterGroupNbt.getListOrEmpty("meters");
 					List<MeterProperties> meters = new ArrayList<>();
 
 					for (int j = 0; j < metersNbt.size(); j++) {
-						meters.add(MeterProperties.fromNbt(metersNbt.getCompound(j)));
+						meters.add(MeterProperties.fromNbt(metersNbt.getCompound(j).get()));
 					}
 
 					meterGroups[i] = new SavedMeterGroup(name, meters);

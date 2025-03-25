@@ -29,8 +29,8 @@ public class MeterUpdatePacket implements RSMMPacket {
 
 	@Override
 	public void decode(CompoundTag data) {
-		id = data.getLong("id");
-		properties = MeterProperties.fromNbt(data.getCompound("properties"));
+		id = data.getLong("id").get();
+		properties = MeterProperties.fromNbt(data.getCompound("properties").get());
 	}
 
 	@Override

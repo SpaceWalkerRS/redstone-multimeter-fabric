@@ -28,8 +28,8 @@ public class MeterIndexPacket implements RSMMPacket {
 
 	@Override
 	public void decode(CompoundTag data) {
-		id = data.getLong("id");
-		index = data.getInt("index");
+		id = data.getLong("id").get();
+		index = data.getInt("index").get();
 	}
 
 	@Override

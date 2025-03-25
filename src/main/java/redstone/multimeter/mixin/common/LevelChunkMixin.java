@@ -4,7 +4,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -27,11 +26,11 @@ public class LevelChunkMixin {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			shift = Shift.BEFORE,
-			target = "Lnet/minecraft/world/level/block/state/BlockState;onRemove(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V"
+			ordinal = 0,
+			target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"
 		)
 	)
-	private void logBlockChange(BlockPos pos, BlockState state, boolean movedByPiston, CallbackInfoReturnable<BlockState> cir, int y, LevelChunkSection section, boolean hadOnlyAir, int sectionX, int sectionY, int sectionZ, BlockState prevState) {
+	private void logBlockChange(BlockPos pos, BlockState state, int flags, CallbackInfoReturnable<BlockState> cir, int y, LevelChunkSection section, boolean hadOnlyAir, int sectionX, int sectionY, int sectionZ, BlockState prevState) {
 		if (!level.isClientSide()) {
 			((IServerLevel)level).getMultimeter().onBlockChange(level, pos, prevState, state);
 		}

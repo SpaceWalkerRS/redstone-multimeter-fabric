@@ -1,5 +1,7 @@
 package redstone.multimeter.util;
 
+import java.util.List;
+
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -19,9 +21,19 @@ public class NbtUtils {
 	}
 
 	public static ResourceLocation nbtToResourceLocation(CompoundTag nbt) {
-		String namespace = nbt.getString("namespace");
-		String path = nbt.getString("path");
+		String namespace = nbt.getString("namespace").get();
+		String path = nbt.getString("path").get();
 
 		return ResourceLocation.fromNamespaceAndPath(namespace, path);
+	}
+
+	public static long[] toLongArray(List<Long> list) {
+		long[] array = new long[list.size()];
+
+		for (int i = 0; i < list.size(); i++) {
+			array[i] = list.get(i);
+		}
+
+		return array;
 	}
 }

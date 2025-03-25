@@ -10,13 +10,13 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.MultimeterServer;
+import redstone.multimeter.util.NbtUtils;
 
 public class MeterUpdatesPacket implements RSMMPacket {
 	
@@ -39,7 +39,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	@Override
 	public void encode(CompoundTag data) {
 		if (!removedMeters.isEmpty()) {
-			data.putLongArray("removed", removedMeters);
+			data.putLongArray("removed", NbtUtils.toLongArray(removedMeters));
 		}
 		if (!meterUpdates.isEmpty()) {
 			ListTag list = new ListTag();
@@ -56,32 +56,32 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			data.put("updates", list);
 		}
 		if (!meters.isEmpty()) {
-			data.putLongArray("meters", meters);
+			data.putLongArray("meters", NbtUtils.toLongArray(meters));
 		}
 	}
 	
 	@Override
 	public void decode(CompoundTag data) {
 		if (data.contains("removed")) {
-			long[] removed = data.getLongArray("removed");
+			long[] removed = data.getLongArray("removed").get();
 
 			for (long id : removed) {
 				removedMeters.add(id);
 			}
 		}
 		if (data.contains("updates")) {
-			ListTag updates = data.getList("updates", Tag.TAG_COMPOUND);
+			ListTag updates = data.getList("updates").get();
 
 			for (int i = 0; i < updates.size(); i++) {
-				CompoundTag nbt = updates.getCompound(i);
-				long id = nbt.getLong("id");
+				CompoundTag nbt = updates.getCompound(i).get();
+				long id = nbt.getLong("id").get();
 				MeterProperties update = MeterProperties.fromNbt(nbt);
 
 				meterUpdates.put(id, update);
 			}
 		}
 		if (data.contains("meters")) {
-			long[] ids = data.getLongArray("meters");
+			long[] ids = data.getLongArray("meters").get();
 
 			for (long id : ids) {
 				meters.add(id);

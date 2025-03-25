@@ -25,7 +25,7 @@ public class TeleportToMeterPacket implements RSMMPacket {
 
 	@Override
 	public void decode(CompoundTag data) {
-		id = data.getLong("id");
+		id = data.getLong("id").get();
 	}
 
 	@Override

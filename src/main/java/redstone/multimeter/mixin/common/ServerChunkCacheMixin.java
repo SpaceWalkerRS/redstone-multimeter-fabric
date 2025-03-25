@@ -97,7 +97,7 @@ public class ServerChunkCacheMixin {
 	}
 
 	@Inject(
-		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;JLjava/util/List;)V",
+		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;J)V",
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
@@ -109,7 +109,7 @@ public class ServerChunkCacheMixin {
 	}
 
 	@Inject(
-		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;JLjava/util/List;)V",
+		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;J)V",
 		at = @At(
 			value = "TAIL"
 		)
