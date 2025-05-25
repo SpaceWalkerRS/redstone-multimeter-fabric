@@ -14,7 +14,7 @@ public class CarpetCompat {
 	}
 
 	public boolean isFrozen() {
-		if (RedstoneMultimeterMod.isCarpetPreset()) {
+		if (RedstoneMultimeterMod.isCarpetPresent()) {
 			return !TickSpeed.process_entities;
 
 		}
