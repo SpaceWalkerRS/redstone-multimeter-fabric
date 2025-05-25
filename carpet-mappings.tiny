@@ -1,0 +1,3 @@
+tiny	2	0	intermediary	named
+c	carpet/fakes/ThreadedAnvilChunkStorageInterface	carpet/fakes/ThreadedAnvilChunkStorageInterface
+	m	()Ljava/lang/Iterable;	getChunks	carpet$getChunks
