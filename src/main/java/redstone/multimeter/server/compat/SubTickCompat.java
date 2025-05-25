@@ -3,7 +3,7 @@ package redstone.multimeter.server.compat;
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.server.MultimeterServer;
 
-import subtick.TickHandler;
+import subtick.ITickHandleable;
 
 public class SubTickCompat {
 
@@ -14,8 +14,8 @@ public class SubTickCompat {
 	}
 
 	public boolean isFrozen() {
-		if (RedstoneMultimeterMod.isSubtickPreset()) {
-			return TickHandler.frozen();
+		if (RedstoneMultimeterMod.isSubtickPresent()) {
+			return ((ITickHandleable)server.getMinecraftServer()).tickHandler().frozen();
 		}
 
 		return false;
