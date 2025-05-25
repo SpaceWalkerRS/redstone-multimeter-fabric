@@ -51,11 +51,13 @@ public enum EventType {
 
 		@Override
 		public void addTextToTooltip(Tooltip tooltip, int metadata) {
+			// tick priorities were added in 1.4 snapshots!
+
 			String status = ((metadata >> 30) == 1) ? "scheduling" : "performing";
-			int priority = (metadata & 0xF) - 3;
+//			int priority = (metadata & 0xF) - 3;
 
 			tooltip.add(TextUtils.formatKeyValue("status", status));
-			tooltip.add(TextUtils.formatKeyValue("priority", priority));
+//			tooltip.add(TextUtils.formatKeyValue("priority", priority));
 		}
 	},
 	BLOCK_EVENT(6, "block_event") {

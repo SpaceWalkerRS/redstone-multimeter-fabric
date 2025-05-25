@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
@@ -93,7 +95,9 @@ public class BlockListElement extends SelectableScrollableListElement {
 
 			for (Block b : Block.BY_ID) {
 				if (b != null) {
-					String id = b.getTranslationKey().substring("tile.".length());
+					String id = (b.getTranslationKey() == null)
+						? String.valueOf(b.id)
+						: b.getTranslationKey().substring("tile.".length());
 
 					if (id.equals(key)) {
 						block = b;
@@ -118,7 +122,9 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int y = getY() + (height - 16) / 2;
 
 			if (stack != null) {
-				itemRenderer.renderGuiItem(textRenderer, textureManager, stack, x, y);
+				itemRenderer.renderGuiItem(textRenderer, textureManager, stack.itemId, stack.getMetadata(), 0, x, y);
+
+				GL11.glDisable(GL11.GL_LIGHTING);
 			}
 
 			x = getX() + 22;

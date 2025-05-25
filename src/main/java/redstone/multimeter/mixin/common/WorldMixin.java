@@ -140,7 +140,7 @@ public class WorldMixin implements TickTaskExecutor {
 			target = "Lnet/minecraft/block/Block;neighborChanged(Lnet/minecraft/world/World;IIII)V"
 		)
 	)
-	private void logBlockUpdate(int x, int y, int z, int neighborBlock, CallbackInfo ci, int block) {
+	private void logBlockUpdate(int x, int y, int z, int neighborBlock, CallbackInfo ci, Block block) {
 		if (!isMultiplayer) {
 			MultimeterServer server = ((IServerWorld)this).getMultimeterServer();
 			Multimeter multimeter = server.getMultimeter();
@@ -150,8 +150,8 @@ public class WorldMixin implements TickTaskExecutor {
 			// 'powered' changes for most meterable blocks are handled in those classes
 			// to reduce expensive calls to
 			// World.hasNeighborSignal and World.getNeighborSignal
-			if (((IBlock)Block.BY_ID[block]).rsmm$logPoweredOnBlockUpdate()) {
-				multimeter.logPowered((World)(Object)this, x, y, z, block, getBlockMetadata(x, y, z));
+			if (((IBlock)block).rsmm$logPoweredOnBlockUpdate()) {
+				multimeter.logPowered((World)(Object)this, x, y, z, block.id, getBlockMetadata(x, y, z));
 			}
 		}
 	}

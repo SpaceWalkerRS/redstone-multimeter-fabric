@@ -155,18 +155,6 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	@Inject(
 		method = "tick",
 		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-			args = "ldc=portalForcer"
-		)
-	)
-	private void swapTickTaskPortals(CallbackInfo ci) {
-		rsmm$swapTickTask(TickTask.PORTALS);
-	}
-
-	@Inject(
-		method = "tick",
-		at = @At(
 			value = "INVOKE",
 			ordinal = 1,
 			target = "Lnet/minecraft/server/world/ServerWorld;doBlockEvents()V"
@@ -295,24 +283,24 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 	}
 
 	@Inject(
-		method = "scheduleTick(IIIIII)V",
+		method = "scheduleTick(IIIII)V",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void captureScheduledTicks(int x, int y, int z, int block, int delay, int priority, CallbackInfo ci) {
+	private void captureScheduledTicks(int x, int y, int z, int block, int delay, CallbackInfo ci) {
 		rsmm$scheduledTicks = scheduledTicks.size();
 	}
 
 	@Inject(
-		method = "scheduleTick(IIIIII)V",
+		method = "scheduleTick(IIIII)V",
 		at = @At(
 			value = "TAIL"
 		)
 	)
-	private void logScheduleTick(int x, int y, int z, int block, int delay, int priority, CallbackInfo ci) {
+	private void logScheduleTick(int x, int y, int z, int block, int delay, CallbackInfo ci) {
 		if (rsmm$scheduledTicks != scheduledTicks.size()) {
-			getMultimeter().logScheduledTick(this, x, y, z, priority, true);
+			getMultimeter().logScheduledTick(this, x, y, z, true);
 		}
 	}
 
@@ -324,7 +312,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		)
 	)
 	private void logScheduledTick(boolean debug, CallbackInfoReturnable<Boolean> cir, @Local ScheduledTick scheduledTick) {
-		getMultimeter().logScheduledTick(this, scheduledTick.x, scheduledTick.y, scheduledTick.z, scheduledTick.priority, false);
+		getMultimeter().logScheduledTick(this, scheduledTick.x, scheduledTick.y, scheduledTick.z, false);
 	}
 
 	@Inject(

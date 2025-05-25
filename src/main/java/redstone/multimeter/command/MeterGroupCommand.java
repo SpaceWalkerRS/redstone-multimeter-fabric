@@ -1,7 +1,6 @@
 package redstone.multimeter.command;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -12,10 +11,10 @@ import java.util.function.Function;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.AbstractCommand;
 import net.minecraft.server.command.Command;
-import net.minecraft.server.command.TargetSelector;
 import net.minecraft.server.command.exception.CommandException;
 import net.minecraft.server.command.exception.CommandNotFoundException;
 import net.minecraft.server.command.exception.IncorrectUsageException;
+import net.minecraft.server.command.exception.PlayerNotFoundException;
 import net.minecraft.server.command.source.CommandSource;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 
@@ -205,7 +204,7 @@ public class MeterGroupCommand extends AbstractCommand {
 						throw new IncorrectUsageException(USAGE_MEMBERS_LIST);
 					case "add":
 						if (args.length == 3) {
-							membersAdd(source, parsePlayers(source, args[2]));
+							membersAddPlayer(source, args[2]);
 							return;
 						}
 
@@ -353,19 +352,21 @@ public class MeterGroupCommand extends AbstractCommand {
 		});
 	}
 
-	private void membersAdd(CommandSource source, Collection<ServerPlayerEntity> players) {
+	private void membersAddPlayer(CommandSource source, String playerName) {
 		commandMembers(source, (meterGroup, owner) -> {
-			for (ServerPlayerEntity player : players) {
-				if (player == owner) {
-					source.sendMessage("You cannot add yourself as a member!");
-				} else if (meterGroup.hasMember(player)) {
-					source.sendMessage(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getDisplayName(), meterGroup.getName()));
-				} else if (!multimeter.getServer().isMultimeterClient(player)) {
-					source.sendMessage(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getDisplayName(), RedstoneMultimeterMod.MOD_NAME));
-				} else {
-					multimeter.addMemberToMeterGroup(meterGroup, player.getDisplayName());
-					source.sendMessage(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getDisplayName(), meterGroup.getName()));
-				}
+			ServerPlayerEntity player = multimeter.getServer().getPlayerList().get(playerName);
+
+			if (player == null) {
+				throw new PlayerNotFoundException();
+			} else if (player == owner) {
+				source.sendMessage("You cannot add yourself as a member!");
+			} else if (meterGroup.hasMember(player)) {
+				source.sendMessage(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getDisplayName(), meterGroup.getName()));
+			} else if (!multimeter.getServer().isMultimeterClient(player)) {
+				source.sendMessage(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getDisplayName(), RedstoneMultimeterMod.MOD_NAME));
+			} else {
+				multimeter.addMemberToMeterGroup(meterGroup, player.getDisplayName());
+				source.sendMessage(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getDisplayName(), meterGroup.getName()));
 			}
 		});
 	}
@@ -431,20 +432,10 @@ public class MeterGroupCommand extends AbstractCommand {
 
 	private boolean run(CommandSource source, Function<ServerPlayerEntity, Boolean> command) {
 		try {
-			return command.apply(asPlayer(source));
+			return command.apply((ServerPlayerEntity) asPlayer(source));
 		} catch (CommandException e) {
 			return false;
 		}
-	}
-
-	private static List<ServerPlayerEntity> parsePlayers(CommandSource source, String arg) throws CommandException {
-		ServerPlayerEntity[] players = TargetSelector.select(source, arg);
-
-		if (players.length == 0) {
-			return Arrays.asList(AbstractCommand.parsePlayer(source, arg));
-		}
-
-		return Arrays.asList(players);
 	}
 
 	@FunctionalInterface

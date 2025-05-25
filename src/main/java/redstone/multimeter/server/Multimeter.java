@@ -523,8 +523,8 @@ public class Multimeter {
 		tryLogEvent(world, x, y, z, EventType.RANDOM_TICK);
 	}
 
-	public void logScheduledTick(World world, int x, int y, int z, int priority, boolean scheduling) {
-		tryLogEvent(world, x, y, z, EventType.SCHEDULED_TICK, (scheduling ? (1 << 30) : 0) | (priority + 3));
+	public void logScheduledTick(World world, int x, int y, int z, boolean scheduling) {
+		tryLogEvent(world, x, y, z, EventType.SCHEDULED_TICK, scheduling ? (1 << 30) : 0);
 	}
 
 	public void logBlockEvent(World world, int x, int y, int z, int type, int depth, boolean queueing) {

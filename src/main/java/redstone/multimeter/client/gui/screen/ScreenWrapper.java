@@ -15,7 +15,6 @@ public class ScreenWrapper extends Screen {
 	private double prevY;
 	private double mouseX;
 	private double mouseY;
-	private int touchEvents;
 	private int lastButton;
 	private long buttonTicks;
 
@@ -72,19 +71,11 @@ public class ScreenWrapper extends Screen {
 			int button = Mouse.getEventButton();
 
 			if (Mouse.getEventButtonState()) {
-				if (minecraft.options.touchscreen && touchEvents++ > 0) {
-					continue;
-				}
-
 				lastButton = button;
 				buttonTicks = Minecraft.getTime();
 
 				screen.mouseClick(mouseX, mouseY, button);
 			} else {
-				if (minecraft.options.touchscreen && --touchEvents > 0) {
-					return;
-				}
-
 				screen.mouseRelease(mouseX, mouseY, button);
 
 				if (button == lastButton) {

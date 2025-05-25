@@ -10,7 +10,7 @@ public class DimensionUtils {
 	public static Map<String, Dimension> BY_KEY;
 
 	public static String getKey(Dimension dimension) {
-		return dimension.getName().toLowerCase().replace(' ', '_');
+		return dimension.m_9807986().toLowerCase().replace(' ', '_');
 	}
 
 	public static Dimension byKey(String key) {
