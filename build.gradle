@@ -10,6 +10,14 @@ base {
 version = project.mod_version
 group = project.maven_group
 
+loom {
+	runs {
+		client {
+			programArgs "--userProperties", "{}"
+		}
+	}
+}
+
 repositories {
 }
 
