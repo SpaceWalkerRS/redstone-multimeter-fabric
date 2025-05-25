@@ -23,9 +23,6 @@ repositories {
 		name "Siphalor's Maven"
 	}
 	maven {
-		url "https://jitpack.io"
-	}
-	maven {
 		url "https://masa.dy.fi/maven"
 	}
 }
@@ -36,8 +33,10 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	modImplementation "de.siphalor:amecsapi-1.19:1+"
-	include "de.siphalor:amecsapi-1.19:1+"
+	include(modImplementation("de.siphalor:amecsapi-1.19:1+") {
+		// exclude lazydfu
+		exclude group: 'com.github.astei'
+	})
 	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
 		// eclipse gets confused and puts two versions of loader on the classpath...
 		exclude group: 'net.fabricmc'
