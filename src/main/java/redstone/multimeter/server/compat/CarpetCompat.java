@@ -17,7 +17,7 @@ public class CarpetCompat {
 	}
 
 	public boolean isFrozen() {
-		if (RedstoneMultimeterMod.isCarpetPreset()) {
+		if (RedstoneMultimeterMod.isCarpetPresent()) {
 			MinecraftServer server = this.server.getMinecraftServer();
 			ServerTickRateManager trm = ((MinecraftServerInterface)server).getTickRateManager();
 

@@ -23,7 +23,7 @@ public class RedstoneMultimeterMod implements ModInitializer {
 		LOGGER.info(String.format("%s %s has been initialized!", MOD_NAME, MOD_VERSION));
 	}
 
-	public static boolean isCarpetPreset() {
+	public static boolean isCarpetPresent() {
 		if (carpet == null) {
 			carpet = FabricLoader.getInstance().isModLoaded("carpet");
 		}
@@ -31,7 +31,7 @@ public class RedstoneMultimeterMod implements ModInitializer {
 		return carpet;
 	}
 
-	public static boolean isSubtickPreset() {
+	public static boolean isSubtickPresent() {
 		if (subtick == null) {
 			subtick = FabricLoader.getInstance().isModLoaded("subtick");
 		}
