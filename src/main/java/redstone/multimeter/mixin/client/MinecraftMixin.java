@@ -3,25 +3,32 @@ package redstone.multimeter.mixin.client;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.sugar.Local;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.interfaces.mixin.IKeyMapping;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
 @Mixin(Minecraft.class)
 public class MinecraftMixin implements IMinecraft {
+
+	@Shadow
+	private Options options;
 
 	private MultimeterClient multimeterClient;
 
@@ -83,7 +90,7 @@ public class MinecraftMixin implements IMinecraft {
 		multimeterClient.getInputHandler().handleKeybinds();
 	}
 
-	@Redirect(
+	@Inject(
 		method = "handleKeybinds",
 		slice = @Slice(
 			from = @At(
@@ -97,8 +104,20 @@ public class MinecraftMixin implements IMinecraft {
 			target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z"
 		)
 	)
-	private boolean handleHotbarKeybinds(KeyMapping keybind, @Local int slot) {
-		return keybind.consumeClick() && !multimeterClient.getInputHandler().handleHotbarKeybinds(slot);
+
+	private void handleHotbarKeybinds(CallbackInfo ci, @Local int slot) {
+		KeyMapping keybind = options.keyHotbarSlots[slot];
+		InputConstants.Key key = ((IKeyMapping) keybind).rsmm$getKey();
+
+		while (keybind.consumeClick()) {
+			if (!multimeterClient.getInputHandler().handleHotbarKeybinds(slot)) {
+				// un-consume the click so the toolbar/
+				// select hotbar slot code can be handled
+				KeyMapping.click(key);
+
+				break;
+			}
+		}
 	}
 
 	@Inject(
