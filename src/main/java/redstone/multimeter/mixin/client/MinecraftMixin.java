@@ -21,6 +21,7 @@ import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Connection;
 import net.minecraft.network.LocalConnection;
+import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.interfaces.mixin.IConnection;
@@ -128,7 +129,7 @@ public class MinecraftMixin implements IMinecraft {
 		savedSysTime = sysTime;
 
 		if (getTime() - sysTime <= 200) {
-			int scrollY = Mouse.getEventDWheel();
+			int scrollY = MathHelper.clamp(Mouse.getEventDWheel(), -1, 1);
 
 			if (multimeterClient.getInputHandler().handleMouseScroll(0, scrollY)) {
 				// prevent vanilla handling of scroll event
