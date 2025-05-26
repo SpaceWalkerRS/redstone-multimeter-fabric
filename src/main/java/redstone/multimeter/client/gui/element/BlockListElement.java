@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -104,7 +106,10 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int x = getX() + 2;
 			int y = getY() + (height - 16) / 2;
 
-			itemRenderer.renderGuiItem(stack, x, y);
+			if (stack != null) {
+				GlStateManager.enableTexture();
+				itemRenderer.renderGuiItem(stack, x, y);
+			}
 
 			x = getX() + 22;
 			y = getY() + height - (height + font.lineHeight) / 2;
