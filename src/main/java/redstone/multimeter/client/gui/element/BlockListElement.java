@@ -122,8 +122,8 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int y = getY() + (height - 16) / 2;
 
 			if (stack != null) {
+				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				itemRenderer.renderGuiItem(textRenderer, textureManager, stack.itemId, stack.getMetadata(), 0, x, y);
-
 				GL11.glDisable(GL11.GL_LIGHTING);
 			}
 
