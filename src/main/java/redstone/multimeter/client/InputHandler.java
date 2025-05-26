@@ -110,7 +110,7 @@ public class InputHandler {
 	}
 
 	public boolean handleMouseScroll(double scrollX, double scrollY) {
-		if (Keybinds.SCROLL_HUD.pressed && client.isHudActive()) {
+		if (Keybinds.SCROLL_HUD.pressed && client.isHudActive() && client.getHud().isPaused()) {
 			client.getHud().scroll((int)Math.round(scrollY), true);
 		} else {
 			return false;
