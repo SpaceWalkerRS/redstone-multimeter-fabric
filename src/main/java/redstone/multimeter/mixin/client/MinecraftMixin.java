@@ -104,7 +104,7 @@ public class MinecraftMixin implements IMinecraft {
 		savedSysTime = sysTime;
 
 		if (getTime() - sysTime <= 200) {
-			int scrollY = MathHelper.clamp(Mouse.getDWheel(), -1, 1);
+			int scrollY = MathHelper.clamp(Mouse.getEventDWheel(), -1, 1);
 
 			if (multimeterClient.getInputHandler().handleMouseScroll(0, scrollY)) {
 				// prevent vanilla handling of scroll event
