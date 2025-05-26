@@ -220,6 +220,7 @@ public class MeterRenderer {
 
 		font.draw(name, -font.width(name) / 2, 0, 0xFFFFFFFF);
 
+		GlStateManager.enableDepthTest();
 		GlStateManager.enableLighting();
 		GlStateManager.disableBlend();
 		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
