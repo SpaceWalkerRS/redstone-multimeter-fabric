@@ -12,6 +12,7 @@ import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.texture.TextureManager;
 import net.minecraft.client.resource.Identifier;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -95,7 +96,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 			this.key = key;
 			this.block = (Block) Block.REGISTRY.get(key.toString());
 
-			if (this.block == null) {
+			if (this.block == null || Item.byBlock(block) == null) {
 				this.stack = null;
 			} else {
 				this.stack = new ItemStack(this.block);
