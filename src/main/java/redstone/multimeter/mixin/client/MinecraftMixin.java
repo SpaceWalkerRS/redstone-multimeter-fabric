@@ -2,19 +2,22 @@ package redstone.multimeter.mixin.client;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.living.player.LocalClientPlayerEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.handler.ClientNetworkHandler;
+import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.Connection;
 import net.minecraft.network.LocalConnection;
@@ -27,11 +30,22 @@ import redstone.multimeter.interfaces.mixin.IMinecraft;
 public class MinecraftMixin implements IMinecraft {
 
 	@Shadow
+	private GameOptions options;
+	@Shadow
 	private Screen screen;
 	@Shadow
+	private LocalClientPlayerEntity player;
+	@Shadow
 	private boolean paused;
+	@Shadow
+	private long sysTime;
 
 	private MultimeterClient multimeterClient;
+	private long savedSysTime;
+	private int savedHotbarSlot;
+
+	@Shadow
+	private static long getTime() { return 0L; }
 
 	@Inject(
 		method = "init",
@@ -83,25 +97,55 @@ public class MinecraftMixin implements IMinecraft {
 		multimeterClient.getInputHandler().handleKeybinds();
 	}
 
-	@Redirect(
+	@Inject(
 		method = "tick()V",
+		slice = @Slice(
+			from = @At(
+				value = "INVOKE_STRING",
+				target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+				args = "ldc=mouse"
+			)
+		),
 		at = @At(
 			value = "INVOKE",
-			remap = false,
-			target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I"
+			ordinal = 0,
+			target = "Lnet/minecraft/client/Minecraft;getTime()J"
 		)
 	)
-	private int handleScroll() {
-		int scrollY = Mouse.getEventDWheel();
+	private void handleScroll(CallbackInfo ci) {
+		savedSysTime = sysTime;
 
-		if (multimeterClient.getInputHandler().handleMouseScroll(0, scrollY)) {
-			return 0;
+		if (getTime() - sysTime <= 200) {
+			int scrollY = Mouse.getEventDWheel();
+
+			if (multimeterClient.getInputHandler().handleMouseScroll(0, scrollY)) {
+				// prevent vanilla handling of scroll event
+				sysTime = -Integer.MIN_VALUE;
+			}
 		}
-
-		return scrollY;
 	}
 
-	@Redirect(
+	@Inject(
+		method = "tick()V",
+		slice = @Slice(
+			from = @At(
+				value = "INVOKE_STRING",
+				target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+				args = "ldc=mouse"
+			)
+		),
+		at = @At(
+			value = "FIELD",
+			ordinal = 0,
+			shift = Shift.AFTER,
+			target = "Lnet/minecraft/client/Minecraft;sysTime:J"
+		)
+	)
+	private void restoreScroll(CallbackInfo ci) {
+		sysTime = savedSysTime;
+	}
+
+	@Inject(
 		method = "tick()V",
 		slice = @Slice(
 			from = @At(
@@ -116,8 +160,38 @@ public class MinecraftMixin implements IMinecraft {
 			target = "Lorg/lwjgl/input/Keyboard;getEventKey()I"
 		)
 	)
-	private int handleHotbarKeybinds(@Local(ordinal = 0) int slot) {
-		return Keyboard.getEventKey() == 2 + slot && multimeterClient.getInputHandler().handleHotbarKeybinds(slot) ? -1 : Keyboard.getEventKey();
+	private void handleHotbarKeybinds(CallbackInfo ci, @Local(ordinal = 0) int slot) {
+		savedHotbarSlot = -1;
+
+		if (Keyboard.getEventKey() == 2 + slot) {
+			if (multimeterClient.getInputHandler().handleHotbarKeybinds(slot)) {
+				// save the selected slot before vanilla handling of
+				// the hotbar slot keys - then reset afterwards
+				// after all, rsmm's handling was successful!
+				savedHotbarSlot = player.inventory.selectedSlot;
+			}
+		}
+	}
+
+	@Inject(
+		method = "tick()V",
+		slice = @Slice(
+			from = @At(
+				value = "CONSTANT",
+				ordinal = 0,
+				args = "intValue=9"
+			)
+		),
+		at = @At(
+			value = "FIELD",
+			ordinal = 0,
+			target = "Lnet/minecraft/client/options/GameOptions;debugEnabled:Z"
+		)
+	)
+	private void restoreHotbarKeybinds(CallbackInfo ci) {
+		if (savedHotbarSlot >= 0) {
+			player.inventory.selectedSlot = savedHotbarSlot;
+		}
 	}
 
 	@Inject(
