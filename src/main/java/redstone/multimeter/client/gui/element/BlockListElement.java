@@ -95,7 +95,9 @@ public class BlockListElement extends SelectableScrollableListElement {
 
 			for (Block b : Block.BY_ID) {
 				if (b != null) {
-					String id = b.getTranslationKey().substring("tile.".length());
+					String id = (b.getTranslationKey() == null)
+						? String.valueOf(b.id)
+						: b.getTranslationKey().substring("tile.".length());
 
 					if (id.equals(key)) {
 						block = b;
