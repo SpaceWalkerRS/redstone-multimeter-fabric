@@ -93,7 +93,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 			super(0, 0, width, height);
 
 			this.key = key;
-			this.block = (Block) Block.REGISTRY.get(key);
+			this.block = (Block) Block.REGISTRY.get(key.toString());
 
 			if (this.block == null) {
 				this.stack = null;
