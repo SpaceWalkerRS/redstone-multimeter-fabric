@@ -223,6 +223,7 @@ public class MeterRenderer {
 
 		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 0xFFFFFFFF);
 
+		GlStateManager.enableDepthTest();
 		GlStateManager.enableLighting();
 		GlStateManager.disableBlend();
 		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
