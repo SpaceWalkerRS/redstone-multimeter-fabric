@@ -16,7 +16,7 @@ import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.block.PowerSource;
 
 @Mixin(ComparatorBlock.class)
-public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSource {
+public abstract class ComparatorBlockMixin extends DiodeBlockMixin implements MeterableBlock, PowerSource {
 
 	@Inject(
 		method = "calculateOutputSignal",
@@ -26,6 +26,11 @@ public abstract class ComparatorBlockMixin implements MeterableBlock, PowerSourc
 	)
 	private void logPowered(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
 		rsmm$logPowered(world, pos, cir.getReturnValue() > MIN_POWER);
+	}
+
+	@Override
+	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
+		return super.rsmm$isActive(world, pos, state) || state.get(ComparatorBlock.POWERED);
 	}
 
 	@Override
