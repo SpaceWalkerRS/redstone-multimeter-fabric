@@ -467,7 +467,7 @@ public class Multimeter {
 		Block oldBlock = oldState.getBlock();
 		Block newBlock = newState.getBlock();
 
-		if (oldBlock == newBlock && ((IBlock)newBlock).rsmm$isPowerSource() && ((PowerSource)newBlock).rsmm$logPowerChangeOnStateChange()) {
+		if (oldBlock.is(newBlock) && ((IBlock)newBlock).rsmm$isPowerSource() && ((PowerSource)newBlock).rsmm$logPowerChangeOnStateChange()) {
 			logPowerChange(world, pos, oldState, newState);
 		}
 
