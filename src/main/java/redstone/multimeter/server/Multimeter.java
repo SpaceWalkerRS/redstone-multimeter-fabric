@@ -465,7 +465,7 @@ public class Multimeter {
 	}
 
 	public void onBlockChange(World world, int x, int y, int z, Block oldBlock, int oldMetadata, Block newBlock, int newMetadata) {
-		if (oldBlock == newBlock && ((IBlock)newBlock).rsmm$isPowerSource() && ((PowerSource)newBlock).rsmm$logPowerChangeOnStateChange()) {
+		if (oldBlock.is(newBlock) && ((IBlock)newBlock).rsmm$isPowerSource() && ((PowerSource)newBlock).rsmm$logPowerChangeOnStateChange()) {
 			logPowerChange(world, x, y, z, oldMetadata, newMetadata);
 		}
 
