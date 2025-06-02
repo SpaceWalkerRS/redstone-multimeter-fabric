@@ -370,7 +370,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		)
 	)
 	private void onRunBlockEvents(CallbackInfo ci) {
-		rsmm$currentDepth = 0;
+		rsmm$currentDepth = -1; // will be incremented before first batch is run
 	}
 
 	@Inject(
