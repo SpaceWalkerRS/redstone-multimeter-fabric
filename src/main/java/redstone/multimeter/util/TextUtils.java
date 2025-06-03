@@ -87,7 +87,7 @@ public class TextUtils {
 
 	public static Text formatKeyValue(String key, Object value) {
 		return Text.literal("").append(Text.literal(key + ": ").setFormatting(Formatting.GOLD))
-			.append(Text.literal(value.toString()));
+			.append(Text.literal(value.toString()).setFormatting(Formatting.WHITE));
 	}
 
 	public static Text formatKeybindInfo(Object... keybinds) {
