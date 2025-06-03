@@ -59,6 +59,8 @@ public abstract class AbstractParentElement extends AbstractElement {
 			if (focused != null) {
 				consumed = focused.mouseClick(mouseX, mouseY, button);
 			}
+
+			updateHoveredElement(mouseX, mouseY);
 		}
 
 		return consumed;
@@ -74,6 +76,8 @@ public abstract class AbstractParentElement extends AbstractElement {
 			if (focused != null) {
 				consumed = focused.mouseRelease(mouseX, mouseY, button);
 			}
+
+			updateHoveredElement(mouseX, mouseY);
 		}
 
 		return consumed;
