@@ -29,11 +29,6 @@ public abstract class ComparatorBlockMixin extends DiodeBlockMixin implements Me
 	}
 
 	@Override
-	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return super.rsmm$isActive(world, pos, state) || state.get(ComparatorBlock.POWERED);
-	}
-
-	@Override
 	public boolean rsmm$logPowerChangeOnStateChange() {
 		return false;
 	}
