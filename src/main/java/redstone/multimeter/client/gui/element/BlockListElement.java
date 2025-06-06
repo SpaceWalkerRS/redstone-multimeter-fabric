@@ -7,6 +7,8 @@ import java.util.function.Predicate;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.Lighting;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
@@ -126,9 +128,10 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int y = getY() + (height - 16) / 2;
 
 			if (icon != null) {
+				Lighting.turnOnGui();
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
+
 				itemRenderer.renderGuiItem(textRenderer, textureManager, icon, x, y);
-				GL11.glDisable(GL11.GL_LIGHTING);
 			}
 
 			x = getX() + 22;
