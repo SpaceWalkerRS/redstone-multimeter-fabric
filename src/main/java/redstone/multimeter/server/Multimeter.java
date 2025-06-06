@@ -512,9 +512,8 @@ public class Multimeter {
 
 	public void logPowerChange(World world, int x, int y, int z, int oldBlock, int oldMetadata, int newBlock, int newMetadata) {
 		tryLogEvent(world, x, y, z, EventType.POWER_CHANGE, () -> {
-			PowerSource block = (PowerSource)Block.BY_ID[newBlock];
-			int oldPower = block.rsmm$getPowerLevel(world, 0, 0, 0, 0);
-			int newPower = block.rsmm$getPowerLevel(world, 0, 0, 0, 0);
+			int oldPower = (oldBlock == 0) ? 0 : ((PowerSource)Block.BY_ID[oldBlock]).rsmm$getPowerLevel(world, x, y, z, oldMetadata);
+			int newPower = (newBlock == 0) ? 0 : ((PowerSource)Block.BY_ID[newBlock]).rsmm$getPowerLevel(world, x, y, z, newMetadata);
 
 			return (oldPower << 8) | newPower;
 		}, (meterGroup, meter, event) -> {
