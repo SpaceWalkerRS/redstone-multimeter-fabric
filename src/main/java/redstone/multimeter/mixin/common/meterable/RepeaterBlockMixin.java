@@ -5,23 +5,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.DiodeBlock;
 import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
 import redstone.multimeter.block.MeterableBlock;
-import redstone.multimeter.block.PowerSource;
 
 @Mixin(RepeaterBlock.class)
-public abstract class RepeaterBlockMixin extends DiodeBlock implements MeterableBlock, PowerSource {
-
-	private RepeaterBlockMixin(boolean powered) {
-		super(powered);
-	}
+public abstract class RepeaterBlockMixin implements MeterableBlock {
 
 	@Inject(
 		method = "isLocked",
@@ -33,10 +26,5 @@ public abstract class RepeaterBlockMixin extends DiodeBlock implements Meterable
 		if (cir.getReturnValue() && world instanceof ServerWorld) {
 			rsmm$logPowered((ServerWorld)world, pos, state);
 		}
-	}
-
-	@Override
-	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
-		return powered ? MAX_POWER : MIN_POWER;
 	}
 }
