@@ -359,7 +359,7 @@ public class MultimeterClient {
 	private void onTargetBlock(Consumer<DimPos> action) {
 		HitResult hit = minecraft.crosshairTarget;
 
-		if (hit.type == HitResult.Type.BLOCK) {
+		if (hit != null && hit.type == HitResult.Type.BLOCK) {
 			World world = minecraft.world;
 			int x = hit.x;
 			int y = hit.y;
