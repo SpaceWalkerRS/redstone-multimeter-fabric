@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.Lighting;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -107,7 +108,9 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int y = getY() + (height - 16) / 2;
 
 			if (stack != null) {
+				Lighting.turnOnGui();
 				GlStateManager.enableTexture();
+
 				itemRenderer.renderGuiItem(stack, x, y);
 			}
 
