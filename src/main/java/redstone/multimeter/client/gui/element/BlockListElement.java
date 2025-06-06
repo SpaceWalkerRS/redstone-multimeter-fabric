@@ -123,7 +123,9 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int y = getY() + (height - 16) / 2;
 
 			if (icon != null) {
+				Lighting.turnOnGui();
 				GlStateManager.enableTexture();
+
 				itemRenderer.renderGuiItem(icon, x, y);
 			}
 
