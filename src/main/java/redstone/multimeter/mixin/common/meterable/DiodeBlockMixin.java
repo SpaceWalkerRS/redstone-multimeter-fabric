@@ -11,12 +11,14 @@ import net.minecraft.block.DiodeBlock;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
+import redstone.multimeter.block.PowerSource;
 
 @Mixin(DiodeBlock.class)
-public class DiodeBlockMixin implements MeterableBlock {
+public class DiodeBlockMixin implements MeterableBlock, PowerSource {
 
 	@Shadow @Final private boolean powered;
 
+	@Shadow private boolean isPowered(int metadata) { return false; }
 	@Shadow private boolean shouldBePowered(World world, int x, int y, int z, int metadata) { return false; }
 
 	@Inject(
@@ -26,7 +28,7 @@ public class DiodeBlockMixin implements MeterableBlock {
 		)
 	)
 	private void logPowered(World world, int x, int y, int z, int metadata, CallbackInfoReturnable<Boolean> cir) {
-		rsmm$logPowered(world, 0, 0, 0, cir.getReturnValue()); // repeaters
+		rsmm$logPowered(world, x, y, z, cir.getReturnValue()); // repeaters
 	}
 
 	@Override
@@ -41,6 +43,11 @@ public class DiodeBlockMixin implements MeterableBlock {
 
 	@Override
 	public boolean rsmm$isActive(World world, int x, int y, int z, int metadata) {
-		return powered;
+		return isPowered(metadata);
+	}
+
+	@Override
+	public int rsmm$getPowerLevel(World world, int x, int y, int z, int metadata) {
+		return isPowered(metadata) ? MAX_POWER : MIN_POWER; // repeaters
 	}
 }
