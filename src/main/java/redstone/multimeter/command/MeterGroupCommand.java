@@ -359,12 +359,12 @@ public class MeterGroupCommand extends AbstractCommand {
 				if (player == owner) {
 					source.sendMessage("You cannot add yourself as a member!");
 				} else if (meterGroup.hasMember(player)) {
-					source.sendMessage(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getName(), meterGroup.getName()));
+					source.sendMessage(String.format("Player \'%s\' is already a member of meter group \'%s\'!", player.getDisplayName(), meterGroup.getName()));
 				} else if (!multimeter.getServer().isMultimeterClient(player)) {
-					source.sendMessage(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getName(), RedstoneMultimeterMod.MOD_NAME));
+					source.sendMessage(String.format("You cannot add player \'%s\' as a member; they do not have %s installed!", player.getDisplayName(), RedstoneMultimeterMod.MOD_NAME));
 				} else {
 					multimeter.addMemberToMeterGroup(meterGroup, player.getDisplayName());
-					source.sendMessage(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getName(), meterGroup.getName()));
+					source.sendMessage(String.format("Player \'%s\' is now a member of meter group \'%s\'", player.getDisplayName(), meterGroup.getName()));
 				}
 			}
 		});

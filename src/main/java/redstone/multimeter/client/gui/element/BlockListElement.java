@@ -1,6 +1,7 @@
 package redstone.multimeter.client.gui.element;
 
 import java.util.Collection;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -11,14 +12,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.texture.TextureManager;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.util.Blocks;
+import redstone.multimeter.util.Items;
 import redstone.multimeter.util.TextUtils;
 
 public class BlockListElement extends SelectableScrollableListElement {
+
+	private static final Random RANDOM = new Random();
 
 	private final TextureManager textureManager;
 	private final ItemRenderer itemRenderer;
@@ -85,32 +91,32 @@ public class BlockListElement extends SelectableScrollableListElement {
 	private class BlockListEntry extends AbstractElement {
 
 		private final String key;
-		private final Block block;
-		private final ItemStack stack;
+		private final ItemStack icon;
 
 		protected BlockListEntry(int width, int height, String key) {
 			super(0, 0, width, height);
 
-			Block block = null;
+			Block block = Blocks.byKey(key);
+			Item item = null;
 
-			for (Block b : Block.BY_ID) {
-				if (b != null) {
-					String id = b.getTranslationKey().substring("tile.".length());
+			if (block != null) {
+				item = Items.byBlock(block);
 
-					if (id.equals(key)) {
-						block = b;
-					}
+				// some blocks do not have direct a item counterpart
+				// so to get the item, we try a few different things
+				if (item == null) {
+					// first check for an item with the same key
+					item = Items.byKey(key.toString());
+				}
+				if (item == null) {
+					// if nothing has worked yet, use the item dropped
+					// by the block when broken
+					item = Item.BY_ID[block.getDropItem(0, RANDOM, 0)];
 				}
 			}
 
 			this.key = key;
-			this.block = block;
-
-			if (this.block == null) {
-				this.stack = null;
-			} else {
-				this.stack = new ItemStack(this.block);
-			}
+			this.icon = (item == null) ? null : new ItemStack(item);
 		}
 
 		@Override
@@ -119,9 +125,9 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int x = getX() + 2;
 			int y = getY() + (height - 16) / 2;
 
-			if (stack != null) {
+			if (icon != null) {
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				itemRenderer.renderGuiItem(textRenderer, textureManager, stack, x, y);
+				itemRenderer.renderGuiItem(textRenderer, textureManager, icon, x, y);
 				GL11.glDisable(GL11.GL_LIGHTING);
 			}
 
