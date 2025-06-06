@@ -35,7 +35,7 @@ public abstract class RepeaterBlockMixin extends Block implements MeterableBlock
 		)
 	)
 	private void logPowered(World world, int x, int y, int z, int metadata, CallbackInfoReturnable<Boolean> cir) {
-		rsmm$logPowered(world, 0, 0, 0, cir.getReturnValue()); // repeaters
+		rsmm$logPowered(world, x, y, z, cir.getReturnValue());
 	}
 
 	@Inject(
@@ -46,7 +46,7 @@ public abstract class RepeaterBlockMixin extends Block implements MeterableBlock
 	)
 	private void logPowered(WorldView world, int x, int y, int z, int metadata, CallbackInfoReturnable<Boolean> cir) {
 		if (cir.getReturnValue() && world instanceof ServerWorld) {
-			rsmm$logPowered((ServerWorld)world, x, y, z, id, metadata);
+			rsmm$logPowered((ServerWorld)world, x, y, z, ((Block)(Object)this).id, metadata);
 		}
 	}
 
