@@ -131,7 +131,7 @@ public class BlockListElement extends SelectableScrollableListElement {
 				Lighting.turnOnGui();
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
 
-				itemRenderer.renderGuiItem(textRenderer, textureManager, icon.itemId, icon.getMetadata(), 0, x, y);
+				itemRenderer.renderGuiItem(textRenderer, textureManager, icon.itemId, icon.getMetadata(), icon.getSprite(), x, y);
 			}
 
 			x = getX() + 22;
