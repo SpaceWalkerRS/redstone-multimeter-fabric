@@ -27,11 +27,6 @@ public abstract class ComparatorBlockMixin extends DiodeBlockMixin implements Me
 	}
 
 	@Override
-	public boolean rsmm$isActive(World world, int x, int y, int z, int metadata) {
-		return super.rsmm$isActive(world, x, y, z, metadata) || (metadata & 8) != 0;
-	}
-
-	@Override
 	public boolean rsmm$logPowerChangeOnStateChange() {
 		return false;
 	}
