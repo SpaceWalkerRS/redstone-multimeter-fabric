@@ -27,11 +27,23 @@ public class WorldChunkMixin {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/Block;onAdded(Lnet/minecraft/world/World;III)V"
+			target = "Lnet/minecraft/block/Block;onRemoved(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;I)V"
 		)
 	)
 	private void logBlockChange(int localX, int y, int localZ, Block block, int metadata, CallbackInfoReturnable<Boolean> cir, int index, int oldHeight, Block oldBlock, int oldMetadata, WorldChunkSection section, int heightIncreased /* the fuck? */, int x, int z) {
-		((IServerWorld)world).getMultimeter().onBlockChange(world, x, y, z, oldBlock, oldMetadata, block, metadata);
+		((IServerWorld)world).getMultimeter().onBlockChange(world, x, y, z, oldBlock, oldMetadata, block, oldMetadata /* metadata has not changed yet! */);
+	}
+
+	@Inject(
+		method = "setBlockWithMetadataAt",
+		locals = LocalCapture.CAPTURE_FAILHARD,
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/block/Block;onAdded(Lnet/minecraft/world/World;III)V"
+		)
+	)
+	private void logBlockMetadataChange(int localX, int y, int localZ, Block block, int metadata, CallbackInfoReturnable<Boolean> cir, int index, int oldHeight, Block oldBlock, int oldMetadata, WorldChunkSection section, int heightIncreased /* the fuck? */, int x, int z) {
+		((IServerWorld)world).getMultimeter().onBlockChange(world, x, y, z, block /* block change was already handled */, oldMetadata, block, metadata);
 	}
 
 	@Inject(
@@ -42,7 +54,7 @@ public class WorldChunkMixin {
 			target = "Lnet/minecraft/world/chunk/WorldChunkSection;setBlockMetadata(IIII)V"
 		)
 	)
-	private void logBlockChange(int localX, int y, int localZ, int metadata, CallbackInfoReturnable<Boolean> cir, WorldChunkSection section) {
+	private void logBlockMetadataChange(int localX, int y, int localZ, int metadata, CallbackInfoReturnable<Boolean> cir, WorldChunkSection section) {
 		if (!world.isMultiplayer) {
 			int x = (chunkX << 4) + localX;
 			int z = (chunkZ << 4) + localZ;
