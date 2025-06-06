@@ -467,8 +467,12 @@ public class Multimeter {
 		Block oldBlock = oldState.getBlock();
 		Block newBlock = newState.getBlock();
 
-		if (oldBlock.is(newBlock) && ((IBlock)newBlock).rsmm$isPowerSource() && ((PowerSource)newBlock).rsmm$logPowerChangeOnStateChange()) {
-			logPowerChange(world, pos, oldState, newState);
+		if (oldBlock.is(newBlock)) {
+			if (((IBlock)newBlock).rsmm$isPowerSource() && ((PowerSource)newBlock).rsmm$logPowerChangeOnStateChange()) {
+				logPowerChange(world, pos, oldState, newState);
+			}
+
+			logDataChange(world, pos, oldState, newState);
 		}
 
 		boolean wasMeterable = ((IBlock)oldBlock).rsmm$isMeterable();
@@ -574,6 +578,19 @@ public class Multimeter {
 
 	public void logInteractBlock(World world, BlockPos pos) {
 		tryLogEvent(world, pos, EventType.INTERACT_BLOCK);
+	}
+
+	public void logDataChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
+		int oldStateData = oldState.getBlock().getMetadataFromState(oldState);
+		int newStateData = newState.getBlock().getMetadataFromState(newState);
+
+		tryLogEvent(world, pos, EventType.BLOCK_DATA_CHANGE, (oldStateData << 8) | newStateData, (meterGroup, meter, event) -> {
+			int data = event.getMetadata();
+			int oldData = (data >> 8) & 0xFF;
+			int newData = data & 0xFF;
+
+			return oldData != newData;
+		});
 	}
 
 	private void tryLogEvent(World world, BlockPos pos, EventType type) {
