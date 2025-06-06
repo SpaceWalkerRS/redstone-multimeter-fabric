@@ -1,15 +1,18 @@
 package redstone.multimeter.client.gui.element;
 
 import java.util.Collection;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.Lighting;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.Identifier;
 
@@ -19,6 +22,8 @@ import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.util.TextUtils;
 
 public class BlockListElement extends SelectableScrollableListElement {
+
+	private static final Random RANDOM = new Random();
 
 	private final ItemRenderer itemRenderer;
 	private final TextRenderer textRenderer;
@@ -83,20 +88,32 @@ public class BlockListElement extends SelectableScrollableListElement {
 	private class BlockListEntry extends AbstractElement {
 
 		private final Identifier key;
-		private final Block block;
-		private final ItemStack stack;
+		private final ItemStack icon;
 
 		protected BlockListEntry(int width, int height, Identifier key) {
 			super(0, 0, width, height);
 
-			this.key = key;
-			this.block = Block.REGISTRY.get(key);
+			Block block = Block.REGISTRY.get(key);
+			Item item = null;
 
-			if (this.block == null) {
-				this.stack = null;
-			} else {
-				this.stack = new ItemStack(this.block);
+			if (block != null) {
+				item = Item.byBlock(block);
+
+				// some blocks do not have direct a item counterpart
+				// so to get the item, we try a few different things
+				if (item == null) {
+					// first check for an item with the same key
+					item = Item.REGISTRY.get(key);
+				}
+				if (item == null) {
+					// if nothing has worked yet, use the item dropped
+					// by the block when broken
+					item = block.getDropItem(block.defaultState(), RANDOM, 0);
+				}
 			}
+
+			this.key = key;
+			this.icon = (item == null) ? null : new ItemStack(item);
 		}
 
 		@Override
@@ -105,9 +122,9 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int x = getX() + 2;
 			int y = getY() + (height - 16) / 2;
 
-			if (stack != null) {
+			if (icon != null) {
 				GlStateManager.enableTexture();
-				itemRenderer.renderGuiItem(stack, x, y);
+				itemRenderer.renderGuiItem(icon, x, y);
 			}
 
 			x = getX() + 22;
