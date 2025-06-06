@@ -85,7 +85,18 @@ public enum EventType {
 		}
 	},
 	OBSERVER_UPDATE(12, "observer_update"),
-	INTERACT_BLOCK(13, "interact_block");
+	INTERACT_BLOCK(13, "interact_block"),
+	BLOCK_DATA_CHANGE(14, "block_data_change") {
+
+		@Override
+		public void addTextToTooltip(Tooltip tooltip, int metadata) {
+			int oldData = (metadata >> 8) & 0xFF;
+			int newData =  metadata       & 0xFF;
+
+			tooltip.add(TextUtils.formatKeyValue("old data", oldData));
+			tooltip.add(TextUtils.formatKeyValue("new data", newData));
+		}
+	};
 
 	public static final EventType[] ALL;
 	private static final Map<String, EventType> BY_NAME;
