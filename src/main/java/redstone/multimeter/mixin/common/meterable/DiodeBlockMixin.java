@@ -13,12 +13,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.MeterableBlock;
+import redstone.multimeter.block.PowerSource;
 
 @Mixin(DiodeBlock.class)
-public class DiodeBlockMixin implements MeterableBlock {
+public class DiodeBlockMixin implements MeterableBlock, PowerSource {
 
 	@Shadow @Final private boolean powered;
 
+	@Shadow private boolean isPowered(BlockState state) { return false; }
 	@Shadow private boolean shouldBePowered(World world, BlockPos pos, BlockState state) { return false; }
 
 	@Inject(
@@ -43,6 +45,11 @@ public class DiodeBlockMixin implements MeterableBlock {
 
 	@Override
 	public boolean rsmm$isActive(World world, BlockPos pos, BlockState state) {
-		return powered;
+		return isPowered(state);
+	}
+
+	@Override
+	public int rsmm$getPowerLevel(World world, BlockPos pos, BlockState state) {
+		return isPowered(state) ? MAX_POWER : MIN_POWER; // repeaters
 	}
 }
