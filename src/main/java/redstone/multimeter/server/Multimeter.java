@@ -526,9 +526,8 @@ public class Multimeter {
 
 	public void logPowerChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
 		tryLogEvent(world, pos, EventType.POWER_CHANGE, () -> {
-			PowerSource block = (PowerSource)newState.getBlock();
-			int oldPower = block.rsmm$getPowerLevel(world, pos, oldState);
-			int newPower = block.rsmm$getPowerLevel(world, pos, newState);
+			int oldPower = ((PowerSource)oldState.getBlock()).rsmm$getPowerLevel(world, pos, oldState);
+			int newPower = ((PowerSource)newState.getBlock()).rsmm$getPowerLevel(world, pos, newState);
 
 			return (oldPower << 8) | newPower;
 		}, (meterGroup, meter, event) -> {
