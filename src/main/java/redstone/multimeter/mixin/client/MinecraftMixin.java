@@ -36,8 +36,8 @@ public class MinecraftMixin implements IMinecraft {
 	private Screen screen;
 	@Shadow
 	private LocalClientPlayerEntity player;
-	@Shadow(aliases = "paused")
-	private boolean $paused; // mappings issue...
+	@Shadow
+	private boolean stopped; // mappings issue... this is 'paused'
 	@Shadow
 	private long sysTime;
 
@@ -81,7 +81,7 @@ public class MinecraftMixin implements IMinecraft {
 		ClientNetworkHandler networkHandler = ((Minecraft) (Object) this).getNetworkHandler();
 		Connection connection = networkHandler != null ? networkHandler.getConnection() : null;
 
-		if (connection != null && connection instanceof LocalConnection && $paused) {
+		if (connection != null && connection instanceof LocalConnection && stopped) {
 			((IConnection) connection).rsmm$handleRsmmPackets();;
 		}
 	}
