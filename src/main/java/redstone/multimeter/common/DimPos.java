@@ -5,7 +5,7 @@ import com.google.common.base.Objects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
 
-import redstone.multimeter.util.DimensionUtils;
+import redstone.multimeter.util.Dimensions;
 import redstone.multimeter.util.Direction;
 import redstone.multimeter.util.Direction.Axis;
 
@@ -24,7 +24,7 @@ public class DimPos {
 	}
 
 	public DimPos(World world, int x, int y, int z) {
-		this(DimensionUtils.getKey(world.dimension), x, y, z);
+		this(Dimensions.REGISTRY.getKey(world.dimension.id), x, y, z);
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class DimPos {
 	}
 
 	public boolean is(World world) {
-		return DimensionUtils.getKey(world.dimension).equals(dimension);
+		return (Integer) Dimensions.REGISTRY.get(dimension) == world.dimension.id;
 	}
 
 	public DimPos offset(String dimension) {
