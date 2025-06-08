@@ -56,6 +56,8 @@ public class MultimeterClient {
 		return warning;
 	};
 
+	public static Minecraft MINECRAFT;
+
 	private final Minecraft minecraft;
 	private final ClientPacketHandler packetHandler;
 	private final InputHandler inputHandler;
@@ -74,6 +76,8 @@ public class MultimeterClient {
 	private long prevGameTime;
 
 	public MultimeterClient(Minecraft minecraft) {
+		MINECRAFT = minecraft;
+
 		this.minecraft = minecraft;
 		this.packetHandler = new ClientPacketHandler(this);
 		this.inputHandler = new InputHandler(this);
