@@ -85,20 +85,21 @@ public class BlockListElement extends SelectableScrollableListElement {
 	private class BlockListEntry extends AbstractElement {
 
 		private final ResourceLocation key;
-		private final Block block;
-		private final ItemStack stack;
+		private final ItemStack icon;
 
 		protected BlockListEntry(int width, int height, ResourceLocation key) {
 			super(0, 0, width, height);
 
-			this.key = key;
-			this.block = Registry.BLOCK.get(key);
 
-			if (this.block == null) {
-				this.stack = null;
+			Block block = Registry.BLOCK.get(key);
+
+			if (block == null) {
+				this.icon = null;
 			} else {
-				this.stack = new ItemStack(this.block.asItem());
+				this.icon = new ItemStack(block.asItem());
 			}
+
+			this.key = key;
 		}
 
 		@Override
@@ -107,11 +108,11 @@ public class BlockListElement extends SelectableScrollableListElement {
 			int x = getX() + 2;
 			int y = getY() + (height - 16) / 2;
 
-			if (stack != null) {
+			if (icon != null) {
 				Lighting.turnOnGui();
 				GlStateManager.enableTexture();
 
-				itemRenderer.renderGuiItem(stack, x, y);
+				itemRenderer.renderGuiItem(icon, x, y);
 			}
 
 			x = getX() + 22;
