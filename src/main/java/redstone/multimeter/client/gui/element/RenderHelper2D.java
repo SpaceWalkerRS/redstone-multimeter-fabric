@@ -10,12 +10,12 @@ import com.mojang.blaze3d.vertex.Tesselator;
 
 import com.mojang.math.Matrix4f;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.network.chat.Component;
 
+import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
 import redstone.multimeter.util.ColorUtils;
@@ -123,7 +123,7 @@ public class RenderHelper2D {
 	}
 
 	protected void renderTexture(PoseStack poses, Texture texture, Drawer drawer) {
-		Minecraft.getInstance().getTextureManager().bind(texture.location);
+		MultimeterClient.MINECRAFT.getTextureManager().bind(texture.location);
 		RenderSystem.enableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -174,7 +174,7 @@ public class RenderHelper2D {
 	}
 
 	protected void renderTextureColor(PoseStack poses, Texture texture, Drawer drawer) {
-		Minecraft.getInstance().getTextureManager().bind(texture.location);
+		MultimeterClient.MINECRAFT.getTextureManager().bind(texture.location);
 		RenderSystem.enableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
