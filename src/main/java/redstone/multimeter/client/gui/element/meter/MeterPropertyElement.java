@@ -21,6 +21,7 @@ import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.action.MousePress;
 import redstone.multimeter.client.gui.element.button.ButtonFactory;
 import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.element.button.TransparentToggleButton;
@@ -212,7 +213,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 					int coord = AxisUtils.choose(axis, p.getX(), p.getY(), p.getZ());
 
 					return String.valueOf(coord);
-				});
+				}, SuggestionsProvider.none());
 			});
 
 			int size = getHeight() / 2 - 1;
