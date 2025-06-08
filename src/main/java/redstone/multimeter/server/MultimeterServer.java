@@ -21,7 +21,7 @@ import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.common.network.packets.TickTimePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
-import redstone.multimeter.util.DimensionUtils;
+import redstone.multimeter.util.Dimensions;
 //import redstone.multimeter.server.compat.CarpetCompat;
 
 public class MultimeterServer {
@@ -190,7 +190,7 @@ public class MultimeterServer {
 	}
 
 	public ServerWorld getWorld(String key) {
-		DimensionType dimension = DimensionUtils.byKey(key);
+		DimensionType dimension = Dimensions.REGISTRY.get(key);
 		return dimension == null ? null : server.getWorld(dimension.getId());
 	}
 
