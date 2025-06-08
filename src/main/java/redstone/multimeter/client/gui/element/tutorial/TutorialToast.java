@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.toast.Toast;
 import net.minecraft.client.gui.toast.ToastGui;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.text.Text;
+
+import redstone.multimeter.client.MultimeterClient;
 
 public class TutorialToast implements Toast {
 
@@ -29,8 +30,7 @@ public class TutorialToast implements Toast {
 	private Visibility visibility;
 
 	public TutorialToast(Text title, Text description) {
-		Minecraft client = Minecraft.getInstance();
-		TextRenderer textRenderer = client.textRenderer;
+		TextRenderer textRenderer = MultimeterClient.MINECRAFT.textRenderer;
 
 		this.toastWidth = 200;
 
@@ -54,8 +54,7 @@ public class TutorialToast implements Toast {
 	public Visibility render(ToastGui toasts, long animationTime) {
 		drawBackground(toasts, animationTime);
 
-		Minecraft minecraft = toasts.getMinecraft();
-		TextRenderer textRenderer = minecraft.textRenderer;
+		TextRenderer textRenderer = MultimeterClient.MINECRAFT.textRenderer;
 
 		float x = 7.0F;
 		float y = 7.0F;

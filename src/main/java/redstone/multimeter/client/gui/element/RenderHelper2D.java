@@ -9,10 +9,10 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tessellator;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.text.Text;
 
+import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
 import redstone.multimeter.util.ColorUtils;
@@ -119,7 +119,7 @@ public class RenderHelper2D {
 	}
 
 	protected void renderTexture(Texture texture, Drawer drawer) {
-		Minecraft.getInstance().getTextureManager().bind(texture.location);
+		MultimeterClient.MINECRAFT.getTextureManager().bind(texture.location);
 		GlStateManager.enableTexture();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
@@ -169,7 +169,7 @@ public class RenderHelper2D {
 	}
 
 	protected void renderTextureColor(Texture texture, Drawer drawer) {
-		Minecraft.getInstance().getTextureManager().bind(texture.location);
+		MultimeterClient.MINECRAFT.getTextureManager().bind(texture.location);
 		GlStateManager.enableTexture();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
