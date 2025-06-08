@@ -1,5 +1,7 @@
 package redstone.multimeter.client.gui.element.button;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -25,9 +27,14 @@ public class TextField extends AbstractButton {
 	private final KeyboardHandler keyboard;
 	private final Consumer<String> listener;
 	private final Supplier<String> textSupplier;
+	private final SuggestionsProvider suggestionsProvider;
 
 	private String fullText;
 	private String visibleText;
+	private String suggestion;
+	private String visibleSuggestion;
+	private int suggestionIndex;
+	private List<String> suggestions;
 	private int textX;
 	private int textY;
 	private int textWidth;
@@ -43,11 +50,11 @@ public class TextField extends AbstractButton {
 	private int selectionIndex;
 	private SelectType selection;
 
-	public TextField(MultimeterClient client, int x, int y, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text) {
-		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, tooltip, listener, text);
+	public TextField(MultimeterClient client, int x, int y, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text, SuggestionsProvider suggestions) {
+		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, tooltip, listener, text, suggestions);
 	}
 
-	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text) {
+	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text, SuggestionsProvider suggestions) {
 		super(client, x, y, width, height, () -> Component.literal(""), tooltip);
 
 		Minecraft minecraft = this.client.getMinecraft();
@@ -55,9 +62,14 @@ public class TextField extends AbstractButton {
 		this.keyboard = minecraft.keyboardHandler;
 		this.listener = listener;
 		this.textSupplier = text;
+		this.suggestionsProvider = suggestions;
 
 		this.fullText = "";
 		this.visibleText = "";
+		this.suggestion = "";
+		this.visibleSuggestion = "";
+		this.suggestionIndex = -1;
+		this.suggestions = Collections.emptyList();
 		this.textX = getX() + 4;
 		this.textY = getY() + (getHeight() - this.font.lineHeight) / 2;
 		this.textWidth = getWidth() - 8;
@@ -171,10 +183,20 @@ public class TextField extends AbstractButton {
 			moveCursorFromKeyboard(1);
 			break;
 		case GLFW.GLFW_KEY_UP:
+			if (!suggestions.isEmpty()) {
+				moveSuggestion(-1);
+				break;
+			}
+			// fall through
 		case GLFW.GLFW_KEY_PAGE_UP:
 			setCursorFromKeyboard(0);
 			break;
 		case GLFW.GLFW_KEY_DOWN:
+			if (!suggestions.isEmpty()) {
+				moveSuggestion(1);
+				break;
+			}
+			// fall through
 		case GLFW.GLFW_KEY_PAGE_DOWN:
 			setCursorFromKeyboard(fullText.length());
 			break;
@@ -183,6 +205,11 @@ public class TextField extends AbstractButton {
 			break;
 		case GLFW.GLFW_KEY_DELETE:
 			erase(true);
+			break;
+		case GLFW.GLFW_KEY_TAB:
+			if (!suggestions.isEmpty()) {
+				useSuggestion();
+			}
 			break;
 		default:
 			if (!RSMMScreen.isControlPressed()) {
@@ -318,15 +345,21 @@ public class TextField extends AbstractButton {
 		renderText(font, graphics, visibleText, textX, textY, true, color);
 
 		if (isFocused()) {
-			if (isActive() && (cursorTicks / 6) % 2 == 0) {
-				if (cursorIndex == fullText.length()) {
-					int x = textX + font.width(visibleText);
-					renderText(font, graphics, "_", x, textY, true, color);
-				} else {
-					int width = font.width(fullText.substring(scrollIndex, cursorIndex));
-					int x = textX + width;
+			if (isActive()) {
+				if (suggestionIndex >= 0) {
+					int suggestionColor = getSuggestionColor();
+					renderText(font, graphics, visibleSuggestion, textX + font.width(visibleText), textY, true, suggestionColor);
+				}
+				if ((cursorTicks / 6) % 2 == 0) {
+					if (cursorIndex == fullText.length()) {
+						int x = textX + font.width(visibleText);
+						renderText(font, graphics, "_", x, textY, true, color);
+					} else {
+						int width = font.width(fullText.substring(scrollIndex, cursorIndex));
+						int x = textX + width;
 
-					renderRect(graphics, x, selectionY, 1, selectionHeight, color);
+						renderRect(graphics, x, selectionY, 1, selectionHeight, color);
+					}
 				}
 			}
 			if (hasSelection()) {
@@ -376,6 +409,10 @@ public class TextField extends AbstractButton {
 		return isActive() ? 0xFFFFFFFF : 0xFFB0B0B0;
 	}
 
+	private int getSuggestionColor() {
+		return 0xFF808080;
+	}
+
 	public String getText() {
 		return fullText;
 	}
@@ -418,6 +455,10 @@ public class TextField extends AbstractButton {
 		}
 	}
 
+	private void useSuggestion() {
+		replace(suggestion, 0, fullText.length());
+	}
+
 	private void insert(String text, int index) {
 		replace(text, index, index);
 	}
@@ -436,6 +477,7 @@ public class TextField extends AbstractButton {
 		}
 
 		fullText = text;
+
 		updateMaxScroll();
 		updateVisibleText();
 
@@ -471,8 +513,49 @@ public class TextField extends AbstractButton {
 		}
 	}
 
+	private void updateSuggestions() {
+		if (!isFocused() || !isActive() || cursorIndex < fullText.length() || selection != SelectType.NONE) {
+			suggestions = Collections.emptyList();
+		} else {
+			suggestions = suggestionsProvider.provide(fullText);
+		}
+
+		setSuggestion(0);
+	}
+
 	private void updateVisibleText() {
 		visibleText = font.plainSubstrByWidth(fullText.substring(scrollIndex), textWidth, false);
+
+		if (!suggestion.isBlank()) {
+			visibleSuggestion = font.plainSubstrByWidth(suggestion.substring(visibleText.length()), textWidth - font.width(visibleText), false);
+		} else {
+			visibleSuggestion = "";
+		}
+	}
+
+	private void moveSuggestion(int amount) {
+		int nextIndex = suggestionIndex + amount;
+
+		if (nextIndex < 0) {
+			nextIndex = suggestions.size() - 1;
+		}
+		if (nextIndex >= suggestions.size()) {
+			nextIndex = 0;
+		}
+
+		setSuggestion(nextIndex);
+	}
+
+	private void setSuggestion(int index) {
+		if (suggestions.isEmpty()) {
+			suggestionIndex = -1;
+			suggestion = "";
+		} else {
+			suggestionIndex = Mth.clamp(index, 0, suggestions.size() - 1);
+			suggestion = suggestions.get(suggestionIndex);
+		}
+
+		updateVisibleText();
 	}
 
 	public int getMaxLength() {
@@ -537,6 +620,8 @@ public class TextField extends AbstractButton {
 	}
 
 	private void onCursorMoved() {
+		updateSuggestions();
+
 		if (!isSelecting()) {
 			selectionIndex = -1;
 		}
