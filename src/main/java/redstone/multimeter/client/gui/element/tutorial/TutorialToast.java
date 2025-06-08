@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
+
+import redstone.multimeter.client.MultimeterClient;
 
 public class TutorialToast implements Toast {
 
@@ -29,8 +30,7 @@ public class TutorialToast implements Toast {
 	private Visibility visibility;
 
 	public TutorialToast(Component title, Component description) {
-		Minecraft client = Minecraft.getInstance();
-		Font font = client.font;
+		Font font = MultimeterClient.MINECRAFT.font;
 
 		this.toastWidth = 200;
 
@@ -54,8 +54,7 @@ public class TutorialToast implements Toast {
 	public Visibility render(ToastComponent toasts, long age) {
 		drawBackground(toasts, age);
 
-		Minecraft client = toasts.getMinecraft();
-		Font font = client.font;
+		Font font = MultimeterClient.MINECRAFT.font;
 
 		float x = 7.0F;
 		float y = 7.0F;
