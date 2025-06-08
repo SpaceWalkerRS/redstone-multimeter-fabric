@@ -49,7 +49,7 @@ public class SavedMeterGroupsManager {
 
 	public void load() {
 		try {
-			CompoundTag nbt = NbtIo.read(file.toFile());
+			CompoundTag nbt = NbtIo.read(file);
 
 			if (nbt == null) {
 				return;
@@ -105,7 +105,7 @@ public class SavedMeterGroupsManager {
 				nbt.put(key, meterGroupNbt);
 			}
 
-			NbtIo.write(nbt, file.toFile());
+			NbtIo.write(nbt, file);
 		} catch (IOException e) {
 			RedstoneMultimeterMod.LOGGER.warn("failed to save saved meter groups", e);
 		}
