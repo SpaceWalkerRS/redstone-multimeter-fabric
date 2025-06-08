@@ -3,6 +3,7 @@ package redstone.multimeter.client.option;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 
 public class StringOption extends Option<String> {
@@ -22,7 +23,7 @@ public class StringOption extends Option<String> {
 
 	@Override
 	public IButton createControl(MultimeterClient client, int width, int height) {
-		TextField textField = new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> set(text), () -> get());
+		TextField textField = new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> set(text), () -> get(), SuggestionsProvider.none());
 		textField.setMaxLength(maxLength);
 
 		return textField;
