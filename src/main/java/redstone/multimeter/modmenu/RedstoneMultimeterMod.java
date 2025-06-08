@@ -15,7 +15,7 @@ public class RedstoneMultimeterMod implements ModMenuApi {
 	@Override
 	public ConfigScreenFactory<?> getModConfigScreenFactory() {
 		return parent -> {
-			Minecraft minecraft = Minecraft.getInstance();
+			Minecraft minecraft = MultimeterClient.MINECRAFT;
 			MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
 
 			return new ScreenWrapper(parent, new OptionsScreen(client));
