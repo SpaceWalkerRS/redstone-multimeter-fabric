@@ -2,7 +2,6 @@ package redstone.multimeter.client.gui.element.tutorial;
 
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
@@ -11,6 +10,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+
+import redstone.multimeter.client.MultimeterClient;
 
 public class TutorialToast implements Toast {
 
@@ -26,8 +27,7 @@ public class TutorialToast implements Toast {
 	private Visibility visibility;
 
 	public TutorialToast(Component title, Component description) {
-		Minecraft client = Minecraft.getInstance();
-		Font font = client.font;
+		Font font = MultimeterClient.MINECRAFT.font;
 
 		this.toastWidth = 200;
 
