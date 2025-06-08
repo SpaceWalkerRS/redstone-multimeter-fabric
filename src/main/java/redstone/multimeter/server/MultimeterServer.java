@@ -10,7 +10,6 @@ import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.Dimension;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.DimPos;
@@ -21,7 +20,7 @@ import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.common.network.packets.TickTimePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
-import redstone.multimeter.util.DimensionUtils;
+import redstone.multimeter.util.Dimensions;
 //import redstone.multimeter.server.compat.CarpetCompat;
 
 public class MultimeterServer {
@@ -190,8 +189,8 @@ public class MultimeterServer {
 	}
 
 	public ServerWorld getWorld(String key) {
-		Dimension dimension = DimensionUtils.byKey(key);
-		return dimension == null ? null : server.getWorld(dimension.getId());
+		int dimension = Dimensions.REGISTRY.get(key);
+		return server.getWorld(dimension);
 	}
 
 	public ServerWorld getWorld(DimPos pos) {
