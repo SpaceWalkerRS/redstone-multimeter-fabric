@@ -25,7 +25,7 @@ import redstone.multimeter.interfaces.mixin.IServerWorld;
 import redstone.multimeter.interfaces.mixin.TickTaskExecutor;
 import redstone.multimeter.server.Multimeter;
 import redstone.multimeter.server.MultimeterServer;
-import redstone.multimeter.util.DimensionUtils;
+import redstone.multimeter.util.Dimensions;
 
 @Mixin(World.class)
 public class WorldMixin implements TickTaskExecutor {
@@ -43,7 +43,7 @@ public class WorldMixin implements TickTaskExecutor {
 		)
 	)
 	private void startTickTaskEntities(CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.ENTITIES, DimensionUtils.getKey(dimension));
+		rsmm$startTickTask(TickTask.ENTITIES, Dimensions.REGISTRY.getKey(dimension.getType()));
 	}
 
 	@Inject(
