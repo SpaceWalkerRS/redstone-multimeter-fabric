@@ -18,6 +18,7 @@ import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.element.button.Slider;
+import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.ToggleButton;
 import redstone.multimeter.common.DimPos;
@@ -28,6 +29,7 @@ import redstone.multimeter.common.network.packets.MeterUpdatePacket;
 import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 import redstone.multimeter.common.network.packets.TeleportToMeterPacket;
 import redstone.multimeter.util.ColorUtils;
+import redstone.multimeter.util.Dimensions;
 import redstone.multimeter.util.Direction.Axis;
 import redstone.multimeter.util.TextUtils;
 
@@ -151,13 +153,13 @@ public class MeterControlsElement extends AbstractParentElement {
 		});
 		pos.addControl("dimension", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, dimension -> {
 			changePos(meter.getPos().offset(dimension));
-		}, () -> meter.getPos().getDimension().toString()));
+		}, () -> meter.getPos().getDimension().toString(), SuggestionsProvider.matching(Dimensions.REGISTRY, true)));
 		pos.addCoordinateControl(Axis.X, () -> meter.getPos(), p -> changePos(p));
 		pos.addCoordinateControl(Axis.Y, () -> meter.getPos(), p -> changePos(p));
 		pos.addCoordinateControl(Axis.Z, () -> meter.getPos(), p -> changePos(p));
 
 		MeterPropertyElement name = new MeterPropertyElement(client, totalWidth, buttonWidth, "Name");
-		name.addControl("", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> changeName(text), () -> meter.getName()));
+		name.addControl("", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> changeName(text), () -> meter.getName(), SuggestionsProvider.none()));
 
 		MeterPropertyElement color = new MeterPropertyElement(client, totalWidth, buttonWidth, "Color");
 		color.addControl("rgb", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
@@ -166,7 +168,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			} catch (NumberFormatException e) {
 
 			}
-		}, () -> ColorUtils.toRGBString(meter.getColor())));
+		}, () -> ColorUtils.toRGBString(meter.getColor()), SuggestionsProvider.none()));
 		color.addControl("red", text -> Formatting.RED + text, (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int red = ColorUtils.getRed(c);
