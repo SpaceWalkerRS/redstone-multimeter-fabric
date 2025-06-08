@@ -1,5 +1,6 @@
 package redstone.multimeter.client.gui.screen;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,6 +17,7 @@ import redstone.multimeter.client.gui.element.ScrollableListElement;
 import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.element.button.Slider;
+import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.ToggleButton;
 import redstone.multimeter.client.gui.element.meter.MeterPropertyElement;
@@ -23,6 +25,7 @@ import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
+import redstone.multimeter.util.Blocks;
 import redstone.multimeter.util.ColorUtils;
 
 public class DefaultMeterPropertiesScreen extends RSMMScreen {
@@ -115,7 +118,19 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		y += IButton.DEFAULT_HEIGHT + 2;
 		width = half - (IButton.DEFAULT_HEIGHT + 2);
 
-		searchbar = new TextField(client, x, y, width, IButton.DEFAULT_HEIGHT, () -> Tooltip.EMPTY, text -> blockList.update(), null);
+		SuggestionsProvider suggestDefaults = SuggestionsProvider.matching(defaults.keySet(), true);
+		SuggestionsProvider suggestOverrides = SuggestionsProvider.matching(overrides.keySet(), true);
+
+		searchbar = new TextField(client, x, y, width, IButton.DEFAULT_HEIGHT, () -> Tooltip.EMPTY, text -> blockList.update(), null, input -> {
+			if (currentTab == Tab.DEFAULTS) {
+				return suggestDefaults.provide(input);
+			}
+			if (currentTab == Tab.OVERRIDES) {
+				return suggestOverrides.provide(input);
+			}
+
+			return Collections.emptyList();
+		});
 		IButton clear = new Button(client, x + width + 2, y, 20, IButton.DEFAULT_HEIGHT, () -> Text.literal("X"), () -> Tooltip.EMPTY, button -> {
 			searchbar.clear();
 			return true;
@@ -134,7 +149,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		create = new TextField(client, x + 2 * (IButton.DEFAULT_HEIGHT + 2), y, half - (4 + 2 * IButton.DEFAULT_HEIGHT), IButton.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltip.of("That name is not valid or that block already has an override!") : Tooltip.EMPTY, text -> {
 			String key = nextBlockKey();
 			add.setActive(key != null && !key.trim().isEmpty());
-		}, null);
+		}, null, SuggestionsProvider.matching(Blocks.REGISTRY, false));
 
 		top -= 2 * (IButton.DEFAULT_HEIGHT + 2);
 		bottom -= (IButton.DEFAULT_HEIGHT + 2);
@@ -245,7 +260,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			name.addControl("", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
 				properties.setName(text);
 				name.update();
-			}, () -> properties.name()));
+			}, () -> properties.name(), SuggestionsProvider.none()));
 
 			switch (currentTab) {
 			case DEFAULTS:
@@ -267,7 +282,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 					color.update();
 				} catch (NumberFormatException e) {
 				}
-			}, () -> ColorUtils.toRGBString(properties.color())));
+			}, () -> ColorUtils.toRGBString(properties.color()), SuggestionsProvider.none()));
 			color.addControl("red", style -> style.setColor(Formatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 				int c = properties.color();
 				int red = ColorUtils.getRed(c);

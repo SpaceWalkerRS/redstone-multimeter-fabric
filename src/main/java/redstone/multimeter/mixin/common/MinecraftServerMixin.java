@@ -13,7 +13,7 @@ import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.server.MultimeterServer;
 import redstone.multimeter.util.Blocks;
-import redstone.multimeter.util.DimensionUtils;
+import redstone.multimeter.util.Dimensions;
 import redstone.multimeter.util.Items;
 
 @Mixin(MinecraftServer.class)
@@ -35,6 +35,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 		if (isDedicated()) {
 			Blocks.setUp();
 			Items.setUp();
+			Dimensions.setUp();
 		}
 
 		this.multimeterServer = new MultimeterServer((MinecraftServer)(Object)this);
@@ -165,16 +166,6 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	)
 	private void endTickTaskServerGui(CallbackInfo ci) {
 		rsmm$endTickTask();
-	}
-
-	@Inject(
-		method = "stop",
-		at = @At(
-			value = "HEAD"
-		)
-	)
-	private void stop(CallbackInfo ci) {
-		DimensionUtils.destroy();
 	}
 
 	@Override
