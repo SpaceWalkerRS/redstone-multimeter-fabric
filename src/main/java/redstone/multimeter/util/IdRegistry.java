@@ -1,22 +1,21 @@
 package redstone.multimeter.util;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-import net.minecraft.util.registry.MappedRegistry;
+public class IdRegistry {
 
-public class IdRegistry extends MappedRegistry/*<String, Integer>*/ {
-
+	private final Map<String, Integer> values = new HashMap<>();
 	private final Int2ObjectMap<String> keys = new Int2ObjectOpenHashMap<>();
 
-//	@Override
 	public Integer get(String key) {
-		return (Integer) super.get(key);
+		return values.get(key);
 	}
 
-//	@Override	
 	public void put(String key, Integer value) {
 		if (value == null) {
 			throw new NullPointerException();
@@ -26,8 +25,8 @@ public class IdRegistry extends MappedRegistry/*<String, Integer>*/ {
 	}
 
 	public void put(String key, int value) {
-		if (!entries.containsKey(key)) {
-			entries.put(key, value);
+		if (!values.containsKey(key)) {
+			values.put(key, value);
 		}
 
 		keys.put(value, key);
@@ -38,10 +37,10 @@ public class IdRegistry extends MappedRegistry/*<String, Integer>*/ {
 	}
 
 	public boolean containsKey(String key) {
-		return entries.containsKey(key);
+		return values.containsKey(key);
 	}
 
 	public Set<String> keySet() {
-		return entries.keySet();
+		return values.keySet();
 	}
 }

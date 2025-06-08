@@ -50,7 +50,6 @@
 		"client.MinecraftMixin"
 	],
 	"server": [
-		"server.DedicatedServerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

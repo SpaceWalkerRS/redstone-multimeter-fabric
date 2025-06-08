@@ -28,6 +28,7 @@ import redstone.multimeter.interfaces.mixin.IConnection;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 import redstone.multimeter.util.Blocks;
 import redstone.multimeter.util.Items;
+import redstone.multimeter.util.Dimensions;
 
 @Mixin(Minecraft.class)
 public class MinecraftMixin implements IMinecraft {
@@ -59,6 +60,7 @@ public class MinecraftMixin implements IMinecraft {
 	private void init(CallbackInfo ci) {
 		Blocks.setUp();
 		Items.setUp();
+		Dimensions.setUp();
 
 		this.multimeterClient = new MultimeterClient((Minecraft)(Object)this);
 		this.multimeterClient.onStartup();
