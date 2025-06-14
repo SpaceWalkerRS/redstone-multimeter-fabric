@@ -22,6 +22,7 @@ public class RenderHelper2D {
 		GlStateManager.disableTexture();
 		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
+		GlStateManager.enableDepthTest();
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
 		Tessellator tessellator = Tessellator.getInstance();
@@ -119,10 +120,12 @@ public class RenderHelper2D {
 
 	protected void renderTexture(Texture texture, Drawer drawer) {
 		MultimeterClient.MINECRAFT.getTextureManager().bind(texture.location);
+
 		GlStateManager.enableTexture();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
+		GlStateManager.enableDepthTest();
 
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
@@ -170,10 +173,12 @@ public class RenderHelper2D {
 
 	protected void renderTextureColor(Texture texture, Drawer drawer) {
 		MultimeterClient.MINECRAFT.getTextureManager().bind(texture.location);
+
 		GlStateManager.enableTexture();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GlStateManager.color3f(1.0F, 1.0F, 1.0F);
+		GlStateManager.enableDepthTest();
 
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();

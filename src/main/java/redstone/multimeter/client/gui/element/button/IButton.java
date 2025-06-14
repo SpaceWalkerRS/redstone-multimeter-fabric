@@ -31,8 +31,8 @@ public interface IButton extends Element {
 		setMessage(new LiteralText(message));
 	}
 
-	public static void playClickSound(MultimeterClient client) {
-		SoundManager soundManager = client.getMinecraft().getSoundManager();
+	public static void playClickSound() {
+		SoundManager soundManager = MultimeterClient.MINECRAFT.getSoundManager();
 		SoundInstance sound = SimpleSoundInstance.of(CLICK_SOUND, 1.0F);
 
 		soundManager.play(sound);
