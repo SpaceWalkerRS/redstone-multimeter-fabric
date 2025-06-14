@@ -146,7 +146,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	private MeterProperties getDefaultProperties(Block block) {
+	public MeterProperties getDefaultProperties(Block block) {
 		Identifier key = Block.REGISTRY.getKey(block);
 
 		if (key == null) {

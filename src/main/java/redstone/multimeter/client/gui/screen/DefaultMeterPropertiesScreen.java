@@ -1,6 +1,5 @@
 package redstone.multimeter.client.gui.screen;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,6 +19,7 @@ import redstone.multimeter.client.gui.element.ScrollableListElement;
 import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.element.button.Slider;
+import redstone.multimeter.client.gui.element.button.SuggestionsMenu;
 import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.ToggleButton;
@@ -107,7 +107,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 		blockList.setSpacing(0);
 		blockList.setDrawBackground(true);
-		blockList.setBlockFilter(id -> id.toString().contains(searchbar.getText()));
+		blockList.setBlockFilter(id -> id.toString().contains(searchbar.getValue()));
 		blockList.setX(x);
 		blockList.setY(y);
 
@@ -120,19 +120,8 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		y += IButton.DEFAULT_HEIGHT + 2;
 		width = half - (IButton.DEFAULT_HEIGHT + 2);
 
-		SuggestionsProvider suggestDefaults = SuggestionsProvider.resources(defaults.keySet(), true);
-		SuggestionsProvider suggestOverrides = SuggestionsProvider.resources(overrides.keySet(), true);
-
-		searchbar = new TextField(client, x, y, width, IButton.DEFAULT_HEIGHT, () -> Tooltip.EMPTY, text -> blockList.update(), null, input -> {
-			if (currentTab == Tab.DEFAULTS) {
-				return suggestDefaults.provide(input);
-			}
-			if (currentTab == Tab.OVERRIDES) {
-				return suggestOverrides.provide(input);
-			}
-
-			return Collections.emptyList();
-		});
+		searchbar = new TextField(client, x, y, width, IButton.DEFAULT_HEIGHT, () -> Tooltip.EMPTY, text -> blockList.update(), null);
+		searchbar.setHint("search");
 		IButton clear = new Button(client, x + width + 2, y, 20, IButton.DEFAULT_HEIGHT, () -> new LiteralText("X"), () -> Tooltip.EMPTY, button -> {
 			searchbar.clear();
 			return true;
@@ -151,7 +140,9 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		create = new TextField(client, x + 2 * (IButton.DEFAULT_HEIGHT + 2), y, half - (4 + 2 * IButton.DEFAULT_HEIGHT), IButton.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltip.of("That name is not valid or that block already has an override!") : Tooltip.EMPTY, text -> {
 			Identifier key = nextBlockKey();
 			add.setActive(key != null && !key.getPath().trim().isEmpty());
-		}, null, SuggestionsProvider.resources(Block.REGISTRY, false));
+		}, null);
+		create.setHint("create");
+		SuggestionsMenu blockSuggestions = create.setSuggestions(SuggestionsProvider.resources(Block.REGISTRY, true));
 
 		top -= 2 * (IButton.DEFAULT_HEIGHT + 2);
 		bottom -= (IButton.DEFAULT_HEIGHT + 2);
@@ -176,6 +167,8 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			close();
 			return true;
 		});
+
+		addChild(blockSuggestions);
 
 		addChild(blockList);
 		addChild(propertiesList);
@@ -262,7 +255,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			name.addControl("", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
 				properties.setName(text);
 				name.update();
-			}, () -> properties.name(), SuggestionsProvider.none()));
+			}, () -> properties.name()));
 
 			switch (currentTab) {
 			case DEFAULTS:
@@ -284,7 +277,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 					color.update();
 				} catch (NumberFormatException e) {
 				}
-			}, () -> ColorUtils.toRGBString(properties.color()), SuggestionsProvider.none()));
+			}, () -> ColorUtils.toRGBString(properties.color())));
 			color.addControl("red", style -> style.setColor(Formatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 				int c = properties.color();
 				int red = ColorUtils.getRed(c);
@@ -425,7 +418,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	public Identifier nextBlockKey() {
-		String name = create.getText();
+		String name = create.getValue();
 		Identifier key = new Identifier(name);
 
 		if (!overrides.containsKey(key)) {
