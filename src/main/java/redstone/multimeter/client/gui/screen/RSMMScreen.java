@@ -73,29 +73,16 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	@Override
+	public final boolean isHovered() {
+		return true;
+	}
+
+	@Override
 	public final void setX(int x) {
 	}
 
 	@Override
 	public final void setY(int y) {
-	}
-
-	@Override
-	public void setWidth(int width) {
-		super.setWidth(width);
-	}
-
-	@Override
-	public void setHeight(int height) {
-		super.setHeight(height);
-	}
-
-	@Override
-	protected final void onChangedX(int x) {
-	}
-
-	@Override
-	protected final void onChangedY(int y) {
 	}
 
 	public void init(int width, int height) {
@@ -111,7 +98,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		double mouseX = (double)mouse.xpos() * window.getGuiScaledWidth() / window.getWidth();
 		double mouseY = (double)mouse.ypos() * window.getGuiScaledHeight() / window.getHeight();
 
-		updateHoveredElement(mouseX, mouseY);
+		mouseMove(mouseX, mouseY);
 	}
 
 	protected abstract void initScreen();

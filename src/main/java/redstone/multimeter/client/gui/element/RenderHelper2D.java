@@ -25,6 +25,7 @@ public class RenderHelper2D {
 		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableDepthTest();
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
@@ -125,6 +126,7 @@ public class RenderHelper2D {
 		RenderSystem.setShaderTexture(0, texture.location);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableDepthTest();
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
@@ -176,6 +178,7 @@ public class RenderHelper2D {
 		RenderSystem.setShaderTexture(0, texture.location);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableDepthTest();
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();

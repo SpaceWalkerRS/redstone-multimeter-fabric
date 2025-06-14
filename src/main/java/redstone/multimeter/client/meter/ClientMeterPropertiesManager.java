@@ -147,7 +147,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	private MeterProperties getDefaultProperties(Block block) {
+	public MeterProperties getDefaultProperties(Block block) {
 		ResourceLocation key = BuiltInRegistries.BLOCK.getKey(block);
 
 		if (key == null) {
