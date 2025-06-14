@@ -17,8 +17,10 @@ import redstone.multimeter.client.gui.element.TextElement;
 import redstone.multimeter.client.gui.element.action.MousePress;
 import redstone.multimeter.client.gui.element.button.ButtonFactory;
 import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.SuggestionsMenu;
 import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
+import redstone.multimeter.client.gui.element.button.TextFieldFactory;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.element.button.TransparentToggleButton;
 import redstone.multimeter.common.DimPos;
@@ -59,7 +61,9 @@ public class MeterPropertyElement extends AbstractParentElement {
 	}
 
 	@Override
-	protected void onChangedX(int x) {
+	public void setX(int x) {
+		super.setX(x);
+
 		if (toggle == null) {
 			property.setX(x + 2);
 		} else {
@@ -71,7 +75,9 @@ public class MeterPropertyElement extends AbstractParentElement {
 	}
 
 	@Override
-	protected void onChangedY(int y) {
+	public void setY(int y) {
+		super.setY(y);
+
 		if (toggle != null) {
 			toggle.setY(y + IButton.DEFAULT_HEIGHT - (IButton.DEFAULT_HEIGHT + toggle.getHeight()) / 2);
 		}
@@ -88,6 +94,8 @@ public class MeterPropertyElement extends AbstractParentElement {
 	}
 
 	private void addControl(MeterControlElement control) {
+		control.addChildren();
+
 		controls.add(control);
 		controls.updateCoords();
 
@@ -102,12 +110,20 @@ public class MeterPropertyElement extends AbstractParentElement {
 		addControl(name, text -> text, factory, tooltip);
 	}
 
+	public void addControl(String name, TextFieldFactory factory, SuggestionsProvider suggestions) {
+		addControl(name, text -> text, factory, suggestions);
+	}
+
 	public void addControl(String name, Function<String, String> formatter, ButtonFactory factory) {
 		addControl(new MeterControlElement(name, formatter, factory));
 	}
 
 	public void addControl(String name, Function<String, String> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
 		addControl(new MeterControlElement(name, formatter, factory, tooltip));
+	}
+
+	public void addControl(String name, Function<String, String> formatter, TextFieldFactory factory, SuggestionsProvider suggestions) {
+		addControl(new TextFieldControlElement(name, formatter, factory, suggestions));
 	}
 
 	public void addCoordinateControl(Axis axis, Supplier<DimPos> getter, Consumer<DimPos> setter) {
@@ -145,9 +161,6 @@ public class MeterPropertyElement extends AbstractParentElement {
 			this.name = new TextElement(client, 0, 0, t -> t.setText(formatName(name, formatter)).setWithShadow(true), tooltip);
 			this.control = factory.create(client, buttonWidth, IButton.DEFAULT_HEIGHT);
 
-			addChild(this.name);
-			addChild(this.control);
-
 			setWidth(this.name.getWidth() + 4 + this.control.getWidth() + 10);
 			setHeight(IButton.DEFAULT_HEIGHT);
 		}
@@ -155,6 +168,19 @@ public class MeterPropertyElement extends AbstractParentElement {
 		@Override
 		public void setX(int x) {
 			super.setX(x + controls.getWidth() - getWidth());
+
+			name.setX(getX());
+			control.setX(getX() + name.getWidth() + 4);
+		}
+
+		@Override
+		public void setY(int y) {
+			super.setY(y);
+
+			int height = getHeight();
+
+			name.setY(y + height - (height + textRenderer.fontHeight) / 2);
+			control.setY(y);
 		}
 
 		@Override
@@ -163,24 +189,38 @@ public class MeterPropertyElement extends AbstractParentElement {
 			control.setActive(active);
 		}
 
-		@Override
-		protected void onChangedX(int x) {
-			name.setX(x);
-			control.setX(x + name.getWidth() + 4);
-		}
-
-		@Override
-		protected void onChangedY(int y) {
-			int height = getHeight();
-
-			name.setY(y + height - (height + textRenderer.fontHeight) / 2);
-			control.setY(y);
+		protected void addChildren() {
+			addChild(name);
+			addChild(control);
 		}
 
 		protected String formatName(String name, Function<String, String> formatter) {
 			int width = controls.getWidth() - (4 + buttonWidth + 10);
 			String text = textRenderer.trim(name, width, true);
 			return active ? formatter.apply(text) : Formatting.GRAY + text;
+		}
+	}
+
+	private class TextFieldControlElement extends MeterControlElement {
+
+		private final SuggestionsMenu suggestions;
+
+		public TextFieldControlElement(String name, Function<String, String> formatter, TextFieldFactory factory, SuggestionsProvider suggestions) {
+			super(name, formatter, factory, () -> Tooltip.EMPTY);
+
+			this.suggestions = ((TextField) this.control).setSuggestions(suggestions);
+		}
+
+		@Override
+		public boolean isMouseOver(double mouseX, double mouseY) {
+			return super.isMouseOver(mouseX, mouseY) || suggestions.isMouseOver(mouseX, mouseY);
+		}
+
+		@Override
+		protected void addChildren() {
+			addChild(suggestions);
+
+			super.addChildren();
 		}
 	}
 
@@ -213,7 +253,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 					int coord = axis.choose(x, y, z);
 
 					return String.valueOf(coord);
-				}, SuggestionsProvider.none());
+				});
 			});
 
 			int size = getHeight() / 2 - 1;
@@ -236,14 +276,11 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 				return true;
 			});
-
-			addChild(this.increase);
-			addChild(this.decrease);
 		}
 
 		@Override
-		protected void onChangedX(int x) {
-			super.onChangedX(x);
+		public void setX(int x) {
+			super.setX(x);
 
 			x = control.getX() + control.getWidth();
 
@@ -252,13 +289,21 @@ public class MeterPropertyElement extends AbstractParentElement {
 		}
 
 		@Override
-		protected void onChangedY(int y) {
-			super.onChangedY(y);
+		public void setY(int y) {
+			super.setY(y);
 
 			y = control.getY() + 1;
 
 			increase.setY(y);
 			decrease.setY(y + increase.getHeight());
+		}
+
+		@Override
+		protected void addChildren() {
+			super.addChildren();
+
+			addChild(increase);
+			addChild(decrease);
 		}
 	}
 }

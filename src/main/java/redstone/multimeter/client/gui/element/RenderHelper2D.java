@@ -19,6 +19,7 @@ public class RenderHelper2D {
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glColor3f(1.0F, 1.0F, 1.0F);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 
 		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
@@ -123,6 +124,7 @@ public class RenderHelper2D {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glColor3f(1.0F, 1.0F, 1.0F);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 
 		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
 
@@ -174,6 +176,7 @@ public class RenderHelper2D {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glColor3f(1.0F, 1.0F, 1.0F);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 
 		BufferBuilder bufferBuilder = BufferBuilder.INSTANCE;
 

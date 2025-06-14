@@ -9,72 +9,68 @@ public interface Element {
 	int MOUSE_SCROLL_UP    = 7;
 	int MOUSE_SCROLL_DOWN  = 8;
 
-	public void render(int mouseX, int mouseY);
+	void render(int mouseX, int mouseY);
 
-	public void mouseMove(double mouseX, double mouseY);
-
-	default boolean mouseClick(double mouseX, double mouseY, int button) {
-		if (button == MOUSE_BUTTON_LEFT) {
-			setDraggingMouse(true);
-		}
-
-		return false;
-	}
-
-	default boolean mouseRelease(double mouseX, double mouseY, int button) {
-		if (button == MOUSE_BUTTON_LEFT) {
-			setDraggingMouse(false);
-		}
-
-		return false;
-	}
-
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY);
-
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY);
-
-	default boolean isHovered(double mouseX, double mouseY) {
+	default boolean isMouseOver(double mouseX, double mouseY) {
 		return mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= getY() && mouseY <= (getY() + getHeight());
 	}
 
-	public boolean keyPress(int keyCode);
+	void mouseMove(double mouseX, double mouseY);
 
-	public boolean keyRelease(int keyCode);
+	boolean mouseClick(double mouseX, double mouseY, int button);
 
-	public boolean typeChar(char chr);
+	boolean mouseRelease(double mouseX, double mouseY, int button);
 
-	public boolean isDraggingMouse();
+	boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY);
 
-	public void setDraggingMouse(boolean dragging);
+	boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY);
 
-	public void onRemoved();
+	boolean keyPress(int keyCode);
 
-	public boolean isFocused();
+	boolean keyRelease(int keyCode);
 
-	public void setFocused(boolean focused);
+	boolean typeChar(char chr);
 
-	public void tick();
+	boolean isHovered();
 
-	public int getX();
+	void setHovered(boolean hovered);
 
-	public void setX(int x);
+	boolean isDraggingMouse();
 
-	public int getY();
+	void setDraggingMouse(boolean draggingMouse);
 
-	public void setY(int y);
+	void onRemoved();
 
-	public int getWidth();
+	boolean isFocused();
 
-	public int getHeight();
+	void setFocused(boolean focused);
 
-	public boolean isVisible();
+	void tick();
 
-	public void setVisible(boolean visible);
+	int getX();
+
+	void setX(int x);
+
+	int getY();
+
+	void setY(int y);
+
+	int getWidth();
+
+	void setWidth(int width);
+
+	int getHeight();
+
+	void setHeight(int height);
+
+	boolean isVisible();
+
+	void setVisible(boolean visible);
 
 	default Tooltip getTooltip(int mouseX, int mouseY) {
 		return Tooltip.EMPTY;
 	}
 
-	public void update();
+	void update();
 
 }
