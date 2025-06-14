@@ -23,11 +23,6 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 
 	@Override
-	public void onRemoved() {
-		super.onRemoved();
-	}
-
-	@Override
 	public void update() {
 		super.update();
 		list.updateCoords();
