@@ -1,7 +1,5 @@
 package redstone.multimeter.client.gui.element.button;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -13,6 +11,7 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
@@ -22,6 +21,7 @@ import net.minecraft.util.Mth;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.element.Element;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.util.TextUtils;
@@ -30,15 +30,14 @@ public class TextField extends AbstractButton {
 
 	private final KeyboardHandler keyboard;
 	private final Consumer<String> listener;
-	private final Supplier<String> textSupplier;
-	private final SuggestionsProvider suggestionsProvider;
+	private final Supplier<String> updater;
 
-	private String fullText;
-	private String visibleText;
-	private String suggestion;
-	private String visibleSuggestion;
-	private int suggestionIndex;
-	private List<String> suggestions;
+	private SuggestionsMenu suggestions;
+
+	private String hint;
+	private String value;
+	private String suffix;
+
 	private int textX;
 	private int textY;
 	private int textWidth;
@@ -48,33 +47,29 @@ public class TextField extends AbstractButton {
 
 	private int maxLength;
 	private int maxScroll;
-	private int scrollIndex;
-	private int cursorIndex;
+	private int scroll;
+	private int cursor;
 	private long cursorTicks;
-	private int selectionIndex;
-	private SelectType selection;
+	private int selection;
+	private SelectionMethod selectionMethod;
 
-	public TextField(MultimeterClient client, int x, int y, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text, SuggestionsProvider suggestions) {
-		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, tooltip, listener, text, suggestions);
+	public TextField(MultimeterClient client, int x, int y, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> updater) {
+		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, tooltip, listener, updater);
 	}
 
-
-	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> text, SuggestionsProvider suggestions) {
+	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> updater) {
 		super(client, x, y, width, height, () -> new TextComponent(""), tooltip);
 
-		Minecraft minecraft = this.client.getMinecraft();
+		Minecraft minecraft = client.getMinecraft();
 
 		this.keyboard = minecraft.keyboardHandler;
 		this.listener = listener;
-		this.textSupplier = text;
-		this.suggestionsProvider = suggestions;
+		this.updater = updater;
 
-		this.fullText = "";
-		this.visibleText = "";
-		this.suggestion = "";
-		this.visibleSuggestion = "";
-		this.suggestionIndex = -1;
-		this.suggestions = Collections.emptyList();
+		this.hint = "";
+		this.value = "";
+		this.suffix = "";
+
 		this.textX = getX() + 4;
 		this.textY = getY() + (getHeight() - this.font.lineHeight) / 2;
 		this.textWidth = getWidth() - 8;
@@ -84,16 +79,16 @@ public class TextField extends AbstractButton {
 
 		this.maxLength = 32;
 		this.maxScroll = 0;
-		this.scrollIndex = 0;
-		this.cursorIndex = 0;
+		this.scroll = 0;
+		this.cursor = 0;
 		this.cursorTicks = -1;
-		this.selectionIndex = -1;
-		this.selection = SelectType.NONE;
+		this.selection = -1;
+		this.selectionMethod = SelectionMethod.NONE;
 	}
 
 	@Override
 	public void render(int mouseX, int mouseY) {
-		if (selection == SelectType.MOUSE) {
+		if (selectionMethod == SelectionMethod.MOUSE) {
 			if (mouseX < textX) {
 				moveCursor(-1);
 			} else if (mouseX > textX + textWidth) {
@@ -106,14 +101,6 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
-		boolean wasHovered = isHovered();
-		super.mouseMove(mouseX, mouseY);
-
-		if (isHovered()) {
-			setCursor(client.getMinecraft(), CursorType.IBEAM);
-		} else if (wasHovered) {
-			setCursor(client.getMinecraft(), CursorType.ARROW);
-		}
 	}
 
 	@Override
@@ -121,20 +108,11 @@ public class TextField extends AbstractButton {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
 		if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			if (!isFocused()) {
-				setFocused(true);
-			}
 			if (!isSelecting() && isDoubleClick()) {
 				setDraggingMouse(false);
 				selectAll();
-			} else if (mouseX < textX) {
-				setCursor(scrollIndex - 5);
-			} else if (mouseX > textX + textWidth) {
-				setCursor(scrollIndex + visibleText.length() + 5);
 			} else {
-				setCursorFromMouse(mouseX + 2);
-				startSelecting(SelectType.MOUSE);
-				cursorTicks = 0L;
+				setCursorFromMouse(mouseX);
 			}
 
 			consumed = true;
@@ -148,7 +126,7 @@ public class TextField extends AbstractButton {
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			stopSelecting(SelectType.MOUSE);
+			consumed = stopSelecting(SelectionMethod.MOUSE) || consumed;
 		}
 
 		return consumed;
@@ -156,12 +134,13 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (selection == SelectType.MOUSE && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			setCursorFromMouse(mouseX);
-			return true;
+		boolean consumed = false;
+
+		if (selectionMethod == SelectionMethod.MOUSE && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			consumed = setCursorFromMouse(mouseX);
 		}
 
-		return false;
+		return consumed;
 	}
 
 	@Override
@@ -171,15 +150,10 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_ENTER) {
-			setFocused(false);
-			return true;
-		}
-
 		switch (keyCode) {
 		case GLFW.GLFW_KEY_LEFT_SHIFT:
 		case GLFW.GLFW_KEY_RIGHT_SHIFT:
-			startSelecting(SelectType.KEYBOARD);
+			startSelecting(SelectionMethod.KEYBOARD);
 			break;
 		case GLFW.GLFW_KEY_LEFT:
 			moveCursorFromKeyboard(-1);
@@ -188,22 +162,12 @@ public class TextField extends AbstractButton {
 			moveCursorFromKeyboard(1);
 			break;
 		case GLFW.GLFW_KEY_UP:
-			if (!suggestions.isEmpty()) {
-				moveSuggestion(-1);
-				break;
-			}
-			// fall through
 		case GLFW.GLFW_KEY_PAGE_UP:
 			setCursorFromKeyboard(0);
 			break;
 		case GLFW.GLFW_KEY_DOWN:
-			if (!suggestions.isEmpty()) {
-				moveSuggestion(1);
-				break;
-			}
-			// fall through
 		case GLFW.GLFW_KEY_PAGE_DOWN:
-			setCursorFromKeyboard(fullText.length());
+			setCursorFromKeyboard(value.length());
 			break;
 		case GLFW.GLFW_KEY_BACKSPACE:
 			erase(false);
@@ -211,10 +175,9 @@ public class TextField extends AbstractButton {
 		case GLFW.GLFW_KEY_DELETE:
 			erase(true);
 			break;
-		case GLFW.GLFW_KEY_TAB:
-			if (!suggestions.isEmpty()) {
-				useSuggestion();
-			}
+		case GLFW.GLFW_KEY_ENTER:
+		case GLFW.GLFW_KEY_ESCAPE:
+			setFocused(false);
 			break;
 		default:
 			if (!RSMMScreen.isControlPressed()) {
@@ -222,15 +185,15 @@ public class TextField extends AbstractButton {
 			}
 			switch (keyCode) {
 			case GLFW.GLFW_KEY_A:
-				if (selection != SelectType.MOUSE) {
+				if (selectionMethod != SelectionMethod.MOUSE) {
 					selectAll();
 				}
 				break;
 			case GLFW.GLFW_KEY_C:
-				copyTextToClipboard(false);
+				copySelectionToClipboard(false);
 				break;
 			case GLFW.GLFW_KEY_X:
-				copyTextToClipboard(true);
+				copySelectionToClipboard(true);
 				break;
 			case GLFW.GLFW_KEY_V:
 				pasteClipboard();
@@ -244,11 +207,13 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+		boolean consumed = false;
+
 		if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT) {
-			stopSelecting(SelectType.KEYBOARD);
+			consumed = stopSelecting(SelectionMethod.KEYBOARD);
 		}
 
-		return false;
+		return consumed;
 	}
 
 	@Override
@@ -262,18 +227,35 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public void onRemoved() {
+	public void setHovered(boolean hovered) {
+		if (suggestions == null) {
+			setHoveredAndUpdateCursor(hovered);
+		}
+	}
+
+	public void setHoveredAndUpdateCursor(boolean hovered) {
+		boolean wasHovered = isHovered();
+		super.setHovered(hovered);
+
+		if (hovered) {
+			Element.setCursor(CursorType.IBEAM);
+		} else if (wasHovered) {
+			Element.setCursor(CursorType.ARROW);
+		}
 	}
 
 	@Override
 	public void setFocused(boolean focused) {
 		super.setFocused(focused);
+
 		update();
 
 		if (!focused) {
-			selectionIndex = -1;
+			stopSelecting();
+			clearSelection();
+			setCursor(value.length());
+
 			cursorTicks = -1;
-			setCursor(fullText.length());
 		}
 	}
 
@@ -287,12 +269,22 @@ public class TextField extends AbstractButton {
 	@Override
 	public void setX(int x) {
 		super.setX(x);
+
+		if (suggestions != null) {
+			suggestions.updatePosition();
+		}
+
 		textX = x + 4;
 	}
 
 	@Override
 	public void setY(int y) {
 		super.setY(y);
+
+		if (suggestions != null) {
+			suggestions.updatePosition();
+		}
+
 		textY = y + getHeight() - (getHeight() + font.lineHeight) / 2;
 		selectionY = textY - 1;
 	}
@@ -301,8 +293,8 @@ public class TextField extends AbstractButton {
 	public Tooltip getTooltip(int mouseX, int mouseY) {
 		Tooltip tooltip = super.getTooltip(mouseX, mouseY);
 
-		if (tooltip.isEmpty() && !isFocused() && visibleText.length() < fullText.length()) {
-			tooltip = Tooltip.of(TextUtils.toLines(font, fullText));
+		if (tooltip.isEmpty() && !isFocused() && font.width(value) > textWidth) {
+			tooltip = Tooltip.of(TextUtils.toLines(font, value));
 		}
 
 		return tooltip;
@@ -310,21 +302,33 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public void update() {
-		if (!isFocused() && textSupplier != null) {
-			setText(textSupplier.get(), false);
-			updateVisibleText();
+		if (!isFocused() && updater != null) {
+			setValue(updater.get(), false);
+		}
+		if (suggestions != null) {
+			suggestions.update();
 		}
 	}
 
 	@Override
 	public void setWidth(int width) {
 		super.setWidth(width);
+
+		if (suggestions != null) {
+			suggestions.updateSize();
+		}
+
 		textWidth = width - 8;
 	}
 
 	@Override
 	public void setHeight(int height) {
 		super.setHeight(height);
+
+		if (suggestions != null) {
+			suggestions.updatePosition();
+		}
+
 		textHeight = font.lineHeight;
 		selectionHeight = textHeight + 2;
 	}
@@ -346,46 +350,71 @@ public class TextField extends AbstractButton {
 
 	@Override
 	protected void renderButtonMessage() {
-		int color = getTextColor();
-		renderText(font, visibleText, textX, textY, true, color);
+		if (!isFocused() && isActive() && value.isEmpty() && !hint.isEmpty()) {
+			// ideally the hint would be entirely visible but just in case...
+			String visibleHint = ChatFormatting.ITALIC + font.substrByWidth(hint, textWidth, false);
+			int hintColor = getHintColor();
 
-		if (isFocused()) {
-			if (isActive()) {
-				if (suggestionIndex >= 0) {
-					int suggestionColor = getSuggestionColor();
-					renderText(font, visibleSuggestion, textX + font.width(visibleText), textY, true, suggestionColor);
-				}
-				if ((cursorTicks / 6) % 2 == 0) {
-					if (cursorIndex == fullText.length()) {
-						int x = textX + font.width(visibleText);
-						renderText(font, "_", x, textY, true, color);
+			renderText(font, visibleHint, textX, textY, true, hintColor);
+		} else {
+			String scrolledValue = value.substring(scroll);
+			String visibleValue = font.substrByWidth(scrolledValue, textWidth, false);
+			String coveredValue = scrolledValue.substring(0, cursor - scroll);
+
+			int valueColor = getTextColor();
+
+			// render input value
+			renderText(font, visibleValue, textX, textY, true, valueColor);
+
+			int valueWidth = font.width(visibleValue);
+			int coveredWidth = font.width(coveredValue);
+
+			// render remainder
+			if (coveredValue.length() < visibleValue.length() && suggestions != null && suggestions.hasSuggestions()) {
+				String visibleRemainder = visibleValue.substring(coveredValue.length());
+				int remainderColor = getRemainderColor();
+
+				renderText(font, visibleRemainder, textX + coveredWidth, textY, true, remainderColor);
+			}
+
+			// render suggestion suffix
+			if (!suffix.isEmpty() && valueWidth < textWidth) {
+				String visibleSuffix = font.substrByWidth(suffix, textWidth - valueWidth, false);
+				int suggestionColor = getSuggestionColor();
+
+				renderText(font, visibleSuffix, textX + valueWidth, textY, true, suggestionColor);
+			}
+
+			if (isFocused()) {
+				if (isActive() && (cursorTicks / 6) % 2 == 0) {
+					if (cursor == value.length()) {
+						renderText(font, "_", textX + valueWidth, textY, true, valueColor);
 					} else {
-						int width = font.width(fullText.substring(scrollIndex, cursorIndex));
-						int x = textX + width;
-
-						renderRect(x, selectionY, 1, selectionHeight, color);
+						renderRect(textX + coveredWidth, selectionY, 1, selectionHeight, valueColor);
 					}
 				}
-			}
-			if (hasSelection()) {
-				drawSelectionHighlight();
+				if (hasSelection()) {
+					drawSelectionHighlight();
+				}
 			}
 		}
 	}
 
 	private void drawSelectionHighlight() {
-		int start = Math.min(cursorIndex, selectionIndex);
-		int end = Math.max(cursorIndex, selectionIndex);
+		int start = Math.min(cursor, selection);
+		int end = Math.max(cursor, selection);
 
 		int x0 = textX;
 		int x1 = textX + textWidth;
 
-		if (start >= scrollIndex) {
-			String t = fullText.substring(scrollIndex, start);
+		String visibleText = font.substrByWidth(value.substring(scroll), textWidth, false);
+
+		if (start >= scroll) {
+			String t = value.substring(scroll, start);
 			x0 = textX + font.width(t);
 		}
-		if (end <= scrollIndex + visibleText.length()) {
-			String t = fullText.substring(scrollIndex, end);
+		if (end <= scroll + visibleText.length()) {
+			String t = value.substring(scroll, end);
 			x1 = textX + font.width(t);
 		}
 
@@ -430,20 +459,44 @@ public class TextField extends AbstractButton {
 		return isHovered() ? 0xFFB0B0B0 : 0xFF808080;
 	}
 
+	private int getHintColor() {
+		return 0xFF606060;
+	}
+
 	private int getTextColor() {
 		return isActive() ? 0xFFFFFFFF : 0xFFB0B0B0;
+	}
+
+	private int getRemainderColor() {
+		return 0xFFB0B0B0;
 	}
 
 	private int getSuggestionColor() {
 		return 0xFF808080;
 	}
 
-	public String getText() {
-		return fullText;
+	public SuggestionsMenu setSuggestions(SuggestionsProvider provider) {
+		return suggestions = new SuggestionsMenu(this, provider);
+	}
+
+	public void setHint(String text) {
+		hint = text;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public String getValueBeforeCursor() {
+		return value.substring(0, Math.min(cursor, value.length()));
+	}
+
+	public void setValue(String text) {
+		replace(text, 0, value.length());
 	}
 
 	public void clear() {
-		replace("", 0, fullText.length());
+		replace("", 0, value.length());
 	}
 
 	private void write(String text) {
@@ -452,12 +505,12 @@ public class TextField extends AbstractButton {
 		}
 
 		if (hasSelection()) {
-			int start = Math.min(selectionIndex, cursorIndex);
-			int end = Math.max(selectionIndex, cursorIndex);
+			int start = Math.min(selection, cursor);
+			int end = Math.max(selection, cursor);
 
 			replace(text, start, end);
 		} else {
-			insert(text, cursorIndex);
+			insert(text, cursor);
 		}
 	}
 
@@ -467,56 +520,60 @@ public class TextField extends AbstractButton {
 		}
 
 		if (hasSelection()) {
-			int start = Math.min(selectionIndex, cursorIndex);
-			int end = Math.max(selectionIndex, cursorIndex);
+			int start = Math.min(selection, cursor);
+			int end = Math.max(selection, cursor);
 
 			replace("", start, end);
 		} else {
 			if (forward) {
-				replace("", cursorIndex, cursorIndex + 1);
-			} else if (cursorIndex > 0) {
-				replace("", cursorIndex - 1, cursorIndex);
+				replace("", cursor, cursor + 1);
+			} else if (cursor > 0) {
+				replace("", cursor - 1, cursor);
 			}
 		}
 	}
 
-	private void useSuggestion() {
-		replace(suggestion, 0, fullText.length());
+	private boolean insert(String text, int index) {
+		return replace(text, index, index);
 	}
 
-	private void insert(String text, int index) {
-		replace(text, index, index);
+	private boolean replace(String text, int start, int end) {
+		String t0 = value.substring(0, start);
+		String t1 = value.substring(end);
+
+		return setValue(t0 + text + t1, start + text.length(), true);
 	}
 
-	private void replace(String text, int start, int end) {
-		String t0 = fullText.substring(0, start);
-		String t1 = fullText.substring(end);
-
-		setText(t0 + text + t1, true);
-		setCursor(start + text.length());
+	private boolean setValue(String text, boolean updateListener) {
+		return setValue(text, text.length(), updateListener);
 	}
 
-	private boolean setText(String text, boolean updateListener) {
-		if (fullText.equals(text) || text.length() > maxLength) {
+	private boolean setValue(String text, int cursor, boolean updateListener) {
+		if (value.equals(text) || text.length() > maxLength) {
 			return false;
 		}
 
-		fullText = text;
+		value = text;
 
-		updateMaxScroll();
-		updateVisibleText();
+		stopSelecting();
+		clearSelection();
 
-		selectionIndex = -1;
-		selection = SelectType.NONE;
+		if (suggestions != null) {
+			suggestions.update();
+		}
+
+		if (cursor >= 0) {
+			setCursor(cursor);
+		}
 
 		if (updateListener) {
-			listener.accept(fullText);
+			listener.accept(value);
 		}
 
 		return true;
 	}
 
-	private void copyTextToClipboard(boolean erase) {
+	private void copySelectionToClipboard(boolean erase) {
 		if (hasSelection()) {
 			String text = getSelection();
 
@@ -538,133 +595,123 @@ public class TextField extends AbstractButton {
 		}
 	}
 
-	private void updateSuggestions() {
-		if (!isFocused() || !isActive() || cursorIndex < fullText.length() || selection != SelectType.NONE) {
-			suggestions = Collections.emptyList();
-		} else {
-			suggestions = suggestionsProvider.provide(fullText);
+	public void updateSuggestion() {
+		suffix = "";
+
+		if (suggestions.hasSelection()) {
+			String suggestion = suggestions.getSelection();
+			int index = suggestion.indexOf(value);
+
+			if (index == 0) {
+				suffix = suggestion.substring(value.length());
+			}
 		}
 
-		setSuggestion(0);
-	}
-
-	private void updateVisibleText() {
-		visibleText = font.substrByWidth(fullText.substring(scrollIndex), textWidth, false);
-
-		if (!suggestion.isEmpty()) {
-			visibleSuggestion = font.substrByWidth(suggestion.substring(visibleText.length()), textWidth - font.width(visibleText), false);
-		} else {
-			visibleSuggestion = "";
-		}
-	}
-
-	private void moveSuggestion(int amount) {
-		int nextIndex = suggestionIndex + amount;
-
-		if (nextIndex < 0) {
-			nextIndex = suggestions.size() - 1;
-		}
-		if (nextIndex >= suggestions.size()) {
-			nextIndex = 0;
-		}
-
-		setSuggestion(nextIndex);
-	}
-
-	private void setSuggestion(int index) {
-		if (suggestions.isEmpty()) {
-			suggestionIndex = -1;
-			suggestion = "";
-		} else {
-			suggestionIndex = Mth.clamp(index, 0, suggestions.size() - 1);
-			suggestion = suggestions.get(suggestionIndex);
-		}
-
-		updateVisibleText();
+		updateMaxScroll();
+		updateScroll();
 	}
 
 	public int getMaxLength() {
 		return maxLength;
 	}
 
-	public void setMaxLength(int maxLength) {
-		this.maxLength = maxLength;
+	public void setMaxLength(int length) {
+		maxLength = length;
+	}
+
+	private void updateScroll() {
+		if (scroll > maxScroll) {
+			scroll(maxScroll - scroll);
+		}
+		if (cursor < scroll) {
+			scroll(cursor - scroll);
+		}
+
+		String valueAndCursor = font.substrByWidth(value + "_", textWidth + 1, true);
+		int maxCursorForScroll = scroll + valueAndCursor.length() - 1;
+
+		if (cursor > maxCursorForScroll) {
+			scroll(cursor - maxCursorForScroll);
+		}
 	}
 
 	private void updateMaxScroll() {
 		maxScroll = 0;
 
-		if (!fullText.isEmpty()) {
-			String text = font.substrByWidth(fullText + "_", textWidth + 1, true);
+		if (!value.isEmpty()) {
+			String valueAndCursor = font.substrByWidth(value + "_", textWidth + 1, true);
 
-			if (text.length() <= fullText.length()) {
-				maxScroll = fullText.length() - text.length() + 1;
+			if (valueAndCursor.length() <= value.length()) {
+				maxScroll = value.length() - (valueAndCursor.length() - 1);
 			}
 		}
-
-		setCursor(cursorIndex);
 	}
 
 	private void scroll(int amount) {
-		setScroll(scrollIndex + amount);
+		setScroll(scroll + amount);
 	}
 
-	private void setScroll(int scroll) {
-		int prevScroll = scrollIndex;
-		scrollIndex = Mth.clamp(scroll, 0, maxScroll);
-
-		if (scrollIndex != prevScroll) {
-			updateVisibleText();
-		}
+	private void setScroll(int value) {
+		scroll = Mth.clamp(value, 0, maxScroll);
 	}
 
-	private void setCursorFromMouse(double mouseX) {
-		if (selection != SelectType.KEYBOARD) {
-			String text = font.substrByWidth(visibleText, (int)mouseX - textX);
-			setCursor(scrollIndex + text.length());
+	private boolean setCursorFromMouse(double mouseX) {
+		if (selectionMethod != SelectionMethod.KEYBOARD) {
+			String scrolledValue = value.substring(scroll);
+			String visibleValue = font.substrByWidth(scrolledValue, textWidth, false);
+
+			// first handle clicks on the border:
+			// scroll a bit to the left or right
+			if (mouseX < textX) {
+				setCursor(scroll - 5);
+			} else if (mouseX > textX + textWidth) {
+				setCursor(scroll + visibleValue.length() + 5);
+			// then handle clicks within the border:
+			// move cursor to mouse position
+			} else {
+				String coveredValue = font.substrByWidth(visibleValue, (int)(mouseX + 2) - textX, false);
+
+				setCursor(scroll + coveredValue.length());
+				startSelecting(SelectionMethod.MOUSE);
+			}
+
+			return true;
+		} else {
+			return false;
 		}
 	}
 
 	private void moveCursorFromKeyboard(int amount) {
-		setCursorFromKeyboard(cursorIndex + amount);
+		setCursorFromKeyboard(cursor + amount);
 	}
 
 	private void setCursorFromKeyboard(int index) {
-		if (selection != SelectType.MOUSE) {
+		if (selectionMethod != SelectionMethod.MOUSE) {
 			setCursor(index);
 		}
 	}
 
 	private void moveCursor(int amount) {
-		setCursor(cursorIndex + amount);
+		setCursor(cursor + amount);
 	}
 
 	private void setCursor(int index) {
-		cursorIndex = Mth.clamp(index, 0, fullText.length());
+		cursor = Mth.clamp(index, 0, value.length());
+		cursorTicks = isFocused() ? 0 : -1;
+
 		onCursorMoved();
 	}
 
 	private void onCursorMoved() {
-		updateSuggestions();
-
 		if (!isSelecting()) {
-			selectionIndex = -1;
+			clearSelection();
+
+			if (suggestions != null) {
+				suggestions.update();
+			}
 		}
 
-		if (cursorIndex == fullText.length()) {
-			setScroll(maxScroll);
-			return;
-		}
-		if (cursorIndex < scrollIndex) {
-			scroll(cursorIndex - scrollIndex);
-			return;
-		}
-
-		int max = scrollIndex + visibleText.length();
-
-		if (cursorIndex > max) {
-			scroll(cursorIndex - max);
-		}
+		updateScroll();
 	}
 
 	private boolean isDoubleClick() {
@@ -672,42 +719,57 @@ public class TextField extends AbstractButton {
 	}
 
 	private boolean hasSelection() {
-		return selectionIndex >= 0 && selectionIndex != cursorIndex;
+		return selection >= 0 && selection != cursor;
 	}
 
 	private String getSelection() {
-		int start = Math.min(selectionIndex, cursorIndex);
-		int end = Math.max(selectionIndex, cursorIndex);
+		int start = Math.min(selection, cursor);
+		int end = Math.max(selection, cursor);
 
-		return fullText.substring(start, end);
+		return value.substring(start, end);
 	}
 
-	private void startSelecting(SelectType type) {
-		if (selection == SelectType.NONE) {
-			selection = type;
+	private void clearSelection() {
+		selection = -1;
+	}
 
-			if (selectionIndex < 0) {
-				selectionIndex = cursorIndex;
+	private boolean startSelecting(SelectionMethod method) {
+		if (selectionMethod == SelectionMethod.NONE) {
+			selectionMethod = method;
+
+			if (selection < 0) {
+				selection = cursor;
 			}
+
+			return true;
+		} else {
+			return false;
 		}
 	}
 
-	private void stopSelecting(SelectType type) {
-		if (selection == type) {
-			selection = SelectType.NONE;
+	private boolean stopSelecting(SelectionMethod method) {
+		if (selectionMethod == method) {
+			selectionMethod = SelectionMethod.NONE;
+			return true;
+		} else {
+			return false;
 		}
+	}
+
+	private boolean stopSelecting() {
+		return stopSelecting(selectionMethod);
 	}
 
 	private void selectAll() {
-		setCursor(fullText.length());
-		selectionIndex = 0;
+		setCursor(value.length());
+		selection = 0;
 	}
 
 	private boolean isSelecting() {
-		return selection != SelectType.NONE;
+		return selectionMethod != SelectionMethod.NONE;
 	}
 
-	private enum SelectType {
+	private enum SelectionMethod {
 		NONE, MOUSE, KEYBOARD
 	}
 }

@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.GlStateManager;
 
 import redstone.multimeter.client.gui.CursorType;
+import redstone.multimeter.client.gui.element.Element;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -24,15 +25,15 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		if (!isDraggingMouse()) {
 			CursorType cursor = CursorType.ARROW;
 
-			if (isHovered(mouseX, mouseY)) {
-				if (isBorderHovered(mouseX)) {
+			if (isHovered()) {
+				if (isMouseOverBorder(mouseX)) {
 					cursor = CursorType.HRESIZE;
 				} else if (hud.isPaused()) {
 					cursor = CursorType.HAND;
 				}
 			}
 
-			setCursor(hud.client.getMinecraft(), cursor);
+			Element.setCursor(cursor);
 		}
 	}
 
@@ -45,7 +46,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			if (isDraggingMouse()) {
 				dx = 0.0D;
 
-				if (isBorderHovered(mouseX)) {
+				if (isMouseOverBorder(mouseX)) {
 					resizing = true;
 				}
 
@@ -60,7 +61,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				}
 
 				Options.HUD.SELECTED_COLUMN.set(column);
-				IButton.playClickSound(hud.client);
+				IButton.playClickSound();
 
 				consumed = true;
 			}
@@ -102,7 +103,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		GlStateManager.pushMatrix();
 
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
-			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
+			if (!isDraggingMouse() && isMouseOver(mouseX, mouseY) && !isMouseOverBorder(mouseX)) {
 				drawHighlight(getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
 			}
 
@@ -157,7 +158,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		return hud.getColumn(hud.getCurrentTick(), true);
 	}
 
-	private boolean isBorderHovered(double mouseX) {
+	private boolean isMouseOverBorder(double mouseX) {
 		long x = Math.round(mouseX);
 
 		switch (hud.getDirectionalityX()) {
