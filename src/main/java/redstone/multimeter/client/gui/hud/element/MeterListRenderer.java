@@ -93,7 +93,7 @@ public class MeterListRenderer extends AbstractElement {
 
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		cursorRow = isHovered(mouseX, mouseY) ? hud.getHoveredRow(mouseY) : -1;
+		cursorRow = isMouseOver(mouseX, mouseY) ? hud.getHoveredRow(mouseY) : -1;
 
 		if (cursorMeter == null && cursorOriginRow >= 0) {
 			cursorMeter = hud.meters.get(cursorOriginRow);
@@ -137,10 +137,6 @@ public class MeterListRenderer extends AbstractElement {
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
 		return false;
-	}
-
-	@Override
-	public void onRemoved() {
 	}
 
 	@Override
@@ -206,7 +202,7 @@ public class MeterListRenderer extends AbstractElement {
 
 	private void drawHighlights(GuiGraphics graphics, int mouseX, int mouseY) {
 		if (hud.isOnScreen()) {
-			if (cursorMeter == null && isHovered(mouseX, mouseY)) {
+			if (cursorMeter == null && isMouseOver(mouseX, mouseY)) {
 				drawHighlight(graphics, hud.getHoveredRow(mouseY), false);
 			}
 

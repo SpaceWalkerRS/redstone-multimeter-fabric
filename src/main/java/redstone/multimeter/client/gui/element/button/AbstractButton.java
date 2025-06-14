@@ -15,16 +15,12 @@ import redstone.multimeter.client.gui.element.AbstractElement;
 
 public abstract class AbstractButton extends AbstractElement implements IButton {
 
-	protected final MultimeterClient client;
 	protected final Font font;
 	private final Supplier<Component> messageSupplier;
 	private final Supplier<Tooltip> tooltipSupplier;
 
 	private boolean active;
-	private boolean hovered;
 	private Component message;
-
-	private boolean moved;
 
 	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<Component> message, Supplier<Tooltip> tooltip) {
 		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip);
@@ -35,42 +31,18 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 
 		Minecraft minecraft = client.getMinecraft();
 
-		this.client = client;
 		this.font = minecraft.font;
 		this.messageSupplier = message;
 		this.tooltipSupplier = tooltip;
 
 		this.active = true;
-		this.hovered = false;
 		this.message = message.get();
 	}
 
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
-		if (moved) {
-			moved = false;
-			updateHovered(mouseX, mouseY);
-		}
-
 		renderButton(graphics);
 		renderButtonMessage(graphics);
-	}
-
-	@Override
-	public void mouseMove(double mouseX, double mouseY) {
-		updateHovered(mouseX, mouseY);
-	}
-
-	@Override
-	public void setX(int x) {
-		super.setX(x);
-		moved = true;
-	}
-
-	@Override
-	public void setY(int y) {
-		super.setY(y);
-		moved = true;
 	}
 
 	@Override
@@ -94,11 +66,6 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 
 	@Override
-	public boolean isHovered() {
-		return hovered;
-	}
-
-	@Override
 	public Component getMessage() {
 		return message;
 	}
@@ -109,11 +76,7 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 
 	protected void playClickSound() {
-		IButton.playClickSound(client);
-	}
-
-	protected void updateHovered(double mouseX, double mouseY) {
-		hovered = isActive() && isHovered(mouseX, mouseY);
+		IButton.playClickSound();
 	}
 
 	protected void updateMessage() {
