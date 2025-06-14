@@ -6,8 +6,9 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 	private int y;
 	private int width;
 	private int height;
-	private boolean focused;
+	private boolean hovered;
 	private boolean dragging;
+	private boolean focused;
 	private boolean visible;
 
 	protected AbstractElement(int x, int y, int width, int height) {
@@ -20,6 +21,34 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 	}
 
 	@Override
+	public boolean mouseClick(double mouseX, double mouseY, int button) {
+		if (button == MOUSE_BUTTON_LEFT) {
+			setDraggingMouse(true);
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean mouseRelease(double mouseX, double mouseY, int button) {
+		if (button == MOUSE_BUTTON_LEFT) {
+			setDraggingMouse(false);
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isHovered() {
+		return hovered;
+	}
+
+	@Override
+	public void setHovered(boolean hovered) {
+		this.hovered = hovered;
+	}
+
+	@Override
 	public boolean isDraggingMouse() {
 		return dragging;
 	}
@@ -27,6 +56,13 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 	@Override
 	public void setDraggingMouse(boolean dragging) {
 		this.dragging = dragging;
+	}
+
+	@Override
+	public void onRemoved() {
+		hovered = false;
+		dragging = false;
+		focused = false;
 	}
 
 	@Override
@@ -79,11 +115,13 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 		this.visible = visible;
 	}
 
-	protected void setWidth(int width) {
+	@Override
+	public void setWidth(int width) {
 		this.width = width;
 	}
 
-	protected void setHeight(int height) {
+	@Override
+	public void setHeight(int height) {
 		this.height = height;
 	}
 }
