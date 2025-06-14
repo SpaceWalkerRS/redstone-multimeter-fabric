@@ -46,7 +46,7 @@ public class ScrollableListElement extends SimpleListElement {
 				}
 			}
 
-			renderScrollBar(isHovered(mouseX, mouseY));
+			renderScrollBar(isMouseOver(mouseX, mouseY));
 		}
 	}
 
@@ -99,20 +99,20 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 
 	@Override
-	public int getHeight() {
-		return height;
-	}
-
-	@Override
-	public void onChangedX(int x) {
-		super.onChangedX(x);
+	public void setX(int x) {
+		super.setX(x);
 		scrollBarX = (x + getWidth()) - (scrollBarWidth + 2);
 	}
 
 	@Override
-	public void onChangedY(int y) {
-		super.onChangedY(y);
+	public void setY(int y) {
+		super.setY(y);
 		updateScrollBar();
+	}
+
+	@Override
+	public int getHeight() {
+		return height;
 	}
 
 	@Override
