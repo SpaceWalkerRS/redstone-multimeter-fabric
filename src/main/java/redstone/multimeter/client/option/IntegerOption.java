@@ -6,7 +6,6 @@ import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.Tooltip;
 import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.element.button.Slider;
-import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 
 public class IntegerOption extends Option<Integer> {
@@ -46,7 +45,7 @@ public class IntegerOption extends Option<Integer> {
 				setFromString(text);
 			}, () -> {
 				return get().toString();
-			}, SuggestionsProvider.none());
+			});
 		}
 
 		return new Slider(client, 0, 0, width, height, () -> {

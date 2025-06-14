@@ -45,6 +45,10 @@ public class MeterEventDetails extends AbstractElement {
 		}
 	}
 
+	@Override
+	public void mouseMove(double mouseX, double mouseY) {
+	}
+
 	private void renderEventDetails(GuiGraphics graphics, EventLog event) {
 		Tooltip tooltip = event.getTooltip();
 		List<Component> lines = tooltip.getLines();
@@ -94,10 +98,6 @@ public class MeterEventDetails extends AbstractElement {
 	}
 
 	@Override
-	public void mouseMove(double mouseX, double mouseY) {
-	}
-
-	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		return false;
 	}
@@ -120,10 +120,6 @@ public class MeterEventDetails extends AbstractElement {
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
 		return false;
-	}
-
-	@Override
-	public void onRemoved() {
 	}
 
 	@Override
