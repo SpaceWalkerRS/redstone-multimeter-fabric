@@ -46,13 +46,17 @@ public class OptionsCategoryElement extends AbstractParentElement {
 	}
 
 	@Override
-	protected void onChangedX(int x) {
+	public void setX(int x) {
+		super.setX(x);
+
 		category.setX(x + (options.getWidth() - category.getWidth()) / 2);
 		options.setX(x);
 	}
 
 	@Override
-	protected void onChangedY(int y) {
+	public void setY(int y) {
+		super.setY(y);
+
 		category.setY(y);
 		options.setY(y + category.getHeight() + 6);
 	}
@@ -86,13 +90,9 @@ public class OptionsCategoryElement extends AbstractParentElement {
 		}
 
 		@Override
-		public void onRemoved() {
-			option.setListener(null);
-			super.onRemoved();
-		}
+		public void setX(int x) {
+			super.setX(x);
 
-		@Override
-		protected void onChangedX(int x) {
 			int mid = x + options.getWidth() / 2;
 
 			name.setX(mid - name.getWidth() - 2);
@@ -101,12 +101,20 @@ public class OptionsCategoryElement extends AbstractParentElement {
 		}
 
 		@Override
-		protected void onChangedY(int y) {
+		public void setY(int y) {
+			super.setY(y);
+
 			int height = getHeight();
 
 			name.setY(y + height - (height + textRenderer.fontHeight) / 2);
 			control.setY(y);
 			reset.setY(y);
+		}
+
+		@Override
+		public void onRemoved() {
+			option.setListener(null);
+			super.onRemoved();
 		}
 
 		@Override
