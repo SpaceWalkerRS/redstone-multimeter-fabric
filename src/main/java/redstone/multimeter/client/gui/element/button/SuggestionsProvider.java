@@ -23,6 +23,16 @@ public interface SuggestionsProvider {
 		return input -> Collections.emptyList();
 	}
 
+	static SuggestionsProvider matching(Collection<String> resources, boolean suggestAllOnBlankInput) {
+		return input -> {
+			if (input.isBlank() && !suggestAllOnBlankInput) {
+				return Collections.emptyList();
+			} else {
+				return suggestMatching(input, resources);
+			}
+		};
+	}
+
 	static <T> SuggestionsProvider resources(ResourceKey<Registry<T>> key, boolean suggestAllOnBlankInput) {
 		return input -> {
 			if (input.isBlank() && !suggestAllOnBlankInput) {
@@ -46,10 +56,33 @@ public interface SuggestionsProvider {
 		};
 	}
 
-	private static List<String> suggestResources(String input, Collection<ResourceLocation> resources) {
-		Set<String> identifiers = new TreeSet<>();
-		Set<String> namespaces = new TreeSet<>();
-		Set<String> paths = new TreeSet<>();
+	static List<String> suggestMatching(String input, Collection<String> strings) {
+		Set<String> start = new TreeSet<>();
+		Set<String> anywhere = new TreeSet<>();
+
+		for (String string : strings) {
+			if (string.length() > input.length()) {
+				if (string.startsWith(input)) {
+					start.add(string);
+				} else if (string.contains(input)) {
+					anywhere.add(string);
+				}
+			}
+		}
+
+		List<String> suggestions = new ArrayList<>();
+
+		suggestions.addAll(start);
+		suggestions.addAll(anywhere);
+
+		return suggestions;
+	}
+
+	static List<String> suggestResources(String input, Collection<ResourceLocation> resources) {
+		Set<String> identifiersStart = new TreeSet<>();
+		Set<String> identifiersAnywhere = new TreeSet<>();
+		Set<String> namespacesStart = new TreeSet<>();
+		Set<String> namespacesAnywhere = new TreeSet<>();
 
 		boolean hasSeparator = (input.indexOf(':') > 0);
 
@@ -58,24 +91,33 @@ public interface SuggestionsProvider {
 			String namespace = dimension.getNamespace() + ":";
 			String path = dimension.getPath();
 
-			if (hasSeparator && identifier.length() > input.length() && identifier.startsWith(input)) {
-				identifiers.add(identifier);
+			if (hasSeparator && identifier.length() > input.length()) {
+				if (identifier.startsWith(input)) {
+					identifiersStart.add(identifier);
+				}
 			}
-			if (!hasSeparator && namespace.length() > input.length() && namespace.startsWith(input)) {
-				namespaces.add(namespace);
+			if (!hasSeparator && namespace.length() > input.length()) {
+				if (namespace.startsWith(input)) {
+					namespacesStart.add(namespace);
+				} else if (namespace.contains(input)) {
+					namespacesAnywhere.add(namespace);
+				}
 			}
-			if (!hasSeparator && path.length() > input.length() && path.startsWith(input)) {
-				paths.add(path);
+			if (!hasSeparator && path.length() > input.length()) {
+				if (path.startsWith(input)) {
+					identifiersStart.add(identifier);
+				} else if (path.contains(input)) {
+					identifiersAnywhere.add(identifier);
+				}
 			}
 		}
 
 		List<String> suggestions = new ArrayList<>();
 
-		if (namespaces.size() > 1) {
-			suggestions.addAll(namespaces);
-		}
-		suggestions.addAll(paths);
-		suggestions.addAll(identifiers);
+		suggestions.addAll(namespacesStart);
+		suggestions.addAll(namespacesAnywhere);
+		suggestions.addAll(identifiersStart);
+		suggestions.addAll(identifiersAnywhere);
 
 		return suggestions;
 	}
