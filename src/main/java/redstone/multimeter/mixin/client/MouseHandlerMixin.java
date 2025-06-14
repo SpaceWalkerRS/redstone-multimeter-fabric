@@ -12,7 +12,7 @@ import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screen.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.screen.RSMMScreen;
+import redstone.multimeter.client.gui.screen.ScreenWrapper;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
 @Mixin(MouseHandler.class)
@@ -31,22 +31,16 @@ public class MouseHandlerMixin {
 		)
 	)
 	private void scrollOnScreen(long window, double horizontal, double vertical, CallbackInfo ci) {
-		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
-
-		if (client == null) {
-			return;
-		}
-
-		RSMMScreen screen = client.getScreen();
-
-		if (screen != null) {
+		Screen screen = MultimeterClient.MINECRAFT.screen;
+		
+		if (screen instanceof ScreenWrapper) {
 			double mouseX = xpos * minecraft.window.getGuiScaledWidth() / minecraft.window.getScreenWidth();
 			double mouseY = ypos * minecraft.window.getGuiScaledHeight() / minecraft.window.getScreenHeight();
 			double discrete = minecraft.options.discreteMouseScroll;
 			double scrollX = discrete * horizontal;
 			double scrollY = discrete * vertical;
-
-			screen.mouseScroll(mouseX, mouseY, scrollX, scrollY);
+			
+			((ScreenWrapper) screen).mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 		}
 	}
 
@@ -83,21 +77,13 @@ public class MouseHandlerMixin {
 		)
 	)
 	private void onMove(long window, double horizontal, double vertical, CallbackInfo ci) {
-		MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
+		Screen screen = minecraft.screen;
 
-		if (client == null) {
-			return;
+		if (screen instanceof ScreenWrapper) {
+			double mouseX = xpos * minecraft.window.getGuiScaledWidth() / minecraft.window.getScreenWidth();
+			double mouseY = ypos * minecraft.window.getGuiScaledHeight() / minecraft.window.getScreenHeight();
+
+			Screen.wrapScreenError(() -> ((ScreenWrapper) screen).mouseMoved(mouseX, mouseY), "mouseMoved event handler", screen.getClass().getCanonicalName());
 		}
-
-		RSMMScreen screen = client.getScreen();
-
-		if (screen == null) {
-			return;
-		}
-
-		double mouseX = xpos * minecraft.window.getGuiScaledWidth() / minecraft.window.getScreenWidth();
-		double mouseY = ypos * minecraft.window.getGuiScaledHeight() / minecraft.window.getScreenHeight();
-
-		Screen.wrapScreenError(() -> screen.mouseMove(mouseX, mouseY), "mouseMoved event handler", screen.getClass().getCanonicalName());
 	}
 }

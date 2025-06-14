@@ -2,82 +2,77 @@ package redstone.multimeter.client.gui.element;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.Minecraft;
-
+import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.Tooltip;
 
 public interface Element {
 
-	public void render(int mouseX, int mouseY);
+	void render(int mouseX, int mouseY);
 
-	public void mouseMove(double mouseX, double mouseY);
-
-	default boolean mouseClick(double mouseX, double mouseY, int button) {
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			setDraggingMouse(true);
-		}
-
-		return false;
-	}
-
-	default boolean mouseRelease(double mouseX, double mouseY, int button) {
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			setDraggingMouse(false);
-		}
-
-		return false;
-	}
-
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY);
-
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY);
-
-	default boolean isHovered(double mouseX, double mouseY) {
+	default boolean isMouseOver(double mouseX, double mouseY) {
 		return mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= getY() && mouseY <= (getY() + getHeight());
 	}
 
-	public boolean keyPress(int keyCode, int scanCode, int modifiers);
+	void mouseMove(double mouseX, double mouseY);
 
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers);
+	boolean mouseClick(double mouseX, double mouseY, int button);
 
-	public boolean typeChar(char chr, int modifiers);
+	boolean mouseRelease(double mouseX, double mouseY, int button);
 
-	public boolean isDraggingMouse();
+	boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY);
 
-	public void setDraggingMouse(boolean dragging);
+	boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY);
 
-	public void onRemoved();
+	boolean keyPress(int keyCode, int scanCode, int modifiers);
 
-	public boolean isFocused();
+	boolean keyRelease(int keyCode, int scanCode, int modifiers);
 
-	public void setFocused(boolean focused);
+	boolean typeChar(char chr, int modifiers);
 
-	public void tick();
+	boolean isHovered();
 
-	public int getX();
+	void setHovered(boolean hovered);
 
-	public void setX(int x);
+	boolean isDraggingMouse();
 
-	public int getY();
+	void setDraggingMouse(boolean draggingMouse);
 
-	public void setY(int y);
+	void onRemoved();
 
-	public int getWidth();
+	boolean isFocused();
 
-	public int getHeight();
+	void setFocused(boolean focused);
 
-	public boolean isVisible();
+	void tick();
 
-	public void setVisible(boolean visible);
+	int getX();
+
+	void setX(int x);
+
+	int getY();
+
+	void setY(int y);
+
+	int getWidth();
+
+	void setWidth(int width);
+
+	int getHeight();
+
+	void setHeight(int height);
+
+	boolean isVisible();
+
+	void setVisible(boolean visible);
 
 	default Tooltip getTooltip(int mouseX, int mouseY) {
 		return Tooltip.EMPTY;
 	}
 
-	public void update();
+	void update();
 
-	default void setCursor(Minecraft client, CursorType type) {
-		GLFW.glfwSetCursor(client.window.getWindow(), type.getCursor());
+	static void setCursor(CursorType type) {
+		GLFW.glfwSetCursor(MultimeterClient.MINECRAFT.window.getWindow(), type.getCursor());
 	}
 }

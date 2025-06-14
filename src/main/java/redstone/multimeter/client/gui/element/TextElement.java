@@ -18,7 +18,6 @@ import redstone.multimeter.client.gui.element.button.IButton;
 
 public class TextElement extends AbstractElement {
 
-	private final MultimeterClient client;
 	private final TextRenderer textRenderer;
 	private final Consumer<TextElement> updater;
 	private final Supplier<Tooltip> tooltipSupplier;
@@ -43,7 +42,6 @@ public class TextElement extends AbstractElement {
 
 		Minecraft minecraft = client.getMinecraft();
 
-		this.client = client;
 		this.textRenderer = minecraft.textRenderer;
 		this.updater = updater;
 		this.tooltipSupplier = tooltipSupplier;
@@ -82,7 +80,7 @@ public class TextElement extends AbstractElement {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
 		if (!consumed && mousePress.accept(this)) {
-			IButton.playClickSound(client);
+			IButton.playClickSound();
 			consumed = true;
 		}
 
@@ -112,10 +110,6 @@ public class TextElement extends AbstractElement {
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
 		return false;
-	}
-
-	@Override
-	public void onRemoved() {
 	}
 
 	@Override

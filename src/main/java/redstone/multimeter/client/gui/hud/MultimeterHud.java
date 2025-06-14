@@ -115,7 +115,7 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 
 	@Override
-	public boolean isHovered(double mouseX, double mouseY) {
+	public boolean isMouseOver(double mouseX, double mouseY) {
 		int minX = Math.max(getX(), hudX);
 		int maxX = Math.min(getX() + getAvailableWidth(), hudX + hudWidth);
 		int minY = Math.max(getY(), hudY);
@@ -170,7 +170,9 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 
 	@Override
-	protected void onChangedX(int x) {
+	public void setX(int x) {
+		super.setX(x);
+
 		int effectiveWidth = names.getWidth() + ticks.getWidth();
 		int range = getAvailableWidth() - effectiveWidth;
 		float rawPos = getScreenPosX();
@@ -234,7 +236,9 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 
 	@Override
-	protected void onChangedY(int y) {
+	public void setY(int y) {
+		super.setY(y);
+
 		int range = getAvailableHeight() - getHeight();
 		float position = getScreenPosY();
 		hudY = y + Math.round(position * range);
@@ -747,7 +751,7 @@ public class MultimeterHud extends AbstractParentElement {
 		}
 
 		validateHudWidth();
-		onChangedX(getX());
+		setX(getX());
 	}
 
 	private void validateHudWidth() {
@@ -766,7 +770,7 @@ public class MultimeterHud extends AbstractParentElement {
 		hudHeight = Math.max(names.getHeight(), details.getHeight()) + settings.rowHeight + settings.gridSize;
 
 		validateHudHeight();
-		onChangedY(getY());
+		setY(getY());
 	}
 
 	private void validateHudHeight() {

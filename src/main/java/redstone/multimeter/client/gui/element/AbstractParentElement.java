@@ -9,9 +9,8 @@ public abstract class AbstractParentElement extends AbstractElement {
 
 	private final List<Element> children = new ArrayList<>();
 
-	private boolean focused;
-	private Element hoveredElement;
-	private Element focusedElement;
+	private Element hovered;
+	private Element focused;
 
 	protected AbstractParentElement() {
 		this(0, 0, 0, 0);
@@ -34,17 +33,15 @@ public abstract class AbstractParentElement extends AbstractElement {
 
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
-		hoveredElement = null;
+		if (!isDraggingMouse()) {
+			updateHoveredElement(mouseX, mouseY);
+		}
 
 		for (int index = 0; index < children.size(); index++) {
 			Element child = children.get(index);
 
 			if (child.isVisible()) {
 				child.mouseMove(mouseX, mouseY);
-
-				if (hoveredElement == null && child.isHovered(mouseX, mouseY)) {
-					hoveredElement = child;
-				}
 			}
 		}
 	}
@@ -59,8 +56,6 @@ public abstract class AbstractParentElement extends AbstractElement {
 			if (focused != null) {
 				consumed = focused.mouseClick(mouseX, mouseY, button);
 			}
-
-			updateHoveredElement(mouseX, mouseY);
 		}
 
 		return consumed;
@@ -76,8 +71,6 @@ public abstract class AbstractParentElement extends AbstractElement {
 			if (focused != null) {
 				consumed = focused.mouseRelease(mouseX, mouseY, button);
 			}
-
-			updateHoveredElement(mouseX, mouseY);
 		}
 
 		return consumed;
@@ -122,19 +115,19 @@ public abstract class AbstractParentElement extends AbstractElement {
 
 	@Override
 	public void onRemoved() {
+		super.onRemoved();
+
+		hovered = null;
+		focused = null;
+
 		for (int index = 0; index < children.size(); index++) {
 			children.get(index).onRemoved();
 		}
 	}
 
 	@Override
-	public boolean isFocused() {
-		return focused;
-	}
-
-	@Override
 	public void setFocused(boolean focused) {
-		this.focused = focused;
+		super.setFocused(focused);
 
 		if (!isFocused()) {
 			setFocusedElement(null);
@@ -150,18 +143,6 @@ public abstract class AbstractParentElement extends AbstractElement {
 				child.tick();
 			}
 		}
-	}
-
-	@Override
-	public void setX(int x) {
-		super.setX(x);
-		onChangedX(x);
-	}
-
-	@Override
-	public void setY(int y) {
-		super.setY(y);
-		onChangedY(y);
 	}
 
 	@Override
@@ -190,8 +171,8 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	public void removeChildren() {
-		hoveredElement = null;
-		focusedElement = null;
+		hovered = null;
+		focused = null;
 
 		for (int index = 0; index < children.size(); index++) {
 			children.get(index).onRemoved();
@@ -201,59 +182,62 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	protected Element getHoveredElement() {
-		return hoveredElement;
+		return hovered;
 	}
 
-	protected void updateHoveredElement(double mouseX, double mouseY) {
-		hoveredElement = getHoveredElement(mouseX, mouseY);
-	}
+	private void updateHoveredElement(double mouseX, double mouseY) {
+		hovered = null;
 
-	private Element getHoveredElement(double mouseX, double mouseY) {
-		if (!isDraggingMouse() && isHovered(mouseX, mouseY)) {
-			for (int index = 0; index < children.size(); index++) {
-				Element child = children.get(index);
+		for (int index = 0; index < children.size(); index++) {
+			Element child = children.get(index);
 
-				if (child.isVisible() && child.isHovered(mouseX, mouseY)) {
-					return child;
-				}
+			if (hovered == null && isHovered() && child.isVisible() && child.isMouseOver(mouseX, mouseY)) {
+				hovered = child;
+			} else {
+				child.setHovered(false);
 			}
 		}
 
-		return null;
+		// always do this last, that way the transition from one
+		// hovered element to another behaves consistently:
+		//   oldHovered.setHovered(false);
+		//   newHovered.setHovered(true);
+		// if this is instead done during iteration, the order may
+		// be different:
+		//   newHovered.setHovered(true);
+		//   oldHovered.setHovered(false);
+		if (hovered != null) {
+			hovered.setHovered(true);
+		}
 	}
 
 	protected Element getFocusedElement() {
-		if (focusedElement != null && !focusedElement.isFocused()) {
+		if (focused != null && !focused.isFocused()) {
 			setFocusedElement(null);
 		}
 
-		return focusedElement;
+		return focused;
 	}
 
 	protected Element updateFocusedElement() {
-		return setFocusedElement(hoveredElement);
+		return setFocusedElement(hovered);
 	}
 
 	private Element setFocusedElement(Element element) {
-		if (element == focusedElement) {
-			return focusedElement;
+		if (element == focused) {
+			return focused;
 		}
 
-		if (focusedElement != null) {
-			focusedElement.setFocused(false);
+		if (focused != null) {
+			focused.setFocused(false);
 		}
 
-		focusedElement = element;
+		focused = element;
 
-		if (focusedElement != null) {
-			focusedElement.setFocused(true);
+		if (focused != null) {
+			focused.setFocused(true);
 		}
 
-		return focusedElement;
+		return focused;
 	}
-
-	protected abstract void onChangedX(int x);
-
-	protected abstract void onChangedY(int y);
-
 }
