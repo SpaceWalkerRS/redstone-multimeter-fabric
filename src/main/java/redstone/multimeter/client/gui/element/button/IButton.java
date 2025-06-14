@@ -20,7 +20,7 @@ public interface IButton extends Element {
 
 	public void setMessage(String message);
 
-	public static void playClickSound(MultimeterClient client) {
-		client.getMinecraft().soundSystem.play(CLICK_SOUND, 1.0F, 1.0F);
+	public static void playClickSound() {
+		MultimeterClient.MINECRAFT.soundSystem.play(CLICK_SOUND, 1.0F, 1.0F);
 	}
 }

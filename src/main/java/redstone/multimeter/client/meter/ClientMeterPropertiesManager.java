@@ -142,7 +142,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	private MeterProperties getDefaultProperties(int block) {
+	public MeterProperties getDefaultProperties(int block) {
 		String key = Blocks.REGISTRY.getKey(block);
 
 		if (key == null) {

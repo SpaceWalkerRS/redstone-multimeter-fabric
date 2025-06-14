@@ -69,18 +69,23 @@ public class ScreenWrapper extends Screen {
 
 		while (Mouse.next()) {
 			int button = Mouse.getEventButton();
+			boolean consumed = false;
 
 			if (Mouse.getEventButtonState()) {
 				lastButton = button;
 				buttonTicks = Minecraft.getTime();
 
-				screen.mouseClick(mouseX, mouseY, button);
+				consumed = screen.mouseClick(mouseX, mouseY, button);
 			} else {
-				screen.mouseRelease(mouseX, mouseY, button);
+				consumed = screen.mouseRelease(mouseX, mouseY, button);
 
 				if (button == lastButton) {
 					lastButton = -1;
 				}
+			}
+
+			if (consumed) {
+				screen.mouseMove(mouseX, mouseY);
 			}
 		}
 
@@ -102,7 +107,11 @@ public class ScreenWrapper extends Screen {
 		double scrollY = 0.05D * Mouse.getDWheel();
 
 		if (scrollY != 0) {
-			screen.mouseScroll(mouseX, mouseY, 0, scrollY);
+			boolean consumed = screen.mouseScroll(mouseX, mouseY, 0, scrollY);
+
+			if (consumed) {
+				screen.mouseMove(mouseX, mouseY);
+			}
 		}
 	}
 
@@ -112,7 +121,11 @@ public class ScreenWrapper extends Screen {
 			double deltaY = mouseY - prevY;
 
 			if (deltaX != 0 && deltaY != 0) {
-				screen.mouseDrag(mouseX, mouseY, lastButton, deltaX, deltaY);
+				boolean consumed = screen.mouseDrag(mouseX, mouseY, lastButton, deltaX, deltaY);
+
+				if (consumed) {
+					screen.mouseMove(mouseX, mouseY);
+				}
 			}
 		}
 	}
@@ -121,18 +134,25 @@ public class ScreenWrapper extends Screen {
 		while (Keyboard.next()) {
 			char chr = Keyboard.getEventCharacter();
 			int key = Keyboard.getEventKey();
+			boolean consumed = false;
 
 			if (key != Keyboard.CHAR_NONE) {
 				if (Keyboard.getEventKeyState()) {
-					if (!screen.keyPress(key) && key == Keyboard.KEY_ESCAPE) {
+					consumed = screen.keyPress(key);
+					
+					if (!consumed && key == Keyboard.KEY_ESCAPE) {
 						screen.close();
 					}
 				} else {
-					screen.keyRelease(key);
+					consumed = screen.keyRelease(key);
 				}
 			}
 			if (chr >= ' ') {
-				screen.typeChar(chr);
+				consumed = screen.typeChar(chr);
+			}
+
+			if (consumed) {
+				screen.mouseMove(mouseX, mouseY);
 			}
 		}
 	}
