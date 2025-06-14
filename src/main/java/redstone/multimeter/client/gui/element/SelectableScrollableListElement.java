@@ -87,7 +87,7 @@ public class SelectableScrollableListElement extends ScrollableListElement {
 		selectionChanged(element);
 
 		if (playClick) {
-			IButton.playClickSound(client);
+			IButton.playClickSound();
 		}
 
 		return true;

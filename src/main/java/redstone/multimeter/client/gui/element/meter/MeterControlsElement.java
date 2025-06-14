@@ -71,10 +71,11 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			return true;
 		});
-		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(Component.literal("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").withStyle(ChatFormatting.ITALIC)).setWithShadow(true));
-		this.controls = new SimpleListElement(this.client, getWidth());
 
+		this.deleteConfirm = new TextElement(this.client, 0, 0, t -> t.add(Component.literal("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").withStyle(ChatFormatting.ITALIC)).setWithShadow(true));
 		this.deleteConfirm.setVisible(false);
+
+		this.controls = new SimpleListElement(this.client, getWidth());
 
 		addChild(this.title);
 		addChild(this.hideButton);
@@ -108,6 +109,18 @@ public class MeterControlsElement extends AbstractParentElement {
 	}
 
 	@Override
+	public void setX(int x) {
+		super.setX(x);
+		updateCoords();
+	}
+
+	@Override
+	public void setY(int y) {
+		super.setY(y);
+		updateCoords();
+	}
+
+	@Override
 	public int getHeight() {
 		return height;
 	}
@@ -127,16 +140,6 @@ public class MeterControlsElement extends AbstractParentElement {
 		}
 
 		super.update();
-		updateCoords();
-	}
-
-	@Override
-	public void onChangedX(int x) {
-		updateCoords();
-	}
-
-	@Override
-	public void onChangedY(int y) {
 		updateCoords();
 	}
 
@@ -163,13 +166,13 @@ public class MeterControlsElement extends AbstractParentElement {
 			} catch (ResourceLocationException e) {
 
 			}
-		}, () -> meter.getPos().getDimension().toString(), SuggestionsProvider.resources(Registries.DIMENSION_TYPE, true)));
+		}, () -> meter.getPos().getDimension().toString()), SuggestionsProvider.resources(Registries.DIMENSION_TYPE, false));
 		pos.addCoordinateControl(Axis.X, () -> meter.getPos(), p -> changePos(p));
 		pos.addCoordinateControl(Axis.Y, () -> meter.getPos(), p -> changePos(p));
 		pos.addCoordinateControl(Axis.Z, () -> meter.getPos(), p -> changePos(p));
 
 		MeterPropertyElement name = new MeterPropertyElement(client, totalWidth, buttonWidth, "Name");
-		name.addControl("", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> changeName(text), () -> meter.getName(), SuggestionsProvider.none()));
+		name.addControl("", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> changeName(text), () -> meter.getName()));
 
 		MeterPropertyElement color = new MeterPropertyElement(client, totalWidth, buttonWidth, "Color");
 		color.addControl("rgb", style -> style.withColor(meter.getColor()), (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
@@ -178,7 +181,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			} catch (NumberFormatException e) {
 
 			}
-		}, () -> ColorUtils.toRGBString(meter.getColor()), SuggestionsProvider.none()));
+		}, () -> ColorUtils.toRGBString(meter.getColor())));
 		color.addControl("red", style -> style.withColor(ChatFormatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
 			int c = meter.getColor();
 			int red = ColorUtils.getRed(c);
