@@ -13,7 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.screen.RSMMScreen;
+import redstone.multimeter.client.gui.screen.ScreenWrapper;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
 @Mixin(MouseHandler.class)
@@ -30,15 +30,14 @@ public class MouseHandlerMixin {
 		)
 	)
 	private void scrollOnScreen(long window, double horizontal, double vertical, CallbackInfo ci, double scrollY, double mouseX, double mouseY) {
-		MultimeterClient multimeterClient = ((IMinecraft)minecraft).getMultimeterClient();
-		RSMMScreen screen = multimeterClient.getScreen();
+		ScreenWrapper screen = (ScreenWrapper) MultimeterClient.MINECRAFT.screen;
 		
 		if (screen != null) {
 			boolean discrete = minecraft.options.discreteMouseScroll().get();
 			double sensitivity = minecraft.options.mouseWheelSensitivity().get();
 			double scrollX = sensitivity * (discrete ? Math.signum(horizontal) : horizontal);
 			
-			screen.mouseScroll(mouseX, mouseY, scrollX, scrollY);
+			screen.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 		}
 	}
 
