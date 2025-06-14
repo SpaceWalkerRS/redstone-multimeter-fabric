@@ -55,7 +55,7 @@ public class SimpleListElement extends AbstractParentElement {
 	@Override
 	public void render(PoseStack poses, int mouseX, int mouseY) {
 		if (shouldUpdateHovered) {
-			updateHoveredElement(mouseX, mouseY);
+			mouseMove(mouseX, mouseY);
 			shouldUpdateHovered = false;
 		}
 
@@ -71,9 +71,21 @@ public class SimpleListElement extends AbstractParentElement {
 	}
 
 	@Override
-	public boolean isHovered(double mouseX, double mouseY) {
+	public boolean isMouseOver(double mouseX, double mouseY) {
 		// ignore when the mouse is hovering over the borders
 		return mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= minY && mouseY <= maxY;
+	}
+
+	@Override
+	public void setX(int x) {
+		super.setX(x);
+		updateContentX();
+	}
+
+	@Override
+	public void setY(int y) {
+		super.setY(y);
+		updateContentY();
 	}
 
 	@Override
@@ -87,16 +99,6 @@ public class SimpleListElement extends AbstractParentElement {
 		sort();
 		updateCoords();
 		super.update();
-	}
-
-	@Override
-	protected void onChangedX(int x) {
-		updateContentX();
-	}
-
-	@Override
-	protected void onChangedY(int y) {
-		updateContentY();
 	}
 
 	protected void drawBackground(PoseStack poses) {
