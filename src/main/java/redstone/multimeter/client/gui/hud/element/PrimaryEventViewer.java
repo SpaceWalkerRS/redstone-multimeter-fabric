@@ -17,6 +17,10 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
+	public void mouseMove(double mouseX, double mouseY) {
+	}
+
+	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean wasDragging = isDraggingMouse();
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
@@ -25,7 +29,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			if (isDraggingMouse()) {
 				dx = 0.0D;
 
-				if (isBorderHovered(mouseX)) {
+				if (isMouseOverBorder(mouseX)) {
 					resizing = true;
 				}
 
@@ -40,7 +44,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				}
 
 				Options.HUD.SELECTED_COLUMN.set(column);
-				IButton.playClickSound(hud.client);
+				IButton.playClickSound();
 
 				consumed = true;
 			}
@@ -82,7 +86,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		GL11.glPushMatrix();
 
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
-			if (!isDraggingMouse() && isHovered(mouseX, mouseY) && !isBorderHovered(mouseX)) {
+			if (!isDraggingMouse() && isMouseOver(mouseX, mouseY) && !isMouseOverBorder(mouseX)) {
 				drawHighlight(getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
 			}
 
@@ -137,7 +141,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		return hud.getColumn(hud.getCurrentTick(), true);
 	}
 
-	private boolean isBorderHovered(double mouseX) {
+	private boolean isMouseOverBorder(double mouseX) {
 		long x = Math.round(mouseX);
 
 		switch (hud.getDirectionalityX()) {
