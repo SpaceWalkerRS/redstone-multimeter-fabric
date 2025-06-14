@@ -35,10 +35,6 @@ public abstract class MeterEventViewer extends AbstractElement {
 	}
 
 	@Override
-	public void mouseMove(double mouseX, double mouseY) {
-	}
-
-	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		return false;
 	}
@@ -61,10 +57,6 @@ public abstract class MeterEventViewer extends AbstractElement {
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
 		return false;
-	}
-
-	@Override
-	public void onRemoved() {
 	}
 
 	@Override

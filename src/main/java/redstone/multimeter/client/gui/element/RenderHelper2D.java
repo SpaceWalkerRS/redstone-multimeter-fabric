@@ -26,6 +26,7 @@ public class RenderHelper2D {
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableDepthTest();
 		RenderSystem.shadeModel(GL11.GL_SMOOTH);
 
 		Tesselator tessellator = Tesselator.getInstance();
@@ -127,6 +128,7 @@ public class RenderHelper2D {
 		RenderSystem.enableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableDepthTest();
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
@@ -178,6 +180,7 @@ public class RenderHelper2D {
 		RenderSystem.enableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableDepthTest();
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuilder();
