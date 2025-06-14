@@ -37,6 +37,10 @@ public class Slider extends AbstractButton {
 	}
 
 	@Override
+	public void mouseMove(double mouseX, double mouseY) {
+	}
+
+	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
@@ -88,10 +92,6 @@ public class Slider extends AbstractButton {
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
 		return false;
-	}
-
-	@Override
-	public void onRemoved() {
 	}
 
 	@Override
