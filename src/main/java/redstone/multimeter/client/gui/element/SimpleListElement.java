@@ -21,9 +21,9 @@ public class SimpleListElement extends AbstractParentElement {
 	protected static final Collator COLLATOR = Collator.getInstance();
 
 	protected final MultimeterClient client;
-	protected final int topBorder;
-	protected final int bottomBorder;
 
+	private int topBorder;
+	private int bottomBorder;
 	private int spacing;
 	private int height;
 	private int minY;
@@ -41,10 +41,10 @@ public class SimpleListElement extends AbstractParentElement {
 
 	public SimpleListElement(MultimeterClient client, int width, int topBorder, int bottomBorder) {
 		this.client = client;
-		this.topBorder = topBorder - BORDER_MARGIN_TOP;
-		this.bottomBorder = bottomBorder - BORDER_MARGIN_BOTTOM;
 
-		this.spacing = 2;
+		setSpacing(2);
+		setTopBorder(topBorder);
+		setBottomBorder(bottomBorder);
 
 		this.sorter = null;
 		this.filter = e -> true;
@@ -118,6 +118,8 @@ public class SimpleListElement extends AbstractParentElement {
 	}
 
 	protected void renderList(GuiGraphics graphics, int mouseX, int mouseY) {
+		graphics.enableScissor(getX(), minY, getX() + getWidth(), maxY);
+
 		List<Element> children = getChildren();
 
 		for (int index = 0; index < children.size(); index++) {
@@ -134,6 +136,8 @@ public class SimpleListElement extends AbstractParentElement {
 				renderElement(element, graphics, mouseX, mouseY);
 			}
 		}
+
+		graphics.disableScissor();
 	}
 
 	protected void renderElement(Element element, GuiGraphics graphics, int mouseX, int mouseY) {
@@ -183,11 +187,31 @@ public class SimpleListElement extends AbstractParentElement {
 		}
 	}
 
-	public int getTotalHeight() {
-		return getHeight() + (topBorder + BORDER_MARGIN_TOP) + (bottomBorder + BORDER_MARGIN_BOTTOM);
+	public int getTopBorder() {
+		return topBorder;
 	}
 
-	protected int getTotalSpacing() {
+	public int getTopBorderAndMargin() {
+		return topBorder + BORDER_MARGIN_TOP;
+	}
+
+	public int getBottomBorder() {
+		return bottomBorder;
+	}
+
+	public int getBottomBorderAndMargin() {
+		return bottomBorder + BORDER_MARGIN_BOTTOM;
+	}
+
+	public int getSpacing() {
+		return spacing;
+	}
+
+	public int getTotalHeight() {
+		return getHeight() + getTopBorderAndMargin() + getBottomBorderAndMargin();
+	}
+
+	public int getTotalSpacing() {
 		return spacing * (getChildren().size() - 1);
 	}
 
@@ -294,6 +318,22 @@ public class SimpleListElement extends AbstractParentElement {
 	public void updateCoords() {
 		updateContentX();
 		updateContentY();
+	}
+
+	public void setTopBorder(int topBorder) {
+		if (topBorder < 0) {
+			topBorder = 0;
+		}
+
+		this.topBorder = topBorder - BORDER_MARGIN_TOP;
+	}
+
+	public void setBottomBorder(int bottomBorder) {
+		if (bottomBorder < 0) {
+			bottomBorder = 0;
+		}
+
+		this.bottomBorder = bottomBorder - BORDER_MARGIN_BOTTOM;
 	}
 
 	public void setSpacing(int spacing) {
