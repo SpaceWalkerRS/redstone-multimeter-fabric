@@ -20,7 +20,7 @@ public class ScrollableListElement extends SimpleListElement {
 	public ScrollableListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder) {
 		super(client, width, topBorder, bottomBorder);
 
-		this.height = height - (topBorder + bottomBorder);
+		this.height = height;
 		this.scrollBarWidth = 6;
 		this.scrollMode = ScrollMode.NONE;
 
@@ -33,7 +33,7 @@ public class ScrollableListElement extends SimpleListElement {
 
 		if (getMaxScrollAmount() > 0.0D) {
 			if (scrollMode == ScrollMode.PULL) {
-				int visibleHeight = height;
+				int visibleHeight = getHeight();
 				int totalHeight = visibleHeight + (int)getMaxScrollAmount();
 
 				int middle = scrollBarY + scrollBarHeight * ((int)scrollAmount + visibleHeight / 2) / totalHeight;
@@ -46,8 +46,12 @@ public class ScrollableListElement extends SimpleListElement {
 				}
 			}
 
-			renderScrollBar(isMouseOver(mouseX, mouseY));
+			renderScrollBar(scrollMode == ScrollMode.DRAG || (isHovered() && isMouseOverScrollBar(mouseX, mouseY)));
 		}
+	}
+
+	private boolean isMouseOverScrollBar(double mouseX, double mouseY) {
+		return mouseX >= scrollBarX && mouseX <= scrollBarX + scrollBarWidth && mouseY >= scrollBarY && mouseY <= scrollBarY + scrollBarHeight;
 	}
 
 	@Override
@@ -81,7 +85,7 @@ public class ScrollableListElement extends SimpleListElement {
 		boolean consumed = super.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
 
 		if (!consumed && scrollMode == ScrollMode.DRAG) {
-			consumed = scroll(deltaY * (getMaxScrollAmount() + height) / scrollBarHeight);
+			consumed = scroll(deltaY * (getMaxScrollAmount() + getHeight()) / scrollBarHeight);
 		}
 
 		return consumed;
@@ -112,7 +116,7 @@ public class ScrollableListElement extends SimpleListElement {
 
 	@Override
 	public int getHeight() {
-		return height;
+		return height - getTopBorderAndMargin() - getBottomBorderAndMargin();
 	}
 
 	@Override
@@ -123,6 +127,7 @@ public class ScrollableListElement extends SimpleListElement {
 	@Override
 	protected void updateContentY() {
 		super.updateContentY();
+		updateScrollBar();
 		validateScrollAmount();
 	}
 
@@ -138,7 +143,7 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 
 	protected double getMaxScrollAmount() {
-		double amount = getTotalSpacing() - height;
+		double amount = getTotalSpacing() - getHeight();
 
 		for (Element element : getChildren()) {
 			if (element.isVisible()) {
@@ -205,8 +210,8 @@ public class ScrollableListElement extends SimpleListElement {
 	}
 
 	private void updateScrollBar() {
-		scrollBarY = getY() + topBorder + 3;
-		scrollBarHeight = height - 6;
+		scrollBarY = getY() + getTopBorder() + 3;
+		scrollBarHeight = getHeight() - 6;
 
 		if (shouldDrawBackground()) {
 			scrollBarHeight += (BORDER_MARGIN_TOP + BORDER_MARGIN_BOTTOM);
@@ -215,10 +220,10 @@ public class ScrollableListElement extends SimpleListElement {
 		}
 	}
 
-	protected void renderScrollBar(boolean dark) {
+	protected void renderScrollBar(boolean light) {
 		renderRect(scrollBarX, scrollBarY, scrollBarWidth, scrollBarHeight, 0xFF000000); // background
 
-		int visibleHeight = height;
+		int visibleHeight = getHeight();
 		int totalHeight = visibleHeight + (int)getMaxScrollAmount();
 
 		int x = scrollBarX;
@@ -226,8 +231,8 @@ public class ScrollableListElement extends SimpleListElement {
 		int width = scrollBarWidth;
 		int height = Math.round((float)scrollBarHeight * visibleHeight / totalHeight);
 
-		int color0 = dark ? 0xFF555555 : 0xFF777777;
-		int color1 = dark ? 0xFF999999 : 0xFFBBBBBB;
+		int color0 = light ? 0xFF777777 : 0xFF555555;
+		int color1 = light ? 0xFFBBBBBB : 0xFF999999;
 
 		renderRect(x, y, width, height, color0);
 		renderRect(x, y, width - 1, height - 1, color1);
