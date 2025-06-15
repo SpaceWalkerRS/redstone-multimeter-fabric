@@ -1,11 +1,16 @@
 package redstone.multimeter.client.gui.element;
 
+import java.util.Stack;
+
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
+import net.minecraft.client.render.Window;
 import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -14,6 +19,37 @@ import redstone.multimeter.client.gui.TextureRegion;
 import redstone.multimeter.util.ColorUtils;
 
 public class RenderHelper2D {
+
+	private static final ScissorStack SCISSOR_STACK = new ScissorStack();
+
+	public static void enableScissor(int x0, int y0, int x1, int y1) {
+		applyScissor(SCISSOR_STACK.push(new ScissorBox(x0, y0, x1 - x0, y1 - y0)));
+	}
+
+	public static void disableScissor() {
+		applyScissor(SCISSOR_STACK.pop());
+	}
+
+	private static void applyScissor(ScissorBox box) {
+		if (box == null) {
+			GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		} else {
+			Minecraft minecraft = MultimeterClient.MINECRAFT;
+			RenderTarget target = minecraft.getRenderTarget();
+			Window window = new Window(minecraft.options, minecraft.width, minecraft.height);
+
+			int windowHeight = target.viewHeight;
+			double windowScale = window.getScale();
+
+			int x = (int)(box.x * windowScale);
+			int y = (int)(windowHeight - (box.y + box.height) * windowScale);
+			int width = (int)(box.width * windowScale);
+			int height = (int)(box.height * windowScale);
+
+	        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+	        GL11.glScissor(x, y, Math.max(0, width), Math.max(0, height));
+		}
+	}
 
 	protected void renderRect(Drawer drawer) {
 		GL11.glEnable(GL11.GL_BLEND);
@@ -259,5 +295,53 @@ public class RenderHelper2D {
 
 		public void draw(BufferBuilder bufferBuilder);
 
+	}
+
+	private static class ScissorStack {
+
+		private final Stack<ScissorBox> boxes = new Stack<>();
+
+		public ScissorBox push(ScissorBox box) {
+			if (!boxes.isEmpty()) {
+				box = boxes.peek().intersection(box);
+			}
+
+			return boxes.push(box);
+		}
+
+		public ScissorBox pop() {
+			if (boxes.isEmpty()) {
+				throw new IllegalStateException("popping empty scissor stack");
+			} else{
+				boxes.pop();
+				return boxes.isEmpty() ? null : boxes.peek();
+			}
+		}
+	}
+
+	private static class ScissorBox {
+
+		private static final ScissorBox EMPTY = new ScissorBox(0, 0, 0, 0);
+
+		private final int x;
+		private final int y;
+		private final int width;
+		private final int height;
+
+		public ScissorBox(int x, int y, int width, int height) {
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+		}
+
+		public ScissorBox intersection(ScissorBox o) {
+			int x0 = Math.max(x, o.x);
+			int y0 = Math.max(y, o.y);
+			int x1 = Math.min(x + width, o.x + o.width);
+			int y1 = Math.min(y + height, o.y + o.height);
+
+			return (x0 == x1 || y0 == y1) ? EMPTY : new ScissorBox(x0, y0, x1 - x0, y1 - y0);
+		}
 	}
 }
