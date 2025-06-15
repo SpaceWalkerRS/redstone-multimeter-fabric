@@ -33,6 +33,14 @@ import redstone.multimeter.util.ColorUtils;
 
 public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
+	private static final int SIDE_SPACING = 10;
+	private static final int TOP_SPACING = 30;
+	private static final int BOTTOM_SPACING = 38;
+	private static final int BLOCK_LIST_TOP_BORDER = 6 + 2 * (IButton.DEFAULT_HEIGHT + 2) + 2;
+	private static final int BLOCK_LIST_BOTTOM_BORDER = 3 + 1 * (IButton.DEFAULT_HEIGHT + 2) + 2;
+	private static final int PROPERTIES_LIST_TOP_BORDER = 6;
+	private static final int PROPERTIES_LIST_BOTTOM_BORDER = 3;
+
 	private final ClientMeterPropertiesManager meterPropertiesManager;
 	private final Map<ResourceLocation, EditableMeterProperties> defaults;
 	private final Map<ResourceLocation, EditableMeterProperties> overrides;
@@ -95,16 +103,13 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	protected void initScreen() {
 		minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
-		int spacing = 10;
-		int top = 10 + 3 * (IButton.DEFAULT_HEIGHT + 2);
-		int bottom = 18 + 2 * (IButton.DEFAULT_HEIGHT + 2);
+		int listWidth = (getWidth() - 3 * SIDE_SPACING) / 2;
+		int listHeight = getHeight() - TOP_SPACING - BOTTOM_SPACING;
 
-		int half = (getWidth() - 3 * spacing) / 2;
+		int x = getX() + SIDE_SPACING;
+		int y = getY() + TOP_SPACING;
 
-		int x = getX() + spacing;
-		int y = getY();
-
-		blockList = new BlockListElement(client, half, getHeight(), top, bottom, key -> selectBlock(key));
+		blockList = new BlockListElement(client, listWidth, listHeight, BLOCK_LIST_TOP_BORDER, BLOCK_LIST_BOTTOM_BORDER, key -> selectBlock(key));
 
 		blockList.setSpacing(0);
 		blockList.setDrawBackground(true);
@@ -112,23 +117,24 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		blockList.setX(x);
 		blockList.setY(y);
 
-		y += IButton.DEFAULT_HEIGHT + 4;
-		int width = (half / 2) - 2;
+		x += 2;
+		y += 2;
+		int tabWidth = (listWidth - 3 * 2) / 2;
 
-		IButton defaultsTab = createTabButton(Tab.DEFAULTS, x, y, width, IButton.DEFAULT_HEIGHT);
-		IButton overridesTab = createTabButton(Tab.OVERRIDES, x + half - width, y, width, IButton.DEFAULT_HEIGHT);
+		IButton defaultsTab = createTabButton(Tab.DEFAULTS, x, y, tabWidth, IButton.DEFAULT_HEIGHT);
+		IButton overridesTab = createTabButton(Tab.OVERRIDES, x + (listWidth - 2) - (tabWidth + 2), y, tabWidth, IButton.DEFAULT_HEIGHT);
 
 		y += IButton.DEFAULT_HEIGHT + 2;
-		width = half - (IButton.DEFAULT_HEIGHT + 2);
+		int searchbarWidth = (listWidth - 2 * 2) - (IButton.DEFAULT_HEIGHT + 2);
 
-		searchbar = new TextField(client, x, y, width, IButton.DEFAULT_HEIGHT, () -> Tooltip.EMPTY, text -> blockList.update(), null);
+		searchbar = new TextField(client, x, y, searchbarWidth, IButton.DEFAULT_HEIGHT, () -> Tooltip.EMPTY, text -> blockList.update(), null);
 		searchbar.setHint("search");
-		IButton clear = new Button(client, x + width + 2, y, 20, IButton.DEFAULT_HEIGHT, () -> new TextComponent("X"), () -> Tooltip.EMPTY, button -> {
+		IButton clear = new Button(client, x + searchbarWidth + 2, y, 20, IButton.DEFAULT_HEIGHT, () -> new TextComponent("X"), () -> Tooltip.EMPTY, button -> {
 			searchbar.clear();
 			return true;
 		});
 
-		y = getY() + getHeight() - (bottom - 6);
+		y = blockList.getY() + blockList.getTotalHeight() - (BLOCK_LIST_BOTTOM_BORDER - 3) + 2;
 
 		add = new Button(client, x, y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> new TextComponent("+").withStyle(ChatFormatting.GREEN), () -> Tooltip.EMPTY, button -> {
 			add();
@@ -138,19 +144,17 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			remove();
 			return true;
 		});
-		create = new TextField(client, x + 2 * (IButton.DEFAULT_HEIGHT + 2), y, half - (4 + 2 * IButton.DEFAULT_HEIGHT), IButton.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltip.of("That name is not valid or that block already has an override!") : Tooltip.EMPTY, text -> {
+		create = new TextField(client, x + 2 * (IButton.DEFAULT_HEIGHT + 2), y, (listWidth - 2) - (4 + 2 * IButton.DEFAULT_HEIGHT) - 2, IButton.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltip.of("That name is not valid or that block already has an override!") : Tooltip.EMPTY, text -> {
 			ResourceLocation key = nextBlockKey();
 			add.setActive(key != null && !key.getPath().isBlank());
 		}, null);
 		create.setHint("create");
 		SuggestionsMenu blockSuggestions = create.setSuggestions(SuggestionsProvider.resources(Registry.BLOCK_REGISTRY, true));
 
-		top -= 2 * (IButton.DEFAULT_HEIGHT + 2);
-		bottom -= (IButton.DEFAULT_HEIGHT + 2);
-		x = getX() + half + 2 * spacing;
-		y = getY();
+		x = getX() + getWidth() - listWidth - SIDE_SPACING;
+		y = getY() + TOP_SPACING;
 
-		propertiesList = new ScrollableListElement(client, half, getHeight(), top, bottom);
+		propertiesList = new ScrollableListElement(client, listWidth, listHeight, PROPERTIES_LIST_TOP_BORDER, PROPERTIES_LIST_BOTTOM_BORDER);
 
 		propertiesList.setDrawBackground(true);
 		propertiesList.setX(x);
@@ -214,18 +218,20 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 		switch (currentTab) {
 		case DEFAULTS:
+			blockList.setBottomBorder(PROPERTIES_LIST_BOTTOM_BORDER);
 			blockList.add(defaults.keySet());
 			break;
 		case OVERRIDES:
+			blockList.setBottomBorder(BLOCK_LIST_BOTTOM_BORDER);
 			blockList.add(overrides.keySet());
 			break;
 		}
 
 		blockList.update();
 
-		add.setActive(false);
-		remove.setActive(false);
-		create.setActive(currentTab == Tab.OVERRIDES);
+		add.setVisible(currentTab == Tab.OVERRIDES);
+		remove.setVisible(currentTab == Tab.OVERRIDES);
+		create.setVisible(currentTab == Tab.OVERRIDES);
 		create.clear();
 	}
 
