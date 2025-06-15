@@ -90,7 +90,7 @@ public class ServerMeterGroup extends MeterGroup {
 
 	@Override
 	protected void meterAdded(Meter meter) {
-		meterUpdates.putIfAbsent(meter.getId(), meter.getProperties());
+		meterUpdates.put(meter.getId(), meter.getProperties());
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class ServerMeterGroup extends MeterGroup {
 
 	@Override
 	protected void meterUpdated(Meter meter) {
-		meterUpdates.putIfAbsent(meter.getId(), meter.getProperties());
+		meterUpdates.put(meter.getId(), meter.getProperties());
 	}
 
 	@Override
