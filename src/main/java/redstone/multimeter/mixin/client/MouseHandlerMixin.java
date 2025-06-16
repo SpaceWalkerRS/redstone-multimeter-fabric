@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
+import net.minecraft.client.gui.screens.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.screen.ScreenWrapper;
@@ -30,14 +31,14 @@ public class MouseHandlerMixin {
 		)
 	)
 	private void scrollOnScreen(long window, double horizontal, double vertical, CallbackInfo ci, double scrollY, double mouseX, double mouseY) {
-		ScreenWrapper screen = (ScreenWrapper) MultimeterClient.MINECRAFT.screen;
+		Screen screen = MultimeterClient.MINECRAFT.screen;
 		
-		if (screen != null) {
+		if (screen instanceof ScreenWrapper) {
 			boolean discrete = minecraft.options.discreteMouseScroll().get();
 			double sensitivity = minecraft.options.mouseWheelSensitivity().get();
 			double scrollX = sensitivity * (discrete ? Math.signum(horizontal) : horizontal);
 			
-			screen.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+			((ScreenWrapper) screen).mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 		}
 	}
 
