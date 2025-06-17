@@ -287,6 +287,14 @@ public class SuggestionsMenu extends AbstractElement {
 	}
 
 	@Override
+	public int getHeight() {
+		// suggestions are always listed top down, so if the menu
+		// appears above the text field, extend it down until it
+		// connects with it again
+		return getY() < input.getY() ? getMaxHeight() : super.getHeight();
+	}
+
+	@Override
 	public void update() {
 		if (isEnabled()) {
 			suggestions = provider.provide(input.getValueBeforeCursor());
