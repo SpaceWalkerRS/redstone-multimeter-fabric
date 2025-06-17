@@ -1,5 +1,7 @@
 package redstone.multimeter.common.meter;
 
+import java.util.Objects;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -19,7 +21,6 @@ public class MeterProperties {
 	private Integer eventTypes;
 
 	public MeterProperties() {
-
 	}
 
 	public MeterProperties(DimPos pos, String name, Integer color, Boolean movable, Integer eventTypes) {
@@ -33,6 +34,29 @@ public class MeterProperties {
 	@Override
 	public String toString() {
 		return String.format("MeterProperties[pos: %s, name: %s, color: %s, movable: %s, event types: %s]", pos, name, color, movable, eventTypes);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(pos, name, color, movable, eventTypes);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof MeterProperties)) {
+			return false;
+		}
+
+		MeterProperties p = (MeterProperties)o;
+
+		return Objects.equals(pos, p.pos)
+			&& Objects.equals(name, p.name)
+			&& Objects.equals(color, p.color)
+			&& Objects.equals(movable, p.movable)
+			&& Objects.equals(eventTypes, p.eventTypes);
 	}
 
 	public DimPos getPos() {
