@@ -61,7 +61,7 @@ public class MeterGroupSubscriptionPacket implements RSMMPacket {
 		ClientMeterGroup meterGroupPreview = client.getMeterGroupPreview();
 
 		if (subscribe) {
-			meterGroup.subscribe(name);
+			client.handleSubscribeToMeterGroup(name);
 		} else {
 			meterGroup.unsubscribe(false);
 		}
