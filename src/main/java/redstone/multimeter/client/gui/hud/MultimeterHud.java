@@ -43,6 +43,7 @@ public class MultimeterHud extends AbstractParentElement {
 	private PrimaryEventViewer ticks;
 	private SecondaryEventViewer subticks;
 	private MeterEventDetails details;
+	private TextElement meterGroupSlot;
 	private TextElement meterGroupName;
 	private TextElement tickMarkerCounter;
 
@@ -185,8 +186,15 @@ public class MultimeterHud extends AbstractParentElement {
 
 			x = hudX;
 			names.setX(x);
-			meterGroupName.setX(x + settings.gridSize + 1);
 
+			x += settings.gridSize + 1;
+			if (meterGroupSlot.isVisible()) {
+				meterGroupSlot.setX(x);
+				x += meterGroupSlot.getWidth() + settings.gridSize + 1;
+			}
+			meterGroupName.setX(x);
+
+			x = hudX;
 			x += names.getWidth();
 			ticks.setX(x);
 
@@ -210,8 +218,16 @@ public class MultimeterHud extends AbstractParentElement {
 
 			x = hudX + (getWidth() - names.getWidth());
 			names.setX(x);
-			meterGroupName.setX(x + names.getWidth() - (meterGroupName.getWidth() + settings.gridSize + 1));
 
+			x += names.getWidth();
+			if (meterGroupSlot.isVisible()) {
+				x -= meterGroupSlot.getWidth() + settings.gridSize + 1;
+				meterGroupSlot.setX(x + 1);
+			}
+			x -= meterGroupName.getWidth() + settings.gridSize;
+			meterGroupName.setX(x);
+
+			x = hudX + (getWidth() - names.getWidth());
 			x -= ticks.getWidth();
 			ticks.setX(x);
 
@@ -252,6 +268,7 @@ public class MultimeterHud extends AbstractParentElement {
 			details.setY(y);
 
 			y += names.getHeight();
+			meterGroupSlot.setY(y + settings.gridSize);
 			meterGroupName.setY(y + settings.gridSize);
 
 			y += 1;
@@ -266,6 +283,7 @@ public class MultimeterHud extends AbstractParentElement {
 			ticks.setY(y);
 			subticks.setY(y);
 			details.setY(y - (details.getHeight() - names.getHeight()));
+			meterGroupSlot.setY(y - meterGroupSlot.getHeight());
 			meterGroupName.setY(y - meterGroupName.getHeight());
 
 			y -= playPauseButton.getHeight();
@@ -286,6 +304,33 @@ public class MultimeterHud extends AbstractParentElement {
 		this.ticks = new PrimaryEventViewer(this);
 		this.subticks = new SecondaryEventViewer(this);
 		this.details = new MeterEventDetails(this);
+		this.meterGroupSlot = new TextElement(this.client, 0, 0, t -> {
+			int slot = this.client.isPreviewing()
+				? this.client.getMeterGroupPreview().getSlot()
+				: this.client.getMeterGroup().getSlot();
+
+			if (slot < 0) {
+				t.setVisible(false);
+			} else {
+				t.setVisible(true);
+
+				String text = "[" + slot + "]";
+				int a = Math.round(0xFF * settings.opacity() / 100.0F);
+				int rgb = onScreen ? 0xF0F0F0 : 0x404040;
+				int color = ColorUtils.setAlpha(rgb, a);
+
+				if (!this.client.isPreviewing() && this.client.getMeterGroup().isDirty()) {
+					text = ChatFormatting.BOLD + text;
+				}
+
+				t.setText(text);
+				t.setColor(color);
+			}
+		}, () -> {
+			return this.client.isPreviewing() || !this.client.getMeterGroup().isDirty()
+				? Tooltip.EMPTY
+				: Tooltip.of("There are unsaved changes to this saved meter group!");
+		});
 		this.meterGroupName = new TextElement(this.client, 0, 0, t -> {
 			String text = this.client.isPreviewing()
 				? this.client.getMeterGroupPreview().getName()
@@ -353,6 +398,7 @@ public class MultimeterHud extends AbstractParentElement {
 		addChild(this.ticks);
 		addChild(this.subticks);
 		addChild(this.details);
+		addChild(this.meterGroupSlot);
 		addChild(this.meterGroupName);
 		addChild(this.tickMarkerCounter);
 		addChild(this.playPauseButton);
@@ -415,6 +461,7 @@ public class MultimeterHud extends AbstractParentElement {
 
 		paused = pause;
 
+		meterGroupSlot.update();
 		meterGroupName.update();
 		playPauseButton.update();
 		fastBackwardButton.setActive(paused);
@@ -788,7 +835,9 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}
 
+		meterGroupSlot.update();
 		meterGroupName.update();
+
 		onResized();
 
 		if (selectedMeter != null && !meterGroup.hasMeter(selectedMeter)) {
@@ -837,6 +886,7 @@ public class MultimeterHud extends AbstractParentElement {
 		settings.forceFullOpacity = true;
 		settings.ignoreHiddenMeters = false;
 
+		meterGroupSlot.update();
 		meterGroupName.update();
 		playPauseButton.setVisible(true);
 		playPauseButton.update();
@@ -857,6 +907,7 @@ public class MultimeterHud extends AbstractParentElement {
 		settings.gridSize = Options.HUD.GRID_SIZE.get();
 		updateTickMarkerColor();
 
+		meterGroupSlot.update();
 		meterGroupName.update();
 		playPauseButton.setVisible(onScreen || Options.HUD.PAUSE_INDICATOR.get());
 		onResized();
