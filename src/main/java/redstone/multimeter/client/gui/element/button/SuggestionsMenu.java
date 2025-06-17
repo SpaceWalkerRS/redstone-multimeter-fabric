@@ -79,7 +79,7 @@ public class SuggestionsMenu extends AbstractElement {
 	public void render(PoseStack poses, int mouseX, int mouseY) {
 		if (isShowingSuggestions()) {
 			poses.pushPose();
-			poses.translate(0.0D, 0.0D, 1000.0D);
+			poses.translate(0.0D, 0.0D, 10.0D);
 
 			renderBackground(poses);
 			renderHighlights(poses);
