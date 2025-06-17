@@ -109,6 +109,10 @@ public class SavedMeterGroupsManager {
 		}
 	}
 
+	public SavedMeterGroup getSavedMeterGroup(int slot) {
+		return meterGroups[slot + SLOT_OFFSET];
+	}
+
 	public void tick() {
 		if (bypassLoadWarningTicks >= 0) {
 			bypassLoadWarningTicks--;
@@ -182,7 +186,7 @@ public class SavedMeterGroupsManager {
 			Text warning = Text.literal(String.format("Cannot preview meter group from slot %d: that slot is empty!", slot));
 			client.sendMessage(warning, true);
 		} else {
-			client.getMeterGroupPreview().preview(name, meters);
+			client.getMeterGroupPreview().preview(slot, name, meters);
 
 			Text message = Text.literal("Previewing meter group \'" + name + "\' from slot " + slot);
 			client.sendMessage(message, true);
@@ -218,7 +222,7 @@ public class SavedMeterGroupsManager {
 				client.sendMessage(warning, true);
 			}
 		} else {
-			client.subscribeToMeterGroup(name);
+			client.subscribeToMeterGroup(slot, name);
 
 			SetMetersPacket packet = new SetMetersPacket(meters);
 			client.sendPacket(packet);
