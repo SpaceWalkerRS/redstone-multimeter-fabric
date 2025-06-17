@@ -75,6 +75,9 @@ public class MultimeterClient {
 	private boolean hudEnabled;
 	private long prevGameTime;
 
+	private int pendingMeterGroupSlot = -1;
+	private String pendingMeterGroupName = null;
+
 	public MultimeterClient(Minecraft minecraft) {
 		MINECRAFT = minecraft;
 
@@ -278,12 +281,26 @@ public class MultimeterClient {
 			name = minecraft.getUser().getName();
 		}
 
-		subscribeToMeterGroup(name);
+		subscribeToMeterGroup(-1, name);
 	}
 
-	public void subscribeToMeterGroup(String name) {
+	public void subscribeToMeterGroup(int slot, String name) {
+		pendingMeterGroupSlot = slot;
+		pendingMeterGroupName = name;
+
 		MeterGroupSubscriptionPacket packet = new MeterGroupSubscriptionPacket(name, true);
 		sendPacket(packet);
+	}
+
+	public void handleSubscribeToMeterGroup(String name) {
+		int slot = name.equals(pendingMeterGroupName)
+			? pendingMeterGroupSlot
+			: -1;
+
+		meterGroup.subscribe(slot,  name);
+
+		pendingMeterGroupSlot = -1;
+		pendingMeterGroupName = null;
 	}
 
 	public void unsubscribeFromMeterGroup() {
