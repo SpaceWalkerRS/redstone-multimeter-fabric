@@ -82,7 +82,7 @@ public class SuggestionsMenu extends AbstractElement {
 			PoseStack poses = graphics.pose();
 
 			poses.pushPose();
-			poses.translate(0.0D, 0.0D, 1000.0D);
+			poses.translate(0.0D, 0.0D, 10.0D);
 
 			renderBackground(graphics);
 			renderHighlights(graphics);
