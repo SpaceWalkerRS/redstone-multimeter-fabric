@@ -8,6 +8,8 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
 import net.minecraft.nbt.NbtCompound;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.SavedMeterGroup;
+import redstone.multimeter.client.SavedMeterGroupsManager;
 import redstone.multimeter.client.meter.log.ClientLogManager;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -20,6 +22,7 @@ public class ClientMeterGroup extends MeterGroup {
 
 	private boolean subscribed;
 	private boolean previewing;
+	private int slot = -1;
 	private String name;
 	private int nextIndex;
 
@@ -89,6 +92,10 @@ public class ClientMeterGroup extends MeterGroup {
 		return previewing;
 	}
 
+	public int getSlot() {
+		return slot;
+	}
+
 	public int getNextMeterIndex() {
 		return nextIndex;
 	}
@@ -132,9 +139,10 @@ public class ClientMeterGroup extends MeterGroup {
 		meterUpdated(meter);
 	}
 
-	public void subscribe(String newName) {
+	public void subscribe(int newSlot, String newName) {
 		subscribed = true;
 		previewing = false;
+		slot = newSlot;
 		name = newName;
 		logManager.getPrinter().onNewMeterGroup();
 
@@ -147,6 +155,7 @@ public class ClientMeterGroup extends MeterGroup {
 	public void unsubscribe(boolean disconnect) {
 		subscribed = false;
 		previewing = false;
+		slot = -1;
 		name = super.getName();
 		logManager.getPrinter().stop(!disconnect);
 
@@ -161,9 +170,10 @@ public class ClientMeterGroup extends MeterGroup {
 		client.getTutorial().onMeterGroupRefreshed();
 	}
 
-	public void preview(String newName, List<MeterProperties> meters) {
+	public void preview(int newSlot, String newName, List<MeterProperties> meters) {
 		subscribed = false;
 		previewing = true;
+		slot = newSlot;
 		name = newName;
 
 		clear();
@@ -178,6 +188,7 @@ public class ClientMeterGroup extends MeterGroup {
 	public void stopPreviewing() {
 		subscribed = false;
 		previewing = false;
+		slot = -1;
 		name = super.getName();
 
 		clear();
@@ -187,5 +198,32 @@ public class ClientMeterGroup extends MeterGroup {
 
 	public void tick() {
 		logManager.tick();
+	}
+
+	public boolean isDirty() {
+		if (slot < 0) {
+			return false;
+		}
+
+		List<Meter> meters = getMeters();
+
+		SavedMeterGroupsManager savedMeterGroups = client.getSavedMeterGroupsManager();
+		SavedMeterGroup savedMeterGroup = savedMeterGroups.getSavedMeterGroup(slot);
+		List<MeterProperties> savedMeters = savedMeterGroup.getMeters();
+
+		if (meters.size() != savedMeters.size()) {
+			return true;
+		}
+
+		for (int i = 0; i < meters.size(); i++) {
+			MeterProperties properties = meters.get(i).getProperties();
+			MeterProperties savedProperties = savedMeters.get(i);
+
+			if (!properties.equals(savedProperties)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

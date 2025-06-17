@@ -51,7 +51,7 @@ public class MeterGroupRefreshPacket implements RSMMPacket {
 		if (meterGroup.getName().equals(name)) {
 			meterGroup.refresh(meterGroupData);
 		} else {
-			meterGroup.subscribe(name);
+			meterGroup.subscribe(-1, name);
 		}
 	}
 }
