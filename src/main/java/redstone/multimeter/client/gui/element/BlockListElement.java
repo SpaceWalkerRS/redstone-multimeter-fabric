@@ -98,22 +98,22 @@ public class BlockListElement extends SelectableScrollableListElement {
 		protected BlockListEntry(int width, int height, String key) {
 			super(0, 0, width, height);
 
-			Block block = Blocks.byKey(key);
+			Integer block = Blocks.REGISTRY.get(key);
 			Item item = null;
 
 			if (block != null) {
-				item = Items.byBlock(block);
+				item = Item.BY_ID[block];
 
 				// some blocks do not have direct a item counterpart
 				// so to get the item, we try a few different things
 				if (item == null) {
 					// first check for an item with the same key
-					item = Items.byKey(key.toString());
+					item = Item.BY_ID[Items.REGISTRY.get(key)];
 				}
 				if (item == null) {
 					// if nothing has worked yet, use the item dropped
 					// by the block when broken
-					item = Item.BY_ID[block.getDropItem(0, RANDOM, 0)];
+					item = Item.BY_ID[Block.BY_ID[block].getDropItem(0, RANDOM, 0)];
 				}
 			}
 
