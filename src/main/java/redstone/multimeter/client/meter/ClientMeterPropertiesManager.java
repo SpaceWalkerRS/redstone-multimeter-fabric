@@ -35,13 +35,14 @@ import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.MeterPropertiesManager;
 import redstone.multimeter.common.meter.event.EventType;
+import redstone.multimeter.util.Blocks;
 
 public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 	private static final String PROPERTIES_PATH = "meter/default_properties";
 	private static final String RESOURCES_PATH = String.format("/assets/%s/%s", RedstoneMultimeterMod.NAMESPACE, PROPERTIES_PATH);
 	private static final String FILE_EXTENSION = ".json";
-	private static final String MINECRAFT_NAMESPACE = "minecraft";
+	private static final String DEFAULT_NAMESPACE = "minecraft";
 	private static final String DEFAULT_KEY = "block";
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -142,37 +143,37 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	private MeterProperties getDefaultProperties(int block) {
-		String id = (block == 0) ? "air" : Block.BY_ID[block].getTranslationKey().substring("tile.".length());
+		String key = Blocks.REGISTRY.getKey(block);
 
-		if (id == null) {
+		if (key == null) {
 			return null; // we should never get here
 		}
 
-		return cache.computeIfAbsent(id, _key -> {
-			String defaultId = DEFAULT_KEY;
+		return cache.computeIfAbsent(key, _key -> {
+			String defaultKey = DEFAULT_KEY;
 
 			return new MutableMeterProperties().
-				fill(overrides.get(id)).
-				fill(defaults.get(id)).
-				fill(overrides.get(defaultId)).
-				fill(defaults.get(defaultId)).
+				fill(overrides.get(key)).
+				fill(defaults.get(key)).
+				fill(overrides.get(defaultKey)).
+				fill(defaults.get(defaultKey)).
 				immutable();
 		});
 	}
 
 	private void initDefaults() {
-		loadDefaultProperties(new String(DEFAULT_KEY));
+		loadDefaultProperties(DEFAULT_KEY);
 
 		for (Block block : Block.BY_ID) {
 			if (block != null) {
-				String id = block.getTranslationKey().substring("tile.".length());
-				loadDefaultProperties(id);
+				String key = Blocks.REGISTRY.getKey(block.id);
+				loadDefaultProperties(key);
 			}
 		}
 	}
 
 	private void loadDefaultProperties(String key) {
-		String path = String.format("%s/%s/%s%s", RESOURCES_PATH, MINECRAFT_NAMESPACE, key, FILE_EXTENSION);
+		String path = String.format("%s/%s/%s%s", RESOURCES_PATH, DEFAULT_NAMESPACE, key, FILE_EXTENSION);
 		InputStream resource = getClass().getResourceAsStream(path);
 
 		if (resource == null) {
@@ -210,10 +211,14 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			return;
 		}
 
-		String id = path.substring(0, path.length() - FILE_EXTENSION.length());
+		String key = path.substring(0, path.length() - FILE_EXTENSION.length());
 
 		try (BufferedReader br = Files.newBufferedReader(file)) {
-			loadProperties(overrides, id, br);
+			loadProperties(overrides, key, br);
+		}
+
+		if (!DEFAULT_NAMESPACE.equals(namespace)) {
+			RedstoneMultimeterMod.LOGGER.warn("loaded user meter properties override for \'" + key + "\' from non-default namespace \'" + namespace + "\' - it will be saved to the default namespace!");
 		}
 	}
 
@@ -242,7 +247,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	private void saveUserOverrides(String key, MeterProperties properties) throws Exception {
-		String namespace = MINECRAFT_NAMESPACE;
+		String namespace = DEFAULT_NAMESPACE;
+		String path = key;
 
 		Path dirForNamespace = dir.resolve(namespace);
 
@@ -250,13 +256,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			Files.createDirectories(dirForNamespace);
 		}
 		if (!Files.isDirectory(dirForNamespace)) {
-			throw new IOException("Unable to save properties for \'" + key.toString() + "\' - the \'" + namespace + "\' folder does not exist and cannot be created!");
+			throw new IOException("Unable to save properties for \'" + key + "\' - the \'" + namespace + "\' folder does not exist and cannot be created!");
 		}
 
 		Path file = dirForNamespace.resolve(String.format("%s%s", key, FILE_EXTENSION));
 
 		if (Files.exists(file) && !Files.isRegularFile(file)) {
-			RedstoneMultimeterMod.LOGGER.warn("Unable to save properties for \'" + key.toString() + "\' - the \'" + key + "\' file does not exist and cannot be created!");
+			RedstoneMultimeterMod.LOGGER.warn("Unable to save properties for \'" + key + "\' - the \'" + path + "\' file does not exist and cannot be created!");
 			return;
 		}
 
@@ -268,11 +274,12 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	}
 
 	private void deleteOverrideFile(String key) {
-		String namespace = MINECRAFT_NAMESPACE;
+		String namespace = DEFAULT_NAMESPACE;
+		String path = key;
 
 		try {
 			Path folder = dir.resolve(namespace);
-			Path file = folder.resolve(String.format("%s%s", key, FILE_EXTENSION));
+			Path file = folder.resolve(String.format("%s%s", path, FILE_EXTENSION));
 
 			Files.deleteIfExists(file);
 		} catch (IOException e) {

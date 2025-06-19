@@ -102,7 +102,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 		blockList.setSpacing(0);
 		blockList.setDrawBackground(true);
-		blockList.setBlockFilter(id -> id.toString().contains(searchbar.getText()));
+		blockList.setBlockFilter(id -> id.contains(searchbar.getText()));
 		blockList.setX(x);
 		blockList.setY(y);
 
