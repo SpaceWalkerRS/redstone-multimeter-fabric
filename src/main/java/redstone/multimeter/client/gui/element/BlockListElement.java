@@ -14,7 +14,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.texture.TextureManager;
-import net.minecraft.client.resource.Identifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -32,13 +31,13 @@ public class BlockListElement extends SelectableScrollableListElement {
 	private final TextureManager textureManager;
 	private final ItemRenderer itemRenderer;
 	private final TextRenderer textRenderer;
-	private final Consumer<Identifier> selectionListener;
+	private final Consumer<String> selectionListener;
 
-	public BlockListElement(MultimeterClient client, int width, int height, Consumer<Identifier> selector) {
+	public BlockListElement(MultimeterClient client, int width, int height, Consumer<String> selector) {
 		this(client, width, height, 0, 0, selector);
 	}
 
-	public BlockListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder, Consumer<Identifier> selectionListener) {
+	public BlockListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder, Consumer<String> selectionListener) {
 		super(client, width, height, topBorder, bottomBorder);
 
 		Minecraft minecraft = this.client.getMinecraft();
@@ -70,17 +69,17 @@ public class BlockListElement extends SelectableScrollableListElement {
 		}
 	}
 
-	public void add(Identifier key) {
+	public void add(String key) {
 		addChild(new BlockListEntry(getEffectiveWidth(), IButton.DEFAULT_HEIGHT, key));
 	}
 
-	public void add(Collection<Identifier> keys) {
-		for (Identifier key : keys) {
+	public void add(Collection<String> keys) {
+		for (String key : keys) {
 			add(key);
 		}
 	}
 
-	public void setBlockFilter(Predicate<Identifier> filter) {
+	public void setBlockFilter(Predicate<String> filter) {
 		setFilter(e -> {
 			if (e instanceof BlockListEntry) {
 				BlockListEntry entry = (BlockListEntry)e;
@@ -93,28 +92,28 @@ public class BlockListElement extends SelectableScrollableListElement {
 
 	private class BlockListEntry extends AbstractElement {
 
-		private final Identifier key;
+		private final String key;
 		private final ItemStack icon;
 
-		protected BlockListEntry(int width, int height, Identifier key) {
+		protected BlockListEntry(int width, int height, String key) {
 			super(0, 0, width, height);
 
-			Block block = Blocks.byKey(key);
+			Integer block = Blocks.REGISTRY.get(key);
 			Item item = null;
 
 			if (block != null) {
-				item = Items.byBlock(block);
+				item = Item.BY_ID[block];
 
 				// some blocks do not have direct a item counterpart
 				// so to get the item, we try a few different things
 				if (item == null) {
 					// first check for an item with the same key
-					item = Items.byKey(key.toString());
+					item = Item.BY_ID[Items.REGISTRY.get(key)];
 				}
 				if (item == null) {
 					// if nothing has worked yet, use the item dropped
 					// by the block when broken
-					item = Item.BY_ID[block.getDropItem(0, RANDOM, 0)];
+					item = Item.BY_ID[Block.BY_ID[block].getDropItem(0, RANDOM, 0)];
 				}
 			}
 

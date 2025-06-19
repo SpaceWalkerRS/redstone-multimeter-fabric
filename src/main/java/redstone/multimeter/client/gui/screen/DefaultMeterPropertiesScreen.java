@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 
 import org.lwjgl.input.Keyboard;
 
-import net.minecraft.client.resource.Identifier;
 import net.minecraft.text.Formatting;
 import net.minecraft.text.Text;
 
@@ -29,11 +28,11 @@ import redstone.multimeter.util.ColorUtils;
 public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 	private final ClientMeterPropertiesManager meterPropertiesManager;
-	private final Map<Identifier, EditableMeterProperties> defaults;
-	private final Map<Identifier, EditableMeterProperties> overrides;
+	private final Map<String, EditableMeterProperties> defaults;
+	private final Map<String, EditableMeterProperties> overrides;
 
 	private Tab currentTab;
-	private Identifier currentBlock;
+	private String currentBlock;
 
 	private BlockListElement blockList;
 	private ScrollableListElement propertiesList;
@@ -49,14 +48,14 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		this.defaults = new HashMap<>();
 		this.overrides = new HashMap<>();
 
-		for (Entry<Identifier, MeterProperties> entry : this.meterPropertiesManager.getDefaults().entrySet()) {
-			Identifier key = entry.getKey();
+		for (Entry<String, MeterProperties> entry : this.meterPropertiesManager.getDefaults().entrySet()) {
+			String key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			this.defaults.put(key, new EditableMeterProperties(properties));
 		}
-		for (Entry<Identifier, MeterProperties> entry : this.meterPropertiesManager.getOverrides().entrySet()) {
-			Identifier key = entry.getKey();
+		for (Entry<String, MeterProperties> entry : this.meterPropertiesManager.getOverrides().entrySet()) {
+			String key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			this.overrides.put(key, new EditableMeterProperties(properties));
@@ -103,7 +102,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 		blockList.setSpacing(0);
 		blockList.setDrawBackground(true);
-		blockList.setBlockFilter(id -> id.toString().contains(searchbar.getText()));
+		blockList.setBlockFilter(id -> id.contains(searchbar.getText()));
 		blockList.setX(x);
 		blockList.setY(y);
 
@@ -133,8 +132,8 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			return true;
 		});
 		create = new TextField(client, x + 2 * (IButton.DEFAULT_HEIGHT + 2), y, half - (4 + 2 * IButton.DEFAULT_HEIGHT), IButton.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltip.of("That name is not valid or that block already has an override!") : Tooltip.EMPTY, text -> {
-			Identifier key = nextBlockKey();
-			add.setActive(key != null && !key.getPath().trim().isEmpty());
+			String key = nextBlockKey();
+			add.setActive(key != null && !key.trim().isEmpty());
 		}, null);
 
 		top -= 2 * (IButton.DEFAULT_HEIGHT + 2);
@@ -219,7 +218,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		create.clear();
 	}
 
-	private void selectBlock(Identifier key) {
+	private void selectBlock(String key) {
 		currentBlock = key;
 
 		if (currentTab == Tab.OVERRIDES) {
@@ -393,7 +392,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	private void add() {
-		Identifier key = nextBlockKey();
+		String key = nextBlockKey();
 
 		if (key != null && overrides.putIfAbsent(key, new EditableMeterProperties()) == null) {
 			selectTab(Tab.OVERRIDES);
@@ -408,9 +407,8 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		}
 	}
 
-	public Identifier nextBlockKey() {
-		String name = create.getText();
-		Identifier key = new Identifier(name);
+	public String nextBlockKey() {
+		String key = create.getText();
 
 		if (!overrides.containsKey(key)) {
 			return key;

@@ -1,17 +1,13 @@
 package redstone.multimeter.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.block.Block;
-import net.minecraft.client.resource.Identifier;
 
 public class Blocks {
 
-	private static Map<String, Block> BLOCKS;
+	public static IdRegistry REGISTRY;
 
-	private static void setUp() {
-		BLOCKS = new HashMap<>();
+	public static void setUp() {
+		REGISTRY = new IdRegistry();
 
 		for (Block block : Block.BY_ID) {
 			if (block == null) {
@@ -24,19 +20,9 @@ public class Blocks {
 				continue;
 			}
 
-			BLOCKS.put(key.substring("tile.".length()), block);
-		}
-	}
-
-	public static Block byKey(Identifier key) {
-		return byKey(key.getPath());
-	}
-
-	public static Block byKey(String key) {
-		if (BLOCKS == null) {
-			setUp();
+			REGISTRY.put(key.substring("tile.".length()), block.id);
 		}
 
-		return BLOCKS.get(key);
+		REGISTRY.put("air", 0);
 	}
 }
