@@ -215,7 +215,7 @@ public class SuggestionsMenu extends AbstractElement {
 			return input.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 		}
 		if (isShowingSuggestions()) {
-			moveSelection((int)scrollY);
+			moveSelection(-(int)scrollY);
 			return true;
 		}
 
