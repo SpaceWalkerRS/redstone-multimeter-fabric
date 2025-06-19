@@ -11,13 +11,13 @@ public class ScreenWrapper extends Screen {
 	private final Screen parent;
 	private final RSMMScreen screen;
 
-	private double prevX;
-	private double prevY;
+	private double prevMouseX;
+	private double prevMouseY;
 	private double mouseX;
 	private double mouseY;
 	private int touchEvents;
 	private int lastButton;
-	private long buttonTicks;
+	private long lastClickTime;
 
 	public ScreenWrapper(Screen parent, RSMMScreen screen) {
 		this.parent = parent;
@@ -28,17 +28,11 @@ public class ScreenWrapper extends Screen {
 
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
-		screen.render(mouseX, mouseY);
-	}
+		// input events are handled once per tick
+		// but we want it once per frame for a snappier experience
+		handleInputs();
 
-	@Override
-	public void handleInputs() {
-		if (Mouse.isCreated()) {
-			handleMouseEvents();
-		}
-		if (Keyboard.isCreated()) {
-			handleKeyboardEvents();
-		}
+		screen.render(mouseX, mouseY);
 	}
 
 	@Override
@@ -56,113 +50,89 @@ public class ScreenWrapper extends Screen {
 		screen.onRemoved();
 	}
 
+	@Override
+	public void handleMouse() {
+		boolean consumed = false;
+
+		prevMouseX = mouseX;
+		prevMouseY = mouseY;
+		mouseX = (double)Mouse.getEventX() * width / minecraft.width;
+		mouseY = height - 1 - (double)Mouse.getEventY() * height / minecraft.height;
+
+		if (mouseX != prevMouseX || mouseY != prevMouseY) {
+			screen.mouseMove(mouseX, mouseY);
+		}
+
+		int button = Mouse.getEventButton();
+
+		if (Mouse.getEventButtonState()) {
+			if (minecraft.options.touchscreen && touchEvents++ > 0) {
+				return;
+			}
+
+			lastButton = button;
+			lastClickTime = Minecraft.getTime();
+
+			consumed = screen.mouseClick(mouseX, mouseY, button);
+		} else if (button != -1) {
+			if (minecraft.options.touchscreen && --touchEvents > 0) {
+				return;
+			}
+
+			consumed = screen.mouseRelease(mouseX, mouseY, button);
+
+			if (button == lastButton) {
+				lastButton = -1;
+			}
+		} else if (lastButton != -1 && Minecraft.getTime() - lastClickTime > 0) {
+			double deltaX = mouseX - prevMouseX;
+			double deltaY = mouseY - prevMouseY;
+
+			consumed = screen.mouseDrag(mouseX, mouseY, lastButton, deltaX, deltaY);
+		}
+
+		double scrollY = 0.009D * Mouse.getEventDWheel();
+
+		if (scrollY != 0) {
+			consumed = screen.mouseScroll(mouseX, mouseY, 0, scrollY);
+		}
+
+		if (consumed) {
+			screen.mouseMove(mouseX, mouseY);
+		}
+	}
+
+	@Override
+	public void handleKeyboard() {
+		char chr = Keyboard.getEventCharacter();
+		int key = Keyboard.getEventKey();
+		boolean consumed = false;
+
+		if (key != Keyboard.CHAR_NONE) {
+			if (Keyboard.getEventKeyState()) {
+				consumed = screen.keyPress(key);
+				
+				if (!consumed && key == Keyboard.KEY_ESCAPE) {
+					screen.close();
+				}
+			} else {
+				consumed = screen.keyRelease(key);
+			}
+		}
+		if (chr >= ' ') {
+			consumed = screen.typeChar(chr);
+		}
+
+		if (consumed) {
+			screen.mouseMove(mouseX, mouseY);
+		}
+	}
+
 	public Screen getParent() {
 		return parent;
 	}
 
 	public RSMMScreen getScreen() {
 		return screen;
-	}
-
-	private void handleMouseEvents() {
-		updateMousePos();
-		handleScroll();
-
-		while (Mouse.next()) {
-			int button = Mouse.getEventButton();
-			boolean consumed = false;
-
-			if (Mouse.getEventButtonState()) {
-				if (minecraft.options.touchscreen && touchEvents++ > 0) {
-					continue;
-				}
-
-				lastButton = button;
-				buttonTicks = Minecraft.getTime();
-
-				consumed = screen.mouseClick(mouseX, mouseY, button);
-			} else {
-				if (minecraft.options.touchscreen && --touchEvents > 0) {
-					return;
-				}
-
-				consumed = screen.mouseRelease(mouseX, mouseY, button);
-
-				if (button == lastButton) {
-					lastButton = -1;
-				}
-			}
-
-			if (consumed) {
-				screen.mouseMove(mouseX, mouseY);
-			}
-		}
-
-		handleDrag();
-	}
-
-	private void updateMousePos() {
-		prevX = mouseX;
-		prevY = mouseY;
-		mouseX = (double)Mouse.getX() * width / minecraft.width;
-		mouseY = height - 1 - (double)Mouse.getY() * height / minecraft.height;
-
-		if (mouseX != prevX || mouseY != prevY) {
-			screen.mouseMove(mouseX, mouseY);
-		}
-	}
-
-	private void handleScroll() {
-		double scrollY = 0.05D * Mouse.getDWheel();
-
-		if (scrollY != 0) {
-			boolean consumed = screen.mouseScroll(mouseX, mouseY, 0, scrollY);
-
-			if (consumed) {
-				screen.mouseMove(mouseX, mouseY);
-			}
-		}
-	}
-
-	private void handleDrag() {
-		if (lastButton != -1 && buttonTicks > 0L) {
-			double deltaX = mouseX - prevX;
-			double deltaY = mouseY - prevY;
-
-			if (deltaX != 0 && deltaY != 0) {
-				boolean consumed = screen.mouseDrag(mouseX, mouseY, lastButton, deltaX, deltaY);
-
-				if (consumed) {
-					screen.mouseMove(mouseX, mouseY);
-				}
-			}
-		}
-	}
-
-	private void handleKeyboardEvents() {
-		while (Keyboard.next()) {
-			char chr = Keyboard.getEventCharacter();
-			int key = Keyboard.getEventKey();
-			boolean consumed = false;
-
-			if (key != Keyboard.CHAR_NONE) {
-				if (Keyboard.getEventKeyState()) {
-					consumed = screen.keyPress(key);
-					
-					if (!consumed && key == Keyboard.KEY_ESCAPE) {
-						screen.close();
-					}
-				} else {
-					consumed = screen.keyRelease(key);
-				}
-			}
-			if (chr >= ' ') {
-				consumed = screen.typeChar(chr);
-			}
-
-			if (consumed) {
-				screen.mouseMove(mouseX, mouseY);
-			}
-		}
 	}
 }
