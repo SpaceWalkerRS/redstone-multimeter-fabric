@@ -1,5 +1,5 @@
 {
-	"name": "note_block",
+	"name": "noteblock",
 	"event_types": [
 		"powered",
 		"moved",
