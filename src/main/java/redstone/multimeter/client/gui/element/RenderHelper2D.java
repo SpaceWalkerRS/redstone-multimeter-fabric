@@ -15,6 +15,7 @@ import redstone.multimeter.client.gui.Texture;
 import redstone.multimeter.client.gui.TextureRegion;
 import redstone.multimeter.util.ColorUtils;
 import redstone.multimeter.util.GL;
+import redstone.multimeter.util.TextUtils;
 
 public class RenderHelper2D {
 
@@ -262,7 +263,11 @@ public class RenderHelper2D {
 	}
 
 	protected int textWidth(TextRenderer textRenderer, String text) {
-		return textRenderer.getWidth(text);
+		TextUtils.fixTextWidths = true;
+		int width = textRenderer.getWidth(text);
+		TextUtils.fixTextWidths = false;
+
+		return width;
 	}
 
 	protected void renderText(TextRenderer textRenderer, String text, int x, int y, boolean shadow, int color) {

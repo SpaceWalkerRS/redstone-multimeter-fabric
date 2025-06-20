@@ -47,7 +47,8 @@
 		"client.GLXMixin",
 		"client.IntegratedServerMixin",
 		"client.LocalConnectionMixin",
-		"client.MinecraftMixin"
+		"client.MinecraftMixin",
+		"client.TextRendererMixin"
 	],
 	"server": [
 	],

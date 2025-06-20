@@ -18,6 +18,8 @@ public class TextUtils {
 	public static final String ACTION_BAR_KEY = "rsmm:action_bar|";
 
 	private static final int MAX_WIDTH = 200;
+	
+	public static boolean fixTextWidths = false;
 
 	public static List<String> toLines(TextRenderer textRenderer, String text) {
 		List<String> lines = new ArrayList<>();
