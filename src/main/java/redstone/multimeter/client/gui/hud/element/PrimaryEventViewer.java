@@ -1,8 +1,9 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import org.lwjgl.opengl.GL11;
-
-import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.CursorType;
+import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.element.Element;
+import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
@@ -11,6 +12,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 
 	private double dx;
 	private boolean resizing;
+	private boolean updateCursor;
 
 	public PrimaryEventViewer(MultimeterHud hud) {
 		super(hud);
@@ -18,6 +20,16 @@ public class PrimaryEventViewer extends MeterEventViewer {
 
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
+		if (this.updateCursor) {
+			this.updateCursor = false;
+
+			// TODO: LegacyLWJGL3 compat
+			//if (this.isHovered() && this.isMouseOverBorder(mouseX)) {
+			//	Element.setCursor(CursorType.HRESIZE);
+			//} else {
+			//	Element.setCursor(CursorType.ARROW);
+			//}
+		}
 	}
 
 	@Override
@@ -30,7 +42,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				dx = 0.0D;
 
 				if (isMouseOverBorder(mouseX)) {
-					resizing = true;
+					setResizing(true);
 				}
 
 				consumed = true;
@@ -44,7 +56,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 				}
 
 				Options.HUD.SELECTED_COLUMN.set(column);
-				IButton.playClickSound();
+				Button.playClickSound();
 
 				consumed = true;
 			}
@@ -56,8 +68,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		if (button == MOUSE_BUTTON_LEFT) {
-			dx = 0.0D;
-			resizing = false;
+			setResizing(false);
 		}
 
 		return super.mouseRelease(mouseX, mouseY, button);
@@ -82,34 +93,42 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	protected void drawHighlights(int mouseX, int mouseY) {
-		GL11.glPushMatrix();
+	public void setHovered(boolean hovered) {
+		boolean wasHovered = this.isHovered();
+		super.setHovered(hovered);
+
+		this.updateCursor = hovered || wasHovered;
+	}
+
+	@Override
+	protected void drawHighlights(GuiRenderer renderer, int mouseX, int mouseY) {
+		renderer.pushMatrix();
 
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
 			if (!isDraggingMouse() && isMouseOver(mouseX, mouseY) && !isMouseOverBorder(mouseX)) {
-				drawHighlight(getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
+				drawHighlight(renderer, getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
 			}
 
-			drawHighlight(Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
+			drawHighlight(renderer, Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
 		}
 
-		GL11.glTranslated(0, 0, -0.1);
+		renderer.translate(0, 0, -0.1);
 
 		if (hud.hasTickMarker()) {
 			long tick = hud.getTickMarker();
 			int column = hud.getColumn(tick);
 
 			if (column >= 0) {
-				drawHighlight(column, 1, 0, hud.meters.size(), hud.settings.colorHighlightTickMarker);
+				drawHighlight(renderer, column, 1, 0, hud.meters.size(), hud.settings.colorHighlightTickMarker);
 			}
 		}
 
-		GL11.glPopMatrix();
+		renderer.popMatrix();
 	}
 
 	@Override
-	protected void drawDecorators() {
-		if (hud.settings.rowHeight < hud.textRenderer.fontHeight) {
+	protected void drawDecorators(GuiRenderer renderer) {
+		if (hud.settings.rowHeight < hud.font.height()) {
 			return;
 		}
 
@@ -117,17 +136,17 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		long currentTick = hud.client.getPrevGameTime() + 1;
 
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderPulseLengths(x, y, firstTick, currentTick, meter);
+			hud.eventRenderers.renderPulseLengths(renderer, x, y, firstTick, currentTick, meter);
 		});
 	}
 
 	@Override
-	protected void drawMeterEvents() {
+	protected void drawMeterEvents(GuiRenderer renderer) {
 		long firstTick = hud.getSelectedTick() - Options.HUD.SELECTED_COLUMN.get();
 		long lastTick = hud.client.getPrevGameTime() + 1;
 
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderTickLogs(x, y, firstTick, lastTick, meter);
+			hud.eventRenderers.renderTickLogs(renderer, x, y, firstTick, lastTick, meter);
 		});
 	}
 
@@ -150,6 +169,20 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			return x >= (getX() + getWidth() - 1);
 		case RIGHT_TO_LEFT:
 			return x <= getX() + 1;
+		}
+	}
+
+	private void setResizing(boolean resizing) {
+		if (this.resizing != resizing) {
+			this.resizing = resizing;
+			this.dx = 0.0D;
+
+			// TODO: LegacyLWJGL3 Comopat
+			//if (this.resizing) {
+			//	Element.setCursor(CursorType.HRESIZE);
+			//} else {
+			//	Element.setCursor(CursorType.ARROW);
+			//}
 		}
 	}
 

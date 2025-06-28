@@ -6,10 +6,11 @@ import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickPhaseTree;
@@ -19,7 +20,6 @@ import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.common.network.packets.TickTimePacket;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.util.Dimensions;
-import redstone.multimeter.util.TextUtils;
 //import redstone.multimeter.server.compat.CarpetCompat;
 
 public class MultimeterServer {
@@ -230,9 +230,9 @@ public class MultimeterServer {
 
 	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
 		if (actionBar) {
-			message = Text.literal(TextUtils.ACTION_BAR_KEY).append(message);
+			message = Texts.actionBar(message);
 		}
 
-		player.sendMessage(message);
+		player.sendMessage(message.resolve());
 	}
 }

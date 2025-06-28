@@ -15,7 +15,6 @@ import java.util.Set;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.options.KeyBinding;
 
 import redstone.multimeter.RedstoneMultimeterMod;
@@ -140,7 +139,7 @@ public class Keybinds {
 		return key == keybind.keyCode;
 	}
 
-	public static boolean isPressed(Minecraft minecraft, KeyBinding keybind) {
+	public static boolean isPressed(KeyBinding keybind) {
 		int key = keybind.keyCode;
 
 		if (key < 0) {

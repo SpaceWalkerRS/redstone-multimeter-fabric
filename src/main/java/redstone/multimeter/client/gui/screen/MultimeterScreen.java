@@ -3,22 +3,21 @@ package redstone.multimeter.client.gui.screen;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
 
-import redstone.multimeter.RedstoneMultimeterMod;
-import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.element.ScrollableListElement;
+import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.element.ScrollableList;
 import redstone.multimeter.client.gui.element.meter.MeterControlsElement;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
+import redstone.multimeter.client.gui.text.Texts;
 
 public class MultimeterScreen extends RSMMScreen {
 
 	private final boolean isPauseScreen;
 
-	private ScrollableListElement list;
+	private ScrollableList list;
 
-	public MultimeterScreen(MultimeterClient client) {
-		super(client, Text.literal(RedstoneMultimeterMod.MOD_NAME), false);
+	public MultimeterScreen() {
+		super(Texts.modName(), false);
 
 		this.isPauseScreen = !Screen.isShiftDown();
 	}
@@ -39,14 +38,14 @@ public class MultimeterScreen extends RSMMScreen {
 	protected void initScreen() {
 		Keyboard.enableRepeatEvents(true);
 
-		list = new ScrollableListElement(client, getWidth(), getHeight());
+		list = new ScrollableList(getWidth(), getHeight());
 		list.setX(getX());
 		list.setY(getY());
 
 		MultimeterHud hud = client.getHud();
 
 		list.add(hud);
-		list.add(new MeterControlsElement(client, 0, 0, list.getEffectiveWidth()));
+		list.add(new MeterControlsElement(0, 0, list.getEffectiveWidth()));
 
 		addChild(list);
 
@@ -59,9 +58,9 @@ public class MultimeterScreen extends RSMMScreen {
 	}
 
 	@Override
-	protected void renderContent(int mouseX, int mouseY) {
+	protected void renderContent(GuiRenderer renderer, int mouseX, int mouseY) {
 		if (client.getHud().hasContent()) {
-			super.renderContent(mouseX, mouseY);
+			super.renderContent(renderer, mouseX, mouseY);
 		} else {
 			String text;
 
@@ -71,12 +70,12 @@ public class MultimeterScreen extends RSMMScreen {
 				text = "Nothing to see here! Subscribe to a meter group to get started.";
 			}
 
-			int textWidth = textRenderer.getWidth(text);
-			int textHeight = textRenderer.fontHeight;
+			int textWidth = font.width(text);
+			int textHeight = font.height();
 			int x = getX() + (getWidth() - textWidth) / 2;
 			int y = getY() + (getHeight() - textHeight) / 2;
 
-			renderText(textRenderer, text, x, y, true, 0xFFFFFFFF);
+			font.drawWithShadow(text, x, y);
 		}
 	}
 }

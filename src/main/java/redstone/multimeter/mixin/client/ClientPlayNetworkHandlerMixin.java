@@ -13,11 +13,11 @@ import net.minecraft.client.network.handler.ClientNetworkHandler;
 import net.minecraft.network.packet.ChatMessagePacket;
 import net.minecraft.network.packet.CustomPayloadPacket;
 import net.minecraft.network.packet.LoginPacket;
-
+import net.minecraft.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.common.network.Packets;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 import redstone.multimeter.util.DataStreams;
-import redstone.multimeter.util.TextUtils;
 
 @Mixin(ClientNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
@@ -43,8 +43,8 @@ public class ClientPlayNetworkHandlerMixin {
 		)
 	)
 	private void handleChatMessage(ChatMessagePacket packet, CallbackInfo ci) {
-		if (packet.message.startsWith(TextUtils.ACTION_BAR_KEY)) {
-			String message = packet.message.substring(TextUtils.ACTION_BAR_KEY.length());
+		if (Text.deserialize(packet.message).buildString(false).startsWith(Texts.ACTION_BAR_KEY)) {
+			String message = Text.deserialize(packet.message).buildString(true).substring(Texts.ACTION_BAR_KEY.length());
 			minecraft.gui.setOverlayMessage(message, false);
 
 			ci.cancel();

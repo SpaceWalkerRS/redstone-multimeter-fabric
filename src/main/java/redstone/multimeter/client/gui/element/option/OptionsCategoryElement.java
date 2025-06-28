@@ -2,38 +2,32 @@ package redstone.multimeter.client.gui.element.option;
 
 import java.util.Collection;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Formatting;
-import net.minecraft.text.Text;
-
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
-import redstone.multimeter.client.gui.element.SimpleListElement;
-import redstone.multimeter.client.gui.element.TextElement;
+import redstone.multimeter.client.gui.element.SimpleList;
+import redstone.multimeter.client.gui.element.Label;
+import redstone.multimeter.client.gui.element.button.BasicButton;
 import redstone.multimeter.client.gui.element.button.Button;
-import redstone.multimeter.client.gui.element.button.IButton;
-import redstone.multimeter.client.option.IOption;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
+import redstone.multimeter.client.option.Option;
 import redstone.multimeter.client.option.OptionListener;
-import redstone.multimeter.util.TextUtils;
 
 public class OptionsCategoryElement extends AbstractParentElement {
 
-	private final MultimeterClient client;
-	private final TextRenderer textRenderer;
-	private final TextElement category;
-	private final SimpleListElement options;
+	private final FontRenderer font;
+	private final Label category;
+	private final SimpleList options;
 
-	public OptionsCategoryElement(MultimeterClient client, int width, String category, Collection<IOption> options) {
-		Minecraft minecraft = client.getMinecraft();
+	public OptionsCategoryElement(int width, String category, Collection<Option> options) {
+		this.font = MultimeterClient.INSTANCE.getFontRenderer();
+		this.category = new Label(0, 0, t -> t.setLines(Texts.literal(category).format(Formatting.ITALIC)).setShadow(true));
+		this.options = new SimpleList(width);
 
-		this.client = client;
-		this.textRenderer = minecraft.textRenderer;
-		this.category = new TextElement(this.client, 0, 0, t -> t.setText(Text.literal(category).setFormatting(Formatting.ITALIC)).setWithShadow(true));
-		this.options = new SimpleListElement(this.client, width);
-
-		for (IOption option : options) {
+		for (Option option : options) {
 			this.options.add(new OptionElement(option));
 		}
 
@@ -64,18 +58,18 @@ public class OptionsCategoryElement extends AbstractParentElement {
 
 	private class OptionElement extends AbstractParentElement implements OptionListener {
 
-		private final IOption option;
-		private final TextElement name;
-		private final IButton control;
-		private final IButton reset;
+		private final Option option;
+		private final Label name;
+		private final Button control;
+		private final Button reset;
 
-		public OptionElement(IOption option) {
-			Tooltip tooltip = Tooltip.of(TextUtils.toLines(textRenderer, option.getDescription()));
+		public OptionElement(Option option) {
+			Tooltip tooltip = Tooltips.split(font, option.getDescription());
 
 			this.option = option;
-			this.name = new TextElement(client, 0, 0, t -> t.setText(this.option.getName()).setWithShadow(true), () -> tooltip, t -> false);
-			this.control = this.option.createControl(client, 100, IButton.DEFAULT_HEIGHT);
-			this.reset = new Button(client, 0, 0, 50, IButton.DEFAULT_HEIGHT, () -> Text.literal("Reset"), () -> Tooltip.EMPTY, button -> {
+			this.name = new Label(0, 0, t -> t.setLines(this.option.getName()).setShadow(true), () -> tooltip, t -> false);
+			this.control = this.option.createControl(100, Button.DEFAULT_HEIGHT);
+			this.reset = new BasicButton(0, 0, 50, Button.DEFAULT_HEIGHT, Texts::guiReset, Tooltips::empty, button -> {
 				this.option.reset();
 				return true;
 			});
@@ -85,7 +79,7 @@ public class OptionsCategoryElement extends AbstractParentElement {
 			addChild(this.reset);
 
 			setWidth(options.getWidth());
-			setHeight(IButton.DEFAULT_HEIGHT);
+			setHeight(Button.DEFAULT_HEIGHT);
 
 			this.option.setListener(this);
 		}
@@ -107,7 +101,7 @@ public class OptionsCategoryElement extends AbstractParentElement {
 
 			int height = getHeight();
 
-			name.setY(y + height - (height + textRenderer.fontHeight) / 2);
+			name.setY(y + height - (height + font.height()) / 2);
 			control.setY(y);
 			reset.setY(y);
 		}
