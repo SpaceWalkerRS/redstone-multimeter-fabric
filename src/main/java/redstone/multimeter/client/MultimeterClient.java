@@ -4,23 +4,24 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.gui.screen.MultimeterScreen;
 import redstone.multimeter.client.gui.screen.OptionsScreen;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.client.gui.screen.ScreenWrapper;
 import redstone.multimeter.client.gui.screen.TickPhaseTreeScreen;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
 import redstone.multimeter.client.option.Options;
@@ -56,11 +57,13 @@ public class MultimeterClient {
 		return warning;
 	};
 
+	public static MultimeterClient INSTANCE;
 	public static Minecraft MINECRAFT;
 
 	private final Minecraft minecraft;
 	private final ClientPacketHandler packetHandler;
 	private final InputHandler inputHandler;
+	private final FontRenderer fontRenderer;
 	private final MeterRenderer meterRenderer;
 	private final MultimeterHud hud;
 	private final SavedMeterGroupsManager savedMeterGroupsManager;
@@ -79,11 +82,13 @@ public class MultimeterClient {
 	private String pendingMeterGroupName = null;
 
 	public MultimeterClient(Minecraft minecraft) {
+		INSTANCE = this;
 		MINECRAFT = minecraft;
 
 		this.minecraft = minecraft;
 		this.packetHandler = new ClientPacketHandler(this);
 		this.inputHandler = new InputHandler(this);
+		this.fontRenderer = new FontRenderer(this);
 		this.meterRenderer = new MeterRenderer(this);
 		this.hud = new MultimeterHud(this);
 		this.savedMeterGroupsManager = new SavedMeterGroupsManager(this);
@@ -117,6 +122,10 @@ public class MultimeterClient {
 
 	public InputHandler getInputHandler() {
 		return inputHandler;
+	}
+
+	public FontRenderer getFontRenderer() {
+		return fontRenderer;
 	}
 
 	public MeterRenderer getMeterRenderer() {
@@ -262,7 +271,7 @@ public class MultimeterClient {
 			connected = true;
 
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Component warning = new TextComponent(VERSION_WARNING.apply(modVersion)).withStyle(ChatFormatting.RED);
+				Text warning = Texts.literal(VERSION_WARNING.apply(modVersion)).format(Formatting.RED);
 				sendMessage(warning, false);
 			}
 
@@ -365,7 +374,7 @@ public class MultimeterClient {
 
 	public void openMeterControls() {
 		onTargetMeter(meter -> {
-			openScreen(new MultimeterScreen(this));
+			openScreen(new MultimeterScreen());
 			hud.selectMeter(meter);
 		});
 	}
@@ -407,7 +416,7 @@ public class MultimeterClient {
 			hudEnabled = !hudEnabled;
 
 			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(new TextComponent(message), true);
+			sendMessage(Texts.literal(message), true);
 
 			tutorial.onToggleHud(hudEnabled);
 		}
@@ -445,7 +454,7 @@ public class MultimeterClient {
 		return screen != null && screen instanceof OptionsScreen;
 	}
 
-	public void sendMessage(Component message, boolean actionBar) {
-		minecraft.player.displayClientMessage(message, actionBar);
+	public void sendMessage(Text message, boolean actionBar) {
+		minecraft.player.displayClientMessage(message.resolve(), actionBar);
 	}
 }

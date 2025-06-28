@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -14,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickPhaseTree;
@@ -216,7 +216,7 @@ public class MultimeterServer {
 		return playerList.has(player.getUUID());
 	}
 
-	public void sendMessage(ServerPlayer player, Component message, boolean actionBar) {
-		player.displayClientMessage(message, actionBar);
+	public void sendMessage(ServerPlayer player, Text message, boolean actionBar) {
+		player.displayClientMessage(message.resolve(), actionBar);
 	}
 }
