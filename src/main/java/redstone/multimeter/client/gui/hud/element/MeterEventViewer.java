@@ -1,7 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -18,20 +17,20 @@ public abstract class MeterEventViewer extends AbstractElement {
 	}
 
 	@Override
-	public void render(int mouseX, int mouseY) {
-		GlStateManager.pushMatrix();
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
+		renderer.pushMatrix();
 		if (!hud.client.isPreviewing()) {
-			drawHighlights(mouseX, mouseY);
-			GlStateManager.translated(0, 0, -1);
-			drawDecorators();
-			GlStateManager.translated(0, 0, -1);
-			drawMeterEvents();
-			GlStateManager.translated(0, 0, -1);
+			drawHighlights(renderer, mouseX, mouseY);
+			renderer.translate(0, 0, -1);
+			drawDecorators(renderer);
+			renderer.translate(0, 0, -1);
+			drawMeterEvents(renderer);
+			renderer.translate(0, 0, -1);
 		}
-		drawGridLines();
-		GlStateManager.translated(0, 0, -1);
-		hud.renderer.renderRect(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		GlStateManager.popMatrix();
+		drawGridLines(renderer);
+		renderer.translate(0, 0, -1);
+		renderer.fill(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
+		renderer.popMatrix();
 	}
 
 	@Override
@@ -79,79 +78,75 @@ public abstract class MeterEventViewer extends AbstractElement {
 		}
 	}
 
-	protected abstract void drawHighlights(int mouseX, int mouseY);
+	protected abstract void drawHighlights(GuiRenderer renderer, int mouseX, int mouseY);
 
-	protected void drawHighlight(int column, int columnCount, int row, int rowCount, boolean selection) {
+	protected void drawHighlight(GuiRenderer renderer, int column, int columnCount, int row, int rowCount, boolean selection) {
 		int color = selection ? hud.settings.colorHighlightSelected : hud.settings.colorHighlightHovered;
-		drawHighlight(column, columnCount, row, rowCount, color);
+		drawHighlight(renderer, column, columnCount, row, rowCount, color);
 	}
 
-	protected void drawHighlight(int column, int columnCount, int row, int rowCount, int color) {
-		int w = hud.settings.columnWidth + hud.settings.gridSize;
-		int h = hud.settings.rowHeight + hud.settings.gridSize;
-		int x = column * w;
-		int y = row * h;
-		int width = columnCount * w;
-		int height = rowCount * h;
+	protected void drawHighlight(GuiRenderer renderer, int column, int columnCount, int row, int rowCount, int color) {
+		int d = hud.settings.gridSize;
+		int w = hud.settings.columnWidth + d;
+		int h = hud.settings.rowHeight + d;
 
-		hud.renderer.renderHighlight(x, y, width, height, color);
+		int x0 = column * w;
+		int y0 = row * h;
+		int x1 = x0 + columnCount * w + d;
+		int y1 = y0 + rowCount * h + d;
+
+		renderer.borders(x0, y0, x1, y1, d, color);
 	}
 
-	protected abstract void drawDecorators();
+	protected abstract void drawDecorators(GuiRenderer renderer);
 
-	protected abstract void drawMeterEvents();
+	protected abstract void drawMeterEvents(GuiRenderer renderer);
 
-	private void drawGridLines() {
-		GlStateManager.pushMatrix();
+	private void drawGridLines(GuiRenderer renderer) {
+		renderer.pushMatrix();
 
 		int columns = getColumnCount();
 		int rows = hud.meters.size();
 		int marker = getCurrentTickMarkerColumn();
 
-		int lineX;
-		int lineY;
-		int lineWidth;
-		int lineHeight;
-		int color;
-
 		// current tick marker
 		if (marker >= 0) {
-			lineX = marker * (hud.settings.columnWidth + hud.settings.gridSize);
-			lineY = hud.settings.gridSize;
-			lineWidth = hud.settings.gridSize;
-			lineHeight = getHeight() - 2 * hud.settings.gridSize;
-			color = hud.settings.colorGridMarker;
+			int x0 = marker * (hud.settings.columnWidth + hud.settings.gridSize);
+			int y0 = hud.settings.gridSize;
+			int x1 = x0 + hud.settings.gridSize;
+			int y1 = y0 + getHeight() - 2 * hud.settings.gridSize;
+			int color = hud.settings.colorGridMarker;
 
-			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
+			renderer.fill(x0, y0, x1, y1, color);
 		}
 
-		GlStateManager.translated(0, 0, -0.1);
+		renderer.translate(0, 0, -0.1);
 
 		// horizonal lines
 		for (int i = 0; i <= rows; i++) {
-			lineX = 0;
-			lineY = i * (hud.settings.rowHeight + hud.settings.gridSize);
-			lineWidth = getWidth();
-			lineHeight = hud.settings.gridSize;
-			color = hud.settings.colorGridMain;
+			int x0 = 0;
+			int y0 = i * (hud.settings.rowHeight + hud.settings.gridSize);
+			int x1 = x0 + getWidth();
+			int y1 = y0 + hud.settings.gridSize;
+			int color = hud.settings.colorGridMain;
 
-			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
+			renderer.fill(x0, y0, x1, y1, color);
 		}
 
-		GlStateManager.translated(0, 0, -0.1);
+		renderer.translate(0, 0, -0.1);
 
 		// vertical lines
 		for (int i = 0; i <= columns; i++) {
-			lineX = i * (hud.settings.columnWidth + hud.settings.gridSize);
-			lineY = 0;
-			lineWidth = hud.settings.gridSize;
-			lineHeight = getHeight();
-			color = (i > 0 && i < columns && i % 5 == 0) ? hud.settings.colorGridInterval : hud.settings.colorGridMain;
+			int x0 = i * (hud.settings.columnWidth + hud.settings.gridSize);
+			int y0 = 0;
+			int x1 = x0 + hud.settings.gridSize;
+			int y1 = y0 + getHeight();
+			int color = (i > 0 && i < columns && i % 5 == 0) ? hud.settings.colorGridInterval : hud.settings.colorGridMain;
 
-			hud.renderer.renderRect(lineX, lineY, lineWidth, lineHeight, color);
+			renderer.fill(x0, y0, x1, y1, color);
 		}
 
-		GlStateManager.popMatrix();
+		renderer.popMatrix();
 	}
 
 	protected abstract int getColumnCount();

@@ -7,9 +7,9 @@ import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.math.Direction;
 
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.TooltipBuilder;
 import redstone.multimeter.util.NbtUtils;
-import redstone.multimeter.util.TextUtils;
 
 public enum EventType {
 
@@ -17,58 +17,61 @@ public enum EventType {
 	POWERED(0, "powered") {
 
 		@Override
-		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatKeyValue("became powered", metadata == 1));
+		public void buildTooltip(TooltipBuilder builder, int metadata) {
+			builder.line(Texts.keyValue("became powered", metadata == 1));
 		}
 	},
 	ACTIVE(1, "active") {
 
 		@Override
-		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatKeyValue("became active", metadata == 1));
+		public void buildTooltip(TooltipBuilder builder, int metadata) {
+			builder.line(Texts.keyValue("became active", metadata == 1));
 		}
 	},
 	MOVED(2, "moved") {
 
 		@Override
-		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatKeyValue("direction", Direction.byId(metadata).getName()));
+		public void buildTooltip(TooltipBuilder builder, int metadata) {
+			builder.line(Texts.keyValue("direction", Direction.byId(metadata).getName()));
 		}
 	},
 	POWER_CHANGE(3, "power_change") {
 
 		@Override
-		public void addTextToTooltip(Tooltip tooltip, int metadata) {
+		public void buildTooltip(TooltipBuilder builder, int metadata) {
 			int oldPower = (metadata >> 8) & 0xFF;
 			int newPower =  metadata       & 0xFF;
 
-			tooltip.add(TextUtils.formatKeyValue("old power", oldPower));
-			tooltip.add(TextUtils.formatKeyValue("new power", newPower));
+			builder
+				.line(Texts.keyValue("old power", oldPower))
+				.line(Texts.keyValue("new power", newPower));
 		}
 	},
 	RANDOM_TICK(4, "random_tick"),
 	SCHEDULED_TICK(5, "scheduled_tick") {
 
 		@Override
-		public void addTextToTooltip(Tooltip tooltip, int metadata) {
+		public void buildTooltip(TooltipBuilder builder, int metadata) {
 			String status = ((metadata >> 30) == 1) ? "scheduling" : "performing";
 			int priority = (metadata & 0xF) - 3;
 
-			tooltip.add(TextUtils.formatKeyValue("status", status));
-			tooltip.add(TextUtils.formatKeyValue("priority", priority));
+			builder
+				.line(Texts.keyValue("status", status))
+				.line(Texts.keyValue("priority", priority));
 		}
 	},
 	BLOCK_EVENT(6, "block_event") {
 
 		@Override
-		public void addTextToTooltip(Tooltip tooltip, int metadata) {
+		public void buildTooltip(TooltipBuilder builder, int metadata) {
 			String status = ((metadata >> 30) == 1) ? "queueing" : "performing";
 			int depth = (metadata >> 4) & 0xFFFF;
 			int type  =  metadata       & 0xF;
 
-			tooltip.add(TextUtils.formatKeyValue("status", status));
-			tooltip.add(TextUtils.formatKeyValue("type", type));
-			tooltip.add(TextUtils.formatKeyValue("depth", depth));
+			builder
+				.line(Texts.keyValue("status", status))
+				.line(Texts.keyValue("type", type))
+				.line(Texts.keyValue("depth", depth));
 		}
 	},
 	ENTITY_TICK(7, "entity_tick"),
@@ -78,8 +81,8 @@ public enum EventType {
 	SHAPE_UPDATE(11, "shape_update") {
 
 		@Override
-		public void addTextToTooltip(Tooltip tooltip, int metadata) {
-			tooltip.add(TextUtils.formatKeyValue("direction", Direction.byId(metadata).getName()));
+		public void buildTooltip(TooltipBuilder builder, int metadata) {
+			builder.line(Texts.keyValue("direction", Direction.byId(metadata).getName()));
 		}
 	},
 	OBSERVER_UPDATE(12, "observer_update"),
@@ -87,12 +90,12 @@ public enum EventType {
 	BLOCK_DATA_CHANGE(14, "block_data_change") {
 
 		@Override
-		public void addTextToTooltip(Tooltip tooltip, int metadata) {
+		public void buildTooltip(TooltipBuilder builder, int metadata) {
 			int oldData = (metadata >> 8) & 0xFF;
 			int newData =  metadata       & 0xFF;
 
-			tooltip.add(TextUtils.formatKeyValue("old data", oldData));
-			tooltip.add(TextUtils.formatKeyValue("new data", newData));
+			builder.line(Texts.keyValue("old data", oldData));
+			builder.line(Texts.keyValue("new data", newData));
 		}
 	};
 
@@ -146,7 +149,7 @@ public enum EventType {
 		return 1 << index;
 	}
 
-	public void addTextToTooltip(Tooltip tooltip, int metadata) {
+	public void buildTooltip(TooltipBuilder builder, int metadata) {
 	}
 
 	public NbtElement toNbt() {

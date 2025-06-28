@@ -169,7 +169,8 @@ public class Tutorial implements TutorialListener {
 	}
 
 	private boolean canDoTutorial() {
-		return client.isConnected() && minecraft.world != null;
+		// TODO: implement tutorial toasts
+		return false /*client.isConnected() && minecraft.world != null*/;
 	}
 
 	private void start() {
