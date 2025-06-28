@@ -51,11 +51,13 @@
 		"client.ClientPlayNetworkHandlerMixin",
 		"client.ConnectionListenerMixin",
 		"client.ConnectionMixin",
+		"client.FontAccessor",
 		"client.GameGuiMixin",
 		"client.GameOptionsMixin",
 		"client.GameRendererMixin",
 		"client.IntegratedServerMixin",
-		"client.MinecraftMixin"
+		"client.MinecraftMixin",
+		"client.StyleAccess"
 	],
 	"server": [
 	],
