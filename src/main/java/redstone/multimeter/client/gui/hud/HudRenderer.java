@@ -47,19 +47,19 @@ public class HudRenderer extends GuiRenderer {
 	}
 
 	private int x(String s, int x) {
-		return this.x(x, x + this.width(s));
+		return this.x(x, x + this.width(s) - 1);
 	}
 
 	private int x(Text t, int x) {
-		return this.x(x, x + this.width(t));
+		return this.x(x, x + this.width(t) - 1);
 	}
 
 	private int y(String s, int y) {
-		return this.y(y, y + this.height());
+		return this.y(y, y + this.height() - 2);
 	}
 
 	private int y(Text t, int y) {
-		return this.y(y, y + this.height());
+		return this.y(y, y + this.height() - 2);
 	}
 
 	private int color(int color) {
