@@ -4,55 +4,54 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.FontRenderer;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.Element;
-import redstone.multimeter.client.gui.element.TextElement;
+import redstone.multimeter.client.gui.element.Label;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.hud.element.MeterEventDetails;
 import redstone.multimeter.client.gui.hud.element.MeterListRenderer;
 import redstone.multimeter.client.gui.hud.element.PrimaryEventViewer;
 import redstone.multimeter.client.gui.hud.element.SecondaryEventViewer;
 import redstone.multimeter.client.gui.hud.event.MeterEventRenderDispatcher;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.util.ColorUtils;
-import redstone.multimeter.util.TextUtils;
 
 public class MultimeterHud extends AbstractParentElement {
 
 	public final MultimeterClient client;
-	public final Font font;
+	public final FontRenderer font;
 	public final HudSettings settings;
-	public final HudRenderer renderer;
 	public final MeterEventRenderDispatcher eventRenderers;
 	public final List<Meter> meters;
+
+	private int partCount;
 
 	private MeterListRenderer names;
 	private PrimaryEventViewer ticks;
 	private SecondaryEventViewer subticks;
 	private MeterEventDetails details;
-	private TextElement meterGroupSlot;
-	private TextElement meterGroupName;
-	private TextElement tickMarkerCounter;
+	private Label meterGroupSlot;
+	private Label meterGroupName;
+	private Label tickMarkerCounter;
 
 	private TransparentButton playPauseButton;
 	private TransparentButton fastBackwardButton;
 	private TransparentButton fastForwardButton;
-	private TextElement printIndicator;
+	private Label printIndicator;
 
 	private int hudX;
 	private int hudY;
@@ -71,40 +70,51 @@ public class MultimeterHud extends AbstractParentElement {
 	private long tickMarker;
 
 	public MultimeterHud(MultimeterClient client) {
-		Minecraft minecraft = client.getMinecraft();
-
 		this.client = client;
-		this.font = minecraft.font;
+		this.font = client.getFontRenderer();
 		this.settings = new HudSettings(this);
-		this.renderer = new HudRenderer(this);
 		this.eventRenderers = new MeterEventRenderDispatcher(this);
 		this.meters = new ArrayList<>();
 
 		this.tickMarker = -1L;
 	}
 
+	// render in-game
+	public void render(GuiRenderer renderer) {
+		render(renderer, -1, -1);
+	}
+
+	// render on screen
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
 		if (!hasContent()) {
 			return;
 		}
 
-		PoseStack poses = graphics.pose();
+		HudRenderer hudRenderer = new HudRenderer(this, renderer);
 
-		poses.pushPose();
-		poses.translate(0, 0, 100);
+		renderer.push();
+		renderer.translate(0, 0, 100);
 
 		List<Element> children = getChildren();
 
-		for (int index = 0; index < children.size(); index++) {
-			Element child = children.get(index);
+		for (int index = 0; index < this.partCount; index++) {
+			Element part = children.get(index);
 
-			if (child.isVisible()) {
-				renderer.render(child, graphics, mouseX, mouseY);
+			if (part.isVisible()) {
+				hudRenderer.render(part, mouseX, mouseY);
 			}
 		}
 
-		poses.popPose();
+		renderer.pop();
+
+		for (int index = this.partCount; index < children.size(); index++) {
+			Element child = children.get(index);
+
+			if (child.isVisible()) {
+				child.render(renderer, mouseX, mouseY);
+			}
+		}
 	}
 
 	@Override
@@ -301,12 +311,17 @@ public class MultimeterHud extends AbstractParentElement {
 		printIndicator.setY(y);
 	}
 
+	private void addPart(Element part) {
+		this.addChild(part);
+		this.partCount++;
+	}
+
 	public void init() {
 		this.names = new MeterListRenderer(this);
 		this.ticks = new PrimaryEventViewer(this);
 		this.subticks = new SecondaryEventViewer(this);
 		this.details = new MeterEventDetails(this);
-		this.meterGroupSlot = new TextElement(this.client, 0, 0, t -> {
+		this.meterGroupSlot = new Label(0, 0, t -> {
 			int slot = this.client.isPreviewing()
 				? this.client.getMeterGroupPreview().getSlot()
 				: this.client.getMeterGroup().getSlot();
@@ -316,24 +331,24 @@ public class MultimeterHud extends AbstractParentElement {
 			} else {
 				t.setVisible(true);
 
-				String text = "[" + slot + "]";
+				Text text = Texts.literal("[" + slot + "]");
 				int a = Math.round(0xFF * settings.opacity() / 100.0F);
 				int rgb = onScreen ? 0xF0F0F0 : 0x404040;
 				int color = ColorUtils.setAlpha(rgb, a);
 
 				if (!this.client.isPreviewing() && this.client.getMeterGroup().isDirty()) {
-					text = ChatFormatting.BOLD + text;
+					text.format(Formatting.BOLD);
 				}
 
-				t.setText(text);
+				t.addLine(text);
 				t.setColor(color);
 			}
 		}, () -> {
 			return this.client.isPreviewing() || !this.client.getMeterGroup().isDirty()
-				? Tooltip.EMPTY
-				: Tooltip.of("There are unsaved changes to this saved meter group!");
+				? Tooltips.EMPTY
+				: Tooltips.line("There are unsaved changes to this saved meter group!");
 		});
-		this.meterGroupName = new TextElement(this.client, 0, 0, t -> {
+		this.meterGroupName = new Label(0, 0, t -> {
 			String text = this.client.isPreviewing()
 				? this.client.getMeterGroupPreview().getName()
 				: this.client.getMeterGroup().getName();
@@ -346,9 +361,9 @@ public class MultimeterHud extends AbstractParentElement {
 				text += " (Paused)";
 			}
 
-			t.add(text).setColor(color);
+			t.addLine(text).setColor(color);
 		});
-		this.tickMarkerCounter = new TextElement(this.client, 0, 0, t -> {
+		this.tickMarkerCounter = new Label(0, 0, t -> {
 			if (hasTickMarker()) {
 				long tick = paused ? getSelectedTick() : getCurrentTick();
 				String text = String.valueOf(tick - tickMarker);
@@ -357,17 +372,17 @@ public class MultimeterHud extends AbstractParentElement {
 				int rgb = settings.colorHighlightTickMarker;
 				int color = ColorUtils.setAlpha(rgb, a);
 
-				t.add(text).setColor(color).setVisible(true);
+				t.addLine(text).setColor(color).setVisible(true);
 			} else {
 				t.setVisible(false);
 			}
-		}, () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.TOGGLE_MARKER)));
+		}, () -> Tooltips.keybind(Keybinds.TOGGLE_MARKER));
 
-		this.playPauseButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Component.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PAUSE_METERS)), button -> {
+		this.playPauseButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltips.keybind(Keybinds.PAUSE_METERS), button -> {
 			togglePaused();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Component.literal(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
+		this.fastBackwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltips.keybind(Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
 			stepBackward(Screen.hasControlDown());
 			return true;
 		}) {
@@ -377,7 +392,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(this.client, 0, 0, 9, 9, () -> Component.literal(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" })), button -> {
+		this.fastForwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltips.keybind(Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
 			stepForward(Screen.hasControlDown());
 			return true;
 		}) {
@@ -387,7 +402,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new TextElement(this.client, 0, 0, t -> t.add(Component.literal("P").withStyle(ChatFormatting.BOLD)).setWithShadow(true), () -> Tooltip.of(TextUtils.formatKeybindInfo(Keybinds.PRINT_LOGS)));
+		this.printIndicator = new Label(0, 0, t -> t.addLine(Texts.literal("P").format(Formatting.BOLD)).setShadow(true), () -> Tooltips.keybind(Keybinds.PRINT_LOGS));
 
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);
@@ -396,10 +411,13 @@ public class MultimeterHud extends AbstractParentElement {
 		this.fastForwardButton.setVisible(false);
 		this.printIndicator.setVisible(false);
 
-		addChild(this.names);
-		addChild(this.ticks);
-		addChild(this.subticks);
-		addChild(this.details);
+		this.partCount = 0;
+
+		addPart(this.names);
+		addPart(this.ticks);
+		addPart(this.subticks);
+		addPart(this.details);
+
 		addChild(this.meterGroupSlot);
 		addChild(this.meterGroupName);
 		addChild(this.tickMarkerCounter);
@@ -420,10 +438,6 @@ public class MultimeterHud extends AbstractParentElement {
 		} else {
 			return fast ? "\u23ee" : "\u23ea";
 		}
-	}
-
-	public void render(GuiGraphics graphics) {
-		render(graphics, -1, -1);
 	}
 
 	public float getScreenPosX() {
@@ -607,12 +621,12 @@ public class MultimeterHud extends AbstractParentElement {
 
 			if (setFocusMode(enable)) {
 				String message = String.format("%s Focus Mode", enable ? "Enabled" : "Disabled");
-				client.sendMessage(Component.literal(message), true);
+				client.sendMessage(Texts.literal(message), true);
 
 				client.getTutorial().onToggleFocusMode(enable);
 			} else {
 				String message = "No meter event logs available to focus on...";
-				client.sendMessage(Component.literal(message), true);
+				client.sendMessage(Texts.literal(message), true);
 			}
 		}
 	}
@@ -866,8 +880,8 @@ public class MultimeterHud extends AbstractParentElement {
 
 		onScreen = true;
 
-		if (settings.rowHeight < font.lineHeight) {
-			settings.rowHeight = font.lineHeight;
+		if (settings.rowHeight < font.height()) {
+			settings.rowHeight = font.height();
 		}
 
 		settings.forceFullOpacity = true;
