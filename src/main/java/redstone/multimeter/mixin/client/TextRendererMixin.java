@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.render.TextRenderer;
 
-import redstone.multimeter.util.TextUtils;
+import redstone.multimeter.client.gui.FontRenderer;
 
 @Mixin(TextRenderer.class)
 public class TextRendererMixin {
@@ -26,7 +26,7 @@ public class TextRendererMixin {
 		)
 	)
 	private void beforeGetCharWidth(CallbackInfoReturnable<Integer> cir) {
-		zeroCharWidth = TextUtils.fixTextWidths;
+		zeroCharWidth = FontRenderer.fixFormattedTextWidth();
 	}
 
 	@Inject(

@@ -1,6 +1,8 @@
 package redstone.multimeter.client.gui.element;
 
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.CursorType;
+import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
 
 public interface Element {
 
@@ -9,10 +11,10 @@ public interface Element {
 	int MOUSE_SCROLL_UP    = 7;
 	int MOUSE_SCROLL_DOWN  = 8;
 
-	void render(int mouseX, int mouseY);
+	void render(GuiRenderer renderer, int mouseX, int mouseY);
 
 	default boolean isMouseOver(double mouseX, double mouseY) {
-		return mouseX >= getX() && mouseX <= (getX() + getWidth()) && mouseY >= getY() && mouseY <= (getY() + getHeight());
+		return mouseX >= this.getX() && mouseX <= (this.getX() + this.getWidth()) && mouseY >= this.getY() && mouseY <= (this.getY() + this.getHeight());
 	}
 
 	void mouseMove(double mouseX, double mouseY);
@@ -67,10 +69,12 @@ public interface Element {
 
 	void setVisible(boolean visible);
 
-	default Tooltip getTooltip(int mouseX, int mouseY) {
-		return Tooltip.EMPTY;
-	}
+	Tooltip getTooltip(int mouseX, int mouseY);
 
 	void update();
 
+	static void setCursor(CursorType type) {
+		// TODO: LegacyLWJGL3 compat
+		// GLFW.glfwSetCursor(MultimeterClient.MINECRAFT.getWindow().getWindow(), type.getCursor());
+	}
 }

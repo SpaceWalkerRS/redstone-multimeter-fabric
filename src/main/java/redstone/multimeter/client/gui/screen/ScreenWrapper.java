@@ -6,6 +6,10 @@ import org.lwjgl.input.Mouse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
+import redstone.multimeter.client.gui.CursorType;
+import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.element.Element;
+
 public class ScreenWrapper extends Screen {
 
 	private final Screen parent;
@@ -31,7 +35,7 @@ public class ScreenWrapper extends Screen {
 		// but we want it once per frame for a snappier experience
 		handleInputs();
 
-		screen.render(mouseX, mouseY);
+		screen.render(new GuiRenderer(), mouseX, mouseY);
 	}
 
 	@Override
@@ -47,6 +51,8 @@ public class ScreenWrapper extends Screen {
 	@Override
 	public void removed() {
 		screen.onRemoved();
+		// TODO: LegacyLWJGL3 compat
+		//Element.setCursor(CursorType.ARROW);
 	}
 
 	@Override

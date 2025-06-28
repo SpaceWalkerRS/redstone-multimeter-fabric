@@ -1,6 +1,9 @@
 package redstone.multimeter.client.gui.element;
 
-public abstract class AbstractElement extends RenderHelper2D implements Element {
+import redstone.multimeter.client.gui.tooltip.Tooltip;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
+
+public abstract class AbstractElement implements Element {
 
 	private int x;
 	private int y;
@@ -23,7 +26,7 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		if (button == MOUSE_BUTTON_LEFT) {
-			setDraggingMouse(true);
+			this.setDraggingMouse(true);
 		}
 
 		return false;
@@ -32,7 +35,7 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		if (button == MOUSE_BUTTON_LEFT) {
-			setDraggingMouse(false);
+			this.setDraggingMouse(false);
 		}
 
 		return false;
@@ -40,7 +43,7 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 
 	@Override
 	public boolean isHovered() {
-		return hovered;
+		return this.hovered;
 	}
 
 	@Override
@@ -50,7 +53,7 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 
 	@Override
 	public boolean isDraggingMouse() {
-		return dragging;
+		return this.dragging;
 	}
 
 	@Override
@@ -60,14 +63,14 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 
 	@Override
 	public void onRemoved() {
-		hovered = false;
-		dragging = false;
-		focused = false;
+		this.hovered = false;
+		this.dragging = false;
+		this.focused = false;
 	}
 
 	@Override
 	public boolean isFocused() {
-		return focused;
+		return this.focused;
 	}
 
 	@Override
@@ -77,7 +80,7 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 
 	@Override
 	public int getX() {
-		return x;
+		return this.x;
 	}
 
 	@Override
@@ -87,7 +90,7 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 
 	@Override
 	public int getY() {
-		return y;
+		return this.y;
 	}
 
 	@Override
@@ -97,17 +100,17 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 
 	@Override
 	public int getWidth() {
-		return width;
+		return this.width;
 	}
 
 	@Override
 	public int getHeight() {
-		return height;
+		return this.height;
 	}
 
 	@Override
 	public boolean isVisible() {
-		return visible;
+		return this.visible;
 	}
 
 	@Override
@@ -123,5 +126,10 @@ public abstract class AbstractElement extends RenderHelper2D implements Element 
 	@Override
 	public void setHeight(int height) {
 		this.height = height;
+	}
+
+	@Override
+	public Tooltip getTooltip(int mouseX, int mouseY) {
+		return Tooltips.EMPTY;
 	}
 }

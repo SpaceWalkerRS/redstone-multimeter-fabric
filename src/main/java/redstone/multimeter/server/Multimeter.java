@@ -24,6 +24,12 @@ import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
+import redstone.multimeter.client.gui.text.ClickEvent;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.HoverEvent;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.TextColor;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -152,7 +158,7 @@ public class Multimeter {
 		ServerPlayerEntity owner = server.getPlayerList().get(ownerName);
 
 		if (owner != null) {
-			String message = String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time);
+			Text message = Texts.literal("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time);
 			server.sendMessage(owner, message, false);
 		}
 	}
@@ -186,7 +192,7 @@ public class Multimeter {
 
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
-				String message = String.format("meter limit (%d) reached!", options.meter_group.meter_limit);
+				Text message = Texts.literal("meter limit (%d) reached!", options.meter_group.meter_limit);
 				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
@@ -261,8 +267,8 @@ public class Multimeter {
 			if (meterGroup.isOwnedBy(player)) {
 				setMeters(meterGroup, meters);
 			} else {
-				String message = String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName());
-				server.sendMessage(player, message, true);
+				Text message = Texts.literal("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName());
+				server.sendMessage(player, message, false);
 			}
 		}
 	}
@@ -376,7 +382,18 @@ public class Multimeter {
 
 		meterGroup.addMember(playerName);
 
-		String message = String.format("You have been invited to meter group \'%s\' - run \'/metergroup subscribe %s\' to subscribe to it.", meterGroup.getName(), meterGroup.getName());
+		Text message = Texts.composite(
+			String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()),
+			Texts.literal("[here]").format(style ->
+				style.withHoverEvent(HoverEvent.showText(
+					Texts.literal("Subscribe to meter group \'%s\'", meterGroup.getName())
+				)).withClickEvent(ClickEvent.runCommand(
+					String.format("/metergroup subscribe %s", meterGroup.getName())
+				)).withColor(Formatting.GREEN)
+			),
+			" to subscribe to it."
+		);
+
 		server.sendMessage(player, message, false);
 	}
 
@@ -393,7 +410,7 @@ public class Multimeter {
 			if (player != null && meterGroup.hasSubscriber(playerName)) {
 				unsubscribeFromMeterGroup(meterGroup, player);
 
-				String message = String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName());
+				Text message = Texts.literal("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName());
 				server.sendMessage(player, message, false);
 			}
 		}
@@ -414,7 +431,7 @@ public class Multimeter {
 
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
-			String message = "This server does not allow meter teleporting!";
+			Text message = Texts.literal("This server does not allow meter teleporting!");
 			server.sendMessage(player, message, false);
 
 			return;
@@ -443,14 +460,46 @@ public class Multimeter {
 					player.teleportToDimension(newWorld.dimension.id);
 					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
-					String text = String.format("Teleported to meter \"%s\"", meter.getName());
+					Text text = Texts.literal(String.format("Teleported to meter \"%s\"", meter.getName()));
 					server.sendMessage(player, text, false);
 				}
 			}
 		}
 	}
+// TODO: implement this through custom packets or something
+	/**
+	 * Send the player a message they can click to return to the location they were
+	 * at before teleporting to a meter.
+	 */
+/*	private void sendClickableReturnMessage(ServerWorld world, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayerEntity player) {
+		String dimension = DimensionType.getKey(world.dimension.getType()).toString();
+		String x = NUMBER_FORMAT.format(_x);
+		String y = NUMBER_FORMAT.format(_y);
+		String z = NUMBER_FORMAT.format(_z);
+		String yaw = NUMBER_FORMAT.format(_yaw);
+		String pitch = NUMBER_FORMAT.format(_pitch);
 
+		Text message = Texts.composite(
+			"Click",
+			Texts.literal("[here]").format(style ->
+				style.withHoverEvent(HoverEvent.showText(
+					Texts.composite(
+						"Teleport to",
+						Texts.keyValue("\n  dimension", dimension),
+						Texts.keyValue("\n  x", x),
+						Texts.keyValue("\n  y", y),
+						Texts.keyValue("\n  z", z)
+					)
+				)).withClickEvent(ClickEvent.runCommand(
+					String.format("/execute in %s run tp @s %s %s %s %s %s", dimension, x, y, z, yaw, pitch)
+				)).withColor(TextColor.GREEN)
+			),
+			" to return to your previous location"
+		);
 
+		server.sendMessage(player, message, false);
+	}
+*/
 	public void onBlockChange(World world, int x, int y, int z, int oldBlock, int oldMetadata, int newBlock, int newMetadata) {
 		if (oldBlock != 0 && oldBlock == newBlock) {
 			if (((IBlock)Block.BY_ID[newBlock]).rsmm$isPowerSource() && ((PowerSource)Block.BY_ID[newBlock]).rsmm$logPowerChangeOnStateChange()) {
