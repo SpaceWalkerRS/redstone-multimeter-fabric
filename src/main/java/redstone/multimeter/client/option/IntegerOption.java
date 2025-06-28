@@ -1,14 +1,12 @@
 package redstone.multimeter.client.option;
 
-import net.minecraft.network.chat.TextComponent;
-
-import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Tooltip;
-import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.element.button.Slider;
 import redstone.multimeter.client.gui.element.button.TextField;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 
-public class IntegerOption extends Option<Integer> {
+public class IntegerOption extends BaseOption<Integer> {
 
 	protected final int min;
 	protected final int max;
@@ -39,18 +37,18 @@ public class IntegerOption extends Option<Integer> {
 	}
 
 	@Override
-	public IButton createControl(MultimeterClient client, int width, int height) {
+	public Button createControl(int width, int height) {
 		if (range > 1000) {
-			return new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
+			return new TextField(0, 0, width, height, Tooltips::empty, text -> {
 				setFromString(text);
 			}, () -> {
 				return get().toString();
 			});
 		}
 
-		return new Slider(client, 0, 0, width, height, () -> {
-			return new TextComponent(get().toString());
-		}, () -> Tooltip.EMPTY, value -> {
+		return new Slider(0, 0, width, height, () -> {
+			return Texts.literal(get().toString());
+		}, Tooltips::empty, value -> {
 			set(min + (int)Math.round(range * value));
 		}, () -> {
 			return (double)(get() - min) / range;
