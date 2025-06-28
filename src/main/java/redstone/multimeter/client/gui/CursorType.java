@@ -19,10 +19,10 @@ public enum CursorType {
 	}
 
 	public long getCursor() {
-		if (cursor == null) {
-			cursor = GLFW.glfwCreateStandardCursor(shape);
+		if (this.cursor == null) {
+			this.cursor = GLFW.glfwCreateStandardCursor(this.shape);
 		}
 
-		return cursor;
+		return this.cursor;
 	}
 }

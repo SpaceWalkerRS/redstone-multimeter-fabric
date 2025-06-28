@@ -1,9 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.client.gui.GuiGraphics;
-
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
@@ -19,7 +16,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 
 	@Override
-	public void renderTickLogs(GuiGraphics graphics, int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderTickLogs(GuiRenderer renderer, int x, int y, long firstTick, long lastTick, Meter meter) {
 		y += hud.settings.gridSize;
 
 		MeterLogs logs = meter.getLogs();
@@ -45,7 +42,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 				int column = (int)(tick - firstTick); // The event is no older than 1M ticks, so we can safely cast to int
 				int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 
-				drawEvent(graphics, columnX, y, meter, log.getEvent());
+				drawEvent(renderer, columnX, y, meter, log.getEvent());
 			}
 
 			if ((log = logs.getLog(type, ++index)) == null) {
@@ -55,7 +52,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 
 	@Override
-	public void renderSubtickLogs(GuiGraphics graphics, int x, int y, long tick, int subtickCount, Meter meter) {
+	public void renderSubtickLogs(GuiRenderer renderer, int x, int y, long tick, int subtickCount, Meter meter) {
 		y += hud.settings.gridSize;
 
 		MeterLogs logs = meter.getLogs();
@@ -70,7 +67,7 @@ public class BasicEventRenderer extends MeterEventRenderer {
 			int column = log.getSubtick();
 			int columnX = x + column * (hud.settings.columnWidth + hud.settings.gridSize) + hud.settings.gridSize;
 
-			drawEvent(graphics, columnX, y, meter, log.getEvent());
+			drawEvent(renderer, columnX, y, meter, log.getEvent());
 
 			if ((log = logs.getLog(type, ++index)) == null) {
 				break;
@@ -82,35 +79,42 @@ public class BasicEventRenderer extends MeterEventRenderer {
 		this.type = type;
 	}
 
-	protected void drawEvent(GuiGraphics graphics, int x, int y, Meter meter, MeterEvent event) {
-		PoseStack poses = graphics.pose();
-
-		poses.pushPose();
-		drawCenter(graphics, x, y, meter, event);
-		poses.translate(0, 0, -0.01);
-		drawEdges(graphics, x, y, meter, event);
-		poses.popPose();
+	protected void drawEvent(GuiRenderer renderer, int x, int y, Meter meter, MeterEvent event) {
+		renderer.push();
+		drawCenter(renderer, x, y, meter, event);
+		renderer.translate(0, 0, -0.01);
+		drawEdges(renderer, x, y, meter, event);
+		renderer.pop();
 	}
 
-	protected void drawEdges(GuiGraphics graphics, int x, int y, Meter meter, MeterEvent event) {
-		if (hud.settings.rowHeight < (3 + hud.settings.hparity) * hud.settings.scale) {
+	protected void drawEdges(GuiRenderer renderer, int x, int y, Meter meter, MeterEvent event) {
+		int height = hud.settings.scale * (3 + hud.settings.hparity);
+
+		if (hud.settings.rowHeight < height) {
 			return;
 		}
 
-		int width = hud.settings.columnWidth;
-		int height = hud.settings.scale * (3 + hud.settings.hparity);
 		int heightOffset = (hud.settings.rowHeight - height) / 2 + hud.settings.hparity;
+
+		int x0 = x;
+		int y0 = y + heightOffset;
+		int x1 = x0 + hud.settings.columnWidth;
+		int y1 = y0 + height;
 		int color = hud.settings.colorBackground;
 
-		hud.renderer.renderRect(graphics, x, y + heightOffset, width, height, color);
+		renderer.fill(x0, y0, x1, y1, color);
 	}
 
-	protected void drawCenter(GuiGraphics graphics, int x, int y, Meter meter, MeterEvent event) {
-		int width = hud.settings.columnWidth;
+	protected void drawCenter(GuiRenderer renderer, int x, int y, Meter meter, MeterEvent event) {
 		int height = hud.settings.scale * (1 + hud.settings.hparity);
 		int heightOffset = (hud.settings.rowHeight - height) / 2 + hud.settings.hparity;
+
+		int x0 = x;
+		int y0 = y + heightOffset;
+		int x1 = x0 + hud.settings.columnWidth;
+		int y1 = y0 + height;
 		int color = meter.getColor();
 
-		hud.renderer.renderRect(graphics, x, y + heightOffset, width, height, color);
+		renderer.fill(x0, y0, x1, y1, color);
 	}
 }

@@ -5,13 +5,11 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.FontRenderer;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
 
 public class SuggestionsMenu extends AbstractElement {
@@ -25,7 +23,7 @@ public class SuggestionsMenu extends AbstractElement {
 	private static final int ENTRY_SPACING = 2;
 	private static final int BORDER_SPACING = 2;
 
-	private final Font font;
+	private final FontRenderer font;
 	private final TextField input;
 	private final SuggestionsProvider provider;
 
@@ -42,7 +40,7 @@ public class SuggestionsMenu extends AbstractElement {
 	public SuggestionsMenu(TextField input, SuggestionsProvider provider) {
 		super(0, 0, 0, 0);
 
-		this.font = MultimeterClient.MINECRAFT.font;
+		this.font = MultimeterClient.INSTANCE.getFontRenderer();
 		this.input = input;
 		this.provider = provider;
 
@@ -56,89 +54,89 @@ public class SuggestionsMenu extends AbstractElement {
 		this.scroll = 0;
 		this.size = 0;
 
-		updatePosition();
-		updateSize();
+		this.updatePosition();
+		this.updateSize();
 	}
 
 	public void setThreshold(int size) {
-		threshold = size;
+		this.threshold = size;
 	}
 
 	public void setMinSize(int size) {
-		minSize = size;
+		this.minSize = size;
 	}
 
 	public void setMaxSize(int size) {
-		maxSize = size;
+		this.maxSize = size;
 	}
 
 	public int getMaxHeight() {
-		return maxSize * (font.lineHeight + ENTRY_SPACING);
+		return this.maxSize * (this.font.height() + ENTRY_SPACING);
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
-		if (isShowingSuggestions()) {
-			PoseStack poses = graphics.pose();
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
+		if (this.isShowingSuggestions()) {
+			renderer.push();
+			renderer.translate(0.0D, 0.0D, 10.0D);
 
-			poses.pushPose();
-			poses.translate(0.0D, 0.0D, 10.0D);
+			this.renderBackground(renderer);
+			this.renderHighlights(renderer);
 
-			renderBackground(graphics);
-			renderHighlights(graphics);
+			int x = this.getX() + BORDER_SPACING;
+			int y = this.getY() + ENTRY_SPACING;
+			int height = this.font.height() + ENTRY_SPACING;
 
-			int x = getX() + BORDER_SPACING;
-			int y = getY() + ENTRY_SPACING;
-			int height = font.lineHeight + ENTRY_SPACING;
-
-			for (int i = 0; i < size && scroll + i < suggestions.size(); i++) {
-				renderText(font, graphics, suggestions.get(scroll + i), x, y, false, 0xFFFFFFFF);
+			for (int i = 0; i < this.size && this.scroll + i < this.suggestions.size(); i++) {
+				renderer.drawString(this.suggestions.get(this.scroll + i), x, y);
 
 				y += height;
 			}
 
-			poses.popPose();
+			renderer.pop();
 		}
 	}
 
 	public boolean isShowingSuggestions() {
-		return isEnabled() && hasEnoughSuggestions();
+		return this.isEnabled() && this.hasEnoughSuggestions();
 	}
 
 	public boolean isEnabled() {
-		return input.isFocused() && input.isActive();
+		return this.input.isFocused() && this.input.isActive();
 	}
 
 	private boolean hasEnoughSuggestions() {
-		return suggestions.size() >= threshold;
+		return this.suggestions.size() >= this.threshold;
 	}
 
-	private void renderBackground(GuiGraphics graphics) {
-		int x = getX();
-		int y = getY();
-		int width = getWidth();
-		int height = getHeight();
-		int backgroundColor = getBackgroundColor();
+	private void renderBackground(GuiRenderer renderer) {
+		int x0 = this.getX();
+		int y0 = this.getY();
+		int x1 = x0 + this.getWidth();
+		int y1 = y0 + this.getHeight();
+		int backgroundColor = this.getBackgroundColor();
 
-		renderRect(graphics, x, y, width, height, backgroundColor);
+		renderer.fill(x0, y0, x1, y1, backgroundColor);
 	}
 
-	private void renderHighlights(GuiGraphics graphics) {
-		int x = getX();
-		int width = getWidth();
-		int height = font.lineHeight + ENTRY_SPACING;
+	private void renderHighlights(GuiRenderer renderer) {
+		int x0 = this.getX();
+		int x1 = this.getWidth();
+		int height = this.font.height() + ENTRY_SPACING;
 
-		if (hovered >= 0) {
-			int y = getY() + (hovered - scroll) * height;
-			int hoveredColor = getHoveredColor();
+		if (this.hovered >= 0) {
+			int y0 = this.getY() + (this.hovered - this.scroll) * height;
+			int y1 = y0 + height;
+			int hoveredColor = this.getHoveredColor();
 
-			renderRect(graphics, x, y, width, height, hoveredColor);
+			renderer.fill(x0, y0, x1, y1, hoveredColor);
 		}
-		if (selected >= 0) {
-			int y = getY() + (selected - scroll) * height;
-			int selectedColor = getSelectedColor();
+		if (this.selected >= 0) {
+			int y0 = this.getY() + (this.selected - this.scroll) * height;
+			int y1 = y0 + height;
+			int selectedColor = this.getSelectedColor();
 
-			renderRect(graphics, x, y, width, height, selectedColor);
+			renderer.fill(x0, y0, x1, y1, selectedColor);
 		}
 	}
 
@@ -156,23 +154,23 @@ public class SuggestionsMenu extends AbstractElement {
 
 	@Override
 	public boolean isMouseOver(double mouseX, double mouseY) {
-		return input.isMouseOver(mouseX, mouseY) || super.isMouseOver(mouseX, mouseY);
+		return this.input.isMouseOver(mouseX, mouseY) || super.isMouseOver(mouseX, mouseY);
 	}
 
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
-		hovered = -1;
+		this.hovered = -1;
 
-		if (input.isMouseOver(mouseX, mouseY)) {
-			input.setHoveredAndUpdateCursor(isHovered());
+		if (this.input.isMouseOver(mouseX, mouseY)) {
+			this.input.setHoveredAndUpdateCursor(this.isHovered());
 		} else {
-			input.setHoveredAndUpdateCursor(false);
+			this.input.setHoveredAndUpdateCursor(false);
 
-			if (isShowingSuggestions() && isHovered()) {
-				int idx = scroll + (int)((mouseY - getY()) / (font.lineHeight + ENTRY_SPACING));
+			if (this.isShowingSuggestions() && this.isHovered()) {
+				int idx = this.scroll + (int)((mouseY - this.getY()) / (this.font.height() + ENTRY_SPACING));
 
-				if (idx >= 0 && idx < suggestions.size()) {
-					hovered = idx;
+				if (idx >= 0 && idx < this.suggestions.size()) {
+					this.hovered = idx;
 				}
 			}
 		}
@@ -180,18 +178,18 @@ public class SuggestionsMenu extends AbstractElement {
 
 	@Override
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		if (input.isMouseOver(mouseX, mouseY)) {
-			return input.mouseClick(mouseX, mouseY, button);
+		if (this.input.isMouseOver(mouseX, mouseY)) {
+			return this.input.mouseClick(mouseX, mouseY, button);
 		} else {
 			boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
 			if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-				if (isShowingSuggestions()) {
-					int idx = hovered;
+				if (this.isShowingSuggestions()) {
+					int idx = this.hovered;
 
 					if (idx >= 0) {
-						setSelection(idx);
-						useSelection();
+						this.setSelection(idx);
+						this.useSelection();
 					}
 				}
 
@@ -205,21 +203,21 @@ public class SuggestionsMenu extends AbstractElement {
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
-		return input.mouseRelease(mouseX, mouseY, button) || consumed;
+		return this.input.mouseRelease(mouseX, mouseY, button) || consumed;
 	}
 
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		return input.isMouseOver(mouseX, mouseY) && input.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
+		return this.input.isMouseOver(mouseX, mouseY) && this.input.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
 	}
 
 	@Override
 	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (input.isMouseOver(mouseX, mouseY)) {
-			return input.mouseScroll(mouseX, mouseY, scrollX, scrollY);
+		if (this.input.isMouseOver(mouseX, mouseY)) {
+			return this.input.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 		}
-		if (isShowingSuggestions()) {
-			moveSelection(-(int)scrollY);
+		if (this.isShowingSuggestions()) {
+			this.moveSelection(-(int)scrollY);
 			return true;
 		}
 
@@ -229,37 +227,37 @@ public class SuggestionsMenu extends AbstractElement {
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_ENTER) {
-			setFocused(false);
+			this.setFocused(false);
 		}
 
 		boolean consumed = false;
 
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			setFocused(false);
+			this.setFocused(false);
 			consumed = true;
 		}
 
-		if (hasSuggestions()) {
+		if (this.hasSuggestions()) {
 			consumed = true;
 
 			switch (keyCode) {
 			case GLFW.GLFW_KEY_UP:
-				moveSelection(-1);
+				this.moveSelection(-1);
 				break;
 			case GLFW.GLFW_KEY_PAGE_UP:
-				setSelection(0);
+				this.setSelection(0);
 				break;
 			case GLFW.GLFW_KEY_DOWN:
-				moveSelection(1);
+				this.moveSelection(1);
 				break;
 			case GLFW.GLFW_KEY_PAGE_DOWN:
-				setSelection(suggestions.size() - 1);
+				this.setSelection(this.suggestions.size() - 1);
 				break;
 			case GLFW.GLFW_KEY_TAB:
 			case GLFW.GLFW_KEY_ENTER:
-				useSelection();
+				this.useSelection();
 				if (keyCode == GLFW.GLFW_KEY_ENTER) {
-					setFocused(false);
+					this.setFocused(false);
 				}
 				break;
 			default:
@@ -267,23 +265,23 @@ public class SuggestionsMenu extends AbstractElement {
 			}
 		}
 
-		return consumed || input.keyPress(keyCode, scanCode, modifiers);
+		return consumed || this.input.keyPress(keyCode, scanCode, modifiers);
 	}
 
 	@Override
 	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
-		return input.keyRelease(keyCode, scanCode, modifiers);
+		return this.input.keyRelease(keyCode, scanCode, modifiers);
 	}
 
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
-		return input.typeChar(chr, modifiers);
+		return this.input.typeChar(chr, modifiers);
 	}
 
 	@Override
 	public void setFocused(boolean focused) {
 		super.setFocused(focused);
-		input.setFocused(focused);
+		this.input.setFocused(focused);
 	}
 
 	@Override
@@ -295,122 +293,122 @@ public class SuggestionsMenu extends AbstractElement {
 		// suggestions are always listed top down, so if the menu
 		// appears above the text field, extend it down until it
 		// connects with it again
-		return getY() < input.getY() ? getMaxHeight() : super.getHeight();
+		return this.getY() < this.input.getY() ? this.getMaxHeight() : super.getHeight();
 	}
 
 	@Override
 	public void update() {
-		if (isEnabled()) {
-			suggestions = provider.provide(input.getValueBeforeCursor());
+		if (this.isEnabled()) {
+			this.suggestions = this.provider.provide(this.input.getValueBeforeCursor());
 		} else {
-			suggestions = Collections.emptyList();
+			this.suggestions = Collections.emptyList();
 		}
 
-		updateSize();
-		setSelection(0);
+		this.updateSize();
+		this.setSelection(0);
 	}
 
 	public void updatePosition() {
-		setX(input.getX() + 2);
+		this.setX(this.input.getX() + 2);
 
-		if (fitsBelowInput() || !fitsAboveInput()) {
-			setY(input.getY() + input.getHeight() - 1);
+		if (this.fitsBelowInput() || !this.fitsAboveInput()) {
+			this.setY(this.input.getY() + this.input.getHeight() - 1);
 		} else {
-			setY(input.getY() + 1 - getMaxHeight());
+			this.setY(this.input.getY() + 1 - this.getMaxHeight());
 		}
 	}
 
 	private boolean fitsAboveInput() {
-		return input.getY() + 1 - getMaxHeight() >= 0;
+		return this.input.getY() + 1 - this.getMaxHeight() >= 0;
 	}
 
 	private boolean fitsBelowInput() {
-		return input.getY() + input.getHeight() - 1 + getMaxHeight() <= MultimeterClient.MINECRAFT.screen.height;
+		return this.input.getY() + this.input.getHeight() - 1 + this.getMaxHeight() <= MultimeterClient.MINECRAFT.screen.height;
 	}
 
 	public void updateSize() {
-		if (hasEnoughSuggestions()) {
-			size = Mth.clamp(suggestions.size(), minSize, maxSize);
+		if (this.hasEnoughSuggestions()) {
+			this.size = Mth.clamp(this.suggestions.size(), this.minSize, this.maxSize);
 
 			int width = 2 * BORDER_SPACING;
-			int height = size * (font.lineHeight + ENTRY_SPACING);
+			int height = this.size * (this.font.height() + ENTRY_SPACING);
 
-			for (int i = 0; i < size && scroll + i < suggestions.size(); i++) {
-				String suggestion = suggestions.get(scroll + i);
-				int suggestionWidth = font.width(suggestion);
+			for (int i = 0; i < this.size && this.scroll + i < this.suggestions.size(); i++) {
+				String suggestion = this.suggestions.get(this.scroll + i);
+				int suggestionWidth = this.font.width(suggestion);
 
 				if (suggestionWidth > width) {
 					width = suggestionWidth;
 				}
 			}
 
-			setWidth(width + 2 * BORDER_SPACING);
-			setHeight(height);
+			this.setWidth(width + 2 * BORDER_SPACING);
+			this.setHeight(height);
 		} else {
-			size = 0;
+			this.size = 0;
 
-			setWidth(0);
-			setHeight(0);
+			this.setWidth(0);
+			this.setHeight(0);
 		}
 	}
 
 	public boolean hasSuggestions() {
-		return !suggestions.isEmpty();
+		return !this.suggestions.isEmpty();
 	}
 
 	public boolean hasSelection() {
-		return hasSuggestions() && selected >= 0;
+		return this.hasSuggestions() && this.selected >= 0;
 	}
 
 	public String getSelection() {
-		return hasSelection() ? suggestions.get(selected) : null;
+		return this.hasSelection() ? this.suggestions.get(this.selected) : null;
 	}
 
 	public void moveSelection(int amount) {
-		int newSelection = selected + amount;
+		int newSelection = this.selected + amount;
 
 		if (newSelection < 0) {
-			newSelection = suggestions.size() - 1;
+			newSelection = this.suggestions.size() - 1;
 		}
-		if (newSelection >= suggestions.size()) {
+		if (newSelection >= this.suggestions.size()) {
 			newSelection = 0;
 		}
 
-		setSelection(newSelection);
+		this.setSelection(newSelection);
 	}
 
 	public void setSelection(int index) {
-		selected = Mth.clamp(index, 0, suggestions.size() - 1);
+		this.selected = Mth.clamp(index, 0, this.suggestions.size() - 1);
 
-		updateScroll();
-		input.updateSuggestion();
+		this.updateScroll();
+		this.input.updateSuggestion();
 	}
 
 	public void useSelection() {
-		if (hasSelection()) {
-			input.setValue(getSelection());
+		if (this.hasSelection()) {
+			this.input.setValue(this.getSelection());
 		}
 	}
 
 	private void updateScroll() {
-		if (selected >= scroll + size) {
-			scroll(selected - (scroll + size) + 1);
+		if (this.selected >= this.scroll + this.size) {
+			this.scroll(this.selected - (this.scroll + this.size) + 1);
 		}
-		if (selected < scroll) {
-			scroll(selected - scroll);
+		if (this.selected < this.scroll) {
+			this.scroll(this.selected - this.scroll);
 		}
 	}
 
 	private void scroll(int amount) {
-		setScroll(scroll + amount);
+		this.setScroll(this.scroll + amount);
 	}
 
 	private void setScroll(int value) {
-		int oldScroll = scroll;
-		scroll = Mth.clamp(value, 0, suggestions.size() - size);
+		int oldScroll = this.scroll;
+		this.scroll = Mth.clamp(value, 0, this.suggestions.size() - this.size);
 
-		if (scroll != oldScroll) {
-			updateSize();
+		if (this.scroll != oldScroll) {
+			this.updateSize();
 		}
 	}
 }

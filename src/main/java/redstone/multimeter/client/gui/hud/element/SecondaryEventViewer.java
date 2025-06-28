@@ -1,9 +1,8 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import net.minecraft.client.gui.GuiGraphics;
-
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.common.meter.log.MeterLogs;
@@ -15,9 +14,9 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
 		if (!hud.client.isPreviewing() && hud.isPaused() && getColumnCount() > 0) {
-			super.render(graphics, mouseX, mouseY);
+			super.render(renderer, mouseX, mouseY);
 		}
 	}
 
@@ -45,33 +44,33 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	protected void drawHighlights(GuiGraphics graphics, int mouseX, int mouseY) {
+	protected void drawHighlights(GuiRenderer renderer, int mouseX, int mouseY) {
 		if (hud.isFocusMode()) {
 			EventLog highlight = hud.getFocussedEvent();
 
 			if (highlight != null) {
-				drawHighlight(graphics, highlight.getSubtick(), 1, 0, hud.meters.size(), true);
+				drawHighlight(renderer, highlight.getSubtick(), 1, 0, hud.meters.size(), true);
 			}
 		}
 		if (isMouseOver(mouseX, mouseY)) {
 			int column = getHoveredColumn(mouseX);
 			int row = hud.getHoveredRow(mouseY);
 
-			drawHighlight(graphics, column, 1, row, 1, false);
+			drawHighlight(renderer, column, 1, row, 1, false);
 		}
 	}
 
 	@Override
-	protected void drawDecorators(GuiGraphics graphics) {
+	protected void drawDecorators(GuiRenderer renderer) {
 	}
 
 	@Override
-	protected void drawMeterEvents(GuiGraphics graphics) {
+	protected void drawMeterEvents(GuiRenderer renderer) {
 		long tick = hud.getSelectedTick();
 		int subticks = hud.client.getMeterGroup().getLogManager().getSubtickCount(tick);
 
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderSubtickLogs(graphics, x, y, tick, subticks, meter);
+			hud.eventRenderers.renderSubtickLogs(renderer, x, y, tick, subticks, meter);
 		});
 	}
 
