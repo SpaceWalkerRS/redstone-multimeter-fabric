@@ -54,7 +54,8 @@
 		"client.GameRendererMixin",
 		"client.IntegratedServerMixin",
 		"client.KeyBindingMixin",
-		"client.MinecraftMixin"
+		"client.MinecraftMixin",
+		"client.StyleAccess"
 	],
 	"injectors": {
 		"defaultRequire": 1

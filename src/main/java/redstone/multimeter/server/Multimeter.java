@@ -22,17 +22,18 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.Formatting;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
+import redstone.multimeter.client.gui.text.ClickEvent;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.HoverEvent;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.TextColor;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -160,7 +161,7 @@ public class Multimeter {
 		ServerPlayerEntity owner = server.getPlayerList().get(ownerUuid);
 
 		if (owner != null) {
-			Text message = new LiteralText(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
+			Text message = Texts.literal("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time);
 			server.sendMessage(owner, message, false);
 		}
 	}
@@ -195,7 +196,7 @@ public class Multimeter {
 
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
-				Text message = new LiteralText(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
+				Text message = Texts.literal("meter limit (%d) reached!", options.meter_group.meter_limit);
 				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
@@ -267,7 +268,7 @@ public class Multimeter {
 			if (meterGroup.isOwnedBy(player)) {
 				setMeters(meterGroup, meters);
 			} else {
-				Text message = new LiteralText(String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName()));
+				Text message = Texts.literal("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName());
 				server.sendMessage(player, message, false);
 			}
 		}
@@ -383,15 +384,18 @@ public class Multimeter {
 
 		meterGroup.addMember(playerUuid);
 
-		Text message = new LiteralText("")
-			.append(new LiteralText(String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName())))
-			.append(new LiteralText("[here]").withStyle(style -> {
-				style.setColor(Formatting.GREEN)
-					.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-						new LiteralText(String.format("Subscribe to meter group \'%s\'", meterGroup.getName()))))
-					.setClickEvent(
-						new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
-			})).append(new LiteralText(" to subscribe to it."));
+		Text message = Texts.composite(
+			String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()),
+			Texts.literal("[here]").format(style ->
+				style.withHoverEvent(HoverEvent.showText(
+					Texts.literal("Subscribe to meter group \'%s\'", meterGroup.getName())
+				)).withClickEvent(ClickEvent.runCommand(
+					String.format("/metergroup subscribe %s", meterGroup.getName())
+				)).withColor(Formatting.GREEN)
+			),
+			" to subscribe to it."
+		);
+
 		server.sendMessage(player, message, false);
 	}
 
@@ -408,7 +412,7 @@ public class Multimeter {
 			if (player != null && meterGroup.hasSubscriber(playerUuid)) {
 				unsubscribeFromMeterGroup(meterGroup, player);
 
-				Text message = new LiteralText(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
+				Text message = Texts.literal("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName());
 				server.sendMessage(player, message, false);
 			}
 		}
@@ -429,7 +433,7 @@ public class Multimeter {
 
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
-			Text message = new LiteralText("This server does not allow meter teleporting!");
+			Text message = Texts.literal("This server does not allow meter teleporting!");
 			server.sendMessage(player, message, false);
 
 			return;
@@ -456,13 +460,46 @@ public class Multimeter {
 					player.teleportToDimension(newWorld.dimension.getType().getId());
 					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
-					Text text = new LiteralText(String.format("Teleported to meter \"%s\"", meter.getName()));
+					Text text = Texts.literal(String.format("Teleported to meter \"%s\"", meter.getName()));
 					server.sendMessage(player, text, false);
 				}
 			}
 		}
 	}
+// TODO: implement this through custom packets or something
+	/**
+	 * Send the player a message they can click to return to the location they were
+	 * at before teleporting to a meter.
+	 */
+/*	private void sendClickableReturnMessage(ServerWorld world, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayerEntity player) {
+		String dimension = DimensionType.getKey(world.dimension.getType()).toString();
+		String x = NUMBER_FORMAT.format(_x);
+		String y = NUMBER_FORMAT.format(_y);
+		String z = NUMBER_FORMAT.format(_z);
+		String yaw = NUMBER_FORMAT.format(_yaw);
+		String pitch = NUMBER_FORMAT.format(_pitch);
 
+		Text message = Texts.composite(
+			"Click",
+			Texts.literal("[here]").format(style ->
+				style.withHoverEvent(HoverEvent.showText(
+					Texts.composite(
+						"Teleport to",
+						Texts.keyValue("\n  dimension", dimension),
+						Texts.keyValue("\n  x", x),
+						Texts.keyValue("\n  y", y),
+						Texts.keyValue("\n  z", z)
+					)
+				)).withClickEvent(ClickEvent.runCommand(
+					String.format("/execute in %s run tp @s %s %s %s %s %s", dimension, x, y, z, yaw, pitch)
+				)).withColor(TextColor.GREEN)
+			),
+			" to return to your previous location"
+		);
+
+		server.sendMessage(player, message, false);
+	}
+*/
 	public void onBlockChange(World world, BlockPos pos, BlockState oldState, BlockState newState) {
 		Block oldBlock = oldState.getBlock();
 		Block newBlock = newState.getBlock();

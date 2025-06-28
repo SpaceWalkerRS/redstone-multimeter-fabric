@@ -7,11 +7,11 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.TickPhaseTree;
@@ -220,6 +220,6 @@ public class MultimeterServer {
 	}
 
 	public void sendMessage(ServerPlayerEntity player, Text message, boolean actionBar) {
-		player.addMessage(message, actionBar);
+		player.addMessage(message.resolve(), actionBar);
 	}
 }
