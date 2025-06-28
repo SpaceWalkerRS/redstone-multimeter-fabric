@@ -2,11 +2,11 @@ package redstone.multimeter.common.meter.log;
 
 import net.minecraft.nbt.CompoundTag;
 
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 import redstone.multimeter.common.TickPhase;
-import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.event.MeterEvent;
-import redstone.multimeter.util.TextUtils;
 
 public class EventLog {
 
@@ -82,18 +82,12 @@ public class EventLog {
 	}
 
 	public Tooltip getTooltip() {
-		EventType type = event.getType();
-		int data = event.getMetadata();
-
-		Tooltip tooltip = new Tooltip();
-
-		tooltip.add(TextUtils.formatKeyValue("event type", type.getName()));
-		type.addTextToTooltip(tooltip, data);
-		tooltip.add(TextUtils.formatKeyValue("tick", tick));
-		tooltip.add(TextUtils.formatKeyValue("subtick", subtick));
-		tickPhase.addTextToTooltip(tooltip);
-
-		return tooltip;
+		return Tooltips.builder()
+			.lines(event::buildTooltip)
+			.line(Texts.keyValue("tick", tick))
+			.line(Texts.keyValue("subtick", subtick))
+			.lines(tickPhase::buildTooltip)
+			.build();
 	}
 
 	public CompoundTag toNbt() {

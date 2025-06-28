@@ -6,33 +6,36 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.FontRenderer;
+import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.texture.Texture;
+import redstone.multimeter.client.gui.texture.Textures;
 
 public class TutorialToast implements Toast {
 
-	protected static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("toast/tutorial");
+	protected static final Texture TEXTURE = Textures.TUTORIAL_TOAST;
 	protected static final int EDGE = 4;
 
-	private final Component title;
-	private final List<FormattedCharSequence> description;
+	private final Text title;
+	private final List<Text> description;
 
 	private final int toastWidth;
 	private final int toastHeight;
 
 	private Visibility visibility;
 
-	public TutorialToast(Component title, Component description) {
-		Font font = MultimeterClient.MINECRAFT.font;
+	public TutorialToast(Text title, Text description) {
+		FontRenderer font = MultimeterClient.INSTANCE.getFontRenderer();
 
 		this.toastWidth = 200;
 
 		this.title = title;
-		this.description = font.split(description, width() - 14);
+		this.description = font.split(description.buildString(), width() - 14).stream().map(Texts::literal).toList();
+//		this.description = font.split(description, width() - 14);
 
 		this.toastHeight = 10 + 12 + 10 * this.description.size();
 
@@ -60,27 +63,31 @@ public class TutorialToast implements Toast {
 
 	@Override
 	public void render(GuiGraphics graphics, Font font, long age) {
-		drawBackground(graphics, font, age);
+		GuiRenderer renderer = new GuiRenderer(
+			graphics
+		);
+
+		drawBackground(renderer, font, age);
 
 		int x = 7;
 		int y = 7;
 
-		graphics.drawString(font, title, x, y, 0xFF500050, false);
+		renderer.drawString(title, x, y, 0xFF500050);
 
 		y += 12.0F;
 
 		for (int i = 0; i < description.size(); i++, y += 10.0F) {
-			graphics.drawString(font, description.get(i), x, y, 0xFF000000, false);
+			renderer.drawString(description.get(i), x, y, 0xFF000000);
 		}
 
-		drawDecoration(graphics, font, age);
+		drawDecoration(renderer, font, age);
 	}
 
-	protected void drawBackground(GuiGraphics graphics, Font toasts, long age) {
-		graphics.blitSprite(RenderType::guiTextured, TEXTURE, 0 ,0, width(), height());
+	protected void drawBackground(GuiRenderer renderer, Font toasts, long age) {
+		renderer.blit(TEXTURE, 0 ,0, width(), height());
 	}
 
-	protected void drawDecoration(GuiGraphics graphics, Font toasts, long age) {
+	protected void drawDecoration(GuiRenderer renderer, Font toasts, long age) {
 	}
 
 	public void hide() {
