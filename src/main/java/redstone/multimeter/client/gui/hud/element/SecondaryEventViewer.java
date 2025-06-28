@@ -1,9 +1,8 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.log.EventLog;
 import redstone.multimeter.common.meter.log.MeterLogs;
@@ -15,9 +14,9 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
 		if (!hud.client.isPreviewing() && hud.isPaused() && getColumnCount() > 0) {
-			super.render(poses, mouseX, mouseY);
+			super.render(renderer, mouseX, mouseY);
 		}
 	}
 
@@ -45,33 +44,33 @@ public class SecondaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	protected void drawHighlights(PoseStack poses, int mouseX, int mouseY) {
+	protected void drawHighlights(GuiRenderer renderer, int mouseX, int mouseY) {
 		if (hud.isFocusMode()) {
 			EventLog highlight = hud.getFocussedEvent();
 
 			if (highlight != null) {
-				drawHighlight(poses, highlight.getSubtick(), 1, 0, hud.meters.size(), true);
+				drawHighlight(renderer, highlight.getSubtick(), 1, 0, hud.meters.size(), true);
 			}
 		}
 		if (isMouseOver(mouseX, mouseY)) {
 			int column = getHoveredColumn(mouseX);
 			int row = hud.getHoveredRow(mouseY);
 
-			drawHighlight(poses, column, 1, row, 1, false);
+			drawHighlight(renderer, column, 1, row, 1, false);
 		}
 	}
 
 	@Override
-	protected void drawDecorators(PoseStack poses) {
+	protected void drawDecorators(GuiRenderer renderer) {
 	}
 
 	@Override
-	protected void drawMeterEvents(PoseStack poses) {
+	protected void drawMeterEvents(GuiRenderer renderer) {
 		long tick = hud.getSelectedTick();
 		int subticks = hud.client.getMeterGroup().getLogManager().getSubtickCount(tick);
 
 		drawMeterLogs((x, y, meter) -> {
-			hud.eventRenderers.renderSubtickLogs(poses, x, y, tick, subticks, meter);
+			hud.eventRenderers.renderSubtickLogs(renderer, x, y, tick, subticks, meter);
 		});
 	}
 

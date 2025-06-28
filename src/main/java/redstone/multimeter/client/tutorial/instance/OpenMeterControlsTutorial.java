@@ -1,23 +1,22 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
-import redstone.multimeter.util.TextUtils;
 
 public class OpenMeterControlsTutorial extends StagedTutorialInstance {
 
-	private static final Component TITLE = new TextComponent("Open Meter Controls");
-	private static final Component DESCRIPTION = new TextComponent("").
-													append("Open a meter's controls through the Multimeter screen or by looking at it and pressing ").
-													append(TextUtils.formatKeybind(Keybinds.OPEN_METER_CONTROLS));
+	private static final Text TITLE = Texts.literal("Open Meter Controls");
+	private static final Text DESCRIPTION = Texts.composite(
+		"Open a meter's controls through the Multimeter screen or by looking at it and pressing ",
+		Texts.keybind(Keybinds.OPEN_METER_CONTROLS)
+	);
 
 	private Stage stage;
 

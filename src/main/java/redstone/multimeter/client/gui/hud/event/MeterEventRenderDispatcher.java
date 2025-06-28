@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
@@ -41,20 +40,20 @@ public class MeterEventRenderDispatcher {
 		return eventRenderer;
 	}
 
-	public void renderTickLogs(PoseStack poses, int x, int y, long firstTick, long lastTick, Meter meter) {
-		renderMeterEvents(poses, meter, renderer -> renderer.renderTickLogs(poses, x, y, firstTick, lastTick, meter));
+	public void renderTickLogs(GuiRenderer renderer, int x, int y, long firstTick, long lastTick, Meter meter) {
+		renderMeterEvents(renderer, meter, eventRenderer -> eventRenderer.renderTickLogs(renderer, x, y, firstTick, lastTick, meter));
 	}
 
-	public void renderPulseLengths(PoseStack poses, int x, int y, long firstTick, long lastTick, Meter meter) {
-		renderMeterEvents(poses, meter, renderer -> renderer.renderPulseLengths(poses, x, y, firstTick, lastTick, meter));
+	public void renderPulseLengths(GuiRenderer renderer, int x, int y, long firstTick, long lastTick, Meter meter) {
+		renderMeterEvents(renderer, meter, eventRenderer -> eventRenderer.renderPulseLengths(renderer, x, y, firstTick, lastTick, meter));
 	}
 
-	public void renderSubtickLogs(PoseStack poses, int x, int y, long tick, int subTickCount, Meter meter) {
-		renderMeterEvents(poses, meter, renderer -> renderer.renderSubtickLogs(poses, x, y, tick, subTickCount, meter));
+	public void renderSubtickLogs(GuiRenderer renderer, int x, int y, long tick, int subTickCount, Meter meter) {
+		renderMeterEvents(renderer, meter, eventRenderer -> eventRenderer.renderSubtickLogs(renderer, x, y, tick, subTickCount, meter));
 	}
 
-	private void renderMeterEvents(PoseStack poses, Meter meter, Consumer<MeterEventRenderer> consumer) {
-		poses.pushPose();
+	private void renderMeterEvents(GuiRenderer renderer, Meter meter, Consumer<MeterEventRenderer> consumer) {
+		renderer.pushMatrix();
 
 		for (int index = EventType.ALL.length - 1; index >= 0; index--) {
 			EventType type = EventType.ALL[index];
@@ -63,9 +62,9 @@ public class MeterEventRenderDispatcher {
 				consumer.accept(getEventRenderer(type));
 			}
 
-			poses.translate(0, 0, -0.1);
+			renderer.translate(0, 0, -0.1);
 		}
 
-		poses.popPose();
+		renderer.popMatrix();
 	}
 }

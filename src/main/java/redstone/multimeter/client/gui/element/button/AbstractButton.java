@@ -2,63 +2,59 @@ package redstone.multimeter.client.gui.element.button;
 
 import java.util.function.Supplier;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.Component;
-
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Texture;
-import redstone.multimeter.client.gui.TextureRegion;
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.FontRenderer;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.texture.Texture;
+import redstone.multimeter.client.gui.texture.TextureRegion;
+import redstone.multimeter.client.gui.texture.TextureRegions;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
 
-public abstract class AbstractButton extends AbstractElement implements IButton {
+public abstract class AbstractButton extends AbstractElement implements Button {
 
-	protected final Font font;
-	private final Supplier<Component> messageSupplier;
+	private final FontRenderer font;
+	private final Supplier<Text> messageSupplier;
 	private final Supplier<Tooltip> tooltipSupplier;
 
+	private Text message;
 	private boolean active;
-	private Component message;
 
-	protected AbstractButton(MultimeterClient client, int x, int y, Supplier<Component> message, Supplier<Tooltip> tooltip) {
-		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip);
+	protected AbstractButton(int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip) {
+		this(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip);
 	}
 
-	protected AbstractButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Component> message, Supplier<Tooltip> tooltip) {
+	protected AbstractButton(int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip) {
 		super(x, y, width, height);
 
-		Minecraft minecraft = client.getMinecraft();
-
-		this.font = minecraft.font;
+		this.font = MultimeterClient.INSTANCE.getFontRenderer();
 		this.messageSupplier = message;
 		this.tooltipSupplier = tooltip;
 
-		this.active = true;
 		this.message = message.get();
+		this.active = true;
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
-		renderButton(poses);
-		renderButtonMessage(poses);
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
+		this.renderButton(renderer);
+		this.renderButtonMessage(renderer);
 	}
 
 	@Override
 	public Tooltip getTooltip(int mouseX, int mouseY) {
-		return tooltipSupplier.get();
+		return this.tooltipSupplier.get();
 	}
 
 	@Override
 	public void update() {
-		updateMessage();
+		this.updateMessage();
 	}
 
 	@Override
 	public boolean isActive() {
-		return active;
+		return this.active;
 	}
 
 	@Override
@@ -67,52 +63,44 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 	}
 
 	@Override
-	public Component getMessage() {
-		return message;
+	public Text getMessage() {
+		return this.message;
 	}
 
 	@Override
-	public void setMessage(Component message) {
+	public void setMessage(Text message) {
 		this.message = message;
 	}
 
-	protected void playClickSound() {
-		IButton.playClickSound();
-	}
-
 	protected void updateMessage() {
-		setMessage(messageSupplier.get());
-	}
-
-	protected void renderButton(PoseStack poses) {
-		TextureRegion texture = getBackgroundTexture();
-
-		if (texture != null) {
-			drawTexturedButton(poses, texture, getX(), getY(), getWidth(), getHeight());
-		}
-	}
-
-	protected TextureRegion getBackgroundTexture() {
-		return getButtonTexture();
+		this.setMessage(this.messageSupplier.get());
 	}
 
 	protected TextureRegion getButtonTexture() {
-		if (!isActive()) {
-			return TextureRegion.BASIC_BUTTON_INACTIVE;
+		if (!this.isActive()) {
+			return TextureRegions.BASIC_BUTTON_INACTIVE;
 		}
-		if (isHovered()) {
-			return TextureRegion.BASIC_BUTTON_HOVERED;
+		if (this.isHovered()) {
+			return TextureRegions.BASIC_BUTTON_HOVERED;
 		}
 
-		return TextureRegion.BASIC_BUTTON;
+		return TextureRegions.BASIC_BUTTON;
 	}
 
-	protected void drawTexturedButton(PoseStack poses, TextureRegion region, int x, int y, int width, int height) {
+	protected void renderButton(GuiRenderer renderer) {
+		TextureRegion texture = this.getButtonTexture();
+
+		if (texture != null) {
+			this.renderButtonTexture(renderer, texture, getX(), this.getY(), this.getWidth(), this.getHeight());
+		}
+	}
+
+	protected void renderButtonTexture(GuiRenderer renderer, TextureRegion region, int x, int y, int width, int height) {
 		boolean matchWidth = (width == region.width);
 		boolean matchHeight = (height == region.height);
 
 		if (matchWidth && matchHeight) {
-			renderTextureRegion(poses, region, x, y, width, height);
+			renderer.blit(region, x, y, x + width, y + height);
 		} else {
 			Texture texture = region.texture;
 
@@ -132,46 +120,44 @@ public abstract class AbstractButton extends AbstractElement implements IButton 
 			int y2 = y + height - bottomHeight;
 			int y3 = y + height;
 
-			int tx0 = region.x;
-			int tx1 = region.x + leftWidth;
-			int tx2 = region.x + region.width - rightWidth;
-			int tx3 = region.x + region.width;
-			int ty0 = region.y;
-			int ty1 = region.y + topHeight;
-			int ty2 = region.y + region.height - bottomHeight;
-			int ty3 = region.y + region.height;
+			int u0 = region.x;
+			int u1 = region.x + leftWidth;
+			int u2 = region.x + region.width - rightWidth;
+			int u3 = region.x + region.width;
+			int v0 = region.y;
+			int v1 = region.y + topHeight;
+			int v2 = region.y + region.height - bottomHeight;
+			int v3 = region.y + region.height;
 
-			renderTexture(poses, texture, (bufferBuilder, pose) -> {
-				drawTexture(bufferBuilder, pose, texture, x0, y0, x1, y1, tx0, ty0, tx1, ty1);
-				drawTexture(bufferBuilder, pose, texture, x0, y2, x1, y3, tx0, ty2, tx1, ty3);
-				drawTexture(bufferBuilder, pose, texture, x2, y2, x3, y3, tx2, ty2, tx3, ty3);
-				drawTexture(bufferBuilder, pose, texture, x2, y0, x3, y1, tx2, ty0, tx3, ty1);
-			});
+			renderer.blit(texture, x0, y0, x1, y1, u0, v0, u1, v1);
+			renderer.blit(texture, x0, y2, x1, y3, u0, v2, u1, v3);
+			renderer.blit(texture, x2, y2, x3, y3, u2, v2, u3, v3);
+			renderer.blit(texture, x2, y0, x3, y1, u2, v0, u3, v1);
 		}
 	}
 
-	protected void renderButtonMessage(PoseStack poses) {
-		Component message = getMessage();
+	protected void renderButtonMessage(GuiRenderer renderer) {
+		Text message = this.getMessage();
 
 		if (message != null) {
-			int x = getMessageX(message);
-			int y = getMessageY();
-			int color = getMessageColor();
+			int x = this.getMessageX(message);
+			int y = this.getMessageY();
+			int color = this.getMessageColor();
 
-			renderText(font, poses, message, x, y, true, color);
+			renderer.drawStringWithShadow(message, x, y, color);
 		}
 	}
 
-	protected int getMessageX(Component message) {
-		return getX() + getWidth() - (getWidth() + textWidth(font, message)) / 2;
+	protected int getMessageX(Text message) {
+		return this.getX() + this.getWidth() - (this.getWidth() + this.font.width(message)) / 2;
 	}
 
 	public int getMessageY() {
-		return getY() + getHeight() - (getHeight() + font.lineHeight) / 2;
+		return this.getY() + this.getHeight() - (this.getHeight() + this.font.height()) / 2;
 	}
 
 	protected int getMessageColor() {
-		return isActive() ? 0xFFFFFFFF : 0xFFA0A0A0;
+		return this.isActive() ? 0xFFFFFFFF : 0xFFA0A0A0;
 	}
 
 }

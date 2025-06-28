@@ -4,20 +4,18 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 
-import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Tooltip;
+public class ToggleButton extends BasicButton {
 
-public class ToggleButton extends Button {
-
-	public ToggleButton(MultimeterClient client, int x, int y, int width, int height, Supplier<Boolean> getter, Consumer<Button> toggle) {
-		this(client, x, y, width, height, on -> new TextComponent(String.valueOf(on)).withStyle(on ? ChatFormatting.GREEN : ChatFormatting.RED), getter, toggle);
+	public ToggleButton(int x, int y, int width, int height, Supplier<Boolean> getter, Consumer<BasicButton> toggle) {
+		this(x, y, width, height, on -> Texts.of(on).format(on ? Formatting.GREEN : Formatting.RED), getter, toggle);
 	}
 
-	public ToggleButton(MultimeterClient client, int x, int y, int width, int height, Function<Boolean, Component> text, Supplier<Boolean> getter, Consumer<Button> toggle) {
-		super(client, x, y, width, height, () -> text.apply(getter.get()), () -> Tooltip.EMPTY, button -> { toggle.accept(button); return true; });
+	public ToggleButton(int x, int y, int width, int height, Function<Boolean, Text> text, Supplier<Boolean> getter, Consumer<BasicButton> toggle) {
+		super(x, y, width, height, () -> text.apply(getter.get()), Tooltips::empty, button -> { toggle.accept(button); return true; });
 	}
 }

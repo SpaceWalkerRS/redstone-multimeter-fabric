@@ -8,12 +8,11 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
@@ -35,7 +34,7 @@ public class GuiMixin {
 		MultimeterHud hud = client.getHud();
 
 		if (client.isHudActive() && !hud.isOnScreen()) {
-			hud.render(new PoseStack());
+			hud.render(new GuiRenderer());
 		}
 	}
 }

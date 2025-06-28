@@ -2,12 +2,11 @@ package redstone.multimeter.client.gui.screen;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 import redstone.multimeter.client.gui.CursorType;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.Element;
 
 public class ScreenWrapper extends Screen {
@@ -19,7 +18,7 @@ public class ScreenWrapper extends Screen {
 	private double lastMouseY = Double.MIN_VALUE;
 
 	public ScreenWrapper(Screen parent, RSMMScreen screen) {
-		super(screen.getTitle());
+		super(new TextComponent(""));
 
 		this.parent = parent;
 		this.screen = screen;
@@ -28,13 +27,8 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public Component getTitle() {
-		return screen.getTitle();
-	}
-
-	@Override
 	public void render(int mouseX, int mouseY, float delta) {
-		screen.render(new PoseStack(), mouseX, mouseY);
+		screen.render(new GuiRenderer(), mouseX, mouseY);
 	}
 
 	@Override
