@@ -1,16 +1,8 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import java.util.List;
-
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.network.chat.Component;
-
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
-import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
-import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.log.EventLog;
 
 public class MeterEventDetails extends AbstractElement {
@@ -36,18 +28,20 @@ public class MeterEventDetails extends AbstractElement {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
 		EventLog event = getEvent();
 
 		if (event != null) {
-			renderEventDetails(poses, event);
+			renderer.tooltip(event.getTooltip(), -15, -15);
+			// TODO: remove
+//			renderEventDetails(renderer, event);
 		}
 	}
 
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
 	}
-
+/*
 	private void renderEventDetails(PoseStack poses, EventLog event) {
 		Tooltip tooltip = event.getTooltip();
 		List<Component> lines = tooltip.getLines();
@@ -93,7 +87,7 @@ public class MeterEventDetails extends AbstractElement {
 
 		poses.popPose();
 	}
-
+*/
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		return false;
@@ -131,7 +125,7 @@ public class MeterEventDetails extends AbstractElement {
 		EventLog event = getEvent();
 
 		if (event != null) {
-			setWidth(event.getTooltip().getWidth(hud.font) + 8);
+			setWidth(hud.font.width(event.getTooltip()) + 8);
 		} else {
 			setWidth(0);
 		}
@@ -141,7 +135,7 @@ public class MeterEventDetails extends AbstractElement {
 		EventLog event = getEvent();
 
 		if (event != null) {
-			setHeight(event.getTooltip().getHeight(hud.font) + 8);
+			setHeight(hud.font.height(event.getTooltip()) + 8);
 		} else {
 			setHeight(0);
 		}

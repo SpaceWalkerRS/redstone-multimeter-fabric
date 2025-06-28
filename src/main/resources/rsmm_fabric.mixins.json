@@ -67,7 +67,8 @@
 		"client.LevelRendererMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
-		"client.OptionsMixin"
+		"client.OptionsMixin",
+		"client.StyleAccess"
 	],
 	"injectors": {
 		"defaultRequire": 1
