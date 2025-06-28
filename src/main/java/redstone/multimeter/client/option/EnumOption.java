@@ -1,14 +1,13 @@
 package redstone.multimeter.client.option;
 
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
 
-import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.element.button.BasicButton;
 import redstone.multimeter.client.gui.element.button.Button;
-import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 
-public class EnumOption<T extends Enum<T> & Cyclable<T>> extends Option<T> {
+public class EnumOption<T extends Enum<T> & Cyclable<T>> extends BaseOption<T> {
 
 	protected final Class<T> type;
 
@@ -28,8 +27,8 @@ public class EnumOption<T extends Enum<T> & Cyclable<T>> extends Option<T> {
 	}
 
 	@Override
-	public IButton createControl(MultimeterClient client, int width, int height) {
-		return new Button(client, 0, 0, width, height, () -> new TextComponent(get().getName()), () -> Tooltip.EMPTY, button -> {
+	public Button createControl(int width, int height) {
+		return new BasicButton(0, 0, width, height, () -> Texts.literal(get().getName()), Tooltips::empty, button -> {
 			cycle(!Screen.hasShiftDown());
 			return true;
 		});

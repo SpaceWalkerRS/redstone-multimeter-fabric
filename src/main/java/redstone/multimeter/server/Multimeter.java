@@ -16,13 +16,8 @@ import java.util.function.Supplier;
 
 import com.google.common.base.Suppliers;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -34,6 +29,12 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.block.Meterable;
 import redstone.multimeter.block.PowerSource;
+import redstone.multimeter.client.gui.text.ClickEvent;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.HoverEvent;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.TextColor;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -50,7 +51,6 @@ import redstone.multimeter.server.meter.ServerMeterPropertiesManager;
 import redstone.multimeter.server.meter.event.MeterEventPredicate;
 import redstone.multimeter.server.option.Options;
 import redstone.multimeter.server.option.OptionsManager;
-import redstone.multimeter.util.TextUtils;
 
 public class Multimeter {
 
@@ -162,7 +162,7 @@ public class Multimeter {
 		ServerPlayer owner = server.getPlayerList().get(ownerUuid);
 
 		if (owner != null) {
-			Component message = new TextComponent(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
+			Text message = Texts.literal("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time);
 			server.sendMessage(owner, message, false);
 		}
 	}
@@ -197,7 +197,7 @@ public class Multimeter {
 
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
-				Component message = new TextComponent(String.format("meter limit (%d) reached!", options.meter_group.meter_limit));
+				Text message = Texts.literal("meter limit (%d) reached!", options.meter_group.meter_limit);
 				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
@@ -269,7 +269,7 @@ public class Multimeter {
 			if (meterGroup.isOwnedBy(player)) {
 				setMeters(meterGroup, meters);
 			} else {
-				Component message = new TextComponent(String.format("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName()));
+				Text message = Texts.literal("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName());
 				server.sendMessage(player, message, false);
 			}
 		}
@@ -385,15 +385,18 @@ public class Multimeter {
 
 		meterGroup.addMember(playerUuid);
 
-		Component message = new TextComponent("")
-			.append(new TextComponent(String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName())))
-			.append(new TextComponent("[here]").withStyle(style -> {
-				return style.withColor(ChatFormatting.GREEN)
-					.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-						new TextComponent(String.format("Subscribe to meter group \'%s\'", meterGroup.getName()))))
-					.withClickEvent(
-						new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/metergroup subscribe %s", meterGroup.getName())));
-			})).append(new TextComponent(" to subscribe to it."));
+		Text message = Texts.composite(
+			String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()),
+			Texts.literal("[here]").format(style ->
+				style.withHoverEvent(HoverEvent.showText(
+					Texts.literal("Subscribe to meter group \'%s\'", meterGroup.getName())
+				)).withClickEvent(ClickEvent.runCommand(
+					String.format("/metergroup subscribe %s", meterGroup.getName())
+				)).withColor(Formatting.GREEN)
+			),
+			" to subscribe to it."
+		);
+
 		server.sendMessage(player, message, false);
 	}
 
@@ -410,7 +413,7 @@ public class Multimeter {
 			if (player != null && meterGroup.hasSubscriber(playerUuid)) {
 				unsubscribeFromMeterGroup(meterGroup, player);
 
-				Component message = new TextComponent(String.format("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName()));
+				Text message = Texts.literal("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName());
 				server.sendMessage(player, message, false);
 			}
 		}
@@ -431,7 +434,7 @@ public class Multimeter {
 
 	public void teleportToMeter(ServerPlayer player, long id) {
 		if (!options.meter.allow_teleports) {
-			Component message = new TextComponent("This server does not allow meter teleporting!");
+			Text message = Texts.literal("This server does not allow meter teleporting!");
 			server.sendMessage(player, message, false);
 
 			return;
@@ -462,7 +465,7 @@ public class Multimeter {
 
 					player.teleportTo(newLevel, newX, newY, newZ, newYRot, newXRot);
 
-					Component text = new TextComponent(String.format("Teleported to meter \"%s\"", meter.getName()));
+					Text text = Texts.literal(String.format("Teleported to meter \"%s\"", meter.getName()));
 					server.sendMessage(player, text, false);
 
 					sendClickableReturnMessage(oldLevel, oldX, oldY, oldZ, newYRot, newXRot, player);
@@ -483,16 +486,23 @@ public class Multimeter {
 		String yaw = NUMBER_FORMAT.format(_yaw);
 		String pitch = NUMBER_FORMAT.format(_pitch);
 
-		Component message = new TextComponent("Click ").append(new TextComponent("[here]").withStyle((style) -> {
-			return style
-				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-					new TextComponent("Teleport to").append(TextUtils.formatKeyValue("\n  dimension", dimension))
-						.append(TextUtils.formatKeyValue("\n  x", x)).append(TextUtils.formatKeyValue("\n  y", y))
-						.append(TextUtils.formatKeyValue("\n  z", z))))
-				.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-					String.format("/execute in %s run tp @s %s %s %s %s %s", dimension, x, y, z, yaw, pitch)))
-				.withColor(ChatFormatting.GREEN);
-		})).append(new TextComponent(" to return to your previous location"));
+		Text message = Texts.composite(
+			"Click",
+			Texts.literal("[here]").format(style ->
+				style.withHoverEvent(HoverEvent.showText(
+					Texts.composite(
+						"Teleport to",
+						Texts.keyValue("\n  dimension", dimension),
+						Texts.keyValue("\n  x", x),
+						Texts.keyValue("\n  y", y),
+						Texts.keyValue("\n  z", z)
+					)
+				)).withClickEvent(ClickEvent.runCommand(
+					String.format("/execute in %s run tp @s %s %s %s %s %s", dimension, x, y, z, yaw, pitch)
+				)).withColor(TextColor.GREEN)
+			),
+			" to return to your previous location"
+		);
 
 		server.sendMessage(player, message, false);
 	}
