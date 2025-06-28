@@ -1,10 +1,15 @@
 package redstone.multimeter.common.meter.event;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.nbt.NbtCompound;
 
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
+import redstone.multimeter.client.gui.tooltip.TooltipBuilder;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 
 public class MeterEvent {
 
@@ -23,18 +28,22 @@ public class MeterEvent {
 	public String toString() {
 		String string = type.getName();
 
-		Tooltip tooltip = new Tooltip();
-		type.addTextToTooltip(tooltip, metadata);
+		Tooltip tooltip = Tooltips.builder()
+			.lines(this::buildTooltip)
+			.build();
 
-		if (!tooltip.isEmpty()) {
-			List<String> lines = tooltip.getLines();
-			String[] args = new String[lines.size()];
+		List<String> parts = new ArrayList<>();
+		int partCount = 0;
 
-			for (int index = 0; index < lines.size(); index++) {
-				args[index] = lines.get(index);
+		for (Text line : tooltip) {
+			// first line is event type name
+			if (partCount++ > 0) {
+				parts.add(line.buildString());
 			}
+		}
 
-			string += "[" + String.join(", ", args) + "]";
+		if (!parts.isEmpty()) {
+			string += "[" + String.join(", ", parts) + "]";
 		}
 
 		return string;
@@ -46,6 +55,12 @@ public class MeterEvent {
 
 	public int getMetadata() {
 		return metadata;
+	}
+
+	public void buildTooltip(TooltipBuilder builder) {
+		builder
+			.line(Texts.keyValue("event type", type.getName()))
+			.lines(b -> type.buildTooltip(builder, metadata));
 	}
 
 	public NbtCompound toNbt() {

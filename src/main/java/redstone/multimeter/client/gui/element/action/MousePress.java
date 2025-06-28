@@ -4,6 +4,13 @@ import redstone.multimeter.client.gui.element.Element;
 
 public interface MousePress<T extends Element> {
 
-	public boolean accept(T element);
+	boolean accept(T element);
 
+	static <T extends Element> boolean pass(T element) {
+		return false;
+	}
+
+	static <T extends Element> boolean consume(T element) {
+		return true;
+	}
 }

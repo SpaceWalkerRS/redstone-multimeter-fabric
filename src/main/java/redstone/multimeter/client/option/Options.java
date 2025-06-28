@@ -75,20 +75,20 @@ public class Options {
 
 	}
 
-	private static final Map<String, IOption> BY_NAME;
-	private static final Map<String, List<IOption>> BY_CATEGORY;
+	private static final Map<String, Option> BY_NAME;
+	private static final Map<String, List<Option>> BY_CATEGORY;
 
 	private static final String FILE_NAME = "options.txt";
 
-	public static Collection<IOption> all() {
+	public static Collection<Option> all() {
 		return Collections.unmodifiableCollection(BY_NAME.values());
 	}
 
-	public static Map<String, List<IOption>> byCategory() {
+	public static Map<String, List<Option>> byCategory() {
 		return Collections.unmodifiableMap(BY_CATEGORY);
 	}
 
-	public static Collection<IOption> ofCategory(String category) {
+	public static Collection<Option> ofCategory(String category) {
 		return Collections.unmodifiableCollection(BY_CATEGORY.getOrDefault(category, Collections.emptyList()));
 	}
 
@@ -128,7 +128,7 @@ public class Options {
 				String name = args[0];
 				String value = args[1];
 
-				IOption option = BY_NAME.get(name);
+				Option option = BY_NAME.get(name);
 
 				if (option != null) {
 					option.setFromString(value);
@@ -153,7 +153,7 @@ public class Options {
 		Path file = dir.resolve(FILE_NAME);
 
 		try (BufferedWriter bw = Files.newBufferedWriter(file)) {
-			for (Entry<String, IOption> entry : BY_NAME.entrySet()) {
+			for (Entry<String, Option> entry : BY_NAME.entrySet()) {
 				String name = entry.getKey();
 				String value = entry.getValue().getAsString();
 
@@ -165,7 +165,7 @@ public class Options {
 		}
 	}
 
-	private static void register(String category, IOption... options) {
+	private static void register(String category, Option... options) {
 		if (category != null) {
 			if (BY_CATEGORY.containsKey(category)) {
 				throw new IllegalStateException("Cannot register a category multiple times!");
@@ -174,7 +174,7 @@ public class Options {
 			BY_CATEGORY.put(category, Arrays.asList(options));
 		}
 
-		for (IOption option : options) {
+		for (Option option : options) {
 			if (BY_NAME.containsKey(option.getName())) {
 				throw new IllegalStateException("Cannot register multiple options with the same name!");
 			}

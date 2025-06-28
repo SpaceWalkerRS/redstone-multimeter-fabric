@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GameGui;
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.interfaces.mixin.IGameGui;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
@@ -34,7 +35,7 @@ public class GameGuiMixin implements IGameGui {
 		MultimeterHud hud = client.getHud();
 
 		if (client.isHudActive() && !hud.isOnScreen()) {
-			hud.render();
+			hud.render(new GuiRenderer());
 		}
 	}
 
