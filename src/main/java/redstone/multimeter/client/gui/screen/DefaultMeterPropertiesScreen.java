@@ -6,25 +6,23 @@ import java.util.Map.Entry;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Tooltip;
-import redstone.multimeter.client.gui.element.BlockListElement;
-import redstone.multimeter.client.gui.element.ScrollableListElement;
+import redstone.multimeter.client.gui.element.BlockSelectorList;
+import redstone.multimeter.client.gui.element.ScrollableList;
+import redstone.multimeter.client.gui.element.button.BasicButton;
 import redstone.multimeter.client.gui.element.button.Button;
-import redstone.multimeter.client.gui.element.button.IButton;
 import redstone.multimeter.client.gui.element.button.Slider;
 import redstone.multimeter.client.gui.element.button.SuggestionsMenu;
 import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.ToggleButton;
 import redstone.multimeter.client.gui.element.meter.MeterPropertyElement;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
 import redstone.multimeter.common.meter.MeterProperties;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
@@ -36,8 +34,8 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	private static final int SIDE_SPACING = 10;
 	private static final int TOP_SPACING = 30;
 	private static final int BOTTOM_SPACING = 38;
-	private static final int BLOCK_LIST_TOP_BORDER = 6 + 2 * (IButton.DEFAULT_HEIGHT + 2) + 2;
-	private static final int BLOCK_LIST_BOTTOM_BORDER = 3 + 1 * (IButton.DEFAULT_HEIGHT + 2) + 2;
+	private static final int BLOCK_LIST_TOP_BORDER = 6 + 2 * (Button.DEFAULT_HEIGHT + 2) + 2;
+	private static final int BLOCK_LIST_BOTTOM_BORDER = 3 + 1 * (Button.DEFAULT_HEIGHT + 2) + 2;
 	private static final int PROPERTIES_LIST_TOP_BORDER = 6;
 	private static final int PROPERTIES_LIST_BOTTOM_BORDER = 3;
 
@@ -48,15 +46,15 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	private Tab currentTab;
 	private ResourceLocation currentBlock;
 
-	private BlockListElement blockList;
-	private ScrollableListElement propertiesList;
+	private BlockSelectorList blockList;
+	private ScrollableList propertiesList;
 	private TextField searchbar;
-	private IButton add;
-	private IButton remove;
+	private Button add;
+	private Button remove;
 	private TextField create;
 
-	protected DefaultMeterPropertiesScreen(MultimeterClient client) {
-		super(client, Component.literal("Default Meter Properties"), true);
+	protected DefaultMeterPropertiesScreen() {
+		super(Texts.literal("Default Meter Properties"), true);
 
 		this.meterPropertiesManager = this.client.getMeterPropertiesManager();
 		this.defaults = new HashMap<>();
@@ -109,7 +107,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		int x = getX() + SIDE_SPACING;
 		int y = getY() + TOP_SPACING;
 
-		blockList = new BlockListElement(client, listWidth, listHeight, BLOCK_LIST_TOP_BORDER, BLOCK_LIST_BOTTOM_BORDER, key -> selectBlock(key));
+		blockList = new BlockSelectorList(listWidth, listHeight, BLOCK_LIST_TOP_BORDER, BLOCK_LIST_BOTTOM_BORDER, key -> selectBlock(key));
 
 		blockList.setSpacing(0);
 		blockList.setDrawBackground(true);
@@ -121,30 +119,30 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		y += 2;
 		int tabWidth = (listWidth - 3 * 2) / 2;
 
-		IButton defaultsTab = createTabButton(Tab.DEFAULTS, x, y, tabWidth, IButton.DEFAULT_HEIGHT);
-		IButton overridesTab = createTabButton(Tab.OVERRIDES, x + (listWidth - 2) - (tabWidth + 2), y, tabWidth, IButton.DEFAULT_HEIGHT);
+		Button defaultsTab = createTabButton(Tab.DEFAULTS, x, y, tabWidth, Button.DEFAULT_HEIGHT);
+		Button overridesTab = createTabButton(Tab.OVERRIDES, x + (listWidth - 2) - (tabWidth + 2), y, tabWidth, Button.DEFAULT_HEIGHT);
 
-		y += IButton.DEFAULT_HEIGHT + 2;
-		int searchbarWidth = (listWidth - 2 * 2) - (IButton.DEFAULT_HEIGHT + 2);
+		y += Button.DEFAULT_HEIGHT + 2;
+		int searchbarWidth = (listWidth - 2 * 2) - (Button.DEFAULT_HEIGHT + 2);
 
-		searchbar = new TextField(client, x, y, searchbarWidth, IButton.DEFAULT_HEIGHT, () -> Tooltip.EMPTY, text -> blockList.update(), null);
+		searchbar = new TextField(x, y, searchbarWidth, Button.DEFAULT_HEIGHT, Tooltips::empty, text -> blockList.update(), null);
 		searchbar.setHint("search");
-		IButton clear = new Button(client, x + searchbarWidth + 2, y, 20, IButton.DEFAULT_HEIGHT, () -> Component.literal("X"), () -> Tooltip.EMPTY, button -> {
+		Button clear = new BasicButton(x + searchbarWidth + 2, y, 20, Button.DEFAULT_HEIGHT, () -> Texts.literal("X"), Tooltips::empty, button -> {
 			searchbar.clear();
 			return true;
 		});
 
 		y = blockList.getY() + blockList.getTotalHeight() - (BLOCK_LIST_BOTTOM_BORDER - 3) + 2;
 
-		add = new Button(client, x, y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> Component.literal("+").withStyle(ChatFormatting.GREEN), () -> Tooltip.EMPTY, button -> {
+		add = new BasicButton(x, y, Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT, () -> Texts.literal("+").format(Formatting.GREEN), Tooltips::empty, button -> {
 			add();
 			return true;
 		});
-		remove = new Button(client, x + (IButton.DEFAULT_HEIGHT + 2), y, IButton.DEFAULT_HEIGHT, IButton.DEFAULT_HEIGHT, () -> Component.literal("-").withStyle(ChatFormatting.RED), () -> Tooltip.EMPTY, button -> {
+		remove = new BasicButton(x + (Button.DEFAULT_HEIGHT + 2), y, Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT, () -> Texts.literal("-").format(Formatting.RED), Tooltips::empty, button -> {
 			remove();
 			return true;
 		});
-		create = new TextField(client, x + 2 * (IButton.DEFAULT_HEIGHT + 2), y, (listWidth - 2) - (4 + 2 * IButton.DEFAULT_HEIGHT) - 2, IButton.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltip.of("That name is not valid or that block already has an override!") : Tooltip.EMPTY, text -> {
+		create = new TextField(x + 2 * (Button.DEFAULT_HEIGHT + 2), y, (listWidth - 2) - (4 + 2 * Button.DEFAULT_HEIGHT) - 2, Button.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltips.line("That name is not valid or that block already has an override!") : Tooltips.empty(), text -> {
 			ResourceLocation key = nextBlockKey();
 			add.setActive(key != null && !key.getPath().isBlank());
 		}, null);
@@ -154,20 +152,20 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		x = getX() + getWidth() - listWidth - SIDE_SPACING;
 		y = getY() + TOP_SPACING;
 
-		propertiesList = new ScrollableListElement(client, listWidth, listHeight, PROPERTIES_LIST_TOP_BORDER, PROPERTIES_LIST_BOTTOM_BORDER);
+		propertiesList = new ScrollableList(listWidth, listHeight, PROPERTIES_LIST_TOP_BORDER, PROPERTIES_LIST_BOTTOM_BORDER);
 
 		propertiesList.setDrawBackground(true);
 		propertiesList.setX(x);
 		propertiesList.setY(y);
 
 		x = getX() + getWidth() / 2;
-		y = getY() + getHeight() - (8 + IButton.DEFAULT_HEIGHT);
+		y = getY() + getHeight() - (8 + Button.DEFAULT_HEIGHT);
 
-		IButton cancel = new Button(client, x - (4 + IButton.DEFAULT_WIDTH), y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> CommonComponents.GUI_CANCEL, () -> Tooltip.EMPTY, button -> {
+		Button cancel = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiCancel, Tooltips::empty, button -> {
 			close();
 			return true;
 		});
-		IButton done = new Button(client, x + 4, y, IButton.DEFAULT_WIDTH, IButton.DEFAULT_HEIGHT, () -> CommonComponents.GUI_DONE, () -> Tooltip.EMPTY, button -> {
+		Button done = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiDone, Tooltips::empty, button -> {
 			save();
 			close();
 			return true;
@@ -196,8 +194,8 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		return false;
 	}
 
-	private IButton createTabButton(Tab tab, int x, int y, int width, int height) {
-		return new Button(client, x, y, width, height, () -> Component.literal(tab.name), () -> Tooltip.EMPTY, button -> {
+	private Button createTabButton(Tab tab, int x, int y, int width, int height) {
+		return new BasicButton(x, y, width, height, () -> Texts.literal(tab.name), Tooltips::empty, button -> {
 			selectTab(tab);
 			selectBlock(null);
 			return true;
@@ -258,8 +256,8 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		int buttonWidth = totalWidth > 300 ? 150 : (totalWidth > 200 ? 100 : 50);
 
 		if (force || properties.getName() != null) {
-			MeterPropertyElement name = new MeterPropertyElement(client, totalWidth, buttonWidth, "Name");
-			name.addControl("", (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
+			MeterPropertyElement name = new MeterPropertyElement(totalWidth, buttonWidth, "Name");
+			name.addControl("", (width, height) -> new TextField(0, 0, width, height, Tooltips::empty, text -> {
 				properties.setName(text);
 				name.update();
 			}, () -> properties.name()));
@@ -277,20 +275,20 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			propertiesList.add(name);
 		}
 		if (force || properties.getColor() != null) {
-			MeterPropertyElement color = new MeterPropertyElement(client, totalWidth, buttonWidth, "Color");
-			color.addControl("rgb", style -> style.withColor(properties.color()), (client, width, height) -> new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
+			MeterPropertyElement color = new MeterPropertyElement(totalWidth, buttonWidth, "Color");
+			color.addControl("rgb", style -> style.withColor(properties.color()), (width, height) -> new TextField(0, 0, width, height, Tooltips::empty, text -> {
 				try {
 					properties.setColor(ColorUtils.fromRGBString(text));
 					color.update();
 				} catch (NumberFormatException e) {
 				}
 			}, () -> ColorUtils.toRGBString(properties.color())));
-			color.addControl("red", style -> style.withColor(ChatFormatting.RED), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+			color.addControl("red", style -> style.withColor(Formatting.RED), (width, height) -> new Slider(0, 0, width, height, () -> {
 				int c = properties.color();
 				int red = ColorUtils.getRed(c);
 
-				return Component.literal(String.valueOf(red));
-			}, () -> Tooltip.EMPTY, value -> {
+				return Texts.literal(String.valueOf(red));
+			}, Tooltips::empty, value -> {
 				int red = (int)Math.round(value * 0xFF);
 				int c = ColorUtils.setRed(properties.color(), red);
 
@@ -302,12 +300,12 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 				return (double)red / 0xFF;
 			}, 0xFF));
-			color.addControl("blue", style -> style.withColor(ChatFormatting.BLUE), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+			color.addControl("blue", style -> style.withColor(Formatting.BLUE), (width, height) -> new Slider(0, 0, width, height, () -> {
 				int c = properties.color();
 				int blue = ColorUtils.getBlue(c);
 
-				return Component.literal(String.valueOf(blue));
-			}, () -> Tooltip.EMPTY, value -> {
+				return Texts.literal(String.valueOf(blue));
+			}, Tooltips::empty, value -> {
 				int blue = (int)Math.round(value * 0xFF);
 				int c = ColorUtils.setBlue(properties.color(), blue);
 
@@ -319,12 +317,12 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 				return (double)blue / 0xFF;
 			}, 0xFF));
-			color.addControl("green", style -> style.withColor(ChatFormatting.GREEN), (client, width, height) -> new Slider(client, 0, 0, width, height, () -> {
+			color.addControl("green", style -> style.withColor(Formatting.GREEN), (width, height) -> new Slider(0, 0, width, height, () -> {
 				int c = properties.color();
 				int green = ColorUtils.getGreen(c);
 
-				return Component.literal(String.valueOf(green));
-			}, () -> Tooltip.EMPTY, value -> {
+				return Texts.literal(String.valueOf(green));
+			}, Tooltips::empty, value -> {
 				int green = (int)Math.round(value * 0xFF);
 				int c = ColorUtils.setGreen(properties.color(), green);
 
@@ -350,8 +348,8 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			propertiesList.add(color);
 		}
 		if (force || properties.getMovable() != null) {
-			MeterPropertyElement movable = new MeterPropertyElement(client, totalWidth, buttonWidth, "Movable");
-			movable.addControl("", (client, width, height) -> new ToggleButton(client, 0, 0, width, height, () -> properties.movable(), button -> {
+			MeterPropertyElement movable = new MeterPropertyElement(totalWidth, buttonWidth, "Movable");
+			movable.addControl("", (width, height) -> new ToggleButton(0, 0, width, height, () -> properties.movable(), button -> {
 				properties.toggleMovable();
 				movable.update();
 			}));
@@ -369,9 +367,9 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			propertiesList.add(movable);
 		}
 		if (force || properties.getEventTypes() != null) {
-			MeterPropertyElement eventTypes = new MeterPropertyElement(client, totalWidth, buttonWidth, "Event Types");
+			MeterPropertyElement eventTypes = new MeterPropertyElement(totalWidth, buttonWidth, "Event Types");
 			for (EventType type : EventType.ALL) {
-				eventTypes.addControl(type.getName(), (client, width, height) -> new ToggleButton(client, 0, 0, width, height, () -> properties.hasEventType(type), button -> {
+				eventTypes.addControl(type.getName(), (width, height) -> new ToggleButton(0, 0, width, height, () -> properties.hasEventType(type), button -> {
 					properties.toggleEventType(type);
 					eventTypes.update();
 				}));
