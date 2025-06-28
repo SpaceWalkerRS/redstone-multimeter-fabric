@@ -51,6 +51,7 @@
 	"client": [
 		"client.ClientPlayNetworkHandlerMixin",
 		"client.ConnectionListenerMixin",
+		"client.FontAccessor",
 		"client.GameGuiMixin",
 		"client.GameOptionsMixin",
 		"client.GameRendererMixin",
