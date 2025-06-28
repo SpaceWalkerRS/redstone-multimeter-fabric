@@ -3,13 +3,23 @@ package redstone.multimeter.client.tutorial.instance;
 import net.minecraft.block.Blocks;
 import net.minecraft.stat.achievement.AchievementStat;
 
+import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
 public class PauseHudTutorial extends StagedTutorialInstance {
+
+	private static final Text TITLE = Texts.literal("Pause The HUD");
+	private static final Text DESCRIPTION = Texts.composite(
+		"Press ",
+		Texts.keybind(Keybinds.PAUSE_METERS),
+		" to pause the Multimeter timeline."
+	);
 
 	private Stage stage;
 

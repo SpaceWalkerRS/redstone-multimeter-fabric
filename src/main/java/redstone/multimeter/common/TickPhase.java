@@ -5,9 +5,9 @@ import java.util.Arrays;
 import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtElement;
 
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.TooltipBuilder;
 import redstone.multimeter.util.NbtUtils;
-import redstone.multimeter.util.TextUtils;
 
 public class TickPhase {
 
@@ -39,14 +39,14 @@ public class TickPhase {
 		return string;
 	}
 
-	public void addTextToTooltip(Tooltip tooltip) {
-		tooltip.add(TextUtils.formatKeyValue("tick phase", tasks[0].getName()));
+	public void buildTooltip(TooltipBuilder builder) {
+		builder.line(Texts.keyValue("tick phase", tasks[0].getName()));
 
 		// used to indent subsequent lines
 		String whitespace = "              ";
 
 		for (int index = 1; index < tasks.length; index++) {
-			tooltip.add(whitespace + "> " + tasks[index].getName());
+			builder.line(whitespace + "> " + tasks[index].getName());
 			whitespace += "  ";
 		}
 	}
