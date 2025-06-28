@@ -240,7 +240,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			Supplier<Tooltip> tooltip = Tooltips::empty;
 
 			if (!keybind.isUnbound()) {
-				tooltip = () -> Tooltips.keybind(keybind);
+				tooltip = () -> Tooltips.keybind(String.format("Toggle %s Event", type.getName()), keybind);
 			}
 
 			eventTypes.addControl(type.getName(), (width, height) -> new ToggleButton(0, 0, width, height, () -> this.meter.isMetering(type), button -> this.toggleEventType(type)), tooltip);
