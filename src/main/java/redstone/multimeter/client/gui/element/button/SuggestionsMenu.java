@@ -121,7 +121,7 @@ public class SuggestionsMenu extends AbstractElement {
 
 	private void renderHighlights(GuiRenderer renderer) {
 		int x0 = this.getX();
-		int x1 = this.getWidth();
+		int x1 = x0 + this.getWidth();
 		int height = this.font.height() + ENTRY_SPACING;
 
 		if (this.hovered >= 0) {
