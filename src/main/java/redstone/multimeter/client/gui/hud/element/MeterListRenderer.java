@@ -150,7 +150,7 @@ public class MeterListRenderer extends AbstractElement {
 			return super.getTooltip(mouseX, mouseY);
 		}
 
-		return Tooltips.keybind(Keybinds.OPEN_METER_CONTROLS);
+		return Tooltips.keybind("Open Meter Controls", Keybinds.OPEN_METER_CONTROLS);
 	}
 
 	@Override
