@@ -3,9 +3,8 @@ package redstone.multimeter.client.gui.element;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
 
 public abstract class AbstractParentElement extends AbstractElement {
 
@@ -23,24 +22,24 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	@Override
-	public void render(PoseStack poses, int mouseX, int mouseY) {
-		for (int index = 0; index < children.size(); index++) {
-			Element child = children.get(index);
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
+		for (int index = 0; index < this.children.size(); index++) {
+			Element child = this.children.get(index);
 
 			if (child.isVisible()) {
-				child.render(poses, mouseX, mouseY);
+				child.render(renderer, mouseX, mouseY);
 			}
 		}
 	}
 
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
-		if (!isDraggingMouse()) {
-			updateHoveredElement(mouseX, mouseY);
+		if (!this.isDraggingMouse()) {
+			this.updateHoveredElement(mouseX, mouseY);
 		}
 
-		for (int index = 0; index < children.size(); index++) {
-			Element child = children.get(index);
+		for (int index = 0; index < this.children.size(); index++) {
+			Element child = this.children.get(index);
 
 			if (child.isVisible()) {
 				child.mouseMove(mouseX, mouseY);
@@ -53,7 +52,7 @@ public abstract class AbstractParentElement extends AbstractElement {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
 		if (!consumed) {
-			Element focused = updateFocusedElement();
+			Element focused = this.updateFocusedElement();
 
 			if (focused != null) {
 				consumed = focused.mouseClick(mouseX, mouseY, button);
@@ -68,7 +67,7 @@ public abstract class AbstractParentElement extends AbstractElement {
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 
 		if (!consumed) {
-			Element focused = getFocusedElement();
+			Element focused = this.getFocusedElement();
 
 			if (focused != null) {
 				consumed = focused.mouseRelease(mouseX, mouseY, button);
@@ -80,8 +79,8 @@ public abstract class AbstractParentElement extends AbstractElement {
 
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (isDraggingMouse()) {
-			Element focused = getFocusedElement();
+		if (this.isDraggingMouse()) {
+			Element focused = this.getFocusedElement();
 
 			if (focused != null) {
 				return focused.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
@@ -93,25 +92,25 @@ public abstract class AbstractParentElement extends AbstractElement {
 
 	@Override
 	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		Element hovered = getHoveredElement();
+		Element hovered = this.getHoveredElement();
 		return hovered != null && hovered.mouseScroll(mouseX, mouseY, scrollX, scrollY);
 	}
 
 	@Override
 	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		Element focused = getFocusedElement();
+		Element focused = this.getFocusedElement();
 		return focused != null && focused.keyPress(keyCode, scanCode, modifiers);
 	}
 
 	@Override
 	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
-		Element focused = getFocusedElement();
+		Element focused = this.getFocusedElement();
 		return focused != null && focused.keyRelease(keyCode, scanCode, modifiers);
 	}
 
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
-		Element focused = getFocusedElement();
+		Element focused = this.getFocusedElement();
 		return focused != null && focused.typeChar(chr, modifiers);
 	}
 
@@ -119,11 +118,11 @@ public abstract class AbstractParentElement extends AbstractElement {
 	public void onRemoved() {
 		super.onRemoved();
 
-		hovered = null;
-		focused = null;
+		this.hovered = null;
+		this.focused = null;
 
-		for (int index = 0; index < children.size(); index++) {
-			children.get(index).onRemoved();
+		for (int index = 0; index < this.children.size(); index++) {
+			this.children.get(index).onRemoved();
 		}
 	}
 
@@ -131,15 +130,15 @@ public abstract class AbstractParentElement extends AbstractElement {
 	public void setFocused(boolean focused) {
 		super.setFocused(focused);
 
-		if (!isFocused()) {
-			setFocusedElement(null);
+		if (!this.isFocused()) {
+			this.setFocusedElement(null);
 		}
 	}
 
 	@Override
 	public void tick() {
-		for (int index = 0; index < children.size(); index++) {
-			Element child = children.get(index);
+		for (int index = 0; index < this.children.size(); index++) {
+			Element child = this.children.get(index);
 
 			if (child.isVisible()) {
 				child.tick();
@@ -149,52 +148,52 @@ public abstract class AbstractParentElement extends AbstractElement {
 
 	@Override
 	public Tooltip getTooltip(int mouseX, int mouseY) {
-		Element hovered = getHoveredElement();
+		Element hovered = this.getHoveredElement();
 		return hovered == null ? super.getTooltip(mouseX, mouseY) : hovered.getTooltip(mouseX, mouseY);
 	}
 
 	@Override
 	public void update() {
-		for (int index = 0; index < children.size(); index++) {
-			children.get(index).update();
+		for (int index = 0; index < this.children.size(); index++) {
+			this.children.get(index).update();
 		}
 	}
 
 	protected List<Element> getChildren() {
-		return children;
+		return this.children;
 	}
 
 	protected void addChild(Element element) {
-		children.add(element);
+		this.children.add(element);
 	}
 
 	protected void addChild(int index, Element element) {
-		children.add(index, element);
+		this.children.add(index, element);
 	}
 
 	public void removeChildren() {
-		hovered = null;
-		focused = null;
+		this.hovered = null;
+		this.focused = null;
 
-		for (int index = 0; index < children.size(); index++) {
-			children.get(index).onRemoved();
+		for (int index = 0; index < this.children.size(); index++) {
+			this.children.get(index).onRemoved();
 		}
 
-		children.clear();
+		this.children.clear();
 	}
 
 	protected Element getHoveredElement() {
-		return hovered;
+		return this.hovered;
 	}
 
 	private void updateHoveredElement(double mouseX, double mouseY) {
-		hovered = null;
+		this.hovered = null;
 
-		for (int index = 0; index < children.size(); index++) {
-			Element child = children.get(index);
+		for (int index = 0; index < this.children.size(); index++) {
+			Element child = this.children.get(index);
 
-			if (hovered == null && isHovered() && child.isVisible() && child.isMouseOver(mouseX, mouseY)) {
-				hovered = child;
+			if (this.hovered == null && this.isHovered() && child.isVisible() && child.isMouseOver(mouseX, mouseY)) {
+				this.hovered = child;
 			} else {
 				child.setHovered(false);
 			}
@@ -208,38 +207,38 @@ public abstract class AbstractParentElement extends AbstractElement {
 		// be different:
 		//   newHovered.setHovered(true);
 		//   oldHovered.setHovered(false);
-		if (hovered != null) {
-			hovered.setHovered(true);
+		if (this.hovered != null) {
+			this.hovered.setHovered(true);
 		}
 	}
 
 	protected Element getFocusedElement() {
-		if (focused != null && !focused.isFocused()) {
-			setFocusedElement(null);
+		if (this.focused != null && !this.focused.isFocused()) {
+			this.setFocusedElement(null);
 		}
 
-		return focused;
+		return this.focused;
 	}
 
 	protected Element updateFocusedElement() {
-		return setFocusedElement(hovered);
+		return this.setFocusedElement(this.hovered);
 	}
 
 	private Element setFocusedElement(Element element) {
-		if (element == focused) {
-			return focused;
+		if (element == this.focused) {
+			return this.focused;
 		}
 
-		if (focused != null) {
-			focused.setFocused(false);
+		if (this.focused != null) {
+			this.focused.setFocused(false);
 		}
 
-		focused = element;
+		this.focused = element;
 
-		if (focused != null) {
-			focused.setFocused(true);
+		if (this.focused != null) {
+			this.focused.setFocused(true);
 		}
 
-		return focused;
+		return this.focused;
 	}
 }

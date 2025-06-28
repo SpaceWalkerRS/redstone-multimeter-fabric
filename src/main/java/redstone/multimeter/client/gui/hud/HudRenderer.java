@@ -1,133 +1,188 @@
 package redstone.multimeter.client.gui.hud;
 
-import org.joml.Matrix4f;
+import net.minecraft.world.item.ItemStack;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.network.chat.Component;
-
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.Element;
-import redstone.multimeter.client.gui.element.RenderHelper2D;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.texture.Texture;
+import redstone.multimeter.client.gui.texture.TextureRegion;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.util.ColorUtils;
 
-public class HudRenderer extends RenderHelper2D {
+public class HudRenderer extends GuiRenderer {
 
 	private final MultimeterHud hud;
 
 	private Element target;
 
-	public HudRenderer(MultimeterHud hud) {
+	public HudRenderer(MultimeterHud hud, GuiRenderer renderer) {
+		super(renderer);
+
 		this.hud = hud;
-		this.target = hud;
 	}
 
-	public void render(Element element, PoseStack poses, int mouseX, int mouseY) {
-		(target = element).render(poses, mouseX, mouseY);
+	public void render(Element element, int mouseX, int mouseY) {
+		(this.target = element).render(this, mouseX, mouseY);
 	}
 
-	private int translateX(int x, int width) {
-		switch (hud.getDirectionalityX()) {
+	private int x(int x0, int x1) {
+		switch (this.hud.getDirectionalityX()) {
 		default:
 		case LEFT_TO_RIGHT:
-			return target.getX() + x;
+			return this.target.getX() + x0;
 		case RIGHT_TO_LEFT:
-			return (target.getX() + target.getWidth()) - (x + width);
+			return (this.target.getX() + this.target.getWidth()) - x1;
 		}
 	}
 
-	private int translateY(int y, int height) {
-		switch (hud.getDirectionalityY()) {
+	private int y(int y0, int y1) {
+		switch (this.hud.getDirectionalityY()) {
 		default:
 		case TOP_TO_BOTTOM:
-			return target.getY() + y;
+			return this.target.getY() + y0;
 		case BOTTOM_TO_TOP:
-			return (target.getY() + target.getHeight()) - (y + height);
+			return (this.target.getY() + this.target.getHeight()) - y1;
 		}
 	}
 
-	public void renderHighlight(PoseStack poses, int x, int y, int width, int height, int color) {
-		int d = hud.settings.gridSize;
-		renderBorder(poses, x, y, width + d, height + d, d, color);
+	private int x(String s, int x) {
+		return this.x(x, x + this.width(s));
 	}
 
-	public void renderRect(PoseStack poses, int x, int y, int width, int height, int color) {
-		super.renderRect(poses, x, y, width, height, color);
+	private int x(Text t, int x) {
+		return this.x(x, x + this.width(t));
 	}
 
-	public void renderGradient(PoseStack poses, int x, int y, int width, int height, int color0, int color1) {
-		super.renderGradient(poses, x, y, width, height, color0, color1);
+	private int y(String s, int y) {
+		return this.y(y, y + this.height());
 	}
 
-	public void renderText(PoseStack poses, String text, int x, int y, int color) {
-		super.renderText(hud.font, poses, text, x, y, false, color);
+	private int y(Text t, int y) {
+		return this.y(y, y + this.height());
 	}
 
-	public void renderText(PoseStack poses, Component text, int x, int y, int color) {
-		super.renderText(hud.font, poses, text, x, y, false, color);
-	}
-
-	@Override
-	protected void drawRect(BufferBuilder bufferBuilder, Matrix4f pose, int x, int y, int width, int height, int color) {
-		RenderSystem.enableDepthTest();
-
-		int x0 = translateX(x, width);
-		int y0 = translateY(y, height);
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		int a = Math.round(ColorUtils.getAlpha(color) * hud.settings.opacity() / 100.0F);
-		int r = ColorUtils.getRed(color);
-		int g = ColorUtils.getGreen(color);
-		int b = ColorUtils.getBlue(color);
-
-		drawRect(bufferBuilder, pose, x0, y0, x1, y1, a, r, g, b);
+	private int color(int color) {
+		return ColorUtils.setAlpha(color, Math.round(ColorUtils.getAlpha(color) * hud.settings.opacity() / 100.0F));
 	}
 
 	@Override
-	protected void drawGradient(BufferBuilder bufferBuilder, Matrix4f pose, int x, int y, int width, int height, int color0, int color1) {
-		RenderSystem.enableDepthTest();
-
-		int x0 = translateX(x, width);
-		int y0 = translateY(y, height);
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		int a0 = Math.round(ColorUtils.getAlpha(color0) * hud.settings.opacity() / 100.0F);
-		int r0 = ColorUtils.getRed(color0);
-		int g0 = ColorUtils.getGreen(color0);
-		int b0 = ColorUtils.getBlue(color0);
-
-		int a1 = Math.round(ColorUtils.getAlpha(color1) * hud.settings.opacity() / 100.0F);
-		int r1 = ColorUtils.getRed(color1);
-		int g1 = ColorUtils.getGreen(color1);
-		int b1 = ColorUtils.getBlue(color1);
-
-		drawGradient(bufferBuilder, pose, x0, y0, x1, y1, a0, r0, g0, b0, a1, r1, g1, b1);
+	public void fill(int x0, int y0, int x1, int y1, int color) {
+		super.fill(x(x0, x1), y(y0, y1), x(x1, x0), y(y1, y0), color(color));
 	}
 
 	@Override
-	protected void drawText(BufferSource source, Matrix4f pose, Font font, String text, int x, int y, boolean shadow, int color) {
-		x = translateX(x, font.width(text) - 1);
-		y = translateY(y, font.lineHeight - 2);
-
-		int alpha = Math.round(ColorUtils.getAlpha(color) * hud.settings.opacity() / 100.0F);
-		color = ColorUtils.setAlpha(color, alpha);
-
-		super.drawText(source, pose, font, text, x, y, shadow, color);
+	public void gradient(int x0, int y0, int x1, int y1, int color0, int color1) {
+		super.gradient(x(x0, x1), y(y0, y1), x(x1, x0), y(y1, y0), color(color0), color(color1));
 	}
 
 	@Override
-	protected void drawText(BufferSource source, Matrix4f pose, Font font, Component text, int x, int y, boolean shadow, int color) {
-		x = translateX(x, font.width(text) - 1);
-		y = translateY(y, font.lineHeight - 2);
+	public void highlight(int x0, int y0, int x1, int y1, int color) {
+		super.highlight(x(x0, x1), y(y0, y1), x(x1, x0), y(y1, y0), color(color));
+	}
 
-		int alpha = Math.round(ColorUtils.getAlpha(color) * hud.settings.opacity() / 100.0F);
-		color = ColorUtils.setAlpha(color, alpha);
+	@Override
+	public void tooltip(Tooltip tooltip, int x0, int y0, int x1, int y1) {
+		super.tooltip(tooltip, x(x0, x1), y(y0, y1), x(x1, x0), y(y1, y0));
+	}
 
-		super.drawText(source, pose, font, text, x, y, shadow, color);
+	@Override
+	public void tooltip(Tooltip tooltip, int x0, int y0, int x1, int y1, int backgroundColor, int borderColor0, int borderColor1) {
+		super.tooltip(tooltip, x(x0, x1), y(y0, y1), x(x1, x0), y(y1, y0), color(backgroundColor), color(borderColor0), color(borderColor1));
+	}
+
+	@Override
+	public void blit(Texture t, int x0, int y0, int x1, int y1) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void blit(Texture t, int x0, int y0, int x1, int y1, int color) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void blit(Texture t, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void blit(Texture t, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int color) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void blit(TextureRegion t, int x0, int y0, int x1, int y1) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void blit(TextureRegion t, int x0, int y0, int x1, int y1, int color) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void pushScissor(int x0, int y0, int x1, int y1) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void popScissor() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void renderItem(ItemStack item, int x, int y) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void drawString(String s, int x, int y) {
+		super.drawString(s, x(s, x), y(s, y));
+	}
+
+	@Override
+	public void drawString(Text t, int x, int y) {
+		super.drawString(t, x(t, x), y(t, y));
+	}
+
+	@Override
+	public void drawString(String s, int x, int y, int color) {
+		super.drawString(s, x(s, x), y(s, y), color);
+	}
+
+	@Override
+	public void drawString(Text t, int x, int y, int color) {
+		super.drawString(t, x(t, x), y(t, y), color);
+	}
+
+	@Override
+	public void drawStringWithShadow(String s, int x, int y) {
+		super.drawStringWithShadow(s, x(s, x), y(s, y));
+	}
+
+	@Override
+	public void drawStringWithShadow(Text t, int x, int y) {
+		super.drawStringWithShadow(t, x(t, x), y(t, y));
+	}
+
+	@Override
+	public void drawStringWithShadow(String s, int x, int y, int color) {
+		super.drawStringWithShadow(s, x(s, x), y(s, y), color);
+	}
+
+	@Override
+	public void drawStringWithShadow(Text t, int x, int y, int color) {
+		super.drawStringWithShadow(t, x(t, x), y(t, y), color);
+	}
+
+	@Override
+	public void drawString(String s, int x, int y, int color, boolean shadow) {
+		super.drawString(s, x(s, x), y(s, y), color, shadow);
+	}
+
+	@Override
+	public void drawString(Text t, int x, int y, int color, boolean shadow) {
+		super.drawString(t, x(t, x), y(t, y), color, shadow);
 	}
 }

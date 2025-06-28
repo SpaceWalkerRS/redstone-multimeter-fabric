@@ -1,24 +1,24 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.network.chat.Component;
-
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
-import redstone.multimeter.util.TextUtils;
 
 public class PauseHudTutorial extends StagedTutorialInstance {
 
-	private static final Component TITLE = Component.literal("Pause The HUD");
-	private static final Component DESCRIPTION = Component.literal("").
-													append("Press ").
-													append(TextUtils.formatKeybind(Keybinds.PAUSE_METERS)).
-													append(" to pause the primary overview of the Multimeter HUD.");
+	private static final Text TITLE = Texts.literal("Pause The HUD");
+	private static final Text DESCRIPTION = Texts.composite(
+		"Press ",
+		Texts.keybind(Keybinds.PAUSE_METERS),
+		" to pause the Multimeter timeline."
+	);
 
 	private Stage stage;
 

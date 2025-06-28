@@ -61,13 +61,15 @@
 	],
 	"client": [
 		"client.ClientPacketListenerMixin",
+		"client.GuiComponentAccessor",
 		"client.GuiMixin",
 		"client.IntegratedServerMixin",
 		"client.KeyMappingMixin",
 		"client.LevelRendererMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
-		"client.OptionsMixin"
+		"client.OptionsMixin",
+		"client.StyleAccess"
 	],
 	"injectors": {
 		"defaultRequire": 1
