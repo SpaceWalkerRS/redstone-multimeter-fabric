@@ -377,13 +377,13 @@ public class MultimeterHud extends AbstractParentElement {
 			} else {
 				t.setVisible(false);
 			}
-		}, () -> Tooltips.keybind(Keybinds.TOGGLE_MARKER));
+		}, () -> Tooltips.keybind("Toggle Tick Marker", Keybinds.TOGGLE_MARKER));
 
-		this.playPauseButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltips.keybind(Keybinds.PAUSE_METERS), button -> {
+		this.playPauseButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltips.keybind("Pause Timeline", Keybinds.PAUSE_METERS), button -> {
 			togglePaused();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(false, Screen.isControlDown())), () -> Tooltips.keybind(Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
+		this.fastBackwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(false, Screen.isControlDown())), () -> Tooltips.keybind("Step Backward", Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
 			stepBackward(Screen.isControlDown());
 			return true;
 		}) {
@@ -393,7 +393,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(true, Screen.isControlDown())), () -> Tooltips.keybind(Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
+		this.fastForwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(true, Screen.isControlDown())), () -> Tooltips.keybind("Step Forward", Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
 			stepForward(Screen.isControlDown());
 			return true;
 		}) {
@@ -403,7 +403,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new Label(0, 0, t -> t.addLine(Texts.literal("P").format(Formatting.BOLD)).setShadow(true), () -> Tooltips.keybind(Keybinds.PRINT_LOGS));
+		this.printIndicator = new Label(0, 0, t -> t.addLine(Texts.literal("P").format(Formatting.BOLD)).setShadow(true), () -> Tooltips.keybind("Pring Logs To File", Keybinds.PRINT_LOGS));
 
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);
