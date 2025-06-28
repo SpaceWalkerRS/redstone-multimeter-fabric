@@ -3,35 +3,27 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyboardHandler;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.FontRenderer;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.Element;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 import redstone.multimeter.client.option.Options;
-import redstone.multimeter.util.TextUtils;
 
 public class TextField extends AbstractButton {
 
+	private final FontRenderer font;
 	private final KeyboardHandler keyboard;
 	private final Consumer<String> listener;
 	private final Supplier<String> updater;
@@ -57,16 +49,15 @@ public class TextField extends AbstractButton {
 	private int selection;
 	private SelectionMethod selectionMethod;
 
-	public TextField(MultimeterClient client, int x, int y, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> updater) {
-		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, tooltip, listener, updater);
+	public TextField(int x, int y, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> updater) {
+		this(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, tooltip, listener, updater);
 	}
 
-	public TextField(MultimeterClient client, int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> updater) {
-		super(client, x, y, width, height, () -> Component.literal(""), tooltip);
+	public TextField(int x, int y, int width, int height, Supplier<Tooltip> tooltip, Consumer<String> listener, Supplier<String> updater) {
+		super(x, y, width, height, () -> Texts.literal(""), tooltip);
 
-		Minecraft minecraft = client.getMinecraft();
-
-		this.keyboard = minecraft.keyboardHandler;
+		this.font = MultimeterClient.INSTANCE.getFontRenderer();
+		this.keyboard = MultimeterClient.MINECRAFT.keyboardHandler;
 		this.listener = listener;
 		this.updater = updater;
 
@@ -74,10 +65,10 @@ public class TextField extends AbstractButton {
 		this.value = "";
 		this.suffix = "";
 
-		this.textX = getX() + 4;
-		this.textY = getY() + (getHeight() - this.font.lineHeight) / 2;
-		this.textWidth = getWidth() - 8;
-		this.textHeight = this.font.lineHeight;
+		this.textX = this.getX() + 4;
+		this.textY = this.getY() + (this.getHeight() - this.font.height()) / 2;
+		this.textWidth = this.getWidth() - 8;
+		this.textHeight = this.font.height();
 		this.selectionY = this.textY - 1;
 		this.selectionHeight = this.textHeight + 2;
 
@@ -91,16 +82,16 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
-		if (selectionMethod == SelectionMethod.MOUSE) {
-			if (mouseX < textX) {
-				moveCursor(-1);
-			} else if (mouseX > textX + textWidth) {
-				moveCursor(1);
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
+		if (this.selectionMethod == SelectionMethod.MOUSE) {
+			if (mouseX < this.textX) {
+				this.moveCursor(-1);
+			} else if (mouseX > this.textX + this.textWidth) {
+				this.moveCursor(1);
 			}
 		}
 
-		super.render(graphics, mouseX, mouseY);
+		super.render(renderer, mouseX, mouseY);
 	}
 
 	@Override
@@ -112,11 +103,11 @@ public class TextField extends AbstractButton {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
 		if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			if (!isSelecting() && isDoubleClick()) {
-				setDraggingMouse(false);
-				selectAll();
+			if (!this.isSelecting() && this.isDoubleClick()) {
+				this.setDraggingMouse(false);
+				this.selectAll();
 			} else {
-				setCursorFromMouse(mouseX);
+				this.setCursorFromMouse(mouseX);
 			}
 
 			consumed = true;
@@ -130,7 +121,7 @@ public class TextField extends AbstractButton {
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			consumed = stopSelecting(SelectionMethod.MOUSE) || consumed;
+			consumed = this.stopSelecting(SelectionMethod.MOUSE) || consumed;
 		}
 
 		return consumed;
@@ -140,8 +131,8 @@ public class TextField extends AbstractButton {
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		boolean consumed = false;
 
-		if (selectionMethod == SelectionMethod.MOUSE && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			consumed = setCursorFromMouse(mouseX);
+		if (this.selectionMethod == SelectionMethod.MOUSE && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			consumed = this.setCursorFromMouse(mouseX);
 		}
 
 		return consumed;
@@ -157,31 +148,31 @@ public class TextField extends AbstractButton {
 		switch (keyCode) {
 		case GLFW.GLFW_KEY_LEFT_SHIFT:
 		case GLFW.GLFW_KEY_RIGHT_SHIFT:
-			startSelecting(SelectionMethod.KEYBOARD);
+			this.startSelecting(SelectionMethod.KEYBOARD);
 			break;
 		case GLFW.GLFW_KEY_LEFT:
-			moveCursorFromKeyboard(-1);
+			this.moveCursorFromKeyboard(-1);
 			break;
 		case GLFW.GLFW_KEY_RIGHT:
-			moveCursorFromKeyboard(1);
+			this.moveCursorFromKeyboard(1);
 			break;
 		case GLFW.GLFW_KEY_UP:
 		case GLFW.GLFW_KEY_PAGE_UP:
-			setCursorFromKeyboard(0);
+			this.setCursorFromKeyboard(0);
 			break;
 		case GLFW.GLFW_KEY_DOWN:
 		case GLFW.GLFW_KEY_PAGE_DOWN:
-			setCursorFromKeyboard(value.length());
+			this.setCursorFromKeyboard(this.value.length());
 			break;
 		case GLFW.GLFW_KEY_BACKSPACE:
-			erase(false);
+			this.erase(false);
 			break;
 		case GLFW.GLFW_KEY_DELETE:
-			erase(true);
+			this.erase(true);
 			break;
 		case GLFW.GLFW_KEY_ENTER:
 		case GLFW.GLFW_KEY_ESCAPE:
-			setFocused(false);
+			this.setFocused(false);
 			break;
 		default:
 			if (!RSMMScreen.isControlPressed()) {
@@ -189,18 +180,18 @@ public class TextField extends AbstractButton {
 			}
 			switch (keyCode) {
 			case GLFW.GLFW_KEY_A:
-				if (selectionMethod != SelectionMethod.MOUSE) {
-					selectAll();
+				if (this.selectionMethod != SelectionMethod.MOUSE) {
+					this.selectAll();
 				}
 				break;
 			case GLFW.GLFW_KEY_C:
-				copySelectionToClipboard(false);
+				this.copySelectionToClipboard(false);
 				break;
 			case GLFW.GLFW_KEY_X:
-				copySelectionToClipboard(true);
+				this.copySelectionToClipboard(true);
 				break;
 			case GLFW.GLFW_KEY_V:
-				pasteClipboard();
+				this.pasteClipboard();
 				break;
 			default:
 			}
@@ -214,7 +205,7 @@ public class TextField extends AbstractButton {
 		boolean consumed = false;
 
 		if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT) {
-			consumed = stopSelecting(SelectionMethod.KEYBOARD);
+			consumed = this.stopSelecting(SelectionMethod.KEYBOARD);
 		}
 
 		return consumed;
@@ -222,8 +213,8 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public boolean typeChar(char chr, int modifiers) {
-		if (isActive() && StringUtil.isAllowedChatCharacter(chr)) {
-			write(String.valueOf(chr));
+		if (this.isActive() && StringUtil.isAllowedChatCharacter(chr)) {
+			this.write(String.valueOf(chr));
 			return true;
 		}
 
@@ -232,8 +223,8 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public void setHovered(boolean hovered) {
-		if (suggestions == null) {
-			setHoveredAndUpdateCursor(hovered);
+		if (this.suggestions == null) {
+			this.setHoveredAndUpdateCursor(hovered);
 		}
 	}
 
@@ -252,21 +243,21 @@ public class TextField extends AbstractButton {
 	public void setFocused(boolean focused) {
 		super.setFocused(focused);
 
-		update();
+		this.update();
 
 		if (!focused) {
-			stopSelecting();
-			clearSelection();
-			setCursor(value.length());
+			this.stopSelecting();
+			this.clearSelection();
+			this.setCursor(this.value.length());
 
-			cursorTicks = -1;
+			this.cursorTicks = -1;
 		}
 	}
 
 	@Override
 	public void tick() {
-		if (isFocused()) {
-			cursorTicks++;
+		if (this.isFocused()) {
+			this.cursorTicks++;
 		}
 	}
 
@@ -274,31 +265,31 @@ public class TextField extends AbstractButton {
 	public void setX(int x) {
 		super.setX(x);
 
-		if (suggestions != null) {
-			suggestions.updatePosition();
+		if (this.suggestions != null) {
+			this.suggestions.updatePosition();
 		}
 
-		textX = x + 4;
+		this.textX = x + 4;
 	}
 
 	@Override
 	public void setY(int y) {
 		super.setY(y);
 
-		if (suggestions != null) {
-			suggestions.updatePosition();
+		if (this.suggestions != null) {
+			this.suggestions.updatePosition();
 		}
 
-		textY = y + getHeight() - (getHeight() + font.lineHeight) / 2;
-		selectionY = textY - 1;
+		this.textY = y + this.getHeight() - (this.getHeight() + this.font.height()) / 2;
+		this.selectionY = this.textY - 1;
 	}
 
 	@Override
 	public Tooltip getTooltip(int mouseX, int mouseY) {
 		Tooltip tooltip = super.getTooltip(mouseX, mouseY);
 
-		if (tooltip.isEmpty() && !isFocused() && font.width(value) > textWidth) {
-			tooltip = Tooltip.of(TextUtils.toLines(font, value));
+		if (tooltip.isEmpty() && !this.isFocused() && this.font.width(this.value) > this.textWidth) {
+			tooltip = Tooltips.split(this.font, this.value);
 		}
 
 		return tooltip;
@@ -306,11 +297,11 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public void update() {
-		if (!isFocused() && updater != null) {
-			setValue(updater.get(), false);
+		if (!this.isFocused() && this.updater != null) {
+			this.setValue(this.updater.get(), false);
 		}
-		if (suggestions != null) {
-			suggestions.update();
+		if (this.suggestions != null) {
+			this.suggestions.update();
 		}
 	}
 
@@ -318,149 +309,127 @@ public class TextField extends AbstractButton {
 	public void setWidth(int width) {
 		super.setWidth(width);
 
-		if (suggestions != null) {
-			suggestions.updateSize();
+		if (this.suggestions != null) {
+			this.suggestions.updateSize();
 		}
 
-		textWidth = width - 8;
+		this.textWidth = width - 8;
 	}
 
 	@Override
 	public void setHeight(int height) {
 		super.setHeight(height);
 
-		if (suggestions != null) {
-			suggestions.updatePosition();
+		if (this.suggestions != null) {
+			this.suggestions.updatePosition();
 		}
 
-		textHeight = font.lineHeight;
-		selectionHeight = textHeight + 2;
+		this.textHeight = this.font.height();
+		this.selectionHeight = this.textHeight + 2;
 	}
 
 	@Override
-	protected void renderButton(GuiGraphics graphics) {
-		int x = getX();
-		int y = getY();
-		int width = getWidth();
-		int height = getHeight();
-		int borderColor = getBorderColor();
+	protected void renderButton(GuiRenderer renderer) {
+		int x0 = this.getX();
+		int y0 = this.getY();
+		int x1 = x0 + this.getWidth();
+		int y1 = y0 + this.getHeight();
+		int borderColor = this.getBorderColor();
 		int backgroundColor = 0xFF000000;
 
-		renderRect(graphics, (bufferBuilder, pose) -> {
-			drawRect(bufferBuilder, pose, x, y, width, height, borderColor);
-			drawRect(bufferBuilder, pose, x + 1, y + 1, width - 2, height - 2, backgroundColor);
-		});
+		renderer.fill(x0 + 1, y0 + 1, x1 - 1, y1 - 1, backgroundColor);
+		renderer.borders(x0, y0, x1, y1, borderColor);
 	}
 
 	@Override
-	protected void renderButtonMessage(GuiGraphics graphics) {
-		if (!isFocused() && isActive() && value.isEmpty() && !hint.isEmpty()) {
+	protected void renderButtonMessage(GuiRenderer renderer) {
+		if (!this.isFocused() && this.isActive() && this.value.isEmpty() && !this.hint.isEmpty()) {
 			// ideally the hint would be entirely visible but just in case...
-			String visibleHint = ChatFormatting.ITALIC + font.plainSubstrByWidth(hint, textWidth, false);
-			int hintColor = getHintColor();
+			String visibleHint = ChatFormatting.ITALIC + this.font.trim(this.hint, this.textWidth, false);
+			int hintColor = this.getHintColor();
 
-			renderText(font, graphics, visibleHint, textX, textY, true, hintColor);
+			renderer.drawStringWithShadow(visibleHint, this.textX, this.textY, hintColor);
 		} else {
-			String scrolledValue = value.substring(scroll);
-			String visibleValue = font.plainSubstrByWidth(scrolledValue, textWidth, false);
-			String coveredValue = scrolledValue.substring(0, cursor - scroll);
+			String scrolledValue = this.value.substring(this.scroll);
+			String visibleValue = this.font.trim(scrolledValue, this.textWidth, false);
+			String coveredValue = scrolledValue.substring(0, this.cursor - this.scroll);
 
-			int valueColor = getTextColor();
+			int valueColor = this.getTextColor();
 
 			// render input value
-			renderText(font, graphics, visibleValue, textX, textY, true, valueColor);
+			renderer.drawStringWithShadow(visibleValue, this.textX, this.textY, valueColor);
 
-			int valueWidth = font.width(visibleValue);
-			int coveredWidth = font.width(coveredValue);
+			int valueWidth = this.font.width(visibleValue);
+			int coveredWidth = this.font.width(coveredValue);
 
 			// render remainder
-			if (coveredValue.length() < visibleValue.length() && suggestions != null && suggestions.hasSuggestions()) {
+			if (coveredValue.length() < visibleValue.length() && this.suggestions != null && this.suggestions.hasSuggestions()) {
 				String visibleRemainder = visibleValue.substring(coveredValue.length());
-				int remainderColor = getRemainderColor();
+				int remainderColor = this.getRemainderColor();
 
-				renderText(font, graphics, visibleRemainder, textX + coveredWidth, textY, true, remainderColor);
+				renderer.drawStringWithShadow(visibleRemainder, this.textX + coveredWidth, this.textY, remainderColor);
 			}
 
 			// render suggestion suffix
-			if (!suffix.isEmpty() && valueWidth < textWidth) {
-				String visibleSuffix = font.plainSubstrByWidth(suffix, textWidth - valueWidth, false);
-				int suggestionColor = getSuggestionColor();
+			if (!this.suffix.isEmpty() && valueWidth < this.textWidth) {
+				String visibleSuffix = this.font.trim(this.suffix, this.textWidth - valueWidth, false);
+				int suggestionColor = this.getSuggestionColor();
 
-				renderText(font, graphics, visibleSuffix, textX + valueWidth, textY, true, suggestionColor);
+				renderer.drawStringWithShadow(visibleSuffix, this.textX + valueWidth, this.textY, suggestionColor);
 			}
 
-			if (isFocused()) {
-				if (isActive() && (cursorTicks / 6) % 2 == 0) {
-					if (cursor == value.length()) {
-						renderText(font, graphics, "_", textX + valueWidth, textY, true, valueColor);
+			if (this.isFocused()) {
+				if (this.isActive() && (this.cursorTicks / 6) % 2 == 0) {
+					if (this.cursor == this.value.length()) {
+						renderer.drawStringWithShadow("_", this.textX + valueWidth, this.textY, valueColor);
 					} else {
-						renderRect(graphics, textX + coveredWidth, selectionY, 1, selectionHeight, valueColor);
+						renderer.fill(this.textX + coveredWidth, this.selectionY, this.textX + coveredWidth + 1, this.selectionY + this.selectionHeight, valueColor);
 					}
 				}
-				if (hasSelection()) {
-					drawSelectionHighlight(graphics);
+				if (this.hasSelection()) {
+					this.drawSelectionHighlight(renderer);
 				}
 			}
 		}
 	}
 
-	private void drawSelectionHighlight(GuiGraphics graphics) {
-		int start = Math.min(cursor, selection);
-		int end = Math.max(cursor, selection);
+	private void drawSelectionHighlight(GuiRenderer renderer) {
+		int start = Math.min(this.cursor, this.selection);
+		int end = Math.max(this.cursor, this.selection);
 
-		int x0 = textX;
-		int x1 = textX + textWidth;
+		int x0 = this.textX;
+		int x1 = this.textX + this.textWidth;
 
-		String visibleText = font.plainSubstrByWidth(value.substring(scroll), textWidth, false);
+		String visibleText = this.font.trim(this.value.substring(this.scroll), this.textWidth, false);
 
-		if (start >= scroll) {
-			String t = value.substring(scroll, start);
-			x0 = textX + font.width(t);
+		if (start >= this.scroll) {
+			String t = this.value.substring(this.scroll, start);
+			x0 = this.textX + this.font.width(t);
 		}
-		if (end <= scroll + visibleText.length()) {
-			String t = value.substring(scroll, end);
-			x1 = textX + font.width(t);
+		if (end <= this.scroll + visibleText.length()) {
+			String t = this.value.substring(this.scroll, end);
+			x1 = this.textX + this.font.width(t);
 		}
 
 		if (x0 >= x1) {
 			return;
 		}
 
-		int y0 = selectionY;
-		int y1 = selectionY + selectionHeight;
-		int z = 0;
+		int y0 = this.selectionY;
+		int y1 = this.selectionY + this.selectionHeight;
 
-		RenderSystem.setShader(() -> GameRenderer.getPositionShader());
-		RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
-		RenderSystem.enableColorLogicOp();
-		RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
-
-		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
-		Matrix4f pose = graphics.pose().last().pose();
-
-		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-
-		bufferBuilder.vertex(pose, x0, y0, z).endVertex();
-		bufferBuilder.vertex(pose, x0, y1, z).endVertex();
-		bufferBuilder.vertex(pose, x1, y1, z).endVertex();
-		bufferBuilder.vertex(pose, x1, y0, z).endVertex();
-
-		tessellator.end();
-
-		RenderSystem.disableColorLogicOp();
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		renderer.highlight(x0, y0, x1, y1, 0xFF0000FF);
 	}
 
 	private int getBorderColor() {
-		if (!isActive()) {
+		if (!this.isActive()) {
 			return 0xFF404040;
 		}
-		if (isFocused()) {
+		if (this.isFocused()) {
 			return 0xFFFFFFFF;
 		}
 
-		return isHovered() ? 0xFFB0B0B0 : 0xFF808080;
+		return this.isHovered() ? 0xFFB0B0B0 : 0xFF808080;
 	}
 
 	private int getHintColor() {
@@ -468,7 +437,7 @@ public class TextField extends AbstractButton {
 	}
 
 	private int getTextColor() {
-		return isActive() ? 0xFFFFFFFF : 0xFFB0B0B0;
+		return this.isActive() ? 0xFFFFFFFF : 0xFFB0B0B0;
 	}
 
 	private int getRemainderColor() {
@@ -480,203 +449,203 @@ public class TextField extends AbstractButton {
 	}
 
 	public SuggestionsMenu setSuggestions(SuggestionsProvider provider) {
-		return suggestions = new SuggestionsMenu(this, provider);
+		return this.suggestions = new SuggestionsMenu(this, provider);
 	}
 
 	public void setHint(String text) {
-		hint = text;
+		this.hint = text;
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public String getValueBeforeCursor() {
-		return value.substring(0, Math.min(cursor, value.length()));
+		return this.value.substring(0, Math.min(this.cursor, this.value.length()));
 	}
 
 	public void setValue(String text) {
-		replace(text, 0, value.length());
+		this.replace(text, 0, this.value.length());
 	}
 
 	public void clear() {
-		replace("", 0, value.length());
+		this.replace("", 0, this.value.length());
 	}
 
 	private void write(String text) {
-		if (!isActive()) {
+		if (!this.isActive()) {
 			return;
 		}
 
 		if (hasSelection()) {
-			int start = Math.min(selection, cursor);
-			int end = Math.max(selection, cursor);
+			int start = Math.min(this.selection, this.cursor);
+			int end = Math.max(this.selection, this.cursor);
 
-			replace(text, start, end);
+			this.replace(text, start, end);
 		} else {
-			insert(text, cursor);
+			this.insert(text, this.cursor);
 		}
 	}
 
 	private void erase(boolean forward) {
-		if (!isActive()) {
+		if (!this.isActive()) {
 			return;
 		}
 
 		if (hasSelection()) {
-			int start = Math.min(selection, cursor);
-			int end = Math.max(selection, cursor);
+			int start = Math.min(this.selection, this.cursor);
+			int end = Math.max(this.selection, this.cursor);
 
-			replace("", start, end);
+			this.replace("", start, end);
 		} else {
 			if (forward) {
-				replace("", cursor, cursor + 1);
-			} else if (cursor > 0) {
-				replace("", cursor - 1, cursor);
+				this.replace("", this.cursor, this.cursor + 1);
+			} else if (this.cursor > 0) {
+				this.replace("", this.cursor - 1, this.cursor);
 			}
 		}
 	}
 
 	private boolean insert(String text, int index) {
-		return replace(text, index, index);
+		return this.replace(text, index, index);
 	}
 
 	private boolean replace(String text, int start, int end) {
-		String t0 = value.substring(0, start);
-		String t1 = value.substring(end);
+		String t0 = this.value.substring(0, start);
+		String t1 = this.value.substring(end);
 
-		return setValue(t0 + text + t1, start + text.length(), true);
+		return this.setValue(t0 + text + t1, start + text.length(), true);
 	}
 
 	private boolean setValue(String text, boolean updateListener) {
-		return setValue(text, text.length(), updateListener);
+		return this.setValue(text, text.length(), updateListener);
 	}
 
 	private boolean setValue(String text, int cursor, boolean updateListener) {
-		if (value.equals(text) || text.length() > maxLength) {
+		if (this.value.equals(text) || text.length() > this.maxLength) {
 			return false;
 		}
 
-		value = text;
+		this.value = text;
 
-		stopSelecting();
-		clearSelection();
+		this.stopSelecting();
+		this.clearSelection();
 
-		if (suggestions != null) {
-			suggestions.update();
+		if (this.suggestions != null) {
+			this.suggestions.update();
 		}
 
 		if (cursor >= 0) {
-			setCursor(cursor);
+			this.setCursor(cursor);
 		}
 
 		if (updateListener) {
-			listener.accept(value);
+			this.listener.accept(this.value);
 		}
 
 		return true;
 	}
 
 	private void copySelectionToClipboard(boolean erase) {
-		if (hasSelection()) {
-			String text = getSelection();
+		if (this.hasSelection()) {
+			String text = this.getSelection();
 
 			if (!text.isEmpty()) {
-				keyboard.setClipboard(text);
+				this.keyboard.setClipboard(text);
 
 				if (erase) {
-					erase(false);
+					this.erase(false);
 				}
 			}
 		}
 	}
 
 	private void pasteClipboard() {
-		String text = keyboard.getClipboard();
+		String text = this.keyboard.getClipboard();
 
 		if (!text.isEmpty()) {
-			write(text);
+			this.write(text);
 		}
 	}
 
 	public void updateSuggestion() {
-		suffix = "";
+		this.suffix = "";
 
-		if (suggestions.hasSelection()) {
-			String suggestion = suggestions.getSelection();
-			int index = suggestion.indexOf(value);
+		if (this.suggestions.hasSelection()) {
+			String suggestion = this.suggestions.getSelection();
+			int index = suggestion.indexOf(this.value);
 
 			if (index == 0) {
-				suffix = suggestion.substring(value.length());
+				this.suffix = suggestion.substring(this.value.length());
 			}
 		}
 
-		updateMaxScroll();
-		updateScroll();
+		this.updateMaxScroll();
+		this.updateScroll();
 	}
 
 	public int getMaxLength() {
-		return maxLength;
+		return this.maxLength;
 	}
 
 	public void setMaxLength(int length) {
-		maxLength = length;
+		this.maxLength = length;
 	}
 
 	private void updateScroll() {
-		if (scroll > maxScroll) {
-			scroll(maxScroll - scroll);
+		if (this.scroll > this.maxScroll) {
+			this.scroll(this.maxScroll - this.scroll);
 		}
-		if (cursor < scroll) {
-			scroll(cursor - scroll);
+		if (this.cursor < this.scroll) {
+			this.scroll(this.cursor - this.scroll);
 		}
 
-		String valueAndCursor = font.plainSubstrByWidth(value + "_", textWidth + 1, true);
-		int maxCursorForScroll = scroll + valueAndCursor.length() - 1;
+		String valueAndCursor = this.font.trim(this.value + "_", this.textWidth + 1, true);
+		int maxCursorForScroll = this.scroll + valueAndCursor.length() - 1;
 
-		if (cursor > maxCursorForScroll) {
-			scroll(cursor - maxCursorForScroll);
+		if (this.cursor > maxCursorForScroll) {
+			this.scroll(this.cursor - maxCursorForScroll);
 		}
 	}
 
 	private void updateMaxScroll() {
-		maxScroll = 0;
+		this.maxScroll = 0;
 
-		if (!value.isEmpty()) {
-			String valueAndCursor = font.plainSubstrByWidth(value + "_", textWidth + 1, true);
+		if (!this.value.isEmpty()) {
+			String valueAndCursor = this.font.trim(this.value + "_", this.textWidth + 1, true);
 
-			if (valueAndCursor.length() <= value.length()) {
-				maxScroll = value.length() - (valueAndCursor.length() - 1);
+			if (valueAndCursor.length() <= this.value.length()) {
+				this.maxScroll = this.value.length() - (valueAndCursor.length() - 1);
 			}
 		}
 	}
 
 	private void scroll(int amount) {
-		setScroll(scroll + amount);
+		this.setScroll(this.scroll + amount);
 	}
 
 	private void setScroll(int value) {
-		scroll = Mth.clamp(value, 0, maxScroll);
+		this.scroll = Mth.clamp(value, 0, this.maxScroll);
 	}
 
 	private boolean setCursorFromMouse(double mouseX) {
-		if (selectionMethod != SelectionMethod.KEYBOARD) {
-			String scrolledValue = value.substring(scroll);
-			String visibleValue = font.plainSubstrByWidth(scrolledValue, textWidth, false);
+		if (this.selectionMethod != SelectionMethod.KEYBOARD) {
+			String scrolledValue = this.value.substring(this.scroll);
+			String visibleValue = this.font.trim(scrolledValue, this.textWidth, false);
 
 			// first handle clicks on the border:
 			// scroll a bit to the left or right
-			if (mouseX < textX) {
-				setCursor(scroll - 5);
-			} else if (mouseX > textX + textWidth) {
-				setCursor(scroll + visibleValue.length() + 5);
+			if (mouseX < this.textX) {
+				this.setCursor(this.scroll - 5);
+			} else if (mouseX > this.textX + this.textWidth) {
+				this.setCursor(this.scroll + visibleValue.length() + 5);
 			// then handle clicks within the border:
 			// move cursor to mouse position
 			} else {
-				String coveredValue = font.plainSubstrByWidth(visibleValue, (int)(mouseX + 2) - textX, false);
+				String coveredValue = this.font.trim(visibleValue, (int)(mouseX + 2) - this.textX, false);
 
-				setCursor(scroll + coveredValue.length());
-				startSelecting(SelectionMethod.MOUSE);
+				this.setCursor(this.scroll + coveredValue.length());
+				this.startSelecting(SelectionMethod.MOUSE);
 			}
 
 			return true;
@@ -686,63 +655,63 @@ public class TextField extends AbstractButton {
 	}
 
 	private void moveCursorFromKeyboard(int amount) {
-		setCursorFromKeyboard(cursor + amount);
+		this.setCursorFromKeyboard(this.cursor + amount);
 	}
 
 	private void setCursorFromKeyboard(int index) {
-		if (selectionMethod != SelectionMethod.MOUSE) {
-			setCursor(index);
+		if (this.selectionMethod != SelectionMethod.MOUSE) {
+			this.setCursor(index);
 		}
 	}
 
 	private void moveCursor(int amount) {
-		setCursor(cursor + amount);
+		this.setCursor(this.cursor + amount);
 	}
 
 	private void setCursor(int index) {
-		cursor = Mth.clamp(index, 0, value.length());
-		cursorTicks = isFocused() ? 0 : -1;
+		this.cursor = Mth.clamp(index, 0, this.value.length());
+		this.cursorTicks = this.isFocused() ? 0 : -1;
 
-		onCursorMoved();
+		this.onCursorMoved();
 	}
 
 	private void onCursorMoved() {
-		if (!isSelecting()) {
-			clearSelection();
+		if (!this.isSelecting()) {
+			this.clearSelection();
 
-			if (suggestions != null) {
-				suggestions.update();
+			if (this.suggestions != null) {
+				this.suggestions.update();
 			}
 		}
 
-		updateScroll();
+		this.updateScroll();
 	}
 
 	private boolean isDoubleClick() {
-		return cursorTicks >= 0 && cursorTicks < Options.Miscellaneous.DOUBLE_CLICK_TIME.get();
+		return this.cursorTicks >= 0 && this.cursorTicks < Options.Miscellaneous.DOUBLE_CLICK_TIME.get();
 	}
 
 	private boolean hasSelection() {
-		return selection >= 0 && selection != cursor;
+		return this.selection >= 0 && this.selection != this.cursor;
 	}
 
 	private String getSelection() {
-		int start = Math.min(selection, cursor);
-		int end = Math.max(selection, cursor);
+		int start = Math.min(this.selection, this.cursor);
+		int end = Math.max(this.selection, this.cursor);
 
-		return value.substring(start, end);
+		return this.value.substring(start, end);
 	}
 
 	private void clearSelection() {
-		selection = -1;
+		this.selection = -1;
 	}
 
 	private boolean startSelecting(SelectionMethod method) {
-		if (selectionMethod == SelectionMethod.NONE) {
-			selectionMethod = method;
+		if (this.selectionMethod == SelectionMethod.NONE) {
+			this.selectionMethod = method;
 
-			if (selection < 0) {
-				selection = cursor;
+			if (this.selection < 0) {
+				this.selection = this.cursor;
 			}
 
 			return true;
@@ -752,8 +721,8 @@ public class TextField extends AbstractButton {
 	}
 
 	private boolean stopSelecting(SelectionMethod method) {
-		if (selectionMethod == method) {
-			selectionMethod = SelectionMethod.NONE;
+		if (this.selectionMethod == method) {
+			this.selectionMethod = SelectionMethod.NONE;
 			return true;
 		} else {
 			return false;
@@ -761,16 +730,16 @@ public class TextField extends AbstractButton {
 	}
 
 	private boolean stopSelecting() {
-		return stopSelecting(selectionMethod);
+		return this.stopSelecting(this.selectionMethod);
 	}
 
 	private void selectAll() {
-		setCursor(value.length());
-		selection = 0;
+		this.setCursor(this.value.length());
+		this.selection = 0;
 	}
 
 	private boolean isSelecting() {
-		return selectionMethod != SelectionMethod.NONE;
+		return this.selectionMethod != SelectionMethod.NONE;
 	}
 
 	private enum SelectionMethod {
