@@ -1,69 +1,23 @@
 package redstone.multimeter.client.option;
 
-public abstract class Option<T> implements IOption {
+import redstone.multimeter.client.gui.element.button.Button;
 
-	private final String name;
-	private final String description;
-	private final T defaultValue;
+public interface Option {
 
-	private T value;
-	private OptionListener listener;
+	public String getName();
 
-	protected Option(String name, String description, T defaultValue) {
-		this.name = name;
-		this.description = description;
-		this.defaultValue = defaultValue;
+	public String getDescription();
 
-		this.value = this.defaultValue;
-	}
+	public boolean isDefault();
 
-	@Override
-	public String getName() {
-		return name;
-	}
+	public void reset();
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
+	public String getAsString();
 
-	@Override
-	public boolean isDefault() {
-		return value.equals(defaultValue);
-	}
+	public void setFromString(String value);
 
-	@Override
-	public void reset() {
-		set(defaultValue);
-	}
+	public Button createControl(int width, int height);
 
-	@Override
-	public String getAsString() {
-		return value.toString();
-	}
+	public void setListener(OptionListener listener);
 
-	@Override
-	public void setListener(OptionListener listener) {
-		this.listener = listener;
-
-		if (this.listener != null) {
-			this.listener.valueChanged();
-		}
-	}
-
-	public T getDefault() {
-		return defaultValue;
-	}
-
-	public T get() {
-		return value;
-	}
-
-	public void set(T value) {
-		this.value = value;
-
-		if (listener != null) {
-			listener.valueChanged();
-		}
-	}
 }

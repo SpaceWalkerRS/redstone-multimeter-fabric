@@ -1,17 +1,8 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import java.util.List;
-
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
-import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
-import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.log.EventLog;
 
 public class MeterEventDetails extends AbstractElement {
@@ -37,19 +28,21 @@ public class MeterEventDetails extends AbstractElement {
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
 		EventLog event = getEvent();
 
 		if (event != null) {
-			renderEventDetails(graphics, event);
+			renderer.tooltip(event.getTooltip(), -15, -15);
+			// TODO: remove
+//			renderEventDetails(renderer, event);
 		}
 	}
 
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
 	}
-
-	private void renderEventDetails(GuiGraphics graphics, EventLog event) {
+/*
+	private void renderEventDetails(GuiRenderer renderer, EventLog event) {
 		Tooltip tooltip = event.getTooltip();
 		List<Component> lines = tooltip.getLines();
 
@@ -63,21 +56,21 @@ public class MeterEventDetails extends AbstractElement {
 		int borderColor0 = hud.isOnScreen() ? 0x505000FF : 0xFF8000FF;
 		int borderColor1 = hud.isOnScreen() ? 0x5028007F : 0xFF5000C0;
 
-		PoseStack poses = graphics.pose();
+		PoseStack poses = renderer.pose();
 
 		poses.pushPose();
 		poses.translate(0, 0, 400);
 
 		// background
-		hud.renderer.renderRect(graphics, x    , y + 1         , width    , height - 2, backgroundColor); // center, left/right outer borders
-		hud.renderer.renderRect(graphics, x + 1, y             , width - 2, 1         , backgroundColor); // top outer border
-		hud.renderer.renderRect(graphics, x + 1, y + height - 1, width - 2, 1         , backgroundColor); // bottom outer border
+		hud.renderer.renderRect(renderer, x    , y + 1         , width    , height - 2, backgroundColor); // center, left/right outer borders
+		hud.renderer.renderRect(renderer, x + 1, y             , width - 2, 1         , backgroundColor); // top outer border
+		hud.renderer.renderRect(renderer, x + 1, y + height - 1, width - 2, 1         , backgroundColor); // bottom outer border
 
 		// inner border
-		hud.renderer.renderGradient(graphics, x + 1        , y + 2         , 1        , height - 4, borderColor0, borderColor1); // left
-		hud.renderer.renderRect    (graphics, x + 1        , y + height - 2, width - 2, 1         , borderColor1);               // bottom
-		hud.renderer.renderGradient(graphics, x + width - 2, y + 2         , 1        , height - 4, borderColor0, borderColor1); // right
-		hud.renderer.renderRect    (graphics, x + 1        , y + 1         , width - 2, 1         , borderColor0);               // top
+		hud.renderer.renderGradient(renderer, x + 1        , y + 2         , 1        , height - 4, borderColor0, borderColor1); // left
+		hud.renderer.renderRect    (renderer, x + 1        , y + height - 2, width - 2, 1         , borderColor1);               // bottom
+		hud.renderer.renderGradient(renderer, x + width - 2, y + 2         , 1        , height - 4, borderColor0, borderColor1); // right
+		hud.renderer.renderRect    (renderer, x + 1        , y + 1         , width - 2, 1         , borderColor0);               // top
 
 		boolean leftToRight = Options.HUD.DIRECTIONALITY_X.get() == Directionality.X.LEFT_TO_RIGHT;
 		boolean topToBottom = Options.HUD.DIRECTIONALITY_Y.get() == Directionality.Y.TOP_TO_BOTTOM;
@@ -91,12 +84,12 @@ public class MeterEventDetails extends AbstractElement {
 			int lineX = textX + (leftToRight ? 0 : (width - 8) - hud.font.width(line));
 			int lineY = textY + (topToBottom ? 1 : -1) * (index + (topToBottom ? 0 : 1)) * (hud.font.lineHeight + 1) + (topToBottom ? 0 : (height - 4));
 
-			hud.renderer.renderText(graphics, line, lineX, lineY, 0xFFFFFFFF);
+			hud.renderer.renderText(renderer, line, lineX, lineY, 0xFFFFFFFF);
 		}
 
 		poses.popPose();
 	}
-
+*/
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		return false;
@@ -134,7 +127,7 @@ public class MeterEventDetails extends AbstractElement {
 		EventLog event = getEvent();
 
 		if (event != null) {
-			setWidth(event.getTooltip().getWidth(hud.font) + 8);
+			setWidth(hud.font.width(event.getTooltip()) + 8);
 		} else {
 			setWidth(0);
 		}
@@ -144,7 +137,7 @@ public class MeterEventDetails extends AbstractElement {
 		EventLog event = getEvent();
 
 		if (event != null) {
-			setHeight(event.getTooltip().getHeight(hud.font) + 8);
+			setHeight(hud.font.height(event.getTooltip()) + 8);
 		} else {
 			setHeight(0);
 		}

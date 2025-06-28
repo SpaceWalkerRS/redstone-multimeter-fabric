@@ -4,9 +4,9 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.client.gui.CursorType;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.Element;
 
 public class ScreenWrapper extends Screen {
@@ -18,7 +18,7 @@ public class ScreenWrapper extends Screen {
 	private double lastMouseY = Double.MIN_VALUE;
 
 	public ScreenWrapper(Screen parent, RSMMScreen screen) {
-		super(screen.getTitle());
+		super(null);
 
 		this.parent = parent;
 		this.screen = screen;
@@ -27,13 +27,8 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public Component getTitle() {
-		return screen.getTitle();
-	}
-
-	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-		screen.render(graphics, mouseX, mouseY);
+		screen.render(new GuiRenderer(graphics), mouseX, mouseY);
 	}
 
 	@Override
