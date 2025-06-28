@@ -12,9 +12,10 @@ import de.siphalor.amecs.impl.duck.IKeyBinding;
 import net.fabricmc.loader.api.FabricLoader;
 
 import net.minecraft.client.KeyMapping;
-import net.minecraft.network.chat.Component;
 
-import redstone.multimeter.util.TextUtils;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 
 public class AmecsHelper {
 
@@ -38,19 +39,19 @@ public class AmecsHelper {
 		return modifiers;
 	}
 
-	public static Component getModifierName(KeyModifier modifier, Variation variation) {
-		return variation.getTranslatableText(modifier.getTranslationKey());
+	public static Text getModifierName(KeyModifier modifier, Variation variation) {
+		return Texts.of(variation.getTranslatableText(modifier.getTranslationKey()));
 	}
 
-	public static Component getModifierName(KeyModifier modifier) {
+	public static Text getModifierName(KeyModifier modifier) {
 		return getModifierName(modifier, Variation.NORMAL);
 	}
 
-	public static Component addModifiers(Component text, KeyMapping keybind) {
+	public static Text addModifiers(Text text, KeyMapping keybind) {
 		if (isAmecsApiLoaded) {
 			for (KeyModifier modifier : getKeyModifiers(keybind)) {
 				text.
-					append(TextUtils.formatKey(getModifierName(modifier))).
+					append(getModifierName(modifier).format(Formatting.YELLOW)).
 					append(" + ");
 			}
 		}

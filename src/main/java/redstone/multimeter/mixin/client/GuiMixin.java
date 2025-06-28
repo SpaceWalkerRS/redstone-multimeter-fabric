@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
 
@@ -33,7 +34,7 @@ public class GuiMixin {
 		MultimeterHud hud = client.getHud();
 
 		if (client.isHudActive() && !hud.isOnScreen()) {
-			hud.render();
+			hud.render(new GuiRenderer());
 		}
 	}
 }

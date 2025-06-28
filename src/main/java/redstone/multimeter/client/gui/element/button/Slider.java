@@ -5,12 +5,13 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
-import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.TextureRegion;
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.texture.TextureRegion;
+import redstone.multimeter.client.gui.texture.TextureRegions;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
 
 public class Slider extends AbstractButton {
 
@@ -22,12 +23,12 @@ public class Slider extends AbstractButton {
 
 	private double value;
 
-	public Slider(MultimeterClient client, int x, int y, Supplier<Component> message, Supplier<Tooltip> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
-		this(client, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip, onSlide, valueSupplier, steps);
+	public Slider(int x, int y, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> onSlide, Supplier<Double> valueSupplier, long steps) {
+		this(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, tooltip, onSlide, valueSupplier, steps);
 	}
 
-	public Slider(MultimeterClient client, int x, int y, int width, int height, Supplier<Component> message, Supplier<Tooltip> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
-		super(client, x, y, width, height, message, tooltip);
+	public Slider(int x, int y, int width, int height, Supplier<Text> message, Supplier<Tooltip> tooltip, Consumer<Double> valueConsumer, Supplier<Double> valueSupplier, long steps) {
+		super(x, y, width, height, message, tooltip);
 
 		this.valueConsumer = valueConsumer;
 		this.valueSupplier = valueSupplier;
@@ -42,8 +43,8 @@ public class Slider extends AbstractButton {
 	public boolean mouseClick(double mouseX, double mouseY, int button) {
 		boolean consumed = super.mouseClick(mouseX, mouseY, button);
 
-		if (!consumed && isActive() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			updateValue(mouseX);
+		if (!consumed && this.isActive() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			this.updateValue(mouseX);
 			consumed = true;
 		}
 
@@ -52,11 +53,11 @@ public class Slider extends AbstractButton {
 
 	@Override
 	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		boolean wasDragging = isDraggingMouse();
+		boolean wasDragging = this.isDraggingMouse();
 		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
 
-		if (wasDragging != isDraggingMouse()) {
-			playClickSound();
+		if (wasDragging != this.isDraggingMouse()) {
+			Button.playClickSound();
 		}
 
 		return consumed;
@@ -64,8 +65,8 @@ public class Slider extends AbstractButton {
 
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (isActive() && isDraggingMouse() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			updateValue(mouseX);
+		if (this.isActive() && this.isDraggingMouse() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			this.updateValue(mouseX);
 			return true;
 		}
 
@@ -98,51 +99,55 @@ public class Slider extends AbstractButton {
 
 	@Override
 	public void update() {
-		setValue(valueSupplier.get(), false);
+		this.setValue(this.valueSupplier.get(), false);
 	}
 
 	@Override
-	protected void renderButton() {
-		super.renderButton();
+	protected void renderButton(GuiRenderer renderer) {
+		super.renderButton(renderer);
 
-		TextureRegion texture = getButtonTexture();
-		int x = getX() + getSliderX();
-		int y = getY();
+		TextureRegion texture = this.getHandleTexture();
+		int x = this.getX() + this.getSliderX();
+		int y = this.getY();
 		int width = SLIDER_WIDTH;
-		int height = getHeight();
+		int height = this.getHeight();
 
-		drawTexturedButton(texture, x, y, width, height);
+		this.renderButtonTexture(renderer, texture, x, y, width, height);
 	}
 
 	@Override
-	protected TextureRegion getBackgroundTexture() {
-		return TextureRegion.BASIC_BUTTON_INACTIVE;
+	protected TextureRegion getButtonTexture() {
+		return TextureRegions.BASIC_BUTTON_INACTIVE;
+	}
+
+	protected TextureRegion getHandleTexture() {
+		return super.getButtonTexture();
 	}
 
 	private int getSliderX() {
-		int range = getWidth() - SLIDER_WIDTH;
-		return Math.round((float)(value * range));
+		int range = this.getWidth() - SLIDER_WIDTH;
+		return Math.round((float)(this.value * range));
 	}
 
 	public double getValue() {
-		return value;
+		return this.value;
 	}
 
 	private void updateValue(double mouseX) {
-		int min = getX() + SLIDER_WIDTH / 2;
-		int range = getWidth() - SLIDER_WIDTH;
+		int min = this.getX() + SLIDER_WIDTH / 2;
+		int range = this.getWidth() - SLIDER_WIDTH;
 
-		setValue((mouseX - min) / range, true);
+		this.setValue((mouseX - min) / range, true);
 	}
 
 	private void setValue(double newValue, boolean updateListener) {
-		value = Mth.clamp(newValue, 0.0D, 1.0D);
-		value = Math.round(steps * value) / steps;
+		this.value = Mth.clamp(newValue, 0.0D, 1.0D);
+		this.value = Math.round(this.steps * this.value) / this.steps;
 
 		if (updateListener) {
-			valueConsumer.accept(value);
+			this.valueConsumer.accept(this.value);
 		}
 
-		updateMessage();
+		this.updateMessage();
 	}
 }

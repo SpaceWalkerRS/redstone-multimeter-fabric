@@ -18,7 +18,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.InputConstants.Key;
 
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.common.meter.event.EventType;
@@ -133,9 +132,9 @@ public class Keybinds {
 		}
 	}
 
-	public static boolean isPressed(Minecraft minecraft, KeyMapping keybind) {
+	public static boolean isPressed(KeyMapping keybind) {
 		Key key = ((IKeyMapping)keybind).rsmm$getKey();
-		return key != null && GLFW.glfwGetKey(minecraft.window.getWindow(), key.getValue()) == GLFW.GLFW_PRESS;
+		return key != null && GLFW.glfwGetKey(MultimeterClient.MINECRAFT.window.getWindow(), key.getValue()) == GLFW.GLFW_PRESS;
 	}
 
 	static {
