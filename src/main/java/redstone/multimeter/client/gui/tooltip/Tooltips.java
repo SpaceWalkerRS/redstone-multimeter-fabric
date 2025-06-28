@@ -51,11 +51,14 @@ public class Tooltips {
 		return lines(font.split(text, width));
 	}
 
-	public static Tooltip keybind(Object... keybinds) {
-		return line(Texts.keyValue(
-			"keybind",
-			Texts.keybinds(keybinds)
-		));
+	public static Tooltip keybind(String title, Object... keybinds) {
+		return lines(
+			title,
+			Texts.keyValue(
+				"keybind",
+				Texts.keybinds(keybinds)
+			)
+		);
 	}
 
 	public static TooltipBuilder builder() {
