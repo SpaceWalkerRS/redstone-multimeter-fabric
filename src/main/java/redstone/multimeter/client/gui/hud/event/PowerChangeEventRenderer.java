@@ -1,7 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
@@ -16,17 +15,23 @@ public class PowerChangeEventRenderer extends BasicEventRenderer {
 	}
 
 	@Override
-	protected void drawCenter(PoseStack poses, int x, int y, Meter meter, MeterEvent event) {
+	protected void drawCenter(GuiRenderer renderer, int x, int y, Meter meter, MeterEvent event) {
 		int width = hud.settings.columnWidth - hud.settings.scale;
 		int height = hud.settings.scale * (1 + hud.settings.hparity);
 		int heightOffset = (hud.settings.rowHeight - height) / 2 + hud.settings.hparity;
+
+		int x0 = x;
+		int y0 = y + heightOffset;
+		int x1 = x0 + width;
+		int y1 = y0 + height;
 		int color = meter.getColor();
 
 		if (increased(event)) {
-			x += hud.settings.scale;
+			x0 += hud.settings.scale;
+			x1 += hud.settings.scale;
 		}
 
-		hud.renderer.renderRect(poses, x, y + heightOffset, width, height, color);
+		renderer.fill(x0, y0, x1, y1, color);
 	}
 
 	private boolean increased(MeterEvent event) {

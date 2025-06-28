@@ -12,11 +12,11 @@ import java.util.Queue;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.TickPhase;
 import redstone.multimeter.common.meter.Meter;
@@ -95,7 +95,7 @@ public class LogPrinter {
 			}
 
 			if (notifyPlayer) {
-				Component message = new TextComponent("Started printing logs to file...");
+				Text message = Texts.literal("Started printing logs to file...");
 				client.sendMessage(message, false);
 			}
 
@@ -121,7 +121,7 @@ public class LogPrinter {
 			writer = null;
 
 			if (notifyPlayer) {
-				Component message = new TextComponent("Stopped printing logs to file");
+				Text message = Texts.literal("Stopped printing logs to file");
 				client.sendMessage(message, false);
 			}
 
@@ -153,7 +153,7 @@ public class LogPrinter {
 			long runtime = getGameTime() - firstTick;
 
 			if (limit >= 0 && runtime > limit) {
-				Component message = new TextComponent("Printer exceeded maximum runtime!");
+				Text message = Texts.literal("Printer exceeded maximum runtime!");
 				client.sendMessage(message, false);
 
 				stop(true);
@@ -221,7 +221,7 @@ public class LogPrinter {
 				writer.newLine();
 			}
 		} catch (IOException e) {
-			Component message = new TextComponent("Printer encountered issues!");
+			Text message = Texts.literal("Printer encountered issues!");
 			client.sendMessage(message, false);
 
 			stop(true);
@@ -247,7 +247,7 @@ public class LogPrinter {
 
 		@Override
 		public String toString() {
-			return String.format("%d - (%s) %s", log.getSubtick(), meter.getName(), log.getEvent().toString());
+			return String.format("%d - (%s) %s", log.getSubtick(), meter.getName(), log.getEvent());
 		}
 
 		@Override
