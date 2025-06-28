@@ -26,13 +26,13 @@ public class InputHandler {
 		}
 
 		while (Keybinds.OPEN_MULTIMETER_SCREEN.consumeClick()) {
-			client.openScreen(new MultimeterScreen(client));
+			client.openScreen(new MultimeterScreen());
 		}
 		while (Keybinds.OPEN_OPTIONS_MENU.consumeClick()) {
-			client.openScreen(new OptionsScreen(client));
+			client.openScreen(new OptionsScreen());
 		}
 		while (Keybinds.VIEW_TICK_PHASE_TREE.consumeClick()) {
-			client.openScreen(new TickPhaseTreeScreen(client));
+			client.openScreen(new TickPhaseTreeScreen());
 		}
 		while (Keybinds.LOAD_METER_GROUP.consumeClick()) {
 			client.getSavedMeterGroupsManager().setLoading();
@@ -129,14 +129,14 @@ public class InputHandler {
 				Minecraft minecraft = client.getMinecraft();
 
 				if (minecraft.player != null) {
-					client.openScreen(new MultimeterScreen(client));
+					client.openScreen(new MultimeterScreen());
 				}
 			}
 		} else if (Keybinds.OPEN_OPTIONS_MENU.matchesMouse(button)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
-				client.openScreen(new OptionsScreen(client));
+				client.openScreen(new OptionsScreen());
 			}
 		} else if (Keybinds.VIEW_TICK_PHASE_TREE.matchesMouse(button)) {
 			if (!client.isConnected()) {
@@ -144,7 +144,7 @@ public class InputHandler {
 			} else if (screen instanceof TickPhaseTreeScreen) {
 				screen.close();
 			} else {
-				client.openScreen(new TickPhaseTreeScreen(client));
+				client.openScreen(new TickPhaseTreeScreen());
 			}
 		} else if (screen instanceof MultimeterScreen) {
 			if (Keybinds.PAUSE_METERS.matchesMouse(button)) {
@@ -175,14 +175,14 @@ public class InputHandler {
 				Minecraft minecraft = client.getMinecraft();
 
 				if (minecraft.player != null) {
-					client.openScreen(new MultimeterScreen(client));
+					client.openScreen(new MultimeterScreen());
 				}
 			}
 		} else if (Keybinds.OPEN_OPTIONS_MENU.matches(keyCode, scanCode)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
-				client.openScreen(new OptionsScreen(client));
+				client.openScreen(new OptionsScreen());
 			}
 		} else if (Keybinds.VIEW_TICK_PHASE_TREE.matches(keyCode, scanCode)) {
 			if (!client.isConnected()) {
@@ -190,7 +190,7 @@ public class InputHandler {
 			} else if (screen instanceof TickPhaseTreeScreen) {
 				screen.close();
 			} else {
-				client.openScreen(new TickPhaseTreeScreen(client));
+				client.openScreen(new TickPhaseTreeScreen());
 			}
 		} else if (screen instanceof MultimeterScreen) {
 			if (Keybinds.PAUSE_METERS.matches(keyCode, scanCode)) {
@@ -228,6 +228,6 @@ public class InputHandler {
 	}
 
 	private boolean isPressed(KeyBinding keybind) {
-		return Keybinds.isPressed(client.getMinecraft(), keybind);
+		return Keybinds.isPressed(keybind);
 	}
 }

@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.gui.screen.Screen;
 
 import redstone.multimeter.client.gui.CursorType;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.Element;
 
 public class ScreenWrapper extends Screen {
@@ -24,7 +25,7 @@ public class ScreenWrapper extends Screen {
 
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
-		screen.render(mouseX, mouseY);
+		screen.render(new GuiRenderer(), mouseX, mouseY);
 	}
 
 	public final void mouseMoved(double mouseX, double mouseY) {

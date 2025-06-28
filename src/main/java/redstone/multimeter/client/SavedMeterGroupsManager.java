@@ -8,10 +8,10 @@ import java.util.List;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
@@ -137,10 +137,10 @@ public class SavedMeterGroupsManager {
 		stopPreviewing();
 
 		if (Options.RedstoneMultimeter.PREVIEW_METER_GROUPS.get()) {
-			Text message = new LiteralText("Press one of the number keys to preview the meter group from that slot!");
+			Text message = Texts.literal("Press one of the number keys to preview the meter group from that slot!");
 			client.sendMessage(message, true);
 		} else {
-			Text message = new LiteralText("Press one of the number keys to load the meter group from that slot!");
+			Text message = Texts.literal("Press one of the number keys to load the meter group from that slot!");
 			client.sendMessage(message, true);
 		}
 	}
@@ -186,12 +186,12 @@ public class SavedMeterGroupsManager {
 		SavedMeterGroup meterGroup = meterGroups[slot + SLOT_OFFSET];
 
 		if (meterGroup == null) {
-			Text warning = new LiteralText(String.format("Cannot preview meter group from slot %d: that slot is empty!", slot));
+			Text warning = Texts.literal(String.format("Cannot preview meter group from slot %d: that slot is empty!", slot));
 			client.sendMessage(warning, true);
 		} else {
 			client.getMeterGroupPreview().preview(slot, name, meters);
 
-			Text message = new LiteralText("Previewing meter group \'" + name + "\' from slot " + slot);
+			Text message = Texts.literal("Previewing meter group \'" + name + "\' from slot " + slot);
 			client.sendMessage(message, true);
 		}
 
@@ -212,16 +212,16 @@ public class SavedMeterGroupsManager {
 				if (bypassWarnings) {
 					client.unsubscribeFromMeterGroup();
 
-					Text warning = new LiteralText(String.format("Loaded empty slot %d and unsubscribed from meter group!", slot));
+					Text warning = Texts.literal(String.format("Loaded empty slot %d and unsubscribed from meter group!", slot));
 					client.sendMessage(warning, true);
 
 					setIdle();
 				} else {
-					Text warning = new LiteralText("That slot is empty! Are you sure you want to unsubscribe from your current meter group?");
+					Text warning = Texts.literal("That slot is empty! Are you sure you want to unsubscribe from your current meter group?");
 					sendLoadWarning(slot, warning);
 				}
 			} else {
-				Text warning = new LiteralText(String.format("Could not load empty slot %d: you are not subscribed to a meter group!", slot));
+				Text warning = Texts.literal(String.format("Could not load empty slot %d: you are not subscribed to a meter group!", slot));
 				client.sendMessage(warning, true);
 			}
 		} else {
@@ -230,7 +230,7 @@ public class SavedMeterGroupsManager {
 			SetMetersPacket packet = new SetMetersPacket(meters);
 			client.sendPacket(packet);
 
-			Text message = new LiteralText("Loaded meter group \'" + name + "\' from slot " + slot);
+			Text message = Texts.literal("Loaded meter group \'" + name + "\' from slot " + slot);
 			client.sendMessage(message, true);
 
 			setIdle();
@@ -263,10 +263,10 @@ public class SavedMeterGroupsManager {
 		stopPreviewing();
 
 		if (client.hasSubscription()) {
-			Text message = new LiteralText("Press one of the number keys to save this meter group to that slot!");
+			Text message = Texts.literal("Press one of the number keys to save this meter group to that slot!");
 			client.sendMessage(message, true);
 		} else {
-			Text message = new LiteralText("Press one of the number keys to clear that saved meter group slot!");
+			Text message = Texts.literal("Press one of the number keys to clear that saved meter group slot!");
 			client.sendMessage(message, true);
 		}
 	}
@@ -300,16 +300,15 @@ public class SavedMeterGroupsManager {
 			if (bypassWarnings) {
 				meterGroups[slot + SLOT_OFFSET] = null;
 
-
-				Text message = new LiteralText("Cleared saved meter group slot " + slot);
+				Text message = Texts.literal("Cleared saved meter group slot " + slot);
 				client.sendMessage(message, true);
 			} else {
-				Text warning = new LiteralText("You are not subscribed to a meter group! Are you sure you want to clear that slot?");
+				Text warning = Texts.literal("You are not subscribed to a meter group! Are you sure you want to clear that slot?");
 				sendSaveWarning(slot, warning);
 			}
 		} else {
 			if (meters.isEmpty() && !bypassWarnings) {
-				Text warning = new LiteralText("Your current meter group is empty! Are you sure you want to save it?");
+				Text warning = Texts.literal("Your current meter group is empty! Are you sure you want to save it?");
 				sendSaveWarning(slot, warning);
 			} else {
 				List<MeterProperties> savedMeters = new ArrayList<>();
@@ -320,7 +319,7 @@ public class SavedMeterGroupsManager {
 
 				meterGroups[slot + SLOT_OFFSET] = new SavedMeterGroup(name, savedMeters);
 
-				Text message = new LiteralText("Saved meter group \'" + name + "\'to slot " + slot);
+				Text message = Texts.literal("Saved meter group \'" + name + "\'to slot " + slot);
 				client.sendMessage(message, true);
 			}
 		}

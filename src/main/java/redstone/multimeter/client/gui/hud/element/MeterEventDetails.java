@@ -1,15 +1,8 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import java.util.List;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-
-import net.minecraft.text.Text;
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
-import redstone.multimeter.client.gui.hud.Directionality;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
-import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.log.EventLog;
 
 public class MeterEventDetails extends AbstractElement {
@@ -35,18 +28,20 @@ public class MeterEventDetails extends AbstractElement {
 	}
 
 	@Override
-	public void render(int mouseX, int mouseY) {
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
 		EventLog event = getEvent();
 
 		if (event != null) {
-			renderEventDetails(event);
+			renderer.tooltip(event.getTooltip(), -15, -15);
+			// TODO: remove
+//			renderEventDetails(renderer, event);
 		}
 	}
 
 	@Override
 	public void mouseMove(double mouseX, double mouseY) {
 	}
-
+/*
 	private void renderEventDetails(EventLog event) {
 		Tooltip tooltip = event.getTooltip();
 		List<Text> lines = tooltip.getLines();
@@ -92,7 +87,7 @@ public class MeterEventDetails extends AbstractElement {
 
 		GlStateManager.popMatrix();
 	}
-
+*/
 	@Override
 	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		return false;
@@ -130,7 +125,7 @@ public class MeterEventDetails extends AbstractElement {
 		EventLog event = getEvent();
 
 		if (event != null) {
-			setWidth(event.getTooltip().getWidth(hud.textRenderer) + 8);
+			setWidth(hud.font.width(event.getTooltip()) + 8);
 		} else {
 			setWidth(0);
 		}
@@ -140,7 +135,7 @@ public class MeterEventDetails extends AbstractElement {
 		EventLog event = getEvent();
 
 		if (event != null) {
-			setHeight(event.getTooltip().getHeight(hud.textRenderer) + 8);
+			setHeight(hud.font.height(event.getTooltip()) + 8);
 		} else {
 			setHeight(0);
 		}

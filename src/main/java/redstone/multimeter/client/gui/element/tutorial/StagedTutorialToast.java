@@ -1,10 +1,10 @@
 package redstone.multimeter.client.gui.element.tutorial;
 
-import net.minecraft.client.gui.GuiElement;
 import net.minecraft.client.gui.toast.ToastGui;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
+import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.tutorial.instance.StagedTutorialInstance;
 
 public class StagedTutorialToast extends TutorialToast {
@@ -22,20 +22,20 @@ public class StagedTutorialToast extends TutorialToast {
 	}
 
 	@Override
-	protected void drawDecoration(ToastGui toasts, long animationTime) {
+	protected void drawDecoration(GuiRenderer renderer, ToastGui toasts, long age) {
 		float newProgress = tutorial.getProgress();
 
 		if (newProgress != progress) {
 			lastProgress = progress;
 			progress = newProgress;
-			ageAtLastProgressUpdate = animationTime;
+			ageAtLastProgressUpdate = age;
 		}
 
 		int width = width();
 		int height = height();
 		int edge = EDGE - 1;
 
-		float renderProgress = (float)MathHelper.clampedLerp(lastProgress, progress, (animationTime - ageAtLastProgressUpdate) / 100.0F);
+		float renderProgress = (float)MathHelper.clampedLerp(lastProgress, progress, (age - ageAtLastProgressUpdate) / 100.0F);
 
 		int x = edge;
 		int y = height - edge;
@@ -43,7 +43,7 @@ public class StagedTutorialToast extends TutorialToast {
 		int w2 = (int)(w * renderProgress);
 		int h = 1;
 
-		GuiElement.fill(x, y, x + w, y + h, 0xFFFFFFFF);
-		GuiElement.fill(x, y, x + w2, y + h, 0xFF500050);
+		renderer.fill(x, y, x + w, y + h, 0xFFFFFFFF);
+		renderer.fill(x, y, x + w2, y + h, 0xFF500050);
 	}
 }

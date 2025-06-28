@@ -1,29 +1,28 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
-import redstone.multimeter.util.TextUtils;
 
 public class ScrollHudTutorial extends StagedTutorialInstance {
 
-	private static final Text TITLE = new LiteralText("Scroll The HUD");
-	private static final Text DESCRIPTION = new LiteralText("").
-													append("Use the ").
-													append(TextUtils.formatKeybind(Keybinds.STEP_BACKWARD)).
-													append(" and ").
-													append(TextUtils.formatKeybind(Keybinds.STEP_FORWARD)).
-													append(" keys or ").
-													append(TextUtils.formatKeybind(Keybinds.SCROLL_HUD, "scroll")).
-													append(" to scroll through the primary overview of the Multimeter HUD.");
+	private static final Text TITLE = Texts.literal("Scroll The HUD");
+	private static final Text DESCRIPTION = Texts.composite(
+		"Use the ",
+		Texts.keybind(Keybinds.STEP_BACKWARD),
+		" and ",
+		Texts.keybind(Keybinds.STEP_FORWARD),
+		" keys or ",
+		Texts.keybinds(Keybinds.SCROLL_HUD, "scroll"),
+		" to scroll through the Multimeter timeline."
+	);
 
 	private static final int TIMES_SCROLLED_TARGET = 5;
 

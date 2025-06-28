@@ -56,11 +56,13 @@
 		"client.GameGuiMixin",
 		"client.GameOptionsMixin",
 		"client.GameRendererMixin",
+		"client.InputConstantsTypeAccessor",
 		"client.IntegratedServerMixin",
 		"client.KeyBindingMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
-		"client.WindowMixin"
+		"client.WindowMixin",
+		"client.StyleAccess"
 	],
 	"injectors": {
 		"defaultRequire": 1
