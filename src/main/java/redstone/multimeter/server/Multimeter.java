@@ -481,7 +481,7 @@ public class Multimeter {
 		String pitch = NUMBER_FORMAT.format(_pitch);
 
 		Text message = Texts.composite(
-			"Click",
+			"Click ",
 			Texts.literal("[here]").format(style ->
 				style.withHoverEvent(HoverEvent.showText(
 					Texts.composite(
