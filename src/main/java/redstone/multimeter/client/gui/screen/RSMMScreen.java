@@ -1,59 +1,56 @@
 package redstone.multimeter.client.gui.screen;
 
-import java.util.List;
-
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Texture;
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.FontRenderer;
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.texture.Textures;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
 
 public abstract class RSMMScreen extends AbstractParentElement {
 
 	protected final MultimeterClient client;
 	protected final Minecraft minecraft;
-	protected final Font font;
+	protected final FontRenderer font;
 
-	private final Component title;
+	private final Text title;
 	private final boolean drawTitle;
 
 	protected ScreenWrapper wrapper;
 
-	protected RSMMScreen(MultimeterClient client, Component title, boolean drawTitle) {
-		this.client = client;
-		this.minecraft = client.getMinecraft();
-		this.font = this.minecraft.font;
+	protected RSMMScreen(Text title, boolean drawTitle) {
+		this.client = MultimeterClient.INSTANCE;
+		this.minecraft = MultimeterClient.MINECRAFT;
+		this.font = client.getFontRenderer();
 
 		this.title = title;
 		this.drawTitle = drawTitle;
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY) {
-		renderBackground(graphics);
-		renderContent(graphics, mouseX, mouseY);
+	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
+		renderBackground(renderer);
+		renderContent(renderer, mouseX, mouseY);
 
 		if (drawTitle) {
 			int width = font.width(title);
 			int x = getX() + (getWidth() - width) / 2;
 			int y = getY() + 6;
 
-			renderText(font, graphics, title, x, y, true, 0xFFFFFFFF);
+			font.drawWithShadow(title, x, y);
 		}
 
 		Tooltip tooltip = getTooltip(mouseX, mouseY);
 
 		if (!tooltip.isEmpty()) {
-			drawTooltip(graphics, tooltip, mouseX, mouseY);
+			renderer.tooltip(tooltip, mouseX, mouseY);
 		}
 	}
 
@@ -111,94 +108,33 @@ public abstract class RSMMScreen extends AbstractParentElement {
 		minecraft.setScreen(wrapper.getParent());
 	}
 
-	protected void renderBackground(GuiGraphics graphics) {
-		if (hasTransparentBackground()) {
-			renderGradient(graphics, getX(), getY(), getWidth(), getHeight(), 0xC0101010, 0xD0101010);
-		} else {
-			renderBackgroundTexture(graphics);
-		}
-	}
-
 	protected boolean hasTransparentBackground() {
 		return minecraft.level != null;
 	}
 
-	protected void renderBackgroundTexture(GuiGraphics graphics) {
-		int x0 = getX();
-		int y0 = getY();
-		int x1 = x0 + getWidth();
-		int y1 = y0 + getHeight();
+	protected void renderBackground(GuiRenderer renderer) {
+		if (hasTransparentBackground()) {
+			renderer.gradient(getX(), getY(), getX() + getWidth(), getY() + getHeight(), 0xC0101010, 0xD0101010);
+		} else {
+			int x0 = getX();
+			int y0 = getY();
+			int x1 = x0 + getWidth();
+			int y1 = y0 + getHeight();
 
-		int tx0 = x0 / 2;
-		int ty0 = y0 / 2;
-		int tx1 = x1 / 2;
-		int ty1 = y1 / 2;
+			int u0 = x0 / 2;
+			int v0 = y0 / 2;
+			int u1 = x1 / 2;
+			int v1 = y1 / 2;
 
-		renderTextureColor(graphics, Texture.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF, 0x40, 0x40, 0x40);
-	}
-
-	protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY) {
-		super.render(graphics, mouseX, mouseY);
-	}
-
-	protected void drawTooltip(GuiGraphics graphics, Tooltip tooltip, int mouseX, int mouseY) {
-		List<Component> lines = tooltip.getLines();
-
-		int width = tooltip.getWidth(font) + 8;
-		int height = tooltip.getHeight(font) + 8;
-
-		int x = mouseX + 15;
-		int y = mouseY;
-
-		if (x + width > getX() + getWidth()) {
-			x = mouseX - 15 - width;
+			renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, u0, v0, u1, v1, 0xFF404040);
 		}
-		if (y + height > getY() + getHeight()) {
-			y = mouseY - height;
-		}
-
-		drawTooltip(graphics, lines, x, y, width, height);
 	}
 
-	private void drawTooltip(GuiGraphics graphics, List<Component> lines, int x, int y, int width, int height) {
-		int backgroundColor = 0xF0100010;
-		int borderColor0 = 0x505000FF;
-		int borderColor1 = 0x5028007F;
-
-		PoseStack poses = graphics.pose();
-
-		poses.pushPose();
-		poses.translate(0, 0, 400);
-
-		renderRect(graphics, (bufferBuilder, pose) -> {
-			// background
-			drawRect(bufferBuilder, pose, x    , y + 1         , width    , height - 2, backgroundColor); // center, left/right outer borders
-			drawRect(bufferBuilder, pose, x + 1, y             , width - 2, 1         , backgroundColor); // top outer border
-			drawRect(bufferBuilder, pose, x + 1, y + height - 1, width - 2, 1         , backgroundColor); // bottom outer border
-
-			// inner border
-			drawGradient(bufferBuilder, pose, x + 1        , y + 2         , 1        , height - 4, borderColor0, borderColor1); // left
-			drawRect    (bufferBuilder, pose, x + 1        , y + height - 2, width - 2, 1         , borderColor1);               // bottom
-			drawGradient(bufferBuilder, pose, x + width - 2, y + 2         , 1        , height - 4, borderColor0, borderColor1); // right
-			drawRect    (bufferBuilder, pose, x + 1        , y + 1         , width - 2, 1         , borderColor0);               // top
-		});
-
-		renderText(graphics, (immediate, model) -> {
-			int textX = x + 4;
-			int textY = y + 4;
-
-			for (int index = 0; index < lines.size(); index++) {
-				Component line = lines.get(index);
-				drawText(immediate, model, font, line, textX, textY, true);
-
-				textY += font.lineHeight + 1;
-			}
-		});
-
-		poses.popPose();
+	protected void renderContent(GuiRenderer renderer, int mouseX, int mouseY) {
+		super.render(renderer, mouseX, mouseY);
 	}
 
-	public Component getTitle() {
+	public Text getTitle() {
 		return title;
 	}
 
