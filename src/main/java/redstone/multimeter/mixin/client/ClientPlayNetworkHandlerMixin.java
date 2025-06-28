@@ -15,9 +15,9 @@ import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.network.packet.s2c.play.LoginS2CPacket;
 
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.common.network.Packets;
 import redstone.multimeter.interfaces.mixin.IMinecraft;
-import redstone.multimeter.util.TextUtils;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
@@ -43,8 +43,8 @@ public class ClientPlayNetworkHandlerMixin {
 		)
 	)
 	private void handleChatMessage(ChatMessageS2CPacket packet, CallbackInfo ci) {
-		if (TextUtils.ACTION_BAR_KEY.equals(packet.getMessage().getContent())) {
-			String message = packet.getMessage().getString().substring(TextUtils.ACTION_BAR_KEY.length());
+		if (Texts.ACTION_BAR_KEY.equals(packet.getMessage().getContent())) {
+			String message = packet.getMessage().getFormattedString().substring(Texts.ACTION_BAR_KEY.length());
 			minecraft.gui.setOverlayMessage(message, false);
 
 			ci.cancel();

@@ -1,5 +1,6 @@
 package redstone.multimeter.client.gui.hud.event;
 
+import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
@@ -20,12 +21,12 @@ public abstract class MeterEventRenderer {
 		return type;
 	}
 
-	public abstract void renderTickLogs(int x, int y, long firstTick, long lastTick, Meter meter);
+	public abstract void renderTickLogs(GuiRenderer renderer, int x, int y, long firstTick, long lastTick, Meter meter);
 
-	public void renderPulseLengths(int x, int y, long firstTick, long lastTick, Meter meter) {
+	public void renderPulseLengths(GuiRenderer renderer, int x, int y, long firstTick, long lastTick, Meter meter) {
 
 	}
 
-	public abstract void renderSubtickLogs(int x, int y, long tick, int subtickCount, Meter meter);
+	public abstract void renderSubtickLogs(GuiRenderer renderer, int x, int y, long tick, int subtickCount, Meter meter);
 
 }

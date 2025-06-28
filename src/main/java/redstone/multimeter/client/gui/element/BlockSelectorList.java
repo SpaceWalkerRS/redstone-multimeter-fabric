@@ -5,48 +5,32 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.Lighting;
-
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.TextRenderer;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.render.texture.TextureManager;
 import net.minecraft.client.resource.Identifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Tooltip;
-import redstone.multimeter.client.gui.element.button.IButton;
-import redstone.multimeter.util.TextUtils;
+import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 
-public class BlockListElement extends SelectableScrollableListElement {
+public class BlockSelectorList extends SelectorList {
 
 	private static final Random RANDOM = new Random();
 
-	private final TextureManager textureManager;
-	private final ItemRenderer itemRenderer;
-	private final TextRenderer textRenderer;
 	private final Consumer<Identifier> selectionListener;
 
-	public BlockListElement(MultimeterClient client, int width, int height, Consumer<Identifier> selector) {
-		this(client, width, height, 0, 0, selector);
+	public BlockSelectorList(int width, int height, Consumer<Identifier> selectionListener) {
+		this(width, height, 0, 0, selectionListener);
 	}
 
-	public BlockListElement(MultimeterClient client, int width, int height, int topBorder, int bottomBorder, Consumer<Identifier> selectionListener) {
-		super(client, width, height, topBorder, bottomBorder);
+	public BlockSelectorList(int width, int height, int topBorder, int bottomBorder, Consumer<Identifier> selectionListener) {
+		super(width, height, topBorder, bottomBorder);
 
-		Minecraft minecraft = this.client.getMinecraft();
-
-		this.textureManager = minecraft.getTextureManager();
-		this.itemRenderer = new ItemRenderer();
-		this.textRenderer = minecraft.textRenderer;
 		this.selectionListener = selectionListener;
 
-		setSorter((o1, o2) -> {
+		this.setSorter((o1, o2) -> {
 			if (o1 instanceof BlockListEntry && o2 instanceof BlockListEntry) {
 				BlockListEntry e1 = (BlockListEntry)o1;
 				BlockListEntry e2 = (BlockListEntry)o2;
@@ -64,22 +48,22 @@ public class BlockListElement extends SelectableScrollableListElement {
 
 		if (element instanceof BlockListEntry) {
 			BlockListEntry entry = (BlockListEntry)element;
-			selectionListener.accept(entry.key);
+			this.selectionListener.accept(entry.key);
 		}
 	}
 
 	public void add(Identifier key) {
-		addChild(new BlockListEntry(getEffectiveWidth(), IButton.DEFAULT_HEIGHT, key));
+		this.addChild(new BlockListEntry(this.getEffectiveWidth(), Button.DEFAULT_HEIGHT, key));
 	}
 
 	public void add(Collection<Identifier> keys) {
 		for (Identifier key : keys) {
-			add(key);
+			this.add(key);
 		}
 	}
 
 	public void setBlockFilter(Predicate<Identifier> filter) {
-		setFilter(e -> {
+		this.setFilter(e -> {
 			if (e instanceof BlockListEntry) {
 				BlockListEntry entry = (BlockListEntry)e;
 				return filter.test(entry.key);
@@ -121,23 +105,20 @@ public class BlockListElement extends SelectableScrollableListElement {
 		}
 
 		@Override
-		public void render(int mouseX, int mouseY) {
-			int height = getHeight();
-			int x = getX() + 2;
-			int y = getY() + (height - 16) / 2;
+		public void render(GuiRenderer renderer, int mouseX, int mouseY) {
+			int height = this.getHeight();
+			int x = this.getX() + 2;
+			int y = this.getY() + (height - 16) / 2;
 
-			if (icon != null) {
-				Lighting.turnOnGui();
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-				itemRenderer.renderGuiItem(textRenderer, textureManager, icon, x, y);
+			if (this.icon != null) {
+				renderer.renderItem(this.icon, x, y);
 			}
 
-			x = getX() + 22;
-			y = getY() + height - (height + textRenderer.fontHeight) / 2;
-			String text = textRenderer.trim(key.toString(), getWidth() - 22);
+			x = this.getX() + 22;
+			y = this.getY() + height - (height + font.height()) / 2;
+			String text = font.trim(this.key.toString(), getWidth() - 22);
 
-			renderText(textRenderer, text, x, y, true, 0xFFFFFFFF);
+			renderer.drawStringWithShadow(text, x, y);
 		}
 
 		@Override
@@ -182,10 +163,10 @@ public class BlockListElement extends SelectableScrollableListElement {
 			Tooltip tooltip = super.getTooltip(mouseX, mouseY);
 
 			if (tooltip.isEmpty()) {
-				String keyString = key.toString();
+				String keyString = this.key.toString();
 
-				if (textRenderer.getWidth(keyString) > (getWidth() - 22)) {
-					tooltip = Tooltip.of(TextUtils.toLines(textRenderer, keyString));
+				if (font.width(keyString) > (this.getWidth() - 22)) {
+					tooltip = Tooltips.split(font, keyString);
 				}
 			}
 

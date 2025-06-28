@@ -2,94 +2,90 @@ package redstone.multimeter.client.gui.element.meter;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.TextRenderer;
-import net.minecraft.text.Formatting;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
 
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.Tooltip;
+import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
-import redstone.multimeter.client.gui.element.SimpleListElement;
-import redstone.multimeter.client.gui.element.TextElement;
+import redstone.multimeter.client.gui.element.SimpleList;
+import redstone.multimeter.client.gui.element.Label;
 import redstone.multimeter.client.gui.element.action.MousePress;
 import redstone.multimeter.client.gui.element.button.ButtonFactory;
-import redstone.multimeter.client.gui.element.button.IButton;
+import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.element.button.SuggestionsMenu;
 import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.TextFieldFactory;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
 import redstone.multimeter.client.gui.element.button.TransparentToggleButton;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.Style;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
+import redstone.multimeter.client.gui.tooltip.Tooltips;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.util.Direction.Axis;
 
 public class MeterPropertyElement extends AbstractParentElement {
 
-	private final MultimeterClient client;
-	private final TextRenderer textRenderer;
-	private final TextElement property;
-	private final SimpleListElement controls;
+	private final FontRenderer font;
+	private final Label property;
+	private final SimpleList controls;
 	private final int buttonWidth;
 
-	private IButton toggle;
+	private Button toggle;
 	private Consumer<Boolean> listener;
 
 	private boolean active;
 
-	public MeterPropertyElement(MultimeterClient client, int width, int buttonWidth, String name) {
-		this(client, width, buttonWidth, name, () -> Tooltip.EMPTY, t -> false);
+	public MeterPropertyElement(int width, int buttonWidth, String name) {
+		this(width, buttonWidth, name, Tooltips::empty, MousePress::pass);
 	}
 
-	public MeterPropertyElement(MultimeterClient client, int width, int buttonWidth, String name, Supplier<Tooltip> tooltip,
-		MousePress<TextElement> onPress) {
-		Minecraft minecraft = client.getMinecraft();
-
-		this.client = client;
-		this.textRenderer = minecraft.textRenderer;
-		this.property = new TextElement(this.client, 0, 0, t -> t.setText(new LiteralText(name).setFormatting(Formatting.ITALIC, this.active ? Formatting.WHITE : Formatting.GRAY)).setWithShadow(true), tooltip, onPress);
-		this.controls = new SimpleListElement(client, width);
+	public MeterPropertyElement(int width, int buttonWidth, String name, Supplier<Tooltip> tooltip, MousePress<Label> onPress) {
+		this.font = MultimeterClient.INSTANCE.getFontRenderer();
+		this.property = new Label(0, 0, t -> t.setLines(Texts.literal(name).format(Formatting.ITALIC, this.active ? Formatting.WHITE : Formatting.GRAY)).setShadow(true), tooltip, onPress);
+		this.controls = new SimpleList(width);
 		this.buttonWidth = buttonWidth;
 		this.active = true;
 
-		addChild(this.property);
-		addChild(this.controls);
+		this.addChild(this.property);
+		this.addChild(this.controls);
 
-		setWidth(width);
+		this.setWidth(width);
 	}
 
 	@Override
 	public void setX(int x) {
 		super.setX(x);
 
-		if (toggle == null) {
-			property.setX(x + 2);
+		if (this.toggle == null) {
+			this.property.setX(x + 2);
 		} else {
-			toggle.setX(x + 2);
-			property.setX(toggle.getX() + toggle.getWidth() + 4);
+			this.toggle.setX(x + 2);
+			this.property.setX(this.toggle.getX() + this.toggle.getWidth() + 4);
 		}
 
-		controls.setX(x);
+		this.controls.setX(x);
 	}
 
 	@Override
 	public void setY(int y) {
 		super.setY(y);
 
-		if (toggle != null) {
-			toggle.setY(y + IButton.DEFAULT_HEIGHT - (IButton.DEFAULT_HEIGHT + toggle.getHeight()) / 2);
+		if (this.toggle != null) {
+			this.toggle.setY(y + Button.DEFAULT_HEIGHT - (Button.DEFAULT_HEIGHT + this.toggle.getHeight()) / 2);
 		}
-		property.setY(y + IButton.DEFAULT_HEIGHT - (IButton.DEFAULT_HEIGHT + textRenderer.fontHeight) / 2);
-		controls.setY(y);
+		this.property.setY(y + Button.DEFAULT_HEIGHT - (Button.DEFAULT_HEIGHT + this.font.height()) / 2);
+		this.controls.setY(y);
 	}
 
 	public void withToggle(Consumer<Boolean> listener) {
-		if (toggle == null) {
-			addChild(0, toggle = new TransparentToggleButton(client, 0, 0, 12, 12, on -> new LiteralText(on ? "\u25A0" : "\u25A1"), () -> isActive(), button -> setActive(!active)));
+		if (this.toggle == null) {
+			this.addChild(0, this.toggle = new TransparentToggleButton(0, 0, 12, 12, on -> Texts.literal(on ? "\u25A0" : "\u25A1"), () -> this.isActive(), button -> this.setActive(!this.isActive())));
 		}
 
 		this.listener = listener;
@@ -98,81 +94,81 @@ public class MeterPropertyElement extends AbstractParentElement {
 	private void addControl(MeterControlElement control) {
 		control.addChildren();
 
-		controls.add(control);
-		controls.updateCoords();
+		this.controls.add(control);
+		this.controls.updateCoords();
 
-		setHeight(controls.getHeight());
+		this.setHeight(this.controls.getHeight());
 	}
 
 	public void addControl(String name, ButtonFactory factory) {
-		addControl(name, style -> { }, factory);
+		this.addControl(name, UnaryOperator.identity(), factory);
 	}
 
 	public void addControl(String name, ButtonFactory factory, Supplier<Tooltip> tooltip) {
-		addControl(name, style -> { }, factory, tooltip);
+		this.addControl(name, UnaryOperator.identity(), factory, tooltip);
 	}
 
 	public void addControl(String name, TextFieldFactory factory, SuggestionsProvider suggestions) {
-		addControl(name, style -> { }, factory, suggestions);
+		this.addControl(name, UnaryOperator.identity(), factory, suggestions);
 	}
 
-	public void addControl(String name, Consumer<Style> formatter, ButtonFactory factory) {
-		addControl(new MeterControlElement(name, formatter, factory));
+	public void addControl(String name, UnaryOperator<Style> formatter, ButtonFactory factory) {
+		this.addControl(new MeterControlElement(name, formatter, factory));
 	}
 
-	public void addControl(String name, Consumer<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
-		addControl(new MeterControlElement(name, formatter, factory, tooltip));
+	public void addControl(String name, UnaryOperator<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+		this.addControl(new MeterControlElement(name, formatter, factory, tooltip));
 	}
 
-	public void addControl(String name, Consumer<Style> formatter, TextFieldFactory factory, SuggestionsProvider suggestions) {
-		addControl(new TextFieldControlElement(name, formatter, factory, suggestions));
+	public void addControl(String name, UnaryOperator<Style> formatter, TextFieldFactory factory, SuggestionsProvider suggestions) {
+		this.addControl(new TextFieldControlElement(name, formatter, factory, suggestions));
 	}
 
 	public void addCoordinateControl(Axis axis, Supplier<DimPos> getter, Consumer<DimPos> setter) {
-		addControl(new CoordinateControlElement(axis, getter, setter));
+		this.addControl(new CoordinateControlElement(axis, getter, setter));
 	}
 
 	public boolean isActive() {
-		return active;
+		return this.active;
 	}
 
 	public void setActive(boolean active) {
 		this.active = active;
 
-		if (listener != null) {
-			listener.accept(this.active);
+		if (this.listener != null) {
+			this.listener.accept(this.active);
 		}
 
-		update();
+		this.update();
 	}
 
 	private class MeterControlElement extends AbstractParentElement {
 
-		protected final TextElement name;
-		protected final IButton control;
+		protected final Label name;
+		protected final Button control;
 
 		public MeterControlElement(String name, ButtonFactory factory) {
-			this(name, style -> { }, factory);
+			this(name, UnaryOperator.identity(), factory);
 		}
 
-		public MeterControlElement(String name, Consumer<Style> formatter, ButtonFactory factory) {
-			this(name, formatter, factory, () -> Tooltip.EMPTY);
+		public MeterControlElement(String name, UnaryOperator<Style> formatter, ButtonFactory factory) {
+			this(name, formatter, factory, Tooltips::empty);
 		}
 
-		public MeterControlElement(String name, Consumer<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
-			this.name = new TextElement(client, 0, 0, t -> t.setText(formatName(name, formatter)).setWithShadow(true), tooltip);
-			this.control = factory.create(client, buttonWidth, IButton.DEFAULT_HEIGHT);
+		public MeterControlElement(String name, UnaryOperator<Style> formatter, ButtonFactory factory, Supplier<Tooltip> tooltip) {
+			this.name = new Label(0, 0, t -> t.setLines(formatName(name, formatter)).setShadow(true), tooltip);
+			this.control = factory.create(MeterPropertyElement.this.buttonWidth, Button.DEFAULT_HEIGHT);
 
-			setWidth(this.name.getWidth() + 4 + this.control.getWidth() + 10);
-			setHeight(IButton.DEFAULT_HEIGHT);
+			this.setWidth(this.name.getWidth() + 4 + this.control.getWidth() + 10);
+			this.setHeight(Button.DEFAULT_HEIGHT);
 		}
 
 		@Override
 		public void setX(int x) {
-			super.setX(x + controls.getWidth() - getWidth());
+			super.setX(x + MeterPropertyElement.this.controls.getWidth() - getWidth());
 
-			name.setX(getX());
-			control.setX(getX() + name.getWidth() + 4);
+			this.name.setX(getX());
+			this.control.setX(getX() + this.name.getWidth() + 4);
 		}
 
 		@Override
@@ -181,25 +177,25 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 			int height = getHeight();
 
-			name.setY(y + height - (height + textRenderer.fontHeight) / 2);
-			control.setY(y);
+			this.name.setY(y + height - (height + MeterPropertyElement.this.font.height()) / 2);
+			this.control.setY(y);
 		}
 
 		@Override
 		public void update() {
 			super.update();
-			control.setActive(active);
+			this.control.setActive(MeterPropertyElement.this.isActive());
 		}
 
 		protected void addChildren() {
-			addChild(name);
-			addChild(control);
+			this.addChild(this.name);
+			this.addChild(this.control);
 		}
 
-		protected Text formatName(String name, Consumer<Style> formatter) {
-			int width = controls.getWidth() - (4 + buttonWidth + 10);
-			Text text = new LiteralText(textRenderer.trim(name, width, true));
-			return active ? text.withStyle(formatter) : text.setFormatting(Formatting.GRAY);
+		protected Text formatName(String name, UnaryOperator<Style> formatter) {
+			int width = MeterPropertyElement.this.controls.getWidth() - (4 + MeterPropertyElement.this.buttonWidth + 10);
+			Text text = Texts.literal(MeterPropertyElement.this.font.trim(name, width, true));
+			return MeterPropertyElement.this.isActive() ? text.format(formatter) : text.format(Formatting.GRAY);
 		}
 	}
 
@@ -207,20 +203,20 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 		private final SuggestionsMenu suggestions;
 
-		public TextFieldControlElement(String name, Consumer<Style> formatter, TextFieldFactory factory, SuggestionsProvider suggestions) {
-			super(name, formatter, factory, () -> Tooltip.EMPTY);
+		public TextFieldControlElement(String name, UnaryOperator<Style> formatter, TextFieldFactory factory, SuggestionsProvider suggestions) {
+			super(name, formatter, factory, Tooltips::empty);
 
 			this.suggestions = ((TextField) this.control).setSuggestions(suggestions);
 		}
 
 		@Override
 		public boolean isMouseOver(double mouseX, double mouseY) {
-			return super.isMouseOver(mouseX, mouseY) || suggestions.isMouseOver(mouseX, mouseY);
+			return super.isMouseOver(mouseX, mouseY) || this.suggestions.isMouseOver(mouseX, mouseY);
 		}
 
 		@Override
 		protected void addChildren() {
-			addChild(suggestions);
+			this.addChild(this.suggestions);
 
 			super.addChildren();
 		}
@@ -228,12 +224,12 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 	private class CoordinateControlElement extends MeterControlElement {
 
-		private final IButton increase;
-		private final IButton decrease;
+		private final Button increase;
+		private final Button decrease;
 
 		public CoordinateControlElement(Axis axis, Supplier<DimPos> getter, Consumer<DimPos> setter) {
-			super(axis.getName(), (client, width, height) -> {
-				return new TextField(client, 0, 0, width, height, () -> Tooltip.EMPTY, text -> {
+			super(axis.getName(), (width, height) -> {
+				return new TextField(0, 0, width, height, Tooltips::empty, text -> {
 					try {
 						DimPos pos = getter.get();
 						int x = pos.getX();
@@ -258,9 +254,9 @@ public class MeterPropertyElement extends AbstractParentElement {
 				});
 			});
 
-			int size = getHeight() / 2 - 1;
+			int size = this.getHeight() / 2 - 1;
 
-			this.increase = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("+"), () -> Tooltip.EMPTY, button -> {
+			this.increase = new TransparentButton(0, 0, size, size, Texts::addition, Tooltips::empty, button -> {
 				int distance = Screen.isShiftDown() ? 10 : 1;
 				DimPos pos = getter.get();
 				DimPos newPos = pos.offset(axis, distance);
@@ -269,7 +265,7 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 				return true;
 			});
-			this.decrease = new TransparentButton(client, 0, 0, size, size, () -> new LiteralText("-"), () -> Tooltip.EMPTY, button -> {
+			this.decrease = new TransparentButton(0, 0, size, size, Texts::subtraction, Tooltips::empty, button -> {
 				int distance = Screen.isShiftDown() ? 10 : 1;
 				DimPos pos = getter.get();
 				DimPos newPos = pos.offset(axis, -distance);
@@ -284,28 +280,28 @@ public class MeterPropertyElement extends AbstractParentElement {
 		public void setX(int x) {
 			super.setX(x);
 
-			x = control.getX() + control.getWidth();
+			x = this.control.getX() + this.control.getWidth();
 
-			increase.setX(x);
-			decrease.setX(x);
+			this.increase.setX(x);
+			this.decrease.setX(x);
 		}
 
 		@Override
 		public void setY(int y) {
 			super.setY(y);
 
-			y = control.getY() + 1;
+			y = this.control.getY() + 1;
 
-			increase.setY(y);
-			decrease.setY(y + increase.getHeight());
+			this.increase.setY(y);
+			this.decrease.setY(y + this.increase.getHeight());
 		}
 
 		@Override
 		protected void addChildren() {
 			super.addChildren();
 
-			addChild(increase);
-			addChild(decrease);
+			this.addChild(this.increase);
+			this.addChild(this.decrease);
 		}
 	}
 }

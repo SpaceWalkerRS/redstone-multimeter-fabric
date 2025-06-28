@@ -4,12 +4,26 @@ import net.minecraft.block.Blocks;
 import net.minecraft.stat.achievement.AchievementStat;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.Keybinds;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
 public class ScrollHudTutorial extends StagedTutorialInstance {
+
+	private static final Text TITLE = Texts.literal("Scroll The HUD");
+	private static final Text DESCRIPTION = Texts.composite(
+		"Use the ",
+		Texts.keybind(Keybinds.STEP_BACKWARD),
+		" and ",
+		Texts.keybind(Keybinds.STEP_FORWARD),
+		" keys or ",
+		Texts.keybinds(Keybinds.SCROLL_HUD, "scroll"),
+		" to scroll through the Multimeter timeline."
+	);
 
 	private static final int TIMES_SCROLLED_TARGET = 5;
 

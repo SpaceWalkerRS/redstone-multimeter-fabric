@@ -3,6 +3,9 @@ package redstone.multimeter.client.tutorial.instance;
 import net.minecraft.block.Blocks;
 import net.minecraft.stat.achievement.AchievementStat;
 
+import redstone.multimeter.client.Keybinds;
+import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
@@ -10,6 +13,13 @@ import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 
 public class PlaceMeterTutorial extends StagedTutorialInstance {
+
+	private static final Text TITLE = Texts.literal("Place A Meter");
+	private static final Text DESCRIPTION = Texts.composite(
+		"Look at a block and press ",
+		Texts.keybind(Keybinds.TOGGLE_METER),
+		" to place a meter on that block."
+	);
 
 	private Stage stage;
 	private DimPos lastRequest;
