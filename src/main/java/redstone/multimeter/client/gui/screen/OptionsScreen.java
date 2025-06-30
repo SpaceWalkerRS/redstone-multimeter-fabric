@@ -28,7 +28,7 @@ public class OptionsScreen extends RSMMScreen {
 		super.onRemoved();
 		Options.validate();
 		minecraft.options.save();
-		client.getHud().onOptionsChanged();
+		client.getHud().optionsChanged();
 	}
 
 	@Override
