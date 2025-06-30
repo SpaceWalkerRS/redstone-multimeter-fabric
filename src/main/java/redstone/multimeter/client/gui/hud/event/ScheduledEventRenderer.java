@@ -16,16 +16,17 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 	@Override
 	protected void drawEdges(int x, int y, Meter meter, MeterEvent event) {
 		if (scheduling(event)) {
-			if (hud.settings.columnWidth < 3) {
+			if (hud.settings.columnWidth < (3 + hud.settings.wparity) * hud.settings.scale) {
 				return;
 			}
 
-			int width = hud.settings.columnWidth;
-			int half = hud.settings.rowHeight / 2;
-			int height = (2 * half < hud.settings.rowHeight) ? 5 : 6;
-			int color = edgeColorProvider.apply(meter, event);
+			int width = hud.settings.scale * (3 + hud.settings.wparity);
+			int widthOffset = (hud.settings.columnWidth - width) / 2;
+			int height = hud.settings.scale * (hud.settings.rowHeight / hud.settings.scale / 3 + 2);
+			int heightOffset = (hud.settings.rowHeight - height) / 2 + hud.settings.hparity;
+			int color = hud.settings.colorBackground;
 
-			hud.renderer.renderRect(x, y + half - (height / 2), width, height, color);
+			hud.renderer.renderRect(x + widthOffset, y + heightOffset, width, height, color);
 		} else {
 			super.drawEdges(x, y, meter, event);
 		}
@@ -34,13 +35,13 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 	@Override
 	protected void drawCenter(int x, int y, Meter meter, MeterEvent event) {
 		if (scheduling(event)) {
-			int halfWidth = hud.settings.columnWidth / 2;
-			int width = hud.settings.columnWidth - 2;
-			int halfHeight = hud.settings.rowHeight / 2;
-			int height = (2 * halfHeight < hud.settings.rowHeight) ? 3 : 4;
-			int color = centerColorProvider.apply(meter, event);
+			int width = hud.settings.scale * (1 + hud.settings.wparity);
+			int widthOffset = (hud.settings.columnWidth - width) / 2;
+			int height = hud.settings.scale * (hud.settings.rowHeight / hud.settings.scale / 3);
+			int heightOffset = (hud.settings.rowHeight - height) / 2 + hud.settings.hparity;
+			int color = meter.getColor();
 
-			hud.renderer.renderRect(x + halfWidth - (width / 2), y + halfHeight - (height / 2), width, height, color);
+			hud.renderer.renderRect(x + widthOffset, y + heightOffset, width, height, color);
 		} else {
 			super.drawCenter(x, y, meter, event);
 		}
