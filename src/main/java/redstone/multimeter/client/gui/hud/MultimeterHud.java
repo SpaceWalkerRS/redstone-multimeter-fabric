@@ -379,7 +379,7 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}, () -> Tooltips.keybind("Toggle Tick Marker", Keybinds.TOGGLE_MARKER));
 
-		this.playPauseButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltips.keybind("Pause Timeline", Keybinds.PAUSE_METERS), button -> {
+		this.playPauseButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltips.keybind("Pause Meters", Keybinds.PAUSE_METERS), button -> {
 			togglePaused();
 			return true;
 		});
