@@ -46,9 +46,10 @@ public class Options {
 		public static final EnumOption<Directionality.Y> DIRECTIONALITY_Y     = new EnumOption<>("Vertical Directionality", "The direction along which meters are listed.", Directionality.Y.class, Directionality.Y.TOP_TO_BOTTOM);
 		public static final IntegerOption                COLUMN_COUNT         = new IntegerOption("History", "The number of ticks displayed in the primary overview.", 60, 1, 10001);
 		public static final IntegerOption                SELECTED_COLUMN      = new IntegerOption("Selected Column", "The column of the primary overview that highlights the tick that is selected for showing sub-tick events in the secondary overview.", 44, 0, 10000);
+		public static final IntegerOption                CELL_SCALE           = new IntegerOption("Cell Scale", "The scale of cells in the primary and secondary overviews.", 1, 1, 10);
 		public static final IntegerOption                COLUMN_WIDTH         = new IntegerOption("Column Width", "The width of a column of the primary and secondary overviews.", 3, 1, 50);
 		public static final IntegerOption                ROW_HEIGHT           = new IntegerOption("Row Height", "The height of a row in the HUD.", 9, 1, 50);
-		public static final IntegerOption                GRID_SIZE            = new IntegerOption("Grid Size", "The thickness of the gridlines in the HUD.", 1, 1, 5);
+		public static final IntegerOption                GRID_SIZE            = new IntegerOption("Grid Size", "The thickness of the gridlines in the HUD.", 1, 1, 10);
 		public static final StringOption                 TICK_MARKER_COLOR    = new StringOption("Tick Marker Color", "The color of the highlight around the tick marker, in RRGGBB format.", "FF0000", 6);
 		public static final BooleanOption                AUTO_REMOVE_MARKER   = new BooleanOption("Auto Remove Tick Marker", "Automatically remove the tick marker when unpausing the HUD.", false);
 		public static final BooleanOption                HIDE_HIGHLIGHT       = new BooleanOption("Hide Highlight", "Hide the highlight around the selected tick when the HUD is not paused.", true);
@@ -206,6 +207,7 @@ public class Options {
 			HUD.DIRECTIONALITY_Y,
 			HUD.COLUMN_COUNT,
 			HUD.SELECTED_COLUMN,
+			HUD.CELL_SCALE,
 			HUD.COLUMN_WIDTH,
 			HUD.ROW_HEIGHT,
 			HUD.GRID_SIZE,
