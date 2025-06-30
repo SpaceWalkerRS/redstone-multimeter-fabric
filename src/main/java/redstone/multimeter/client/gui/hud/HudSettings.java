@@ -1,6 +1,7 @@
 package redstone.multimeter.client.gui.hud;
 
 import redstone.multimeter.client.option.Options;
+import redstone.multimeter.util.ColorUtils;
 
 public class HudSettings {
 
@@ -16,6 +17,9 @@ public class HudSettings {
 	public int columnWidth;
 	public int rowHeight;
 	public int gridSize;
+	public int scale;
+	public int wparity;
+	public int hparity;
 	public int colorHighlightTickMarker;
 	public boolean forceFullOpacity;
 	public boolean ignoreHiddenMeters;
@@ -33,5 +37,33 @@ public class HudSettings {
 
 	public int opacity() {
 		return forceFullOpacity ? 100 : Options.HUD.OPACITY.get();
+	}
+
+	public void optionsChanged() {
+		this.scale = Options.HUD.CELL_SCALE.get();
+		this.columnWidth = Options.HUD.COLUMN_WIDTH.get();
+		this.rowHeight = Options.HUD.ROW_HEIGHT.get();
+		this.gridSize = Options.HUD.GRID_SIZE.get();
+
+		this.wparity = 1 - this.columnWidth % 2;
+		this.hparity = 1 - this.rowHeight % 2;
+
+		this.columnWidth *= this.scale;
+		this.rowHeight *= this.scale;
+
+		if (!this.setTickMarkerColor(Options.HUD.TICK_MARKER_COLOR.get())) {
+			this.setTickMarkerColor(Options.HUD.TICK_MARKER_COLOR.getDefault());
+		}
+	}
+
+	public boolean setTickMarkerColor(String hexColor) {
+		try {
+			int color = ColorUtils.fromRGBString(hexColor);
+			this.colorHighlightTickMarker = color;
+
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 }
