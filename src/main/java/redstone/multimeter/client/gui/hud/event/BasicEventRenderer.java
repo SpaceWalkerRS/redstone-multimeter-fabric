@@ -1,7 +1,5 @@
 package redstone.multimeter.client.gui.hud.event;
 
-import java.util.function.BiFunction;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import redstone.multimeter.client.gui.hud.MultimeterHud;
@@ -14,18 +12,8 @@ import redstone.multimeter.common.meter.log.MeterLogs;
 
 public class BasicEventRenderer extends MeterEventRenderer {
 
-	protected final BiFunction<Meter, MeterEvent, Integer> edgeColorProvider;
-	protected final BiFunction<Meter, MeterEvent, Integer> centerColorProvider;
-
 	public BasicEventRenderer(MultimeterHud hud) {
-		this(hud, (m, e) -> hud.settings.colorBackground, (m, e) -> m.getColor());
-	}
-
-	public BasicEventRenderer(MultimeterHud hud, BiFunction<Meter, MeterEvent, Integer> edgeColorProvider, BiFunction<Meter, MeterEvent, Integer> centerColorProvider) {
 		super(hud, null);
-
-		this.edgeColorProvider = edgeColorProvider;
-		this.centerColorProvider = centerColorProvider;
 	}
 
 	@Override
@@ -101,24 +89,24 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 
 	protected void drawEdges(PoseStack poses, int x, int y, Meter meter, MeterEvent event) {
-		if (hud.settings.rowHeight < 3) {
+		if (hud.settings.rowHeight < (3 + hud.settings.hparity) * hud.settings.scale) {
 			return;
 		}
 
 		int width = hud.settings.columnWidth;
-		int half = hud.settings.rowHeight / 2;
-		int height = (2 * half < hud.settings.rowHeight) ? 3 : 4;
-		int color = edgeColorProvider.apply(meter, event);
+		int height = hud.settings.scale * (3 + hud.settings.hparity);
+		int heightOffset = (hud.settings.rowHeight - height) / 2 + hud.settings.hparity;
+		int color = hud.settings.colorBackground;
 
-		hud.renderer.renderRect(poses, x, y + half - (height / 2), width, height, color);
+		hud.renderer.renderRect(poses, x, y + heightOffset, width, height, color);
 	}
 
 	protected void drawCenter(PoseStack poses, int x, int y, Meter meter, MeterEvent event) {
 		int width = hud.settings.columnWidth;
-		int half = hud.settings.rowHeight / 2;
-		int height = (2 * half < hud.settings.rowHeight) ? 1 : 2;
-		int color = centerColorProvider.apply(meter, event);
+		int height = hud.settings.scale * (1 + hud.settings.hparity);
+		int heightOffset = (hud.settings.rowHeight - height) / 2 + hud.settings.hparity;
+		int color = meter.getColor();
 
-		hud.renderer.renderRect(poses, x, y + half - (height / 2), width, height, color);
+		hud.renderer.renderRect(poses, x, y + heightOffset, width, height, color);
 	}
 }
