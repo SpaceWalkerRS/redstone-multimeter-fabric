@@ -30,7 +30,7 @@ public class OptionsScreen extends RSMMScreen {
 		Options.validate();
 		minecraft.options.save();
 		minecraft.keyboardHandler.setSendRepeatsToGui(false);
-		client.getHud().onOptionsChanged();
+		client.getHud().optionsChanged();
 	}
 
 	@Override
