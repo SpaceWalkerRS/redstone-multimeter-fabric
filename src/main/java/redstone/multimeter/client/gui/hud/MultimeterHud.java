@@ -131,8 +131,6 @@ public class MultimeterHud extends AbstractParentElement {
 
 		onScreen = false;
 
-		settings.rowHeight = Options.HUD.ROW_HEIGHT.get();
-
 		settings.forceFullOpacity = false;
 		settings.ignoreHiddenMeters = true;
 
@@ -321,7 +319,7 @@ public class MultimeterHud extends AbstractParentElement {
 				int color = ColorUtils.setAlpha(rgb, a);
 
 				if (!this.client.isPreviewing() && this.client.getMeterGroup().isDirty()) {
-					text = ChatFormatting.BOLD + text;
+					text = Formatting.BOLD + text;
 				}
 
 				t.setText(text);
@@ -407,7 +405,7 @@ public class MultimeterHud extends AbstractParentElement {
 		addChild(this.fastForwardButton);
 		addChild(this.printIndicator);
 
-		onOptionsChanged();
+		optionsChanged();
 		resetSize();
 	}
 
@@ -670,21 +668,6 @@ public class MultimeterHud extends AbstractParentElement {
 		updateTickMarkerCounter();
 	}
 
-	public boolean setTickMarkerColor(String rawColor) {
-		try {
-			int color = ColorUtils.fromRGBString(rawColor);
-			setTickMarkerColor(color);
-
-			return true;
-		} catch (NumberFormatException e) {
-			return false;
-		}
-	}
-
-	public void setTickMarkerColor(int color) {
-		settings.colorHighlightTickMarker = color;
-	}
-
 	private void updateTickMarkerCounter() {
 		tickMarkerCounter.update();
 
@@ -900,11 +883,8 @@ public class MultimeterHud extends AbstractParentElement {
 		}
 	}
 
-	public void onOptionsChanged() {
-		settings.columnWidth = Options.HUD.COLUMN_WIDTH.get();
-		settings.rowHeight = Options.HUD.ROW_HEIGHT.get();
-		settings.gridSize = Options.HUD.GRID_SIZE.get();
-		updateTickMarkerColor();
+	public void optionsChanged() {
+		settings.optionsChanged();
 
 		meterGroupSlot.update();
 		meterGroupName.update();
@@ -913,15 +893,6 @@ public class MultimeterHud extends AbstractParentElement {
 
 		if (!paused) {
 			resetOffset();
-		}
-	}
-
-	public void updateTickMarkerColor() {
-		String rawColor = Options.HUD.TICK_MARKER_COLOR.get();
-
-		if (!setTickMarkerColor(rawColor)) {
-			rawColor = Options.HUD.TICK_MARKER_COLOR.getDefault();
-			setTickMarkerColor(rawColor);
 		}
 	}
 

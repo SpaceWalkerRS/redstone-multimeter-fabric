@@ -18,7 +18,7 @@ import redstone.multimeter.util.TextUtils;
 
 public class MeterListRenderer extends AbstractElement {
 
-	private static final int MARGIN = 3;
+	private static final int MARGIN = 1;
 
 	private final MultimeterHud hud;
 
@@ -291,7 +291,7 @@ public class MeterListRenderer extends AbstractElement {
 			}
 		}
 
-		setWidth(width + MARGIN);
+		setWidth(width + 2 * hud.settings.gridSize + MARGIN);
 	}
 
 	public void updateHeight() {
