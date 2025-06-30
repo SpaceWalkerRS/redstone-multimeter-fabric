@@ -243,21 +243,22 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 
 	private void drawOn(GuiRenderer renderer, int x, int y, int color) {
-		int offset = hud.settings.scale;
+		int border = hud.settings.scale;
 
-		int width = hud.settings.columnWidth - 2 * offset;
-		int height = hud.settings.rowHeight - 2 * offset;
+		int width = hud.settings.columnWidth - 2 * border;
+		int height = hud.settings.rowHeight - 2 * border;
+		int heightOffset = 0;
 
 		if (mode != Mode.ALL) {
 			height /= 2;
 
 			if (mode == Mode.BOTTOM) {
-				offset += (hud.settings.rowHeight - (height + 2 * hud.settings.scale));
+				heightOffset = (hud.settings.rowHeight - (height + 2 * hud.settings.scale));
 			}
 		}
 
-		int x0 = x + 1;
-		int y0 = y + offset;
+		int x0 = x + border;
+		int y0 = y + border + heightOffset;
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
