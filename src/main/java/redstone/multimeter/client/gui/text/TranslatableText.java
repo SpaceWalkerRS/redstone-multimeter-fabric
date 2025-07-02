@@ -126,7 +126,7 @@ public class TranslatableText extends BaseText {
 			String line;
 
 			while ((line = br.readLine()) != null) {
-				if (line.charAt(0) == '#' || line.trim().isEmpty()) {
+				if (line.trim().isEmpty() || line.charAt(0) == '#') {
 					continue;
 				}
 
