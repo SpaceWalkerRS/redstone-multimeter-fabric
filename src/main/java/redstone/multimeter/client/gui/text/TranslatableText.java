@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.TextComponent;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 
@@ -56,7 +56,7 @@ public class TranslatableText extends BaseText {
 
 	@Override
 	MutableComponent buildComponent() {
-		return new TranslatableComponent(this.key, this.args);
+		return new TextComponent(this.buildFormattedString());
 	}
 
 	private void resolve(String translation) {
@@ -130,7 +130,7 @@ public class TranslatableText extends BaseText {
 			String line;
 
 			while ((line = br.readLine()) != null) {
-				if (line.charAt(0) == '#' || line.trim().isEmpty()) {
+				if (line.trim().isEmpty() || line.charAt(0) == '#') {
 					continue;
 				}
 
