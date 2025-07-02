@@ -8,7 +8,9 @@ import net.minecraft.client.render.TextRenderer;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.text.TextColor;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
+import redstone.multimeter.util.ColorUtils;
 
 public class FontRenderer {
 
@@ -35,7 +37,7 @@ public class FontRenderer {
 	}
 
 	public void draw(Text t, int x, int y) {
-		this.font.draw(t.resolve(), x, y, 0xFFFFFFFF);
+		this.font.draw(t.buildFormattedString(), x, y, this.resolveColor(t, 0xFFFFFFFF));
 	}
 
 	public void draw(String s, int x, int y, int color) {
@@ -43,7 +45,7 @@ public class FontRenderer {
 	}
 
 	public void draw(Text t, int x, int y, int color) {
-		this.font.draw(t.resolve(), x, y, color);
+		this.font.draw(t.buildFormattedString(), x, y, this.resolveColor(t, color));
 	}
 
 	public void drawWithShadow(String s, int x, int y) {
@@ -51,7 +53,7 @@ public class FontRenderer {
 	}
 
 	public void drawWithShadow(Text t, int x, int y) {
-		this.font.drawWithShadow(t.resolve(), x, y, 0xFFFFFFFF);
+		this.font.drawWithShadow(t.buildFormattedString(), x, y, this.resolveColor(t, 0xFFFFFFFF));
 	}
 
 	public void drawWithShadow(String s, int x, int y, int color) {
@@ -59,7 +61,7 @@ public class FontRenderer {
 	}
 
 	public void drawWithShadow(Text t, int x, int y, int color) {
-		this.font.drawWithShadow(t.resolve(), x, y, color);
+		this.font.drawWithShadow(t.buildFormattedString(), x, y, this.resolveColor(t, color));
 	}
 
 	public void draw(String s, int x, int y, int color, boolean shadow) {
@@ -76,6 +78,19 @@ public class FontRenderer {
 		} else {
 			this.draw(t, x, y, color);
 		}
+	}
+
+	private int resolveColor(Text t, int color) {
+		TextColor textColor = t.getStyle().getColor();
+
+		if (textColor != null) {
+			int rgb = textColor.getColor();
+			int alpha = ColorUtils.getAlpha(color);
+
+			color = ColorUtils.setAlpha(rgb, alpha);
+		}
+
+		return color;
 	}
 
 	public String trim(String s, int width) {
