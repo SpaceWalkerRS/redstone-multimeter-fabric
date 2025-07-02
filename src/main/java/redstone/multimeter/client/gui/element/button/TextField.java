@@ -5,10 +5,9 @@ import java.util.function.Supplier;
 
 import org.lwjgl.input.Keyboard;
 
-import net.minecraft.text.Formatting;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.math.MathHelper;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
@@ -16,6 +15,8 @@ import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.Element;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
+import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.client.gui.tooltip.Tooltips;
@@ -29,7 +30,7 @@ public class TextField extends AbstractButton {
 
 	private SuggestionsMenu suggestions;
 
-	private String hint;
+	private Text hint;
 	private String value;
 	private String suffix;
 
@@ -59,7 +60,7 @@ public class TextField extends AbstractButton {
 		this.listener = listener;
 		this.updater = updater;
 
-		this.hint = "";
+		this.hint = null;
 		this.value = "";
 		this.suffix = "";
 
@@ -342,12 +343,11 @@ public class TextField extends AbstractButton {
 
 	@Override
 	protected void renderButtonMessage(GuiRenderer renderer) {
-		if (!this.isFocused() && this.isActive() && this.value.isEmpty() && !this.hint.isEmpty()) {
-			// ideally the hint would be entirely visible but just in case...
-			String visibleHint = Formatting.ITALIC + this.font.trim(this.hint, this.textWidth, false);
+		if (!this.isFocused() && this.isActive() && this.value.isEmpty() && this.hint != null) {
+			Text hint = this.hint.format(Formatting.ITALIC);
 			int hintColor = this.getHintColor();
 
-			renderer.drawStringWithShadow(visibleHint, this.textX, this.textY, hintColor);
+			renderer.drawStringWithShadow(hint, this.textX, this.textY, hintColor);
 		} else {
 			String scrolledValue = this.value.substring(this.scroll);
 			String visibleValue = this.font.trim(scrolledValue, this.textWidth, false);
@@ -451,7 +451,7 @@ public class TextField extends AbstractButton {
 		return this.suggestions = new SuggestionsMenu(this, provider);
 	}
 
-	public void setHint(String text) {
+	public void setHint(Text text) {
 		this.hint = text;
 	}
 
