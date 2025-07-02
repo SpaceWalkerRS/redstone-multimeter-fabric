@@ -6,6 +6,8 @@ import net.minecraft.network.chat.Component;
 
 public interface Text {
 
+	Style getStyle();
+
 	Text format(Formatting... formattings);
 
 	Text format(Style style);
