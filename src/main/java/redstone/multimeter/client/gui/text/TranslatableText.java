@@ -56,7 +56,7 @@ public class TranslatableText extends BaseText {
 
 	@Override
 	net.minecraft.text.Text buildText() {
-		return net.minecraft.text.Text.translatable(this.key, this.args);
+		return net.minecraft.text.Text.literal(this.buildFormattedString());
 	}
 
 	private void resolve(String translation) {
@@ -130,7 +130,7 @@ public class TranslatableText extends BaseText {
 			String line;
 
 			while ((line = br.readLine()) != null) {
-				if (line.charAt(0) == '#' || line.trim().isEmpty()) {
+				if (line.trim().isEmpty() || line.charAt(0) == '#') {
 					continue;
 				}
 

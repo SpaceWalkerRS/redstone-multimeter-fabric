@@ -17,6 +17,11 @@ public abstract class BaseText implements Text {
 	}
 
 	@Override
+	public Style getStyle() {
+		return this.style;
+	}
+
+	@Override
 	public Text format(Formatting... formattings) {
 		this.style = this.style.applyFormattings(formattings);
 		return this;
