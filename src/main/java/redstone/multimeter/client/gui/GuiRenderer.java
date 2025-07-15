@@ -11,6 +11,7 @@ import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.texture.Texture;
 import redstone.multimeter.client.gui.texture.TextureRegion;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
+import redstone.multimeter.mixin.client.GuiGraphicsAccessor;
 
 public class GuiRenderer {
 
@@ -129,7 +130,19 @@ public class GuiRenderer {
 	}
 
 	public void blit(Texture t, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int color) {
-		this.graphics.blit(RenderType::guiTextured, t.location, x0, y0, u0, v0, x1 - x0, y1 - y0, u1 - u0, v1 - v0, t.width, t.height, color);
+		((GuiGraphicsAccessor) this.graphics).rsmm$innerBlit(
+			RenderType::guiTextured,
+			t.location,
+			x0,
+			x1,
+			y0,
+			y1,
+			u0 / (float) t.width,
+			u1 / (float) t.width,
+			v0 / (float) t.height,
+			v1 / (float) t.height,
+			color
+		);
 	}
 
 	public void blit(TextureRegion t, int x0, int y0, int x1, int y1) {
