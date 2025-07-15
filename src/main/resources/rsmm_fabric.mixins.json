@@ -62,8 +62,8 @@
 	],
 	"client": [
 		"client.ClientPacketListenerMixin",
+		"client.GuiGraphicsAccessor",
 		"client.GuiMixin",
-		"client.IGuiGraphics",
 		"client.IntegratedServerMixin",
 		"client.KeyMappingMixin",
 		"client.LevelRendererMixin",
