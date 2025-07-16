@@ -7,7 +7,6 @@ import redstone.multimeter.client.gui.element.Element;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.texture.Texture;
 import redstone.multimeter.client.gui.texture.TextureRegion;
-import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.util.ColorUtils;
 
 public class HudRenderer extends GuiRenderer {
@@ -79,16 +78,6 @@ public class HudRenderer extends GuiRenderer {
 	@Override
 	public void highlight(int x0, int y0, int x1, int y1, int color) {
 		super.highlight(x(x0, x1), y(y0, y1), x(x1, x0), y(y1, y0), color(color));
-	}
-
-	@Override
-	public void tooltip(Tooltip tooltip, int x0, int y0, int x1, int y1) {
-		super.tooltip(tooltip, x(x0, x1), y(y0, y1), x(x1, x0), y(y1, y0));
-	}
-
-	@Override
-	public void tooltip(Tooltip tooltip, int x0, int y0, int x1, int y1, int backgroundColor, int borderColor0, int borderColor1) {
-		super.tooltip(tooltip, x(x0, x1), y(y0, y1), x(x1, x0), y(y1, y0), color(backgroundColor), color(borderColor0), color(borderColor1));
 	}
 
 	@Override
