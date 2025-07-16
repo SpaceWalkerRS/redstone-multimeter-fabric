@@ -7,12 +7,13 @@ import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
 import redstone.multimeter.client.gui.text.Text;
-import redstone.multimeter.client.gui.texture.Texture;
 import redstone.multimeter.client.gui.texture.TextureRegion;
 import redstone.multimeter.client.gui.texture.TextureRegions;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
 
 public abstract class AbstractButton extends AbstractElement implements Button {
+
+	protected static final int EDGE = 3;
 
 	private final FontRenderer font;
 	private final Supplier<Text> messageSupplier;
@@ -91,48 +92,12 @@ public abstract class AbstractButton extends AbstractElement implements Button {
 		TextureRegion texture = this.getButtonTexture();
 
 		if (texture != null) {
-			this.renderButtonTexture(renderer, texture, getX(), this.getY(), this.getWidth(), this.getHeight());
-		}
-	}
+			int x0 = this.getX();
+			int y0 = this.getY();
+			int x1 = x0 + this.getWidth();
+			int y1 = y0 + this.getHeight();
 
-	protected void renderButtonTexture(GuiRenderer renderer, TextureRegion region, int x, int y, int width, int height) {
-		boolean matchWidth = (width == region.width);
-		boolean matchHeight = (height == region.height);
-
-		if (matchWidth && matchHeight) {
-			renderer.blit(region, x, y, x + width, y + height);
-		} else {
-			Texture texture = region.texture;
-
-			int border = 3;
-
-			int leftWidth = Math.min(region.width, width) - border;
-			int rightWidth = width - leftWidth;
-			int topHeight = Math.min(region.height, height) - border;
-			int bottomHeight = height - topHeight;
-
-			int x0 = x;
-			int x1 = x + leftWidth;
-			int x2 = x + width - rightWidth;
-			int x3 = x + width;
-			int y0 = y;
-			int y1 = y + topHeight;
-			int y2 = y + height - bottomHeight;
-			int y3 = y + height;
-
-			int u0 = region.x;
-			int u1 = region.x + leftWidth;
-			int u2 = region.x + region.width - rightWidth;
-			int u3 = region.x + region.width;
-			int v0 = region.y;
-			int v1 = region.y + topHeight;
-			int v2 = region.y + region.height - bottomHeight;
-			int v3 = region.y + region.height;
-
-			renderer.blit(texture, x0, y0, x1, y1, u0, v0, u1, v1);
-			renderer.blit(texture, x0, y2, x1, y3, u0, v2, u1, v3);
-			renderer.blit(texture, x2, y2, x3, y3, u2, v2, u3, v3);
-			renderer.blit(texture, x2, y0, x3, y1, u2, v0, u3, v1);
+			renderer.blitSpliced(texture, x0, y0, x1, y1, EDGE);
 		}
 	}
 
