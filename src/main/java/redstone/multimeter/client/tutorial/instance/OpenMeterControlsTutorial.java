@@ -4,7 +4,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.stat.achievement.AchievementStat;
 
 import redstone.multimeter.client.Keybinds;
-import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
+import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
@@ -12,12 +13,6 @@ import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
 public class OpenMeterControlsTutorial extends StagedTutorialInstance {
-
-	private static final Text TITLE = Texts.literal("Open Meter Controls");
-	private static final Text DESCRIPTION = Texts.composite(
-		"Open a meter's controls through the Multimeter screen or by looking at it and pressing ",
-		Texts.keybind(Keybinds.OPEN_METER_CONTROLS)
-	);
 
 	private Stage stage;
 
@@ -30,6 +25,16 @@ public class OpenMeterControlsTutorial extends StagedTutorialInstance {
 	@Override
 	protected AchievementStat createAchievement() {
 		return new AchievementStat("stats.rsmm.open_meter_controls", "rsmm.open_meter_controls", -1, -1, Blocks.CRAFTING_TABLE, null);
+	}
+
+	protected TutorialToast createToast() {
+		return new StagedTutorialToast(
+			this,
+			TutorialStep.OPEN_METER_CONTROLS.getName(),
+			TutorialStep.OPEN_METER_CONTROLS.getDescription(
+				Texts.keybind(Keybinds.OPEN_METER_CONTROLS)
+			)
+		);
 	}
 
 	@Override

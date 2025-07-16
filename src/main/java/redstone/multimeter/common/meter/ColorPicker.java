@@ -31,15 +31,15 @@ public enum ColorPicker implements Cyclable<ColorPicker> {
 		}
 	};
 
-	private ColorPicker(String name) {
-		this.name = name;
+	private ColorPicker(String key) {
+		this.key = key;
 	}
 
-	private final String name;
+	private final String key;
 
 	@Override
-	public String getName() {
-		return name;
+	public String key() {
+		return key;
 	}
 
 	public abstract int next();
