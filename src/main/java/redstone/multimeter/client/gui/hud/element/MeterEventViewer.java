@@ -18,7 +18,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 
 	@Override
 	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
-		renderer.push();
+		renderer.pushMatrix();
 		if (!hud.client.isPreviewing()) {
 			drawHighlights(renderer, mouseX, mouseY);
 			renderer.translate(0, 0, -1);
@@ -30,7 +30,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 		drawGridLines(renderer);
 		renderer.translate(0, 0, -1);
 		renderer.fill(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		renderer.pop();
+		renderer.popMatrix();
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 	protected abstract void drawMeterEvents(GuiRenderer renderer);
 
 	private void drawGridLines(GuiRenderer renderer) {
-		renderer.push();
+		renderer.pushMatrix();
 
 		int columns = getColumnCount();
 		int rows = hud.meters.size();
@@ -146,7 +146,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 			renderer.fill(x0, y0, x1, y1, color);
 		}
 
-		renderer.pop();
+		renderer.popMatrix();
 	}
 
 	protected abstract int getColumnCount();

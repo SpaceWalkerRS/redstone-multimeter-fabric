@@ -118,7 +118,7 @@ public class SimpleList extends AbstractParentElement {
 	}
 
 	protected void renderList(GuiRenderer renderer, int mouseX, int mouseY) {
-		renderer.enableScissor(this.getX(), this.minY, this.getX() + this.getWidth(), this.maxY);
+		renderer.pushScissor(this.getX(), this.minY, this.getX() + this.getWidth(), this.maxY);
 
 		List<Element> children = this.getChildren();
 
@@ -137,7 +137,7 @@ public class SimpleList extends AbstractParentElement {
 			}
 		}
 
-		renderer.disableScissor();
+		renderer.popScissor();
 	}
 
 	protected void renderElement(GuiRenderer renderer, Element element, int mouseX, int mouseY) {
