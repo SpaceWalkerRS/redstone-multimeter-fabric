@@ -3,7 +3,6 @@ package redstone.multimeter.client.tutorial.instance;
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
-import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
@@ -12,13 +11,6 @@ import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 
 public class RemoveMeterTutorial extends StagedTutorialInstance {
-
-	private static final Text TITLE = Texts.literal("Remove A Meter");
-	private static final Text DESCRIPTION = Texts.composite(
-		"Look at a block with a meter on it and press ",
-		Texts.keybind(Keybinds.TOGGLE_METER),
-		" to remove it."
-	);
 
 	private Stage stage;
 	private DimPos lastRequest;
@@ -31,7 +23,13 @@ public class RemoveMeterTutorial extends StagedTutorialInstance {
 
 	@Override
 	protected TutorialToast createToast() {
-		return new StagedTutorialToast(this, TITLE, DESCRIPTION);
+		return new StagedTutorialToast(
+			this,
+			TutorialStep.REMOVE_METER.getName(),
+			TutorialStep.REMOVE_METER.getDescription(
+				Texts.keybind(Keybinds.TOGGLE_METER)
+			)
+		);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.ScrollableList;
 import redstone.multimeter.client.gui.element.meter.MeterControlsElement;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
+import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 
 public class MultimeterScreen extends RSMMScreen {
@@ -60,13 +61,8 @@ public class MultimeterScreen extends RSMMScreen {
 		if (client.getHud().hasContent()) {
 			super.renderContent(renderer, mouseX, mouseY);
 		} else {
-			String text;
-
-			if (client.hasSubscription()) {
-				text = "Nothing to see here! Add a meter to get started.";
-			} else {
-				text = "Nothing to see here! Subscribe to a meter group to get started.";
-			}
+			String reason = client.hasSubscription() ? "noMeters" : "noMeterGroup";
+			Text text = Texts.translatable("rsmm.gui.multimeter.noContent." + reason);
 
 			int textWidth = font.width(text);
 			int textHeight = font.height();
