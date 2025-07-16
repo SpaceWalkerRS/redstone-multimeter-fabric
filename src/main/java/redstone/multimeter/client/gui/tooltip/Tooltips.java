@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.client.options.KeyBinding;
+
 import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
@@ -43,6 +45,14 @@ public class Tooltips {
 		return line(Texts.literal(line, args));
 	}
 
+	public static Tooltip translatable(String line) {
+		return line(Texts.translatable(line));
+	}
+
+	public static Tooltip translatable(String line, Object... args) {
+		return line(Texts.translatable(line, args));
+	}
+
 	public static Tooltip split(FontRenderer font, String text) {
 		return split(font, text, 200);
 	}
@@ -51,12 +61,28 @@ public class Tooltips {
 		return lines(font.split(text, width));
 	}
 
-	public static Tooltip keybind(String title, Object... keybinds) {
+	public static Tooltip split(FontRenderer font, Text text) {
+		return split(font, text, 200);
+	}
+
+	public static Tooltip split(FontRenderer font, Text text, int width) {
+		return lines(font.split(text, width));
+	}
+
+	public static Tooltip keybind(KeyBinding keybind) {
+		return keybind(Texts.translatable(keybind.getName()), keybind);
+	}
+
+	public static Tooltip keybind(KeyBinding keybind, Object... keys) {
+		return keybind(Texts.translatable(keybind.getName()), keys);
+	}
+
+	public static Tooltip keybind(Text keybind, Object... keys) {
 		return lines(
-			title,
+			keybind,
 			Texts.keyValue(
-				"keybind",
-				Texts.keybinds(keybinds)
+				Texts.translatable("rsmm.keybind"),
+				Texts.keybinds(keys)
 			)
 		);
 	}

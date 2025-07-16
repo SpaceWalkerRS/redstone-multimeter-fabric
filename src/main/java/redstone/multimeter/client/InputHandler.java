@@ -67,7 +67,7 @@ public class InputHandler {
 			KeyBinding keybind = Keybinds.TOGGLE_EVENT_TYPES[index];
 
 			while (keybind.consumeClick()) {
-				client.toggleEventType(EventType.byIndex(index));
+				client.toggleEventType(EventType.byId(index));
 			}
 		}
 
@@ -75,7 +75,7 @@ public class InputHandler {
 			return;
 		}
 
-		while (Keybinds.PAUSE_METERS.consumeClick()) {
+		while (Keybinds.PAUSE_TIMELINE.consumeClick()) {
 			client.getHud().togglePaused();
 		}
 		while (Keybinds.TOGGLE_FOCUS_MODE.consumeClick()) {
@@ -147,7 +147,7 @@ public class InputHandler {
 				client.openScreen(new TickPhaseTreeScreen());
 			}
 		} else if (screen instanceof MultimeterScreen) {
-			if (Keybinds.matchesButton(Keybinds.PAUSE_METERS, button)) {
+			if (Keybinds.matchesButton(Keybinds.PAUSE_TIMELINE, button)) {
 				client.getHud().togglePaused();
 			} else if (Keybinds.matchesButton(Keybinds.TOGGLE_FOCUS_MODE, button)) {
 				client.getHud().toggleFocusMode();
@@ -193,7 +193,7 @@ public class InputHandler {
 				client.openScreen(new TickPhaseTreeScreen());
 			}
 		} else if (screen instanceof MultimeterScreen) {
-			if (Keybinds.matchesKey(Keybinds.PAUSE_METERS, keyCode)) {
+			if (Keybinds.matchesKey(Keybinds.PAUSE_TIMELINE, keyCode)) {
 				client.getHud().togglePaused();
 			} else if (Keybinds.matchesKey(Keybinds.TOGGLE_FOCUS_MODE, keyCode)) {
 				client.getHud().toggleFocusMode();

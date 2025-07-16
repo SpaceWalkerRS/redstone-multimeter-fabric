@@ -14,7 +14,6 @@
 		"common.ServerPlayerInteractionManagerMixin",
 		"common.ServerWorldMixin",
 		"common.StyleAccess",
-		"common.TextMixin",
 		"common.WorldChunkMixin",
 		"common.WorldMixin",
 		"common.compat.alternate_current.WorldHelperMixin",
@@ -54,7 +53,8 @@
 		"client.GameOptionsMixin",
 		"client.GameRendererMixin",
 		"client.IntegratedServerMixin",
-		"client.MinecraftMixin"
+		"client.MinecraftMixin",
+		"client.TranslationStorageMixin"
 	],
 	"server": [
 	],
