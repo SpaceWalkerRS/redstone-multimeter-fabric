@@ -11,7 +11,6 @@ import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.text.Text;
-import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.texture.Texture;
 import redstone.multimeter.client.gui.texture.Textures;
 
@@ -34,8 +33,7 @@ public class TutorialToast implements Toast {
 		this.toastWidth = 200;
 
 		this.title = title;
-		this.description = font.split(description.buildString(), width() - 14).stream().map(Texts::literal).toList();
-//		this.description = font.split(description, width() - 14);
+		this.description = font.split(description, width() - 14);
 
 		this.toastHeight = 10 + 12 + 10 * this.description.size();
 

@@ -137,11 +137,9 @@ public class SavedMeterGroupsManager {
 		stopPreviewing();
 
 		if (Options.RedstoneMultimeter.PREVIEW_METER_GROUPS.get()) {
-			Text message = Texts.literal("Press one of the number keys to preview the meter group from that slot!");
-			client.sendMessage(message, true);
+			client.sendMessage(Texts.translatable("rsmm.meterGroups.preview"), true);
 		} else {
-			Text message = Texts.literal("Press one of the number keys to load the meter group from that slot!");
-			client.sendMessage(message, true);
+			client.sendMessage(Texts.translatable("rsmm.meterGroups.load"), true);
 		}
 	}
 
@@ -186,13 +184,10 @@ public class SavedMeterGroupsManager {
 		SavedMeterGroup meterGroup = meterGroups[slot + SLOT_OFFSET];
 
 		if (meterGroup == null) {
-			Text warning = Texts.literal(String.format("Cannot preview meter group from slot %d: that slot is empty!", slot));
-			client.sendMessage(warning, true);
+			client.sendMessage(Texts.translatable("rsmm.meterGroups.preview.failure.emptySlot", slot), true);
 		} else {
 			client.getMeterGroupPreview().preview(slot, name, meters);
-
-			Text message = Texts.literal("Previewing meter group \'" + name + "\' from slot " + slot);
-			client.sendMessage(message, true);
+			client.sendMessage(Texts.translatable("rsmm.meterGroups.preview.success", name, slot), true);
 		}
 
 		previewSlot = slot;
@@ -211,27 +206,22 @@ public class SavedMeterGroupsManager {
 			if (client.hasSubscription()) {
 				if (bypassWarnings) {
 					client.unsubscribeFromMeterGroup();
-
-					Text warning = Texts.literal(String.format("Loaded empty slot %d and unsubscribed from meter group!", slot));
-					client.sendMessage(warning, true);
+					client.sendMessage(Texts.translatable("rsmm.meterGroups.load.success.unsubscribed", slot), true);
 
 					setIdle();
 				} else {
-					Text warning = Texts.literal("That slot is empty! Are you sure you want to unsubscribe from your current meter group?");
-					sendLoadWarning(slot, warning);
+					sendLoadWarning(slot, Texts.translatable("rsmm.meterGroups.load.failure.emptySlot", slot));
 				}
 			} else {
-				Text warning = Texts.literal(String.format("Could not load empty slot %d: you are not subscribed to a meter group!", slot));
-				client.sendMessage(warning, true);
+				// not currently subscribed to a meter group and selected slot is empty
+				// i.e. nothing to do here
 			}
 		} else {
 			client.subscribeToMeterGroup(slot, name);
+			client.sendMessage(Texts.translatable("rsmm.meterGroups.load.success.subscribed", name, slot), true);
 
 			SetMetersPacket packet = new SetMetersPacket(meters);
 			client.sendPacket(packet);
-
-			Text message = Texts.literal("Loaded meter group \'" + name + "\' from slot " + slot);
-			client.sendMessage(message, true);
 
 			setIdle();
 		}
@@ -263,11 +253,9 @@ public class SavedMeterGroupsManager {
 		stopPreviewing();
 
 		if (client.hasSubscription()) {
-			Text message = Texts.literal("Press one of the number keys to save this meter group to that slot!");
-			client.sendMessage(message, true);
+			client.sendMessage(Texts.translatable("rsmm.meterGroups.save"), true);
 		} else {
-			Text message = Texts.literal("Press one of the number keys to clear that saved meter group slot!");
-			client.sendMessage(message, true);
+			client.sendMessage(Texts.translatable("rsmm.meterGroups.clear"), true);
 		}
 	}
 
@@ -299,17 +287,13 @@ public class SavedMeterGroupsManager {
 		if (name == null) {
 			if (bypassWarnings) {
 				meterGroups[slot + SLOT_OFFSET] = null;
-
-				Text message = Texts.literal("Cleared saved meter group slot " + slot);
-				client.sendMessage(message, true);
+				client.sendMessage(Texts.translatable("rsmm.meterGroups.clear.success", slot), true);
 			} else {
-				Text warning = Texts.literal("You are not subscribed to a meter group! Are you sure you want to clear that slot?");
-				sendSaveWarning(slot, warning);
+				sendSaveWarning(slot, Texts.translatable("rsmm.meterGroups.clear.failure.emptyMeterGroup", slot));
 			}
 		} else {
 			if (meters.isEmpty() && !bypassWarnings) {
-				Text warning = Texts.literal("Your current meter group is empty! Are you sure you want to save it?");
-				sendSaveWarning(slot, warning);
+				sendSaveWarning(slot, Texts.translatable("rsmm.meterGroups.save.failure.emptyMeterGroup", slot));
 			} else {
 				List<MeterProperties> savedMeters = new ArrayList<>();
 
@@ -318,9 +302,7 @@ public class SavedMeterGroupsManager {
 				}
 
 				meterGroups[slot + SLOT_OFFSET] = new SavedMeterGroup(name, savedMeters);
-
-				Text message = Texts.literal("Saved meter group \'" + name + "\'to slot " + slot);
-				client.sendMessage(message, true);
+				client.sendMessage(Texts.translatable("rsmm.meterGroups.save.success", name, slot), true);
 			}
 		}
 
