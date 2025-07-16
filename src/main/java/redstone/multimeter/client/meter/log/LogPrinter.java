@@ -15,7 +15,6 @@ import net.minecraft.client.gui.screens.Screen;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.TickPhase;
@@ -95,12 +94,14 @@ public class LogPrinter {
 			}
 
 			if (notifyPlayer) {
-				Text message = Texts.literal("Started printing logs to file...");
-				client.sendMessage(message, false);
+				client.sendMessage(Texts.translatable("rsmm.logPrinter.start"), false);
 			}
 
 			client.getHud().onTogglePrinter();
 		} catch (IOException e) {
+			client.sendMessage(Texts.translatable("rsmm.logPrinter.error"), false);
+			RedstoneMultimeterMod.LOGGER.warn("Log Printer encountered issues!", e);
+
 			stop(notifyPlayer);
 		}
 	}
@@ -116,13 +117,13 @@ public class LogPrinter {
 		try {
 			writer.close();
 		} catch (IOException e) {
-
+			client.sendMessage(Texts.translatable("rsmm.logPrinter.error"), false);
+			RedstoneMultimeterMod.LOGGER.warn("Log Printer encountered issues!", e);
 		} finally {
 			writer = null;
 
 			if (notifyPlayer) {
-				Text message = Texts.literal("Stopped printing logs to file");
-				client.sendMessage(message, false);
+				client.sendMessage(Texts.translatable("rsmm.logPrinter.stop"), false);
 			}
 
 			client.getHud().onTogglePrinter();
@@ -153,8 +154,7 @@ public class LogPrinter {
 			long runtime = getGameTime() - firstTick;
 
 			if (limit >= 0 && runtime > limit) {
-				Text message = Texts.literal("Printer exceeded maximum runtime!");
-				client.sendMessage(message, false);
+				client.sendMessage(Texts.translatable("rsmm.logPrinter.maxRuntimeExceeded"), false);
 
 				stop(true);
 			}
@@ -221,8 +221,8 @@ public class LogPrinter {
 				writer.newLine();
 			}
 		} catch (IOException e) {
-			Text message = Texts.literal("Printer encountered issues!");
-			client.sendMessage(message, false);
+			client.sendMessage(Texts.translatable("rsmm.logPrinter.error"), false);
+			RedstoneMultimeterMod.LOGGER.warn("Log Printer encountered issues!", e);
 
 			stop(true);
 		}
