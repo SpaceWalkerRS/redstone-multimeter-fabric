@@ -114,7 +114,7 @@ public class SimpleList extends AbstractParentElement {
 		int u1 = x1 / 2;
 		int v1 = (y1 - offsetY) / 2;
 
-		renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, u0, v0, u1, v1, 0xFF202020);
+		renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, u0, v0, u1, v1, 0xFF7F7F7F);
 	}
 
 	protected void renderList(GuiRenderer renderer, int mouseX, int mouseY) {
@@ -172,7 +172,7 @@ public class SimpleList extends AbstractParentElement {
 			ty0 = y0 / 2;
 			ty1 = y1 / 2;
 
-			renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF404040);
+			renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFFFFFFFF);
 			renderer.gradient(x0, y1, x1, y1 + 4, 0xFF000000, 0x00000000);
 		}
 		if (renderBottom) {
@@ -182,7 +182,7 @@ public class SimpleList extends AbstractParentElement {
 			ty0 = y0 / 2;
 			ty1 = y1 / 2;
 
-			renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFF404040);
+			renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, tx0, ty0, tx1, ty1, 0xFFFFFFFF);
 			renderer.gradient(x0, y0 - 4, x1, y0, 0x00000000, 0xFF000000);
 		}
 	}
