@@ -111,12 +111,12 @@ public class HudRenderer extends GuiRenderer {
 	}
 
 	@Override
-	public void enableScissor(int x0, int y0, int x1, int y1) {
+	public void pushScissor(int x0, int y0, int x1, int y1) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void disableScissor() {
+	public void popScissor() {
 		throw new UnsupportedOperationException();
 	}
 
