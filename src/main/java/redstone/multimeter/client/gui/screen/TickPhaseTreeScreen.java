@@ -5,6 +5,7 @@ import redstone.multimeter.client.gui.element.SimpleList;
 import redstone.multimeter.client.gui.element.Label;
 import redstone.multimeter.client.gui.element.button.BasicButton;
 import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.tooltip.Tooltips;
 import redstone.multimeter.common.TickPhaseTree;
@@ -16,7 +17,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 	private long lastRequestTime;
 
 	public TickPhaseTreeScreen() {
-		super(Texts.literal("Tick Phases"), true);
+		super(Texts.translatable("rsmm.gui.tickPhases.title"), true);
 
 		this.tickPhaseTree = this.client.getTickPhaseTree();
 		this.lastRequestTime = -1;
@@ -38,7 +39,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 		if (!tickPhaseTree.isComplete()) {
 			request();
 
-			String text = "Requesting tick phase tree from server...";
+			Text text = Texts.translatable("rsmm.gui.tickPhases.requesting");
 			int x = getX() + (getWidth() - font.width(text)) / 2;
 			int y = getY() + (getHeight() - font.height()) / 2;
 			Label textElement = new Label(x, y, t -> t.addLine(text).setShadow(true), () -> {
@@ -46,7 +47,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 					long time = System.currentTimeMillis();
 					long delta = (time - lastRequestTime) / 1000;
 
-					return Tooltips.line("Last request was %d seconds ago", delta);
+					return Tooltips.line(Texts.translatable("rsmm.gui.tickPhases.requesting.tooltip", delta));
 				}
 
 				return Tooltips.empty();
@@ -83,7 +84,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			x = getX() + getWidth() / 2;
 			y = getY() + getHeight() - (Button.DEFAULT_HEIGHT + 8);
 
-			Button rebuild = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, () -> Texts.literal("Refresh"), Tooltips::empty, button -> {
+			Button rebuild = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, () -> Texts.translatable("rsmm.gui.tickPhases.refresh"), Tooltips::empty, button -> {
 				rebuild();
 				return true;
 			});
@@ -114,13 +115,20 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 	}
 
 	private void addTextForTickPhase(Label text, Node node, String indent) {
-		if (node.parent == null) { // root
-			text.addLine(" Server Run Loop").setShadow(false);
-			indent = " |";
-		} else {
-			text.addLine(indent + "__ " + node.task.getName() + " " + String.join(" ", node.args));
-			indent += "   |";
+		boolean root = (node.parent == null);
+
+		text.addLine(Texts.composite(
+			indent + (root ? "" : "__"),
+			node.task.getName(),
+			" ",
+			String.join(" ", node.args)
+		));
+
+		if (!root) {
+			indent += "   ";
 		}
+
+		indent += "|";
 
 		for (int index = 0; index < node.children.size(); index++) {
 			addTextForTickPhase(text, node.children.get(index), indent);
