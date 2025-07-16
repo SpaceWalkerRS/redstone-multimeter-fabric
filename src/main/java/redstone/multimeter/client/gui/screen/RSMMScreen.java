@@ -126,7 +126,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 			int u1 = x1 / 2;
 			int v1 = y1 / 2;
 
-			renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, u0, v0, u1, v1, 0xFF404040);
+			renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, u0, v0, u1, v1, 0xFFFFFFFF);
 		}
 	}
 
