@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -29,15 +30,18 @@ public class Keybinds {
 
 	private static final Set<String> CATEGORIES = new LinkedHashSet<>();
 	private static final Map<String, KeyMapping> KEYBINDS = new LinkedHashMap<>();
+	private static final Map<String, String> LEGACY_KEYS = new HashMap<>();
+
+	public static final KeyMapping[] TOGGLE_EVENT_TYPES = new KeyMapping[EventType.ALL.length];
 
 	public static final String MAIN;
-	public static final String EVENT_TYPES;
+	public static final String METER_EVENT_TYPES;
 
 	public static final KeyMapping TOGGLE_METER;
 	public static final KeyMapping RESET_METER;
 	public static final KeyMapping LOAD_METER_GROUP;
 	public static final KeyMapping SAVE_METER_GROUP;
-	public static final KeyMapping PAUSE_METERS;
+	public static final KeyMapping PAUSE_TIMELINE;
 	public static final KeyMapping TOGGLE_FOCUS_MODE;
 	public static final KeyMapping TOGGLE_MARKER;
 	public static final KeyMapping STEP_BACKWARD;
@@ -50,19 +54,28 @@ public class Keybinds {
 	public static final KeyMapping VIEW_TICK_PHASE_TREE;
 	public static final KeyMapping PRINT_LOGS;
 
-	public static final KeyMapping[] TOGGLE_EVENT_TYPES;
-
 	private static String registerCategory(String category) {
+		category = "rsmm.keybind.category." + category;
+
 		if (!CATEGORIES.add(category)) {
-			throw new IllegalStateException("Cannot register multiple keybind categories with the same name!");
+			throw new IllegalStateException("Cannot register multiple keybind categories with the same name! (" + category + ")");
 		}
 
 		return category;
 	}
 
-	private static KeyMapping registerKeybind(KeyMapping keybind) {
-		if (KEYBINDS.putIfAbsent(keybind.getName(), keybind) != null) {
-			throw new IllegalStateException("Cannot register multiple keybinds with the same name!");
+	private static KeyMapping registerKeybind(String key, String legacyKey, String category, int defaultKey) {
+		key = "rsmm.keybind." + key;
+
+		if (KEYBINDS.containsKey(key)) {
+			throw new IllegalStateException("Cannot register multiple keybinds with the same name! (" + key + ")");
+		}
+
+		KeyMapping keybind = new KeyMapping(key, defaultKey, category);
+		KEYBINDS.put(key, keybind);
+
+		if (legacyKey != null) {
+			LEGACY_KEYS.put(key, legacyKey);
 		}
 
 		return keybind;
@@ -138,31 +151,28 @@ public class Keybinds {
 	}
 
 	static {
+		MAIN              = registerCategory("redstoneMultimeter");
+		METER_EVENT_TYPES = registerCategory("meterEventTypes");
 
-		MAIN        = registerCategory(RedstoneMultimeterMod.MOD_NAME);
-		EVENT_TYPES = registerCategory("Event Types");
-
-		TOGGLE_METER           = registerKeybind(new KeyMapping("Toggle Meter"          , GLFW.GLFW_KEY_M            , MAIN));
-		RESET_METER            = registerKeybind(new KeyMapping("Reset Meter"           , GLFW.GLFW_KEY_B            , MAIN));
-		LOAD_METER_GROUP       = registerKeybind(new KeyMapping("Load Meter Group"      , GLFW.GLFW_KEY_LEFT_BRACKET , MAIN));
-		SAVE_METER_GROUP       = registerKeybind(new KeyMapping("Save Meter Group"      , GLFW.GLFW_KEY_RIGHT_BRACKET, MAIN));
-		PAUSE_METERS           = registerKeybind(new KeyMapping("Pause Meters"          , GLFW.GLFW_KEY_N            , MAIN));
-		TOGGLE_FOCUS_MODE      = registerKeybind(new KeyMapping("Toggle Focus Mode"     , GLFW.GLFW_KEY_F            , MAIN));
-		TOGGLE_MARKER          = registerKeybind(new KeyMapping("Toggle Tick Marker"    , GLFW.GLFW_KEY_Y            , MAIN));
-		STEP_BACKWARD          = registerKeybind(new KeyMapping("Step Backward"         , GLFW.GLFW_KEY_COMMA        , MAIN));
-		STEP_FORWARD           = registerKeybind(new KeyMapping("Step Forward"          , GLFW.GLFW_KEY_PERIOD       , MAIN));
-		SCROLL_HUD             = registerKeybind(new KeyMapping("Scroll HUD"            , GLFW.GLFW_KEY_LEFT_ALT     , MAIN));
-		TOGGLE_HUD             = registerKeybind(new KeyMapping("Toggle HUD"            , GLFW.GLFW_KEY_H            , MAIN));
-		OPEN_MULTIMETER_SCREEN = registerKeybind(new KeyMapping("Open Multimeter Screen", GLFW.GLFW_KEY_G            , MAIN));
-		OPEN_METER_CONTROLS    = registerKeybind(new KeyMapping("Open Meter Controls"   , GLFW.GLFW_KEY_I            , MAIN));
-		OPEN_OPTIONS_MENU      = registerKeybind(new KeyMapping("Open Options Menu"     , GLFW.GLFW_KEY_O            , MAIN));
-		VIEW_TICK_PHASE_TREE   = registerKeybind(new KeyMapping("View Tick Phases"      , GLFW.GLFW_KEY_U            , MAIN));
-		PRINT_LOGS             = registerKeybind(new KeyMapping("Print Logs To File"    , GLFW.GLFW_KEY_P            , MAIN));
-
-		TOGGLE_EVENT_TYPES = new KeyMapping[EventType.ALL.length];
+		TOGGLE_METER           = registerKeybind("toggleMeter"            , "Toggle Meter"          , MAIN, GLFW.GLFW_KEY_M);
+		RESET_METER            = registerKeybind("resetMeter"             , "Reset Meter"           , MAIN, GLFW.GLFW_KEY_B);
+		LOAD_METER_GROUP       = registerKeybind("loadMeterGroup"         , "Load Meter Group"      , MAIN, GLFW.GLFW_KEY_LEFT_BRACKET);
+		SAVE_METER_GROUP       = registerKeybind("saveMeterGroup"         , "Save Meter Group"      , MAIN, GLFW.GLFW_KEY_RIGHT_BRACKET);
+		PAUSE_TIMELINE         = registerKeybind("pauseTimeline"          , "Pause Meters"          , MAIN, GLFW.GLFW_KEY_N);
+		STEP_BACKWARD          = registerKeybind("stepBackwardTimeline"   , "Step Backward"         , MAIN, GLFW.GLFW_KEY_COMMA);
+		STEP_FORWARD           = registerKeybind("stepForwardTimeline"    , "Step Forward"          , MAIN, GLFW.GLFW_KEY_PERIOD);
+		SCROLL_HUD             = registerKeybind("scrollTimeline"         , "Scroll HUD"            , MAIN, GLFW.GLFW_KEY_LEFT_ALT);
+		TOGGLE_HUD             = registerKeybind("toggleHud"              , "Toggle HUD"            , MAIN, GLFW.GLFW_KEY_H);
+		TOGGLE_MARKER          = registerKeybind("toggleTickMarker"       , "Toggle Tick Marker"    , MAIN, GLFW.GLFW_KEY_Y);
+		TOGGLE_FOCUS_MODE      = registerKeybind("toggleFocusMode"        , "Toggle Focus Mode"     , MAIN, GLFW.GLFW_KEY_F);
+		OPEN_MULTIMETER_SCREEN = registerKeybind("openMultimeterScreen"   , "Open Multimeter Screen", MAIN, GLFW.GLFW_KEY_G);
+		OPEN_METER_CONTROLS    = registerKeybind("openMeterControlsScreen", "Open Meter Controls"   , MAIN, GLFW.GLFW_KEY_I);
+		OPEN_OPTIONS_MENU      = registerKeybind("openOptionsScreen"      , "Open Options Menu"     , MAIN, GLFW.GLFW_KEY_O);
+		VIEW_TICK_PHASE_TREE   = registerKeybind("openTickPhaseTreeScreen", "View Tick Phases"      , MAIN, GLFW.GLFW_KEY_U);
+		PRINT_LOGS             = registerKeybind("toggleLogPrinter"       , "Print Logs To File"    , MAIN, GLFW.GLFW_KEY_P);
 
 		for (int index = 0; index < EventType.ALL.length; index++) {
-			TOGGLE_EVENT_TYPES[index] = registerKeybind(new KeyMapping(String.format("Toggle \'%s\'", EventType.byIndex(index).getName()), GLFW.GLFW_KEY_UNKNOWN, EVENT_TYPES));
+			TOGGLE_EVENT_TYPES[index] = registerKeybind("toggleMeterEventType." + EventType.byId(index).getKey(), String.format("Toggle \'%s\'", EventType.byId(index).getLegacyKey()), METER_EVENT_TYPES, GLFW.GLFW_KEY_UNKNOWN);
 		}
 	}
 }
