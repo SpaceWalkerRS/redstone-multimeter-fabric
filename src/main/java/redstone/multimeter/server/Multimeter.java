@@ -384,16 +384,17 @@ public class Multimeter {
 
 		meterGroup.addMember(playerUuid);
 
-		Text message = Texts.composite(
-			String.format("You have been invited to meter group \'%s\' - click ", meterGroup.getName()),
-			Texts.literal("[here]").format(style ->
-				style.withHoverEvent(HoverEvent.showText(
-					Texts.literal("Subscribe to meter group \'%s\'", meterGroup.getName())
-				)).withClickEvent(ClickEvent.runCommand(
-					String.format("/metergroup subscribe %s", meterGroup.getName())
-				)).withColor(Formatting.GREEN)
-			),
-			" to subscribe to it."
+		Text message = Texts.translatable(
+			"rsmm.meterGroup.invited",
+			meterGroup.getName(),
+			Texts
+				.translatable("rsmm.meterGroup.invited.here")
+				.format(style ->
+					style.withHoverEvent(HoverEvent.showText(
+						Texts.translatable("rsmm.meterGroup.invited.subscribe", meterGroup.getName())
+					)).withClickEvent(ClickEvent.runCommand(
+						String.format("/metergroup subscribe %s", meterGroup.getName())
+					)).withColor(Formatting.GREEN))
 		);
 
 		server.sendMessage(player, message, false);
@@ -433,7 +434,7 @@ public class Multimeter {
 
 	public void teleportToMeter(ServerPlayerEntity player, long id) {
 		if (!options.meter.allow_teleports) {
-			Text message = Texts.literal("This server does not allow meter teleporting!");
+			Text message = Texts.translatable("rsmm.meter.teleport.notAllowed");
 			server.sendMessage(player, message, false);
 
 			return;
@@ -460,7 +461,7 @@ public class Multimeter {
 					player.teleportToDimension(newWorld.dimension.getType().getId());
 					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
-					Text text = Texts.literal(String.format("Teleported to meter \"%s\"", meter.getName()));
+					Text text = Texts.translatable("rsmm.meter.teleport.success", meter.getName());
 					server.sendMessage(player, text, false);
 				}
 			}
@@ -479,22 +480,30 @@ public class Multimeter {
 		String yaw = NUMBER_FORMAT.format(_yaw);
 		String pitch = NUMBER_FORMAT.format(_pitch);
 
-		Text message = Texts.composite(
-			"Click ",
-			Texts.literal("[here]").format(style ->
-				style.withHoverEvent(HoverEvent.showText(
-					Texts.composite(
-						"Teleport to",
-						Texts.keyValue("\n  dimension", dimension),
-						Texts.keyValue("\n  x", x),
-						Texts.keyValue("\n  y", y),
-						Texts.keyValue("\n  z", z)
-					)
-				)).withClickEvent(ClickEvent.runCommand(
-					String.format("/execute in %s run tp @s %s %s %s %s %s", dimension, x, y, z, yaw, pitch)
-				)).withColor(TextColor.GREEN)
-			),
-			" to return to your previous location"
+		Text message = Texts.translatable(
+			"rsmm.meter.teleport.return",
+			Texts
+				.translatable("rsmm.meter.teleport.return.here")
+				.format(style ->
+					style.withHoverEvent(HoverEvent.showText(
+						Texts.translatable(
+							"rsmm.meter.teleport.return.teleport",
+							Texts.keyValue(
+								Texts.translatable("rsmm.meter.teleport.return.teleport.dimension"),
+								dimension),
+							Texts.keyValue(
+								Texts.translatable("rsmm.meter.teleport.return.teleport.x"),
+								x),
+							Texts.keyValue(
+								Texts.translatable("rsmm.meter.teleport.return.teleport.y"),
+								y),
+							Texts.keyValue(
+								Texts.translatable("rsmm.meter.teleport.return.teleport.z"),
+								z)
+						)
+					)).withClickEvent(ClickEvent.runCommand(
+						String.format("/execute in %s run tp @s %s %s %s %s %s", dimension, x, y, z, yaw, pitch)
+					)).withColor(TextColor.GREEN))
 		);
 
 		server.sendMessage(player, message, false);
