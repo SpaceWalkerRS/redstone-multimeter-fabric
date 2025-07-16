@@ -77,7 +77,7 @@ public class SuggestionsMenu extends AbstractElement {
 	@Override
 	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
 		if (this.isShowingSuggestions()) {
-			renderer.push();
+			renderer.pushMatrix();
 			renderer.translate(0.0D, 0.0D, 10.0D);
 
 			this.renderBackground(renderer);
@@ -93,7 +93,7 @@ public class SuggestionsMenu extends AbstractElement {
 				y += height;
 			}
 
-			renderer.pop();
+			renderer.popMatrix();
 		}
 	}
 
