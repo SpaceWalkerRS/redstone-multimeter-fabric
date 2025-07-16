@@ -1,23 +1,32 @@
 package redstone.multimeter.client.option;
 
 import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.text.Text;
 
 public interface Option {
 
-	public String getName();
+	String key();
 
-	public String getDescription();
+	String legacyKey();
 
-	public boolean isDefault();
+	String translationKey();
 
-	public void reset();
+	Text getName();
 
-	public String getAsString();
+	Text getDescription();
 
-	public void setFromString(String value);
+	Text getDisplayValue();
 
-	public Button createControl(int width, int height);
+	boolean isDefault();
 
-	public void setListener(OptionListener listener);
+	void reset();
+
+	String getAsString();
+
+	void setFromString(String value);
+
+	Button createControl(int width, int height);
+
+	void setListener(OptionListener listener);
 
 }

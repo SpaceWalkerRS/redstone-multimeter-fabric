@@ -192,7 +192,7 @@ public class MultimeterHud extends AbstractParentElement {
 		int pos = Math.round(range * rawPos);
 		int w;
 
-		switch (getDirectionalityX()) {
+		switch (getOrientationX()) {
 		default:
 		case LEFT_TO_RIGHT:
 			hudX = x + pos;
@@ -271,7 +271,7 @@ public class MultimeterHud extends AbstractParentElement {
 		float position = getScreenPosY();
 		hudY = y + Math.round(position * range);
 
-		switch (getDirectionalityY()) {
+		switch (getOrientationY()) {
 		default:
 		case TOP_TO_BOTTOM:
 			y = hudY;
@@ -347,19 +347,23 @@ public class MultimeterHud extends AbstractParentElement {
 		}, () -> {
 			return this.client.isPreviewing() || !this.client.getMeterGroup().isDirty()
 				? Tooltips.EMPTY
-				: Tooltips.line("There are unsaved changes to this saved meter group!");
+				: Tooltips.translatable("rsmm.gui.multimeter.meterGroup.slot.unsavedChanges");
 		});
 		this.meterGroupName = new Label(0, 0, t -> {
-			String text = this.client.isPreviewing()
+			String name = this.client.isPreviewing()
 				? this.client.getMeterGroupPreview().getName()
 				: this.client.getMeterGroup().getName();
+			Text text = Texts.literal(name);
 
 			int a = Math.round(0xFF * settings.opacity() / 100.0F);
 			int rgb = onScreen ? 0xD0D0D0 : 0x202020;
 			int color = ColorUtils.setAlpha(rgb, a);
 
 			if (paused && !Options.HUD.HIDE_HIGHLIGHT.get() && !Options.HUD.PAUSE_INDICATOR.get()) {
-				text += " (Paused)";
+				text
+					.append(" (")
+					.append(Texts.translatable("rsmm.gui.multimeter.timeline.paused"))
+					.append(")");
 			}
 
 			t.addLine(text).setColor(color);
@@ -377,13 +381,13 @@ public class MultimeterHud extends AbstractParentElement {
 			} else {
 				t.setVisible(false);
 			}
-		}, () -> Tooltips.keybind("Toggle Tick Marker", Keybinds.TOGGLE_MARKER));
+		}, () -> Tooltips.keybind(Keybinds.TOGGLE_MARKER));
 
-		this.playPauseButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltips.keybind("Pause Meters", Keybinds.PAUSE_METERS), button -> {
+		this.playPauseButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltips.keybind(Keybinds.PAUSE_TIMELINE), button -> {
 			togglePaused();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltips.keybind("Step Backward", Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
+		this.fastBackwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltips.keybind(Keybinds.STEP_BACKWARD, Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
 			stepBackward(Screen.hasControlDown());
 			return true;
 		}) {
@@ -393,7 +397,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltips.keybind("Step Forward", Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
+		this.fastForwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltips.keybind(Keybinds.STEP_FORWARD, Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
 			stepForward(Screen.hasControlDown());
 			return true;
 		}) {
@@ -403,7 +407,7 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.printIndicator = new Label(0, 0, t -> t.addLine(Texts.literal("P").format(Formatting.BOLD)).setShadow(true), () -> Tooltips.keybind("Pring Logs To File", Keybinds.PRINT_LOGS));
+		this.printIndicator = new Label(0, 0, t -> t.addLine(Texts.literal("P").format(Formatting.BOLD)).setShadow(true), () -> Tooltips.keybind(Keybinds.PRINT_LOGS));
 
 		if (!Options.HUD.PAUSE_INDICATOR.get()) {
 			this.playPauseButton.setVisible(false);
@@ -432,7 +436,7 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 
 	private String getStepSymbol(boolean forward, boolean fast) {
-		boolean leftToRight = (getDirectionalityX() == Directionality.X.LEFT_TO_RIGHT);
+		boolean leftToRight = (getOrientationX() == Orientation.X.LEFT_TO_RIGHT);
 
 		if (forward == leftToRight) {
 			return fast ? "\u23ed" : "\u23e9";
@@ -449,12 +453,12 @@ public class MultimeterHud extends AbstractParentElement {
 		return Options.HUD.SCREEN_POS_Y.get() / 100.0F;
 	}
 
-	public Directionality.X getDirectionalityX() {
-		return Options.HUD.DIRECTIONALITY_X.get();
+	public Orientation.X getOrientationX() {
+		return Options.HUD.ORIENTATION_X.get();
 	}
 
-	public Directionality.Y getDirectionalityY() {
-		return Options.HUD.DIRECTIONALITY_Y.get();
+	public Orientation.Y getOrientationY() {
+		return Options.HUD.ORIENTATION_Y.get();
 	}
 
 	public boolean isPaused() {
@@ -621,13 +625,12 @@ public class MultimeterHud extends AbstractParentElement {
 			boolean enable = !focusMode;
 
 			if (setFocusMode(enable)) {
-				String message = String.format("%s Focus Mode", enable ? "Enabled" : "Disabled");
-				client.sendMessage(Texts.literal(message), true);
+				String action = enable ? "enabled" : "disabled";
+				client.sendMessage(Texts.translatable("rsmm.toggleFocusMode." + action), true);
 
 				client.getTutorial().onToggleFocusMode(enable);
 			} else {
-				String message = "No meter event logs available to focus on...";
-				client.sendMessage(Texts.literal(message), true);
+				client.sendMessage(Texts.translatable("rsmm.toggleFocusMode.noLogs"), true);
 			}
 		}
 	}
@@ -696,7 +699,7 @@ public class MultimeterHud extends AbstractParentElement {
 		if (tickMarkerCounter.isVisible()) {
 			int x;
 
-			switch (getDirectionalityX()) {
+			switch (getOrientationX()) {
 			default:
 			case LEFT_TO_RIGHT:
 				x = subticks.getX();
@@ -714,7 +717,7 @@ public class MultimeterHud extends AbstractParentElement {
 		int max = meters.size() - 1;
 		int row = Math.min(max, (int)((mouseY - names.getY()) / (settings.rowHeight + settings.gridSize)));
 
-		if (getDirectionalityY() == Directionality.Y.BOTTOM_TO_TOP) {
+		if (getOrientationY() == Orientation.Y.BOTTOM_TO_TOP) {
 			row = max - row;
 		}
 

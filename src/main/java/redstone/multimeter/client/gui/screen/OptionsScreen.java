@@ -47,13 +47,15 @@ public class OptionsScreen extends RSMMScreen {
 			String category = entry.getKey();
 			List<Option> options = entry.getValue();
 
-			list.add(new OptionsCategoryElement(categoryWidth, category, options));
+			if (!"rsmm.option.hidden".equals(category)) {
+				list.add(new OptionsCategoryElement(categoryWidth, category, options));
+			}
 		}
 
 		int x = getX() + getWidth() / 2;
 		int y = getY() + 22;
 
-		Button properties = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, () -> Texts.literal("Default Meter Properties"), Tooltips::empty, button -> {
+		Button properties = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, () -> Texts.translatable("rsmm.gui.defaultMeterProperties.title"), Tooltips::empty, button -> {
 			client.openScreen(new DefaultMeterPropertiesScreen());
 			return true;
 		});
@@ -64,7 +66,7 @@ public class OptionsScreen extends RSMMScreen {
 
 		y = getY() + getHeight() - (Button.DEFAULT_HEIGHT + 8);
 
-		Button reset = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiReset, Tooltips::empty, button -> {
+		Button reset = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiControlsReset, Tooltips::empty, button -> {
 			for (Option option : Options.all()) {
 				option.reset();
 			}
