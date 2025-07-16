@@ -76,7 +76,7 @@ public class TutorialToast implements Toast {
 	}
 
 	protected void drawBackground(GuiRenderer renderer, ToastComponent toasts, long age) {
-		renderer.blit(TEXTURE, 0 ,0, width(), height());
+		renderer.blitSpliced(TEXTURE, 0 ,0, width(), height(), EDGE);
 	}
 
 	protected void drawDecoration(GuiRenderer renderer, ToastComponent toasts, long age) {
