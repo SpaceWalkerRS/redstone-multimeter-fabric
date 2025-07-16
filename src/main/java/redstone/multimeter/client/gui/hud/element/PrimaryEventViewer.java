@@ -103,7 +103,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 
 	@Override
 	protected void drawHighlights(GuiRenderer renderer, int mouseX, int mouseY) {
-		renderer.push();
+		renderer.pushMatrix();
 
 		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
 			if (!isDraggingMouse() && isMouseOver(mouseX, mouseY) && !isMouseOverBorder(mouseX)) {
@@ -124,7 +124,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			}
 		}
 
-		renderer.pop();
+		renderer.popMatrix();
 	}
 
 	@Override
