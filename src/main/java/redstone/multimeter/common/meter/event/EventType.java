@@ -6,6 +6,7 @@ import java.util.Map;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtElement;
 
+import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.tooltip.TooltipBuilder;
 import redstone.multimeter.util.Direction;
@@ -13,29 +14,29 @@ import redstone.multimeter.util.NbtUtils;
 
 public enum EventType {
 
-	UNKNOWN(-1, "unknown"),
-	POWERED(0, "powered") {
+	UNKNOWN(-1, "unknown", "unknown"),
+	POWERED(0, "powered", "powered") {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
 			builder.line(Texts.keyValue("became powered", metadata == 1));
 		}
 	},
-	ACTIVE(1, "active") {
+	ACTIVE(1, "active", "active") {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
 			builder.line(Texts.keyValue("became active", metadata == 1));
 		}
 	},
-	MOVED(2, "moved") {
+	MOVED(2, "moved", "moved") {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
 			builder.line(Texts.keyValue("direction", Direction.fromIndex(metadata).getName()));
 		}
 	},
-	POWER_CHANGE(3, "power_change") {
+	POWER_CHANGE(3, "powerChange", "power_change") {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
@@ -47,8 +48,8 @@ public enum EventType {
 				.line(Texts.keyValue("new power", newPower));
 		}
 	},
-	RANDOM_TICK(4, "random_tick"),
-	SCHEDULED_TICK(5, "scheduled_tick") {
+	RANDOM_TICK(4, "randomTick", "random_tick"),
+	SCHEDULED_TICK(5, "scheduledTick", "scheduled_tick") {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
@@ -60,7 +61,7 @@ public enum EventType {
 				.line(Texts.keyValue("priority", priority));
 		}
 	},
-	BLOCK_EVENT(6, "block_event") {
+	BLOCK_EVENT(6, "blockEvent", "block_event") {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
@@ -74,20 +75,20 @@ public enum EventType {
 				.line(Texts.keyValue("depth", depth));
 		}
 	},
-	ENTITY_TICK(7, "entity_tick"),
-	BLOCK_ENTITY_TICK(8, "block_entity_tick"),
-	BLOCK_UPDATE(9, "block_update"),
-	COMPARATOR_UPDATE(10, "comparator_update"),
-	SHAPE_UPDATE(11, "shape_update") {
+	ENTITY_TICK(7, "entityTick", "entity_tick"),
+	BLOCK_ENTITY_TICK(8, "blockEntityTick", "block_entity_tick"),
+	BLOCK_UPDATE(9, "blockUpdate", "block_update"),
+	COMPARATOR_UPDATE(10, "comparatorUpdate", "comparator_update"),
+	SHAPE_UPDATE(11, "shapeUpdate", "shape_update") {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
 			builder.line(Texts.keyValue("direction", Direction.fromIndex(metadata).getName()));
 		}
 	},
-	OBSERVER_UPDATE(12, "observer_update"),
-	INTERACT_BLOCK(13, "interact_block"),
-	BLOCK_DATA_CHANGE(14, "block_data_change") {
+	OBSERVER_UPDATE(12, "observerUpdate", "observer_update"),
+	INTERACT_BLOCK(13, "interactBlock", "interact_block"),
+	BLOCK_DATA_CHANGE(14, "blockDataChange", "block_data_change") {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
@@ -100,60 +101,72 @@ public enum EventType {
 	};
 
 	public static final EventType[] ALL;
-	private static final Map<String, EventType> BY_NAME;
+	private static final Map<String, EventType> BY_LEGACY_KEY;
 
 	static {
 
 		EventType[] types = values();
 
 		ALL = new EventType[types.length - 1];
-		BY_NAME = new HashMap<>();
+		BY_LEGACY_KEY = new HashMap<>();
 
 		for (int index = 1; index < types.length; index++) {
 			EventType type = types[index];
 
-			ALL[type.index] = type;
-			BY_NAME.put(type.name, type);
+			ALL[type.id] = type;
+			BY_LEGACY_KEY.put(type.legacyKey, type);
 		}
 	}
 
-	private final int index;
-	private final String name;
+	private final int id;
+	private final String key;
+	// used for backwards compatibility
+	// int networking and keybinds
+	private final String legacyKey;
 
-	private EventType(int index, String name) {
-		this.index = index;
-		this.name = name;
+	private EventType(int id, String key, String legacyKey) {
+		this.id = id;
+		this.key = key;
+		this.legacyKey = legacyKey;
 	}
 
-	public int getIndex() {
-		return index;
+	public int getId() {
+		return this.id;
 	}
 
-	public static EventType byIndex(int index) {
-		if (index >= 0 && index < ALL.length) {
-			return ALL[index];
+	public static EventType byId(int id) {
+		if (id >= 0 && id < ALL.length) {
+			return ALL[id];
 		}
-		
+
 		return UNKNOWN;
 	}
 
-	public String getName() {
-		return name;
+	public String getKey() {
+		return this.key;
 	}
 
-	public static EventType byName(String name) {
-		return BY_NAME.getOrDefault(name, UNKNOWN);
+	public String getLegacyKey() {
+		return this.legacyKey;
+	}
+
+	public static EventType byLegacyKey(String name) {
+		return BY_LEGACY_KEY.getOrDefault(name, UNKNOWN);
+	}
+
+	public Text getName() {
+		return Texts.translatable("rsmm.meterControls.eventType." + this.key);
 	}
 
 	public int flag() {
-		return 1 << index;
+		return 1 << this.id;
 	}
 
 	public void buildTooltip(TooltipBuilder builder, int metadata) {
 	}
 
 	public NbtElement toNbt() {
-		return new NbtByte(null, (byte)index);
+		return new NbtByte(null, (byte)this.id);
 	}
 
 	public static EventType fromNbt(NbtElement nbt) {
@@ -164,6 +177,6 @@ public enum EventType {
 		NbtByte nbtByte = (NbtByte)nbt;
 		int index = nbtByte.value;
 
-		return byIndex(index);
+		return byId(index);
 	}
 }
