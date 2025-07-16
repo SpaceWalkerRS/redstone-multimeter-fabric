@@ -59,7 +59,7 @@ public class HudSettings {
 	public boolean setTickMarkerColor(String hexColor) {
 		try {
 			int color = ColorUtils.fromRGBString(hexColor);
-			this.colorHighlightTickMarker = color;
+			this.colorHighlightTickMarker = ColorUtils.setAlpha(color, 0xFF);
 
 			return true;
 		} catch (NumberFormatException e) {
