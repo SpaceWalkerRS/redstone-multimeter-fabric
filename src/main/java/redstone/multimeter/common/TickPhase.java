@@ -30,10 +30,10 @@ public class TickPhase {
 
 	@Override
 	public String toString() {
-		String string = tasks[0].getName();
+		String string = tasks[0].getName().buildString();
 
 		for (int index = 1; index < tasks.length; index++) {
-			string += " > " + tasks[index].getName();
+			string += " > " + tasks[index].getName().buildString();
 		}
 
 		return string;
@@ -46,7 +46,12 @@ public class TickPhase {
 		String whitespace = "              ";
 
 		for (int index = 1; index < tasks.length; index++) {
-			builder.line(whitespace + "> " + tasks[index].getName());
+			builder.line(Texts.composite(
+				whitespace,
+				"> ",
+				tasks[index].getName()
+			));
+
 			whitespace += "  ";
 		}
 	}
@@ -107,7 +112,7 @@ public class TickPhase {
 		byte[] array = new byte[tasks.length];
 
 		for (int index = 0; index < array.length; index++) {
-			array[index] = (byte)tasks[index].getIndex();
+			array[index] = (byte)tasks[index].getId();
 		}
 
 		return new NbtByteArray(null, array);
@@ -123,7 +128,7 @@ public class TickPhase {
 		TickTask[] tasks = new TickTask[array.length];
 
 		for (int index = 0; index < tasks.length; index++) {
-			tasks[index] = TickTask.byIndex(array[index]);
+			tasks[index] = TickTask.byId(array[index]);
 		}
 
 		return new TickPhase(tasks);

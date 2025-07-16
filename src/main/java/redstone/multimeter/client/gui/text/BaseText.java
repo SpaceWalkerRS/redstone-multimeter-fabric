@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
-public abstract class BaseText implements Text {
+abstract class BaseText implements Text {
 
 	private final List<Text> siblings;
 
