@@ -2,7 +2,7 @@ package redstone.multimeter.client.gui.hud.element;
 
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
-import redstone.multimeter.client.gui.hud.Directionality;
+import redstone.multimeter.client.gui.hud.Orientation;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.common.meter.Meter;
 
@@ -159,7 +159,7 @@ public abstract class MeterEventViewer extends AbstractElement {
 		int max = getColumnCount() - 1;
 		int column = Math.min(max, (int)((mouseX - getX()) / (hud.settings.columnWidth + hud.settings.gridSize)));
 
-		if (hud.getDirectionalityX() == Directionality.X.RIGHT_TO_LEFT) {
+		if (hud.getOrientationX() == Orientation.X.RIGHT_TO_LEFT) {
 			column = max - column;
 		}
 
