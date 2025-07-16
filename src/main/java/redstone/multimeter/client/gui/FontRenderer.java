@@ -2,6 +2,7 @@ package redstone.multimeter.client.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -10,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.TextColor;
+import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.util.ColorUtils;
 
@@ -130,6 +132,11 @@ public class FontRenderer {
 		}
 
 		return lines;
+	}
+
+	public List<Text> split(Text s, int width) {
+		// TODO: properly split styled text
+		return this.split(s.buildFormattedString(), width).stream().map(Texts::resolve).collect(Collectors.toList());
 	}
 
 	public int width(String s) {

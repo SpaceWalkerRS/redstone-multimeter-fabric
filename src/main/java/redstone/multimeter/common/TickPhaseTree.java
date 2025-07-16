@@ -23,7 +23,7 @@ public class TickPhaseTree {
 	private boolean complete;
 
 	public TickPhaseTree() {
-		this.root = new Node(null, TickTask.UNKNOWN);
+		this.root = new Node(null, TickTask.RUN_LOOP);
 
 		this.current = root;
 		this.building = false;
@@ -116,7 +116,7 @@ public class TickPhaseTree {
 		if (depth > 0) { // depth 0 is root
 			byte[] array = new byte[3];
 			array[0] = (byte)depth;
-			array[1] = (byte)node.task.getIndex();
+			array[1] = (byte)node.task.getId();
 			array[2] = (byte)node.args.length;
 			ByteArrayTag taskNbt = new ByteArrayTag(array);
 
@@ -152,7 +152,7 @@ public class TickPhaseTree {
 		ByteArrayTag taskNbt = (ByteArrayTag)tasks.get(taskIndex);
 		byte[] array = taskNbt.getAsByteArray();
 		int depth = array[0];
-		TickTask task = TickTask.byIndex(array[1]);
+		TickTask task = TickTask.byId(array[1]);
 		int argsLength = array[2];
 
 		String[] taskArgs;

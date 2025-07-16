@@ -152,7 +152,7 @@ public class MeterProperties {
 
 			for (EventType type : EventType.ALL) {
 				if (hasEventType(type)) {
-					types.add(type.getName());
+					types.add(type.getLegacyKey());
 				}
 			}
 
@@ -202,7 +202,7 @@ public class MeterProperties {
 
 					if (typeJson.isJsonPrimitive()) {
 						String typeName = typeJson.getAsString();
-						EventType type = EventType.byName(typeName);
+						EventType type = EventType.byLegacyKey(typeName);
 
 						if (type != null) {
 							properties.eventTypes |= type.flag();

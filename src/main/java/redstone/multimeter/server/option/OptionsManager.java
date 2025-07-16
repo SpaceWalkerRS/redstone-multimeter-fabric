@@ -57,7 +57,7 @@ public class OptionsManager {
 			break;
 		case "blacklist":
 			for (String name : options.event_types.blacklist) {
-				EventType type = EventType.byName(name);
+				EventType type = EventType.byLegacyKey(name);
 
 				if (type != null) {
 					options.enabledEventTypes &= ~type.flag();
@@ -69,7 +69,7 @@ public class OptionsManager {
 			options.enabledEventTypes = 0;
 
 			for (String name : options.event_types.whitelist) {
-				EventType type = EventType.byName(name);
+				EventType type = EventType.byLegacyKey(name);
 
 				if (type != null) {
 					options.enabledEventTypes |= type.flag();

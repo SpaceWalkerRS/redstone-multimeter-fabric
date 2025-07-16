@@ -7,7 +7,7 @@ import java.util.function.UnaryOperator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
-public abstract class BaseText implements Text {
+abstract class BaseText implements Text {
 
 	private final List<Text> siblings;
 
