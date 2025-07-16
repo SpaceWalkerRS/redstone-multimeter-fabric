@@ -67,7 +67,7 @@ public class InputHandler {
 			KeyBinding keybind = Keybinds.TOGGLE_EVENT_TYPES[index];
 
 			while (keybind.consumeClick()) {
-				client.toggleEventType(EventType.byIndex(index));
+				client.toggleEventType(EventType.byId(index));
 			}
 		}
 
@@ -75,7 +75,7 @@ public class InputHandler {
 			return;
 		}
 
-		while (Keybinds.PAUSE_METERS.consumeClick()) {
+		while (Keybinds.PAUSE_TIMELINE.consumeClick()) {
 			client.getHud().togglePaused();
 		}
 		while (Keybinds.TOGGLE_FOCUS_MODE.consumeClick()) {
@@ -147,7 +147,7 @@ public class InputHandler {
 				client.openScreen(new TickPhaseTreeScreen());
 			}
 		} else if (screen instanceof MultimeterScreen) {
-			if (Keybinds.PAUSE_METERS.matchesMouse(button)) {
+			if (Keybinds.PAUSE_TIMELINE.matchesMouse(button)) {
 				client.getHud().togglePaused();
 			} else if (Keybinds.TOGGLE_FOCUS_MODE.matchesMouse(button)) {
 				client.getHud().toggleFocusMode();
@@ -193,7 +193,7 @@ public class InputHandler {
 				client.openScreen(new TickPhaseTreeScreen());
 			}
 		} else if (screen instanceof MultimeterScreen) {
-			if (Keybinds.PAUSE_METERS.matches(keyCode, scanCode)) {
+			if (Keybinds.PAUSE_TIMELINE.matches(keyCode, scanCode)) {
 				client.getHud().togglePaused();
 			} else if (Keybinds.TOGGLE_FOCUS_MODE.matches(keyCode, scanCode)) {
 				client.getHud().toggleFocusMode();

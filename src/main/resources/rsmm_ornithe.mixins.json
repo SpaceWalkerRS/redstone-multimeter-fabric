@@ -60,6 +60,7 @@
 		"client.InputConstantsTypeAccessor",
 		"client.IntegratedServerMixin",
 		"client.KeyBindingMixin",
+		"client.TranslationStorageMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
 		"client.WindowMixin"
