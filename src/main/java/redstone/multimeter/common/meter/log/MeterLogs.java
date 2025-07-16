@@ -41,7 +41,7 @@ public class MeterLogs {
 	}
 
 	private List<EventLog> getLogs(EventType type) {
-		return eventLogs[type.getIndex()];
+		return eventLogs[type.getId()];
 	}
 
 	public void add(EventLog log) {
@@ -187,7 +187,7 @@ public class MeterLogs {
 			NbtList logs = toNbt(type);
 
 			if (!logs.isEmpty()) {
-				nbt.put(type.getName(), logs);
+				nbt.put(type.getLegacyKey(), logs);
 			}
 		}
 
@@ -208,7 +208,7 @@ public class MeterLogs {
 		Collection<EventLog> logs = new ArrayList<>();
 
 		for (String key : nbt.getKeys()) {
-			EventType type = EventType.byName(key);
+			EventType type = EventType.byLegacyKey(key);
 
 			if (type != null) {
 				logs.addAll(fromNbt(type, nbt.getList(key, NbtUtils.TYPE_COMPOUND)));

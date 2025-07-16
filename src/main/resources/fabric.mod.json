@@ -35,11 +35,6 @@
 	},
 
 	"custom": {
-		"loom:injected_interfaces": {
-			"net/minecraft/unmapped/C_9550253": [
-				"redstone/multimeter/interfaces/mixin/IText"
-			]
-		},
 		"modmenu": {
 			"links": {
 				"modmenu.discord": "https://discord.gg/EJC9zkX"

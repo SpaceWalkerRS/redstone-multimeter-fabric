@@ -11,7 +11,6 @@ import redstone.multimeter.client.gui.element.button.BasicButton;
 import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.text.Formatting;
 import redstone.multimeter.client.gui.text.Texts;
-import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.client.gui.tooltip.Tooltips;
 import redstone.multimeter.client.option.Option;
 import redstone.multimeter.client.option.OptionListener;
@@ -24,7 +23,7 @@ public class OptionsCategoryElement extends AbstractParentElement {
 
 	public OptionsCategoryElement(int width, String category, Collection<Option> options) {
 		this.font = MultimeterClient.INSTANCE.getFontRenderer();
-		this.category = new Label(0, 0, t -> t.setLines(Texts.literal(category).format(Formatting.ITALIC)).setShadow(true));
+		this.category = new Label(0, 0, t -> t.setLines(Texts.translatable(category).format(Formatting.ITALIC)).setShadow(true));
 		this.options = new SimpleList(width);
 
 		for (Option option : options) {
@@ -64,12 +63,10 @@ public class OptionsCategoryElement extends AbstractParentElement {
 		private final Button reset;
 
 		public OptionElement(Option option) {
-			Tooltip tooltip = Tooltips.split(font, option.getDescription());
-
 			this.option = option;
-			this.name = new Label(0, 0, t -> t.setLines(this.option.getName()).setShadow(true), () -> tooltip, t -> false);
+			this.name = new Label(0, 0, t -> t.setLines(this.option.getName()).setShadow(true), () -> Tooltips.split(font, option.getDescription()), t -> false);
 			this.control = this.option.createControl(100, Button.DEFAULT_HEIGHT);
-			this.reset = new BasicButton(0, 0, 50, Button.DEFAULT_HEIGHT, Texts::guiReset, Tooltips::empty, button -> {
+			this.reset = new BasicButton(0, 0, 50, Button.DEFAULT_HEIGHT, Texts::guiControlsReset, Tooltips::empty, button -> {
 				this.option.reset();
 				return true;
 			});
