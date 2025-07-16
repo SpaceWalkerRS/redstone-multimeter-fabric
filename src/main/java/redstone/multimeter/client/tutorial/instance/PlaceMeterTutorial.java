@@ -3,7 +3,6 @@ package redstone.multimeter.client.tutorial.instance;
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
-import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
@@ -12,13 +11,6 @@ import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 
 public class PlaceMeterTutorial extends StagedTutorialInstance {
-
-	private static final Text TITLE = Texts.literal("Place A Meter");
-	private static final Text DESCRIPTION = Texts.composite(
-		"Look at a block and press ",
-		Texts.keybind(Keybinds.TOGGLE_METER),
-		" to place a meter on that block."
-	);
 
 	private Stage stage;
 	private DimPos lastRequest;
@@ -31,7 +23,13 @@ public class PlaceMeterTutorial extends StagedTutorialInstance {
 
 	@Override
 	protected TutorialToast createToast() {
-		return new StagedTutorialToast(this, TITLE, DESCRIPTION);
+		return new StagedTutorialToast(
+			this,
+			TutorialStep.PLACE_METER.getName(),
+			TutorialStep.PLACE_METER.getDescription(
+				Texts.keybind(Keybinds.TOGGLE_METER)
+			)
+		);
 	}
 
 	@Override
@@ -68,12 +66,11 @@ public class PlaceMeterTutorial extends StagedTutorialInstance {
 
 	@Override
 	public void tick() {
-		
 	}
 
 	@Override
 	public TutorialStep getNextStep() {
-		return TutorialStep.PAUSE_HUD;
+		return TutorialStep.PAUSE_TIMELINE;
 	}
 
 	@Override
