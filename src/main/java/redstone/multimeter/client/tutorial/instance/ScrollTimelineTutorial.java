@@ -4,25 +4,20 @@ import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
-import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
-public class PauseHudTutorial extends StagedTutorialInstance {
+public class ScrollTimelineTutorial extends StagedTutorialInstance {
 
-	private static final Text TITLE = Texts.literal("Pause The HUD");
-	private static final Text DESCRIPTION = Texts.composite(
-		"Press ",
-		Texts.keybind(Keybinds.PAUSE_METERS),
-		" to pause the Multimeter timeline."
-	);
+	private static final int TIMES_SCROLLED_TARGET = 5;
 
 	private Stage stage;
+	private int timesScrolled;
 
-	public PauseHudTutorial(Tutorial tutorial) {
+	public ScrollTimelineTutorial(Tutorial tutorial) {
 		super(tutorial);
 
 		findStage();
@@ -30,7 +25,15 @@ public class PauseHudTutorial extends StagedTutorialInstance {
 
 	@Override
 	protected TutorialToast createToast() {
-		return new StagedTutorialToast(this, TITLE, DESCRIPTION);
+		return new StagedTutorialToast(
+			this,
+			TutorialStep.SCROLL_TIMELINE.getName(),
+			TutorialStep.SCROLL_TIMELINE.getDescription(
+				Texts.keybind(Keybinds.STEP_BACKWARD),
+				Texts.keybind(Keybinds.STEP_FORWARD),
+				Texts.keys(Keybinds.SCROLL_HUD, "scroll")
+			)
+		);
 	}
 
 	@Override
@@ -42,7 +45,14 @@ public class PauseHudTutorial extends StagedTutorialInstance {
 
 	@Override
 	public void onPauseHud(boolean paused) {
-		if (stage == Stage.PAUSE_HUD && paused) {
+		if (!paused || stage == Stage.PAUSE_HUD) {
+			findStage();
+		}
+	}
+
+	@Override
+	public void onScrollHud(int amount) {
+		if (stage == Stage.SCROLL_HUD && amount != 0 && ++timesScrolled >= TIMES_SCROLLED_TARGET) {
 			completed = true;
 		}
 	}
@@ -82,12 +92,18 @@ public class PauseHudTutorial extends StagedTutorialInstance {
 
 	@Override
 	public TutorialStep getNextStep() {
-		return TutorialStep.SCROLL_HUD;
+		return TutorialStep.OPEN_MULTIMETER_SCREEN;
 	}
 
 	@Override
 	public float getProgress() {
-		return completed ? 1.0F : (float)stage.ordinal() / 4;
+		float progress = completed ? 1.0F : (float)stage.ordinal() / 5;
+
+		if (stage == Stage.SCROLL_HUD) {
+			progress += (float)timesScrolled / (5 * TIMES_SCROLLED_TARGET);
+		}
+
+		return progress;
 	}
 
 	private void findStage() {
@@ -100,12 +116,16 @@ public class PauseHudTutorial extends StagedTutorialInstance {
 			stage = Stage.ADD_METER;
 		} else if (!client.isHudActive()) {
 			stage = Stage.ACTIVE_HUD;
-		} else {
+		} else if (!client.getHud().isPaused()) {
 			stage = Stage.PAUSE_HUD;
+		} else {
+			stage = Stage.SCROLL_HUD;
 		}
+
+		timesScrolled = 0;
 	}
 
 	public static enum Stage {
-		JOIN_METER_GROUP, ADD_METER, ACTIVE_HUD, PAUSE_HUD
+		JOIN_METER_GROUP, ADD_METER, ACTIVE_HUD, PAUSE_HUD, SCROLL_HUD
 	}
 }

@@ -2,6 +2,7 @@ package redstone.multimeter.client.gui.element.meter;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -57,12 +58,16 @@ public class MeterControlsElement extends AbstractParentElement {
 
 		this.client = MultimeterClient.INSTANCE;
 
-		this.title = new Label(0, 0, t -> t.addLine(Texts.literal("Edit Meter \'%s\'", this.meter == null ? "" : this.meter.getName()).format(Formatting.UNDERLINED)).setShadow(true));
+		this.title = new Label(0, 0, t -> {
+			if (this.meter != null) {
+				t.addLine(Texts.translatable("rsmm.gui.meterControls.edit", this.meter.getName()).format(Formatting.UNDERLINED)).setShadow(true);
+			}
+		});
 		this.hideButton = new BasicButton(0, 0, 18, 18, () -> Texts.literal(this.meter != null && this.meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltips.line("%s Meter", this.meter == null || this.meter.isHidden() ? "Unhide" : "Hide"), button -> {
 			this.client.getMeterGroup().toggleHidden(this.meter);
 			return true;
 		});
-		this.deleteButton = new BasicButton(0, 0, 18, 18, () -> Texts.literal("X").format(this.triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltips.keybind("Delete Meter", Keybinds.TOGGLE_METER), button -> {
+		this.deleteButton = new BasicButton(0, 0, 18, 18, () -> Texts.literal("X").format(this.triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltips.keybind(Texts.translatable("rsmm.gui.meterControls.delete"), Keybinds.TOGGLE_METER), button -> {
 			this.tryDelete();
 
 			if (this.triedDeleting && Screen.hasShiftDown()) {
@@ -72,7 +77,7 @@ public class MeterControlsElement extends AbstractParentElement {
 			return true;
 		});
 
-		this.deleteConfirm = new Label(0, 0, t -> t.addLine(Texts.literal("Are you sure you want to delete this meter? YOU CANNOT UNDO THIS!").format(Formatting.ITALIC)).setShadow(true));
+		this.deleteConfirm = new Label(0, 0, t -> t.addLine(Texts.translatable("rsmm.gui.meterControls.delete.warning").format(Formatting.ITALIC)).setShadow(true));
 		this.deleteConfirm.setVisible(false);
 
 		this.controls = new SimpleList(this.getWidth());
@@ -153,11 +158,11 @@ public class MeterControlsElement extends AbstractParentElement {
 		int totalWidth = 375;
 		int buttonWidth = 150;
 
-		MeterPropertyElement pos = new MeterPropertyElement(totalWidth, buttonWidth, "Pos", () -> Tooltips.line("Click to teleport!"), t -> {
+		MeterPropertyElement pos = new MeterPropertyElement(totalWidth, buttonWidth, "pos", () -> Tooltips.line("Click to teleport!"), t -> {
 			this.teleport();
 			return true;
 		});
-		pos.addControl("dimension", (width, height) -> new TextField(0, 0, width, height, Tooltips::empty, text -> {
+		pos.addControl("dimension", new TextField(0, 0, 0, 0, Tooltips::empty, text -> {
 			try {
 				ResourceLocation dimension = new ResourceLocation(text);
 				DimPos newPos = this.meter.getPos().relative(dimension);
@@ -167,22 +172,16 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			}
 		}, () -> this.meter.getPos().getDimension().toString()), SuggestionsProvider.resources(Registry.DIMENSION_TYPE_REGISTRY, false));
-		pos.addCoordinateControl(Axis.X, () -> this.meter.getPos(), p -> this.changePos(p));
-		pos.addCoordinateControl(Axis.Y, () -> this.meter.getPos(), p -> this.changePos(p));
-		pos.addCoordinateControl(Axis.Z, () -> this.meter.getPos(), p -> this.changePos(p));
+		pos.addCoordinateControl(Axis.X, this.meter::getPos, this::changePos);
+		pos.addCoordinateControl(Axis.Y, this.meter::getPos, this::changePos);
+		pos.addCoordinateControl(Axis.Z, this.meter::getPos, this::changePos);
 
-		MeterPropertyElement name = new MeterPropertyElement(totalWidth, buttonWidth, "Name");
-		name.addControl("", (width, height) -> new TextField(0, 0, width, height, Tooltips::empty, text -> this.changeName(text), () -> this.meter.getName()));
+		MeterPropertyElement name = new MeterPropertyElement(totalWidth, buttonWidth, "name");
+		name.addControl("", new TextField(0, 0, 0, 0, Tooltips::empty, this::changeName, this.meter::getName));
 
-		MeterPropertyElement color = new MeterPropertyElement(totalWidth, buttonWidth, "Color");
-		color.addControl("rgb", style -> style.withColor(this.meter.getColor()), (width, height) -> new TextField(0, 0, width, height, Tooltips::empty, text -> {
-			try {
-				this.changeColor(ColorUtils.fromRGBString(text));
-			} catch (NumberFormatException e) {
-
-			}
-		}, () -> ColorUtils.toRGBString(this.meter.getColor())));
-		color.addControl("red", style -> style.withColor(Formatting.RED), (width, height) -> new Slider(0, 0, width, height, () -> {
+		MeterPropertyElement color = new MeterPropertyElement(totalWidth, buttonWidth, "color");
+		color.addControl("hex", style -> style.withColor(this.meter.getColor()), new TextField(0, 0, 0, 0, Tooltips::empty, this::changeColor, () -> ColorUtils.toRGBString(this.meter.getColor())));
+		color.addControl("red", style -> style.withColor(Formatting.RED), new Slider(0, 0, 0, 0, () -> {
 			int c = this.meter.getColor();
 			int red = ColorUtils.getRed(c);
 
@@ -198,7 +197,7 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			return (double)red / 0xFF;
 		}, 0xFF));
-		color.addControl("blue", style -> style.withColor(Formatting.BLUE), (width, height) -> new Slider(0, 0, width, height, () -> {
+		color.addControl("blue", style -> style.withColor(Formatting.BLUE), new Slider(0, 0, 0, 0, () -> {
 			int c = this.meter.getColor();
 			int blue = ColorUtils.getBlue(c);
 
@@ -214,7 +213,7 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			return (double)blue / 0xFF;
 		}, 0xFF));
-		color.addControl("green", style -> style.withColor(Formatting.GREEN), (width, height) -> new Slider(0, 0, width, height, () -> {
+		color.addControl("green", style -> style.withColor(Formatting.GREEN), new Slider(0, 0, 0, 0, () -> {
 			int c = this.meter.getColor();
 			int green = ColorUtils.getGreen(c);
 
@@ -231,19 +230,17 @@ public class MeterControlsElement extends AbstractParentElement {
 			return (double)green / 0xFF;
 		}, 0xFF));
 
-		MeterPropertyElement movable = new MeterPropertyElement(totalWidth, buttonWidth, "Movable");
-		movable.addControl("", (width, height) -> new ToggleButton(0, 0, width, height, () -> this.meter.isMovable(), button -> this.toggleMovable()));
+		MeterPropertyElement movable = new MeterPropertyElement(totalWidth, buttonWidth, "movable");
+		movable.addControl("", new ToggleButton(0, 0, 0, 0, this.meter::isMovable, button -> this.toggleMovable()));
 
-		MeterPropertyElement eventTypes = new MeterPropertyElement(totalWidth, buttonWidth, "Event Types");
+		MeterPropertyElement eventTypes = new MeterPropertyElement(totalWidth, buttonWidth, "eventTypes");
 		for (EventType type : EventType.ALL) {
-			KeyMapping keybind = Keybinds.TOGGLE_EVENT_TYPES[type.getIndex()];
-			Supplier<Tooltip> tooltip = Tooltips::empty;
+			KeyMapping keybind = Keybinds.TOGGLE_EVENT_TYPES[type.getId()];
+			Supplier<Tooltip> tooltip = () -> keybind.isUnbound()
+				? Tooltips.EMPTY
+				: Tooltips.keybind(keybind);
 
-			if (!keybind.isUnbound()) {
-				tooltip = () -> Tooltips.keybind(String.format("Toggle %s Event", type.getName()), keybind);
-			}
-
-			eventTypes.addControl(type.getName(), (width, height) -> new ToggleButton(0, 0, width, height, () -> this.meter.isMetering(type), button -> this.toggleEventType(type)), tooltip);
+			eventTypes.addControl(type.getName(), UnaryOperator.identity(), new ToggleButton(0, 0, 0, 0, () -> this.meter.isMetering(type), button -> this.toggleEventType(type)), tooltip);
 		}
 
 		this.controls.add(pos);
@@ -317,6 +314,13 @@ public class MeterControlsElement extends AbstractParentElement {
 
 	private void changeName(String name) {
 		this.changeProperty(properties -> properties.setName(name));
+	}
+
+	private void changeColor(String color) {
+		try {
+			this.changeColor(ColorUtils.fromRGBString(color));
+		} catch (NumberFormatException e) {
+		}
 	}
 
 	private void changeColor(int color) {
