@@ -1,4 +1,4 @@
-package redstone.multimeter.mixin.client;
+package redstone.multimeter.mixin.common;
 
 import java.util.List;
 

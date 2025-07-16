@@ -4,19 +4,19 @@ import redstone.multimeter.client.option.Cyclable;
 
 public enum MeterNameMode implements Cyclable<MeterNameMode> {
 
-	NEVER("Never"),
-	ALWAYS("Always"),
-	IN_FOCUS_MODE("In Focus Mode"),
-	WHEN_PREVIEWING("When Previewing");
+	NEVER("never"),
+	ALWAYS("always"),
+	IN_FOCUS_MODE("inFocusMode"),
+	WHEN_PREVIEWING("whenPreviewingMeterGroup");
 
-	private final String name;
+	private final String key;
 
-	private MeterNameMode(String name) {
-		this.name = name;
+	private MeterNameMode(String key) {
+		this.key = key;
 	}
 
 	@Override
-	public String getName() {
-		return name;
+	public String key() {
+		return key;
 	}
 }

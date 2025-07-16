@@ -16,7 +16,7 @@
 		"common.ServerPlayNetworkHandlerMixin",
 		"common.ServerPlayerInteractionManagerMixin",
 		"common.ServerWorldMixin",
-		"common.TextMixin",
+		"common.TextAccessor",
 		"common.WorldChunkMixin",
 		"common.WorldMixin",
 		"common.meterable.ButtonBlockMixin",
@@ -59,7 +59,8 @@
 		"client.GLXMixin",
 		"client.IntegratedServerMixin",
 		"client.LocalConnectionMixin",
-		"client.MinecraftMixin"
+		"client.MinecraftMixin",
+		"client.TranslationStorageMixin"
 	],
 	"server": [
 	],

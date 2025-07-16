@@ -1,27 +1,18 @@
 package redstone.multimeter.client.gui.text;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.minecraft.client.resource.language.LanguageDefinition;
 import net.minecraft.locale.I18n;
 
-import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.MultimeterClient;
 
 public class TranslatableText extends BaseText {
 
-	private static final String BUILT_IN_TRANSLATIONS_PATH = "/assets/redstone_multimeter/lang/en_US.lang";
 	private static final Pattern ARG_FORMAT = Pattern.compile("%(?:(\\d+)\\$)?([A-Za-z%]|$)");
-
-	private static Map<String, String> builtInTranslations;
 
 	private final String key;
 	private final Object[] args;
@@ -40,13 +31,7 @@ public class TranslatableText extends BaseText {
 		LanguageDefinition language = MultimeterClient.MINECRAFT.getLanguageManager().getLanguage();
 
 		if (this.resolved == null || this.resolvedLanguage != language) {
-			String translation;
-
-			if (I18n.hasTranslation(this.key)) {
-				translation = I18n.translate(this.key);
-			} else {
-				translation = builtInTranslate(this.key);
-			}
+			String translation = I18n.translate(this.key);
 
 			this.resolvedLanguage = language;
 			this.resolve(translation);
@@ -57,7 +42,19 @@ public class TranslatableText extends BaseText {
 
 	@Override
 	net.minecraft.text.Text buildText() {
-		return net.minecraft.text.Text.literal(this.buildFormattedString());
+		Object[] args = new Object[this.args.length];
+
+		for (int i = 0; i < args.length; i++) {
+			Object arg = this.args[i];
+
+			if (arg instanceof Text) {
+				arg = ((Text) arg).resolve();
+			}
+
+			args[i] = arg;
+		}
+
+		return net.minecraft.text.Text.translatable(this.key, args);
 	}
 
 	private void resolve(String translation) {
@@ -114,41 +111,5 @@ public class TranslatableText extends BaseText {
 		}
 
 		return Texts.of(arg);
-	}
-
-	private static String builtInTranslate(String key) {
-		if (builtInTranslations == null) {
-			loadBuiltInTranslations();
-		}
-
-		return builtInTranslations.getOrDefault(key, key);
-	}
-
-	private static void loadBuiltInTranslations() {
-		builtInTranslations = new HashMap<>();
-
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(Text.class.getResourceAsStream(BUILT_IN_TRANSLATIONS_PATH)))) {
-			String line;
-
-			while ((line = br.readLine()) != null) {
-				if (line.trim().isEmpty() || line.charAt(0) == '#') {
-					continue;
-				}
-
-				String[] parts = line.split("[=]");
-
-				if (parts.length != 2) {
-					RedstoneMultimeterMod.LOGGER.warn("ignoring invalid built-in RSMM translation \'" + line + "\'");
-					continue;
-				}
-
-				String key = parts[0].trim();
-				String value = parts[1].trim();
-
-				builtInTranslations.put(key, value);
-			}
-		} catch (IOException e) {
-			RedstoneMultimeterMod.LOGGER.warn("unable to load RSMM's built-in translations!", e);
-		}
 	}
 }
