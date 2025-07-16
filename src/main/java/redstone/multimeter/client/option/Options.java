@@ -8,95 +8,96 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import redstone.multimeter.RedstoneMultimeterMod;
-import redstone.multimeter.client.gui.hud.Directionality;
+import redstone.multimeter.client.gui.hud.Orientation;
 import redstone.multimeter.client.render.MeterNameMode;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.ColorPicker;
 import redstone.multimeter.common.meter.MeterGroup;
-import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.util.ColorUtils;
 
 public class Options {
 
 	public static class RedstoneMultimeter {
 
-		public static final BooleanOption                NUMBERED_NAMES       = new BooleanOption("Numbered Meter Names", "Add a number at the end of meter names that increments with each meter you add.", true);
-		public static final EnumOption<ColorPicker>      COLOR_PICKER         = new EnumOption<>("Color Picker", "The algorithm used to pick colors for new meters", ColorPicker.class, ColorPicker.RANDOM);
-		public static final BooleanOption                SHIFTY_METERS        = new BooleanOption("Shifty Meters", "Use the shift key to control whether a new meter is movable or not.", true);
-		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("Auto Random Ticks", String.format("Automatically enable the \'%s\' event type when placing a meter on a block that accepts random ticks.", EventType.RANDOM_TICK.getName()), true);
-		public static final EnumOption<MeterNameMode>    RENDER_METER_NAMES   = new EnumOption<>("Render Meter Names", "Render meter name tags inside the meter highlights in the world.", MeterNameMode.class, MeterNameMode.IN_FOCUS_MODE);
-		public static final IntegerOption                METER_NAME_RANGE     = new IntegerOption("Meter Name Range", "The range within which meter names will be rendered.", 16, 0, 64);
-		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("Create Group On Join", "Automatically create a new meter group upon joining a world or server.", true);
-		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption("Default Meter Group", "The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used instead.", "", MeterGroup.getMaxNameLength());
-		public static final BooleanOption                PREVIEW_METER_GROUPS = new BooleanOption("Preview Meter Groups", "Preview meter groups before loading them from the saved meter group slot. This preview will appear as long as the Load Meter Group keybind is pressed. Pressing the slot key again will stop previewing and load the meter group from that slot.", true);
-		public static final BooleanOption                BYPASS_WARNINGS      = new BooleanOption("Bypass Meter Group Warnings", "Bypass warnings when trying to load a meter group from an empty slot or trying to save a meter group to a slot when not subscribed to one. Otherwise you will have to press the keybind again to confirm the action.", false);
+		public static final BooleanOption                NUMBERED_NAMES       = new BooleanOption("redstoneMultimeter.numberedMeterNames", "Numbered Meter Names", true);
+		public static final EnumOption<ColorPicker>      COLOR_PICKER         = new EnumOption<> ("redstoneMultimeter.colorPicker", "Color Picker", ColorPicker.class, ColorPicker.RANDOM);
+		public static final BooleanOption                SHIFTY_METERS        = new BooleanOption("redstoneMultimeter.shiftyMeters", "Shifty Meters", true);
+		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("redstoneMultimeter.autoRandomTicks", "Auto Random Ticks", true);
+		public static final EnumOption<MeterNameMode>    RENDER_METER_NAMES   = new EnumOption<> ("redstoneMultimeter.meterNameTags", "Render Meter Names", MeterNameMode.class, MeterNameMode.IN_FOCUS_MODE);
+		public static final IntegerOption                METER_NAME_RANGE     = new IntegerOption("redstoneMultimeter.meterNameTagsRange", "Meter Name Range", 16, 0, 64);
+		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("redstoneMultimeter.createMeterGroupOnJoin", "Create Group On Join", true);
+		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption ("redstoneMultimeter.defaultMeterGroup", "Default Meter Group", "", MeterGroup.getMaxNameLength());
+		public static final BooleanOption                PREVIEW_METER_GROUPS = new BooleanOption("redstoneMultimeter.previewMeterGroups", "Preview Meter Groups", true);
+		public static final BooleanOption                BYPASS_WARNINGS      = new BooleanOption("redstoneMultimeter.bypassMeterGroupWarnings", "Bypass Meter Group Warnings", false);
 
 	}
 
 	public static class HUD {
 
-		public static final IntegerOption                SCREEN_POS_X         = new IntegerOption("Horizontal Screen Position", "The horizontal position of the HUD on the screen, as a percentage of the screen width.", 0, 0, 100);
-		public static final IntegerOption                SCREEN_POS_Y         = new IntegerOption("Vertical Screen Position", "The vertical position of the HUD on the screen, as a percantage of the screen height.", 0, 0, 100);
-		public static final EnumOption<Directionality.X> DIRECTIONALITY_X     = new EnumOption<>("Horizontal Directionality", "The direction along which the events are drawn.", Directionality.X.class, Directionality.X.LEFT_TO_RIGHT);
-		public static final EnumOption<Directionality.Y> DIRECTIONALITY_Y     = new EnumOption<>("Vertical Directionality", "The direction along which meters are listed.", Directionality.Y.class, Directionality.Y.TOP_TO_BOTTOM);
-		public static final IntegerOption                COLUMN_COUNT         = new IntegerOption("History", "The number of ticks displayed in the primary overview.", 60, 1, 10001);
-		public static final IntegerOption                SELECTED_COLUMN      = new IntegerOption("Selected Column", "The column of the primary overview that highlights the tick that is selected for showing sub-tick events in the secondary overview.", 44, 0, 10000);
-		public static final IntegerOption                CELL_SCALE           = new IntegerOption("Cell Scale", "The scale of cells in the primary and secondary overviews.", 1, 1, 10);
-		public static final IntegerOption                COLUMN_WIDTH         = new IntegerOption("Column Width", "The width of a column of the primary and secondary overviews.", 3, 1, 50);
-		public static final IntegerOption                ROW_HEIGHT           = new IntegerOption("Row Height", "The height of a row in the HUD.", 9, 1, 50);
-		public static final IntegerOption                GRID_SIZE            = new IntegerOption("Grid Size", "The thickness of the gridlines in the HUD.", 1, 1, 10);
-		public static final StringOption                 TICK_MARKER_COLOR    = new StringOption("Tick Marker Color", "The color of the highlight around the tick marker, in RRGGBB format.", "FF0000", 6);
-		public static final BooleanOption                AUTO_REMOVE_MARKER   = new BooleanOption("Auto Remove Tick Marker", "Automatically remove the tick marker when unpausing the HUD.", false);
-		public static final BooleanOption                HIDE_HIGHLIGHT       = new BooleanOption("Hide Highlight", "Hide the highlight around the selected tick when the HUD is not paused.", true);
-		public static final BooleanOption                PAUSE_INDICATOR      = new BooleanOption("Pause Indicator", "Display a little play/pause indicator underneath the HUD.", false);
-		public static final IntegerOption                OPACITY              = new IntegerOption("Opacity", "", 100, 0, 100);
-		public static final BooleanOption                AUTO_PAUSE           = new BooleanOption("Auto Pause", "Automatically pause the HUD when opening the Multimeter screen.", true);
-		public static final BooleanOption                AUTO_UNPAUSE         = new BooleanOption("Auto Unpause", "Automatically unpause the HUD when closing the Multimeter screen.", true);
+		public static final IntegerOption                SCREEN_POS_X         = new IntegerOption("hud.horizontalScreenPosition", "Horizontal Screen Position", 0, 0, 100);
+		public static final IntegerOption                SCREEN_POS_Y         = new IntegerOption("hud.verticalScreenPosition", "Vertical Screen Position", 0, 0, 100);
+		public static final EnumOption<Orientation.X>    ORIENTATION_X        = new EnumOption<> ("hud.horizontalOrientation", "Horizontal Directionality", Orientation.X.class, Orientation.X.LEFT_TO_RIGHT);
+		public static final EnumOption<Orientation.Y>    ORIENTATION_Y        = new EnumOption<> ("hud.verticalOrientation", "Vertical Directionality", Orientation.Y.class, Orientation.Y.TOP_TO_BOTTOM);
+		public static final IntegerOption                COLUMN_COUNT         = new IntegerOption("hud.history", "History", 60, 1, 10001);
+		public static final IntegerOption                SELECTED_COLUMN      = new IntegerOption("hud.selectedColumn", "Selected Column", 44, 0, 10000);
+		public static final IntegerOption                CELL_SCALE           = new IntegerOption("hud.cellScale", null, 1, 1, 10);
+		public static final IntegerOption                COLUMN_WIDTH         = new IntegerOption("hud.columnWidth", "Column Width", 3, 1, 50);
+		public static final IntegerOption                ROW_HEIGHT           = new IntegerOption("hud.rowHeight", "Row Height", 9, 1, 50);
+		public static final IntegerOption                GRID_SIZE            = new IntegerOption("hud.gridSize", "Grid Size", 1, 1, 10);
+		public static final StringOption                 TICK_MARKER_COLOR    = new StringOption ("hud.tickMarkerColor", "Tick Marker Color", "FF0000", 6);
+		public static final BooleanOption                AUTO_REMOVE_MARKER   = new BooleanOption("hud.autoRemoveTickMarker", "Auto Remove Tick Marker", false);
+		public static final BooleanOption                HIDE_HIGHLIGHT       = new BooleanOption("hud.hideHighlight", "Hide Highlight", true);
+		public static final BooleanOption                PAUSE_INDICATOR      = new BooleanOption("hud.pauseIndicator", "Pause Indicator", false);
+		public static final IntegerOption                OPACITY              = new IntegerOption("hud.opacity", "Opacity", 100, 0, 100);
+		public static final BooleanOption                AUTO_PAUSE           = new BooleanOption("hud.autoPause", "Auto Pause", true);
+		public static final BooleanOption                AUTO_UNPAUSE         = new BooleanOption("hud.autoUnpause", "Auto Unpause", true);
 
 	}
 
 	public static class LogPrinter {
 
-		public static final BooleanOption                PRINT_OLD_LOGS       = new BooleanOption("Print Old Logs", "Print old logs when activating the printer.", false);
-		public static final IntegerOption                MAX_RUNTIME          = new IntegerOption("Maximum Runtime", "The limit of how long the printer can run, in ticks. The printer will automatically stop when reaching this number. Entering a value of -1 will remove the limit entirely.", -1, -1, Integer.MAX_VALUE);
+		public static final BooleanOption                PRINT_OLD_LOGS       = new BooleanOption("logPrinter.printOldLogs", "Print Old Logs", false);
+		public static final IntegerOption                MAX_RUNTIME          = new IntegerOption("logPrinter.maxRuntime", "Maximum Runtime", -1, -1, Integer.MAX_VALUE);
 
 	}
 
 	public static class Miscellaneous {
 
-		public static final IntegerOption                SCROLL_SPEED         = new IntegerOption("Scroll Speed", "The scroll speed in Redstone Multimeter related GUIs.", 7, 1, 69);
-		public static final IntegerOption                DOUBLE_CLICK_TIME    = new IntegerOption("Double Click Time", "The double click time in Redstone Multimeter related GUIs.", 5, 1, 500);
-		public static final BooleanOption                VERSION_WARNING      = new BooleanOption("Version Warning", "Send a warning message in chat when you join a server that has a different version of Redstone Multimeter installed.", true);
+		public static final IntegerOption                SCROLL_SPEED         = new IntegerOption("miscellaneous.scrollSpeed", "Scroll Speed", 7, 1, 69);
+		public static final IntegerOption                DOUBLE_CLICK_TIME    = new IntegerOption("miscellaneous.doubleClickTime", "Double Click Time", 5, 1, 500);
+		public static final BooleanOption                VERSION_WARNING      = new BooleanOption("miscellaneous.serverVersionWarning", "Version Warning", true);
 
 	}
 
 	public static class Hidden {
 
-		public static final EnumOption<TutorialStep>     TUTORIAL_STEP        = new EnumOption<>("Tutorial Step", "", TutorialStep.class, TutorialStep.OPEN_KEYBINDS_SCREEN);
+		public static final EnumOption<TutorialStep>     TUTORIAL_STEP        = new EnumOption<>("hidden.tutorialStep", "Tutorial Step", TutorialStep.class, TutorialStep.OPEN_OPTIONS_SCREEN);
 
 	}
 
-	private static final Map<String, Option> BY_NAME;
-	private static final Map<String, List<Option>> BY_CATEGORY;
+	private static final Map<String, Option> OPTIONS;
+	private static final Map<String, List<Option>> OPTIONS_BY_CATEGORY;
+	private static final Map<String, String> LEGACY_KEYS;
 
 	private static final String FILE_NAME = "options.txt";
 
 	public static Collection<Option> all() {
-		return Collections.unmodifiableCollection(BY_NAME.values());
+		return Collections.unmodifiableCollection(OPTIONS.values());
 	}
 
 	public static Map<String, List<Option>> byCategory() {
-		return Collections.unmodifiableMap(BY_CATEGORY);
+		return Collections.unmodifiableMap(OPTIONS_BY_CATEGORY);
 	}
 
 	public static Collection<Option> ofCategory(String category) {
-		return Collections.unmodifiableCollection(BY_CATEGORY.getOrDefault(category, Collections.emptyList()));
+		return Collections.unmodifiableCollection(OPTIONS_BY_CATEGORY.getOrDefault(category, Collections.emptyList()));
 	}
 
 	public static void validate() {
@@ -132,10 +133,14 @@ public class Options {
 					continue;
 				}
 
-				String name = args[0];
+				String key = args[0];
 				String value = args[1];
 
-				Option option = BY_NAME.get(name);
+				Option option = OPTIONS.get(key);
+				if (option == null && LEGACY_KEYS.containsKey(key)) {
+					key = LEGACY_KEYS.get(key);
+					option = OPTIONS.get(key);
+				}
 
 				if (option != null) {
 					option.setFromString(value);
@@ -160,11 +165,11 @@ public class Options {
 		Path file = dir.resolve(FILE_NAME);
 
 		try (BufferedWriter bw = Files.newBufferedWriter(file)) {
-			for (Entry<String, Option> entry : BY_NAME.entrySet()) {
-				String name = entry.getKey();
+			for (Entry<String, Option> entry : OPTIONS.entrySet()) {
+				String key = entry.getKey();
 				String value = entry.getValue().getAsString();
 
-				bw.write(name + "=" + value);
+				bw.write(key + "=" + value);
 				bw.newLine();
 			}
 		} catch (IOException e) {
@@ -173,29 +178,39 @@ public class Options {
 	}
 
 	private static void register(String category, Option... options) {
+		category = "rsmm.option." + category;
+
 		if (category != null) {
-			if (BY_CATEGORY.containsKey(category)) {
+			if (OPTIONS_BY_CATEGORY.containsKey(category)) {
 				throw new IllegalStateException("Cannot register a category multiple times!");
 			}
 
-			BY_CATEGORY.put(category, Arrays.asList(options));
+			OPTIONS_BY_CATEGORY.put(category, Arrays.asList(options));
 		}
 
 		for (Option option : options) {
-			if (BY_NAME.containsKey(option.getName())) {
+			String key = option.key();
+			String legacyKey = option.legacyKey();
+
+			if (OPTIONS.containsKey(key)) {
 				throw new IllegalStateException("Cannot register multiple options with the same name!");
 			}
 
-			BY_NAME.put(option.getName(), option);
+			OPTIONS.put(key, option);
+
+			if (legacyKey != null) {
+				LEGACY_KEYS.put(legacyKey, key);
+			}
 		}
 	}
 
 	static {
 
-		BY_NAME = new LinkedHashMap<>();
-		BY_CATEGORY = new LinkedHashMap<>();
+		OPTIONS = new LinkedHashMap<>();
+		OPTIONS_BY_CATEGORY = new LinkedHashMap<>();
+		LEGACY_KEYS = new HashMap<>();
 
-		register(RedstoneMultimeterMod.MOD_NAME,
+		register("redstoneMultimeter",
 			RedstoneMultimeter.NUMBERED_NAMES,
 			RedstoneMultimeter.COLOR_PICKER,
 			RedstoneMultimeter.SHIFTY_METERS,
@@ -207,11 +222,11 @@ public class Options {
 			RedstoneMultimeter.PREVIEW_METER_GROUPS,
 			RedstoneMultimeter.BYPASS_WARNINGS
 		);
-		register("HUD",
+		register("hud",
 			HUD.SCREEN_POS_X,
 			HUD.SCREEN_POS_Y,
-			HUD.DIRECTIONALITY_X,
-			HUD.DIRECTIONALITY_Y,
+			HUD.ORIENTATION_X,
+			HUD.ORIENTATION_Y,
 			HUD.COLUMN_COUNT,
 			HUD.SELECTED_COLUMN,
 			HUD.CELL_SCALE,
@@ -226,16 +241,16 @@ public class Options {
 			HUD.AUTO_PAUSE,
 			HUD.AUTO_UNPAUSE
 		);
-		register("Log Printer",
+		register("logPrinter",
 			LogPrinter.PRINT_OLD_LOGS,
 			LogPrinter.MAX_RUNTIME
 		);
-		register("Miscellaneous",
+		register("miscellaneous",
 			Miscellaneous.SCROLL_SPEED,
 			Miscellaneous.DOUBLE_CLICK_TIME,
 			Miscellaneous.VERSION_WARNING
 		);
-		register(null,
+		register("hidden",
 			Hidden.TUTORIAL_STEP
 		);
 	}

@@ -4,7 +4,7 @@ import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.Element;
 import redstone.multimeter.client.gui.element.button.Button;
-import redstone.multimeter.client.gui.hud.Directionality;
+import redstone.multimeter.client.gui.hud.Orientation;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
 
@@ -163,7 +163,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	private boolean isMouseOverBorder(double mouseX) {
 		long x = Math.round(mouseX);
 
-		switch (hud.getDirectionalityX()) {
+		switch (hud.getOrientationX()) {
 		default:
 		case LEFT_TO_RIGHT:
 			return x >= (getX() + getWidth() - 1);
@@ -203,7 +203,7 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		}
 
 		if (c != 0) {
-			if (hud.getDirectionalityX() == Directionality.X.RIGHT_TO_LEFT) {
+			if (hud.getOrientationX() == Orientation.X.RIGHT_TO_LEFT) {
 				c *= -1;
 			}
 
