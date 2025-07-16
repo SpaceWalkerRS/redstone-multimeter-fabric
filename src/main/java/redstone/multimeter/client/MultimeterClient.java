@@ -2,7 +2,6 @@ package redstone.multimeter.client;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NbtCompound;
@@ -42,18 +41,6 @@ import redstone.multimeter.common.network.packets.RemoveMeterPacket;
 import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 
 public class MultimeterClient {
-
-	private static final Function<String, String> VERSION_WARNING = (modVersion) -> {
-		String warning;
-
-		if (modVersion.isEmpty()) {
-			warning = "WARNING: the server is running an unknown version of Redstone Multimeter. If you are experiencing issues, ask the server operator for the correct version of Redstone Multimeter to install.";
-		} else {
-			warning = "WARNING: the server is running a different version of Redstone Multimeter. If you are experiencing issues, install version " + modVersion + " of Redstone Multimeter.";
-		}
-
-		return warning;
-	};
 
 	public static MultimeterClient INSTANCE;
 	public static Minecraft MINECRAFT;
@@ -270,8 +257,15 @@ public class MultimeterClient {
 			connected = true;
 
 			if (Options.Miscellaneous.VERSION_WARNING.get() && !RedstoneMultimeterMod.MOD_VERSION.equals(modVersion)) {
-				Text warning = Texts.literal(VERSION_WARNING.apply(modVersion)).format(Formatting.RED);
-				sendMessage(warning, false);
+				Text warning;
+
+				if (modVersion == null || modVersion.isEmpty()) {
+					warning = Texts.translatable("rsmm.multiplayer.serverVersionWarning.versionUnknown");
+				} else {
+					warning = Texts.translatable("rsmm.multiplayer.serverVersionWarning.versionKnown", modVersion);
+				}
+
+				sendMessage(warning.format(Formatting.RED), false);
 			}
 
 			hud.reset();
@@ -415,11 +409,10 @@ public class MultimeterClient {
 	public void toggleHud() {
 		if (hud.hasContent()) {
 			hudEnabled = !hudEnabled;
-
-			String message = String.format("%s Multimeter HUD", hudEnabled ? "Enabled" : "Disabled");
-			sendMessage(Texts.literal(message), true);
-
 			tutorial.onToggleHud(hudEnabled);
+
+			String action = hudEnabled ? "enabled" : "disabled";
+			sendMessage(Texts.translatable("rsmm.toggleHud." + action), true);
 		}
 	}
 

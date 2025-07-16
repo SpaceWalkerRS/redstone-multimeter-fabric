@@ -13,9 +13,7 @@ public class Texts {
 	public static final Text GUI_DONE = translatable("gui.done");
 	public static final Text GUI_CANCEL = translatable("gui.cancel");
 	public static final Text GUI_CONTROLS = translatable("options.controls");
-	public static final Text GUI_RESET = translatable("controls.reset");
-	public static final Text ADDITION = literal("+");
-	public static final Text SUBTRACTION = literal("-");
+	public static final Text GUI_CONTROLS_RESET = translatable("controls.reset");
 
 	public static final String ACTION_BAR_KEY = "rsmm:action_bar|";
 
@@ -77,16 +75,8 @@ public class Texts {
 		return GUI_CONTROLS;
 	}
 
-	public static Text guiReset() {
-		return GUI_RESET;
-	}
-
-	public static Text addition() {
-		return ADDITION;
-	}
-
-	public static Text subtraction() {
-		return SUBTRACTION;
+	public static Text guiControlsReset() {
+		return GUI_CONTROLS_RESET;
 	}
 
 	public static Text keyValue(Object key, Object value) {
@@ -128,7 +118,11 @@ public class Texts {
 
 		// no (bound) keybinds
 		if (i == 0) {
-			t.append("<unbound>");
+			t.append(composite(
+				"<",
+				translatable("rsmm.keybind.unbound"),
+				">"
+			));
 		}
 
 		return t;
@@ -176,7 +170,11 @@ public class Texts {
 			if (nullable) {
 				return null;
 			} else {
-				return literal("<unbound>");
+				return composite(
+					"<",
+					translatable("rsmm.keybind.unbound"),
+					">"
+				);
 			}
 		} else {
 			return key(keybind.getKeyCode());

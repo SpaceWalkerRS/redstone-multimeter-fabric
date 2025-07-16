@@ -5,32 +5,22 @@ import net.minecraft.stat.achievement.AchievementStat;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.Keybinds;
-import redstone.multimeter.client.gui.text.Text;
+import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
+import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
-public class ScrollHudTutorial extends StagedTutorialInstance {
-
-	private static final Text TITLE = Texts.literal("Scroll The HUD");
-	private static final Text DESCRIPTION = Texts.composite(
-		"Use the ",
-		Texts.keybind(Keybinds.STEP_BACKWARD),
-		" and ",
-		Texts.keybind(Keybinds.STEP_FORWARD),
-		" keys or ",
-		Texts.keybinds(Keybinds.SCROLL_HUD, "scroll"),
-		" to scroll through the Multimeter timeline."
-	);
+public class ScrollTimelineTutorial extends StagedTutorialInstance {
 
 	private static final int TIMES_SCROLLED_TARGET = 5;
 
 	private Stage stage;
 	private int timesScrolled;
 
-	public ScrollHudTutorial(Tutorial tutorial) {
+	public ScrollTimelineTutorial(Tutorial tutorial) {
 		super(tutorial);
 
 		findStage();
@@ -39,6 +29,18 @@ public class ScrollHudTutorial extends StagedTutorialInstance {
 	@Override
 	protected AchievementStat createAchievement() {
 		return new AchievementStat("stats.rsmm.scroll_hud", "rsmm.scroll_hud", -1, -1, Blocks.CRAFTING_TABLE, null);
+	}
+
+	protected TutorialToast createToast() {
+		return new StagedTutorialToast(
+			this,
+			TutorialStep.SCROLL_TIMELINE.getName(),
+			TutorialStep.SCROLL_TIMELINE.getDescription(
+				Texts.keybind(Keybinds.STEP_BACKWARD),
+				Texts.keybind(Keybinds.STEP_FORWARD),
+				Texts.keys(Keybinds.SCROLL_HUD, "scroll")
+			)
+		);
 	}
 
 	@Override

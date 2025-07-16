@@ -26,7 +26,7 @@ public class MeterEvent {
 
 	@Override
 	public String toString() {
-		String string = type.getName();
+		String string = type.getLegacyKey();
 
 		Tooltip tooltip = Tooltips.builder()
 			.lines(this::buildTooltip)
