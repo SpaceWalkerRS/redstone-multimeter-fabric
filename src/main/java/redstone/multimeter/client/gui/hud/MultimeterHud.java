@@ -93,7 +93,7 @@ public class MultimeterHud extends AbstractParentElement {
 
 		HudRenderer hudRenderer = new HudRenderer(this, renderer);
 
-		renderer.push();
+		renderer.pushMatrix();
 		renderer.translate(0, 0, 100);
 
 		List<Element> children = getChildren();
@@ -106,7 +106,7 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}
 
-		renderer.pop();
+		renderer.popMatrix();
 
 		for (int index = this.partCount; index < children.size(); index++) {
 			Element child = children.get(index);
