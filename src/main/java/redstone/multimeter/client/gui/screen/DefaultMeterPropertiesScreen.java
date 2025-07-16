@@ -3,6 +3,7 @@ package redstone.multimeter.client.gui.screen;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.UnaryOperator;
 
 import org.lwjgl.input.Keyboard;
 
@@ -20,6 +21,7 @@ import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.ToggleButton;
 import redstone.multimeter.client.gui.element.meter.MeterPropertyElement;
 import redstone.multimeter.client.gui.text.Formatting;
+import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.tooltip.Tooltips;
 import redstone.multimeter.client.meter.ClientMeterPropertiesManager;
@@ -53,7 +55,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	private TextField create;
 
 	protected DefaultMeterPropertiesScreen() {
-		super(Texts.literal("Default Meter Properties"), true);
+		super(Texts.translatable("rsmm.gui.defaultMeterProperties.title"), true);
 
 		this.meterPropertiesManager = this.client.getMeterPropertiesManager();
 		this.defaults = new HashMap<>();
@@ -118,14 +120,14 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		y += 2;
 		int tabWidth = (listWidth - 3 * 2) / 2;
 
-		Button defaultsTab = createTabButton(Tab.DEFAULTS, x, y, tabWidth, Button.DEFAULT_HEIGHT);
+		Button defaultsTab = createTabButton(Tab.BUILT_IN, x, y, tabWidth, Button.DEFAULT_HEIGHT);
 		Button overridesTab = createTabButton(Tab.OVERRIDES, x + (listWidth - 2) - (tabWidth + 2), y, tabWidth, Button.DEFAULT_HEIGHT);
 
 		y += Button.DEFAULT_HEIGHT + 2;
 		int searchbarWidth = (listWidth - 2 * 2) - (Button.DEFAULT_HEIGHT + 2);
 
 		searchbar = new TextField(x, y, searchbarWidth, Button.DEFAULT_HEIGHT, Tooltips::empty, text -> blockList.update(), null);
-		searchbar.setHint("search");
+		searchbar.setHint(Texts.translatable("rsmm.gui.searchbar.hint"));
 		Button clear = new BasicButton(x + searchbarWidth + 2, y, 20, Button.DEFAULT_HEIGHT, () -> Texts.literal("X"), Tooltips::empty, button -> {
 			searchbar.clear();
 			return true;
@@ -145,7 +147,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			Identifier key = nextBlockKey();
 			add.setActive(key != null && !key.getPath().trim().isEmpty());
 		}, null);
-		create.setHint("create");
+		create.setHint(Texts.translatable("rsmm.gui.defaultMeterProperties.createbar.hint"));
 		SuggestionsMenu blockSuggestions = create.setSuggestions(SuggestionsProvider.matching(Block.REGISTRY, true));
 
 		x = getX() + getWidth() - listWidth - SIDE_SPACING;
@@ -184,7 +186,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		addChild(cancel);
 		addChild(done);
 
-		selectTab(currentTab == null ? Tab.DEFAULTS : currentTab);
+		selectTab(currentTab == null ? Tab.BUILT_IN : currentTab);
 		selectBlock(null);
 	}
 
@@ -194,7 +196,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	private Button createTabButton(Tab tab, int x, int y, int width, int height) {
-		return new BasicButton(x, y, width, height, () -> Texts.literal(tab.name), Tooltips::empty, button -> {
+		return new BasicButton(x, y, width, height, tab::getName, Tooltips::empty, button -> {
 			selectTab(tab);
 			selectBlock(null);
 			return true;
@@ -214,7 +216,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		searchbar.clear();
 
 		switch (currentTab) {
-		case DEFAULTS:
+		case BUILT_IN:
 			blockList.setBottomBorder(PROPERTIES_LIST_BOTTOM_BORDER);
 			blockList.add(defaults.keySet());
 			break;
@@ -250,19 +252,19 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			return;
 		}
 
-		boolean force = (currentTab != Tab.DEFAULTS);
+		boolean force = (currentTab != Tab.BUILT_IN);
 		int totalWidth = propertiesList.getEffectiveWidth();
 		int buttonWidth = totalWidth > 300 ? 150 : (totalWidth > 200 ? 100 : 50);
 
 		if (force || properties.getName() != null) {
-			MeterPropertyElement name = new MeterPropertyElement(totalWidth, buttonWidth, "Name");
-			name.addControl("", (width, height) -> new TextField(0, 0, width, height, Tooltips::empty, text -> {
+			MeterPropertyElement name = new MeterPropertyElement(totalWidth, buttonWidth, "name");
+			name.addControl("", new TextField(0, 0, 0, 0, Tooltips::empty, text -> {
 				properties.setName(text);
 				name.update();
-			}, () -> properties.name()));
+			}, properties::name));
 
 			switch (currentTab) {
-			case DEFAULTS:
+			case BUILT_IN:
 				name.setActive(false);
 				break;
 			case OVERRIDES:
@@ -274,15 +276,15 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			propertiesList.add(name);
 		}
 		if (force || properties.getColor() != null) {
-			MeterPropertyElement color = new MeterPropertyElement(totalWidth, buttonWidth, "Color");
-			color.addControl("rgb", style -> style.withColor(properties.color()), (width, height) -> new TextField(0, 0, width, height, Tooltips::empty, text -> {
+			MeterPropertyElement color = new MeterPropertyElement(totalWidth, buttonWidth, "color");
+			color.addControl("hex", style -> style.withColor(properties.color()), new TextField(0, 0, 0, 0, Tooltips::empty, text -> {
 				try {
 					properties.setColor(ColorUtils.fromRGBString(text));
 					color.update();
 				} catch (NumberFormatException e) {
 				}
 			}, () -> ColorUtils.toRGBString(properties.color())));
-			color.addControl("red", style -> style.withColor(Formatting.RED), (width, height) -> new Slider(0, 0, width, height, () -> {
+			color.addControl("red", style -> style.withColor(Formatting.RED), new Slider(0, 0, 0, 0, () -> {
 				int c = properties.color();
 				int red = ColorUtils.getRed(c);
 
@@ -299,7 +301,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 				return (double)red / 0xFF;
 			}, 0xFF));
-			color.addControl("blue", style -> style.withColor(Formatting.BLUE), (width, height) -> new Slider(0, 0, width, height, () -> {
+			color.addControl("blue", style -> style.withColor(Formatting.BLUE), new Slider(0, 0, 0, 0, () -> {
 				int c = properties.color();
 				int blue = ColorUtils.getBlue(c);
 
@@ -316,7 +318,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 				return (double)blue / 0xFF;
 			}, 0xFF));
-			color.addControl("green", style -> style.withColor(Formatting.GREEN), (width, height) -> new Slider(0, 0, width, height, () -> {
+			color.addControl("green", style -> style.withColor(Formatting.GREEN), new Slider(0, 0, 0, 0, () -> {
 				int c = properties.color();
 				int green = ColorUtils.getGreen(c);
 
@@ -335,7 +337,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			}, 0xFF));
 
 			switch (currentTab) {
-			case DEFAULTS:
+			case BUILT_IN:
 				color.setActive(false);
 				break;
 			case OVERRIDES:
@@ -347,14 +349,14 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			propertiesList.add(color);
 		}
 		if (force || properties.getMovable() != null) {
-			MeterPropertyElement movable = new MeterPropertyElement(totalWidth, buttonWidth, "Movable");
-			movable.addControl("", (width, height) -> new ToggleButton(0, 0, width, height, () -> properties.movable(), button -> {
+			MeterPropertyElement movable = new MeterPropertyElement(totalWidth, buttonWidth, "movable");
+			movable.addControl("", new ToggleButton(0, 0, 0, 0, properties::movable, button -> {
 				properties.toggleMovable();
 				movable.update();
 			}));
 
 			switch (currentTab) {
-			case DEFAULTS:
+			case BUILT_IN:
 				movable.setActive(false);
 				break;
 			case OVERRIDES:
@@ -366,16 +368,16 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			propertiesList.add(movable);
 		}
 		if (force || properties.getEventTypes() != null) {
-			MeterPropertyElement eventTypes = new MeterPropertyElement(totalWidth, buttonWidth, "Event Types");
+			MeterPropertyElement eventTypes = new MeterPropertyElement(totalWidth, buttonWidth, "eventTypes");
 			for (EventType type : EventType.ALL) {
-				eventTypes.addControl(type.getName(), (width, height) -> new ToggleButton(0, 0, width, height, () -> properties.hasEventType(type), button -> {
+				eventTypes.addControl(type.getName(), UnaryOperator.identity(), new ToggleButton(0, 0, 0, 0, () -> properties.hasEventType(type), button -> {
 					properties.toggleEventType(type);
 					eventTypes.update();
 				}));
 			}
 
 			switch (currentTab) {
-			case DEFAULTS:
+			case BUILT_IN:
 				eventTypes.setActive(false);
 				break;
 			case OVERRIDES:
@@ -396,7 +398,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		}
 
 		switch (currentTab) {
-		case DEFAULTS:
+		case BUILT_IN:
 			return defaults.get(currentBlock);
 		case OVERRIDES:
 			return overrides.get(currentBlock);
@@ -438,13 +440,17 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 	private enum Tab {
 
-		DEFAULTS("defaults"),
+		BUILT_IN("builtIn"),
 		OVERRIDES("overrides");
 
-		public final String name;
+		private final String key;
 
-		private Tab(String name) {
-			this.name = name;
+		private Tab(String key) {
+			this.key = key;
+		}
+
+		public Text getName() {
+			return Texts.translatable("rsmm.gui.defaultMeterProperties.tab." + this.key);
 		}
 	}
 
