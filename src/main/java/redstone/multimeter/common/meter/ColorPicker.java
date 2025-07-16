@@ -3,7 +3,6 @@ package redstone.multimeter.common.meter;
 import java.awt.Color;
 
 import redstone.multimeter.client.option.Cyclable;
-import redstone.multimeter.util.ColorUtils;
 
 public enum ColorPicker implements Cyclable<ColorPicker> {
 
@@ -16,7 +15,7 @@ public enum ColorPicker implements Cyclable<ColorPicker> {
 			float hue = ((index * 11) % 8 + (index / 8) / 2.0F) / 8.0F;
 			index = (index + 1) % 16;
 
-			return ColorUtils.setAlpha(Color.HSBtoRGB(hue, 0.7F, 1.0F), 0xFF);
+			return Color.HSBtoRGB(hue, 0.7F, 1.0F);
 		}
 	},
 	RAINBOW("rainbow") {
@@ -28,7 +27,7 @@ public enum ColorPicker implements Cyclable<ColorPicker> {
 			float hue = index / 32.0F;
 			index = (index + 1) % 32;
 
-			return ColorUtils.setAlpha(Color.HSBtoRGB(hue, 0.7F, 1.0F), 0xFF);
+			return Color.HSBtoRGB(hue, 0.7F, 1.0F);
 		}
 	};
 
