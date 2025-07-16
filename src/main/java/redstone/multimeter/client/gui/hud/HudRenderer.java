@@ -26,7 +26,7 @@ public class HudRenderer extends GuiRenderer {
 	}
 
 	private int x(int x0, int x1) {
-		switch (this.hud.getDirectionalityX()) {
+		switch (this.hud.getOrientationX()) {
 		default:
 		case LEFT_TO_RIGHT:
 			return this.target.getX() + x0;
@@ -36,7 +36,7 @@ public class HudRenderer extends GuiRenderer {
 	}
 
 	private int y(int y0, int y1) {
-		switch (this.hud.getDirectionalityY()) {
+		switch (this.hud.getOrientationY()) {
 		default:
 		case TOP_TO_BOTTOM:
 			return this.target.getY() + y0;
