@@ -169,11 +169,97 @@ public class GuiRenderer extends GuiComponent {
 	}
 
 	public void blit(TextureRegion t, int x0, int y0, int x1, int y1) {
-		this.blit(t.texture, x0, y0, x1, y1, t.x, t.y, t.width, t.height);
+		this.blit(t.texture, x0, y0, x1, y1, t.x, t.y, t.x + t.width, t.y + t.height);
 	}
 
 	public void blit(TextureRegion t, int x0, int y0, int x1, int y1, int color) {
-		this.blit(t.texture, x0, y0, x1, y1, t.x, t.y, t.width, t.height, color);
+		this.blit(t.texture, x0, y0, x1, y1, t.x, t.y, t.x + t.width, t.y + t.height, color);
+	}
+
+	public void blitSpliced(Texture t, int x0, int y0, int x1, int y1, int edge) {
+		this.blitSpliced(t, x0, y0, x1, y1, 0, 0, t.width, t.height, edge);
+	}
+
+	public void blitSpliced(Texture t, int x0, int y0, int x1, int y1, int edge, int color) {
+		this.blitSpliced(t, x0, y0, x1, y1, 0, 0, t.width, t.height, edge, color);
+	}
+
+	public void blitSpliced(Texture t, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int edge) {
+		this.blitSpliced(t, x0, y0, x1, y1, u0, v0, u1, v1, edge, 0xFFFFFFFF);
+	}
+
+	public void blitSpliced(Texture t, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int edge, int color) {
+		boolean mw = (x1 - x0) == (u1 - u0);
+		boolean mh = (y1 - y0) == (v1 - v0);
+
+		if (mw && mh) {
+			this.blitTiled(t, x0, y0, x1, y1, u0, v0, u1, v1, color);
+		} else if (mw) {
+			this.blitTiled(t, x0, y0       , x1, y0 + edge, u0, v0       , u1, v0 + edge, color); // top
+			this.blitTiled(t, x0, y0 + edge, x1, y1 - edge, u0, v0 + edge, u1, v1 - edge, color); // middle
+			this.blitTiled(t, x0, y1 - edge, x1, y1       , u0, v1 - edge, u1, v1       , color); // bottom
+		} else if (mh) {
+			this.blitTiled(t, x0       , y0, x0 + edge, y1, u0       , v0, u0 + edge, v1, color); // left
+			this.blitTiled(t, x0 + edge, y0, x1 - edge, y1, u0 + edge, v0, u1 - edge, v1, color); // middle
+			this.blitTiled(t, x1 - edge, y0, x1       , y1, u1 - edge, v0, u1       , v1, color); // right
+		} else {
+			this.blitTiled(t, x0       , y0       , x0 + edge, y0 + edge, u0       , v0       , u0 + edge, v0 + edge, color); // top-left
+			this.blitTiled(t, x0 + edge, y0       , x1 - edge, y0 + edge, u0 + edge, v0       , u1 - edge, v0 + edge, color); // top
+			this.blitTiled(t, x1 - edge, y0       , x1       , y0 + edge, u1 - edge, v0       , u1       , v0 + edge, color); // top-right
+			this.blitTiled(t, x0       , y0 + edge, x0 + edge, y1 - edge, u0       , v0 + edge, u0 + edge, v1 - edge, color); // left
+			this.blitTiled(t, x0 + edge, y0 + edge, x1 - edge, y1 - edge, u0 + edge, v0 + edge, u1 - edge, v1 - edge, color); // middle
+			this.blitTiled(t, x1 - edge, y0 + edge, x1       , y1 - edge, u1 - edge, v0 + edge, u1       , v1 - edge, color); // right
+			this.blitTiled(t, x0       , y1 - edge, x0 + edge, y1       , u0       , v1 - edge, u0 + edge, v1       , color); // bottom-left
+			this.blitTiled(t, x0 + edge, y1 - edge, x1 - edge, y1       , u0 + edge, v1 - edge, u1 - edge, v1       , color); // bottom
+			this.blitTiled(t, x1 - edge, y1 - edge, x1       , y1       , u1 - edge, v1 - edge, u1       , v1       , color); // bottom-right
+		}
+	}
+
+	public void blitSpliced(TextureRegion t, int x0, int y0, int x1, int y1, int edge) {
+		this.blitSpliced(t.texture, x0, y0, x1, y1, t.x, t.y, t.x + t.width, t.y + t.height, edge);
+	}
+
+	public void blitSpliced(TextureRegion t, int x0, int y0, int x1, int y1, int edge, int color) {
+		this.blitSpliced(t.texture, x0, y0, x1, y1, t.x, t.y, t.x + t.width, t.y + t.height, edge, color);
+	}
+
+	public void blitTiled(Texture t, int x0, int y0, int x1, int y1) {
+		this.blitTiled(t, x0, y0, x1, y1, 0, 0, t.width, t.height);
+	}
+
+	public void blitTiled(Texture t, int x0, int y0, int x1, int y1, int color) {
+		this.blitTiled(t, x0, y0, x1, y1, 0, 0, t.width, t.height, color);
+	}
+
+	public void blitTiled(Texture t, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1) {
+		this.blitTiled(t, x0, y0, x1, y1, u0, v0, u1, v1, 0xFFFFFFFF);
+	}
+
+	public void blitTiled(Texture t, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int color) {
+		int xs = x0;
+		int ys = y0;
+		int xf = x1;
+		int yf = y1;
+
+		for (x0 = xs; x0 < xf; x0 = x1) {
+			x1 = Math.min(x0 + (u1 - u0), xf);
+			u1 = Math.min(u1, u0 + (x1 - x0));
+
+			for (y0 = ys; y0 < yf; y0 = y1) {
+				y1 = Math.min(y0 + (v1 - v0), yf);
+				v1 = Math.min(v1, v0 + (y1 - y0));
+
+				this.blit(t, x0, y0, x1, y1, u0, v0, u1, v1, color);
+			} 
+		}
+	}
+
+	public void blitTiled(TextureRegion t, int x0, int y0, int x1, int y1) {
+		this.blitTiled(t.texture, x0, y0, x1, y1, t.x, t.y, t.x + t.width, t.y + t.height);
+	}
+
+	public void blitTiled(TextureRegion t, int x0, int y0, int x1, int y1, int color) {
+		this.blitTiled(t.texture, x0, y0, x1, y1, t.x, t.y, t.x + t.width, t.y + t.height, color);
 	}
 
 	private void innerBlit(Texture t, int x0, int x1, int y0, int y1, float u0, float u1, float v0, float v1, int color) {
