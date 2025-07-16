@@ -61,6 +61,7 @@
 		"common.meterable.WeightedPressurePlateBlockMixin"
 	],
 	"client": [
+		"client.ClientLanguageMixin",
 		"client.ClientPacketListenerMixin",
 		"client.GuiGraphicsAccessor",
 		"client.GuiMixin",
