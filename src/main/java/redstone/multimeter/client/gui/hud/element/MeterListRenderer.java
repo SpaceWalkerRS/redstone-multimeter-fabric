@@ -40,7 +40,7 @@ public class MeterListRenderer extends AbstractElement {
 
 	@Override
 	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
-		renderer.push();
+		renderer.pushMatrix();
 		drawCursorMeter(renderer, mouseX, mouseY);
 		renderer.translate(0, 0, -1);
 		drawHighlights(renderer, mouseX, mouseY);
@@ -48,7 +48,7 @@ public class MeterListRenderer extends AbstractElement {
 		drawNames(renderer, mouseX, mouseY);
 		renderer.translate(0, 0, -1);
 		renderer.fill(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		renderer.pop();
+		renderer.popMatrix();
 	}
 
 	@Override
@@ -160,7 +160,7 @@ public class MeterListRenderer extends AbstractElement {
 
 	private void drawCursorMeter(GuiRenderer renderer, int mouseX, int mouseY) {
 		if (cursorMeter != null) {
-			renderer.push();
+			renderer.pushMatrix();
 
 			int startX = mouseX + cursorOffsetX;
 			int startY = mouseY + cursorOffsetY;
@@ -190,7 +190,7 @@ public class MeterListRenderer extends AbstractElement {
 
 			renderer.fill(x0, y0, x1, y1, color);
 
-			renderer.pop();
+			renderer.popMatrix();
 		}
 	}
 
