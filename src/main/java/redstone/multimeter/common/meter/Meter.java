@@ -10,6 +10,7 @@ import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.log.MeterLogs;
+import redstone.multimeter.util.ColorUtils;
 
 public class Meter {
 
@@ -76,7 +77,7 @@ public class Meter {
 	}
 
 	public int getColor() {
-		return properties.getColor();
+		return ColorUtils.setAlpha(properties.getColor(), 0xFF);
 	}
 
 	public boolean isMovable() {
