@@ -255,6 +255,15 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+
+		if (this.suggestions != null) {
+			this.suggestions.setVisible(visible);
+		}
+	}
+
+	@Override
 	public void tick() {
 		if (this.isFocused()) {
 			this.cursorTicks++;
