@@ -80,11 +80,11 @@ public class BasicEventRenderer extends MeterEventRenderer {
 	}
 
 	protected void drawEvent(GuiRenderer renderer, int x, int y, Meter meter, MeterEvent event) {
-		renderer.push();
+		renderer.pushMatrix();
 		drawCenter(renderer, x, y, meter, event);
 		renderer.translate(0, 0, -0.01);
 		drawEdges(renderer, x, y, meter, event);
-		renderer.pop();
+		renderer.popMatrix();
 	}
 
 	protected void drawEdges(GuiRenderer renderer, int x, int y, Meter meter, MeterEvent event) {

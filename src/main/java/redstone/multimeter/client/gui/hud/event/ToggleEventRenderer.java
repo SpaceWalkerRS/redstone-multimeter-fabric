@@ -136,11 +136,11 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 						int bgColor = toggled ? color : hud.settings.colorBackground;
 						int textColor = toggled ? hud.settings.colorTextOn : hud.settings.colorTextOff;
 
-						renderer.push();
+						renderer.pushMatrix();
 						renderer.drawString(text, startX + 1, textY + 1, textColor);
 						renderer.translate(0, 0, -0.01);
 						renderer.fill(startX, y, startX + requiredWidth, y + hud.settings.rowHeight, bgColor);
-						renderer.pop();
+						renderer.popMatrix();
 					}
 				}
 			}
@@ -266,11 +266,11 @@ public abstract class ToggleEventRenderer extends MeterEventRenderer {
 	}
 
 	private void drawOff(GuiRenderer renderer, int x, int y, int color) {
-		renderer.push();
+		renderer.pushMatrix();
 		drawOn(renderer, x, y, hud.settings.colorBackground);
 		renderer.translate(0, 0, -0.01);
 		draw(renderer, x, y, color);
-		renderer.pop();
+		renderer.popMatrix();
 	}
 
 	protected enum Mode {
