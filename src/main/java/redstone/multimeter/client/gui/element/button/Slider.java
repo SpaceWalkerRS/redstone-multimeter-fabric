@@ -107,12 +107,12 @@ public class Slider extends AbstractButton {
 		super.renderButton(renderer);
 
 		TextureRegion texture = this.getHandleTexture();
-		int x = this.getX() + this.getSliderX();
-		int y = this.getY();
-		int width = SLIDER_WIDTH;
-		int height = this.getHeight();
+		int x0 = this.getX() + this.getSliderX();
+		int y0 = this.getY();
+		int x1 = x0 + SLIDER_WIDTH;
+		int y1 = y0 + this.getHeight();
 
-		this.renderButtonTexture(renderer, texture, x, y, width, height);
+		renderer.blitSpliced(texture, x0, y0, x1, y1, EDGE);
 	}
 
 	@Override
