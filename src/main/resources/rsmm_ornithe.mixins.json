@@ -7,6 +7,7 @@
 		"common.BlockMixin",
 		"common.CommandManagerMixin",
 		"common.DimensionMixin",
+		"common.LanguageManagerMixin",
 		"common.MinecraftServerMixin",
 		"common.NbtCompoundAccess",
 		"common.NbtListMixin",

@@ -1,0 +1,486 @@
+rsmm.name = Redstone Multimeter
+
+rsmm.multiplayer.serverVersionWarning.versionKnown = WARNING: the server is running a different version of Redstone Multimeter. If you are experiencing issues, install version %s of Redstone Multimeter.
+rsmm.multiplayer.serverVersionWarning.versionUnknown = WARNING: the server is running an unknown version of Redstone Multimeter. If you are experiencing issues, ask the server operator for the correct version of Redstone Multimeter to install.
+
+rsmm.meterControls.eventType.powered = Powered
+rsmm.meterControls.eventType.active = Active
+rsmm.meterControls.eventType.moved = Moved
+rsmm.meterControls.eventType.powerChange = Power Change
+rsmm.meterControls.eventType.randomTick = Random Tick
+rsmm.meterControls.eventType.scheduledTick = Scheduled Tick
+rsmm.meterControls.eventType.blockEvent = Block Event
+rsmm.meterControls.eventType.entityTick = Entity Tick
+rsmm.meterControls.eventType.blockEntityTick = Block Entity Tick
+rsmm.meterControls.eventType.blockUpdate = Block Update
+rsmm.meterControls.eventType.comparatorUpdate = Comparator Update
+rsmm.meterControls.eventType.shapeUpdate = Shape Update
+rsmm.meterControls.eventType.observerUpdate = Observer Update
+rsmm.meterControls.eventType.interactBlock = Interact Block
+rsmm.meterControls.eventType.blockDataChange = Block Data Change
+
+rsmm.tickTask.unknown = Unknown
+rsmm.tickTask.runLoop = Game Run Loop
+rsmm.tickTask.tick = Tick
+rsmm.tickTask.commandFunctions = Command Functions
+rsmm.tickTask.levels = Levels
+rsmm.tickTask.tickLevel = Tick Level
+rsmm.tickTask.worldBorder = World Border
+rsmm.tickTask.weather = Weather
+rsmm.tickTask.wakeSleepingPlayers = Wake Sleeping Players
+rsmm.tickTask.chunkSource = Chunk Source
+rsmm.tickTask.purgeUnloadedChunks = Purge Unloaded Chunks
+rsmm.tickTask.tickChunks = Tick Chunks
+rsmm.tickTask.mobSpawners = Mob Spawners
+rsmm.tickTask.tickChunk = Tick Chunk
+rsmm.tickTask.thunder = Thunder
+rsmm.tickTask.precipitation = Precipitation
+rsmm.tickTask.randomTicks = Random Ticks
+rsmm.tickTask.customMobSpawning = Custom Mob Spawning
+rsmm.tickTask.broadcastChunks = Broadcast Chunks
+rsmm.tickTask.unloadChunks = Unload Chunks
+rsmm.tickTask.chunkMap = Chunk Map
+rsmm.tickTask.tickTime = Tick Time
+rsmm.tickTask.scheduledTicks = Scheduled Ticks
+rsmm.tickTask.blockTicks = Block Ticks
+rsmm.tickTask.fluidTicks = Fluid Ticks
+rsmm.tickTask.villages = Villages
+rsmm.tickTask.raids = Raids
+rsmm.tickTask.portals = Portals
+rsmm.tickTask.blockEvents = Block Events
+rsmm.tickTask.entities = Entities
+rsmm.tickTask.regularEntities = Regular Entities
+rsmm.tickTask.globalEntities = Global Entities
+rsmm.tickTask.players = Players
+rsmm.tickTask.dragonFight = Dragon Fight
+rsmm.tickTask.blockEntities = Block Entities
+rsmm.tickTask.entityManagement = Entity Management
+rsmm.tickTask.connections = Connections
+rsmm.tickTask.playerPing = Player Ping
+rsmm.tickTask.serverGui = Server GUI
+rsmm.tickTask.autoSave = Auto Save
+rsmm.tickTask.packets = Packets
+rsmm.tickTask.blockEventsEarly = Early Block Events
+rsmm.tickTask.blockEventsLate = Late Block Events
+
+rsmm.toggleHud.enabled = Enabled Multimeter HUD
+rsmm.toggleHud.disabled = Disabled Multimeter HUD
+
+rsmm.toggleFocusMode.enabled = Enabled Focus Mode
+rsmm.toggleFocusMode.disabled = Disabled Focus Mode
+rsmm.toggleFocusMode.noLogs = No meter event logs available to focus on...
+
+rsmm.meterGroup.invited = You have been invited to meter group '%s' - click [%s] to subscribe to it.
+rsmm.meterGroup.invited.here = here
+rsmm.meterGroup.invited.subscribe = Subscribe to meter group '%s'
+
+rsmm.meter.teleport.notAllowed = This server does not allow meter teleporting!
+rsmm.meter.teleport.success = Teleported to meter '%s'
+rsmm.meter.teleport.return = Click [%s] to return to your previous location.
+rsmm.meter.teleport.return.here = here
+rsmm.meter.teleport.return.teleport = Teleport to\n %s\n %s\n %s\n %s
+rsmm.meter.teleport.return.teleport.dimension = dimension
+rsmm.meter.teleport.return.teleport.x = x
+rsmm.meter.teleport.return.teleport.y = y
+rsmm.meter.teleport.return.teleport.z = z
+
+
+
+
+# ===================
+# CLIENT-SIDE OPTIONS
+# ===================
+
+
+rsmm.option.value.true = Enabled
+rsmm.option.value.false = Disabled
+
+
+# categories
+
+rsmm.option.redstoneMultimeter = Redstone Multimeter
+rsmm.option.hud = HUD
+rsmm.option.logPrinter = Log Printer
+rsmm.option.miscellaneous = Miscellaneous
+rsmm.option.hidden = Hidden
+
+
+# Redstone Multimeter category
+
+rsmm.option.redstoneMultimeter.numberedMeterNames.name = Numbered Meter Names
+rsmm.option.redstoneMultimeter.numberedMeterNames.description = Add a number at the end of meter names that increments with each meter you add.
+
+rsmm.option.redstoneMultimeter.colorPicker.name = Color Picker
+rsmm.option.redstoneMultimeter.colorPicker.description = The algorithm used to pick colors for new meters.
+rsmm.option.redstoneMultimeter.colorPicker.value.random = Random
+rsmm.option.redstoneMultimeter.colorPicker.value.rainbow = Rainbow
+
+rsmm.option.redstoneMultimeter.shiftyMeters.name = Shifty Meters
+rsmm.option.redstoneMultimeter.shiftyMeters.description = Use the shift key to control whether a new meter is movable or not.
+
+rsmm.option.redstoneMultimeter.autoRandomTicks.name = Auto Random Ticks
+rsmm.option.redstoneMultimeter.autoRandomTicks.description = Automatically enable the 'Random Tick' event type when placing a meter on a block that accepts random ticks.
+
+rsmm.option.redstoneMultimeter.meterNameTags.name = Meter Name Tags
+rsmm.option.redstoneMultimeter.meterNameTags.description = Render meter name tags inside the meter highlights in the world.
+rsmm.option.redstoneMultimeter.meterNameTags.value.never = Never
+rsmm.option.redstoneMultimeter.meterNameTags.value.always = Always
+rsmm.option.redstoneMultimeter.meterNameTags.value.inFocusMode = In Focus Mode
+rsmm.option.redstoneMultimeter.meterNameTags.value.whenPreviewingMeterGroup = When Previewing Meter Group
+
+rsmm.option.redstoneMultimeter.meterNameTagsRange.name = Meter Name Tags Range
+rsmm.option.redstoneMultimeter.meterNameTagsRange.description = The range within which meter name tags will be rendered.
+rsmm.option.redstoneMultimeter.meterNameTagsRange.value = %s blocks
+
+rsmm.option.redstoneMultimeter.createMeterGroupOnJoin.name = Create Meter Group On Join
+rsmm.option.redstoneMultimeter.createMeterGroupOnJoin.description = Automatically create a new meter group upon joining a world or server.
+
+rsmm.option.redstoneMultimeter.defaultMeterGroup.name = Default Meter Group
+rsmm.option.redstoneMultimeter.defaultMeterGroup.description = The name of the meter group that is created upon joining a world or server. If this field is left blank your username is used instead.
+
+rsmm.option.redstoneMultimeter.previewMeterGroups.name = Preview Meter Groups
+rsmm.option.redstoneMultimeter.previewMeterGroups.description = Preview meter groups before loading them from a saved meter group slot. This preview will appear as long as the 'Load Meter Group' keybind is pressed. Pressing the slot key again will load the meter group from that slot.
+
+rsmm.option.redstoneMultimeter.bypassMeterGroupWarnings.name = Bypass Meter Group Warnings
+rsmm.option.redstoneMultimeter.bypassMeterGroupWarnings.description = Bypass warnings when trying to load a meter group from an empty slot or trying to save a meter group to a slot when not subscribed to one. Otherwise you will have to press the keybind again to confirm the action.
+
+
+# HUD category
+
+rsmm.option.hud.horizontalScreenPosition.name = Horizontal Screen Position
+rsmm.option.hud.horizontalScreenPosition.description = The horizontal position of the HUD on the screen, as a percentage of the screen width.
+rsmm.option.hud.horizontalScreenPosition.value = %s%%
+
+rsmm.option.hud.verticalScreenPosition.name = Vertical Screen Position
+rsmm.option.hud.verticalScreenPosition.description = The vertical position of the HUD on the screen, as a percentage of the screen height.
+rsmm.option.hud.verticalScreenPosition.value = %s%%
+
+rsmm.option.hud.horizontalOrientation.name = Horizontal Orientation
+rsmm.option.hud.horizontalOrientation.description = The direction along the timeline in which the events are drawn.
+rsmm.option.hud.horizontalOrientation.value.leftToRight = Left-to-Right
+rsmm.option.hud.horizontalOrientation.value.rightToLeft = Right-to-Left
+
+rsmm.option.hud.verticalOrientation.name = Vertical Orientation
+rsmm.option.hud.verticalOrientation.description = The direction along the timeline in which meters are listed.
+rsmm.option.hud.verticalOrientation.value.topToBottom = Top-to-Bottom
+rsmm.option.hud.verticalOrientation.value.bottomToTop = Bottom-to-Top
+
+rsmm.option.hud.history.name = History
+rsmm.option.hud.history.description = The number of ticks displayed in the timeline.
+rsmm.option.hud.history.value = %s
+
+rsmm.option.hud.selectedColumn.name = Selected Column
+rsmm.option.hud.selectedColumn.description = The column of the timeline that highlights the tick that is selected for showing sub-tick events.
+rsmm.option.hud.selectedColumn.value = %s
+
+rsmm.option.hud.cellScale.name = Cell Scale
+rsmm.option.hud.cellScale.description = The scale of cells in the timeline.
+rsmm.option.hud.cellScale.value = %s
+
+rsmm.option.hud.columnWidth.name = Column Width
+rsmm.option.hud.columnWidth.description = The width of a column of the timeline.
+rsmm.option.hud.columnWidth.value = %s px
+
+rsmm.option.hud.rowHeight.name = Row Height
+rsmm.option.hud.rowHeight.description = The height of a row in the timeline.
+rsmm.option.hud.rowHeight.value = %s px
+
+rsmm.option.hud.gridSize.name = Grid Size
+rsmm.option.hud.gridSize.description = The thickness of the gridlines in the timeline.
+rsmm.option.hud.gridSize.value = %s px
+
+rsmm.option.hud.tickMarkerColor.name = Tick Marker Color
+rsmm.option.hud.tickMarkerColor.description =  The color of the highlight around the tick marker, in RRGGBB format.
+rsmm.option.hud.tickMarkerColor.value = #%s
+
+rsmm.option.hud.autoRemoveTickMarker.name = Auto Remove Tick Marker
+rsmm.option.hud.autoRemoveTickMarker.description = Automatically remove the tick marker when unpausing the timeline.
+
+rsmm.option.hud.hideHighlight.name = Hide Highlight
+rsmm.option.hud.hideHighlight.description = Hide the highlight around the selected tick when the timeline is not paused.
+
+rsmm.option.hud.pauseIndicator.name = Pause Indicator
+rsmm.option.hud.pauseIndicator.description = Display a little play/pause indicator underneath the timeline.
+
+rsmm.option.hud.opacity.name = Opacity
+rsmm.option.hud.opacity.description = The opacity of the HUD
+rsmm.option.hud.opacity.value = %s%%
+
+rsmm.option.hud.autoPause.name = Auto Pause
+rsmm.option.hud.autoPause.description = Automatically pause the timeline when opening the Multimeter screen.
+
+rsmm.option.hud.autoUnpause.name = Auto Unpause
+rsmm.option.hud.autoUnpause.description = Automatically unpause the timeline when closing the Multimeter screen.
+
+
+# Log Printer category
+
+rsmm.option.logPrinter.printOldLogs.name = Print Old Logs
+rsmm.option.logPrinter.printOldLogs.description = Print old logs when activating the printer.
+
+rsmm.option.logPrinter.maxRuntime.name = Max Runtime
+rsmm.option.logPrinter.maxRuntime.description = The limit of how long the printer can run, in ticks. The printer will automatically stop when reaching this number. Entering a value of -1 will remove the limit entirely.
+rsmm.option.logPrinter.maxRuntime.value = %s ticks
+
+
+# Miscellaneous category
+
+rsmm.option.miscellaneous.scrollSpeed.name = Scroll Speed
+rsmm.option.miscellaneous.scrollSpeed.description = The scroll speed in Redstone Multimeter related GUIs.
+rsmm.option.miscellaneous.scrollSpeed.value = %s
+
+rsmm.option.miscellaneous.doubleClickTime.name = Double Click Time
+rsmm.option.miscellaneous.doubleClickTime.description = The double click time in Redstone Multimeter related GUIs.
+rsmm.option.miscellaneous.doubleClickTime.value = %s ticks
+
+rsmm.option.miscellaneous.serverVersionWarning.name = Server Version Warning
+rsmm.option.miscellaneous.serverVersionWarning.description = Send a warning message in chat when you join a server that has a different version of Redstone Multimeter installed.
+
+
+# Hidden category (I suppose these are not necessary since they are not displayed, but for the sake of completeness...)
+
+rsmm.option.hidden.tutorialStep.name = Tutorial Step
+rsmm.option.hidden.tutorialStep.description = The last completed tutorial step.
+rsmm.option.hidden.tutorialStep.value.openOptionsScreen = Open Options Screen
+rsmm.option.hidden.tutorialStep.value.joinMeterGroup = Join Meter Group
+rsmm.option.hidden.tutorialStep.value.placeMeter = Place Meter
+rsmm.option.hidden.tutorialStep.value.pauseHud = Pause HUD
+rsmm.option.hidden.tutorialStep.value.scrollHud = Scroll Hud
+rsmm.option.hidden.tutorialStep.value.openMultimeterScreen = Open Multimeter Screen
+rsmm.option.hidden.tutorialStep.value.openMeterControls = Open Meter Controls
+rsmm.option.hidden.tutorialStep.value.removeMeter = Remove Meter
+rsmm.option.hidden.tutorialStep.value.none = None
+
+
+
+
+# ========
+# KEYBINDS
+# ========
+
+
+rsmm.keybind = Keybind
+rsmm.keybind.unbound = unbound
+
+
+# categories
+
+rsmm.keybind.redstoneMultimeter = Redstone Multimeter
+rsmm.keybind.meterEventTypes = Meter Event Types
+
+# Redstone Multimeter keybinds
+
+rsmm.keybind.toggleMeter = Toggle Meter
+rsmm.keybind.resetMeter = Reset Meter
+rsmm.keybind.loadMeterGroup = Load Meter Group
+rsmm.keybind.saveMeterGroup = Save Meter Group
+rsmm.keybind.pauseTimeline = Pause Timeline
+rsmm.keybind.stepBackwardTimeline = Step Backward In Timeline
+rsmm.keybind.stepForwardTimeline = Step Forward In Timeline
+rsmm.keybind.scrollTimelime = Scroll In Timeline
+rsmm.keybind.toggleHud = Toggle HUD
+rsmm.keybind.toggleTickMarker = Toggle Tick Marker
+rsmm.keybind.toggleFocusMode = Toggle Focus Mode
+rsmm.keybind.openMultimeterScreen = Open Multimeter Screen
+rsmm.keybind.openMeterControlsScreen = Open Meter Controls
+rsmm.keybind.openOptionsScreen = Open Options Menu
+rsmm.keybind.openTickPhaseTreeScreen = View Tick Phases
+rsmm.keybind.toggleLogPrinter = Toggle Log Printer
+
+# Meter Event Types keybinds
+
+rsmm.keybind.toggleMeterEventType.powered = Toggle 'Powered'
+rsmm.keybind.toggleMeterEventType.active = Toggle 'Active'
+rsmm.keybind.toggleMeterEventType.moved = Toggle 'Moved'
+rsmm.keybind.toggleMeterEventType.powerChange = Toggle 'Power Change'
+rsmm.keybind.toggleMeterEventType.randomTick = Toggle 'Random Tick'
+rsmm.keybind.toggleMeterEventType.scheduledTick = Toggle 'Scheduled Tick'
+rsmm.keybind.toggleMeterEventType.blockEvent = Toggle 'Block Event'
+rsmm.keybind.toggleMeterEventType.entityTick = Toggle 'Entity Tick'
+rsmm.keybind.toggleMeterEventType.blockEntityTick = Toggle 'Block Entity Tick'
+rsmm.keybind.toggleMeterEventType.blockUpdate = Toggle 'Block Update'
+rsmm.keybind.toggleMeterEventType.comparatorUpdate = Toggle 'Comparator Update'
+rsmm.keybind.toggleMeterEventType.shapeUpdate = Toggle 'Shape Update'
+rsmm.keybind.toggleMeterEventType.observerUpdate = Toggle 'Observer Update'
+rsmm.keybind.toggleMeterEventType.interactBlock = Toggle 'Interact Block'
+rsmm.keybind.toggleMeterEventType.blockDataChange = Toggle 'Block Data Change'
+
+
+
+
+# ==================
+# Saved Meter Groups
+# ==================
+
+
+rsmm.meterGroups.preview = Press one of the number keys to load the meter group from that slot
+rsmm.meterGroups.preview.success = Previewing meter group '%s' from slot %s
+rsmm.meterGroups.preview.failure.emptySlot = Cannot preview meter group from slot %s: that slot is empty!
+
+rsmm.meterGroups.load = Press one of the number keys to preview the meter group from that slot
+rsmm.meterGroups.load.success.subscribed = Loaded meter group '%s' from slot %s
+rsmm.meterGroups.load.success.unsubscribed = Loaded empty slot %s
+rsmm.meterGroups.load.failure.emptySlot = Slot %s is empty! Are you sure you want to load it?
+
+rsmm.meterGroups.save = Press one of the number keys to save this meter group to that slot
+rsmm.meterGroups.save.success = Saved meter group '%s'to slot %s
+rsmm.meterGroups.save.failure.emptyMeterGroup = Your current meter group is empty! Are you sure you want to save it?
+
+rsmm.meterGroups.clear = Press one of the number keys to clear that meter group slot
+rsmm.meterGroups.clear.success = Cleared meter group slot %s
+rsmm.meterGroups.save.failure.emptyMeterGroup = You are not subscribed to a meter group! Are you sure you want to clear slot %s?
+
+
+
+
+# ===
+# GUI
+# ===
+
+controls.reset = Reset
+
+rsmm.gui.searchbar.hint = search...
+
+
+# Meter Controls
+
+rsmm.gui.meterControls.edit = Edit Meter '%s'
+
+rsmm.gui.meterControls.delete = Delete Meter
+rsmm.gui.meterControls.delete.warning = Are you sure you want to delete this meter? This cannot be undone!
+
+rsmm.gui.meterControls.pos = Position
+rsmm.gui.meterControls.pos.dimension = Dimension
+rsmm.gui.meterControls.pos.x = X
+rsmm.gui.meterControls.pos.y = Y
+rsmm.gui.meterControls.pos.z = Z
+
+rsmm.gui.meterControls.name = Name
+
+rsmm.gui.meterControls.color = Color
+rsmm.gui.meterControls.color.hex = RGB
+rsmm.gui.meterControls.color.red = Red
+rsmm.gui.meterControls.color.green = Green
+rsmm.gui.meterControls.color.blue = Blue
+
+rsmm.gui.meterControls.movable = Movable
+
+rsmm.gui.meterControls.eventTypes = Event Types
+
+
+# Default Meter Properties screen
+
+rsmm.gui.defaultMeterProperties.title = Default Meter Properties
+rsmm.gui.defaultMeterProperties.createbar.hint = create...
+rsmm.gui.defaultMeterProperties.tab.builtIn = Built-In
+rsmm.gui.defaultMeterProperties.tab.overrides = Overrides
+
+
+# Multimeter Screen
+
+rsmm.gui.multimeter.noContent.noMeters = Nothing to see here! Add a meter to get started.
+rsmm.gui.multimeter.noContent.noMeterGroup = Nothing to see here! Subscribe to a meter group to get started.
+
+rsmm.gui.multimeter.meterGroup.slot.unsavedChanges = There are unsaved changes to this saved meter group!
+
+rsmm.gui.multimeter.timeline.paused = Paused
+
+
+# Tick  Phases screen
+
+rsmm.gui.tickPhases.title = Tick Phases
+rsmm.gui.tickPhases.requesting = Requesting tick phase tree from server...
+rsmm.gui.tickPhases.requesting.tooltip = Last request was %s seconds ago.
+rsmm.gui.tickPhases.refresh = Refresh
+
+
+
+
+# ========
+# COMMANDS
+# ========
+
+
+rsmm.command.metergroup.warning.notSubscribed = Please subscribe to a meter group first!
+
+rsmm.command.metergroup.list.success = Meter Groups:
+rsmm.command.metergroup.list.failure.none = There are no meter groups yet!
+
+rsmm.command.metergroup.subscribe.success.joined = Subscribed to meter group '%s'
+rsmm.command.metergroup.subscribe.success.created = Created meter group '%s'
+rsmm.command.metergroup.subscribe.success.default = Subscribed to default meter group
+rsmm.command.metergroup.subscribe.failure.private = That meter group is private!
+rsmm.command.metergroup.subscribe.failure.invalid = '%s' is not a valid meter group name!
+
+rsmm.command.metergroup.unsubscribe.success = Unsubscribed from meter group '%s'
+
+rsmm.command.metergroup.private.query.success.private = Meter group '%s' is private
+rsmm.command.metergroup.private.query.success.public = Meter group '%s' is public
+
+rsmm.command.metergroup.private.set.success.private = Meter group '%s' is now private
+rsmm.command.metergroup.private.set.success.public = Meter group '%s' is now public
+rsmm.command.metergroup.private.set.failure.notOwner = Only the owner of a meter group can change its privacy level!
+
+rsmm.command.metergroup.members.warning.public = NOTE: this meter group is public; adding/removing members will not have any effect until you make it private!
+
+rsmm.command.metergroup.members.list.success = Members of meter group %s:
+rsmm.command.metergroup.members.list.failure.none = Meter group '%s' has no members yet!
+
+rsmm.command.metergroup.members.add.success = Player '%s' is now a member of meter group '%s'
+rsmm.command.metergroup.members.add.failure.self = You cannot add yourself as a member!
+rsmm.command.metergroup.members.add.failure.alreadyMember = Player '%s' is already a member of meter group '%s'!
+rsmm.command.metergroup.members.add.failure.notInstalled = You cannot add player '%s' as a member; they do not have Redstone Multimeter installed!
+
+rsmm.command.metergroup.members.remove.success = Player '%s' is no longer a member of meter group '%s'
+rsmm.command.metergroup.members.remove.failure.self = You cannot remove yourself as a member!
+rsmm.command.metergroup.members.remove.failure.noSuchMember = Meter group '%s' has no member with the name '%s'!
+
+rsmm.command.metergroup.members.clear.success = Removed all members from meter group '%s'
+
+rsmm.command.metergroup.clear.success = Removed all meters in meter group '%s'
+
+
+
+
+# ===========
+# LOG PRINTER
+# ===========
+
+
+rsmm.logPrinter.start = Started printing logs to file...
+rsmm.logPrinter.stop = Stopped printing logs to file...
+rsmm.logPrinter.maxRuntimeExceeded = Printer exceeded maximum runtime!
+rsmm.logPrinter.error = Log Printer encountered issues!
+
+
+
+
+# ========
+# TUTORIAL
+# ========
+
+
+rsmm.tutorial.openOptionsScreen.name = Open The Options Screen
+rsmm.tutorial.openOptionsScreen.description = Press %s to open the options menu, or access it through Mod Menu.
+
+rsmm.tutorial.joinMeterGroup.name = Join A Meter Group
+rsmm.tutorial.joinMeterGroup.description = Use the /metergroup command to subscribe to a meter group.
+
+rsmm.tutorial.placeMeter.name = Place A Meter
+rsmm.tutorial.placeMeter.description = Look at a block and press %s to place a meter on that block.
+
+rsmm.tutorial.pauseTimeline.name = Pause The Timeline
+rsmm.tutorial.pauseTimeline.description = Press %s to pause the Multimeter timeline.
+
+rsmm.tutorial.scrollTimeline.name = Scroll Through The Timeline
+rsmm.tutorial.scrollTimeline.description = Use the %s and %s keys or %s to scroll through the Multimeter timeline.
+
+rsmm.tutorial.openMultimeterScreen.name = Open The Multimeter Screen
+rsmm.tutorial.openMultimeterScreen.description = Press %s to open the Multimeter screen.
+
+rsmm.tutorial.openMeterControls.name = Open Meter Controls
+rsmm.tutorial.openMeterControls.description = Open a meter's controls through the Multimeter screen or by looking at it and pressing %s.
+
+rsmm.tutorial.removeMeter.name = Remove A Meter
+rsmm.tutorial.removeMeter.description = Look at a block with a meter on it and press %s to remove it.
+
