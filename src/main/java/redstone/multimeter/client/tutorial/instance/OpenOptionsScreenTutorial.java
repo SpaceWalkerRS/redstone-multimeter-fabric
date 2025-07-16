@@ -4,19 +4,11 @@ import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.screen.OptionsScreen;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
-import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 
 public class OpenOptionsScreenTutorial extends TutorialInstance {
-
-	private static final Text TITLE = Texts.literal("Open The Options Screen");
-	private static final Text DESCRIPTION = Texts.composite(
-		"Press ",
-		Texts.keybind(Keybinds.OPEN_OPTIONS_MENU),
-		" to open the options menu, or access it through Mod Menu."
-	);
 
 	public OpenOptionsScreenTutorial(Tutorial tutorial) {
 		super(tutorial);
@@ -24,7 +16,12 @@ public class OpenOptionsScreenTutorial extends TutorialInstance {
 
 	@Override
 	protected TutorialToast createToast() {
-		return new TutorialToast(TITLE, DESCRIPTION);
+		return new TutorialToast(
+			TutorialStep.OPEN_OPTIONS_SCREEN.getName(),
+			TutorialStep.OPEN_OPTIONS_SCREEN.getDescription(
+				Texts.keybind(Keybinds.OPEN_OPTIONS_MENU)
+			)
+		);
 	}
 
 	@Override

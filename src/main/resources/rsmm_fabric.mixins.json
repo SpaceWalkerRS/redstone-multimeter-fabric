@@ -60,6 +60,7 @@
 		"client.IntegratedServerMixin",
 		"client.KeyMappingMixin",
 		"client.LevelRendererMixin",
+		"client.LocaleMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
 		"client.OptionsMixin"
