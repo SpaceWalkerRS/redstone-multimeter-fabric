@@ -53,7 +53,7 @@ public class MeterEventRenderDispatcher {
 	}
 
 	private void renderMeterEvents(GuiRenderer renderer, Meter meter, Consumer<MeterEventRenderer> consumer) {
-		renderer.push();
+		renderer.pushMatrix();
 
 		for (int index = EventType.ALL.length - 1; index >= 0; index--) {
 			EventType type = EventType.ALL[index];
@@ -65,6 +65,6 @@ public class MeterEventRenderDispatcher {
 			renderer.translate(0, 0, -0.1);
 		}
 
-		renderer.pop();
+		renderer.popMatrix();
 	}
 }

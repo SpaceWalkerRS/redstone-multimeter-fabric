@@ -34,7 +34,7 @@ public class GuiRenderer {
 		this.font.graphics = this.graphics;
 	}
 
-	public void push() {
+	public void pushMatrix() {
 		this.graphics.pose().pushPose();
 	}
 
@@ -42,7 +42,7 @@ public class GuiRenderer {
 		this.graphics.pose().translate(dx, dy, dz);
 	}
 
-	public void pop() {
+	public void popMatrix() {
 		this.graphics.pose().popPose();
 	}
 
@@ -93,7 +93,7 @@ public class GuiRenderer {
 	}
 
 	public void tooltip(Tooltip tooltip, int x0, int y0, int x1, int y1, int backgroundColor, int borderColor0, int borderColor1) {
-		this.push();
+		this.pushMatrix();
 		this.translate(0.0D, 0.0D, 400.0D);
 
 		// background
@@ -115,7 +115,7 @@ public class GuiRenderer {
 			textY += this.font.height() + 1;
 		}
 
-		this.pop();
+		this.popMatrix();
 	}
 
 	public void blit(Texture t, int x0, int y0, int x1, int y1) {
@@ -243,11 +243,11 @@ public class GuiRenderer {
 		this.blitTiled(t.texture, x0, y0, x1, y1, t.x, t.y, t.x + t.width, t.y + t.height, color);
 	}
 
-	public void enableScissor(int x0, int y0, int x1, int y1) {
+	public void pushScissor(int x0, int y0, int x1, int y1) {
 		this.graphics.enableScissor(x0, y0, x1, y1);
 	}
 
-	public void disableScissor() {
+	public void popScissor() {
 		this.graphics.disableScissor();
 	}
 
