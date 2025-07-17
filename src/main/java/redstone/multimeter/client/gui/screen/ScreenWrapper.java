@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.GuiRenderer;
@@ -18,7 +19,7 @@ public class ScreenWrapper extends Screen {
 	private double lastMouseY = Double.MIN_VALUE;
 
 	public ScreenWrapper(Screen parent, RSMMScreen screen) {
-		super(null);
+		super(Component.literal(""));
 
 		this.parent = parent;
 		this.screen = screen;
