@@ -1,7 +1,5 @@
 package redstone.multimeter.client.gui.text;
 
-import java.util.Objects;
-
 import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -184,30 +182,26 @@ public class Texts {
 
 	public static Text key(Key key) {
 		int code = key.getValue();
-		String translationKey = key.getName();
+		String name = key.getName();
 
-		String keyName = translationKey;
+		Object displayName = null;
 
 		switch (key.getType()) {
 		case KEYSYM:
-			keyName = GLFW.glfwGetKeyName(code, -1);
+			displayName = GLFW.glfwGetKeyName(code, -1);
 			break;
 		case SCANCODE:
-			keyName = GLFW.glfwGetKeyName(-1, code);
+			displayName = GLFW.glfwGetKeyName(-1, code);
 			break;
 		case MOUSE:
-			String buttonName = I18n.translate(translationKey);
-
-			if (Objects.equals(translationKey, buttonName)) {
-				keyName = I18n.translate(((InputConstantsTypeAccessor) (Object) InputConstants.Type.MOUSE).rsmm$getDefaultPrefix(), code + 1);
-			} else {
-				keyName = buttonName;
+			if (!I18n.hasTranslation(name)) {
+				displayName = translatable(((InputConstantsTypeAccessor) (Object) InputConstants.Type.MOUSE).rsmm$getDefaultPrefix(), code + 1);
 			}
 
 			break;
 		}
 
-		return translatable(keyName).format(Formatting.YELLOW);
+		return displayName == null ? key(translatable(name)) : key(displayName);
 	}
 
 	public static Text key(Object name) {

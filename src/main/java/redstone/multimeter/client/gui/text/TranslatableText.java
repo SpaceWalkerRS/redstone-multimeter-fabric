@@ -31,6 +31,9 @@ public class TranslatableText extends BaseText {
 	TranslatableText(String key, Object... args) {
 		this.key = key;
 		this.args = args;
+		if (this.key == null) {
+			throw new NullPointerException();
+		}
 	}
 
 	@Override
@@ -124,28 +127,6 @@ public class TranslatableText extends BaseText {
 	private static void loadBuiltInTranslations() {
 		builtInTranslations = new HashMap<>();
 
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(Text.class.getResourceAsStream(BUILT_IN_TRANSLATIONS_PATH)))) {
-			String line;
-
-			while ((line = br.readLine()) != null) {
-				if (line.trim().isEmpty() || line.charAt(0) == '#') {
-					continue;
-				}
-
-				String[] parts = line.split("[=]");
-
-				if (parts.length != 2) {
-					RedstoneMultimeterMod.LOGGER.warn("ignoring invalid built-in RSMM translation \'" + line + "\'");
-					continue;
-				}
-
-				String key = parts[0].trim();
-				String value = parts[1].trim();
-
-				builtInTranslations.put(key, value);
-			}
-		} catch (IOException e) {
-			RedstoneMultimeterMod.LOGGER.warn("unable to load RSMM's built-in translations!", e);
-		}
+		
 	}
 }
