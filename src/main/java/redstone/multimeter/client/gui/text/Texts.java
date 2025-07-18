@@ -100,65 +100,90 @@ public class Texts {
 		int i = 0;
 
 		for (Object o : keybinds) {
-			if (o instanceof KeyMapping) {
-				KeyMapping keybind = (KeyMapping) o;
-
-				if (keybind.isUnbound()) {
-					continue;
-				}
-			}
-
-			if (i++ > 0) {
-				t.append(" OR ");
-			}
+			Text keybind;
 
 			if (o instanceof KeyMapping) {
-				t.append(keybind((KeyMapping) o));
+				keybind = keybind(true, (KeyMapping) o);
 			} else if (o instanceof Key) {
-				t.append(key((Key)o));
+				keybind = key((Key) o);
 			} else if (o instanceof Object[]) {
-				t.append(keys((Object[])o));
+				keybind = keys(true, (Object[]) o);
 			} else {
-				t.append(of(o));
+				keybind = key(o);
+			}
+
+			if (keybind != null) {
+				if (i++ > 0) {
+					t.append(" OR ");
+				}
+
+				t.append(keybind);
 			}
 		}
 
 		// no (bound) keybinds
 		if (i == 0) {
-			t.append("-");
+			t.append("<unbound>");
 		}
 
 		return t;
 	}
 
 	public static Text keys(Object... keys) {
+		return keys(false, keys);
+	}
+
+	private static Text keys(boolean nullable, Object... keys) {
 		Text t = literal("");
 
 		for (int i = 0; i < keys.length; i++) {
-			Object key = keys[i];
+			Object o = keys[i];
+			Text key;
+
+			if (o instanceof KeyMapping) {
+				key = keybind(nullable, (KeyMapping) o);
+			} else if (o instanceof Key) {
+				key = key((Key) o);
+			} else {
+				key = key(o);
+			}
+
+			if (nullable && key == null) {
+				return null;
+			}
 
 			if (i > 0) {
 				t.append(" + ");
 			}
 
-			if (key instanceof KeyMapping) {
-				t.append(keybind((KeyMapping) key));
-			} else if (key instanceof Key) {
-				t.append(key((Key) key));
-			} else {
-				t.append(of(key).format(Formatting.YELLOW));
-			}
+			t.append(key);
 		}
 
 		return t;
 	}
 
 	public static Text keybind(KeyMapping keybind) {
-		return key(((IKeyMapping)keybind).rsmm$getKey());
+		return keybind(false, keybind);
+	}
+
+	private static Text keybind(boolean nullable, KeyMapping keybind) {
+		if (keybind.isUnbound()) {
+			if (nullable) {
+				return null;
+			} else {
+				return literal("<unbound>");
+			}
+		} else {
+			return key(((IKeyMapping) keybind).rsmm$getKey());
+		}
 	}
 
 	public static Text key(Key key) {
 		return of(key.getDisplayName()).format(Formatting.YELLOW);
+	}
+
+	public static Text key(Object name) {
+		return of(name).format(Formatting.YELLOW);
 	}
 
 	public static Text resolve(Component component) {
