@@ -58,7 +58,7 @@ public class TextColor {
 	}
 
 	public ChatFormatting resolve(){
-		return this.formatting.resolve();
+		return this.isFormatting() ? this.formatting.resolve() : null;
 	}
 
 	public static TextColor resolve(ChatFormatting color) {
