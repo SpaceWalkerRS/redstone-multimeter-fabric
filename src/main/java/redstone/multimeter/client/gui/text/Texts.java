@@ -184,30 +184,26 @@ public class Texts {
 
 	public static Text key(Key key) {
 		int code = key.getValue();
-		String translationKey = key.getName();
+		String name = key.getName();
 
-		String keyName = translationKey;
+		Object displayName = null;
 
 		switch (key.getType()) {
 		case KEYSYM:
-			keyName = InputConstants.translateKeyCode(code);
+			displayName = InputConstants.translateKeyCode(code);
 			break;
 		case SCANCODE:
-			keyName = InputConstants.translateScanCode(code);
+			displayName = InputConstants.translateScanCode(code);
 			break;
 		case MOUSE:
-			String buttonName = I18n.get(translationKey);
-
-			if (Objects.equals(translationKey, buttonName)) {
-				keyName = I18n.get(InputConstants.Type.MOUSE.getDefaultPrefix(), code + 1);
-			} else {
-				keyName = buttonName;
+			if (!I18n.exists(name)) {
+				displayName = translatable(InputConstants.Type.MOUSE.getDefaultPrefix(), code + 1);
 			}
 
 			break;
 		}
 
-		return translatable(keyName).format(Formatting.YELLOW);
+		return displayName == null ? key(translatable(name)) : key(displayName);
 	}
 
 	public static Text key(Object name) {
