@@ -97,65 +97,90 @@ public class Texts {
 		int i = 0;
 
 		for (Object o : keybinds) {
-			if (o instanceof KeyBinding) {
-				KeyBinding keybind = (KeyBinding) o;
-
-				if (keybind.getKeyCode() == Keyboard.KEY_NONE) {
-					continue;
-				}
-			}
-
-			if (i++ > 0) {
-				t.append(" OR ");
-			}
+			Text keybind;
 
 			if (o instanceof KeyBinding) {
-				t.append(keybind((KeyBinding) o));
+				keybind = keybind(true, (KeyBinding) o);
 			} else if (o instanceof Integer) {
-				t.append(key((Integer)o));
+				keybind = key((Integer) o);
 			} else if (o instanceof Object[]) {
-				t.append(keys((Object[])o));
+				keybind = keys(true, (Object[]) o);
 			} else {
-				t.append(of(o));
+				keybind = key(o);
+			}
+
+			if (keybind != null) {
+				if (i++ > 0) {
+					t.append(" OR ");
+				}
+
+				t.append(keybind);
 			}
 		}
 
 		// no (bound) keybinds
 		if (i == 0) {
-			t.append("-");
+			t.append("<unbound>");
 		}
 
 		return t;
 	}
 
 	public static Text keys(Object... keys) {
+		return keys(false, keys);
+	}
+
+	private static Text keys(boolean nullable, Object... keys) {
 		Text t = literal("");
 
 		for (int i = 0; i < keys.length; i++) {
-			Object key = keys[i];
+			Object o = keys[i];
+			Text key;
+
+			if (o instanceof KeyBinding) {
+				key = keybind(nullable, (KeyBinding) o);
+			} else if (o instanceof Integer) {
+				key = key((Integer) o);
+			} else {
+				key = key(o);
+			}
+
+			if (nullable && key == null) {
+				return null;
+			}
 
 			if (i > 0) {
 				t.append(" + ");
 			}
 
-			if (key instanceof KeyBinding) {
-				t.append(keybind((KeyBinding) key));
-			} else if (key instanceof Integer) {
-				t.append(key((Integer) key));
-			} else {
-				t.append(of(key).format(Formatting.YELLOW));
-			}
+			t.append(key);
 		}
 
 		return t;
 	}
 
 	public static Text keybind(KeyBinding keybind) {
-		return key(keybind.getKeyCode());
+		return keybind(false, keybind);
+	}
+
+	private static Text keybind(boolean nullable, KeyBinding keybind) {
+		if (keybind.getKeyCode() == Keyboard.KEY_NONE) {
+			if (nullable) {
+				return null;
+			} else {
+				return literal("<unbound>");
+			}
+		} else {
+			return key(keybind.getKeyCode());
+		}
 	}
 
 	public static Text key(int key) {
-		return literal(GameOptions.getKeyName(key)).format(Formatting.YELLOW);
+		return key(GameOptions.getKeyName(key));
+	}
+
+	public static Text key(Object name) {
+		return of(name).format(Formatting.YELLOW);
 	}
 
 	public static Text resolve(net.minecraft.text.Text component) {
