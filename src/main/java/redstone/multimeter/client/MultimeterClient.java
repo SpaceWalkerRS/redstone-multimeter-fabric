@@ -209,7 +209,7 @@ public class MultimeterClient {
 	}
 
 	public boolean isHudActive() {
-		return hud.hasContent() && (hudEnabled || hud.isOnScreen());
+		return hud.hasContent() && ((hudEnabled && hud.settings.opacity() > 0) || hud.isOnScreen());
 	}
 
 	public long getPrevGameTime() {
