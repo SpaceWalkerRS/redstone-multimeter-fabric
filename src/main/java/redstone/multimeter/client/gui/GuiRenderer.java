@@ -40,6 +40,11 @@ public class GuiRenderer {
 		this.font = font;
 		this.itemRenderer = new ItemRenderer();
 		this.textureManager = MultimeterClient.MINECRAFT.getTextureManager();
+
+		// slight hack to ensure initial state is as expected
+		GL11.glEnable(GL11.GL_BLEND);
+		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 	}
 
 	public void pushMatrix() {
