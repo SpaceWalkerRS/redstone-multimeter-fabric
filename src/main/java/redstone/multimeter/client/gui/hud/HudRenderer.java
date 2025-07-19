@@ -127,12 +127,12 @@ public class HudRenderer extends GuiRenderer {
 
 	@Override
 	public void drawString(String s, int x, int y) {
-		super.drawString(s, x(s, x), y(s, y));
+		super.drawString(s, x(s, x), y(s, y), color(0xFFFFFFFF));
 	}
 
 	@Override
 	public void drawString(Text t, int x, int y) {
-		super.drawString(t, x(t, x), y(t, y));
+		super.drawString(t, x(t, x), y(t, y), color(0xFFFFFFFF));
 	}
 
 	@Override
@@ -147,12 +147,12 @@ public class HudRenderer extends GuiRenderer {
 
 	@Override
 	public void drawStringWithShadow(String s, int x, int y) {
-		super.drawStringWithShadow(s, x(s, x), y(s, y));
+		super.drawStringWithShadow(s, x(s, x), y(s, y), color(0xFFFFFFFF));
 	}
 
 	@Override
 	public void drawStringWithShadow(Text t, int x, int y) {
-		super.drawStringWithShadow(t, x(t, x), y(t, y));
+		super.drawStringWithShadow(t, x(t, x), y(t, y), color(0xFFFFFFFF));
 	}
 
 	@Override
