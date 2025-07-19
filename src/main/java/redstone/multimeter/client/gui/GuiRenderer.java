@@ -39,6 +39,9 @@ public class GuiRenderer {
 	private GuiRenderer(FontRenderer font) {
 		this.font = font;
 		this.itemRenderer = MultimeterClient.MINECRAFT.getItemRenderer();
+
+		// slight hack to ensure initial state is as expected
+		GlStateManager.enableBlend();
 	}
 
 	public void pushMatrix() {
