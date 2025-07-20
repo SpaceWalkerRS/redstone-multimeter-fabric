@@ -13,6 +13,7 @@
 		"common.ServerPlayNetworkHandlerMixin",
 		"common.ServerPlayerInteractionManagerMixin",
 		"common.ServerWorldMixin",
+		"common.StyleAccess",
 		"common.TextMixin",
 		"common.WorldChunkMixin",
 		"common.WorldMixin",
@@ -53,8 +54,7 @@
 		"client.GameOptionsMixin",
 		"client.GameRendererMixin",
 		"client.IntegratedServerMixin",
-		"client.MinecraftMixin",
-		"client.StyleAccess"
+		"client.MinecraftMixin"
 	],
 	"server": [
 	],
