@@ -70,4 +70,14 @@ public enum Formatting {
 	public TextColor getColor() {
 		return TextColor.resolve(this);
 	}
+
+	public static Formatting byCode(char code) {
+		for (Formatting f : Formatting.values()) {
+			if (f.code == code) {
+				return f;
+			}
+		}
+
+		throw new IllegalStateException("unknown chat formatting code " + code);
+	}
 }
