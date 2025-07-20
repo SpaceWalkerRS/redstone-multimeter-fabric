@@ -46,6 +46,7 @@ public class TranslatableText extends BaseText {
 				translation = builtInTranslate(this.key);
 			}
 
+			this.resolvedLanguageLoadTimestamp = languageLoadTimestamp;
 			this.resolve(translation);
 		}
 
