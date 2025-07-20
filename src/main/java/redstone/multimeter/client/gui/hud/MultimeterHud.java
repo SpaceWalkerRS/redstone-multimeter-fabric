@@ -847,11 +847,11 @@ public class MultimeterHud extends AbstractParentElement {
 			selectMeter(null);
 		}
 		if (focusMode && focussedMeter != null && !meterGroup.hasMeter(focussedMeter)) {
-			toggleFocusMode();
+			setFocusMode(false);
 		}
 
 		if (paused && !hasContent()) {
-			togglePaused();
+			setPaused(false);
 		}
 	}
 
