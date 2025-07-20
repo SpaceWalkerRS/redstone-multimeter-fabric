@@ -148,7 +148,7 @@ public class FontRenderer {
 	}
 
 	public int width(Text t) {
-		return this.fixedWidth(t.buildString());
+		return this.fixedWidth(t.buildFormattedString());
 	}
 
 	private int fixedWidth(String s) {
