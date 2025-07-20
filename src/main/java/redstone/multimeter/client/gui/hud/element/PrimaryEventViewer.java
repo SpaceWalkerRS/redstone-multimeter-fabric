@@ -24,8 +24,14 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			this.updateCursor = false;
 
 			// TODO: LegacyLWJGL3 compat
-			//if (this.isHovered() && this.isMouseOverBorder(mouseX)) {
-			//	Element.setCursor(CursorType.HRESIZE);
+			//if (this.isHovered()) {
+			//	if (this.isMouseOverBorder(mouseX)) {
+			//		Element.setCursor(CursorType.HRESIZE);
+			//	} else if (this.hud.isPaused()) {
+			//		Element.setCursor(CursorType.HAND);
+			//	} else {
+			//		Element.setCursor(CursorType.ARROW);
+			//	}
 			//} else {
 			//	Element.setCursor(CursorType.ARROW);
 			//}
