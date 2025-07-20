@@ -22,7 +22,7 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 			int height = hud.settings.scale * (hud.settings.rowHeight / hud.settings.scale / 3 + 2);
 			int heightOffset = (hud.settings.rowHeight - height) / 2 + hud.settings.hparity;
 
-			if (hud.settings.columnWidth < height) {
+			if (hud.settings.columnWidth < width) {
 				return;
 			}
 
@@ -46,7 +46,7 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 			int height = hud.settings.scale * (hud.settings.rowHeight / hud.settings.scale / 3);
 			int heightOffset = (hud.settings.rowHeight - height) / 2 + hud.settings.hparity;
 
-			if (hud.settings.columnWidth < height) {
+			if (hud.settings.columnWidth < width) {
 				return;
 			}
 
@@ -54,7 +54,7 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 			int y0 = y + heightOffset;
 			int x1 = x0 + width;
 			int y1 = y0 + height;
-			int color = hud.settings.colorBackground;
+			int color = meter.getColor();
 
 			renderer.fill(x0, y0, x1, y1, color);
 		} else {
