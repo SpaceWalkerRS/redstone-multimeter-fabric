@@ -22,6 +22,8 @@ public class Texts {
 			return (Text) o;
 		} else if (o instanceof net.minecraft.text.Text) {
 			return resolve((net.minecraft.text.Text) o);
+		} else if (o instanceof String) {
+			return resolve((String) o);
 		} else {
 			return literal(o.toString());
 		}
@@ -203,6 +205,39 @@ public class Texts {
 
 		for (net.minecraft.text.Text sibling : component.getSiblings()) {
 			t.append(resolve(sibling));
+		}
+
+		return t;
+	}
+
+	public static Text resolve(String fs) {
+		Text t = literal("");
+		Style s = Style.EMPTY;
+
+		int start = 0;
+		int end = 0;
+
+		boolean parseAsFormatting = false;
+
+		for (; end < fs.length(); end++) {
+			char chr = fs.charAt(end);
+
+			if (parseAsFormatting) {
+				Formatting f = Formatting.byCode(chr);
+
+				if (f == Formatting.RESET) {
+					s = Style.EMPTY;
+				} else {
+					s = s.applyFormattings(f);
+				}
+
+				parseAsFormatting = false;
+			} else if (chr == Formatting.PREFIX) {
+				t.append(literal(fs.substring(start, end)).format(s));
+
+				start = end;
+				parseAsFormatting = true;
+			}
 		}
 
 		return t;
