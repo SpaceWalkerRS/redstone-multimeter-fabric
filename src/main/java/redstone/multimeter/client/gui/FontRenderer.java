@@ -142,7 +142,7 @@ public class FontRenderer {
 	}
 
 	public int width(Text t) {
-		return this.font.getWidth(t.buildString());
+		return this.font.getWidth(t.buildFormattedString());
 	}
 
 	public int width(Tooltip t) {
