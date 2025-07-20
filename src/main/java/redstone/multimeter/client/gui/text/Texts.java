@@ -217,15 +217,19 @@ public class Texts {
 		Text t = literal("");
 		Style s = Style.EMPTY;
 
-		int start = 0;
-		int end = 0;
+		int from = 0;
+		int to = 0;
 
-		boolean parseAsFormatting = false;
+		boolean lastWasFormattingPrefix = false;
+		boolean lastWasFormatting = false;
 
-		for (; end < fs.length(); end++) {
-			char chr = fs.charAt(end);
+		for (; to < fs.length(); to++) {
+			char chr = fs.charAt(to);
 
-			if (parseAsFormatting) {
+			boolean thisIsFormattingPrefix = (chr == Formatting.PREFIX);
+			boolean thisIsStringEnd = (to == fs.length() - 1);
+
+			if (lastWasFormattingPrefix) {
 				Formatting f = Formatting.byCode(chr);
 
 				if (f == Formatting.RESET) {
@@ -234,12 +238,35 @@ public class Texts {
 					s = s.applyFormattings(f);
 				}
 
-				parseAsFormatting = false;
-			} else if (chr == Formatting.PREFIX) {
-				t.append(literal(fs.substring(start, end)).format(s));
+				// make sure current char is not captured
+				if (thisIsStringEnd) {
+					from = to;
+				}
 
-				start = end;
-				parseAsFormatting = true;
+				lastWasFormattingPrefix = false;
+				lastWasFormatting = true;
+			} else if (thisIsFormattingPrefix) {
+				lastWasFormattingPrefix = true;
+				lastWasFormatting = false;
+			} else {
+				if (lastWasFormatting) {
+					from = to;
+				}
+				// make sure current char is captured
+				if (thisIsStringEnd) {
+					to++;
+				}
+
+				lastWasFormattingPrefix = false;
+				lastWasFormatting = false;
+			}
+
+			if (thisIsFormattingPrefix || thisIsStringEnd) {
+				if (from != to) {
+					t.append(literal(fs.substring(from, to)).format(s));
+				}
+
+				from = to;
 			}
 		}
 
