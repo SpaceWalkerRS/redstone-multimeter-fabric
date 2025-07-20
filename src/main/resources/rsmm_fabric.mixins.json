@@ -17,6 +17,7 @@
 		"common.ServerGamePacketListenerImplMixin",
 		"common.ServerLevelMixin",
 		"common.ServerTickListMixin",
+		"common.StyleAccess",
 		"common.compat.alternate_current.LevelHelperMixin",
 		"common.compat.alternate_current_plus.LevelHelperMixin",
 		"common.compat.carpet.RedstoneWireTurboMixin",
@@ -61,8 +62,7 @@
 		"client.KeyMappingMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
-		"client.OptionsMixin",
-		"client.StyleAccess"
+		"client.OptionsMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
