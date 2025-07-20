@@ -13,6 +13,7 @@
 		"common.ServerPlayNetworkHandlerMixin",
 		"common.ServerPlayerInteractionManagerMixin",
 		"common.ServerWorldMixin",
+		"common.StyleAccess",
 		"common.TextMixin",
 		"common.WorldChunkMixin",
 		"common.WorldMixin",
@@ -54,8 +55,7 @@
 		"client.GameRendererMixin",
 		"client.IntegratedServerMixin",
 		"client.KeyBindingMixin",
-		"client.MinecraftMixin",
-		"client.StyleAccess"
+		"client.MinecraftMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
