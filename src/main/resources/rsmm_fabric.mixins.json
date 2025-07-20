@@ -22,6 +22,7 @@
 		"common.ServerCommonPacketListenerImplMixin",
 		"common.ServerGamePacketListenerImplMixin",
 		"common.ServerLevelMixin",
+		"common.StyleAccess",
 		"common.compat.alternate_current.LevelHelperMixin",
 		"common.compat.alternate_current_plus.LevelHelperMixin",
 		"common.meterable.BellBlockMixin",
@@ -69,8 +70,7 @@
 		"client.LevelRendererMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
-		"client.OptionsMixin",
-		"client.StyleAccess"
+		"client.OptionsMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
