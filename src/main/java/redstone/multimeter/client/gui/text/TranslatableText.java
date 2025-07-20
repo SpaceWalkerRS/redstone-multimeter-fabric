@@ -48,6 +48,7 @@ public class TranslatableText extends BaseText {
 				translation = builtInTranslate(this.key);
 			}
 
+			this.resolvedLanguage = language;
 			this.resolve(translation);
 		}
 
