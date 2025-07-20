@@ -61,12 +61,16 @@ public enum Formatting {
 	}
 
 	public static Formatting resolve(ChatFormatting formatting) {
+		return byCode(formatting.toString().charAt(1));
+	}
+
+	public static Formatting byCode(char code) {
 		for (Formatting f : Formatting.values()) {
-			if (f.resolved == formatting) {
+			if (f.code == code) {
 				return f;
 			}
 		}
 
-		throw new IllegalStateException("unknown chat formatting code " + formatting.toString().charAt(1));
+		throw new IllegalStateException("unknown chat formatting code " + code);
 	}
 }
