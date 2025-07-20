@@ -3,7 +3,8 @@ package redstone.multimeter.client.gui.text;
 import java.util.Objects;
 
 import net.minecraft.ChatFormatting;
-import redstone.multimeter.mixin.client.StyleAccess;
+
+import redstone.multimeter.mixin.common.StyleAccess;
 
 public class Style {
 	
