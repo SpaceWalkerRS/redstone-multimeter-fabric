@@ -25,8 +25,14 @@ public class PrimaryEventViewer extends MeterEventViewer {
 		if (this.updateCursor) {
 			this.updateCursor = false;
 
-			if (this.isHovered() && this.isMouseOverBorder(mouseX)) {
-				Element.setCursor(CursorType.HRESIZE);
+			if (this.isHovered()) {
+				if (this.isMouseOverBorder(mouseX)) {
+					Element.setCursor(CursorType.HRESIZE);
+				} else if (this.hud.isPaused()) {
+					Element.setCursor(CursorType.HAND);
+				} else {
+					Element.setCursor(CursorType.ARROW);
+				}
 			} else {
 				Element.setCursor(CursorType.ARROW);
 			}
