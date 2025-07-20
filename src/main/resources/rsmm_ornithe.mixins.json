@@ -16,6 +16,7 @@
 		"common.ServerPlayerInteractionManagerMixin",
 		"common.ServerTickListMixin",
 		"common.ServerWorldMixin",
+		"common.StyleAccess",
 		"common.WorldChunkMixin",
 		"common.WorldMixin",
 		"common.compat.alternate_current.WorldHelperMixin",
@@ -61,8 +62,7 @@
 		"client.KeyBindingMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
-		"client.WindowMixin",
-		"client.StyleAccess"
+		"client.WindowMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
