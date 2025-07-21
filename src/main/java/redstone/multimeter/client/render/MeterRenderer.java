@@ -3,8 +3,6 @@ package redstone.multimeter.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tessellator;
@@ -32,27 +30,25 @@ public class MeterRenderer {
 	}
 
 	public void renderMeters(float tickDelta) {
-		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
 		GlStateManager.disableTexture();
-		GlStateManager.enableDepthTest();
-		GlStateManager.depthMask(false);
+		GlStateManager.disableCull();
 
 		renderMeters(this::renderMeterHighlight, tickDelta);
-
-		GlStateManager.depthMask(true);
-		GlStateManager.enableTexture();
-		GlStateManager.disableBlend();
 	}
 
-	public void renderMeterNames(float tickDelta) {
+	public void renderMeterNameTags(float tickDelta) {
+		GlStateManager.disableDepthTest();
+		GlStateManager.enableTexture();
+
 		MeterNameMode mode = Options.RedstoneMultimeter.RENDER_METER_NAMES.get();
 
 		if (mode == MeterNameMode.ALWAYS
 			|| (mode == MeterNameMode.WHEN_PREVIEWING && client.isPreviewing())
 			|| (mode == MeterNameMode.IN_FOCUS_MODE && client.getHud().isFocusMode() && !client.isPreviewing())) {
-			renderMeters(this::renderMeterName, tickDelta);
+			renderMeters(this::renderMeterNameTag, tickDelta);
 		}
+
+		GlStateManager.enableDepthTest();
 	}
 
 	private void renderMeters(MeterPartRenderer renderer, float tickDelta) {
@@ -95,9 +91,9 @@ public class MeterRenderer {
 		GlStateManager.pushMatrix();;
 		GlStateManager.translated(dx, dy, dz);
 
-		float r = ColorUtils.getRed(color) / 255.0F;
-		float g = ColorUtils.getGreen(color) / 255.0F;
-		float b = ColorUtils.getBlue(color) / 255.0F;
+		float r = ColorUtils.getRed(color) / (float) 0xFF;
+		float g = ColorUtils.getGreen(color) / (float) 0xFF;
+		float b = ColorUtils.getBlue(color) / (float) 0xFF;
 
 		renderMeterHighlight(bufferBuilder, tesselator, r, g, b, 0.5F);
 
@@ -108,7 +104,7 @@ public class MeterRenderer {
 		GlStateManager.popMatrix();
 	}
 
-	private void renderMeterName(Meter meter, float tickDelta) {
+	private void renderMeterNameTag(Meter meter, float tickDelta) {
 		String name = meter.getName();
 		BlockPos pos = meter.getPos().getBlockPos();
 
@@ -142,63 +138,63 @@ public class MeterRenderer {
 		tessellator.end();
 	}
 
-	private void drawBox(BufferBuilder bufferBuilder, float r, float g, float b, float a, boolean outline) {
+	private void drawBox(BufferBuilder buffer, float r, float g, float b, float a, boolean outline) {
 		// The box is slightly larger than 1x1 to prevent z-fighting
 		float c0 = -0.002F;
 		float c1 = 1.002F;
 
 		// West face
-		bufferBuilder.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c0, c0, c1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c0, c1, c1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c0, c1, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c0, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c1, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c1, c0).color(r, g, b, a).nextVertex();
 		if (outline) {
-			bufferBuilder.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
+			buffer.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
 		}
 
 		// East face
-		bufferBuilder.vertex(c1, c0, c0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c1, c0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c1, c1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c0, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c0, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c1, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c1, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c0, c1).color(r, g, b, a).nextVertex();
 		if (outline) {
-			bufferBuilder.vertex(c1, c0, c0).color(r, g, b, a).nextVertex();
+			buffer.vertex(c1, c0, c0).color(r, g, b, a).nextVertex();
 		}
 
 		// North face
-		bufferBuilder.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c0, c1, c0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c1, c0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c0, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c1, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c1, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c0, c0).color(r, g, b, a).nextVertex();
 		if (outline) {
-			bufferBuilder.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
+			buffer.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
 		}
 
 		// South face
-		bufferBuilder.vertex(c0, c0, c1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c0, c1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c1, c1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c0, c1, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c0, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c0, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c1, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c1, c1).color(r, g, b, a).nextVertex();
 		if (outline) {
-			bufferBuilder.vertex(c0, c0, c1).color(r, g, b, a).nextVertex();
+			buffer.vertex(c0, c0, c1).color(r, g, b, a).nextVertex();
 		}
 
 		// Bottom face
-		bufferBuilder.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c0, c0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c0, c1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c0, c0, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c0, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c0, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c0, c1).color(r, g, b, a).nextVertex();
 		if (outline) {
-			bufferBuilder.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
+			buffer.vertex(c0, c0, c0).color(r, g, b, a).nextVertex();
 		}
 
 		// Top face
-		bufferBuilder.vertex(c0, c1, c0).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c0, c1, c1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c1, c1).color(r, g, b, a).nextVertex();
-		bufferBuilder.vertex(c1, c1, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c1, c0).color(r, g, b, a).nextVertex();
+		buffer.vertex(c0, c1, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c1, c1).color(r, g, b, a).nextVertex();
+		buffer.vertex(c1, c1, c0).color(r, g, b, a).nextVertex();
 		if (outline) {
-			bufferBuilder.vertex(c0, c1, c0).color(r, g, b, a).nextVertex();
+			buffer.vertex(c0, c1, c0).color(r, g, b, a).nextVertex();
 		}
 	}
 
@@ -214,19 +210,9 @@ public class MeterRenderer {
 		GlStateManager.rotatef(-yaw, 0.0F, 1.0F, 0.0F);
 		GlStateManager.rotatef(pitch, 1.0F, 0.0F, 0.0F);
 		GlStateManager.scalef(-0.025F, -0.025F, 0.025F);
-		GlStateManager.enableBlend();
-		GlStateManager.disableLighting();
-		GlStateManager.depthMask(true);
-		GlStateManager.disableDepthTest();
-		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
-		GlStateManager.enableTexture();
 
 		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 0xFFFFFFFF);
 
-		GlStateManager.enableDepthTest();
-		GlStateManager.enableLighting();
-		GlStateManager.disableBlend();
-		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		GlStateManager.popMatrix();
 	}
 
