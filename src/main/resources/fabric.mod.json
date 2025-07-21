@@ -32,6 +32,7 @@
 	"mixins": [
 		"rsmm_fabric.mixins.json"
 	],
+	"accessWidener": "rsmm_fabric.accesswidener",
 
 	"depends": {
 		"minecraft": "1.18.x"
