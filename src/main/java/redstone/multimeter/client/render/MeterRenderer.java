@@ -15,7 +15,6 @@ import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.util.ColorUtils;
-import redstone.multimeter.util.GL;
 
 public class MeterRenderer {
 
@@ -28,28 +27,25 @@ public class MeterRenderer {
 	}
 
 	public void renderMeters(float tickDelta) {
-		GL11.glEnable(GL11.GL_BLEND);
-		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glDepthMask(false);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_CULL_FACE);
 
 		renderMeters(this::renderMeterHighlight, tickDelta);
-
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(true);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
 	}
 
-	public void renderMeterNames(float tickDelta) {
+	public void renderMeterNameTags(float tickDelta) {
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+
 		MeterNameMode mode = Options.RedstoneMultimeter.RENDER_METER_NAMES.get();
 
 		if (mode == MeterNameMode.ALWAYS
 			|| (mode == MeterNameMode.WHEN_PREVIEWING && client.isPreviewing())
 			|| (mode == MeterNameMode.IN_FOCUS_MODE && client.getHud().isFocusMode() && !client.isPreviewing())) {
-			renderMeters(this::renderMeterName, tickDelta);
+			renderMeters(this::renderMeterNameTag, tickDelta);
 		}
+
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 	}
 
 	private void renderMeters(MeterPartRenderer renderer, float tickDelta) {
@@ -91,9 +87,9 @@ public class MeterRenderer {
 		GL11.glPushMatrix();;
 		GL11.glTranslated(dx, dy, dz);
 
-		float r = ColorUtils.getRed(color) / 255.0F;
-		float g = ColorUtils.getGreen(color) / 255.0F;
-		float b = ColorUtils.getBlue(color) / 255.0F;
+		float r = ColorUtils.getRed(color) / (float) 0xFF;
+		float g = ColorUtils.getGreen(color) / (float) 0xFF;
+		float b = ColorUtils.getBlue(color) / (float) 0xFF;
 
 		renderMeterHighlight(bufferBuilder, r, g, b, 0.5F);
 
@@ -104,7 +100,7 @@ public class MeterRenderer {
 		GL11.glPopMatrix();
 	}
 
-	private void renderMeterName(Meter meter, float tickDelta) {
+	private void renderMeterNameTag(Meter meter, float tickDelta) {
 		String name = meter.getName();
 		DimPos pos = meter.getPos();
 
@@ -138,65 +134,65 @@ public class MeterRenderer {
 		bufferBuilder.end();
 	}
 
-	private void drawBox(BufferBuilder bufferBuilder, float r, float g, float b, float a, boolean outline) {
+	private void drawBox(BufferBuilder buffer, float r, float g, float b, float a, boolean outline) {
 		// The box is slightly larger than 1x1 to prevent z-fighting
 		float c0 = -0.002F;
 		float c1 = 1.002F;
 
-		bufferBuilder.color(r, g, b, a);
+		buffer.color(r, g, b, a);
 
 		// West face
-		bufferBuilder.vertex(c0, c0, c0);
-		bufferBuilder.vertex(c0, c0, c1);
-		bufferBuilder.vertex(c0, c1, c1);
-		bufferBuilder.vertex(c0, c1, c0);
+		buffer.vertex(c0, c0, c0);
+		buffer.vertex(c0, c0, c1);
+		buffer.vertex(c0, c1, c1);
+		buffer.vertex(c0, c1, c0);
 		if (outline) {
-			bufferBuilder.vertex(c0, c0, c0);
+			buffer.vertex(c0, c0, c0);
 		}
 
 		// East face
-		bufferBuilder.vertex(c1, c0, c0);
-		bufferBuilder.vertex(c1, c1, c0);
-		bufferBuilder.vertex(c1, c1, c1);
-		bufferBuilder.vertex(c1, c0, c1);
+		buffer.vertex(c1, c0, c0);
+		buffer.vertex(c1, c1, c0);
+		buffer.vertex(c1, c1, c1);
+		buffer.vertex(c1, c0, c1);
 		if (outline) {
-			bufferBuilder.vertex(c1, c0, c0);
+			buffer.vertex(c1, c0, c0);
 		}
 
 		// North face
-		bufferBuilder.vertex(c0, c0, c0);
-		bufferBuilder.vertex(c0, c1, c0);
-		bufferBuilder.vertex(c1, c1, c0);
-		bufferBuilder.vertex(c1, c0, c0);
+		buffer.vertex(c0, c0, c0);
+		buffer.vertex(c0, c1, c0);
+		buffer.vertex(c1, c1, c0);
+		buffer.vertex(c1, c0, c0);
 		if (outline) {
-			bufferBuilder.vertex(c0, c0, c0);
+			buffer.vertex(c0, c0, c0);
 		}
 
 		// South face
-		bufferBuilder.vertex(c0, c0, c1);
-		bufferBuilder.vertex(c1, c0, c1);
-		bufferBuilder.vertex(c1, c1, c1);
-		bufferBuilder.vertex(c0, c1, c1);
+		buffer.vertex(c0, c0, c1);
+		buffer.vertex(c1, c0, c1);
+		buffer.vertex(c1, c1, c1);
+		buffer.vertex(c0, c1, c1);
 		if (outline) {
-			bufferBuilder.vertex(c0, c0, c1);
+			buffer.vertex(c0, c0, c1);
 		}
 
 		// Bottom face
-		bufferBuilder.vertex(c0, c0, c0);
-		bufferBuilder.vertex(c1, c0, c0);
-		bufferBuilder.vertex(c1, c0, c1);
-		bufferBuilder.vertex(c0, c0, c1);
+		buffer.vertex(c0, c0, c0);
+		buffer.vertex(c1, c0, c0);
+		buffer.vertex(c1, c0, c1);
+		buffer.vertex(c0, c0, c1);
 		if (outline) {
-			bufferBuilder.vertex(c0, c0, c0);
+			buffer.vertex(c0, c0, c0);
 		}
 
 		// Top face
-		bufferBuilder.vertex(c0, c1, c0);
-		bufferBuilder.vertex(c0, c1, c1);
-		bufferBuilder.vertex(c1, c1, c1);
-		bufferBuilder.vertex(c1, c1, c0);
+		buffer.vertex(c0, c1, c0);
+		buffer.vertex(c0, c1, c1);
+		buffer.vertex(c1, c1, c1);
+		buffer.vertex(c1, c1, c0);
 		if (outline) {
-			bufferBuilder.vertex(c0, c1, c0);
+			buffer.vertex(c0, c1, c0);
 		}
 	}
 
@@ -212,19 +208,9 @@ public class MeterRenderer {
 		GL11.glRotatef(-yaw, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(pitch, 1.0F, 0.0F, 0.0F);
 		GL11.glScalef(-0.025F, -0.025F, 0.025F);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glDepthMask(true);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 0xFFFFFFFF);
 
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		GL11.glPopMatrix();
 	}
 
