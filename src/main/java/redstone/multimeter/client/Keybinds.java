@@ -30,7 +30,7 @@ public class Keybinds {
 
 	private static final Set<String> CATEGORIES = new LinkedHashSet<>();
 	private static final Map<String, KeyMapping> KEYBINDS = new LinkedHashMap<>();
-	private static final Map<String, String> LEGACY_KEYS = new HashMap<>();
+	private static final Map<String, KeyMapping> LEGACY_KEYBINDS = new HashMap<>();
 
 	public static final KeyMapping[] TOGGLE_EVENT_TYPES = new KeyMapping[EventType.ALL.length];
 
@@ -64,18 +64,18 @@ public class Keybinds {
 		return category;
 	}
 
-	private static KeyMapping registerKeybind(String key, String legacyKey, String category, int defaultKey) {
-		key = "rsmm.keybind." + key;
+	private static KeyMapping registerKeybind(String name, String legacyName, String category, int defaultKey) {
+		name = "rsmm.keybind." + name;
 
-		if (KEYBINDS.containsKey(key)) {
-			throw new IllegalStateException("Cannot register multiple keybinds with the same name! (" + key + ")");
+		if (KEYBINDS.containsKey(name)) {
+			throw new IllegalStateException("Cannot register multiple keybinds with the same name! (" + name + ")");
 		}
 
-		KeyMapping keybind = new KeyMapping(key, defaultKey, category);
-		KEYBINDS.put(key, keybind);
+		KeyMapping keybind = new KeyMapping(name, defaultKey, category);
 
-		if (legacyKey != null) {
-			LEGACY_KEYS.put(key, legacyKey);
+		KEYBINDS.put(name, keybind);
+		if (legacyName != null) {
+			LEGACY_KEYBINDS.put(name, keybind);
 		}
 
 		return keybind;
@@ -111,6 +111,9 @@ public class Keybinds {
 				String key = args[1];
 
 				KeyMapping keybind = KEYBINDS.get(name);
+				if (keybind == null) {
+					keybind = LEGACY_KEYBINDS.get(name);
+				}
 
 				if (keybind != null) {
 					keybind.setKey(InputConstants.getKey(key));
