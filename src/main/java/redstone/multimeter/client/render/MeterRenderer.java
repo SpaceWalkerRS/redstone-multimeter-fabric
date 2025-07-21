@@ -9,7 +9,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.core.BlockPos;
@@ -37,21 +37,21 @@ public class MeterRenderer {
 		this.minecraft = this.client.getMinecraft();
 	}
 
-	public void renderMeters(Matrix4f cameraPose, MultiBufferSource.BufferSource bufferSource) {
+	public void renderMeters(Matrix4f cameraPose, BufferSource bufferSource) {
 		renderMeters(cameraPose, bufferSource, this::renderMeterHighlight);
 	}
 
-	public void renderMeterNames(Matrix4f cameraPose, MultiBufferSource.BufferSource bufferSource) {
+	public void renderMeterNameTags(Matrix4f cameraPose, BufferSource bufferSource) {
 		MeterNameMode mode = Options.RedstoneMultimeter.RENDER_METER_NAMES.get();
 
 		if (mode == MeterNameMode.ALWAYS
 			|| (mode == MeterNameMode.WHEN_PREVIEWING && client.isPreviewing())
 			|| (mode == MeterNameMode.IN_FOCUS_MODE && client.getHud().isFocusMode() && !client.isPreviewing())) {
-			renderMeters(cameraPose, bufferSource, this::renderMeterName);
+			renderMeters(cameraPose, bufferSource, this::renderMeterNameTag);
 		}
 	}
 
-	private void renderMeters(Matrix4f cameraPose, MultiBufferSource.BufferSource bufferSource, MeterPartRenderer renderer) {
+	private void renderMeters(Matrix4f cameraPose, BufferSource bufferSource, MeterPartRenderer renderer) {
 		if (client.isPreviewing() || !client.getHud().isFocusMode()) {
 			ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
 
@@ -71,7 +71,7 @@ public class MeterRenderer {
 		}
 	}
 
-	private void renderMeterHighlight(Matrix4f cameraPose, MultiBufferSource.BufferSource bufferSource, Meter meter) {
+	private void renderMeterHighlight(Matrix4f cameraPose, BufferSource bufferSource, Meter meter) {
 		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
@@ -98,7 +98,7 @@ public class MeterRenderer {
 		poses.popPose();
 	}
 
-	private void renderMeterName(Matrix4f cameraPose, MultiBufferSource.BufferSource bufferSource, Meter meter) {
+	private void renderMeterNameTag(Matrix4f cameraPose, BufferSource bufferSource, Meter meter) {
 		String name = meter.getName();
 		BlockPos pos = meter.getPos().getBlockPos();
 
@@ -131,7 +131,7 @@ public class MeterRenderer {
 		}
 	}
 
-	private void renderMeterHighlight(MultiBufferSource.BufferSource bufferSource, PoseStack poses, int color) {
+	private void renderMeterHighlight(BufferSource bufferSource, PoseStack poses, int color) {
 		VertexConsumer buffer = bufferSource.getBuffer(RenderType.debugQuads());
 		Matrix4f pose = poses.last().pose();
 
@@ -143,8 +143,8 @@ public class MeterRenderer {
 		drawBox(buffer, pose, r, g, b, a);
 	}
 
-	private void renderMeterOutline(MultiBufferSource.BufferSource bufferSource, PoseStack poses, int color) {
-		VertexConsumer buffer = bufferSource.getBuffer(RenderType.debugLine(2.0D));
+	private void renderMeterOutline(BufferSource bufferSource, PoseStack poses, int color) {
+		VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
 		ShapeRenderer.renderShape(poses, buffer, OUTLINE_SHAPE, 0.0D, 0.0D, 0.0D, color);
 	}
 
@@ -193,7 +193,7 @@ public class MeterRenderer {
 	@FunctionalInterface
 	private interface MeterPartRenderer {
 
-		void render(Matrix4f cameraPose, MultiBufferSource.BufferSource bufferSource, Meter meter);
+		void render(Matrix4f cameraPose, BufferSource bufferSource, Meter meter);
 
 	}
 }
