@@ -65,6 +65,7 @@
 		"client.GuiMixin",
 		"client.IntegratedServerMixin",
 		"client.KeyMappingMixin",
+		"client.LevelRendererAccessor",
 		"client.LevelRendererMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",

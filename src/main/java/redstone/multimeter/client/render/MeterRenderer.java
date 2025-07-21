@@ -1,29 +1,31 @@
 package redstone.multimeter.client.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import com.mojang.math.Matrix4f;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.common.meter.Meter;
+import redstone.multimeter.mixin.client.LevelRendererAccessor;
 import redstone.multimeter.util.ColorUtils;
 
 public class MeterRenderer {
+
+	// The box is slightly larger than 1x1 to prevent z-fighting
+	private static final VoxelShape OUTLINE_SHAPE = Shapes.box(-0.002F, -0.002F, -0.002F, 1.002F, 1.002F, 1.002F);
 
 	private final MultimeterClient client;
 	private final Minecraft minecraft;
@@ -33,34 +35,21 @@ public class MeterRenderer {
 		this.minecraft = this.client.getMinecraft();
 	}
 
-	public void renderMeters(PoseStack poses) {
-		RenderSystem.setShader(() -> GameRenderer.getPositionColorShader());
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		RenderSystem.disableTexture();
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthMask(false);
-		RenderSystem.enableDepthTest();
-
-		renderMeters(poses, null, this::renderMeterHighlight);
-
-		RenderSystem.depthMask(true);
-		RenderSystem.disableDepthTest();
-		RenderSystem.enableTexture();
-		RenderSystem.disableBlend();
+	public void renderMeters(PoseStack poses, BufferSource bufferSource) {
+		renderMeters(poses, bufferSource, this::renderMeterHighlight);
 	}
 
-	public void renderMeterNames(PoseStack poses, MultiBufferSource.BufferSource bufferSource) {
+	public void renderMeterNameTags(PoseStack poses, BufferSource bufferSource) {
 		MeterNameMode mode = Options.RedstoneMultimeter.RENDER_METER_NAMES.get();
 
 		if (mode == MeterNameMode.ALWAYS
 			|| (mode == MeterNameMode.WHEN_PREVIEWING && client.isPreviewing())
 			|| (mode == MeterNameMode.IN_FOCUS_MODE && client.getHud().isFocusMode() && !client.isPreviewing())) {
-			renderMeters(poses, bufferSource, this::renderMeterName);
+			renderMeters(poses, bufferSource, this::renderMeterNameTag);
 		}
 	}
 
-	private void renderMeters(PoseStack poses, MultiBufferSource.BufferSource bufferSource, MeterPartRenderer renderer) {
+	private void renderMeters(PoseStack poses, BufferSource bufferSource, MeterPartRenderer renderer) {
 		if (client.isPreviewing() || !client.getHud().isFocusMode()) {
 			ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
 
@@ -80,10 +69,7 @@ public class MeterRenderer {
 		}
 	}
 
-	private void renderMeterHighlight(PoseStack poses, MultiBufferSource.BufferSource bufferSource, Meter meter) {
-		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tesselator.getBuilder();
-
+	private void renderMeterHighlight(PoseStack poses, BufferSource bufferSource, Meter meter) {
 		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
@@ -98,22 +84,20 @@ public class MeterRenderer {
 		poses.pushPose();
 		poses.translate(dx, dy, dz);
 
-		Matrix4f pose = poses.last().pose();
+		float r = ColorUtils.getRed(color) / (float) 0xFF;
+		float g = ColorUtils.getGreen(color) / (float) 0xFF;
+		float b = ColorUtils.getBlue(color) / (float) 0xFF;
 
-		float r = ColorUtils.getRed(color) / 255.0F;
-		float g = ColorUtils.getGreen(color) / 255.0F;
-		float b = ColorUtils.getBlue(color) / 255.0F;
-
-		renderMeterHighlight(bufferBuilder, tesselator, pose, r, g, b, 0.5F);
+		renderMeterHighlight(bufferSource, poses, r, g, b, 0.5F);
 
 		if (movable) {
-			renderMeterOutline(bufferBuilder, tesselator, pose, r, g, b, 1.0F);
+			renderMeterOutline(bufferSource, poses, r, g, b, 1.0F);
 		}
 
 		poses.popPose();
 	}
 
-	private void renderMeterName(PoseStack poses, MultiBufferSource.BufferSource bufferSource, Meter meter) {
+	private void renderMeterNameTag(PoseStack poses, BufferSource bufferSource, Meter meter) {
 		String name = meter.getName();
 		BlockPos pos = meter.getPos().getBlockPos();
 
@@ -145,82 +129,64 @@ public class MeterRenderer {
 		}
 	}
 
-	private void renderMeterHighlight(BufferBuilder bufferBuilder, Tesselator tessellator, Matrix4f pose, float r, float g, float b, float a) {
-		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		drawBox(bufferBuilder, pose, r, g, b, a, false);
-		tessellator.end();
+	private void renderMeterHighlight(BufferSource bufferSource, PoseStack poses, float r, float g, float b, float a) {
+		VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.debugQuads());
+		Matrix4f pose = poses.last().pose();
+
+		drawBox(buffer, pose, r, g, b, a);
 	}
 
-	private void renderMeterOutline(BufferBuilder bufferBuilder, Tesselator tessellator, Matrix4f pose, float r, float g, float b, float a) {
-		bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-		drawBox(bufferBuilder, pose, r, g, b, a, true);
-		tessellator.end();
+	private void renderMeterOutline(BufferSource bufferSource, PoseStack poses, float r, float g, float b, float a) {
+		VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
+		LevelRendererAccessor.rsmm$renderShape(poses, buffer, OUTLINE_SHAPE, 0.0D, 0.0D, 0.0D, r, g, b, a);
 	}
 
-	private void drawBox(BufferBuilder bufferBuilder, Matrix4f pose, float r, float g, float b, float a, boolean outline) {
+	private void drawBox(VertexConsumer buffer, Matrix4f pose, float r, float g, float b, float a) {
 		// The box is slightly larger than 1x1 to prevent z-fighting
 		float c0 = -0.002F;
 		float c1 = 1.002F;
 
 		// West face
-		bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
-		if (outline) {
-			bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
-		}
+		buffer.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
 
 		// East face
-		bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
-		if (outline) {
-			bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
-		}
+		buffer.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
 
 		// North face
-		bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
-		if (outline) {
-			bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
-		}
+		buffer.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
 
 		// South face
-		bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
-		if (outline) {
-			bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
-		}
+		buffer.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
 
 		// Bottom face
-		bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
-		if (outline) {
-			bufferBuilder.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
-		}
+		buffer.vertex(pose, c0, c0, c0).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c0, c0).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c0, c1).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c0, c0, c1).color(r, g, b, a).endVertex();
 
 		// Top face
-		bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
-		bufferBuilder.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
-		if (outline) {
-			bufferBuilder.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
-		}
+		buffer.vertex(pose, c0, c1, c0).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c0, c1, c1).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c1, c1).color(r, g, b, a).endVertex();
+		buffer.vertex(pose, c1, c1, c0).color(r, g, b, a).endVertex();
 	}
 
 	@FunctionalInterface
 	private interface MeterPartRenderer {
 
-		void render(PoseStack poses, MultiBufferSource.BufferSource bufferSource, Meter meter);
+		void render(PoseStack poses, BufferSource bufferSource, Meter meter);
 
 	}
 }
