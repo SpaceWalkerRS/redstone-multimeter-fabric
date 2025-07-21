@@ -1,42 +1,38 @@
 package redstone.multimeter.mixin.client;
 
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 
-import redstone.multimeter.interfaces.mixin.IMinecraft;
+import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.render.MeterRenderer;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
-	@Shadow @Final private Minecraft minecraft;
-
 	@Inject(
 		method = "render(FJ)V",
-		at = @At(
-			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
-			args = "ldc=hand"
-		)
-	)
-	private void renderMeterHighlights(float partialTick, long timeNanos, CallbackInfo ci) {
-		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeters();
-	}
-
-	@Inject(
-		method = "render(FJ)V",
+		slice = @Slice(
+			from = @At(
+				value = "FIELD",
+				target = "Lnet/minecraft/world/level/BlockLayer;TRANSLUCENT:Lnet/minecraft/world/level/BlockLayer;"
+			)
+		),
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/GameRenderer;turnOnLightLayer()V"
+			shift = Shift.AFTER,
+			target = "Lnet/minecraft/client/renderer/LevelRenderer;render(Lnet/minecraft/world/level/BlockLayer;Lnet/minecraft/client/Camera;)I"
 		)
 	)
-	private void renderMeterNames(float partialTick, long timeNanos, CallbackInfo ci) {
-		((IMinecraft)minecraft).getMultimeterClient().getMeterRenderer().renderMeterNames();
+	private void renderMeters(float partialTick, long timeNanos, CallbackInfo ci) {
+		MeterRenderer renderer = MultimeterClient.INSTANCE.getMeterRenderer();
+
+		renderer.renderMeters();
+		renderer.renderMeterNameTags();
 	}
 }
