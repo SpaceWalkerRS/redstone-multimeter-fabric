@@ -83,8 +83,8 @@ public class Options {
 	}
 
 	private static final Map<String, Option> OPTIONS;
+	private static final Map<String, Option> LEGACY_OPTIONS;
 	private static final Map<String, List<Option>> OPTIONS_BY_CATEGORY;
-	private static final Map<String, String> LEGACY_KEYS;
 
 	private static final String FILE_NAME = "options.txt";
 
@@ -137,9 +137,8 @@ public class Options {
 				String value = args[1];
 
 				Option option = OPTIONS.get(key);
-				if (option == null && LEGACY_KEYS.containsKey(key)) {
-					key = LEGACY_KEYS.get(key);
-					option = OPTIONS.get(key);
+				if (option == null) {
+					option = LEGACY_OPTIONS.get(key);
 				}
 
 				if (option != null) {
@@ -197,9 +196,8 @@ public class Options {
 			}
 
 			OPTIONS.put(key, option);
-
 			if (legacyKey != null) {
-				LEGACY_KEYS.put(legacyKey, key);
+				LEGACY_OPTIONS.put(legacyKey, option);
 			}
 		}
 	}
@@ -207,8 +205,8 @@ public class Options {
 	static {
 
 		OPTIONS = new LinkedHashMap<>();
+		LEGACY_OPTIONS = new HashMap<>();
 		OPTIONS_BY_CATEGORY = new LinkedHashMap<>();
-		LEGACY_KEYS = new HashMap<>();
 
 		register("redstoneMultimeter",
 			RedstoneMultimeter.NUMBERED_NAMES,
