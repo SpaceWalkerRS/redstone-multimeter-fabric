@@ -37,27 +37,27 @@ public class MeterRenderer {
 		this.minecraft = this.client.getMinecraft();
 	}
 
-	public void renderMeters(Matrix4f cameraPose, BufferSource bufferSource) {
-		renderMeters(cameraPose, bufferSource, this::renderMeterHighlight);
+	public void renderMeters(PoseStack poses, BufferSource bufferSource) {
+		renderMeters(poses, bufferSource, this::renderMeterHighlight);
 	}
 
-	public void renderMeterNameTags(Matrix4f cameraPose, BufferSource bufferSource) {
+	public void renderMeterNameTags(PoseStack poses, BufferSource bufferSource) {
 		MeterNameMode mode = Options.RedstoneMultimeter.RENDER_METER_NAMES.get();
 
 		if (mode == MeterNameMode.ALWAYS
 			|| (mode == MeterNameMode.WHEN_PREVIEWING && client.isPreviewing())
 			|| (mode == MeterNameMode.IN_FOCUS_MODE && client.getHud().isFocusMode() && !client.isPreviewing())) {
-			renderMeters(cameraPose, bufferSource, this::renderMeterNameTag);
+			renderMeters(poses, bufferSource, this::renderMeterNameTag);
 		}
 	}
 
-	private void renderMeters(Matrix4f cameraPose, BufferSource bufferSource, MeterPartRenderer renderer) {
+	private void renderMeters(PoseStack poses, BufferSource bufferSource, MeterPartRenderer renderer) {
 		if (client.isPreviewing() || !client.getHud().isFocusMode()) {
 			ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
 
 			for (Meter meter : meterGroup.getMeters()) {
 				if (meter.isIn(minecraft.level)) {
-					renderer.render(cameraPose, bufferSource, meter);
+					renderer.render(poses, bufferSource, meter);
 				}
 			}
 		} else {
@@ -65,13 +65,13 @@ public class MeterRenderer {
 
 			if (focussed != null) {
 				if (focussed.isIn(minecraft.level)) {
-					renderer.render(cameraPose, bufferSource, focussed);
+					renderer.render(poses, bufferSource, focussed);
 				}
 			}
 		}
 	}
 
-	private void renderMeterHighlight(Matrix4f cameraPose, BufferSource bufferSource, Meter meter) {
+	private void renderMeterHighlight(PoseStack poses, BufferSource bufferSource, Meter meter) {
 		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
@@ -83,15 +83,12 @@ public class MeterRenderer {
 		double dy = pos.getY() - cameraPos.y;
 		double dz = pos.getZ() - cameraPos.z;
 
+		poses.pushPose();
+		poses.translate(dx, dy, dz);
+
 		float r = ColorUtils.getRed(color) / (float) 0xFF;
 		float g = ColorUtils.getGreen(color) / (float) 0xFF;
 		float b = ColorUtils.getBlue(color) / (float) 0xFF;
-
-		PoseStack poses = new PoseStack();
-
-		poses.pushPose();
-		poses.translate(dx, dy, dz);
-//		poses.mulPose(cameraPose);
 
 		renderMeterHighlight(bufferSource, poses, r, g, b, 0.5F);
 
@@ -102,7 +99,7 @@ public class MeterRenderer {
 		poses.popPose();
 	}
 
-	private void renderMeterNameTag(Matrix4f cameraPose, BufferSource bufferSource, Meter meter) {
+	private void renderMeterNameTag(PoseStack poses, BufferSource bufferSource, Meter meter) {
 		String name = meter.getName();
 		BlockPos pos = meter.getPos().getBlockPos();
 
@@ -117,8 +114,6 @@ public class MeterRenderer {
 		double rangeSquared = range * range;
 
 		if (Mth.lengthSquared(dx, dy, dz) < rangeSquared) {
-			PoseStack poses = new PoseStack();
-
 			poses.pushPose();
 			poses.translate(dx + 0.5D, dy + 0.75D, dz + 0.5D);
 			poses.mulPose(camera.rotation());
@@ -192,7 +187,7 @@ public class MeterRenderer {
 	@FunctionalInterface
 	private interface MeterPartRenderer {
 
-		void render(Matrix4f cameraPose, BufferSource bufferSource, Meter meter);
+		void render(PoseStack poses, BufferSource bufferSource, Meter meter);
 
 	}
 }
