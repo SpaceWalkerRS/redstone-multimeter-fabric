@@ -16,6 +16,7 @@ import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.framegraph.FramePass;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
@@ -57,8 +58,10 @@ public class LevelRendererMixin {
 			BufferSource bufferSource = renderBuffers.bufferSource();
 			MeterRenderer renderer = MultimeterClient.INSTANCE.getMeterRenderer();
 
-			renderer.renderMeters(cameraPose, bufferSource);
-			renderer.renderMeterNameTags(cameraPose, bufferSource);
+			PoseStack poses = new PoseStack();
+
+			renderer.renderMeters(poses, bufferSource);
+			renderer.renderMeterNameTags(poses, bufferSource);
 
 			bufferSource.endBatch();
 		});
