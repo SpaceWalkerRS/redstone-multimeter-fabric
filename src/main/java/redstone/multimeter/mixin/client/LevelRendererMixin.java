@@ -10,6 +10,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
@@ -38,8 +40,10 @@ public class LevelRendererMixin {
 		BufferSource bufferSource = renderBuffers.bufferSource();
 		MeterRenderer renderer = MultimeterClient.INSTANCE.getMeterRenderer();
 
-		renderer.renderMeters(cameraPose, bufferSource);
-		renderer.renderMeterNameTags(cameraPose, bufferSource);
+		PoseStack poses = new PoseStack();
+
+		renderer.renderMeters(poses, bufferSource);
+		renderer.renderMeterNameTags(poses, bufferSource);
 
 		bufferSource.endBatch();
 	}
