@@ -532,7 +532,7 @@ public class MultimeterHud extends AbstractParentElement {
 			if (focusMode) {
 				moveFocus(focussedEvent.getTick(), jump ? 0 : focussedEvent.getSubtick(), false);
 			} else if (paused) {
-				scroll(jump ? 10 : 1, false);
+				moveOffset(jump ? 10 : 1, false);
 			}
 		}
 	}
@@ -542,18 +542,28 @@ public class MultimeterHud extends AbstractParentElement {
 			if (focusMode) {
 				moveFocus(focussedEvent.getTick(), jump ? client.getMeterGroup().getLogManager().getSubtickCount(focussedEvent.getTick()) : focussedEvent.getSubtick(), true);
 			} else if (paused) {
-				scroll(jump ? 10 : 1, true);
+				moveOffset(jump ? 10 : 1, true);
 			}
 		}
 	}
 
 	public void scroll(int amount, boolean forward) {
+		if (!client.isPreviewing()) {
+			if (focusMode) {
+				moveFocus(focussedEvent.getTick(), focussedEvent.getSubtick(), forward);
+			} else {
+				moveOffset(amount, forward);
+			}
+		}
+	}
+
+	private void moveOffset(int amount, boolean forward) {
 		if (!forward) amount *= -1;
 		setOffset(offset + amount);
 		client.getTutorial().onScrollHud(amount);
 	}
 
-	public boolean moveFocus(long tick, int subtick, boolean forward) {
+	private boolean moveFocus(long tick, int subtick, boolean forward) {
 		Meter closestMeter = null;
 		EventLog closestEvent = null;
 

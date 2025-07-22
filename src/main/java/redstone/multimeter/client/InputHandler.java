@@ -111,7 +111,12 @@ public class InputHandler {
 
 	public boolean handleMouseScroll(double scrollX, double scrollY) {
 		if (Keybinds.SCROLL_HUD.isPressed() && client.isHudActive() && client.getHud().isPaused()) {
-			client.getHud().scroll((int)Math.round(scrollY), true);
+			int scroll = (int) Math.round(scrollY);
+			boolean forward = (scroll < 0);
+
+			if (scroll != 0) {
+				client.getHud().scroll(Math.abs(scroll), forward);
+			}
 		} else {
 			return false;
 		}
