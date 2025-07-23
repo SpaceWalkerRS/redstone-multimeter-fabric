@@ -262,8 +262,8 @@ rsmm.keybind.unbound = unbound
 
 # categories
 
-rsmm.keybind.redstoneMultimeter = Redstone Multimeter
-rsmm.keybind.meterEventTypes = Meter Event Types
+rsmm.keybind.category.redstoneMultimeter = Redstone Multimeter
+rsmm.keybind.category.meterEventTypes = Meter Event Types
 
 # Redstone Multimeter keybinds
 
