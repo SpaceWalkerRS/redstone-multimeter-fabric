@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -30,7 +29,6 @@ public class OptionsMixin {
 		method = "<init>",
 		at = @At(
 			value = "INVOKE",
-			shift = Shift.BEFORE,
 			target = "Lnet/minecraft/client/Options;load()V"
 		)
 	)
@@ -47,6 +45,8 @@ public class OptionsMixin {
 		for (KeyMapping key : rsmmKeys) {
 			keyMappings[index++] = key;
 		}
+
+		Keybinds.patchLegacyAmecsOptions(minecraft.gameDirectory.toPath());
 	}
 
 	@Inject(
