@@ -79,7 +79,7 @@ public class Keybinds {
 
 		KEYBINDS.put(name, keybind);
 		if (legacyName != null) {
-			LEGACY_KEYBINDS.put(name, keybind);
+			LEGACY_KEYBINDS.put(legacyName, keybind);
 		}
 
 		return keybind;
