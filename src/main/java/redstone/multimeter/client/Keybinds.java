@@ -34,6 +34,7 @@ public class Keybinds {
 
 	private static final Set<String> CATEGORIES = new LinkedHashSet<>();
 	private static final Map<String, KeyMapping> KEYBINDS = new LinkedHashMap<>();
+	// used for parsing keybinds from before RSMM 1.16
 	private static final Map<String, KeyMapping> LEGACY_KEYBINDS = new HashMap<>();
 
 	public static final KeyMapping[] TOGGLE_EVENT_TYPES = new KeyMapping[EventType.ALL.length];
