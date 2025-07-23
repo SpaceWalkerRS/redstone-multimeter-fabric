@@ -9,27 +9,35 @@ import redstone.multimeter.client.tutorial.instance.*;
 
 public enum TutorialStep implements Cyclable<TutorialStep> {
 
-	OPEN_OPTIONS_SCREEN("openOptionsScreen", OpenOptionsScreenTutorial::new),
-	JOIN_METER_GROUP("joinMeterGroup", JoinMeterGroupTutorial::new),
-	PLACE_METER("placeMeter", PlaceMeterTutorial::new),
-	PAUSE_TIMELINE("pauseTimeline", PauseTimelineTutorial::new),
-	SCROLL_TIMELINE("scrollTimeline", ScrollTimelineTutorial::new),
-	OPEN_MULTIMETER_SCREEN("openMultimeterScreen", OpenMultimeterScreenTutorial::new),
-	OPEN_METER_CONTROLS("openMeterControls", OpenMeterControlsTutorial::new),
-	REMOVE_METER("removeMeter", RemoveMeterTutorial::new),
-	NONE("none", CompletedTutorial::new);
+	OPEN_OPTIONS_SCREEN("openOptionsScreen", "OPEN_OPTIONS_SCREEN", OpenOptionsScreenTutorial::new),
+	JOIN_METER_GROUP("joinMeterGroup", "JOIN_METER_GROUP", JoinMeterGroupTutorial::new),
+	PLACE_METER("placeMeter", "PLACE_METER", PlaceMeterTutorial::new),
+	PAUSE_TIMELINE("pauseTimeline", "PAUSE_HUD", PauseTimelineTutorial::new),
+	SCROLL_TIMELINE("scrollTimeline", "SCROLL_HUD", ScrollTimelineTutorial::new),
+	OPEN_MULTIMETER_SCREEN("openMultimeterScreen", "OPEN_MULTIMETER_SCREEN", OpenMultimeterScreenTutorial::new),
+	OPEN_METER_CONTROLS("openMeterControls", "OPEN_METER_CONTROLS", OpenMeterControlsTutorial::new),
+	REMOVE_METER("removeMeter", "REMOVE_METER", RemoveMeterTutorial::new),
+	NONE("none", "NONE", CompletedTutorial::new);
 
 	private final String key;
+	// used for parsing values from before RSMM 1.16
+	private final String legacyKey;
 	private final Function<Tutorial, TutorialInstance> factory;
 
-	private TutorialStep(String key, Function<Tutorial, TutorialInstance> factory) {
+	private TutorialStep(String key, String legacyKey, Function<Tutorial, TutorialInstance> factory) {
 		this.key = key;
+		this.legacyKey = legacyKey;
 		this.factory = factory;
 	}
 
 	@Override
 	public String key() {
 		return this.key;
+	}
+
+	@Override
+	public String legacyKey() {
+		return this.legacyKey;
 	}
 
 	public Text getName() {
