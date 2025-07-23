@@ -30,9 +30,15 @@ public class EnumOption<T extends Enum<T> & Cyclable<T>> extends BaseOption<T> {
 
 	@Override
 	public void setFromString(String value) {
-		try {
-			this.set(Cyclable.byKey(this.type, value));
-		} catch (IllegalStateException e) {
+		T v = Cyclable.byKey(this.type, value);
+		if (v == null) {
+			v = Cyclable.byLegacyKey(this.type, value);
+		}
+
+		if (v == null) {
+			throw new IllegalStateException("could not find value " + value + " of type " + this.type.getSimpleName() + " for option " + this.key());
+		} else {
+			this.set(v);
 		}
 	}
 
