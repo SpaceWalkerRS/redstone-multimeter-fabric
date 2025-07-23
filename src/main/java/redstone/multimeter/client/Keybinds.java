@@ -5,11 +5,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +19,8 @@ import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.InputConstants.Key;
+
+import de.siphalor.amecs.impl.AmecsAPI;
 
 import net.minecraft.client.KeyMapping;
 
@@ -122,6 +126,74 @@ public class Keybinds {
 			}
 		} catch (IOException e) {
 			RedstoneMultimeterMod.LOGGER.warn("exception while loading keybinds", e);
+		}
+	}
+
+	// it's a bit of a hack but it's better than the modifiers
+	// getting lost when updating from RSMM 1.15 to RSMM 1.16
+	public static void patchLegacyAmecsOptions(Path dir) {
+		// length of prefix string
+		int p = 14;
+
+		Path file = dir.resolve("options." + AmecsAPI.MOD_ID + ".txt");
+		Path tmp = dir.resolve(file.getFileName() + ".tmp");
+
+		if (!Files.exists(file)) {
+			return;
+		}
+
+		boolean modified = false;
+		List<String> lines = new ArrayList<>();
+
+		try (BufferedReader br = Files.newBufferedReader(file)) {
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				int i = line.indexOf(':');
+
+				if (i > p) {
+					String legacyKey = line.substring(p, i);
+					KeyMapping keybind = LEGACY_KEYBINDS.get(legacyKey);
+
+					if (keybind != null) {
+						modified = true;
+						line = line.substring(0, p) + keybind.getName() + line.substring(i);
+					}
+				}
+
+				lines.add(line);
+			}
+		} catch (IOException e) {
+			RedstoneMultimeterMod.LOGGER.warn("exception while reading Amecs options", e);
+			return;
+		}
+
+		if (!modified) {
+			return;
+		}
+
+		try (BufferedWriter bw = Files.newBufferedWriter(tmp)) {
+			for (String line : lines) {
+				bw.write(line);
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			RedstoneMultimeterMod.LOGGER.warn("exception while writing patched Amecs options", e);
+
+			try {
+				Files.delete(tmp);
+			} catch (Exception ee) {
+				RedstoneMultimeterMod.LOGGER.warn("exception while deleting patched Amecs options", e);
+			}
+
+			return;
+		}
+
+		try {
+			Files.delete(file);
+			Files.copy(tmp, file);
+		} catch (IOException e) {
+			RedstoneMultimeterMod.LOGGER.warn("exception while saving patched Amecs options", e);
 		}
 	}
 
