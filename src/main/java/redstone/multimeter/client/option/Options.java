@@ -76,6 +76,7 @@ public class Options {
 	}
 
 	private static final Map<String, Option> OPTIONS;
+	// used for parsing options from before RSMM 1.16
 	private static final Map<String, Option> LEGACY_OPTIONS;
 	private static final Map<String, List<Option>> OPTIONS_BY_CATEGORY;
 
