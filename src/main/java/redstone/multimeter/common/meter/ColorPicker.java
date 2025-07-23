@@ -6,7 +6,7 @@ import redstone.multimeter.client.option.Cyclable;
 
 public enum ColorPicker implements Cyclable<ColorPicker> {
 
-	RANDOM("random") {
+	RANDOM("random", "RANDOM") {
 
 		private int index;
 
@@ -18,7 +18,7 @@ public enum ColorPicker implements Cyclable<ColorPicker> {
 			return Color.HSBtoRGB(hue, 0.7F, 1.0F);
 		}
 	},
-	RAINBOW("rainbow") {
+	RAINBOW("rainbow", "RAINBOW") {
 
 		private int index;
 
@@ -31,15 +31,23 @@ public enum ColorPicker implements Cyclable<ColorPicker> {
 		}
 	};
 
-	private ColorPicker(String key) {
-		this.key = key;
-	}
-
 	private final String key;
+	// used for parsing values from before RSMM 1.16
+	private final String legacyKey;
+
+	private ColorPicker(String key, String legacyKey) {
+		this.key = key;
+		this.legacyKey = legacyKey;
+	}
 
 	@Override
 	public String key() {
-		return key;
+		return this.key;
+	}
+
+	@Override
+	public String legacyKey() {
+		return this.legacyKey;
 	}
 
 	public abstract int next();
