@@ -534,7 +534,7 @@ public class Multimeter {
 
 	public void logPowered(World world, int x, int y, int z, int block, int metadata) {
 		tryLogEvent(world, x, y, z, EventType.POWERED, () -> {
-			return ((IBlock)Block.BY_ID[block]).rsmm$isPowered(world, x, y, z, metadata) ? 1 : 0;
+			return block != 0 && ((IBlock)Block.BY_ID[block]).rsmm$isPowered(world, x, y, z, metadata) ? 1 : 0;
 		}, (meterGroup, meter, event) -> {
 			return meter.setPowered(event.getMetadata() != 0);
 		});
@@ -546,7 +546,7 @@ public class Multimeter {
 
 	public void logActive(World world, int x, int y, int z, int block, int metadata) {
 		tryLogEvent(world, x, y, z, EventType.ACTIVE, () -> {
-			return ((IBlock)Block.BY_ID[block]).rsmm$isMeterable() && ((Meterable)Block.BY_ID[block]).rsmm$isActive(world, x, y, z, metadata) ? 1 : 0;
+			return block != 0 && ((IBlock)Block.BY_ID[block]).rsmm$isMeterable() && ((Meterable)Block.BY_ID[block]).rsmm$isActive(world, x, y, z, metadata) ? 1 : 0;
 		}, (meterGroup, meter, event) -> meter.setActive(event.getMetadata() != 0));
 	}
 
