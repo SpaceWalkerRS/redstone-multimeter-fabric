@@ -458,7 +458,9 @@ public class Multimeter {
 					float newYaw = player.yaw;
 					float newPitch = player.pitch;
 
-					player.teleportToDimension(newWorld.dimension.id);
+					if (player.world.dimension.id != newWorld.dimension.id) {
+						player.teleportToDimension(newWorld.dimension.id);
+					}
 					player.networkHandler.teleport(newX, newY, newZ, newYaw, newPitch);
 
 					Text text = Texts.translatable("rsmm.meter.teleport.success", meter.getName());
