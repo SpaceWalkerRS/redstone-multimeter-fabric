@@ -227,7 +227,7 @@ public class MeterControlsElement extends AbstractParentElement {
 		MeterPropertyElement eventTypes = new MeterPropertyElement(totalWidth, buttonWidth, "eventTypes");
 		for (EventType type : EventType.ALL) {
 			KeyBinding keybind = Keybinds.TOGGLE_EVENT_TYPES[type.getId()];
-			Supplier<Tooltip> tooltip = () -> keybind.getKeyCode() != Keyboard.KEY_NONE
+			Supplier<Tooltip> tooltip = () -> keybind.getKeyCode() == Keyboard.KEY_NONE
 				? Tooltips.EMPTY
 				: Tooltips.keybind(keybind);
 
