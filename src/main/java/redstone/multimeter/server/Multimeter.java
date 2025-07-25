@@ -159,7 +159,7 @@ public class Multimeter {
 		ServerPlayerEntity owner = server.getPlayerList().get(ownerUuid);
 
 		if (owner != null) {
-			Text message = Texts.literal("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time);
+			Text message = Texts.translatable("rsmm.meterGroup.removed.idle", meterGroup.getName(), options.meter_group.max_idle_time);
 			server.sendMessage(owner, message, false);
 		}
 	}
@@ -193,7 +193,7 @@ public class Multimeter {
 
 		if (meterGroup != null) {
 			if (meterGroup.isPastMeterLimit()) {
-				Text message = Texts.literal("meter limit (%d) reached!", options.meter_group.meter_limit);
+				Text message = Texts.translatable("rsmm.meterGroup.meterLimitReached", options.meter_group.meter_limit);
 				server.sendMessage(player, message, true);
 			} else if (!addMeter(meterGroup, properties)) {
 				refreshMeterGroup(meterGroup, player);
@@ -268,7 +268,7 @@ public class Multimeter {
 			if (meterGroup.isOwnedBy(player)) {
 				setMeters(meterGroup, meters);
 			} else {
-				Text message = Texts.literal("Could not set meters for meter group \"%s\": you are not the owner of that meter group!", meterGroup.getName());
+				Text message = Texts.translatable("rsmm.meterGroups.load.failure.notOwner", meterGroup.getName());
 				server.sendMessage(player, message, false);
 			}
 		}
@@ -384,13 +384,13 @@ public class Multimeter {
 		meterGroup.addMember(playerUuid);
 
 		Text message = Texts.translatable(
-			"rsmm.meterGroup.invited",
+			"rsmm.meterGroup.member.invited",
 			meterGroup.getName(),
 			Texts
-				.translatable("rsmm.meterGroup.invited.here")
+				.translatable("rsmm.meterGroup.member.invited.here")
 				.format(style ->
 					style.withHoverEvent(HoverEvent.showText(
-						Texts.translatable("rsmm.meterGroup.invited.subscribe", meterGroup.getName())
+						Texts.translatable("rsmm.meterGroup.member.invited.subscribe", meterGroup.getName())
 					)).withClickEvent(ClickEvent.runCommand(
 						String.format("/metergroup subscribe %s", meterGroup.getName())
 					)).withColor(Formatting.GREEN))
@@ -412,7 +412,7 @@ public class Multimeter {
 			if (player != null && meterGroup.hasSubscriber(playerUuid)) {
 				unsubscribeFromMeterGroup(meterGroup, player);
 
-				Text message = Texts.literal("The owner of meter group \'%s\' has removed you as a member!", meterGroup.getName());
+				Text message = Texts.translatable("rsmm.meterGroup.member.removed", meterGroup.getName());
 				server.sendMessage(player, message, false);
 			}
 		}
