@@ -70,9 +70,15 @@ rsmm.toggleFocusMode.enabled = Enabled Focus Mode
 rsmm.toggleFocusMode.disabled = Disabled Focus Mode
 rsmm.toggleFocusMode.noLogs = No meter event logs available to focus on...
 
-rsmm.meterGroup.invited = You have been invited to meter group '%s' - click [%s] to subscribe to it.
-rsmm.meterGroup.invited.here = here
-rsmm.meterGroup.invited.subscribe = Subscribe to meter group '%s'
+rsmm.meterGroup.member.invited = You have been invited to meter group '%s' - click [%s] to subscribe to it.
+rsmm.meterGroup.member.invited.here = here
+rsmm.meterGroup.member.invited.subscribe = Subscribe to meter group '%s'
+
+rsmm.meterGroup.member.removed = The owner of meter group '%s' has removed you as a member!
+
+rsmm.meterGroup.meterLimitReached = Meter limit (%s) reached!
+
+rsmm.meterGroup.removed.idle = One of your meter groups, '%s', was idle for more than %s ticks and has been removed.
 
 rsmm.meter.teleport.notAllowed = This server does not allow meter teleporting!
 rsmm.meter.teleport.success = Teleported to meter '%s'
@@ -321,6 +327,7 @@ rsmm.meterGroups.load = Press one of the number keys to preview the meter group 
 rsmm.meterGroups.load.success.subscribed = Loaded meter group '%s' from slot %s
 rsmm.meterGroups.load.success.unsubscribed = Loaded empty slot %s
 rsmm.meterGroups.load.failure.emptySlot = Slot %s is empty! Are you sure you want to load it?
+rsmm.meterGroups.load.failure.notOwner = Could not load meter group "%s": you are not the owner of that meter group!
 
 rsmm.meterGroups.save = Press one of the number keys to save this meter group to that slot
 rsmm.meterGroups.save.success = Saved meter group '%s'to slot %s
