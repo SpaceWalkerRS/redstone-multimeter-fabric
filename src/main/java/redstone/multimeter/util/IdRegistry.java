@@ -7,22 +7,12 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import net.minecraft.util.registry.MappedRegistry;
 
-public class IdRegistry extends MappedRegistry<String, Integer> {
+public class IdRegistry extends MappedRegistry/*<String, Integer>*/ {
 
 	private final Int2ObjectMap<String> keys = new Int2ObjectOpenHashMap<>();
 
-	@Override
-	public Integer get(String key) {
+	public int getValue(String key) {
 		return (Integer) super.get(key);
-	}
-
-	@Override
-	public void put(String key, Integer value) {
-		if (value == null) {
-			throw new NullPointerException();
-		} else {
-			put(key, value.intValue());
-		}
 	}
 
 	public void put(String key, int value) {

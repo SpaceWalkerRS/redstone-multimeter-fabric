@@ -82,7 +82,7 @@ public class BlockSelectorList extends SelectorList {
 		protected BlockListEntry(int width, int height, String key) {
 			super(0, 0, width, height);
 
-			Integer block = Blocks.REGISTRY.get(key);
+			Integer block = Blocks.REGISTRY.getValue(key);
 			Item item = null;
 
 			if (block != null) {
@@ -92,7 +92,7 @@ public class BlockSelectorList extends SelectorList {
 				// so to get the item, we try a few different things
 				if (item == null) {
 					// first check for an item with the same key
-					item = Item.BY_ID[Items.REGISTRY.get(key)];
+					item = Item.BY_ID[Items.REGISTRY.getValue(key)];
 				}
 				if (item == null) {
 					// if nothing has worked yet, use the item dropped
