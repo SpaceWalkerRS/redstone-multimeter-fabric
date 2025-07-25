@@ -25,7 +25,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 	private boolean isDedicated() { return false; }
 
 	@Inject(
-		method = "<init>(Ljava/io/File;Ljava/net/Proxy;)V",
+		method = "<init>(Ljava/io/File;)V",
 		at = @At(
 			value = "NEW",
 			target = "Lnet/minecraft/server/command/handler/CommandManager;"
