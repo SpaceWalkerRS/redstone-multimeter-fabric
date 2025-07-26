@@ -1,6 +1,7 @@
 package redstone.multimeter.mixin.client;
 
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.sugar.Local;
 
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.framegraph.FramePass;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
@@ -20,8 +22,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.renderer.FogParameters;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
@@ -41,10 +41,10 @@ public class LevelRendererMixin {
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.AFTER,
-			target = "Lnet/minecraft/client/renderer/LevelRenderer;addWeatherPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/world/phys/Vec3;FLnet/minecraft/client/renderer/FogParameters;)V"
+			target = "Lnet/minecraft/client/renderer/LevelRenderer;addWeatherPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/world/phys/Vec3;FLcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"
 		)
 	)
-	private void renderMeters(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, Matrix4f cameraPose, Matrix4f projectionPose, CallbackInfo ci, @Local(ordinal = 0) FogParameters fogParameters, @Local FrameGraphBuilder builder) {
+	private void renderMeters(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, Matrix4f cameraPose, Matrix4f projectionPose, GpuBufferSlice fogParameters, Vector4f fogColor, boolean sky, CallbackInfo ci, @Local FrameGraphBuilder builder) {
 		FramePass pass = builder.addPass("rsmm:meters");
 
 		targets.main = pass.readsAndWrites(targets.main);

@@ -6,35 +6,31 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.client.gui.GuiGraphics;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
-import redstone.multimeter.interfaces.mixin.IMinecraft;
 
 @Mixin(Gui.class)
 public class GuiMixin {
 
 	@Inject(
-		method = "<init>",
+		method = "render",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At(
-			value = "NEW",
-			ordinal = 2,
-			target = "Lnet/minecraft/client/gui/LayeredDraw;"
+			value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/Gui;renderSleepOverlay(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"
 		)
 	)
-	private void renderHud(Minecraft minecraft, CallbackInfo ci, LayeredDraw layers) {
-		layers.add((graphics, partialTick) -> {
-			MultimeterClient client = ((IMinecraft)minecraft).getMultimeterClient();
-			MultimeterHud hud = client.getHud();
+	private void renderHud(GuiGraphics graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+		MultimeterClient client = MultimeterClient.INSTANCE;
+		MultimeterHud hud = client.getHud();
 
-			if (client.isHudActive() && !hud.isOnScreen()) {
-				hud.render(new GuiRenderer(graphics));
-			}
-		});
+		if (client.isHudActive() && !hud.isOnScreen()) {
+			hud.render(new GuiRenderer(graphics));
+		}
 	}
 }

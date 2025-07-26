@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui;
 import com.mojang.blaze3d.platform.Window;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.world.item.ItemStack;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -34,15 +34,15 @@ public class GuiRenderer {
 	}
 
 	public void pushMatrix() {
-		this.graphics.pose().pushPose();
+		this.graphics.pose().pushMatrix();
 	}
 
 	public void translate(double dx, double dy, double dz) {
-		this.graphics.pose().translate(dx, dy, dz);
+//		this.graphics.pose().translate((float) dx, (float) dy);
 	}
 
 	public void popMatrix() {
-		this.graphics.pose().popPose();
+		this.graphics.pose().popMatrix();
 	}
 
 	public void fill(int x0, int y0, int x1, int y1, int color) {
@@ -54,7 +54,7 @@ public class GuiRenderer {
 	}
 
 	public void highlight(int x0, int y0, int x1, int y1, int color) {
-		this.graphics.fill(RenderType.guiTextHighlight(), x0, y0, x1, y1, color);
+		this.graphics.fill(RenderPipelines.GUI_TEXT_HIGHLIGHT, x0, y0, x1, y1, color);
 	}
 
 	public void borders(int x0, int y0, int x1, int y1, int color) {
@@ -131,7 +131,7 @@ public class GuiRenderer {
 
 	public void blit(Texture t, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int color) {
 		((GuiGraphicsAccessor) this.graphics).rsmm$innerBlit(
-			RenderType::guiTextured,
+			RenderPipelines.GUI_TEXTURED,
 			t.location,
 			x0,
 			x1,

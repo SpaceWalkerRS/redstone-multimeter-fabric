@@ -451,7 +451,7 @@ public class Multimeter {
 				ServerLevel newLevel = server.getLevel(pos);
 
 				if (newLevel != null) {
-					ServerLevel oldLevel = player.serverLevel();
+					ServerLevel oldLevel = player.level();
 					double oldX = player.getX();
 					double oldY = player.getY();
 					double oldZ = player.getZ();

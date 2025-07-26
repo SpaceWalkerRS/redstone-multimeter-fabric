@@ -59,7 +59,7 @@ public class MinecraftMixin implements IMinecraft {
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.AFTER,
-			target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"
+			target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(I)V"
 		)
 	)
 	private void resizeDisplay(CallbackInfo ci) {
