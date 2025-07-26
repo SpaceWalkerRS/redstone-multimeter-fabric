@@ -31,18 +31,23 @@ public class GuiRenderer {
 		this.font = font;
 
 		this.font.graphics = this.graphics;
+
+		DepthOverride.reset();
 	}
 
 	public void pushMatrix() {
 		this.graphics.pose().pushMatrix();
+		DepthOverride.push();
 	}
 
 	public void translate(double dx, double dy, double dz) {
-//		this.graphics.pose().translate((float) dx, (float) dy);
+		this.graphics.pose().translate((float) dx, (float) dy);
+		DepthOverride.translate((float) dz);
 	}
 
 	public void popMatrix() {
 		this.graphics.pose().popMatrix();
+		DepthOverride.pop();
 	}
 
 	public void fill(int x0, int y0, int x1, int y1, int color) {

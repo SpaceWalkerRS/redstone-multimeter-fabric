@@ -68,8 +68,12 @@
 	"client": [
 		"client.ClientLanguageMixin",
 		"client.ClientPacketListenerMixin",
+		"client.GuiElementRenderStateMixin",
 		"client.GuiGraphicsAccessor",
 		"client.GuiMixin",
+		"client.GuiRendererMixin",
+		"client.GuiRenderStateMixin",
+		"client.GuiTextRenderStateMixin",
 		"client.IntegratedServerMixin",
 		"client.KeyMappingMixin",
 		"client.LevelRendererMixin",
