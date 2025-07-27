@@ -189,8 +189,8 @@ public class MultimeterServer {
 	}
 
 	public ServerWorld getWorld(String key) {
-		int dimension = Dimensions.REGISTRY.get(key);
-		return server.getWorld(dimension);
+		Integer dimension = Dimensions.REGISTRY.get(key);
+		return dimension == null ? null : server.getWorld(dimension);
 	}
 
 	public ServerWorld getWorld(DimPos pos) {
