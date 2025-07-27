@@ -6,6 +6,7 @@ import redstone.multimeter.client.gui.element.button.BasicButton;
 import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.client.gui.tooltip.Tooltips;
 
 public class EnumOption<T extends Enum<T> & Cyclable<T>> extends BaseOption<T> {
@@ -20,7 +21,11 @@ public class EnumOption<T extends Enum<T> & Cyclable<T>> extends BaseOption<T> {
 
 	@Override
 	public Text getDisplayValue() {
-		return Texts.translatable(this.translationKey() + ".value." + this.getAsString());
+		return Texts.translatable(this.translationKey() + ".value." + this.getAsString() + ".name");
+	}
+
+	private Tooltip getTooltip() {
+		return Tooltips.translatable(this.translationKey() + ".value." + this.getAsString() + ".description");
 	}
 
 	@Override
@@ -44,7 +49,7 @@ public class EnumOption<T extends Enum<T> & Cyclable<T>> extends BaseOption<T> {
 
 	@Override
 	public Button createControl(int width, int height) {
-		return new BasicButton(0, 0, width, height, this::getDisplayValue, Tooltips::empty, button -> {
+		return new BasicButton(0, 0, width, height, this::getDisplayValue, this::getTooltip, button -> {
 			this.cycle(!Screen.hasShiftDown());
 			return true;
 		});
