@@ -115,8 +115,10 @@ rsmm.option.redstoneMultimeter.numberedMeterNames.description = Add a number at 
 
 rsmm.option.redstoneMultimeter.colorPicker.name = Color Picker
 rsmm.option.redstoneMultimeter.colorPicker.description = The algorithm used to pick colors for new meters.
-rsmm.option.redstoneMultimeter.colorPicker.value.random = Random
-rsmm.option.redstoneMultimeter.colorPicker.value.rainbow = Rainbow
+rsmm.option.redstoneMultimeter.colorPicker.value.random.name = Random
+rsmm.option.redstoneMultimeter.colorPicker.value.random.description = Cycle through 8 pseudo-random hues.
+rsmm.option.redstoneMultimeter.colorPicker.value.rainbow.name = Rainbow
+rsmm.option.redstoneMultimeter.colorPicker.value.rainbow.description = Cycle through 32 evenly spaced hues.
 
 rsmm.option.redstoneMultimeter.shiftyMeters.name = Shifty Meters
 rsmm.option.redstoneMultimeter.shiftyMeters.description = Use the shift key to control whether a new meter is movable or not.
@@ -126,10 +128,14 @@ rsmm.option.redstoneMultimeter.autoRandomTicks.description = Automatically enabl
 
 rsmm.option.redstoneMultimeter.meterNameTags.name = Meter Name Tags
 rsmm.option.redstoneMultimeter.meterNameTags.description = Render meter name tags inside the meter highlights in the world.
-rsmm.option.redstoneMultimeter.meterNameTags.value.never = Never
-rsmm.option.redstoneMultimeter.meterNameTags.value.always = Always
-rsmm.option.redstoneMultimeter.meterNameTags.value.inFocusMode = In Focus Mode
-rsmm.option.redstoneMultimeter.meterNameTags.value.whenPreviewingMeterGroup = When Previewing Meter Group
+rsmm.option.redstoneMultimeter.meterNameTags.value.never.name = Never
+rsmm.option.redstoneMultimeter.meterNameTags.value.never.description = Never render meter name tags.
+rsmm.option.redstoneMultimeter.meterNameTags.value.always.name = Always
+rsmm.option.redstoneMultimeter.meterNameTags.value.always.description = Always render meter name tags.
+rsmm.option.redstoneMultimeter.meterNameTags.value.inFocusMode.name = In Focus Mode
+rsmm.option.redstoneMultimeter.meterNameTags.value.inFocusMode.description = Render meter name tags only when in focus mode.
+rsmm.option.redstoneMultimeter.meterNameTags.value.whenPreviewingMeterGroup.name = When Previewing Meter Group
+rsmm.option.redstoneMultimeter.meterNameTags.value.whenPreviewingMeterGroup.description = Render meter name tags only when previewing a meter group.
 
 rsmm.option.redstoneMultimeter.meterNameTagsRange.name = Meter Name Tags Range
 rsmm.option.redstoneMultimeter.meterNameTagsRange.description = The range within which meter name tags will be rendered.
@@ -159,14 +165,18 @@ rsmm.option.hud.verticalScreenPosition.description = The vertical position of th
 rsmm.option.hud.verticalScreenPosition.value = %s%%
 
 rsmm.option.hud.horizontalOrientation.name = Horizontal Orientation
-rsmm.option.hud.horizontalOrientation.description = The direction along the timeline in which the events are drawn.
-rsmm.option.hud.horizontalOrientation.value.leftToRight = Left-to-Right
-rsmm.option.hud.horizontalOrientation.value.rightToLeft = Right-to-Left
+rsmm.option.hud.horizontalOrientation.description = The direction along which HUD elements and events in the timeline are drawn.
+rsmm.option.hud.horizontalOrientation.value.leftToRight.name = Left-to-Right
+rsmm.option.hud.horizontalOrientation.value.leftToRight.description = Draw from left to right.
+rsmm.option.hud.horizontalOrientation.value.rightToLeft.name = Right-to-Left
+rsmm.option.hud.horizontalOrientation.value.rightToLeft.description = Draw from right to left.
 
 rsmm.option.hud.verticalOrientation.name = Vertical Orientation
-rsmm.option.hud.verticalOrientation.description = The direction along the timeline in which meters are listed.
-rsmm.option.hud.verticalOrientation.value.topToBottom = Top-to-Bottom
-rsmm.option.hud.verticalOrientation.value.bottomToTop = Bottom-to-Top
+rsmm.option.hud.verticalOrientation.description = The direction along which HUD elements are drawn and meters are listed.
+rsmm.option.hud.verticalOrientation.value.topToBottom.name = Top-to-Bottom
+rsmm.option.hud.verticalOrientation.value.topToBottom.description = Draw from top to bottom.
+rsmm.option.hud.verticalOrientation.value.bottomToTop.name = Bottom-to-Top
+rsmm.option.hud.verticalOrientation.value.bottomToTop.description = Draw from bottom to top.
 
 rsmm.option.hud.history.name = History
 rsmm.option.hud.history.description = The number of ticks displayed in the timeline.
