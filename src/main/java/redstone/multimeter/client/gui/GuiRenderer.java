@@ -59,6 +59,7 @@ public class GuiRenderer {
 	}
 
 	public void highlight(int x0, int y0, int x1, int y1, int color) {
+		this.graphics.fill(RenderPipelines.GUI_INVERT, x0, y0, x1, y1, 0xFFFFFFFF);
 		this.graphics.fill(RenderPipelines.GUI_TEXT_HIGHLIGHT, x0, y0, x1, y1, color);
 	}
 
