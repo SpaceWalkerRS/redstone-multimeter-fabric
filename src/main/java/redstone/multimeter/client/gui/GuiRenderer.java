@@ -130,20 +130,23 @@ public class GuiRenderer {
 		Minecraft minecraft = MultimeterClient.MINECRAFT;
 		Window window = new Window(minecraft.options, minecraft.width, minecraft.height);
 
-		int width = this.font.width(tooltip) + 8;
-		int height = this.font.height(tooltip) + 8;
+		int windowWidth = window.getWidth();
+		int windowHeight = window.getHeight();
+		int tooltipWidth = this.font.width(tooltip) + 8;
+		int tooltipHeight = this.font.height(tooltip) + 8;
 
 		int x = mouseX + 15;
 		int y = mouseY;
 
-		if (x + width > window.getWidth()) {
-			x = mouseX - 15 - width;
+		if (x + tooltipWidth > windowWidth) {
+			x = Math.max(0, windowWidth - tooltipWidth);
+			y += 15;
 		}
-		if (y + height > window.getHeight()) {
-			y = mouseY - height;
+		if (y + tooltipHeight > windowHeight) {
+			y = Math.max(0, windowHeight - tooltipHeight);
 		}
 
-		this.tooltip(tooltip, x, y, x + width, y + height);
+		this.tooltip(tooltip, x, y, x + tooltipWidth, y + tooltipHeight);
 	}
 
 	public void tooltip(Tooltip tooltip, int x0, int y0, int x1, int y1) {
