@@ -299,7 +299,7 @@ public class TextField extends AbstractButton {
 		Tooltip tooltip = super.getTooltip(mouseX, mouseY);
 
 		if (tooltip.isEmpty() && !this.isFocused() && this.font.width(this.value) > this.textWidth) {
-			tooltip = Tooltips.split(this.font, this.value);
+			tooltip = Tooltips.literal(this.value);
 		}
 
 		return tooltip;
