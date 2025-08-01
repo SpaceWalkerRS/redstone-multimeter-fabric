@@ -167,7 +167,7 @@ public class BlockSelectorList extends SelectorList {
 				String keyString = this.key.toString();
 
 				if (font.width(keyString) > (this.getWidth() - 22)) {
-					tooltip = Tooltips.split(font, keyString);
+					tooltip = Tooltips.literal(keyString);
 				}
 			}
 
