@@ -63,7 +63,7 @@ public class MeterControlsElement extends AbstractParentElement {
 				t.addLine(Texts.translatable("rsmm.gui.meterControls.edit", this.meter.getName()).format(Formatting.UNDERLINED)).setShadow(true);
 			}
 		});
-		this.hideButton = new BasicButton(0, 0, 18, 18, () -> Texts.literal(this.meter != null && this.meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltips.line("%s Meter", this.meter == null || this.meter.isHidden() ? "Unhide" : "Hide"), button -> {
+		this.hideButton = new BasicButton(0, 0, 18, 18, () -> Texts.literal(this.meter != null && this.meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltips.translatable("rsmm.gui.meterControls." + (this.meter == null || this.meter.isHidden() ? "unhide" : "hide")), button -> {
 			this.client.getMeterGroup().toggleHidden(this.meter);
 			return true;
 		});
@@ -158,7 +158,7 @@ public class MeterControlsElement extends AbstractParentElement {
 		int totalWidth = 375;
 		int buttonWidth = 150;
 
-		MeterPropertyElement pos = new MeterPropertyElement(totalWidth, buttonWidth, "pos", () -> Tooltips.line("Click to teleport!"), t -> {
+		MeterPropertyElement pos = new MeterPropertyElement(totalWidth, buttonWidth, "pos", () -> Tooltips.translatable("rsmm.gui.meterControls.clickToTeleport"), t -> {
 			this.teleport();
 			return true;
 		});
