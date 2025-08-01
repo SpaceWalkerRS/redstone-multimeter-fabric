@@ -389,6 +389,7 @@ rsmm.gui.meterControls.eventTypes = Event Types
 
 rsmm.gui.defaultMeterProperties.title = Default Meter Properties
 rsmm.gui.defaultMeterProperties.createbar.hint = create...
+rsmm.gui.defaultMeterProperties.createbar.invalid = That name is not valid or that block already has an override!
 rsmm.gui.defaultMeterProperties.tab.builtIn = Built-In
 rsmm.gui.defaultMeterProperties.tab.overrides = Overrides
 
