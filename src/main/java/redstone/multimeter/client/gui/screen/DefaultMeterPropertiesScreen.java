@@ -144,7 +144,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			remove();
 			return true;
 		});
-		create = new TextField(x + 2 * (Button.DEFAULT_HEIGHT + 2), y, (listWidth - 2) - (4 + 2 * Button.DEFAULT_HEIGHT) - 2, Button.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltips.literal("That name is not valid or that block already has an override!") : Tooltips.empty(), text -> {
+		create = new TextField(x + 2 * (Button.DEFAULT_HEIGHT + 2), y, (listWidth - 2) - (4 + 2 * Button.DEFAULT_HEIGHT) - 2, Button.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltips.translatable("rsmm.gui.defaultMeterProperties.createbar.invalid") : Tooltips.empty(), text -> {
 			ResourceLocation key = nextBlockKey();
 			add.setActive(key != null && !key.getPath().trim().isEmpty());
 		}, null);
