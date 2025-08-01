@@ -360,8 +360,13 @@ rsmm.gui.searchbar.hint = search...
 
 rsmm.gui.meterControls.edit = Edit Meter '%s'
 
+rsmm.gui.meterControls.hide = Hide Meter
+rsmm.gui.meterControls.unhide = Unhide Meter
+
 rsmm.gui.meterControls.delete = Delete Meter
 rsmm.gui.meterControls.delete.warning = Are you sure you want to delete this meter? This cannot be undone!
+
+rsmm.gui.meterControls.clickToTeleport = Click to teleport!
 
 rsmm.gui.meterControls.pos = Position
 rsmm.gui.meterControls.pos.dimension = Dimension
