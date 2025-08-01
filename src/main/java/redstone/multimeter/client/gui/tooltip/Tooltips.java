@@ -1,7 +1,6 @@
 package redstone.multimeter.client.gui.tooltip;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +8,7 @@ import java.util.stream.Stream;
 
 import net.minecraft.client.options.KeyBinding;
 
-import redstone.multimeter.client.gui.FontRenderer;
+import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 
@@ -33,40 +32,28 @@ public class Tooltips {
 		return lines(Stream.of(lines).map(Texts::of).collect(Collectors.toList()));
 	}
 
-	public static Tooltip line(Text line) {
-		return lines(Arrays.asList(line));
+	public static Tooltip split(Text text) {
+		return split(text, 200);
 	}
 
-	public static Tooltip line(String line) {
-		return line(Texts.literal(line));
+	public static Tooltip split(Text text, int width) {
+		return lines(MultimeterClient.INSTANCE.getFontRenderer().split(text, width));
 	}
 
-	public static Tooltip line(String line, Object... args) {
-		return line(Texts.literal(line, args));
+	public static Tooltip literal(String text) {
+		return literal(text, 200);
 	}
 
-	public static Tooltip translatable(String line) {
-		return line(Texts.translatable(line));
+	public static Tooltip literal(String text, int width) {
+		return split(Texts.literal(text), width);
 	}
 
-	public static Tooltip translatable(String line, Object... args) {
-		return line(Texts.translatable(line, args));
+	public static Tooltip translatable(String text) {
+		return translatable(text, 200);
 	}
 
-	public static Tooltip split(FontRenderer font, String text) {
-		return split(font, text, 200);
-	}
-
-	public static Tooltip split(FontRenderer font, String text, int width) {
-		return lines(font.split(text, width));
-	}
-
-	public static Tooltip split(FontRenderer font, Text text) {
-		return split(font, text, 200);
-	}
-
-	public static Tooltip split(FontRenderer font, Text text, int width) {
-		return lines(font.split(text, width));
+	public static Tooltip translatable(String text, int width) {
+		return split(Texts.translatable(text), width);
 	}
 
 	public static Tooltip keybind(KeyBinding keybind) {

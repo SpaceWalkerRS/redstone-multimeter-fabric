@@ -47,7 +47,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 					long time = System.currentTimeMillis();
 					long delta = (time - lastRequestTime) / 1000;
 
-					return Tooltips.line(Texts.translatable("rsmm.gui.tickPhases.requesting.tooltip", delta));
+					return Tooltips.split(Texts.translatable("rsmm.gui.tickPhases.requesting.tooltip", delta));
 				}
 
 				return Tooltips.empty();
