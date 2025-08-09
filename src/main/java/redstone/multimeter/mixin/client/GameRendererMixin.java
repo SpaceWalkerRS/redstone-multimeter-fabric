@@ -33,7 +33,7 @@ public class GameRendererMixin {
 	private void renderMeters(float tickDelta, long timeNanos, CallbackInfo ci) {
 		MeterRenderer renderer = MultimeterClient.INSTANCE.getMeterRenderer();
 
-		renderer.renderMeters(tickDelta);
+		renderer.renderMeterHighlights(tickDelta);
 		renderer.renderMeterNameTags(tickDelta);
 	}
 }
