@@ -16,7 +16,8 @@ import java.util.Map.Entry;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.hud.Orientation;
-import redstone.multimeter.client.render.MeterNameMode;
+import redstone.multimeter.client.render.MeterHighlightMode;
+import redstone.multimeter.client.render.MeterNameTagMode;
 import redstone.multimeter.common.meter.ColorPicker;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.util.ColorUtils;
@@ -25,16 +26,18 @@ public class Options {
 
 	public static class RedstoneMultimeter {
 
-		public static final BooleanOption                NUMBERED_NAMES       = new BooleanOption("redstoneMultimeter.numberedMeterNames", "Numbered Meter Names", true);
-		public static final EnumOption<ColorPicker>      COLOR_PICKER         = new EnumOption<> ("redstoneMultimeter.colorPicker", "Color Picker", ColorPicker.class, ColorPicker.RANDOM);
-		public static final BooleanOption                SHIFTY_METERS        = new BooleanOption("redstoneMultimeter.shiftyMeters", "Shifty Meters", true);
-		public static final BooleanOption                AUTO_RANDOM_TICKS    = new BooleanOption("redstoneMultimeter.autoRandomTicks", "Auto Random Ticks", true);
-		public static final EnumOption<MeterNameMode>    RENDER_METER_NAMES   = new EnumOption<> ("redstoneMultimeter.meterNameTags", "Render Meter Names", MeterNameMode.class, MeterNameMode.IN_FOCUS_MODE);
-		public static final IntegerOption                METER_NAME_RANGE     = new IntegerOption("redstoneMultimeter.meterNameTagsRange", "Meter Name Range", 16, 0, 64);
-		public static final BooleanOption                CREATE_GROUP_ON_JOIN = new BooleanOption("redstoneMultimeter.createMeterGroupOnJoin", "Create Group On Join", true);
-		public static final StringOption                 DEFAULT_METER_GROUP  = new StringOption ("redstoneMultimeter.defaultMeterGroup", "Default Meter Group", "", MeterGroup.getMaxNameLength());
-		public static final BooleanOption                PREVIEW_METER_GROUPS = new BooleanOption("redstoneMultimeter.previewMeterGroups", "Preview Meter Groups", true);
-		public static final BooleanOption                BYPASS_WARNINGS      = new BooleanOption("redstoneMultimeter.bypassMeterGroupWarnings", "Bypass Meter Group Warnings", false);
+		public static final BooleanOption                  NUMBERED_NAMES       = new BooleanOption("redstoneMultimeter.numberedMeterNames", "Numbered Meter Names", true);
+		public static final EnumOption<ColorPicker>        COLOR_PICKER         = new EnumOption<> ("redstoneMultimeter.colorPicker", "Color Picker", ColorPicker.class, ColorPicker.RANDOM);
+		public static final BooleanOption                  SHIFTY_METERS        = new BooleanOption("redstoneMultimeter.shiftyMeters", "Shifty Meters", true);
+		public static final BooleanOption                  AUTO_RANDOM_TICKS    = new BooleanOption("redstoneMultimeter.autoRandomTicks", "Auto Random Ticks", true);
+		public static final EnumOption<MeterHighlightMode> RENDER_METERS        = new EnumOption<> ("redstoneMultimeter.meterHighlights", null, MeterHighlightMode.class, MeterHighlightMode.ALWAYS);
+		public static final IntegerOption                  METER_RANGE          = new IntegerOption("redstoneMultimeter.meterHighlightsRange", null, 64, -1, 1024);
+		public static final EnumOption<MeterNameTagMode>   RENDER_METER_NAMES   = new EnumOption<> ("redstoneMultimeter.meterNameTags", "Render Meter Names", MeterNameTagMode.class, MeterNameTagMode.IN_FOCUS_MODE);
+		public static final IntegerOption                  METER_NAME_RANGE     = new IntegerOption("redstoneMultimeter.meterNameTagsRange", "Meter Name Range", 16, 0, 64);
+		public static final BooleanOption                  CREATE_GROUP_ON_JOIN = new BooleanOption("redstoneMultimeter.createMeterGroupOnJoin", "Create Group On Join", true);
+		public static final StringOption                   DEFAULT_METER_GROUP  = new StringOption ("redstoneMultimeter.defaultMeterGroup", "Default Meter Group", "", MeterGroup.getMaxNameLength());
+		public static final BooleanOption                  PREVIEW_METER_GROUPS = new BooleanOption("redstoneMultimeter.previewMeterGroups", "Preview Meter Groups", true);
+		public static final BooleanOption                  BYPASS_WARNINGS      = new BooleanOption("redstoneMultimeter.bypassMeterGroupWarnings", "Bypass Meter Group Warnings", false);
 
 	}
 
@@ -207,6 +210,8 @@ public class Options {
 			RedstoneMultimeter.COLOR_PICKER,
 			RedstoneMultimeter.SHIFTY_METERS,
 			RedstoneMultimeter.AUTO_RANDOM_TICKS,
+			RedstoneMultimeter.RENDER_METERS,
+			RedstoneMultimeter.METER_RANGE,
 			RedstoneMultimeter.RENDER_METER_NAMES,
 			RedstoneMultimeter.METER_NAME_RANGE,
 			RedstoneMultimeter.CREATE_GROUP_ON_JOIN,
