@@ -1,0 +1,3 @@
+tiny	2	0	intermediary	named
+c	me/jellysquid/mods/lithium/common/world/chunk/LithiumHashPalette	me/jellysquid/mods/lithium/common/world/chunk/LithiumHashPalette
+	m	()I	getSize	lithium$getSize
