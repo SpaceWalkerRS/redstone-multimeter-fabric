@@ -127,6 +127,21 @@ rsmm.option.redstoneMultimeter.shiftyMeters.description = Use the shift key to c
 rsmm.option.redstoneMultimeter.autoRandomTicks.name = Auto Random Ticks
 rsmm.option.redstoneMultimeter.autoRandomTicks.description = Automatically enable the 'Random Tick' event type when placing a meter on a block that accepts random ticks.
 
+rsmm.option.redstoneMultimeter.meterHighlights.name = Meter Highlights
+rsmm.option.redstoneMultimeter.meterHighlights.description = Render meter highlights in the world.
+rsmm.option.redstoneMultimeter.meterHighlights.value.never.name = Never
+rsmm.option.redstoneMultimeter.meterHighlights.value.never.description = Never render meter highlights.
+rsmm.option.redstoneMultimeter.meterHighlights.value.always.name = Always
+rsmm.option.redstoneMultimeter.meterHighlights.value.always.description = Always render meter highlights.
+rsmm.option.redstoneMultimeter.meterHighlights.value.inFocusMode.name = In Focus Mode
+rsmm.option.redstoneMultimeter.meterHighlights.value.inFocusMode.description = Render meter highlights only when in Focus Mode.
+rsmm.option.redstoneMultimeter.meterHighlights.value.inFocus.name = In Focus
+rsmm.option.redstoneMultimeter.meterHighlights.value.inFocus.description = Render meter highlights only when in Focus Mode, and only for the meter that is currently in focus.
+
+rsmm.option.redstoneMultimeter.meterHighlightsRange.name = Meter Highlights Range
+rsmm.option.redstoneMultimeter.meterHighlightsRange.description = The range within which meter highlights will be rendered.
+rsmm.option.redstoneMultimeter.meterHighlightsRange.value = %s blocks
+
 rsmm.option.redstoneMultimeter.meterNameTags.name = Meter Name Tags
 rsmm.option.redstoneMultimeter.meterNameTags.description = Render meter name tags inside the meter highlights in the world.
 rsmm.option.redstoneMultimeter.meterNameTags.value.never.name = Never
@@ -134,7 +149,7 @@ rsmm.option.redstoneMultimeter.meterNameTags.value.never.description = Never ren
 rsmm.option.redstoneMultimeter.meterNameTags.value.always.name = Always
 rsmm.option.redstoneMultimeter.meterNameTags.value.always.description = Always render meter name tags.
 rsmm.option.redstoneMultimeter.meterNameTags.value.inFocusMode.name = In Focus Mode
-rsmm.option.redstoneMultimeter.meterNameTags.value.inFocusMode.description = Render meter name tags only when in focus mode.
+rsmm.option.redstoneMultimeter.meterNameTags.value.inFocusMode.description = Render meter name tags only when in Focus Mode.
 rsmm.option.redstoneMultimeter.meterNameTags.value.whenPreviewingMeterGroup.name = When Previewing Meter Group
 rsmm.option.redstoneMultimeter.meterNameTags.value.whenPreviewingMeterGroup.description = Render meter name tags only when previewing a meter group.
 
