@@ -32,7 +32,7 @@ public class GameRendererMixin {
 	private void renderMeters(float partialTick, long timeNanos, CallbackInfo ci) {
 		MeterRenderer renderer = MultimeterClient.INSTANCE.getMeterRenderer();
 
-		renderer.renderMeters();
+		renderer.renderMeterHighlights();
 		renderer.renderMeterNameTags();
 	}
 }
