@@ -60,7 +60,7 @@ public class LevelRendererMixin {
 
 			PoseStack poses = new PoseStack();
 
-			renderer.renderMeters(poses, bufferSource);
+			renderer.renderMeterHighlights(poses, bufferSource);
 			renderer.renderMeterNameTags(poses, bufferSource);
 
 			bufferSource.endBatch();
