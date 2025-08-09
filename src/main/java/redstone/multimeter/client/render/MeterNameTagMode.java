@@ -2,7 +2,7 @@ package redstone.multimeter.client.render;
 
 import redstone.multimeter.client.option.Cyclable;
 
-public enum MeterNameMode implements Cyclable<MeterNameMode> {
+public enum MeterNameTagMode implements Cyclable<MeterNameTagMode> {
 
 	NEVER("never", "NEVER"),
 	ALWAYS("always", "ALWAYS"),
@@ -13,7 +13,7 @@ public enum MeterNameMode implements Cyclable<MeterNameMode> {
 	// used for parsing values from before RSMM 1.16
 	private final String legacyKey;
 
-	private MeterNameMode(String key, String legacyKey) {
+	private MeterNameTagMode(String key, String legacyKey) {
 		this.key = key;
 		this.legacyKey = legacyKey;
 	}
