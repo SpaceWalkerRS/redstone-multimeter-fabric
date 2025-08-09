@@ -55,6 +55,7 @@ dependencies {
 		// eclipse gets confused and puts two versions of loader on the classpath...
 		exclude group: 'net.fabricmc'
 	}
+	modImplementation "maven.modrinth:lithium:${project.lithium_version}"
 }
 
 processResources {
