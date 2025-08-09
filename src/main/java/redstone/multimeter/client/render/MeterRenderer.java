@@ -1,5 +1,7 @@
 package redstone.multimeter.client.render;
 
+import java.util.function.Predicate;
+
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -29,52 +31,48 @@ public class MeterRenderer {
 		this.minecraft = this.client.getMinecraft();
 	}
 
-	public void renderMeters(float tickDelta) {
+	public void renderMeterHighlights(float tickDelta) {
 		GlStateManager.disableTexture();
 		GlStateManager.disableCull();
 
-		renderMeters(this::renderMeterHighlight, tickDelta);
+		renderMeters(this::shouldRenderHighlight, this::renderHighlight, tickDelta);
 	}
 
 	public void renderMeterNameTags(float tickDelta) {
 		GlStateManager.disableDepthTest();
 		GlStateManager.enableTexture();
 
-		MeterNameMode mode = Options.RedstoneMultimeter.RENDER_METER_NAMES.get();
-
-		if (mode == MeterNameMode.ALWAYS
-			|| (mode == MeterNameMode.WHEN_PREVIEWING && client.isPreviewing())
-			|| (mode == MeterNameMode.IN_FOCUS_MODE && client.getHud().isFocusMode() && !client.isPreviewing())) {
-			renderMeters(this::renderMeterNameTag, tickDelta);
-		}
+		renderMeters(this::shouldRenderNameTag, this::renderNameTag, tickDelta);
 
 		GlStateManager.enableDepthTest();
 	}
 
-	private void renderMeters(MeterPartRenderer renderer, float tickDelta) {
-		if (client.isPreviewing() || !client.getHud().isFocusMode()) {
-			ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
+	private void renderMeters(Predicate<Meter> predicate, MeterPartRenderer renderer, float tickDelta) {
+		ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
 
-			for (Meter meter : meterGroup.getMeters()) {
-				if (meter.isIn(minecraft.world)) {
-					renderer.render(meter, tickDelta);
-				}
-			}
-		} else {
-			Meter focussed = client.getHud().getFocussedMeter();
-
-			if (focussed != null) {
-				if (focussed.isIn(minecraft.world)) {
-					renderer.render(focussed, tickDelta);
-				}
+		for (Meter meter : meterGroup.getMeters()) {
+			if (meter.isIn(minecraft.world) && predicate.test(meter)) {
+				renderer.render(meter, tickDelta);
 			}
 		}
 	}
 
-	private void renderMeterHighlight(Meter meter, float tickDelta) {
-		Tessellator tesselator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tesselator.getBuilder();
+	private boolean shouldRenderHighlight(Meter meter) {
+		switch (Options.RedstoneMultimeter.RENDER_METERS.get()) {
+		case ALWAYS:
+			return true;
+		case IN_FOCUS:
+			return !client.isPreviewing() && client.getHud().isFocusMode() && client.getHud().getFocussedMeter() == meter;
+		case IN_FOCUS_MODE:
+			return !client.isPreviewing() && client.getHud().isFocusMode();
+		case NEVER:
+			return false;
+		default:
+			throw new IllegalStateException("unknown meter highlight mode " + Options.RedstoneMultimeter.RENDER_METERS.getAsString());
+		}
+	}
 
+	private void renderHighlight(Meter meter, float tickDelta) {
 		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
@@ -87,24 +85,54 @@ public class MeterRenderer {
 		double dx = pos.getX() - cameraX;
 		double dy = pos.getY() - cameraY;
 		double dz = pos.getZ() - cameraZ;
+		double distanceSquared = dx * dx + dy * dy + dz * dz;
 
-		GlStateManager.pushMatrix();;
-		GlStateManager.translated(dx, dy, dz);
+		int range = Options.RedstoneMultimeter.METER_RANGE.get();
+		double rangeSquared = range * range;
 
-		float r = ColorUtils.getRed(color) / (float) 0xFF;
-		float g = ColorUtils.getGreen(color) / (float) 0xFF;
-		float b = ColorUtils.getBlue(color) / (float) 0xFF;
+		if (range < 0 || distanceSquared < rangeSquared) {
+			Tessellator tesselator = Tessellator.getInstance();
+			BufferBuilder buffer = tesselator.getBuilder();
 
-		renderMeterHighlight(bufferBuilder, tesselator, r, g, b, 0.5F);
+			int dim = getHighlightDimmingFactor(meter);
 
-		if (movable) {
-			renderMeterOutline(bufferBuilder, tesselator, r, g, b, 1.0F);
+			float r = ColorUtils.getRed(color) / (float) 0xFF;
+			float g = ColorUtils.getGreen(color) / (float) 0xFF;
+			float b = ColorUtils.getBlue(color) / (float) 0xFF;
+
+			GlStateManager.pushMatrix();;
+			GlStateManager.translated(dx, dy, dz);
+
+			renderMeterHighlight(tesselator, buffer, r, g, b, 0.5F / dim);
+
+			if (movable) {
+				renderMeterOutline(tesselator, buffer, r, g, b, 1.0F / dim);
+			}
+
+			GlStateManager.popMatrix();
 		}
-
-		GlStateManager.popMatrix();
 	}
 
-	private void renderMeterNameTag(Meter meter, float tickDelta) {
+	private int getHighlightDimmingFactor(Meter meter) {
+		return shouldDimMeter(meter) ? 3 : 1;
+	}
+
+	private boolean shouldRenderNameTag(Meter meter) {
+		switch (Options.RedstoneMultimeter.RENDER_METER_NAMES.get()) {
+		case ALWAYS:
+			return true;
+		case IN_FOCUS_MODE:
+			return !client.isPreviewing() && client.getHud().isFocusMode();
+		case WHEN_PREVIEWING:
+			return client.isPreviewing();
+		case NEVER:
+			return false;
+		default:
+			throw new IllegalStateException("unknown meter name tag mode " + Options.RedstoneMultimeter.RENDER_METER_NAMES.getAsString());
+		}
+	}
+
+	private void renderNameTag(Meter meter, float tickDelta) {
 		String name = meter.getName();
 		BlockPos pos = meter.getPos().getBlockPos();
 
@@ -122,20 +150,32 @@ public class MeterRenderer {
 		double rangeSquared = range * range;
 
 		if (distanceSquared < rangeSquared) {
-			renderNameTag(minecraft.textRenderer, name, dx + 0.5D, dy + 0.75D, dz + 0.5D);
+			int dim = getNameTagDimmingFactor(meter);
+			int color = ColorUtils.setAlpha(0xFFFFFF, 0xFF / dim);
+
+			renderNameTag(minecraft.textRenderer, name, dx + 0.5D, dy + 0.75D, dz + 0.5D, color);
 		}
 	}
 
-	private void renderMeterHighlight(BufferBuilder bufferBuilder, Tessellator tessellator, float r, float g, float b, float a) {
-		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
-		drawBox(bufferBuilder, r, g, b, a, false);
-		tessellator.end();
+
+	private int getNameTagDimmingFactor(Meter meter) {
+		return shouldDimMeter(meter) ? 2 : 1;
 	}
 
-	private void renderMeterOutline(BufferBuilder bufferBuilder, Tessellator tessellator, float r, float g, float b, float a) {
-		bufferBuilder.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
-		drawBox(bufferBuilder, r, g, b, a, true);
-		tessellator.end();
+	private boolean shouldDimMeter(Meter meter) {
+		return !client.isPreviewing() && client.getHud().isFocusMode() && client.getHud().getFocussedMeter() != meter;
+	}
+
+	private void renderMeterHighlight(Tessellator tesselator, BufferBuilder buffer, float r, float g, float b, float a) {
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+		drawBox(buffer, r, g, b, a, false);
+		tesselator.end();
+	}
+
+	private void renderMeterOutline(Tessellator tesselator, BufferBuilder buffer, float r, float g, float b, float a) {
+		buffer.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
+		drawBox(buffer, r, g, b, a, true);
+		tesselator.end();
 	}
 
 	private void drawBox(BufferBuilder buffer, float r, float g, float b, float a, boolean outline) {
@@ -198,7 +238,7 @@ public class MeterRenderer {
 		}
 	}
 
-	private void renderNameTag(TextRenderer textRenderer, String name, double dx, double dy, double dz) {
+	private void renderNameTag(TextRenderer textRenderer, String name, double dx, double dy, double dz, int color) {
 		EntityRenderDispatcher entityRenderDispatcher = this.minecraft.getEntityRenderDispatcher();
 
 		float yaw = entityRenderDispatcher.cameraYaw;
@@ -211,7 +251,7 @@ public class MeterRenderer {
 		GlStateManager.rotatef(pitch, 1.0F, 0.0F, 0.0F);
 		GlStateManager.scalef(-0.025F, -0.025F, 0.025F);
 
-		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, 0xFFFFFFFF);
+		textRenderer.draw(name, -textRenderer.getWidth(name) / 2, 0, color);
 
 		GlStateManager.popMatrix();
 	}
