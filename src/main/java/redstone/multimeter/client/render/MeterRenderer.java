@@ -1,5 +1,7 @@
 package redstone.multimeter.client.render;
 
+import java.util.function.Predicate;
+
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -36,41 +38,35 @@ public class MeterRenderer {
 		this.minecraft = this.client.getMinecraft();
 	}
 
-	public void renderMeters(PoseStack poses, BufferSource bufferSource) {
-		renderMeters(poses, bufferSource, this::renderMeterHighlight);
+	public void renderMeterHighlights(PoseStack poses, BufferSource bufferSource) {
+		renderMeters(poses, bufferSource, this::shouldRenderHighlight, this::renderHighlight);
 	}
 
 	public void renderMeterNameTags(PoseStack poses, BufferSource bufferSource) {
-		MeterNameMode mode = Options.RedstoneMultimeter.RENDER_METER_NAMES.get();
-
-		if (mode == MeterNameMode.ALWAYS
-			|| (mode == MeterNameMode.WHEN_PREVIEWING && client.isPreviewing())
-			|| (mode == MeterNameMode.IN_FOCUS_MODE && client.getHud().isFocusMode() && !client.isPreviewing())) {
-			renderMeters(poses, bufferSource, this::renderMeterNameTag);
-		}
+		renderMeters(poses, bufferSource, this::shouldRenderNameTag, this::renderNameTag);
 	}
 
-	private void renderMeters(PoseStack poses, BufferSource bufferSource, MeterPartRenderer renderer) {
-		if (client.isPreviewing() || !client.getHud().isFocusMode()) {
-			ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
+	private void renderMeters(PoseStack poses, BufferSource bufferSource, Predicate<Meter> predicate, MeterPartRenderer renderer) {
+		ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
 
-			for (Meter meter : meterGroup.getMeters()) {
-				if (meter.isIn(minecraft.level)) {
-					renderer.render(poses, bufferSource, meter);
-				}
-			}
-		} else {
-			Meter focussed = client.getHud().getFocussedMeter();
-
-			if (focussed != null) {
-				if (focussed.isIn(minecraft.level)) {
-					renderer.render(poses, bufferSource, focussed);
-				}
+		for (Meter meter : meterGroup.getMeters()) {
+			if (meter.isIn(minecraft.level) && predicate.test(meter)) {
+				renderer.render(poses, bufferSource, meter);
 			}
 		}
 	}
 
-	private void renderMeterHighlight(PoseStack poses, BufferSource bufferSource, Meter meter) {
+	private boolean shouldRenderHighlight(Meter meter) {
+		return switch (Options.RedstoneMultimeter.RENDER_METERS.get()) {
+			case ALWAYS        -> true;
+			case IN_FOCUS      -> !client.isPreviewing() && client.getHud().isFocusMode() && client.getHud().getFocussedMeter() == meter;
+			case IN_FOCUS_MODE -> !client.isPreviewing() && client.getHud().isFocusMode();
+			case NEVER         -> false;
+			default -> throw new IllegalStateException("unknown meter highlight mode " + Options.RedstoneMultimeter.RENDER_METERS.getAsString());
+		};
+	}
+
+	private void renderHighlight(PoseStack poses, BufferSource bufferSource, Meter meter) {
 		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
@@ -82,23 +78,44 @@ public class MeterRenderer {
 		double dy = pos.getY() - cameraPos.y;
 		double dz = pos.getZ() - cameraPos.z;
 
-		poses.pushPose();
-		poses.translate(dx, dy, dz);
+		int range = Options.RedstoneMultimeter.METER_RANGE.get();
+		double rangeSquared = range * range;
 
-		float r = ColorUtils.getRed(color) / (float) 0xFF;
-		float g = ColorUtils.getGreen(color) / (float) 0xFF;
-		float b = ColorUtils.getBlue(color) / (float) 0xFF;
+		if (range < 0 || Mth.lengthSquared(dx, dy, dz) < rangeSquared) {
+			int dim = getHighlightDimmingFactor(meter);
 
-		renderMeterHighlight(bufferSource, poses, r, g, b, 0.5F);
+			float r = ColorUtils.getRed(color) / (float) 0xFF;
+			float g = ColorUtils.getGreen(color) / (float) 0xFF;
+			float b = ColorUtils.getBlue(color) / (float) 0xFF;
 
-		if (movable) {
-			renderMeterOutline(bufferSource, poses, r, g, b, 1.0F);
+			poses.pushPose();
+			poses.translate(dx, dy, dz);
+
+			renderMeterHighlight(bufferSource, poses, r, g, b, 0.5F / dim);
+
+			if (movable) {
+				renderMeterOutline(bufferSource, poses, r, g, b, 1.0F / dim);
+			}
+
+			poses.popPose();
 		}
-
-		poses.popPose();
 	}
 
-	private void renderMeterNameTag(PoseStack poses, BufferSource bufferSource, Meter meter) {
+	private int getHighlightDimmingFactor(Meter meter) {
+		return shouldDimMeter(meter) ? 3 : 1;
+	}
+
+	private boolean shouldRenderNameTag(Meter meter) {
+		return switch (Options.RedstoneMultimeter.RENDER_METER_NAMES.get()) {
+			case ALWAYS          -> true;
+			case IN_FOCUS_MODE   -> !client.isPreviewing() && client.getHud().isFocusMode();
+			case WHEN_PREVIEWING -> client.isPreviewing();
+			case NEVER           -> false;
+			default -> throw new IllegalStateException("unknown meter name tag mode " + Options.RedstoneMultimeter.RENDER_METER_NAMES.getAsString());
+		};
+	}
+
+	private void renderNameTag(PoseStack poses, BufferSource bufferSource, Meter meter) {
 		String name = meter.getName();
 		BlockPos pos = meter.getPos().getBlockPos();
 
@@ -113,6 +130,8 @@ public class MeterRenderer {
 		double rangeSquared = range * range;
 
 		if (Mth.lengthSquared(dx, dy, dz) < rangeSquared) {
+			int dim = getNameTagDimmingFactor(meter);
+
 			poses.pushPose();
 			poses.translate(dx + 0.5D, dy + 0.75D, dz + 0.5D);
 			poses.mulPose(camera.rotation());
@@ -123,10 +142,18 @@ public class MeterRenderer {
 			float x = -(minecraft.font.width(name) / 2.0F);
 			float y = 0;
 
-			minecraft.font.drawInBatch(name, x, y, 0xFFFFFFFF, false, pose, bufferSource, true, 0, LightTexture.pack(15, 15));
+			minecraft.font.drawInBatch(name, x, y, ColorUtils.setAlpha(0xFFFFFF, 0xFF / dim), false, pose, bufferSource, true, 0, LightTexture.pack(15, 15));
 
 			poses.popPose();
 		}
+	}
+
+	private int getNameTagDimmingFactor(Meter meter) {
+		return shouldDimMeter(meter) ? 2 : 1;
+	}
+
+	private boolean shouldDimMeter(Meter meter) {
+		return !client.isPreviewing() && client.getHud().isFocusMode() && client.getHud().getFocussedMeter() != meter;
 	}
 
 	private void renderMeterHighlight(BufferSource bufferSource, PoseStack poses, float r, float g, float b, float a) {
