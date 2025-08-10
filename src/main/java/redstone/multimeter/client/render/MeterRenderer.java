@@ -60,7 +60,7 @@ public class MeterRenderer {
 	private boolean shouldRenderHighlight(Meter meter) {
 		return switch (Options.RedstoneMultimeter.RENDER_METERS.get()) {
 			case ALWAYS        -> true;
-			case IN_FOCUS      -> !client.isPreviewing() && client.getHud().isFocusMode() && client.getHud().getFocussedMeter() == meter;
+			case IN_FOCUS      -> client.isPreviewing() || !client.getHud().isFocusMode() || client.getHud().getFocussedMeter() == meter;
 			case IN_FOCUS_MODE -> !client.isPreviewing() && client.getHud().isFocusMode();
 			case NEVER         -> false;
 			default -> throw new IllegalStateException("unknown meter highlight mode " + Options.RedstoneMultimeter.RENDER_METERS.getAsString());
@@ -106,6 +106,7 @@ public class MeterRenderer {
 		return switch (Options.RedstoneMultimeter.RENDER_METER_NAMES.get()) {
 			case ALWAYS          -> true;
 			case IN_FOCUS_MODE   -> !client.isPreviewing() && client.getHud().isFocusMode();
+			case IN_FOCUS        -> !client.isPreviewing() && client.getHud().isFocusMode() && client.getHud().getFocussedMeter() == meter;
 			case WHEN_PREVIEWING -> client.isPreviewing();
 			case NEVER           -> false;
 			default -> throw new IllegalStateException("unknown meter name tag mode " + Options.RedstoneMultimeter.RENDER_METER_NAMES.getAsString());
