@@ -63,7 +63,7 @@ public class MeterRenderer {
 		case ALWAYS:
 			return true;
 		case IN_FOCUS:
-			return !client.isPreviewing() && client.getHud().isFocusMode() && client.getHud().getFocussedMeter() == meter;
+			return client.isPreviewing() || !client.getHud().isFocusMode() || client.getHud().getFocussedMeter() == meter;
 		case IN_FOCUS_MODE:
 			return !client.isPreviewing() && client.getHud().isFocusMode();
 		case NEVER:
@@ -122,6 +122,8 @@ public class MeterRenderer {
 			return true;
 		case IN_FOCUS_MODE:
 			return !client.isPreviewing() && client.getHud().isFocusMode();
+		case IN_FOCUS:
+			return !client.isPreviewing() && client.getHud().isFocusMode() && client.getHud().getFocussedMeter() == meter;
 		case WHEN_PREVIEWING:
 			return client.isPreviewing();
 		case NEVER:
