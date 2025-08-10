@@ -6,8 +6,8 @@ public enum MeterHighlightMode implements Cyclable<MeterHighlightMode> {
 
 	NEVER("never"),
 	ALWAYS("always"),
-	IN_FOCUS_MODE("inFocusMode"),
-	IN_FOCUS("inFocus");
+	IN_FOCUS("inFocus"),
+	IN_FOCUS_MODE("inFocusMode");
 
 	private final String key;
 
