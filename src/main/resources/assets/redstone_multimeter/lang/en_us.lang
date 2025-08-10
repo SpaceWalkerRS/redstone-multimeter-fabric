@@ -133,10 +133,10 @@ rsmm.option.redstoneMultimeter.meterHighlights.value.never.name = Never
 rsmm.option.redstoneMultimeter.meterHighlights.value.never.description = Never render meter highlights.
 rsmm.option.redstoneMultimeter.meterHighlights.value.always.name = Always
 rsmm.option.redstoneMultimeter.meterHighlights.value.always.description = Always render meter highlights.
+rsmm.option.redstoneMultimeter.meterHighlights.value.inFocus.name = In Focus
+rsmm.option.redstoneMultimeter.meterHighlights.value.inFocus.description = Always render meter highlights, except when in Focus Mode, then only for the meter that is currently in focus.
 rsmm.option.redstoneMultimeter.meterHighlights.value.inFocusMode.name = In Focus Mode
 rsmm.option.redstoneMultimeter.meterHighlights.value.inFocusMode.description = Render meter highlights only when in Focus Mode.
-rsmm.option.redstoneMultimeter.meterHighlights.value.inFocus.name = In Focus
-rsmm.option.redstoneMultimeter.meterHighlights.value.inFocus.description = Render meter highlights only when in Focus Mode, and only for the meter that is currently in focus.
 
 rsmm.option.redstoneMultimeter.meterHighlightsRange.name = Meter Highlights Range
 rsmm.option.redstoneMultimeter.meterHighlightsRange.description = The range within which meter highlights will be rendered.
@@ -150,6 +150,8 @@ rsmm.option.redstoneMultimeter.meterNameTags.value.always.name = Always
 rsmm.option.redstoneMultimeter.meterNameTags.value.always.description = Always render meter name tags.
 rsmm.option.redstoneMultimeter.meterNameTags.value.inFocusMode.name = In Focus Mode
 rsmm.option.redstoneMultimeter.meterNameTags.value.inFocusMode.description = Render meter name tags only when in Focus Mode.
+rsmm.option.redstoneMultimeter.meterNameTags.value.inFocus.name = In Focus
+rsmm.option.redstoneMultimeter.meterNameTags.value.inFocus.description = Render meter name tags only when in Focus Mode, and only for the meter that is currently in focus.
 rsmm.option.redstoneMultimeter.meterNameTags.value.whenPreviewingMeterGroup.name = When Previewing Meter Group
 rsmm.option.redstoneMultimeter.meterNameTags.value.whenPreviewingMeterGroup.description = Render meter name tags only when previewing a meter group.
 
