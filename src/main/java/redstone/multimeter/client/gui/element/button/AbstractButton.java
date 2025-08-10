@@ -105,16 +105,35 @@ public abstract class AbstractButton extends AbstractElement implements Button {
 		Text message = this.getMessage();
 
 		if (message != null) {
-			int x = this.getMessageX(message);
+			this.renderScrollingText(renderer, message);
+		}
+	}
+
+	protected void renderScrollingText(GuiRenderer renderer, Text message) {
+		int buttonWidth = this.getWidth();
+		int availableWidth = buttonWidth - 2 * EDGE;
+		int messageWidth = renderer.width(message);
+
+		if (messageWidth > availableWidth) {
+			int x = this.getX() + buttonWidth - (buttonWidth + availableWidth) / 2;
+			int y = this.getMessageY();
+			int color = this.getMessageColor();
+
+			double time = System.nanoTime() / 1000000000.0D;
+			double progress = 0.5D + Math.sin(time) / 2;
+			int maxScroll = messageWidth - availableWidth;
+			int scroll = (int) (maxScroll * progress);
+
+			renderer.pushScissor(x, y, x + availableWidth, y + this.font.height());
+			renderer.drawStringWithShadow(message, x - scroll, y, color);
+			renderer.popScissor();
+		} else {
+			int x = this.getX() + buttonWidth - (buttonWidth + messageWidth) / 2;
 			int y = this.getMessageY();
 			int color = this.getMessageColor();
 
 			renderer.drawStringWithShadow(message, x, y, color);
 		}
-	}
-
-	protected int getMessageX(Text message) {
-		return this.getX() + this.getWidth() - (this.getWidth() + this.font.width(message)) / 2;
 	}
 
 	public int getMessageY() {
