@@ -26,6 +26,7 @@ import net.minecraft.world.chunk.WorldChunkSection;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.storage.WorldStorage;
 
+import redstone.multimeter.common.BlockEventStatus;
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
@@ -378,7 +379,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		)
 	)
 	private void addBlockEvent(BlockPos pos, Block block, int type, int data, CallbackInfo ci) {
-		getMultimeter().logBlockEvent(this, pos, type, rsmm$currentDepth + 1, true);
+		getMultimeter().logBlockEvent(this, pos, type, rsmm$currentDepth + 1, BlockEventStatus.QUEUED);
 	}
 
 	@Inject(
@@ -420,7 +421,17 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		)
 	)
 	private void logBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
-		getMultimeter().logBlockEvent(this, blockEvent.getPos(), blockEvent.getType(), rsmm$currentDepth, false);
+		getMultimeter().logBlockEvent(this, blockEvent.getPos(), blockEvent.getType(), rsmm$currentDepth, BlockEventStatus.TRIGGERED);
+	}
+
+	@Inject(
+		method = "doBlockEvent",
+		at = @At(
+			value = "RETURN"
+		)
+	)
+	private void logBlockEventResult(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
+		getMultimeter().logBlockEvent(this, blockEvent.getPos(), blockEvent.getType(), rsmm$currentDepth, cir.getReturnValue() ? BlockEventStatus.SUCCESS : BlockEventStatus.FAILURE);
 	}
 
 	@Override
