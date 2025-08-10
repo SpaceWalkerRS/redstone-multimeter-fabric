@@ -9,6 +9,7 @@ import net.minecraft.nbt.NbtElement;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.tooltip.TooltipBuilder;
+import redstone.multimeter.common.BlockEventStatus;
 import redstone.multimeter.util.Direction;
 import redstone.multimeter.util.NbtUtils;
 
@@ -65,12 +66,12 @@ public enum EventType {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
-			String status = ((metadata >> 30) == 1) ? "queueing" : "performing";
+			BlockEventStatus status = BlockEventStatus.byId(metadata >> 29);
 			int depth = (metadata >> 4) & 0xFFFF;
 			int type  =  metadata       & 0xF;
 
 			builder
-				.line(Texts.keyValue("status", status))
+				.line(Texts.keyValue("status", status.key()))
 				.line(Texts.keyValue("type", type))
 				.line(Texts.keyValue("depth", depth));
 		}
