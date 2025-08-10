@@ -30,6 +30,7 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.WritableLevelData;
 
+import redstone.multimeter.common.BlockEventStatus;
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.BlockEventListener;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
@@ -411,7 +412,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel, Bl
 		// can exist at any time. To check whether the block event was added, we
 		// check the queue size before and after the new block event was offered.
 		if (rsmm$queueSize < blockEvents.size()) {
-			getMultimeter().logBlockEvent(this, pos, type, rsmm$currentDepth + 1, true);
+			getMultimeter().logBlockEvent(this, pos, type, rsmm$currentDepth + 1, BlockEventStatus.QUEUED);
 		}
 	}
 
@@ -454,7 +455,17 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel, Bl
 		)
 	)
 	private void logBlockEvent(BlockEventData blockEvent, CallbackInfoReturnable<Boolean> cir) {
-		getMultimeter().logBlockEvent(this, blockEvent.getPos(), blockEvent.getParamA(), rsmm$currentDepth, false);
+		getMultimeter().logBlockEvent(this, blockEvent.getPos(), blockEvent.getParamA(), rsmm$currentDepth, BlockEventStatus.TRIGGERED);
+	}
+
+	@Inject(
+		method = "doBlockEvent",
+		at = @At(
+			value = "RETURN"
+		)
+	)
+	private void logBlockEventResult(BlockEventData blockEvent, CallbackInfoReturnable<Boolean> cir) {
+		getMultimeter().logBlockEvent(this, blockEvent.getPos(), blockEvent.getParamA(), rsmm$currentDepth, cir.getReturnValue() ? BlockEventStatus.SUCCESS : BlockEventStatus.FAILURE);
 	}
 
 	@Override
