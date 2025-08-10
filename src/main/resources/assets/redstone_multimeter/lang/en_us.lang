@@ -124,7 +124,7 @@ rsmm.option.redstoneMultimeter.colorPicker.value.rainbow.name = Rainbow
 rsmm.option.redstoneMultimeter.colorPicker.value.rainbow.description = Cycle through 32 evenly spaced hues.
 
 rsmm.option.redstoneMultimeter.shiftyMeters.name = Shifty Meters
-rsmm.option.redstoneMultimeter.shiftyMeters.description = Use the shift key to control whether a new meter is movable or not.
+rsmm.option.redstoneMultimeter.shiftyMeters.description = Use the shift key to make new meters immovable.
 
 rsmm.option.redstoneMultimeter.autoRandomTicks.name = Auto Random Ticks
 rsmm.option.redstoneMultimeter.autoRandomTicks.description = Automatically enable the 'Random Tick' event type when placing a meter on a block that accepts random ticks.
