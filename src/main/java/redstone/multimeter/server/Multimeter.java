@@ -30,6 +30,7 @@ import redstone.multimeter.client.gui.text.HoverEvent;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.TextColor;
 import redstone.multimeter.client.gui.text.Texts;
+import redstone.multimeter.common.BlockEventStatus;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
@@ -591,8 +592,8 @@ public class Multimeter {
 		tryLogEvent(world, x, y, z, EventType.SCHEDULED_TICK, (scheduling ? (1 << 30) : 0) | (priority + 3));
 	}
 
-	public void logBlockEvent(World world, int x, int y, int z, int type, int depth, boolean queueing) {
-		tryLogEvent(world, x, y, z, EventType.BLOCK_EVENT, (queueing ? (1 << 30) : 0) | (depth << 4) | type);
+	public void logBlockEvent(World world, int x, int y, int z, int type, int depth, BlockEventStatus status) {
+		tryLogEvent(world, x, y, z, EventType.BLOCK_EVENT, (status.id() << 29) | (depth << 4) | type);
 	}
 
 	public void logEntityTick(World world, Entity entity) {
