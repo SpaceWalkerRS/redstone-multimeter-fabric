@@ -33,7 +33,7 @@ public class Options {
 		public static final BooleanOption                  AUTO_RANDOM_TICKS    = new BooleanOption("redstoneMultimeter.autoRandomTicks", "Auto Random Ticks", true);
 		public static final EnumOption<MeterHighlightMode> RENDER_METERS        = new EnumOption<> ("redstoneMultimeter.meterHighlights", null, MeterHighlightMode.class, MeterHighlightMode.ALWAYS);
 		public static final IntegerOption                  METER_RANGE          = new IntegerOption("redstoneMultimeter.meterHighlightsRange", null, 64, -1, 1024);
-		public static final EnumOption<MeterNameTagMode>   RENDER_METER_NAMES   = new EnumOption<> ("redstoneMultimeter.meterNameTags", "Render Meter Names", MeterNameTagMode.class, MeterNameTagMode.IN_FOCUS_MODE);
+		public static final EnumOption<MeterNameTagMode>   RENDER_METER_NAMES   = new EnumOption<> ("redstoneMultimeter.meterNameTags", "Render Meter Names", MeterNameTagMode.class, MeterNameTagMode.IN_FOCUS);
 		public static final IntegerOption                  METER_NAME_RANGE     = new IntegerOption("redstoneMultimeter.meterNameTagsRange", "Meter Name Range", 16, 0, 64);
 		public static final BooleanOption                  CREATE_GROUP_ON_JOIN = new BooleanOption("redstoneMultimeter.createMeterGroupOnJoin", "Create Group On Join", true);
 		public static final StringOption                   DEFAULT_METER_GROUP  = new StringOption ("redstoneMultimeter.defaultMeterGroup", "Default Meter Group", "", MeterGroup.getMaxNameLength());
