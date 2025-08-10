@@ -75,7 +75,7 @@ public class MeterListRenderer extends AbstractElement {
 				if (cursorRow < 0) {
 					consumed = hud.selectMeter(cursorOriginRow);
 				}
-			} else {
+			} else if (isMouseOver(mouseX, mouseY)) {
 				consumed = changeMeterIndex(cursorMeter, cursorOriginRow, hud.getHoveredRow(mouseY));
 			}
 
