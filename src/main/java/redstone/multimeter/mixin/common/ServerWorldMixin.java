@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.llamalad7.mixinextras.sugar.Local;
 
-import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ScheduledTick;
@@ -29,6 +28,7 @@ import net.minecraft.world.chunk.WorldChunkSection;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.storage.WorldStorage;
 
+import redstone.multimeter.common.BlockEventStatus;
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IMinecraftServer;
 import redstone.multimeter.interfaces.mixin.IServerWorld;
@@ -343,7 +343,7 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		)
 	)
 	private void addBlockEvent(int x, int y, int z, int block, int type, int data, CallbackInfo ci) {
-		getMultimeter().logBlockEvent(this, x, y, z, type, rsmm$currentDepth + 1, true);
+		getMultimeter().logBlockEvent(this, x, y, z, type, rsmm$currentDepth + 1, BlockEventStatus.QUEUED);
 	}
 
 	@Inject(
@@ -385,7 +385,17 @@ public abstract class ServerWorldMixin extends World implements IServerWorld {
 		)
 	)
 	private void logBlockEvent(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
-		getMultimeter().logBlockEvent(this, blockEvent.getX(), blockEvent.getY(), blockEvent.getZ(), blockEvent.getType(), rsmm$currentDepth, false);
+		getMultimeter().logBlockEvent(this, blockEvent.getX(), blockEvent.getY(), blockEvent.getZ(), blockEvent.getType(), rsmm$currentDepth, BlockEventStatus.TRIGGERED);
+	}
+
+	@Inject(
+		method = "doBlockEvent",
+		at = @At(
+			value = "RETURN"
+		)
+	)
+	private void logBlockEventResult(BlockEvent blockEvent, CallbackInfoReturnable<Boolean> cir) {
+		getMultimeter().logBlockEvent(this, blockEvent.getX(), blockEvent.getY(), blockEvent.getZ(), blockEvent.getType(), rsmm$currentDepth, cir.getReturnValue() ? BlockEventStatus.SUCCESS : BlockEventStatus.FAILURE);
 	}
 
 	@Override
