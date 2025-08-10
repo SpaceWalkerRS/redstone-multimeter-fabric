@@ -7,6 +7,7 @@ public enum MeterNameTagMode implements Cyclable<MeterNameTagMode> {
 	NEVER("never", "NEVER"),
 	ALWAYS("always", "ALWAYS"),
 	IN_FOCUS_MODE("inFocusMode", "IN_FOCUS_MODE"),
+	IN_FOCUS("inFocus", null),
 	WHEN_PREVIEWING("whenPreviewingMeterGroup", "WHEN_PREVIEWING");
 
 	private final String key;
