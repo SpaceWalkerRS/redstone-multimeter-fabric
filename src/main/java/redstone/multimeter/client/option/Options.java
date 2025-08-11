@@ -74,7 +74,7 @@ public class Options {
 	public static class Miscellaneous {
 
 		public static final IntegerOption                SCROLL_SPEED         = new IntegerOption("miscellaneous.scrollSpeed", "Scroll Speed", 7, 1, 69);
-		public static final IntegerOption                DOUBLE_CLICK_TIME    = new IntegerOption("miscellaneous.doubleClickTime", "Double Click Time", 5, 1, 500);
+		public static final IntegerOption                DOUBLE_CLICK_TIME    = new IntegerOption("miscellaneous.doubleClickTime", "Double Click Time", 5, 1, 20);
 		public static final BooleanOption                VERSION_WARNING      = new BooleanOption("miscellaneous.serverVersionWarning", "Version Warning", true);
 
 	}
