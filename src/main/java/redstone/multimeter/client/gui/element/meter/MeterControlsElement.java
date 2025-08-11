@@ -197,22 +197,6 @@ public class MeterControlsElement extends AbstractParentElement {
 
 			return (double)red / 0xFF;
 		}, 0xFF));
-		color.addControl("blue", style -> style.withColor(Formatting.BLUE), new Slider(0, 0, 0, 0, () -> {
-			int c = this.meter.getColor();
-			int blue = ColorUtils.getBlue(c);
-
-			return Texts.literal(String.valueOf(blue));
-		}, Tooltips::empty, value -> {
-			int blue = (int)Math.round(value * 0xFF);
-			int c = ColorUtils.setBlue(this.meter.getColor(), blue);
-
-			this.changeColor(c);
-		}, () -> {
-			int c = this.meter.getColor();
-			int blue = ColorUtils.getBlue(c);
-
-			return (double)blue / 0xFF;
-		}, 0xFF));
 		color.addControl("green", style -> style.withColor(Formatting.GREEN), new Slider(0, 0, 0, 0, () -> {
 			int c = this.meter.getColor();
 			int green = ColorUtils.getGreen(c);
@@ -228,6 +212,22 @@ public class MeterControlsElement extends AbstractParentElement {
 			int green = ColorUtils.getGreen(c);
 
 			return (double)green / 0xFF;
+		}, 0xFF));
+		color.addControl("blue", style -> style.withColor(Formatting.BLUE), new Slider(0, 0, 0, 0, () -> {
+			int c = this.meter.getColor();
+			int blue = ColorUtils.getBlue(c);
+
+			return Texts.literal(String.valueOf(blue));
+		}, Tooltips::empty, value -> {
+			int blue = (int)Math.round(value * 0xFF);
+			int c = ColorUtils.setBlue(this.meter.getColor(), blue);
+
+			this.changeColor(c);
+		}, () -> {
+			int c = this.meter.getColor();
+			int blue = ColorUtils.getBlue(c);
+
+			return (double)blue / 0xFF;
 		}, 0xFF));
 
 		MeterPropertyElement movable = new MeterPropertyElement(totalWidth, buttonWidth, "movable");
