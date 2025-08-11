@@ -54,7 +54,7 @@ public enum EventType {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
-			String status = ((metadata >> 30) == 1) ? "scheduling" : "performing";
+			String status = ((metadata >> 30) == 1) ? "scheduled" : "ticked";
 			int priority = (metadata & 0xF) - 3;
 
 			builder
