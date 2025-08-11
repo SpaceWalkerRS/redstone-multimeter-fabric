@@ -294,23 +294,6 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 				return (double)red / 0xFF;
 			}, 0xFF));
-			color.addControl("blue", style -> style.withColor(Formatting.BLUE), new Slider(0, 0, 0, 0, () -> {
-				int c = properties.color();
-				int blue = ColorUtils.getBlue(c);
-
-				return Texts.literal(String.valueOf(blue));
-			}, Tooltips::empty, value -> {
-				int blue = (int)Math.round(value * 0xFF);
-				int c = ColorUtils.setBlue(properties.color(), blue);
-
-				properties.setColor(c);
-				color.update();
-			}, () -> {
-				int c = properties.color();
-				int blue = ColorUtils.getBlue(c);
-
-				return (double)blue / 0xFF;
-			}, 0xFF));
 			color.addControl("green", style -> style.withColor(Formatting.GREEN), new Slider(0, 0, 0, 0, () -> {
 				int c = properties.color();
 				int green = ColorUtils.getGreen(c);
@@ -327,6 +310,23 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 				int green = ColorUtils.getGreen(c);
 
 				return (double)green / 0xFF;
+			}, 0xFF));
+			color.addControl("blue", style -> style.withColor(Formatting.BLUE), new Slider(0, 0, 0, 0, () -> {
+				int c = properties.color();
+				int blue = ColorUtils.getBlue(c);
+
+				return Texts.literal(String.valueOf(blue));
+			}, Tooltips::empty, value -> {
+				int blue = (int)Math.round(value * 0xFF);
+				int c = ColorUtils.setBlue(properties.color(), blue);
+
+				properties.setColor(c);
+				color.update();
+			}, () -> {
+				int c = properties.color();
+				int blue = ColorUtils.getBlue(c);
+
+				return (double)blue / 0xFF;
 			}, 0xFF));
 
 			switch (currentTab) {
