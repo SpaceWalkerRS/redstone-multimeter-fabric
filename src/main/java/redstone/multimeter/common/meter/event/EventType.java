@@ -54,8 +54,8 @@ public enum EventType {
 
 		@Override
 		public void buildTooltip(TooltipBuilder builder, int metadata) {
-		// tick priorities were added in 1.4 snapshots!
-			String status = ((metadata >> 30) == 1) ? "scheduling" : "performing";
+			// tick priorities were added in 1.4 snapshots!
+			String status = ((metadata >> 30) == 1) ? "scheduled" : "ticked";
 //			int priority = (metadata & 0xF) - 3;
 
 			builder
