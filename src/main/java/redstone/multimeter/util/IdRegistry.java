@@ -11,7 +11,7 @@ public class IdRegistry extends MappedRegistry/*<String, Integer>*/ {
 
 	private final Int2ObjectMap<String> keys = new Int2ObjectOpenHashMap<>();
 
-	public int getValue(String key) {
+	public Integer getValue(String key) {
 		return (Integer) super.get(key);
 	}
 
