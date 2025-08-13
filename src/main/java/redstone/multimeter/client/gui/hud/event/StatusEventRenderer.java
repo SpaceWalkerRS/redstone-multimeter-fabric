@@ -6,9 +6,9 @@ import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.event.MeterEvent;
 
-public class ScheduledEventRenderer extends BasicEventRenderer {
+public abstract class StatusEventRenderer extends BasicEventRenderer {
 
-	public ScheduledEventRenderer(MultimeterHud hud, EventType type) {
+	public StatusEventRenderer(MultimeterHud hud, EventType type) {
 		super(hud);
 
 		this.setType(type);
@@ -16,7 +16,7 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 
 	@Override
 	protected void drawEdges(GuiRenderer renderer, int x, int y, Meter meter, MeterEvent event) {
-		if (scheduling(event)) {
+		if (vertical(event)) {
 			int width = hud.settings.scale * (3 + hud.settings.wparity);
 			int widthOffset = (hud.settings.columnWidth - width) / 2;
 			int height = hud.settings.scale * (hud.settings.rowHeight / hud.settings.scale / 3 + 2);
@@ -40,7 +40,7 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 
 	@Override
 	protected void drawCenter(GuiRenderer renderer, int x, int y, Meter meter, MeterEvent event) {
-		if (scheduling(event)) {
+		if (vertical(event)) {
 			int width = hud.settings.scale * (1 + hud.settings.wparity);
 			int widthOffset = (hud.settings.columnWidth - width) / 2;
 			int height = hud.settings.scale * (hud.settings.rowHeight / hud.settings.scale / 3);
@@ -62,7 +62,6 @@ public class ScheduledEventRenderer extends BasicEventRenderer {
 		}
 	}
 
-	protected boolean scheduling(MeterEvent event) {
-		return (event.getMetadata() >> 30) == 1;
-	}
+	protected abstract boolean vertical(MeterEvent event);
+
 }
