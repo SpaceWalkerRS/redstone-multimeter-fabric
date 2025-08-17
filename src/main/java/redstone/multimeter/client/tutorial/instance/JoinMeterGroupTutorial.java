@@ -1,27 +1,24 @@
 package redstone.multimeter.client.tutorial.instance;
 
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
-import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 
-public class JoinMeterGroupTutorial extends TutorialInstance {
+public class JoinMeterGroupTutorial implements TutorialInstance {
 
-	public JoinMeterGroupTutorial(Tutorial tutorial) {
-		super(tutorial);
-	}
+	private boolean completed;
 
 	@Override
 	public void onJoinMeterGroup() {
-		completed = true;
+		this.completed = true;
 	}
 
 	@Override
 	public void onMeterGroupRefreshed() {
-		completed = true;
+		this.completed = true;
 	}
 
 	@Override
-	protected TutorialToast createToast() {
+	public TutorialToast createToast() {
 		return new TutorialToast(
 			TutorialStep.JOIN_METER_GROUP.getName(),
 			TutorialStep.JOIN_METER_GROUP.getDescription()
@@ -29,11 +26,20 @@ public class JoinMeterGroupTutorial extends TutorialInstance {
 	}
 
 	@Override
+	public void init() {
+	}
+
+	@Override
 	public void tick() {
 	}
 
 	@Override
-	public TutorialStep getNextStep() {
+	public boolean isCompleted() {
+		return this.completed;
+	}
+
+	@Override
+	public TutorialStep nextStep() {
 		return TutorialStep.PLACE_METER;
 	}
 }

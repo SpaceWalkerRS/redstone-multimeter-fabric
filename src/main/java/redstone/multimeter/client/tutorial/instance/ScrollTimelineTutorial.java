@@ -6,25 +6,18 @@ import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
-import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
-public class ScrollTimelineTutorial extends StagedTutorialInstance {
+public class ScrollTimelineTutorial implements StagedTutorialInstance {
 
 	private static final int TIMES_SCROLLED_TARGET = 5;
 
 	private Stage stage;
 	private int timesScrolled;
 
-	public ScrollTimelineTutorial(Tutorial tutorial) {
-		super(tutorial);
-
-		findStage();
-	}
-
 	@Override
-	protected TutorialToast createToast() {
+	public TutorialToast createToast() {
 		return new StagedTutorialToast(
 			this,
 			TutorialStep.SCROLL_TIMELINE.getName(),
@@ -38,52 +31,63 @@ public class ScrollTimelineTutorial extends StagedTutorialInstance {
 
 	@Override
 	public void onToggleHud(boolean enabled) {
-		if (!enabled || stage == Stage.ACTIVE_HUD) {
-			findStage();
+		if (!enabled || this.stage == Stage.ACTIVE_HUD) {
+			this.updateStage();
 		}
 	}
 
 	@Override
 	public void onPauseHud(boolean paused) {
-		if (!paused || stage == Stage.PAUSE_HUD) {
-			findStage();
+		if (!paused || this.stage == Stage.PAUSE_HUD) {
+			this.updateStage();
 		}
 	}
 
 	@Override
 	public void onScrollHud(int amount) {
-		if (stage == Stage.SCROLL_HUD && amount != 0 && ++timesScrolled >= TIMES_SCROLLED_TARGET) {
-			completed = true;
+		if (this.stage == Stage.SCROLL_HUD) {
+			if (amount != 0) {
+				this.timesScrolled++;
+			}
+
+			this.updateStage();
 		}
 	}
 
 	@Override
 	public void onJoinMeterGroup() {
-		if (stage == Stage.JOIN_METER_GROUP) {
-			findStage();
+		if (this.stage == Stage.JOIN_METER_GROUP) {
+			this.updateStage();
 		}
 	}
 
 	@Override
 	public void onLeaveMeterGroup() {
-		findStage();
+		this.updateStage();
 	}
 
 	@Override
 	public void onMeterGroupRefreshed() {
-		findStage();
+		if (this.stage == Stage.JOIN_METER_GROUP) {
+			this.updateStage();
+		}
 	}
 
 	@Override
 	public void onMeterAdded(Meter meter) {
-		if (stage == Stage.ADD_METER) {
-			findStage();
+		if (this.stage == Stage.ADD_METER) {
+			this.updateStage();
 		}
 	}
 
 	@Override
 	public void onMeterRemoved(Meter meter) {
-		findStage();
+		this.updateStage();
+	}
+
+	@Override
+	public void init() {
+		this.updateStage();
 	}
 
 	@Override
@@ -91,41 +95,54 @@ public class ScrollTimelineTutorial extends StagedTutorialInstance {
 	}
 
 	@Override
-	public TutorialStep getNextStep() {
+	public boolean isCompleted() {
+		return this.stage == Stage.COMPLETED;
+	}
+
+	@Override
+	public TutorialStep nextStep() {
 		return TutorialStep.OPEN_MULTIMETER_SCREEN;
 	}
 
 	@Override
 	public float getProgress() {
-		float progress = completed ? 1.0F : (float)stage.ordinal() / 5;
+		float progress = (float) this.stage.ordinal() / (Stage.values().length - 1);
 
-		if (stage == Stage.SCROLL_HUD) {
-			progress += (float)timesScrolled / (5 * TIMES_SCROLLED_TARGET);
+		if (this.stage == Stage.SCROLL_HUD) {
+			progress += (float) this.timesScrolled / (5 * TIMES_SCROLLED_TARGET);
 		}
 
 		return progress;
 	}
 
-	private void findStage() {
-		MultimeterClient client = tutorial.getClient();
+	private void updateStage() {
+		if (this.stage == Stage.COMPLETED) {
+			return;
+		}
+
+		MultimeterClient client = MultimeterClient.INSTANCE;
 		ClientMeterGroup meterGroup = client.getMeterGroup();
 
 		if (!meterGroup.isSubscribed()) {
-			stage = Stage.JOIN_METER_GROUP;
+			this.stage = Stage.JOIN_METER_GROUP;
 		} else if (!meterGroup.hasMeters()) {
-			stage = Stage.ADD_METER;
+			this.stage = Stage.ADD_METER;
 		} else if (!client.isHudActive()) {
-			stage = Stage.ACTIVE_HUD;
+			this.stage = Stage.ACTIVE_HUD;
 		} else if (!client.getHud().isPaused()) {
-			stage = Stage.PAUSE_HUD;
+			this.stage = Stage.PAUSE_HUD;
+		} else if (this.timesScrolled < TIMES_SCROLLED_TARGET) {
+			this.stage = Stage.SCROLL_HUD;
 		} else {
-			stage = Stage.SCROLL_HUD;
+			this.stage = Stage.COMPLETED;
 		}
 
-		timesScrolled = 0;
+		if (this.stage != Stage.SCROLL_HUD) {
+			this.timesScrolled = 0;
+		}
 	}
 
 	public static enum Stage {
-		JOIN_METER_GROUP, ADD_METER, ACTIVE_HUD, PAUSE_HUD, SCROLL_HUD
+		JOIN_METER_GROUP, ADD_METER, ACTIVE_HUD, PAUSE_HUD, SCROLL_HUD, COMPLETED
 	}
 }
