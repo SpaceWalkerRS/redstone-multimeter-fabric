@@ -1,42 +1,19 @@
 package redstone.multimeter.client.tutorial.instance;
 
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
-import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialListener;
 import redstone.multimeter.client.tutorial.TutorialStep;
 
-public abstract class TutorialInstance implements TutorialListener {
+public interface TutorialInstance extends TutorialListener {
 
-	protected final Tutorial tutorial;
-	protected final TutorialToast toast;
+	TutorialToast createToast();
 
-	protected boolean completed = false;
+	void init();
 
-	protected TutorialInstance(Tutorial tutorial) {
-		this.tutorial = tutorial;
-		this.toast = createToast();
-	}
+	void tick();
 
-	protected abstract TutorialToast createToast();
+	boolean isCompleted();
 
-	public abstract void tick();
-
-	public void start() {
-		if (toast != null) {
-			tutorial.getMinecraft().getToasts().addToast(toast);
-		}
-	}
-
-	public void stop() {
-		if (toast != null) {
-			toast.hide();
-		}
-	}
-
-	public boolean isCompleted() {
-		return completed;
-	}
-
-	public abstract TutorialStep getNextStep();
+	TutorialStep nextStep();
 
 }
