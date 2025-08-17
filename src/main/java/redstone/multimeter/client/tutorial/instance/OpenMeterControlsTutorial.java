@@ -1,26 +1,20 @@
 package redstone.multimeter.client.tutorial.instance;
 
 import redstone.multimeter.client.Keybinds;
+import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
-import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
-public class OpenMeterControlsTutorial extends StagedTutorialInstance {
+public class OpenMeterControlsTutorial implements StagedTutorialInstance {
 
 	private Stage stage;
 
-	public OpenMeterControlsTutorial(Tutorial tutorial) {
-		super(tutorial);
-
-		findStage();
-	}
-
 	@Override
-	protected TutorialToast createToast() {
+	public TutorialToast createToast() {
 		return new StagedTutorialToast(
 			this,
 			TutorialStep.OPEN_METER_CONTROLS.getName(),
@@ -32,38 +26,45 @@ public class OpenMeterControlsTutorial extends StagedTutorialInstance {
 
 	@Override
 	public void onMeterControlsOpened() {
-		if (stage == Stage.OPEN_METER_CONTROLS) {
-			completed = true;
+		if (this.stage == Stage.OPEN_METER_CONTROLS) {
+			this.updateStage(true);
 		}
 	}
 
 	@Override
 	public void onJoinMeterGroup() {
-		if (stage == Stage.JOIN_METER_GROUP) {
-			findStage();
+		if (this.stage == Stage.JOIN_METER_GROUP) {
+			this.updateStage(false);
 		}
 	}
 
 	@Override
 	public void onLeaveMeterGroup() {
-		findStage();
+		this.updateStage(false);
 	}
 
 	@Override
 	public void onMeterGroupRefreshed() {
-		findStage();
+		if (this.stage == Stage.JOIN_METER_GROUP) {
+			this.updateStage(false);
+		}
 	}
 
 	@Override
 	public void onMeterAdded(Meter meter) {
-		if (stage == Stage.ADD_METER) {
-			findStage();
+		if (this.stage == Stage.ADD_METER) {
+			this.updateStage(false);
 		}
 	}
 
 	@Override
 	public void onMeterRemoved(Meter meter) {
-		findStage();
+		this.updateStage(false);
+	}
+
+	@Override
+	public void init() {
+		this.updateStage(false);
 	}
 
 	@Override
@@ -71,28 +72,39 @@ public class OpenMeterControlsTutorial extends StagedTutorialInstance {
 	}
 
 	@Override
-	public TutorialStep getNextStep() {
+	public boolean isCompleted() {
+		return this.stage == Stage.COMPLETED;
+	}
+
+	@Override
+	public TutorialStep nextStep() {
 		return TutorialStep.REMOVE_METER;
 	}
 
 	@Override
 	public float getProgress() {
-		return completed ? 1.0F : (float)stage.ordinal() / 3;
+		return (float) this.stage.ordinal() / (Stage.values().length - 1);
 	}
 
-	private void findStage() {
-		ClientMeterGroup meterGroup = tutorial.getClient().getMeterGroup();
+	private void updateStage(boolean meterControls) {
+		if (this.stage == Stage.COMPLETED) {
+			return;
+		}
+
+		ClientMeterGroup meterGroup = MultimeterClient.INSTANCE.getMeterGroup();
 
 		if (!meterGroup.isSubscribed()) {
-			stage = Stage.JOIN_METER_GROUP;
+			this.stage = Stage.JOIN_METER_GROUP;
 		} else if (!meterGroup.hasMeters()) {
-			stage = Stage.ADD_METER;
+			this.stage = Stage.ADD_METER;
+		} else if (!meterControls) {
+			this.stage = Stage.OPEN_METER_CONTROLS;
 		} else {
-			stage = Stage.OPEN_METER_CONTROLS;
+			this.stage = Stage.COMPLETED;
 		}
 	}
 
-	public static enum Stage {
-		JOIN_METER_GROUP, ADD_METER, OPEN_METER_CONTROLS
+	public enum Stage {
+		JOIN_METER_GROUP, ADD_METER, OPEN_METER_CONTROLS, COMPLETED
 	}
 }

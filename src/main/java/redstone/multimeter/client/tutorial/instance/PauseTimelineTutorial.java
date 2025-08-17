@@ -6,22 +6,15 @@ import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
-import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
-public class PauseTimelineTutorial extends StagedTutorialInstance {
+public class PauseTimelineTutorial implements StagedTutorialInstance {
 
 	private Stage stage;
 
-	public PauseTimelineTutorial(Tutorial tutorial) {
-		super(tutorial);
-
-		findStage();
-	}
-
 	@Override
-	protected TutorialToast createToast() {
+	public TutorialToast createToast() {
 		return new StagedTutorialToast(
 			this,
 			TutorialStep.PAUSE_TIMELINE.getName(),
@@ -33,45 +26,52 @@ public class PauseTimelineTutorial extends StagedTutorialInstance {
 
 	@Override
 	public void onToggleHud(boolean enabled) {
-		if (!enabled || stage == Stage.ACTIVE_HUD) {
-			findStage();
+		if (!enabled || this.stage == Stage.ACTIVE_HUD) {
+			this.updateStage();
 		}
 	}
 
 	@Override
 	public void onPauseHud(boolean paused) {
-		if (stage == Stage.PAUSE_HUD && paused) {
-			completed = true;
+		if (!paused || this.stage == Stage.PAUSE_HUD) {
+			this.updateStage();
 		}
 	}
 
 	@Override
 	public void onJoinMeterGroup() {
-		if (stage == Stage.JOIN_METER_GROUP) {
-			findStage();
+		if (this.stage == Stage.JOIN_METER_GROUP) {
+			this.updateStage();
 		}
 	}
 
 	@Override
 	public void onLeaveMeterGroup() {
-		findStage();
+		this.updateStage();
 	}
 
 	@Override
 	public void onMeterGroupRefreshed() {
-		findStage();
+		if (this.stage == Stage.JOIN_METER_GROUP) {
+			this.updateStage();
+		}
 	}
 
 	@Override
 	public void onMeterAdded(Meter meter) {
-		if (stage == Stage.ADD_METER) {
-			findStage();
+		if (this.stage == Stage.ADD_METER) {
+			this.updateStage();
 		}
 	}
 
 	@Override
 	public void onMeterRemoved(Meter meter) {
-		findStage();
+		this.updateStage();
+	}
+
+	@Override
+	public void init() {
+		this.updateStage();
 	}
 
 	@Override
@@ -79,31 +79,42 @@ public class PauseTimelineTutorial extends StagedTutorialInstance {
 	}
 
 	@Override
-	public TutorialStep getNextStep() {
+	public boolean isCompleted() {
+		return this.stage == Stage.COMPLETED;
+	}
+
+	@Override
+	public TutorialStep nextStep() {
 		return TutorialStep.SCROLL_TIMELINE;
 	}
 
 	@Override
 	public float getProgress() {
-		return completed ? 1.0F : (float)stage.ordinal() / 4;
+		return (float) this.stage.ordinal() / (Stage.values().length - 1);
 	}
 
-	private void findStage() {
-		MultimeterClient client = tutorial.getClient();
+	private void updateStage() {
+		if (this.stage == Stage.COMPLETED) {
+			return;
+		}
+
+		MultimeterClient client = MultimeterClient.INSTANCE;
 		ClientMeterGroup meterGroup = client.getMeterGroup();
 
 		if (!meterGroup.isSubscribed()) {
-			stage = Stage.JOIN_METER_GROUP;
+			this.stage = Stage.JOIN_METER_GROUP;
 		} else if (!meterGroup.hasMeters()) {
-			stage = Stage.ADD_METER;
+			this.stage = Stage.ADD_METER;
 		} else if (!client.isHudActive()) {
-			stage = Stage.ACTIVE_HUD;
+			this.stage = Stage.ACTIVE_HUD;
+		} else if (!client.getHud().isPaused()) {
+			this.stage = Stage.PAUSE_HUD;
 		} else {
-			stage = Stage.PAUSE_HUD;
+			this.stage = Stage.COMPLETED;
 		}
 	}
 
 	public static enum Stage {
-		JOIN_METER_GROUP, ADD_METER, ACTIVE_HUD, PAUSE_HUD
+		JOIN_METER_GROUP, ADD_METER, ACTIVE_HUD, PAUSE_HUD, COMPLETED
 	}
 }

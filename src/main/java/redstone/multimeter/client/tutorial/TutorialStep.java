@@ -1,6 +1,6 @@
 package redstone.multimeter.client.tutorial;
 
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
@@ -22,9 +22,9 @@ public enum TutorialStep implements Cyclable<TutorialStep> {
 	private final String key;
 	// used for parsing values from before RSMM 1.16
 	private final String legacyKey;
-	private final Function<Tutorial, TutorialInstance> factory;
+	private final Supplier<TutorialInstance> factory;
 
-	private TutorialStep(String key, String legacyKey, Function<Tutorial, TutorialInstance> factory) {
+	private TutorialStep(String key, String legacyKey, Supplier<TutorialInstance> factory) {
 		this.key = key;
 		this.legacyKey = legacyKey;
 		this.factory = factory;
@@ -48,7 +48,7 @@ public enum TutorialStep implements Cyclable<TutorialStep> {
 		return Texts.translatable("rsmm.tutorial." + this.key + ".description", args);
 	}
 
-	public TutorialInstance createInstance(Tutorial tutorial) {
-		return this.factory.apply(tutorial);
+	public TutorialInstance createInstance() {
+		return this.factory.get();
 	}
 }
