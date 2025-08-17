@@ -1,28 +1,22 @@
 package redstone.multimeter.client.tutorial.instance;
 
 import redstone.multimeter.client.Keybinds;
+import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
-import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 
-public class PlaceMeterTutorial extends StagedTutorialInstance {
+public class PlaceMeterTutorial implements StagedTutorialInstance {
 
 	private Stage stage;
 	private DimPos lastRequest;
 
-	public PlaceMeterTutorial(Tutorial tutorial) {
-		super(tutorial);
-
-		findStage();
-	}
-
 	@Override
-	protected TutorialToast createToast() {
+	public TutorialToast createToast() {
 		return new StagedTutorialToast(
 			this,
 			TutorialStep.PLACE_METER.getName(),
@@ -34,34 +28,40 @@ public class PlaceMeterTutorial extends StagedTutorialInstance {
 
 	@Override
 	public void onJoinMeterGroup() {
-		if (stage == Stage.JOIN_METER_GROUP) {
-			findStage();
+		if (this.stage == Stage.JOIN_METER_GROUP) {
+			this.updateStage(null);
 		}
 	}
 
 	@Override
 	public void onLeaveMeterGroup() {
-		findStage();
+		this.updateStage(null);
 	}
 
 	@Override
 	public void onMeterGroupRefreshed() {
-		findStage();
+		if (this.stage == Stage.JOIN_METER_GROUP) {
+			this.updateStage(null);
+		}
 	}
 
 	@Override
 	public void onMeterAddRequested(DimPos pos) {
-		if (stage == Stage.ADD_METER) {
-			lastRequest = pos;
+		if (this.stage == Stage.ADD_METER) {
+			this.lastRequest = pos;
 		}
 	}
 
 	@Override
 	public void onMeterAdded(Meter meter) {
-		if (stage == Stage.ADD_METER && meter.getPos().equals(lastRequest)) {
-			lastRequest = null;
-			completed = true;
+		if (this.stage == Stage.ADD_METER) {
+			this.updateStage(meter.getPos());
 		}
+	}
+
+	@Override
+	public void init() {
+		this.updateStage(null);
 	}
 
 	@Override
@@ -69,28 +69,39 @@ public class PlaceMeterTutorial extends StagedTutorialInstance {
 	}
 
 	@Override
-	public TutorialStep getNextStep() {
+	public boolean isCompleted() {
+		return this.stage == Stage.COMPLETED;
+	}
+
+	@Override
+	public TutorialStep nextStep() {
 		return TutorialStep.PAUSE_TIMELINE;
 	}
 
 	@Override
 	public float getProgress() {
-		return completed ? 1.0F : (float)stage.ordinal() / 2;
+		return (float) this.stage.ordinal() / (Stage.values().length - 1);
 	}
 
-	private void findStage() {
-		ClientMeterGroup meterGroup = tutorial.getClient().getMeterGroup();
-
-		if (!meterGroup.isSubscribed()) {
-			stage = Stage.JOIN_METER_GROUP;
-		} else {
-			stage = Stage.ADD_METER;
+	private void updateStage(DimPos meterPos) {
+		if (this.stage == Stage.COMPLETED) {
+			return;
 		}
 
-		lastRequest = null;
+		ClientMeterGroup meterGroup = MultimeterClient.INSTANCE.getMeterGroup();
+
+		if (!meterGroup.isSubscribed()) {
+			this.stage = Stage.JOIN_METER_GROUP;
+		} else if (meterPos == null || !meterPos.equals(this.lastRequest)) {
+			this.stage = Stage.ADD_METER;
+		} else {
+			this.stage = Stage.COMPLETED;
+		}
+
+		this.lastRequest = null;
 	}
 
 	public static enum Stage {
-		JOIN_METER_GROUP, ADD_METER
+		JOIN_METER_GROUP, ADD_METER, COMPLETED
 	}
 }
