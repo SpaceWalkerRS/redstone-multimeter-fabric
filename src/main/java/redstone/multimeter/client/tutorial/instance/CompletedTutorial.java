@@ -1,20 +1,17 @@
 package redstone.multimeter.client.tutorial.instance;
 
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
-import redstone.multimeter.client.tutorial.Tutorial;
 import redstone.multimeter.client.tutorial.TutorialStep;
 
-public class CompletedTutorial extends TutorialInstance {
+public class CompletedTutorial implements TutorialInstance {
 
-	public CompletedTutorial(Tutorial tutorial) {
-		super(tutorial);
-
-		this.completed = true;
+	@Override
+	public TutorialToast createToast() {
+		return null;
 	}
 
 	@Override
-	protected TutorialToast createToast() {
-		return null;
+	public void init() {
 	}
 
 	@Override
@@ -22,7 +19,12 @@ public class CompletedTutorial extends TutorialInstance {
 	}
 
 	@Override
-	public TutorialStep getNextStep() {
+	public boolean isCompleted() {
+		return true;
+	}
+
+	@Override
+	public TutorialStep nextStep() {
 		return TutorialStep.NONE;
 	}
 }
