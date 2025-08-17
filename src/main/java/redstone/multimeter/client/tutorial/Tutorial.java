@@ -1,8 +1,10 @@
 package redstone.multimeter.client.tutorial;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.tutorial.TutorialSteps;
 
 import redstone.multimeter.client.MultimeterClient;
+import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.screen.RSMMScreen;
 import redstone.multimeter.client.option.Options;
 import redstone.multimeter.client.tutorial.instance.TutorialInstance;
@@ -17,168 +19,179 @@ public class Tutorial implements TutorialListener {
 	private final Minecraft minecraft;
 	private final MultimeterClient client;
 
-	private TutorialInstance instance;
+	private TutorialInstance step;
+	private TutorialToast toast;
 	private int time;
 	private int cooldown;
 
 	public Tutorial(MultimeterClient client) {
 		this.minecraft = client.getMinecraft();
 		this.client = client;
-
-		this.cooldown = 5 * COOLDOWN;
-	}
-
-	public Minecraft getMinecraft() {
-		return minecraft;
-	}
-
-	public MultimeterClient getClient() {
-		return client;
 	}
 
 	@Override
 	public void onScreenOpened(RSMMScreen screen) {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onScreenOpened(screen);
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onScreenOpened(screen);
 		}
 	}
 
 	@Override
 	public void onToggleHud(boolean enabled) {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onToggleHud(enabled);
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onToggleHud(enabled);
 		}
 	}
 
 	@Override
 	public void onPauseHud(boolean paused) {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onPauseHud(paused);
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onPauseHud(paused);
 		}
 	}
 
 	@Override
 	public void onScrollHud(int amount) {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onScrollHud(amount);
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onScrollHud(amount);
 		}
 	}
 
 	@Override
 	public void onMeterControlsOpened() {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onMeterControlsOpened();
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onMeterControlsOpened();
 		}
 	}
 
 	@Override
 	public void onJoinMeterGroup() {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onJoinMeterGroup();
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onJoinMeterGroup();
 		}
 	}
 
 	@Override
 	public void onLeaveMeterGroup() {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onLeaveMeterGroup();
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onLeaveMeterGroup();
 		}
 	}
 
 	@Override
 	public void onMeterGroupRefreshed() {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onMeterGroupRefreshed();
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onMeterGroupRefreshed();
 		}
 	}
 
 	@Override
 	public void onMeterAddRequested(DimPos pos) {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onMeterAddRequested(pos);
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onMeterAddRequested(pos);
 		}
 	}
 
 	@Override
 	public void onMeterAdded(Meter meter) {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onMeterAdded(meter);
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onMeterAdded(meter);
 		}
 	}
 
 	@Override
 	public void onMeterRemoveRequested(DimPos pos) {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onMeterRemoveRequested(pos);
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onMeterRemoveRequested(pos);
 		}
 	}
 
 	@Override
 	public void onMeterRemoved(Meter meter) {
-		if (instance != null && !instance.isCompleted()) {
-			instance.onMeterRemoved(meter);
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onMeterRemoved(meter);
 		}
+	}
+
+	private boolean isEnabled() {
+		return this.client.isConnected() && this.minecraft.world != null && this.minecraft.options.tutorialStep == TutorialSteps.NONE;
 	}
 
 	public void tick() {
-		if (canDoTutorial()) {
-			if (instance == null) {
-				if (cooldown < 0) {
-					start();
+		if (this.isEnabled()) {
+			if (this.step == null) {
+				this.init();
+			} else if (this.cooldown >= 0) {
+				if (this.cooldown == 0) {
+					this.startStep();
 				} else {
-					cooldown--;
+					this.cooldown--;
 				}
-			} else if (instance.isCompleted()) {
-				TutorialStep nextStep = instance.getNextStep();
+			} else if (this.step.isCompleted()) {
+				TutorialStep nextStep = this.step.nextStep();
 
 				if (nextStep != null) {
-					advance(nextStep);
+					this.nextStep(nextStep);
 				}
-			} else if (time++ > MAX_TIME) {
-				advance(TutorialStep.NONE);
+			} else if (this.time++ > MAX_TIME) {
+				this.nextStep(TutorialStep.NONE);
 			} else {
-				instance.tick();
+				this.step.tick();
 			}
 		} else {
-			stop();
+			this.reset();
 		}
 	}
 
-	public void reset() {
-		advance(Options.Hidden.TUTORIAL_STEP.getDefault());
+	private void init() {
+		this.step = Options.Hidden.TUTORIAL_STEP.get().createInstance();
+		this.initStep();
 	}
 
-	public void advance(TutorialStep step) {
+	private void reset() {
+		this.resetStep();
+		this.step = null;
+	}
+
+	private void nextStep(TutorialStep step) {
 		if (step == Options.Hidden.TUTORIAL_STEP.get()) {
 			return;
 		}
 
+		this.resetStep();
+
 		Options.Hidden.TUTORIAL_STEP.set(step);
 		Options.validate();
-		minecraft.options.save();;
+		this.minecraft.options.save();
 
-		stop();
+		this.initStep();
 	}
 
-	private boolean canDoTutorial() {
-		return client.isConnected() && minecraft.world != null && minecraft.options.tutorialStep == net.minecraft.client.tutorial.TutorialSteps.NONE;
+	private void initStep() {
+		this.step = Options.Hidden.TUTORIAL_STEP.get().createInstance();
+		this.toast = this.step.createToast();
+
+		this.step.init();
+
+		this.time = 0;
+		this.cooldown = COOLDOWN;
 	}
 
-	private void start() {
-		stop();
-
-		instance = Options.Hidden.TUTORIAL_STEP.get().createInstance(this);
-		instance.start();
-
-		time = 0;
-	}
-
-	private void stop() {
-		if (instance != null) {
-			instance.stop();
-			instance = null;
-			time = -1;
-			cooldown = COOLDOWN;
+	private void startStep() {
+		if (this.toast != null) {
+			this.minecraft.getToasts().add(this.toast);
 		}
+
+		this.time = 0;
+		this.cooldown = -1;
+	}
+
+	private void resetStep() {
+		if (this.toast != null) {
+			this.toast.hide();
+		}
+
+		this.time = -1;
+		this.cooldown = -1;
 	}
 }
