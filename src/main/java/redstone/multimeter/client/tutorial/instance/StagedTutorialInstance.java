@@ -1,13 +1,7 @@
 package redstone.multimeter.client.tutorial.instance;
 
-import redstone.multimeter.client.tutorial.Tutorial;
+public interface StagedTutorialInstance extends TutorialInstance {
 
-public abstract class StagedTutorialInstance extends TutorialInstance {
-
-	protected StagedTutorialInstance(Tutorial tutorial) {
-		super(tutorial);
-	}
-
-	public abstract float getProgress();
+	float getProgress();
 
 }
