@@ -17,6 +17,8 @@ public enum TutorialStep implements Cyclable<TutorialStep> {
 	ENABLE_FOCUS_MODE("enableFocusMode", FocusModeTutorial::new),
 	OPEN_MULTIMETER_SCREEN("openMultimeterScreen", "OPEN_MULTIMETER_SCREEN", OpenMultimeterScreenTutorial::new),
 	OPEN_METER_CONTROLS("openMeterControls", "OPEN_METER_CONTROLS", OpenMeterControlsTutorial::new),
+	SAVE_METER_GROUP("saveMeterGroup", SaveMeterGroupTutorial::new),
+	LOAD_METER_GROUP("loadMeterGroup", LoadMeterGroupTutorial::new),
 	REMOVE_METER("removeMeter", "REMOVE_METER", RemoveMeterTutorial::new),
 	NONE("none", "NONE", CompletedTutorial::new);
 
