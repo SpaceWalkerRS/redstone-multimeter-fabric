@@ -100,10 +100,22 @@ public class InputHandler {
 		slot++; // slots are 1-indexed
 
 		if (Keybinds.LOAD_METER_GROUP.isPressed()) {
-			return client.getSavedMeterGroupsManager().loadSlot(slot);
+			boolean success = client.getSavedMeterGroupsManager().loadSlot(slot);
+
+			if (success) {
+				client.getTutorial().onMeterGroupLoaded(slot);
+			}
+
+			return success;
 		}
 		if (Keybinds.SAVE_METER_GROUP.isPressed()) {
-			return client.getSavedMeterGroupsManager().saveSlot(slot);
+			boolean success = client.getSavedMeterGroupsManager().saveSlot(slot);
+
+			if (success) {
+				client.getTutorial().onMeterGroupSaved(slot);
+			}
+
+			return success;
 		}
 
 		return false;
