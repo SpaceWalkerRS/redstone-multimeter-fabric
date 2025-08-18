@@ -65,6 +65,20 @@ public class Tutorial implements TutorialListener {
 	}
 
 	@Override
+	public void onMeterGroupSaved(int slot) {
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onMeterGroupSaved(slot);
+		}
+	}
+
+	@Override
+	public void onMeterGroupLoaded(int slot) {
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onMeterGroupLoaded(slot);
+		}
+	}
+
+	@Override
 	public void onMeterControlsOpened() {
 		if (this.step != null && !this.step.isCompleted()) {
 			this.step.onMeterControlsOpened();
