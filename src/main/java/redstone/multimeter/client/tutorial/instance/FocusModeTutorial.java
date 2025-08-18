@@ -2,29 +2,22 @@ package redstone.multimeter.client.tutorial.instance;
 
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
-import redstone.multimeter.client.gui.element.tutorial.StagedTutorialToast;
 import redstone.multimeter.client.gui.element.tutorial.TutorialToast;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
-public class ScrollTimelineTutorial implements StagedTutorialInstance {
-
-	private static final int TIMES_SCROLLED_TARGET = 5;
+public class FocusModeTutorial implements TutorialInstance {
 
 	private Stage stage;
-	private int timesScrolled;
 
 	@Override
 	public TutorialToast createToast() {
-		return new StagedTutorialToast(
-			this,
-			TutorialStep.SCROLL_TIMELINE.getName(),
-			TutorialStep.SCROLL_TIMELINE.getDescription(
-				Texts.keybind(Keybinds.STEP_BACKWARD),
-				Texts.keybind(Keybinds.STEP_FORWARD),
-				Texts.keys(Keybinds.SCROLL_HUD, "scroll")
+		return new TutorialToast(
+			TutorialStep.ENABLE_FOCUS_MODE.getName(),
+			TutorialStep.ENABLE_FOCUS_MODE.getDescription(
+				Texts.keybind(Keybinds.TOGGLE_FOCUS_MODE)
 			)
 		);
 	}
@@ -37,19 +30,8 @@ public class ScrollTimelineTutorial implements StagedTutorialInstance {
 	}
 
 	@Override
-	public void onPauseHud(boolean paused) {
-		if (!paused || this.stage == Stage.PAUSE_HUD) {
-			this.updateStage();
-		}
-	}
-
-	@Override
-	public void onScrollHud(int amount) {
-		if (this.stage == Stage.SCROLL_HUD) {
-			if (amount != 0) {
-				this.timesScrolled++;
-			}
-
+	public void onToggleFocusMode(boolean enabled) {
+		if (!enabled || this.stage == Stage.ENABLE_FOCUS_MODE) {
 			this.updateStage();
 		}
 	}
@@ -101,18 +83,7 @@ public class ScrollTimelineTutorial implements StagedTutorialInstance {
 
 	@Override
 	public TutorialStep nextStep() {
-		return TutorialStep.ENABLE_FOCUS_MODE;
-	}
-
-	@Override
-	public float getProgress() {
-		float progress = (float) this.stage.ordinal() / (Stage.values().length - 1);
-
-		if (this.stage == Stage.SCROLL_HUD) {
-			progress += (float) this.timesScrolled / (5 * TIMES_SCROLLED_TARGET);
-		}
-
-		return progress;
+		return TutorialStep.OPEN_MULTIMETER_SCREEN;
 	}
 
 	private void updateStage() {
@@ -129,20 +100,14 @@ public class ScrollTimelineTutorial implements StagedTutorialInstance {
 			this.stage = Stage.ADD_METER;
 		} else if (!client.isHudActive()) {
 			this.stage = Stage.ACTIVE_HUD;
-		} else if (!client.getHud().isPaused()) {
-			this.stage = Stage.PAUSE_HUD;
-		} else if (this.timesScrolled < TIMES_SCROLLED_TARGET) {
-			this.stage = Stage.SCROLL_HUD;
+		} else if (!client.getHud().isFocusMode()) {
+			this.stage = Stage.ENABLE_FOCUS_MODE;
 		} else {
 			this.stage = Stage.COMPLETED;
-		}
-
-		if (this.stage != Stage.SCROLL_HUD) {
-			this.timesScrolled = 0;
 		}
 	}
 
 	public static enum Stage {
-		JOIN_METER_GROUP, ADD_METER, ACTIVE_HUD, PAUSE_HUD, SCROLL_HUD, COMPLETED
+		JOIN_METER_GROUP, ADD_METER, ACTIVE_HUD, ENABLE_FOCUS_MODE, COMPLETED
 	}
 }
