@@ -44,6 +44,13 @@ public class Tutorial implements TutorialListener {
 	}
 
 	@Override
+	public void onToggleFocusMode(boolean enabled) {
+		if (this.step != null && !this.step.isCompleted()) {
+			this.step.onToggleFocusMode(enabled);
+		}
+	}
+
+	@Override
 	public void onPauseHud(boolean paused) {
 		if (this.step != null && !this.step.isCompleted()) {
 			this.step.onPauseHud(paused);

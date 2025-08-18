@@ -512,6 +512,9 @@ rsmm.tutorial.pauseTimeline.description = Press %s to pause the Multimeter timel
 rsmm.tutorial.scrollTimeline.name = Scroll Through The Timeline
 rsmm.tutorial.scrollTimeline.description = Use the %s and %s keys or %s to scroll through the Multimeter timeline.
 
+rsmm.tutorial.enableFocusMode.name = Enable Focus Mode
+rsmm.tutorial.enableFocusMode.description = Press %s to toggle Focus Mode and view details on logged events.
+
 rsmm.tutorial.openMultimeterScreen.name = Open The Multimeter Screen
 rsmm.tutorial.openMultimeterScreen.description = Press %s to open the Multimeter screen.
 
