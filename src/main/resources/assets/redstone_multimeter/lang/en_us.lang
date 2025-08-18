@@ -521,6 +521,12 @@ rsmm.tutorial.openMultimeterScreen.description = Press %s to open the Multimeter
 rsmm.tutorial.openMeterControls.name = Open Meter Controls
 rsmm.tutorial.openMeterControls.description = Open a meter's controls through the Multimeter screen or by looking at it and pressing %s.
 
+rsmm.tutorial.saveMeterGroup.name = Save Meter Group
+rsmm.tutorial.saveMeterGroup.description = Hold the %s key and press one of the number keys to save the meter group to that slot.
+
+rsmm.tutorial.loadMeterGroup.name = Load Meter Group
+rsmm.tutorial.loadMeterGroup.description = Hold the %s key and press one of the number keys to load the meter group from that slot.
+
 rsmm.tutorial.removeMeter.name = Remove A Meter
 rsmm.tutorial.removeMeter.description = Look at a block with a meter on it and press %s to remove it.
 

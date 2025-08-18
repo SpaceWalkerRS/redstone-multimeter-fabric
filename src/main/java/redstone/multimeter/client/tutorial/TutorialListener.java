@@ -21,6 +21,12 @@ public interface TutorialListener {
 	default void onScrollHud(int amount) {
 	}
 
+	default void onMeterGroupSaved(int slot) {
+	}
+
+	default void onMeterGroupLoaded(int slot) {
+	}
+
 	default void onMeterControlsOpened() {
 	}
 
