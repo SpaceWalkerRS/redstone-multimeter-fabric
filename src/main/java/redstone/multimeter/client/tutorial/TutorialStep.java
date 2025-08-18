@@ -14,6 +14,7 @@ public enum TutorialStep implements Cyclable<TutorialStep> {
 	PLACE_METER("placeMeter", "PLACE_METER", PlaceMeterTutorial::new),
 	PAUSE_TIMELINE("pauseTimeline", "PAUSE_HUD", PauseTimelineTutorial::new),
 	SCROLL_TIMELINE("scrollTimeline", "SCROLL_HUD", ScrollTimelineTutorial::new),
+	ENABLE_FOCUS_MODE("enableFocusMode", FocusModeTutorial::new),
 	OPEN_MULTIMETER_SCREEN("openMultimeterScreen", "OPEN_MULTIMETER_SCREEN", OpenMultimeterScreenTutorial::new),
 	OPEN_METER_CONTROLS("openMeterControls", "OPEN_METER_CONTROLS", OpenMeterControlsTutorial::new),
 	REMOVE_METER("removeMeter", "REMOVE_METER", RemoveMeterTutorial::new),
@@ -23,6 +24,10 @@ public enum TutorialStep implements Cyclable<TutorialStep> {
 	// used for parsing values from before RSMM 1.16
 	private final String legacyKey;
 	private final Supplier<TutorialInstance> factory;
+
+	private TutorialStep(String key, Supplier<TutorialInstance> factory) {
+		this(key, null, factory);
+	}
 
 	private TutorialStep(String key, String legacyKey, Supplier<TutorialInstance> factory) {
 		this.key = key;
