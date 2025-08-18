@@ -9,7 +9,7 @@ import redstone.multimeter.client.meter.ClientMeterGroup;
 import redstone.multimeter.client.tutorial.TutorialStep;
 import redstone.multimeter.common.meter.Meter;
 
-public class OpenMeterControlsTutorial implements StagedTutorialInstance {
+public class SaveMeterGroupTutorial implements StagedTutorialInstance {
 
 	private Stage stage;
 
@@ -17,58 +17,59 @@ public class OpenMeterControlsTutorial implements StagedTutorialInstance {
 	public TutorialToast createToast() {
 		return new StagedTutorialToast(
 			this,
-			TutorialStep.OPEN_METER_CONTROLS.getName(),
-			TutorialStep.OPEN_METER_CONTROLS.getDescription(
-				Texts.keybind(Keybinds.OPEN_METER_CONTROLS)
+			TutorialStep.SAVE_METER_GROUP.getName(),
+			TutorialStep.SAVE_METER_GROUP.getDescription(
+				Texts.keys(Keybinds.SAVE_METER_GROUP)
 			)
 		);
 	}
 
 	@Override
-	public void onMeterControlsOpened() {
-		if (this.stage == Stage.OPEN_METER_CONTROLS) {
-			this.updateStage(true);
+	public void onMeterGroupSaved(int slot) {
+		if (this.stage == Stage.SAVE_METER_GROUP) {
+			this.updateStage(slot);
 		}
 	}
 
 	@Override
 	public void onJoinMeterGroup() {
 		if (this.stage == Stage.JOIN_METER_GROUP) {
-			this.updateStage(false);
+			this.updateStage(-1);
 		}
 	}
 
 	@Override
 	public void onLeaveMeterGroup() {
-		this.updateStage(false);
+		this.updateStage(-1);
 	}
 
 	@Override
 	public void onMeterGroupRefreshed() {
 		if (this.stage == Stage.JOIN_METER_GROUP) {
-			this.updateStage(false);
+			this.updateStage(-1);
 		}
 	}
 
 	@Override
 	public void onMeterAdded(Meter meter) {
 		if (this.stage == Stage.ADD_METER) {
-			this.updateStage(false);
+			this.updateStage(-1);
 		}
 	}
 
 	@Override
 	public void onMeterRemoved(Meter meter) {
-		this.updateStage(false);
+		this.updateStage(-1);
 	}
 
 	@Override
 	public void init() {
-		this.updateStage(false);
+		this.updateStage(-1);
 	}
 
 	@Override
 	public void tick() {
+		this.updateStage(-1);
 	}
 
 	@Override
@@ -78,7 +79,7 @@ public class OpenMeterControlsTutorial implements StagedTutorialInstance {
 
 	@Override
 	public TutorialStep nextStep() {
-		return TutorialStep.SAVE_METER_GROUP;
+		return TutorialStep.LOAD_METER_GROUP;
 	}
 
 	@Override
@@ -86,7 +87,7 @@ public class OpenMeterControlsTutorial implements StagedTutorialInstance {
 		return (float) this.stage.ordinal() / (Stage.values().length - 1);
 	}
 
-	private void updateStage(boolean meterControls) {
+	private void updateStage(int slot) {
 		if (this.stage == Stage.COMPLETED) {
 			return;
 		}
@@ -97,14 +98,16 @@ public class OpenMeterControlsTutorial implements StagedTutorialInstance {
 			this.stage = Stage.JOIN_METER_GROUP;
 		} else if (!meterGroup.hasMeters()) {
 			this.stage = Stage.ADD_METER;
-		} else if (!meterControls) {
-			this.stage = Stage.OPEN_METER_CONTROLS;
+		} else if (!Keybinds.SAVE_METER_GROUP.isDown()) {
+			this.stage = Stage.PRESS_KEYBIND;
+		} else if (slot == -1) {
+			this.stage = Stage.SAVE_METER_GROUP;
 		} else {
 			this.stage = Stage.COMPLETED;
 		}
 	}
 
-	public enum Stage {
-		JOIN_METER_GROUP, ADD_METER, OPEN_METER_CONTROLS, COMPLETED
+	public static enum Stage {
+		JOIN_METER_GROUP, ADD_METER, PRESS_KEYBIND, SAVE_METER_GROUP, COMPLETED
 	}
 }
