@@ -63,7 +63,8 @@
 		"client.LocaleMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
-		"client.OptionsMixin"
+		"client.OptionsMixin",
+		"client.ToastInstanceMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
