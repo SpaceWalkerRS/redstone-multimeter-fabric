@@ -55,6 +55,7 @@
 		"client.IntegratedServerMixin",
 		"client.KeyBindingMixin",
 		"client.MinecraftMixin",
+		"client.ToastInstanceMixin",
 		"client.TranslationStorageMixin"
 	],
 	"injectors": {
