@@ -63,6 +63,7 @@
 		"client.TranslationStorageMixin",
 		"client.MinecraftMixin",
 		"client.MouseHandlerMixin",
+		"client.ToastInstanceMixin",
 		"client.WindowMixin"
 	],
 	"injectors": {
