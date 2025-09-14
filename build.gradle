@@ -49,13 +49,17 @@ dependencies {
 		transitive = false
 	}
 	include "net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}"
-	modImplementation "de.siphalor:amecsapi-1.16:1+"
-	include "de.siphalor:amecsapi-1.16:1+"
+	include(modImplementation("de.siphalor.amecs-api:amecs-api-mc1.16.5:${project.amecs_version}") {
+		exclude group: 'net.fabricmc'
+		exclude group: 'net.fabricmc.fabric-api'
+	})
 	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
 		// eclipse gets confused and puts two versions of loader on the classpath...
 		exclude group: 'net.fabricmc'
 	}
 	modImplementation "maven.modrinth:lithium:${project.lithium_version}"
+
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 processResources {
