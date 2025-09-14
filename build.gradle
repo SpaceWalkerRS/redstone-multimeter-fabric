@@ -36,12 +36,16 @@ dependencies {
 	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation "de.siphalor:amecsapi-1.14:1+"
-	include "de.siphalor:amecsapi-1.14:1+"
+	include(modImplementation("de.siphalor.amecs-api:amecs-api-mc1.14.4:${project.amecs_version}") {
+		exclude group: 'net.fabricmc'
+		exclude group: 'net.fabricmc.fabric-api'
+	})
 	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
 		// eclipse gets confused and puts two versions of loader on the classpath...
 		exclude group: 'net.fabricmc'
 	}
+
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 processResources {

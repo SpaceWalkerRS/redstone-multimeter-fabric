@@ -12,6 +12,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.compat.amecs.AmecsHelper;
 import redstone.multimeter.interfaces.mixin.IKeyMapping;
 
 public class Texts {
@@ -178,7 +179,7 @@ public class Texts {
 				);
 			}
 		} else {
-			return key(((IKeyMapping) keybind).rsmm$getKey());
+			return AmecsHelper.addModifiers(key(((IKeyMapping) keybind).rsmm$getKey()), keybind);
 		}
 	}
 

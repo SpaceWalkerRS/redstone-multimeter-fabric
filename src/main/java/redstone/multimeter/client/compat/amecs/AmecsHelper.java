@@ -13,7 +13,6 @@ import net.fabricmc.loader.api.FabricLoader;
 
 import net.minecraft.client.KeyMapping;
 
-import redstone.multimeter.client.gui.text.Formatting;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 
@@ -40,7 +39,7 @@ public class AmecsHelper {
 	}
 
 	public static Text getModifierName(KeyModifier modifier, Variation variation) {
-		return Texts.of(variation.getTranslatableText(modifier.getTranslationKey()));
+		return Texts.key(variation.getTranslation(modifier.getTranslationKey()));
 	}
 
 	public static Text getModifierName(KeyModifier modifier) {
@@ -49,11 +48,15 @@ public class AmecsHelper {
 
 	public static Text addModifiers(Text text, KeyMapping keybind) {
 		if (isAmecsApiLoaded) {
+			Text t = Texts.literal("");
+
 			for (KeyModifier modifier : getKeyModifiers(keybind)) {
-				text.
-					append(getModifierName(modifier).format(Formatting.YELLOW)).
+				t.
+					append(getModifierName(modifier)).
 					append(" + ");
 			}
+
+			text = t.append(text);
 		}
 
 		return text;
