@@ -10,6 +10,7 @@ import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.compat.amecs.AmecsHelper;
 import redstone.multimeter.interfaces.mixin.IKeyMapping;
 
 public class Texts {
@@ -25,6 +26,8 @@ public class Texts {
 			return (Text) o;
 		} else if (o instanceof Component) {
 			return resolve((Component) o);
+		} else if (o instanceof ComponentContents) {
+			return resolve((ComponentContents) o);
 		} else if (o instanceof String) {
 			return resolve((String) o);
 		} else {
@@ -176,7 +179,7 @@ public class Texts {
 				);
 			}
 		} else {
-			return key(((IKeyMapping) keybind).rsmm$getKey());
+			return AmecsHelper.addModifiers(key(((IKeyMapping) keybind).rsmm$getKey()), keybind);
 		}
 	}
 
@@ -189,22 +192,7 @@ public class Texts {
 	}
 
 	public static Text resolve(Component component) {
-		ComponentContents contents = component.getContents();
-
-		Text t;
-
-		if (contents instanceof PlainTextContents) {
-			t = literal(((PlainTextContents) contents).text());
-		} else if (contents instanceof TranslatableContents) {
-			TranslatableContents translatable = (TranslatableContents) contents;
-
-			t = translatable(
-				translatable.getKey(),
-				translatable.getArgs()
-			);
-		} else {
-			throw new IllegalStateException("cannot convert " + contents + " to RSMM Text!");
-		}
+		Text t = resolve(component.getContents());
 
 		t.format(Style.resolve(component.getStyle()));
 
@@ -213,6 +201,21 @@ public class Texts {
 		}
 
 		return t;
+	}
+
+	public static Text resolve(ComponentContents contents) {
+		if (contents instanceof PlainTextContents) {
+			return literal(((PlainTextContents) contents).text());
+		} else if (contents instanceof TranslatableContents) {
+			TranslatableContents translatable = (TranslatableContents) contents;
+
+			return translatable(
+				translatable.getKey(),
+				translatable.getArgs()
+			);
+		} else {
+			throw new IllegalStateException("cannot convert " + contents + " to RSMM Text!");
+		}
 	}
 
 	public static Text resolve(String fs) {
