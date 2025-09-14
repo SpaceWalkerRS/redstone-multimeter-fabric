@@ -37,9 +37,9 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	include(modImplementation("de.siphalor:amecsapi-1.19:1+") {
-		// exclude lazydfu
-		exclude group: 'com.github.astei'
+	include(modImplementation("de.siphalor.amecs-api:amecs-api-mc1.19.0:${project.amecs_version}") {
+		exclude group: 'net.fabricmc'
+		exclude group: 'net.fabricmc.fabric-api'
 	})
 	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
 		// eclipse gets confused and puts two versions of loader on the classpath...
