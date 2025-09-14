@@ -44,23 +44,21 @@ dependencies {
 	}
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation "net.fabricmc.fabric-api:fabric-api:0.18.0+build.387-1.16.1"
 	modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
 	modImplementation("net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}") {
 		transitive = false
 	}
 	include "net.earthcomputer.multiconnect:multiconnect-api:${project.multiconnect_version}"
-	modImplementation ("de.siphalor:amecsapi-1.16:1.1.2+mc1.16-rc1") {
-		exclude group: "net.fabricmc.fabric-api"
-		exclude group: "de.siphalor", module: "nmuk-1.15"
-	}
-	include("de.siphalor:amecsapi-1.16:1.1.2+mc1.16-rc1") {
-		exclude group: "de.siphalor", module: "nmuk-1.15"
-	}
+	include(modImplementation("de.siphalor.amecs-api:amecs-api-mc1.16.5:${project.amecs_version}") {
+		exclude group: 'net.fabricmc'
+		exclude group: 'net.fabricmc.fabric-api'
+	})
 	modImplementation("carpet:fabric-carpet:${project.carpet_version}") {
 		// eclipse gets confused and puts two versions of loader on the classpath...
 		exclude group: 'net.fabricmc'
 	}
+
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 processResources {
