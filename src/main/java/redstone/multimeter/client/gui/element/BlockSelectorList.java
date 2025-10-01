@@ -11,6 +11,9 @@ import net.minecraft.world.level.block.Block;
 
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.element.input.CharacterEvent;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.client.gui.tooltip.Tooltips;
 
@@ -111,27 +114,27 @@ public class BlockSelectorList extends SelectorList {
 		}
 
 		@Override
-		public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+		public boolean mouseDrag(MouseEvent.Drag event) {
 			return false;
 		}
 
 		@Override
-		public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+		public boolean mouseScroll(MouseEvent.Scroll event) {
 			return false;
 		}
 
 		@Override
-		public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+		public boolean keyPress(KeyEvent.Press event) {
 			return false;
 		}
 
 		@Override
-		public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+		public boolean keyRelease(KeyEvent.Release event) {
 			return false;
 		}
 
 		@Override
-		public boolean typeChar(char chr, int modifiers) {
+		public boolean typeChar(CharacterEvent.Type event) {
 			return false;
 		}
 

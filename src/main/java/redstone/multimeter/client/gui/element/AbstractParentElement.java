@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.element.input.CharacterEvent;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
 
 public abstract class AbstractParentElement extends AbstractElement {
@@ -48,14 +51,14 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		boolean consumed = super.mouseClick(event);
 
 		if (!consumed) {
 			Element focused = this.updateFocusedElement();
 
 			if (focused != null) {
-				consumed = focused.mouseClick(mouseX, mouseY, button);
+				consumed = focused.mouseClick(event);
 			}
 		}
 
@@ -63,14 +66,14 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	@Override
-	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
+	public boolean mouseRelease(MouseEvent.Release event) {
+		boolean consumed = super.mouseRelease(event);
 
 		if (!consumed) {
 			Element focused = this.getFocusedElement();
 
 			if (focused != null) {
-				consumed = focused.mouseRelease(mouseX, mouseY, button);
+				consumed = focused.mouseRelease(event);
 			}
 		}
 
@@ -78,12 +81,12 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	@Override
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	public boolean mouseDrag(MouseEvent.Drag event) {
 		if (this.isDraggingMouse()) {
 			Element focused = this.getFocusedElement();
 
 			if (focused != null) {
-				return focused.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
+				return focused.mouseDrag(event);
 			}
 		}
 
@@ -91,27 +94,27 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+	public boolean mouseScroll(MouseEvent.Scroll event) {
 		Element hovered = this.getHoveredElement();
-		return hovered != null && hovered.mouseScroll(mouseX, mouseY, scrollX, scrollY);
+		return hovered != null && hovered.mouseScroll(event);
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(KeyEvent.Press event) {
 		Element focused = this.getFocusedElement();
-		return focused != null && focused.keyPress(keyCode, scanCode, modifiers);
+		return focused != null && focused.keyPress(event);
 	}
 
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(KeyEvent.Release event) {
 		Element focused = this.getFocusedElement();
-		return focused != null && focused.keyRelease(keyCode, scanCode, modifiers);
+		return focused != null && focused.keyRelease(event);
 	}
 
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(CharacterEvent.Type event) {
 		Element focused = this.getFocusedElement();
-		return focused != null && focused.typeChar(chr, modifiers);
+		return focused != null && focused.typeChar(event);
 	}
 
 	@Override

@@ -2,11 +2,13 @@ package redstone.multimeter.client.gui.hud.element;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.screens.Screen;
-
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
+import redstone.multimeter.client.gui.element.input.CharacterEvent;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.gui.text.Formatting;
 import redstone.multimeter.client.gui.text.Text;
@@ -56,27 +58,27 @@ public class MeterListRenderer extends AbstractElement {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		boolean consumed = super.mouseClick(event);
 
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			cursorOriginRow = hud.getHoveredRow(mouseY);
+		if (event.isLeftButton()) {
+			cursorOriginRow = hud.getHoveredRow(event.mouseY());
 		}
 
 		return consumed || cursorOriginRow >= 0;
 	}
 
 	@Override
-	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
+	public boolean mouseRelease(MouseEvent.Release event) {
+		boolean consumed = super.mouseRelease(event);
 
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (event.isLeftButton()) {
 			if (cursorMeter == null) {
 				if (cursorRow < 0) {
 					consumed = hud.selectMeter(cursorOriginRow);
 				}
-			} else if (isMouseOver(mouseX, mouseY)) {
-				consumed = changeMeterIndex(cursorMeter, cursorOriginRow, hud.getHoveredRow(mouseY));
+			} else if (isMouseOver(event.mouseX(), event.mouseY())) {
+				consumed = changeMeterIndex(cursorMeter, cursorOriginRow, hud.getHoveredRow(event.mouseY()));
 			}
 
 			cursorOriginRow = -1;
@@ -88,35 +90,35 @@ public class MeterListRenderer extends AbstractElement {
 	}
 
 	@Override
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		cursorRow = isMouseOver(mouseX, mouseY) ? hud.getHoveredRow(mouseY) : -1;
+	public boolean mouseDrag(MouseEvent.Drag event) {
+		cursorRow = isMouseOver(event.mouseX(), event.mouseY()) ? hud.getHoveredRow(event.mouseY()) : -1;
 
 		if (cursorMeter == null && cursorOriginRow >= 0) {
 			cursorMeter = hud.meters.get(cursorOriginRow);
-			cursorOffsetX = getX() - (int)mouseX;
-			cursorOffsetY = getY() - (int)mouseY + cursorOriginRow * (hud.settings.rowHeight + hud.settings.gridSize);
+			cursorOffsetX = getX() - (int)event.mouseX();
+			cursorOffsetY = getY() - (int)event.mouseY() + cursorOriginRow * (hud.settings.rowHeight + hud.settings.gridSize);
 		}
 
 		return false;
 	}
 
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+	public boolean mouseScroll(MouseEvent.Scroll event) {
 		return false;
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(KeyEvent.Press event) {
 		if (!hud.hasSelectedMeter()) {
 			return false;
 		}
 
-		switch (keyCode) {
+		switch (event.keyCode()) {
 		case GLFW.GLFW_KEY_UP:
-			moveSelection(Screen.hasControlDown() ? -hud.getSelectedRow() : -1);
+			moveSelection(InputHandler.isControlDown() ? -hud.getSelectedRow() : -1);
 			break;
 		case GLFW.GLFW_KEY_DOWN:
-			moveSelection(Screen.hasControlDown() ? (hud.meters.size() - 1) - hud.getSelectedRow() : 1);
+			moveSelection(InputHandler.isControlDown() ? (hud.meters.size() - 1) - hud.getSelectedRow() : 1);
 			break;
 		default:
 			return false;
@@ -126,12 +128,12 @@ public class MeterListRenderer extends AbstractElement {
 	}
 
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(KeyEvent.Release event) {
 		return false;
 	}
 
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(CharacterEvent.Type event) {
 		return false;
 	}
 

@@ -64,9 +64,9 @@ public class OptionsCategoryElement extends AbstractParentElement {
 
 		public OptionElement(Option option) {
 			this.option = option;
-			this.name = new Label(0, 0, t -> t.setLines(this.option.getName()).setShadow(true), () -> Tooltips.split(option.getDescription()), t -> false);
+			this.name = new Label(0, 0, t -> t.setLines(this.option.getName()).setShadow(true), () -> Tooltips.split(option.getDescription()), (t, event) -> false);
 			this.control = this.option.createControl(100, Button.DEFAULT_HEIGHT);
-			this.reset = new BasicButton(0, 0, 50, Button.DEFAULT_HEIGHT, Texts::guiControlsReset, Tooltips::empty, button -> {
+			this.reset = new BasicButton(0, 0, 50, Button.DEFAULT_HEIGHT, Texts::guiControlsReset, Tooltips::empty, (button, event) -> {
 				this.option.reset();
 				return true;
 			});

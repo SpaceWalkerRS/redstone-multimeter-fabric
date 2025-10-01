@@ -1,7 +1,6 @@
 package redstone.multimeter.client.gui.element;
 
-import org.lwjgl.glfw.GLFW;
-
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.client.gui.tooltip.Tooltips;
 
@@ -26,8 +25,8 @@ public abstract class AbstractElement implements Element {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+	public boolean mouseClick(MouseEvent.Click event) {
+		if (event.isLeftButton()) {
 			this.setDraggingMouse(true);
 		}
 
@@ -35,8 +34,8 @@ public abstract class AbstractElement implements Element {
 	}
 
 	@Override
-	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+	public boolean mouseRelease(MouseEvent.Release event) {
+		if (event.isLeftButton()) {
 			this.setDraggingMouse(false);
 		}
 

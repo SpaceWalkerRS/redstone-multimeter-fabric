@@ -4,10 +4,11 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.screens.Screen;
-
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 
 public class SelectorList extends ScrollableList {
 
@@ -39,10 +40,10 @@ public class SelectorList extends ScrollableList {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		boolean consumed = super.mouseClick(event);
 
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (event.isLeftButton()) {
 			consumed |= this.setSelection(this.getFocusedElement(), true);
 		}
 
@@ -50,13 +51,13 @@ public class SelectorList extends ScrollableList {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = super.keyPress(keyCode, scanCode, modifiers);
+	public boolean keyPress(KeyEvent.Press event) {
+		boolean consumed = super.keyPress(event);
 
 		if (!consumed) {
-			switch (keyCode) {
+			switch (event.keyCode()) {
 			case GLFW.GLFW_KEY_TAB:
-				return this.moveSelection(!Screen.hasShiftDown(), false);
+				return this.moveSelection(!InputHandler.isShiftDown(), false);
 			case GLFW.GLFW_KEY_UP:
 				return this.moveSelection(false, false);
 			case GLFW.GLFW_KEY_DOWN:

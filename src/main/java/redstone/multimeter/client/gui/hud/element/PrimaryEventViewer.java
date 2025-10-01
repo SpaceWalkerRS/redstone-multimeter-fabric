@@ -1,11 +1,10 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import org.lwjgl.glfw.GLFW;
-
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.Element;
 import redstone.multimeter.client.gui.element.button.Button;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.hud.Orientation;
 import redstone.multimeter.client.gui.hud.MultimeterHud;
 import redstone.multimeter.client.option.Options;
@@ -40,22 +39,22 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
+	public boolean mouseClick(MouseEvent.Click event) {
 		boolean wasDragging = isDraggingMouse();
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+		boolean consumed = super.mouseClick(event);
 
 		if (!consumed && !wasDragging) {
 			if (isDraggingMouse()) {
 				dx = 0.0D;
 
-				if (isMouseOverBorder(mouseX)) {
+				if (isMouseOverBorder(event.mouseX())) {
 					setResizing(true);
 				}
 
 				consumed = true;
 			}
-			if (hud.isPaused() && !hud.isFocusMode() && button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-				int column = getHoveredColumn(mouseX);
+			if (hud.isPaused() && !hud.isFocusMode() && event.isRightButton()) {
+				int column = getHoveredColumn(event.mouseX());
 				int max = getColumnCount() - 1;
 
 				if (column > max) {
@@ -73,30 +72,30 @@ public class PrimaryEventViewer extends MeterEventViewer {
 	}
 
 	@Override
-	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+	public boolean mouseRelease(MouseEvent.Release event) {
+		if (event.isLeftButton()) {
 			setResizing(false);
 		}
 
-		return super.mouseRelease(mouseX, mouseY, button);
+		return super.mouseRelease(event);
 	}
 
 	@Override
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	public boolean mouseDrag(MouseEvent.Drag event) {
 		if (hud.isFocusMode() || !isDraggingMouse()) {
 			return false;
 		}
 
-		return stepAndResize(deltaX);
+		return stepAndResize(event.deltaX());
 	}
 
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (hud.isFocusMode() || isDraggingMouse() || Math.abs(scrollX) < 1.0D) {
+	public boolean mouseScroll(MouseEvent.Scroll event) {
+		if (hud.isFocusMode() || isDraggingMouse() || Math.abs(event.scrollX()) < 1.0D) {
 			return false;
 		}
 
-		return stepAndResize(scrollX);
+		return stepAndResize(event.scrollX());
 	}
 
 	@Override

@@ -11,6 +11,9 @@ import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractElement;
+import redstone.multimeter.client.gui.element.input.CharacterEvent;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 
 public class SuggestionsMenu extends AbstractElement {
 
@@ -177,13 +180,13 @@ public class SuggestionsMenu extends AbstractElement {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		if (this.input.isMouseOver(mouseX, mouseY)) {
-			return this.input.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		if (this.input.isMouseOver(event.mouseX(), event.mouseY())) {
+			return this.input.mouseClick(event);
 		} else {
-			boolean consumed = super.mouseClick(mouseX, mouseY, button);
+			boolean consumed = super.mouseClick(event);
 
-			if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+			if (!consumed && event.isLeftButton()) {
 				if (this.isShowingSuggestions()) {
 					int idx = this.hovered;
 
@@ -201,23 +204,23 @@ public class SuggestionsMenu extends AbstractElement {
 	}
 
 	@Override
-	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
-		return this.input.mouseRelease(mouseX, mouseY, button) || consumed;
+	public boolean mouseRelease(MouseEvent.Release event) {
+		boolean consumed = super.mouseRelease(event);
+		return this.input.mouseRelease(event) || consumed;
 	}
 
 	@Override
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		return this.input.isMouseOver(mouseX, mouseY) && this.input.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
+	public boolean mouseDrag(MouseEvent.Drag event) {
+		return this.input.isMouseOver(event.mouseX(), event.mouseY()) && this.input.mouseDrag(event);
 	}
 
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (this.input.isMouseOver(mouseX, mouseY)) {
-			return this.input.mouseScroll(mouseX, mouseY, scrollX, scrollY);
+	public boolean mouseScroll(MouseEvent.Scroll event) {
+		if (this.input.isMouseOver(event.mouseX(), event.mouseY())) {
+			return this.input.mouseScroll(event);
 		}
 		if (this.isShowingSuggestions()) {
-			this.moveSelection(-(int)scrollY);
+			this.moveSelection(-(int)event.scrollY());
 			return true;
 		}
 
@@ -225,14 +228,14 @@ public class SuggestionsMenu extends AbstractElement {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_ENTER) {
+	public boolean keyPress(KeyEvent.Press event) {
+		if (event.keyCode() == GLFW.GLFW_KEY_ESCAPE || event.keyCode() == GLFW.GLFW_KEY_ENTER) {
 			this.setFocused(false);
 		}
 
 		boolean consumed = false;
 
-		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+		if (event.keyCode() == GLFW.GLFW_KEY_ESCAPE) {
 			this.setFocused(false);
 			consumed = true;
 		}
@@ -240,7 +243,7 @@ public class SuggestionsMenu extends AbstractElement {
 		if (this.hasSuggestions()) {
 			consumed = true;
 
-			switch (keyCode) {
+			switch (event.keyCode()) {
 			case GLFW.GLFW_KEY_UP:
 				this.moveSelection(-1);
 				break;
@@ -256,7 +259,7 @@ public class SuggestionsMenu extends AbstractElement {
 			case GLFW.GLFW_KEY_TAB:
 			case GLFW.GLFW_KEY_ENTER:
 				this.useSelection();
-				if (keyCode == GLFW.GLFW_KEY_ENTER) {
+				if (event.keyCode() == GLFW.GLFW_KEY_ENTER) {
 					this.setFocused(false);
 				}
 				break;
@@ -265,17 +268,17 @@ public class SuggestionsMenu extends AbstractElement {
 			}
 		}
 
-		return consumed || this.input.keyPress(keyCode, scanCode, modifiers);
+		return consumed || this.input.keyPress(event);
 	}
 
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
-		return this.input.keyRelease(keyCode, scanCode, modifiers);
+	public boolean keyRelease(KeyEvent.Release event) {
+		return this.input.keyRelease(event);
 	}
 
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
-		return this.input.typeChar(chr, modifiers);
+	public boolean typeChar(CharacterEvent.Type event) {
+		return this.input.typeChar(event);
 	}
 
 	@Override

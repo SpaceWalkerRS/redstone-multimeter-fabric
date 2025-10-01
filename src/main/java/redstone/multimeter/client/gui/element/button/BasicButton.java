@@ -2,9 +2,10 @@ package redstone.multimeter.client.gui.element.button;
 
 import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
-
 import redstone.multimeter.client.gui.element.action.MousePress;
+import redstone.multimeter.client.gui.element.input.CharacterEvent;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
 
@@ -27,10 +28,10 @@ public class BasicButton extends AbstractButton {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		boolean consumed = super.mouseClick(event);
 
-		if (!consumed && isActive() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT && onPress.accept(this)) {
+		if (!consumed && isActive() && event.isLeftButton() && onPress.accept(this, event)) {
 			Button.playClickSound();
 			consumed = true;
 		}
@@ -39,27 +40,27 @@ public class BasicButton extends AbstractButton {
 	}
 
 	@Override
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	public boolean mouseDrag(MouseEvent.Drag event) {
 		return false;
 	}
 
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+	public boolean mouseScroll(MouseEvent.Scroll event) {
 		return false;
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(KeyEvent.Press event) {
 		return false;
 	}
 
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(KeyEvent.Release event) {
 		return false;
 	}
 
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(CharacterEvent.Type event) {
 		return false;
 	}
 

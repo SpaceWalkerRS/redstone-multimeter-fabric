@@ -5,6 +5,9 @@ import org.lwjgl.glfw.GLFW;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.element.input.CharacterEvent;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
 
 public interface Element {
@@ -17,19 +20,19 @@ public interface Element {
 
 	void mouseMove(double mouseX, double mouseY);
 
-	boolean mouseClick(double mouseX, double mouseY, int button);
+	boolean mouseClick(MouseEvent.Click event);
 
-	boolean mouseRelease(double mouseX, double mouseY, int button);
+	boolean mouseRelease(MouseEvent.Release event);
 
-	boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY);
+	boolean mouseDrag(MouseEvent.Drag event);
 
-	boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY);
+	boolean mouseScroll(MouseEvent.Scroll event);
 
-	boolean keyPress(int keyCode, int scanCode, int modifiers);
+	boolean keyPress(KeyEvent.Press event);
 
-	boolean keyRelease(int keyCode, int scanCode, int modifiers);
+	boolean keyRelease(KeyEvent.Release event);
 
-	boolean typeChar(char chr, int modifiers);
+	boolean typeChar(CharacterEvent.Type event);
 
 	boolean isHovered();
 

@@ -4,12 +4,13 @@ import com.mojang.blaze3d.platform.Window;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
-import net.minecraft.client.gui.screens.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.texture.Textures;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
@@ -55,18 +56,18 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		return super.mouseClick(mouseX, mouseY, button) || client.getInputHandler().mouseClick(this, mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		return super.mouseClick(event) || client.getInputHandler().mouseClick(this, event);
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		return super.keyPress(keyCode, scanCode, modifiers) || client.getInputHandler().keyPress(this, keyCode, scanCode, modifiers);
+	public boolean keyPress(KeyEvent.Press event) {
+		return super.keyPress(event) || client.getInputHandler().keyPress(this, event);
 	}
 
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		return client.getInputHandler().mouseScroll(this, scrollX, scrollY) || super.mouseScroll(mouseX, mouseY, scrollX, scrollY);
+	public boolean mouseScroll(MouseEvent.Scroll event) {
+		return client.getInputHandler().mouseScroll(this, event) || super.mouseScroll(event);
 	}
 
 	@Override
@@ -140,9 +141,5 @@ public abstract class RSMMScreen extends AbstractParentElement {
 
 	public boolean isPauseScreen() {
 		return true;
-	}
-
-	public static boolean isControlPressed() {
-		return Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
 	}
 }

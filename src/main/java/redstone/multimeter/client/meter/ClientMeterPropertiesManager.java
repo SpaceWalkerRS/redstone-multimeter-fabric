@@ -24,7 +24,6 @@ import com.google.gson.JsonSyntaxException;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -33,6 +32,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.option.Options;
@@ -101,7 +101,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 			properties.setColor(Options.RedstoneMultimeter.COLOR_PICKER.get().next());
 		}
 		if (Options.RedstoneMultimeter.SHIFTY_METERS.get()) {
-			properties.setMovable(!Screen.hasShiftDown());
+			properties.setMovable(!InputHandler.isShiftDown());
 		}
 		for (int index = 0; index < EventType.ALL.length; index++) {
 			KeyMapping keybind = Keybinds.TOGGLE_EVENT_TYPES[index];
