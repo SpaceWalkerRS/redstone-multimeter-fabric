@@ -20,6 +20,7 @@ import redstone.multimeter.client.gui.element.button.SuggestionsMenu;
 import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.ToggleButton;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
 import redstone.multimeter.client.gui.element.meter.MeterPropertyElement;
 import redstone.multimeter.client.gui.text.Formatting;
 import redstone.multimeter.client.gui.text.Text;
@@ -77,14 +78,14 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = super.keyPress(keyCode, scanCode, modifiers) || blockList.keyPress(keyCode, scanCode, modifiers);
+	public boolean keyPress(KeyEvent.Press event) {
+		boolean consumed = super.keyPress(event) || blockList.keyPress(event);
 
 		if (!consumed) {
-			if (remove.isActive() && keyCode == GLFW.GLFW_KEY_KP_SUBTRACT) {
+			if (remove.isActive() && event.keyCode() == GLFW.GLFW_KEY_KP_SUBTRACT) {
 				remove();
 				consumed = true;
-			} else if (add.isActive() && keyCode == GLFW.GLFW_KEY_KP_ADD) {
+			} else if (add.isActive() && event.keyCode() == GLFW.GLFW_KEY_KP_ADD) {
 				add();
 				consumed = true;
 			}
@@ -121,18 +122,18 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 
 		searchbar = new TextField(x, y, searchbarWidth, Button.DEFAULT_HEIGHT, Tooltips::empty, text -> blockList.update(), null);
 		searchbar.setHint(Texts.translatable("rsmm.gui.searchbar.hint"));
-		Button clear = new BasicButton(x + searchbarWidth + 2, y, 20, Button.DEFAULT_HEIGHT, () -> Texts.literal("X"), Tooltips::empty, button -> {
+		Button clear = new BasicButton(x + searchbarWidth + 2, y, 20, Button.DEFAULT_HEIGHT, () -> Texts.literal("X"), Tooltips::empty, (button, event) -> {
 			searchbar.clear();
 			return true;
 		});
 
 		y = blockList.getY() + blockList.getTotalHeight() - (BLOCK_LIST_BOTTOM_BORDER - 3) + 2;
 
-		add = new BasicButton(x, y, Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT, () -> Texts.literal("+").format(Formatting.GREEN), Tooltips::empty, button -> {
+		add = new BasicButton(x, y, Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT, () -> Texts.literal("+").format(Formatting.GREEN), Tooltips::empty, (button, event) -> {
 			add();
 			return true;
 		});
-		remove = new BasicButton(x + (Button.DEFAULT_HEIGHT + 2), y, Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT, () -> Texts.literal("-").format(Formatting.RED), Tooltips::empty, button -> {
+		remove = new BasicButton(x + (Button.DEFAULT_HEIGHT + 2), y, Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT, () -> Texts.literal("-").format(Formatting.RED), Tooltips::empty, (button, event) -> {
 			remove();
 			return true;
 		});
@@ -155,11 +156,11 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		x = getX() + getWidth() / 2;
 		y = getY() + getHeight() - (8 + Button.DEFAULT_HEIGHT);
 
-		Button cancel = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiCancel, Tooltips::empty, button -> {
+		Button cancel = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiCancel, Tooltips::empty, (button, event) -> {
 			close();
 			return true;
 		});
-		Button done = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiDone, Tooltips::empty, button -> {
+		Button done = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiDone, Tooltips::empty, (button, event) -> {
 			save();
 			close();
 			return true;
@@ -189,7 +190,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	private Button createTabButton(Tab tab, int x, int y, int width, int height) {
-		return new BasicButton(x, y, width, height, tab::getName, Tooltips::empty, button -> {
+		return new BasicButton(x, y, width, height, tab::getName, Tooltips::empty, (button, event) -> {
 			selectTab(tab);
 			selectBlock(null);
 			return true;

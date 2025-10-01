@@ -8,11 +8,11 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.ResourceLocationException;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
@@ -24,6 +24,8 @@ import redstone.multimeter.client.gui.element.button.Slider;
 import redstone.multimeter.client.gui.element.button.SuggestionsProvider;
 import redstone.multimeter.client.gui.element.button.TextField;
 import redstone.multimeter.client.gui.element.button.ToggleButton;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.text.Formatting;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
@@ -63,14 +65,14 @@ public class MeterControlsElement extends AbstractParentElement {
 				t.addLine(Texts.translatable("rsmm.gui.meterControls.edit", this.meter.getName()).format(Formatting.UNDERLINED)).setShadow(true);
 			}
 		});
-		this.hideButton = new BasicButton(0, 0, 18, 18, () -> Texts.literal(this.meter != null && this.meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltips.translatable("rsmm.gui.meterControls." + (this.meter == null || this.meter.isHidden() ? "unhide" : "hide")), button -> {
+		this.hideButton = new BasicButton(0, 0, 18, 18, () -> Texts.literal(this.meter != null && this.meter.isHidden() ? "\u25A0" : "\u25A1"), () -> Tooltips.translatable("rsmm.gui.meterControls." + (this.meter == null || this.meter.isHidden() ? "unhide" : "hide")), (button, event) -> {
 			this.client.getMeterGroup().toggleHidden(this.meter);
 			return true;
 		});
-		this.deleteButton = new BasicButton(0, 0, 18, 18, () -> Texts.literal("X").format(this.triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltips.keybind(Texts.translatable("rsmm.gui.meterControls.delete"), Keybinds.TOGGLE_METER), button -> {
+		this.deleteButton = new BasicButton(0, 0, 18, 18, () -> Texts.literal("X").format(this.triedDeleting ? Formatting.RED : Formatting.WHITE), () -> Tooltips.keybind(Texts.translatable("rsmm.gui.meterControls.delete"), Keybinds.TOGGLE_METER), (button, event) -> {
 			this.tryDelete();
 
-			if (this.triedDeleting && Screen.hasShiftDown()) {
+			if (this.triedDeleting && InputHandler.isShiftDown()) {
 				this.tryDelete(); // delete without asking for confirmation first
 			}
 
@@ -90,8 +92,8 @@ public class MeterControlsElement extends AbstractParentElement {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		boolean consumed = super.mouseClick(event);
 
 		if (this.triedDeleting && getFocusedElement() != this.deleteButton) {
 			this.undoTryDelete();
@@ -102,10 +104,10 @@ public class MeterControlsElement extends AbstractParentElement {
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = super.keyPress(keyCode, scanCode, modifiers);
+	public boolean keyPress(KeyEvent.Press event) {
+		boolean consumed = super.keyPress(event);
 
-		if (this.triedDeleting && keyCode == GLFW.GLFW_KEY_ESCAPE) {
+		if (this.triedDeleting && event.keyCode() == GLFW.GLFW_KEY_ESCAPE) {
 			this.undoTryDelete();
 			consumed = true;
 		}
@@ -158,7 +160,7 @@ public class MeterControlsElement extends AbstractParentElement {
 		int totalWidth = 375;
 		int buttonWidth = 150;
 
-		MeterPropertyElement pos = new MeterPropertyElement(totalWidth, buttonWidth, "pos", () -> Tooltips.translatable("rsmm.gui.meterControls.clickToTeleport"), t -> {
+		MeterPropertyElement pos = new MeterPropertyElement(totalWidth, buttonWidth, "pos", () -> Tooltips.translatable("rsmm.gui.meterControls.clickToTeleport"), (t, event) -> {
 			this.teleport();
 			return true;
 		});

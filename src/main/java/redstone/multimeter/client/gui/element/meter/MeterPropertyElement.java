@@ -4,10 +4,10 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.element.AbstractParentElement;
@@ -269,8 +269,8 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 			int size = this.getHeight() / 2 - 1;
 
-			this.increase = new TransparentButton(0, 0, size, size, () -> Texts.literal("+"), Tooltips::empty, button -> {
-				int distance = Screen.hasShiftDown() ? 10 : 1;
+			this.increase = new TransparentButton(0, 0, size, size, () -> Texts.literal("+"), Tooltips::empty, (button, event) -> {
+				int distance = InputHandler.isShiftDown() ? 10 : 1;
 				DimPos pos = getter.get();
 				DimPos newPos = pos.relative(axis, distance);
 
@@ -278,8 +278,8 @@ public class MeterPropertyElement extends AbstractParentElement {
 
 				return true;
 			});
-			this.decrease = new TransparentButton(0, 0, size, size, () -> Texts.literal("-"), Tooltips::empty, button -> {
-				int distance = Screen.hasShiftDown() ? 10 : 1;
+			this.decrease = new TransparentButton(0, 0, size, size, () -> Texts.literal("-"), Tooltips::empty, (button, event) -> {
+				int distance = InputHandler.isShiftDown() ? 10 : 1;
 				DimPos pos = getter.get();
 				DimPos newPos = pos.relative(axis, -distance);
 

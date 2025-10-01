@@ -51,7 +51,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 				}
 
 				return Tooltips.empty();
-			}, t -> {
+			}, (t, e) -> {
 				request();
 				return true;
 			});
@@ -59,7 +59,7 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			x = getX() + (getWidth() - Button.DEFAULT_WIDTH) / 2;
 			y = getY() + getHeight() - (8 + Button.DEFAULT_HEIGHT);
 
-			Button done = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiDone, Tooltips::empty, button -> {
+			Button done = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiDone, Tooltips::empty, (button, event) -> {
 				close();
 				return true;
 			});
@@ -84,11 +84,11 @@ public class TickPhaseTreeScreen extends RSMMScreen {
 			x = getX() + getWidth() / 2;
 			y = getY() + getHeight() - (Button.DEFAULT_HEIGHT + 8);
 
-			Button rebuild = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, () -> Texts.translatable("rsmm.gui.tickPhases.refresh"), Tooltips::empty, button -> {
+			Button rebuild = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, () -> Texts.translatable("rsmm.gui.tickPhases.refresh"), Tooltips::empty, (button, event) -> {
 				rebuild();
 				return true;
 			});
-			Button done = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiDone, Tooltips::empty, button -> {
+			Button done = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiDone, Tooltips::empty, (button, event) -> {
 				close();
 				return true;
 			});

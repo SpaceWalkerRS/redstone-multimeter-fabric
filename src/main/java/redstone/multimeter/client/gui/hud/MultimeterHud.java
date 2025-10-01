@@ -5,8 +5,7 @@ import java.util.List;
 
 import com.mojang.blaze3d.platform.Window;
 
-import net.minecraft.client.gui.screens.Screen;
-
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.Keybinds;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.FontRenderer;
@@ -15,6 +14,7 @@ import redstone.multimeter.client.gui.element.AbstractParentElement;
 import redstone.multimeter.client.gui.element.Element;
 import redstone.multimeter.client.gui.element.Label;
 import redstone.multimeter.client.gui.element.button.TransparentButton;
+import redstone.multimeter.client.gui.element.input.MouseEvent.Click;
 import redstone.multimeter.client.gui.hud.element.MeterEventDetails;
 import redstone.multimeter.client.gui.hud.element.MeterListRenderer;
 import redstone.multimeter.client.gui.hud.element.PrimaryEventViewer;
@@ -118,8 +118,8 @@ public class MultimeterHud extends AbstractParentElement {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(Click event) {
+		boolean consumed = super.mouseClick(event);
 
 		if (!consumed) {
 			selectMeter(null);
@@ -382,12 +382,12 @@ public class MultimeterHud extends AbstractParentElement {
 			}
 		}, () -> Tooltips.keybind(Keybinds.TOGGLE_MARKER));
 
-		this.playPauseButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltips.keybind(Keybinds.PAUSE_TIMELINE), button -> {
+		this.playPauseButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(!onScreen ^ paused ? "\u23f5" : "\u23f8"), () -> Tooltips.keybind(Keybinds.PAUSE_TIMELINE), (button, event) -> {
 			togglePaused();
 			return true;
 		});
-		this.fastBackwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(false, Screen.hasControlDown())), () -> Tooltips.keybind(Keybinds.STEP_BACKWARD, Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
-			stepBackward(Screen.hasControlDown());
+		this.fastBackwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(false, InputHandler.isControlDown())), () -> Tooltips.keybind(Keybinds.STEP_BACKWARD, Keybinds.STEP_BACKWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), (button, event) -> {
+			stepBackward(InputHandler.isControlDown());
 			return true;
 		}) {
 
@@ -396,8 +396,8 @@ public class MultimeterHud extends AbstractParentElement {
 				update();
 			}
 		};
-		this.fastForwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(true, Screen.hasControlDown())), () -> Tooltips.keybind(Keybinds.STEP_FORWARD, Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), button -> {
-			stepForward(Screen.hasControlDown());
+		this.fastForwardButton = new TransparentButton(0, 0, 9, 9, () -> Texts.literal(getStepSymbol(true, InputHandler.isControlDown())), () -> Tooltips.keybind(Keybinds.STEP_FORWARD, Keybinds.STEP_FORWARD, new Object[] { Keybinds.SCROLL_HUD, "scroll" }), (button, event) -> {
+			stepForward(InputHandler.isControlDown());
 			return true;
 		}) {
 

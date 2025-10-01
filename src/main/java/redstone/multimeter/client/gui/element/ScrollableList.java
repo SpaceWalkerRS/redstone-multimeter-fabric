@@ -1,8 +1,7 @@
 package redstone.multimeter.client.gui.element;
 
-import org.lwjgl.glfw.GLFW;
-
 import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.option.Options;
 
 public class ScrollableList extends SimpleList {
@@ -57,11 +56,11 @@ public class ScrollableList extends SimpleList {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		boolean consumed = super.mouseClick(event);
 
-		if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			this.scrollMode = this.getScrollMode(mouseX, mouseY);
+		if (!consumed && event.isLeftButton()) {
+			this.scrollMode = this.getScrollMode(event.mouseX(), event.mouseY());
 
 			if (this.scrollMode != ScrollMode.NONE) {
 				consumed = true;
@@ -72,10 +71,10 @@ public class ScrollableList extends SimpleList {
 	}
 
 	@Override
-	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
+	public boolean mouseRelease(MouseEvent.Release event) {
+		boolean consumed = super.mouseRelease(event);
 
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (event.isLeftButton()) {
 			this.scrollMode = ScrollMode.NONE;
 		}
 
@@ -83,22 +82,22 @@ public class ScrollableList extends SimpleList {
 	}
 
 	@Override
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		boolean consumed = super.mouseDrag(mouseX, mouseY, button, deltaX, deltaY);
+	public boolean mouseDrag(MouseEvent.Drag event) {
+		boolean consumed = super.mouseDrag(event);
 
 		if (!consumed && this.scrollMode == ScrollMode.DRAG) {
-			consumed = this.scroll(deltaY * (this.getMaxScrollAmount() + this.getHeight()) / this.scrollBarHeight);
+			consumed = this.scroll(event.deltaY() * (this.getMaxScrollAmount() + this.getHeight()) / this.scrollBarHeight);
 		}
 
 		return consumed;
 	}
 
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
-		boolean consumed = super.mouseScroll(mouseX, mouseY, scrollX, scrollY);
+	public boolean mouseScroll(MouseEvent.Scroll event) {
+		boolean consumed = super.mouseScroll(event);
 
 		if (!consumed && this.scrollMode == ScrollMode.NONE) {
-			consumed = this.scroll(-Options.Miscellaneous.SCROLL_SPEED.get() * scrollY);
+			consumed = this.scroll(-Options.Miscellaneous.SCROLL_SPEED.get() * event.scrollY());
 		}
 
 		return consumed;

@@ -7,20 +7,21 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.util.Mth;
-import net.minecraft.util.StringUtil;
 
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.FontRenderer;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.Element;
-import redstone.multimeter.client.gui.screen.RSMMScreen;
+import redstone.multimeter.client.gui.element.input.CharacterEvent;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.text.Formatting;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
 import redstone.multimeter.client.gui.tooltip.Tooltips;
-import redstone.multimeter.client.option.Options;
 
 public class TextField extends AbstractButton {
 
@@ -100,15 +101,15 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		boolean consumed = super.mouseClick(event);
 
-		if (!consumed && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			if (!this.isSelecting() && this.isDoubleClick()) {
+		if (!consumed && event.isLeftButton()) {
+			if (!this.isSelecting() && event.doubleClick()) {
 				this.setDraggingMouse(false);
 				this.selectAll();
 			} else {
-				this.setCursorFromMouse(mouseX);
+				this.setCursorFromMouse(event.mouseX());
 			}
 
 			consumed = true;
@@ -118,10 +119,10 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public boolean mouseRelease(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
+	public boolean mouseRelease(MouseEvent.Release event) {
+		boolean consumed = super.mouseRelease(event);
 
-		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+		if (event.isLeftButton()) {
 			consumed = this.stopSelecting(SelectionMethod.MOUSE) || consumed;
 		}
 
@@ -129,24 +130,24 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	public boolean mouseDrag(MouseEvent.Drag event) {
 		boolean consumed = false;
 
-		if (this.selectionMethod == SelectionMethod.MOUSE && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			consumed = this.setCursorFromMouse(mouseX);
+		if (this.selectionMethod == SelectionMethod.MOUSE && event.isLeftButton()) {
+			consumed = this.setCursorFromMouse(event.mouseX());
 		}
 
 		return consumed;
 	}
 
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+	public boolean mouseScroll(MouseEvent.Scroll event) {
 		return false;
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
-		switch (keyCode) {
+	public boolean keyPress(KeyEvent.Press event) {
+		switch (event.keyCode()) {
 		case GLFW.GLFW_KEY_LEFT_SHIFT:
 		case GLFW.GLFW_KEY_RIGHT_SHIFT:
 			this.startSelecting(SelectionMethod.KEYBOARD);
@@ -176,10 +177,10 @@ public class TextField extends AbstractButton {
 			this.setFocused(false);
 			break;
 		default:
-			if (!RSMMScreen.isControlPressed()) {
+			if (!InputHandler.isControlDown()) {
 				break;
 			}
-			switch (keyCode) {
+			switch (event.keyCode()) {
 			case GLFW.GLFW_KEY_A:
 				if (this.selectionMethod != SelectionMethod.MOUSE) {
 					this.selectAll();
@@ -202,10 +203,10 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(KeyEvent.Release event) {
 		boolean consumed = false;
 
-		if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+		if (event.keyCode() == GLFW.GLFW_KEY_LEFT_SHIFT || event.keyCode() == GLFW.GLFW_KEY_RIGHT_SHIFT) {
 			consumed = this.stopSelecting(SelectionMethod.KEYBOARD);
 		}
 
@@ -213,9 +214,9 @@ public class TextField extends AbstractButton {
 	}
 
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
-		if (this.isActive() && StringUtil.isAllowedChatCharacter(chr)) {
-			this.write(String.valueOf(chr));
+	public boolean typeChar(CharacterEvent.Type event) {
+		if (this.isActive() && event.characterAllowedInChat()) {
+			this.write(event.characterAsString());
 			return true;
 		}
 
@@ -694,10 +695,6 @@ public class TextField extends AbstractButton {
 		}
 
 		this.updateScroll();
-	}
-
-	private boolean isDoubleClick() {
-		return this.cursorTicks >= 0 && this.cursorTicks < Options.Miscellaneous.DOUBLE_CLICK_TIME.get();
 	}
 
 	private boolean hasSelection() {

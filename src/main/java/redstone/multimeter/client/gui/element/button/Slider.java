@@ -3,11 +3,12 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
-
 import net.minecraft.util.Mth;
 
 import redstone.multimeter.client.gui.GuiRenderer;
+import redstone.multimeter.client.gui.element.input.CharacterEvent;
+import redstone.multimeter.client.gui.element.input.KeyEvent;
+import redstone.multimeter.client.gui.element.input.MouseEvent;
 import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.texture.TextureRegion;
 import redstone.multimeter.client.gui.texture.TextureRegions;
@@ -40,11 +41,11 @@ public class Slider extends AbstractButton {
 	}
 
 	@Override
-	public boolean mouseClick(double mouseX, double mouseY, int button) {
-		boolean consumed = super.mouseClick(mouseX, mouseY, button);
+	public boolean mouseClick(MouseEvent.Click event) {
+		boolean consumed = super.mouseClick(event);
 
-		if (!consumed && this.isActive() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			this.updateValue(mouseX);
+		if (!consumed && this.isActive() && event.isLeftButton()) {
+			this.updateValue(event.mouseX());
 			consumed = true;
 		}
 
@@ -52,9 +53,9 @@ public class Slider extends AbstractButton {
 	}
 
 	@Override
-	public boolean mouseRelease(double mouseX, double mouseY, int button) {
+	public boolean mouseRelease(MouseEvent.Release event) {
 		boolean wasDragging = this.isDraggingMouse();
-		boolean consumed = super.mouseRelease(mouseX, mouseY, button);
+		boolean consumed = super.mouseRelease(event);
 
 		if (wasDragging != this.isDraggingMouse()) {
 			Button.playClickSound();
@@ -64,9 +65,9 @@ public class Slider extends AbstractButton {
 	}
 
 	@Override
-	public boolean mouseDrag(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (this.isActive() && this.isDraggingMouse() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-			this.updateValue(mouseX);
+	public boolean mouseDrag(MouseEvent.Drag event) {
+		if (this.isActive() && this.isDraggingMouse() && event.isLeftButton()) {
+			this.updateValue(event.mouseX());
 			return true;
 		}
 
@@ -74,22 +75,22 @@ public class Slider extends AbstractButton {
 	}
 
 	@Override
-	public boolean mouseScroll(double mouseX, double mouseY, double scrollX, double scrollY) {
+	public boolean mouseScroll(MouseEvent.Scroll event) {
 		return false;
 	}
 
 	@Override
-	public boolean keyPress(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPress(KeyEvent.Press event) {
 		return false;
 	}
 
 	@Override
-	public boolean keyRelease(int keyCode, int scanCode, int modifiers) {
+	public boolean keyRelease(KeyEvent.Release event) {
 		return false;
 	}
 
 	@Override
-	public boolean typeChar(char chr, int modifiers) {
+	public boolean typeChar(CharacterEvent.Type event) {
 		return false;
 	}
 

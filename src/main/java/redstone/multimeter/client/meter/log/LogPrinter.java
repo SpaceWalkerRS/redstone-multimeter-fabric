@@ -11,9 +11,9 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 
 import redstone.multimeter.RedstoneMultimeterMod;
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.option.Options;
@@ -87,7 +87,7 @@ public class LogPrinter {
 			writer.write("-------------------------------------");
 			writer.newLine();
 
-			if (Options.LogPrinter.PRINT_OLD_LOGS.get() || Screen.hasShiftDown()) {
+			if (Options.LogPrinter.PRINT_OLD_LOGS.get() || InputHandler.isShiftDown()) {
 				printLogs();
 			} else {
 				prevTick = firstTick;

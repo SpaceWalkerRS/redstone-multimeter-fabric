@@ -52,18 +52,18 @@ public class OptionsScreen extends RSMMScreen {
 		int x = getX() + getWidth() / 2;
 		int y = getY() + 22;
 
-		Button properties = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, () -> Texts.translatable("rsmm.gui.defaultMeterProperties.title"), Tooltips::empty, button -> {
+		Button properties = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, () -> Texts.translatable("rsmm.gui.defaultMeterProperties.title"), Tooltips::empty, (button, event) -> {
 			client.openScreen(new DefaultMeterPropertiesScreen());
 			return true;
 		});
-		Button controls = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiControls, Tooltips::empty, button -> {
+		Button controls = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiControls, Tooltips::empty, (button, event) -> {
 			minecraft.setScreen(new ControlsScreen(wrapper, minecraft.options));
 			return true;
 		});
 
 		y = getY() + getHeight() - (Button.DEFAULT_HEIGHT + 8);
 
-		Button reset = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiControlsReset, Tooltips::empty, button -> {
+		Button reset = new BasicButton(x - (4 + Button.DEFAULT_WIDTH), y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiControlsReset, Tooltips::empty, (button, event) -> {
 			for (Option option : Options.all()) {
 				option.reset();
 			}
@@ -71,7 +71,7 @@ public class OptionsScreen extends RSMMScreen {
 
 			return true;
 		});
-		Button done = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiDone, Tooltips::empty, button -> {
+		Button done = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiDone, Tooltips::empty, (button, event) -> {
 			close();
 			return true;
 		});

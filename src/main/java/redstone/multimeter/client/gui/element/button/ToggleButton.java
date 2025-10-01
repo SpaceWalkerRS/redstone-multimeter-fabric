@@ -16,6 +16,6 @@ public class ToggleButton extends BasicButton {
 	}
 
 	public ToggleButton(int x, int y, int width, int height, Function<Boolean, Text> text, Supplier<Boolean> getter, Consumer<BasicButton> toggle) {
-		super(x, y, width, height, () -> text.apply(getter.get()), Tooltips::empty, button -> { toggle.accept(button); return true; });
+		super(x, y, width, height, () -> text.apply(getter.get()), Tooltips::empty, (button, event) -> { toggle.accept(button); return true; });
 	}
 }

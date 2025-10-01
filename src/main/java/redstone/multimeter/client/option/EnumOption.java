@@ -1,7 +1,6 @@
 package redstone.multimeter.client.option;
 
-import net.minecraft.client.gui.screens.Screen;
-
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.gui.element.button.BasicButton;
 import redstone.multimeter.client.gui.element.button.Button;
 import redstone.multimeter.client.gui.text.Text;
@@ -49,8 +48,8 @@ public class EnumOption<T extends Enum<T> & Cyclable<T>> extends BaseOption<T> {
 
 	@Override
 	public Button createControl(int width, int height) {
-		return new BasicButton(0, 0, width, height, this::getDisplayValue, this::getTooltip, button -> {
-			this.cycle(!Screen.hasShiftDown());
+		return new BasicButton(0, 0, width, height, this::getDisplayValue, this::getTooltip, (button, event) -> {
+			this.cycle(!InputHandler.isShiftDown());
 			return true;
 		});
 	}

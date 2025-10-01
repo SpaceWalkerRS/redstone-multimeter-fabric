@@ -1,7 +1,6 @@
 package redstone.multimeter.client.gui.screen;
 
-import net.minecraft.client.gui.screens.Screen;
-
+import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.ScrollableList;
 import redstone.multimeter.client.gui.element.meter.MeterControlsElement;
@@ -18,7 +17,7 @@ public class MultimeterScreen extends RSMMScreen {
 	public MultimeterScreen() {
 		super(Texts.modName(), false);
 
-		this.isPauseScreen = !Screen.hasShiftDown();
+		this.isPauseScreen = !InputHandler.isShiftDown();
 	}
 
 	@Override
