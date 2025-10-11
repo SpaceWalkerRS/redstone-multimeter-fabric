@@ -153,7 +153,7 @@ public class InputHandler {
 	// Methods for handling keybinds while the client has a screen open
 
 	public boolean mouseClick(RSMMScreen screen, MouseEvent.Click event) {
-		if (Keybinds.OPEN_MULTIMETER_SCREEN.matchesMouse(event.button())) {
+		if (Keybinds.matches(Keybinds.OPEN_MULTIMETER_SCREEN, event)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
@@ -163,13 +163,13 @@ public class InputHandler {
 					client.openScreen(new MultimeterScreen());
 				}
 			}
-		} else if (Keybinds.OPEN_OPTIONS_MENU.matchesMouse(event.button())) {
+		} else if (Keybinds.matches(Keybinds.OPEN_OPTIONS_MENU, event)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
 				client.openScreen(new OptionsScreen());
 			}
-		} else if (Keybinds.VIEW_TICK_PHASE_TREE.matchesMouse(event.button())) {
+		} else if (Keybinds.matches(Keybinds.VIEW_TICK_PHASE_TREE, event)) {
 			if (!client.isConnected()) {
 				return false;
 			} else if (screen instanceof TickPhaseTreeScreen) {
@@ -178,15 +178,15 @@ public class InputHandler {
 				client.openScreen(new TickPhaseTreeScreen());
 			}
 		} else if (screen instanceof MultimeterScreen) {
-			if (Keybinds.PAUSE_TIMELINE.matchesMouse(event.button())) {
+			if (Keybinds.matches(Keybinds.PAUSE_TIMELINE, event)) {
 				client.getHud().togglePaused();
-			} else if (Keybinds.TOGGLE_FOCUS_MODE.matchesMouse(event.button())) {
+			} else if (Keybinds.matches(Keybinds.TOGGLE_FOCUS_MODE, event)) {
 				client.getHud().toggleFocusMode();
-			} else if (Keybinds.TOGGLE_MARKER.matchesMouse(event.button())) {
+			} else if (Keybinds.matches(Keybinds.TOGGLE_MARKER, event)) {
 				client.getHud().toggleTickMarker(isControlDown());
-			} else if (Keybinds.STEP_BACKWARD.matchesMouse(event.button())) {
+			} else if (Keybinds.matches(Keybinds.STEP_BACKWARD, event)) {
 				client.getHud().stepBackward(isControlDown());
-			} else if (Keybinds.STEP_FORWARD.matchesMouse(event.button())) {
+			} else if (Keybinds.matches(Keybinds.STEP_FORWARD, event)) {
 				client.getHud().stepForward(isControlDown());
 			} else {
 				return false;
@@ -199,7 +199,7 @@ public class InputHandler {
 	}
 
 	public boolean keyPress(RSMMScreen screen, KeyEvent.Press event) {
-		if (Keybinds.OPEN_MULTIMETER_SCREEN.matches(event.keyCode(), event.scanCode())) {
+		if (Keybinds.matches(Keybinds.OPEN_MULTIMETER_SCREEN, event)) {
 			if (screen instanceof MultimeterScreen) {
 				screen.close();
 			} else {
@@ -209,13 +209,13 @@ public class InputHandler {
 					client.openScreen(new MultimeterScreen());
 				}
 			}
-		} else if (Keybinds.OPEN_OPTIONS_MENU.matches(event.keyCode(), event.scanCode())) {
+		} else if (Keybinds.matches(Keybinds.OPEN_OPTIONS_MENU, event)) {
 			if (screen instanceof OptionsScreen) {
 				screen.close();
 			} else {
 				client.openScreen(new OptionsScreen());
 			}
-		} else if (Keybinds.VIEW_TICK_PHASE_TREE.matches(event.keyCode(), event.scanCode())) {
+		} else if (Keybinds.matches(Keybinds.VIEW_TICK_PHASE_TREE, event)) {
 			if (!client.isConnected()) {
 				return false;
 			} else if (screen instanceof TickPhaseTreeScreen) {
@@ -224,15 +224,15 @@ public class InputHandler {
 				client.openScreen(new TickPhaseTreeScreen());
 			}
 		} else if (screen instanceof MultimeterScreen) {
-			if (Keybinds.PAUSE_TIMELINE.matches(event.keyCode(), event.scanCode())) {
+			if (Keybinds.matches(Keybinds.PAUSE_TIMELINE, event)) {
 				client.getHud().togglePaused();
-			} else if (Keybinds.TOGGLE_FOCUS_MODE.matches(event.keyCode(), event.scanCode())) {
+			} else if (Keybinds.matches(Keybinds.TOGGLE_FOCUS_MODE, event)) {
 				client.getHud().toggleFocusMode();
-			} else if (Keybinds.TOGGLE_MARKER.matches(event.keyCode(), event.scanCode())) {
+			} else if (Keybinds.matches(Keybinds.TOGGLE_MARKER, event)) {
 				client.getHud().toggleTickMarker(isControlDown());
-			} else if (Keybinds.STEP_BACKWARD.matches(event.keyCode(), event.scanCode())) {
+			} else if (Keybinds.matches(Keybinds.STEP_BACKWARD, event)) {
 				client.getHud().stepBackward(isControlDown());
-			} else if (Keybinds.STEP_FORWARD.matches(event.keyCode(), event.scanCode())) {
+			} else if (Keybinds.matches(Keybinds.STEP_FORWARD, event)) {
 				client.getHud().stepForward(isControlDown());
 			} else {
 				return false;
@@ -246,7 +246,7 @@ public class InputHandler {
 
 	public boolean mouseScroll(RSMMScreen screen, MouseEvent.Scroll event) {
 		if (screen instanceof MultimeterScreen) {
-			if (isPressed(Keybinds.SCROLL_HUD)) {
+			if (Keybinds.isPressed(Keybinds.SCROLL_HUD)) {
 				client.getHud().scroll((int)Math.round(event.scrollY()), true);
 			} else {
 				return false;
@@ -256,9 +256,5 @@ public class InputHandler {
 		}
 
 		return true;
-	}
-
-	private boolean isPressed(KeyMapping keybind) {
-		return Keybinds.isPressed(keybind);
 	}
 }
