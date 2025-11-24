@@ -36,7 +36,9 @@ public class HudSettings {
 	}
 
 	public int opacity() {
-		return forceFullOpacity ? 100 : Options.HUD.OPACITY.get();
+//		disabled until better support for HUD opacity is implemented
+//		return forceFullOpacity ? 100 : Options.HUD.OPACITY.get();
+		return 100;
 	}
 
 	public void optionsChanged() {

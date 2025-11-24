@@ -14,6 +14,7 @@ import redstone.multimeter.client.gui.text.Texts;
 import redstone.multimeter.client.gui.tooltip.Tooltips;
 import redstone.multimeter.client.option.Option;
 import redstone.multimeter.client.option.OptionListener;
+import redstone.multimeter.client.option.Options;
 
 public class OptionsCategoryElement extends AbstractParentElement {
 
@@ -79,6 +80,13 @@ public class OptionsCategoryElement extends AbstractParentElement {
 			setHeight(Button.DEFAULT_HEIGHT);
 
 			this.option.setListener(this);
+
+			// disable opacity option since it is unsupported
+			// until a better solution is implemented
+			if (this.option == Options.HUD.OPACITY) {
+				this.control.setActive(false);
+				this.reset.setActive(false);
+			}
 		}
 
 		@Override
