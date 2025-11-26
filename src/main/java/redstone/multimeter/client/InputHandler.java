@@ -2,7 +2,6 @@ package redstone.multimeter.client;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 
 import redstone.multimeter.client.gui.element.input.KeyEvent;
 import redstone.multimeter.client.gui.element.input.MouseEvent;
@@ -15,15 +14,15 @@ import redstone.multimeter.common.meter.event.EventType;
 public class InputHandler {
 
 	public static boolean isControlDown() {
-		return Screen.hasControlDown();
+		return MultimeterClient.MINECRAFT.hasControlDown();
 	}
 
 	public static boolean isShiftDown() {
-		return Screen.hasShiftDown();
+		return MultimeterClient.MINECRAFT.hasShiftDown();
 	}
 
 	public static boolean isAltDown() {
-		return Screen.hasAltDown();
+		return MultimeterClient.MINECRAFT.hasAltDown();
 	}
 
 	private final MultimeterClient client;

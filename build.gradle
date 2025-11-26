@@ -34,7 +34,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	include(modImplementation("de.siphalor.amecs-api:amecs-api-mc1.21.8:${project.amecs_version}") {
+	include(modImplementation("de.siphalor.amecs-api:amecs-api-mc1.21.9:${project.amecs_version}") {
 		exclude group: 'net.fabricmc'
 		exclude group: 'net.fabricmc.fabric-api'
 	})

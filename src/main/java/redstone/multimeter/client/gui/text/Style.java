@@ -378,7 +378,7 @@ public class Style {
 	}
 
 	public static Style resolve(net.minecraft.network.chat.Style style) {
-		StyleAccess styleAccess = (StyleAccess) style;
+		StyleAccess styleAccess = (StyleAccess) (Object) style;
 
 		net.minecraft.network.chat.TextColor color = styleAccess.rsmm$color();
 		Boolean bold = styleAccess.rsmm$bold();

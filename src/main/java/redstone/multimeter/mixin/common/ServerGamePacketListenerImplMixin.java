@@ -36,7 +36,7 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
 	)
 	public void rsmm$handleCustomPayload(ServerboundCustomPayloadPacket packet, CallbackInfo ci) {
 		if (packet.payload() instanceof PacketWrapper p) {
-			PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl)(Object)this, server);
+			PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl)(Object)this, server.packetProcessor());
 			((IMinecraftServer)server).getMultimeterServer().getPacketHandler().handlePacket(p, player);
 
 			ci.cancel();

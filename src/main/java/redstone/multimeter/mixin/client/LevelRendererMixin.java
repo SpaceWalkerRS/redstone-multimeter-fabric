@@ -41,10 +41,10 @@ public class LevelRendererMixin {
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.AFTER,
-			target = "Lnet/minecraft/client/renderer/LevelRenderer;addWeatherPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/world/phys/Vec3;FLcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"
+			target = "Lnet/minecraft/client/renderer/LevelRenderer;addWeatherPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/world/phys/Vec3;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"
 		)
 	)
-	private void renderMeters(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, Matrix4f cameraPose, Matrix4f projectionPose, GpuBufferSlice fogParameters, Vector4f fogColor, boolean sky, CallbackInfo ci, @Local FrameGraphBuilder builder) {
+	private void renderMeters(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, Matrix4f cameraPose, Matrix4f projectionPose, Matrix4f projectionPoseForCulling, GpuBufferSlice fogParameters, Vector4f fogColor, boolean sky, CallbackInfo ci, @Local FrameGraphBuilder builder) {
 		FramePass pass = builder.addPass("rsmm:meters");
 
 		targets.main = pass.readsAndWrites(targets.main);

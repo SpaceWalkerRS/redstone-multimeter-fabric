@@ -215,8 +215,8 @@ public class TextField extends AbstractButton {
 
 	@Override
 	public boolean typeChar(CharacterEvent.Type event) {
-		if (this.isActive() && event.characterAllowedInChat()) {
-			this.write(event.characterAsString());
+		if (this.isActive() && event.codePointAllowedInChat()) {
+			this.write(event.codePointAsString());
 			return true;
 		}
 

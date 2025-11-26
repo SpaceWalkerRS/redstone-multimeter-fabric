@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 import redstone.multimeter.client.gui.CursorType;
@@ -54,37 +55,37 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public final boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public final boolean mouseClicked(MouseButtonEvent event, boolean _doubleClick) {
 		int ticksSinceLastClick = this.ticks - this.lastClickTicks;
 		this.lastClickTicks = this.ticks;
 
-		boolean doubleClick = ticksSinceLastClick < Options.Miscellaneous.DOUBLE_CLICK_TIME.get() && this.lastClickButton == button;
-		boolean consumed = screen.mouseClick(MouseEvent.click(mouseX, mouseY, button, doubleClick));
+		boolean doubleClick = ticksSinceLastClick < Options.Miscellaneous.DOUBLE_CLICK_TIME.get() && this.lastClickButton == event.button();
+		boolean consumed = screen.mouseClick(MouseEvent.click(event.x(), event.y(), event.button(), doubleClick));
 
 		if (consumed) {
-			mouseMoved(mouseX, mouseY);
+			mouseMoved(event.x(), event.y());
 		}
 
 		return consumed;
 	}
 
 	@Override
-	public final boolean mouseReleased(double mouseX, double mouseY, int button) {
-		boolean consumed = screen.mouseRelease(MouseEvent.release(mouseX, mouseY, button));
+	public final boolean mouseReleased(MouseButtonEvent event) {
+		boolean consumed = screen.mouseRelease(MouseEvent.release(event.x(), event.y(), event.button()));
 
 		if (consumed) {
-			mouseMoved(mouseX, mouseY);
+			mouseMoved(event.x(), event.y());
 		}
 
 		return consumed;
 	}
 
 	@Override
-	public final boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		boolean consumed = screen.mouseDrag(MouseEvent.drag(mouseX, mouseY, button, deltaX, deltaY));
+	public final boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
+		boolean consumed = screen.mouseDrag(MouseEvent.drag(event.x(), event.y(), event.button(), deltaX, deltaY));
 
 		if (consumed) {
-			mouseMoved(mouseX, mouseY);
+			mouseMoved(event.x(), event.y());
 		}
 
 		return consumed;
@@ -102,12 +103,12 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public final boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (screen.keyPress(KeyEvent.press(keyCode, scanCode, modifiers))) {
+	public final boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+		if (screen.keyPress(KeyEvent.press(event.key(), event.scancode(), event.modifiers()))) {
 			mouseMoved(lastMouseX, lastMouseY);
 			return true;
 		}
-		if (screen.shouldCloseOnEsc() && keyCode == GLFW.GLFW_KEY_ESCAPE) {
+		if (screen.shouldCloseOnEsc() && event.key() == GLFW.GLFW_KEY_ESCAPE) {
 			screen.close();
 			return true;
 		}
@@ -116,8 +117,8 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public final boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-		boolean consumed = screen.keyRelease(KeyEvent.release(keyCode, scanCode, modifiers));
+	public final boolean keyReleased(net.minecraft.client.input.KeyEvent event) {
+		boolean consumed = screen.keyRelease(KeyEvent.release(event.key(), event.scancode(), event.modifiers()));
 
 		if (consumed) {
 			mouseMoved(lastMouseX, lastMouseY);
@@ -127,8 +128,8 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public final boolean charTyped(char chr, int modifiers) {
-		boolean consumed = screen.typeChar(CharacterEvent.type(chr, modifiers));
+	public final boolean charTyped(net.minecraft.client.input.CharacterEvent event) {
+		boolean consumed = screen.typeChar(CharacterEvent.type(event.codepoint(), event.modifiers()));
 
 		if (consumed) {
 			mouseMoved(lastMouseX, lastMouseY);

@@ -78,6 +78,6 @@ public interface Element {
 	void update();
 
 	static void setCursor(CursorType type) {
-		GLFW.glfwSetCursor(MultimeterClient.MINECRAFT.getWindow().getWindow(), type.getCursor());
+		GLFW.glfwSetCursor(MultimeterClient.MINECRAFT.getWindow().handle(), type.getCursor());
 	}
 }

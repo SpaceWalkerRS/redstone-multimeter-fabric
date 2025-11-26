@@ -4,38 +4,38 @@ import net.minecraft.util.StringUtil;
 
 public class CharacterEvent {
 
-	private final char character;
+	private final int codePoint;
 	private final int modifiers;
 
-	CharacterEvent(char character, int modifiers) {
-		this.character = character;
+	CharacterEvent(int codePoint, int modifiers) {
+		this.codePoint = codePoint;
 		this.modifiers = modifiers;
 	}
 
-	public int character() {
-		return this.character;
+	public int codePoint() {
+		return this.codePoint;
 	}
 
-	public String characterAsString() {
-		return Character.toString(this.character);
+	public String codePointAsString() {
+		return Character.toString(this.codePoint);
 	}
 
-	public boolean characterAllowedInChat() {
-		return StringUtil.isAllowedChatCharacter(this.character);
+	public boolean codePointAllowedInChat() {
+		return StringUtil.isAllowedChatCharacter(this.codePoint);
 	}
 
 	public int modifiers() {
 		return this.modifiers;
 	}
 
-	public static CharacterEvent.Type type(char character, int modifiers) {
-		return new Type(character, modifiers);
+	public static CharacterEvent.Type type(int codePoint, int modifiers) {
+		return new Type(codePoint, modifiers);
 	}
 
 	public static class Type extends CharacterEvent {
 
-		Type(char character, int modifiers) {
-			super(character, modifiers);
+		Type(int codePoint, int modifiers) {
+			super(codePoint, modifiers);
 		}
 	}
 }

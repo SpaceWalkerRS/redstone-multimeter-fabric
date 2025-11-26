@@ -9,9 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -19,6 +17,10 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.InputConstants.Key;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.KeyMapping.Category;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.resources.ResourceLocation;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.element.input.KeyEvent;
@@ -30,15 +32,15 @@ public class Keybinds {
 
 	private static final String FILE_NAME = "hotkeys.txt";
 
-	private static final Set<String> CATEGORIES = new LinkedHashSet<>();
+	private static final Map<String, Category> CATEGORIES = new LinkedHashMap<>();
 	private static final Map<String, KeyMapping> KEYBINDS = new LinkedHashMap<>();
 	// used for parsing keybinds from before RSMM 1.16
 	private static final Map<String, KeyMapping> LEGACY_KEYBINDS = new HashMap<>();
 
 	public static final KeyMapping[] TOGGLE_EVENT_TYPES = new KeyMapping[EventType.ALL.length];
 
-	public static final String MAIN;
-	public static final String METER_EVENT_TYPES;
+	public static final Category MAIN;
+	public static final Category METER_EVENT_TYPES;
 
 	public static final KeyMapping TOGGLE_METER;
 	public static final KeyMapping RESET_METER;
@@ -57,17 +59,20 @@ public class Keybinds {
 	public static final KeyMapping VIEW_TICK_PHASE_TREE;
 	public static final KeyMapping PRINT_LOGS;
 
-	private static String registerCategory(String category) {
-		category = "rsmm.keybind.category." + category;
-
-		if (!CATEGORIES.add(category)) {
-			throw new IllegalStateException("Cannot register multiple keybind categories with the same name! (" + category + ")");
+	private static Category registerCategory(String name) {
+		if (CATEGORIES.containsKey(name)) {
+			throw new IllegalStateException("Cannot register multiple keybind categories with the same name! (" + name + ")");
 		}
+
+		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(RedstoneMultimeterMod.NAMESPACE, name);
+		Category category = Category.register(id);
+
+		CATEGORIES.put(name, category);
 
 		return category;
 	}
 
-	private static KeyMapping registerKeybind(String name, String legacyName, String category, int defaultKey) {
+	private static KeyMapping registerKeybind(String name, String legacyName, Category category, int defaultKey) {
 		name = "rsmm.keybind." + name;
 
 		if (KEYBINDS.containsKey(name)) {
@@ -84,8 +89,8 @@ public class Keybinds {
 		return keybind;
 	}
 
-	public static Collection<String> getCategories() {
-		return Collections.unmodifiableSet(CATEGORIES);
+	public static Collection<Category> getCategories() {
+		return Collections.unmodifiableCollection(CATEGORIES.values());
 	}
 
 	public static Collection<KeyMapping> getKeybinds() {
@@ -153,20 +158,20 @@ public class Keybinds {
 
 	public static boolean isPressed(KeyMapping keybind) {
 		Key key = ((IKeyMapping)keybind).rsmm$getKey();
-		return key != null && GLFW.glfwGetKey(MultimeterClient.MINECRAFT.getWindow().getWindow(), key.getValue()) == GLFW.GLFW_PRESS;
+		return key != null && GLFW.glfwGetKey(MultimeterClient.MINECRAFT.getWindow().handle(), key.getValue()) == GLFW.GLFW_PRESS;
 	}
 
 	public static boolean matches(KeyMapping keybind, MouseEvent event) {
-		return keybind.matchesMouse(event.button());
+		return keybind.matchesMouse(new MouseButtonEvent(event.mouseX(), event.mouseY(), new MouseButtonInfo(event.button(), -1)));
 	}
 
 	public static boolean matches(KeyMapping keybind, KeyEvent event) {
-		return keybind.matches(event.keyCode(), event.scanCode());
+		return keybind.matches(new net.minecraft.client.input.KeyEvent(event.keyCode(), event.scanCode(), event.modifiers()));
 	}
 
 	static {
-		MAIN              = registerCategory("redstoneMultimeter");
-		METER_EVENT_TYPES = registerCategory("meterEventTypes");
+		MAIN              = registerCategory("redstone_multimeter");
+		METER_EVENT_TYPES = registerCategory("meter_event_types");
 
 		TOGGLE_METER           = registerKeybind("toggleMeter"            , "Toggle Meter"          , MAIN, GLFW.GLFW_KEY_M);
 		RESET_METER            = registerKeybind("resetMeter"             , "Reset Meter"           , MAIN, GLFW.GLFW_KEY_B);
