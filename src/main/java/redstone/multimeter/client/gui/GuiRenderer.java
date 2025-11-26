@@ -101,9 +101,6 @@ public class GuiRenderer {
 	}
 
 	public void tooltip(Tooltip tooltip, int x0, int y0, int x1, int y1, int backgroundColor, int borderColor0, int borderColor1) {
-		this.pushMatrix();
-		this.translate(0.0D, 0.0D, 400.0D);
-
 		// background
 		this.fill(x0    , y0 + 1, x1    , y1 - 1, backgroundColor); // center, left/right outer borders
 		this.fill(x0 + 1, y0    , x1 - 1, y0 + 1, backgroundColor); // top outer border
@@ -122,8 +119,6 @@ public class GuiRenderer {
 			this.drawStringWithShadow(line, textX, textY);
 			textY += this.font.height() + 1;
 		}
-
-		this.popMatrix();
 	}
 
 	public void blit(Texture t, int x0, int y0, int x1, int y1) {

@@ -47,7 +47,9 @@ public abstract class RSMMScreen extends AbstractParentElement {
 
 			font.drawWithShadow(title, x, y);
 		}
+	}
 
+	public void renderTooltip(GuiRenderer renderer, int mouseX, int mouseY) {
 		Tooltip tooltip = getTooltip(mouseX, mouseY);
 
 		if (!tooltip.isEmpty()) {

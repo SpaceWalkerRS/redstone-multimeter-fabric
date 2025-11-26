@@ -42,6 +42,7 @@ public class ScreenWrapper extends Screen {
 
 		screen.render(renderer, mouseX, mouseY);
 		screen.renderSecondPass(renderer, mouseX, mouseY);
+		screen.renderTooltip(renderer, mouseX, mouseY);
 	}
 
 	@Override
