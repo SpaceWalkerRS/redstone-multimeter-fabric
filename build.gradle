@@ -3,9 +3,6 @@ plugins {
 	id 'fabric-loom' version '1.11-SNAPSHOT'
 }
 
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
-
 base {
 	archivesName = project.archives_base_name
 }
@@ -59,6 +56,9 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
 	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
