@@ -42,15 +42,14 @@ public class MeterListRenderer extends AbstractElement {
 
 	@Override
 	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
-		renderer.pushMatrix();
-		drawCursorMeter(renderer, mouseX, mouseY);
-		renderer.translate(0, 0, -1);
-		drawHighlights(renderer, mouseX, mouseY);
-		renderer.translate(0, 0, -1);
-		drawNames(renderer, mouseX, mouseY);
-		renderer.translate(0, 0, -1);
 		renderer.fill(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		renderer.popMatrix();
+		drawNames(renderer, mouseX, mouseY);
+		drawHighlights(renderer, mouseX, mouseY);
+	}
+
+	@Override
+	public void renderSecondPass(GuiRenderer renderer, int mouseX, int mouseY) {
+		drawCursorMeter(renderer, mouseX, mouseY);
 	}
 
 	@Override
@@ -162,27 +161,9 @@ public class MeterListRenderer extends AbstractElement {
 
 	private void drawCursorMeter(GuiRenderer renderer, int mouseX, int mouseY) {
 		if (cursorMeter != null) {
-			renderer.pushMatrix();
-
 			int startX = mouseX + cursorOffsetX;
 			int startY = mouseY + cursorOffsetY;
 			int alpha = 0xDD;
-
-			int x = startX;
-			int y = startY;
-
-			if (cursorOriginRow == hud.getSelectedRow()) {
-				drawHighlight(renderer, x, y, true);
-
-				renderer.translate(0, 0, -0.1);
-			}
-
-			x = startX + hud.settings.gridSize + 1;
-			y = startY + hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.height()) / 2;
-
-			drawName(renderer, cursorMeter, x, y, ColorUtils.setAlpha(0xFFFFFF, alpha));
-
-			renderer.translate(0, 0, -0.1);
 
 			int x0 = startX;
 			int y0 = startY;
@@ -192,7 +173,17 @@ public class MeterListRenderer extends AbstractElement {
 
 			renderer.fill(x0, y0, x1, y1, color);
 
-			renderer.popMatrix();
+			int x = startX + hud.settings.gridSize + 1;
+			int y = startY + hud.settings.gridSize + 1 + hud.settings.rowHeight - (hud.settings.rowHeight + hud.font.height()) / 2;
+
+			drawName(renderer, cursorMeter, x, y, ColorUtils.setAlpha(0xFFFFFF, alpha));
+
+			x = startX;
+			y = startY;
+
+			if (cursorOriginRow == hud.getSelectedRow()) {
+				drawHighlight(renderer, x, y, true);
+			}
 		}
 	}
 

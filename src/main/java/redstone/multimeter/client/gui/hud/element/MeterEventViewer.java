@@ -21,19 +21,13 @@ public abstract class MeterEventViewer extends AbstractElement {
 
 	@Override
 	public void render(GuiRenderer renderer, int mouseX, int mouseY) {
-		renderer.pushMatrix();
-		if (!hud.client.isPreviewing()) {
-			drawHighlights(renderer, mouseX, mouseY);
-			renderer.translate(0, 0, -1);
-			drawDecorators(renderer);
-			renderer.translate(0, 0, -1);
-			drawMeterEvents(renderer);
-			renderer.translate(0, 0, -1);
-		}
-		drawGridLines(renderer);
-		renderer.translate(0, 0, -1);
 		renderer.fill(0, 0, getWidth(), getHeight(), hud.settings.colorBackground);
-		renderer.popMatrix();
+		drawGridLines(renderer);
+		if (!hud.client.isPreviewing()) {
+			drawMeterEvents(renderer);
+			drawDecorators(renderer);
+			drawHighlights(renderer, mouseX, mouseY);
+		}
 	}
 
 	@Override
@@ -106,37 +100,9 @@ public abstract class MeterEventViewer extends AbstractElement {
 	protected abstract void drawMeterEvents(GuiRenderer renderer);
 
 	private void drawGridLines(GuiRenderer renderer) {
-		renderer.pushMatrix();
-
 		int columns = getColumnCount();
 		int rows = hud.meters.size();
 		int marker = getCurrentTickMarkerColumn();
-
-		// current tick marker
-		if (marker >= 0) {
-			int x0 = marker * (hud.settings.columnWidth + hud.settings.gridSize);
-			int y0 = hud.settings.gridSize;
-			int x1 = x0 + hud.settings.gridSize;
-			int y1 = y0 + getHeight() - 2 * hud.settings.gridSize;
-			int color = hud.settings.colorGridMarker;
-
-			renderer.fill(x0, y0, x1, y1, color);
-		}
-
-		renderer.translate(0, 0, -0.1);
-
-		// horizonal lines
-		for (int i = 0; i <= rows; i++) {
-			int x0 = 0;
-			int y0 = i * (hud.settings.rowHeight + hud.settings.gridSize);
-			int x1 = x0 + getWidth();
-			int y1 = y0 + hud.settings.gridSize;
-			int color = hud.settings.colorGridMain;
-
-			renderer.fill(x0, y0, x1, y1, color);
-		}
-
-		renderer.translate(0, 0, -0.1);
 
 		// vertical lines
 		for (int i = 0; i <= columns; i++) {
@@ -149,7 +115,27 @@ public abstract class MeterEventViewer extends AbstractElement {
 			renderer.fill(x0, y0, x1, y1, color);
 		}
 
-		renderer.popMatrix();
+		// horizonal lines
+		for (int i = 0; i <= rows; i++) {
+			int x0 = 0;
+			int y0 = i * (hud.settings.rowHeight + hud.settings.gridSize);
+			int x1 = x0 + getWidth();
+			int y1 = y0 + hud.settings.gridSize;
+			int color = hud.settings.colorGridMain;
+
+			renderer.fill(x0, y0, x1, y1, color);
+		}
+
+		// current tick marker
+		if (marker >= 0) {
+			int x0 = marker * (hud.settings.columnWidth + hud.settings.gridSize);
+			int y0 = hud.settings.gridSize;
+			int x1 = x0 + hud.settings.gridSize;
+			int y1 = y0 + getHeight() - 2 * hud.settings.gridSize;
+			int color = hud.settings.colorGridMarker;
+
+			renderer.fill(x0, y0, x1, y1, color);
+		}
 	}
 
 	protected abstract int getColumnCount();

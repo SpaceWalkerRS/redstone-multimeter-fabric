@@ -53,18 +53,10 @@ public class MeterEventRenderDispatcher {
 	}
 
 	private void renderMeterEvents(GuiRenderer renderer, Meter meter, Consumer<MeterEventRenderer> consumer) {
-		renderer.pushMatrix();
-
-		for (int index = EventType.ALL.length - 1; index >= 0; index--) {
-			EventType type = EventType.ALL[index];
-
+		for (EventType type : EventType.ALL) {
 			if (meter.isMetering(type)) {
 				consumer.accept(getEventRenderer(type));
 			}
-
-			renderer.translate(0, 0, -0.1);
 		}
-
-		renderer.popMatrix();
 	}
 }

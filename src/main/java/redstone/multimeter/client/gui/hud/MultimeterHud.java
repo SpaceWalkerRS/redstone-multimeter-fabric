@@ -93,26 +93,21 @@ public class MultimeterHud extends AbstractParentElement {
 
 		HudRenderer hudRenderer = new HudRenderer(this, renderer);
 
-		renderer.pushMatrix();
-		renderer.translate(0, 0, 100);
-
 		List<Element> children = getChildren();
-
-		for (int index = 0; index < this.partCount; index++) {
-			Element part = children.get(index);
-
-			if (part.isVisible()) {
-				hudRenderer.render(part, mouseX, mouseY);
-			}
-		}
-
-		renderer.popMatrix();
 
 		for (int index = this.partCount; index < children.size(); index++) {
 			Element child = children.get(index);
 
 			if (child.isVisible()) {
 				child.render(renderer, mouseX, mouseY);
+			}
+		}
+
+		for (int index = 0; index < this.partCount; index++) {
+			Element part = children.get(index);
+
+			if (part.isVisible()) {
+				hudRenderer.render(part, mouseX, mouseY);
 			}
 		}
 	}

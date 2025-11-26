@@ -108,18 +108,6 @@ public class PrimaryEventViewer extends MeterEventViewer {
 
 	@Override
 	protected void drawHighlights(GuiRenderer renderer, int mouseX, int mouseY) {
-		renderer.pushMatrix();
-
-		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
-			if (!isDraggingMouse() && isMouseOver(mouseX, mouseY) && !isMouseOverBorder(mouseX)) {
-				drawHighlight(renderer, getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
-			}
-
-			drawHighlight(renderer, Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
-		}
-
-		renderer.translate(0, 0, -0.1);
-
 		if (hud.hasTickMarker()) {
 			long tick = hud.getTickMarker();
 			int column = hud.getColumn(tick);
@@ -129,7 +117,13 @@ public class PrimaryEventViewer extends MeterEventViewer {
 			}
 		}
 
-		renderer.popMatrix();
+		if (hud.isPaused() || !Options.HUD.HIDE_HIGHLIGHT.get()) {
+			drawHighlight(renderer, Options.HUD.SELECTED_COLUMN.get(), 1, 0, hud.meters.size(), true);
+
+			if (!isDraggingMouse() && isMouseOver(mouseX, mouseY) && !isMouseOverBorder(mouseX)) {
+				drawHighlight(renderer, getHoveredColumn(mouseX), 1, 0, hud.meters.size(), false);
+			}
+		}
 	}
 
 	@Override
