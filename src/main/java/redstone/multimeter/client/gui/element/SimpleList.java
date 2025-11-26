@@ -63,11 +63,16 @@ public class SimpleList extends AbstractParentElement {
 			this.drawBackground(renderer);
 		}
 
-		this.renderList(renderer, mouseX, mouseY);
+		this.renderList(renderer, mouseX, mouseY, true);
 
 		if (this.drawBackground) {
 			this.drawBorders(renderer);
 		}
+	}
+
+	@Override
+	public void renderSecondPass(GuiRenderer renderer, int mouseX, int mouseY) {
+		this.renderList(renderer, mouseX, mouseY, false);
 	}
 
 	@Override
@@ -117,7 +122,7 @@ public class SimpleList extends AbstractParentElement {
 		renderer.blit(Textures.OPTIONS_BACKGROUND, x0, y0, x1, y1, u0, v0, u1, v1, 0xFF7F7F7F);
 	}
 
-	protected void renderList(GuiRenderer renderer, int mouseX, int mouseY) {
+	protected void renderList(GuiRenderer renderer, int mouseX, int mouseY, boolean mainPass) {
 		renderer.pushScissor(this.getX(), this.minY, this.getX() + this.getWidth(), this.maxY);
 
 		List<Element> children = this.getChildren();
@@ -133,15 +138,19 @@ public class SimpleList extends AbstractParentElement {
 			}
 
 			if (element.isVisible()) {
-				this.renderElement(renderer, element, mouseX, mouseY);
+				this.renderElement(renderer, element, mouseX, mouseY, mainPass);
 			}
 		}
 
 		renderer.popScissor();
 	}
 
-	protected void renderElement(GuiRenderer renderer, Element element, int mouseX, int mouseY) {
-		element.render(renderer, mouseX, mouseY);
+	protected void renderElement(GuiRenderer renderer, Element element, int mouseX, int mouseY, boolean mainPass) {
+		if (mainPass) {
+			element.render(renderer, mouseX, mouseY);
+		} else {
+			element.renderSecondPass(renderer, mouseX, mouseY);
+		}
 	}
 
 	protected void drawBorders(GuiRenderer renderer) {

@@ -29,10 +29,10 @@ public class ScrollableList extends SimpleList {
 	}
 
 	@Override
-	protected void renderList(GuiRenderer renderer, int mouseX, int mouseY) {
-		super.renderList(renderer, mouseX, mouseY);
+	protected void renderList(GuiRenderer renderer, int mouseX, int mouseY, boolean mainPass) {
+		super.renderList(renderer, mouseX, mouseY, mainPass);
 
-		if (this.getMaxScrollAmount() > 0.0D) {
+		if (mainPass && this.getMaxScrollAmount() > 0.0D) {
 			if (this.scrollMode == ScrollMode.PULL) {
 				int visibleHeight = this.getHeight();
 				int totalHeight = visibleHeight + (int)this.getMaxScrollAmount();

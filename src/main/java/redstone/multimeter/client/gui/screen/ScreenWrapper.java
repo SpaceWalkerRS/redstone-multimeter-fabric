@@ -38,7 +38,10 @@ public class ScreenWrapper extends Screen {
 
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-		screen.render(new GuiRenderer(graphics), mouseX, mouseY);
+		GuiRenderer renderer = new GuiRenderer(graphics);
+
+		screen.render(renderer, mouseX, mouseY);
+		screen.renderSecondPass(renderer, mouseX, mouseY);
 	}
 
 	@Override

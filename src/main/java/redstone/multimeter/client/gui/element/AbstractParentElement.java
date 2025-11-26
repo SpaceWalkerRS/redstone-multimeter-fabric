@@ -36,6 +36,17 @@ public abstract class AbstractParentElement extends AbstractElement {
 	}
 
 	@Override
+	public void renderSecondPass(GuiRenderer renderer, int mouseX, int mouseY) {
+		for (int index = 0; index < this.children.size(); index++) {
+			Element child = this.children.get(index);
+
+			if (child.isVisible()) {
+				child.renderSecondPass(renderer, mouseX, mouseY);
+			}
+		}
+	}
+
+	@Override
 	public void mouseMove(double mouseX, double mouseY) {
 		if (!this.isDraggingMouse()) {
 			this.updateHoveredElement(mouseX, mouseY);

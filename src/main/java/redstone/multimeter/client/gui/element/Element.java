@@ -14,6 +14,9 @@ public interface Element {
 
 	void render(GuiRenderer renderer, int mouseX, int mouseY);
 
+	default void renderSecondPass(GuiRenderer renderer, int mouseX, int mouseY) {
+	}
+
 	default boolean isMouseOver(double mouseX, double mouseY) {
 		return mouseX >= this.getX() && mouseX <= (this.getX() + this.getWidth()) && mouseY >= this.getY() && mouseY <= (this.getY() + this.getHeight());
 	}

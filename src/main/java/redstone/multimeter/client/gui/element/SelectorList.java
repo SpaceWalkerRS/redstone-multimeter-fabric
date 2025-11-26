@@ -23,7 +23,11 @@ public class SelectorList extends ScrollableList {
 	}
 
 	@Override
-	protected void renderElement(GuiRenderer renderer, Element element, int mouseX, int mouseY) {
+	protected void renderElement(GuiRenderer renderer, Element element, int mouseX, int mouseY, boolean mainPass) {
+		if (!mainPass) {
+			return;
+		}
+
 		boolean selected = (element == this.getSelectedElement());
 		boolean hovered = (element == this.getHoveredElement());
 		boolean drawBackground = selected || hovered;
@@ -32,7 +36,7 @@ public class SelectorList extends ScrollableList {
 			this.drawBackground(renderer, element, selected);
 		}
 
-		super.renderElement(renderer, element, mouseX, mouseY);
+		super.renderElement(renderer, element, mouseX, mouseY, mainPass);
 
 		if (drawBackground) {
 			this.drawBorder(renderer, element, selected);
