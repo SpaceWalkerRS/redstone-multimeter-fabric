@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
@@ -19,13 +19,13 @@ import redstone.multimeter.client.gui.tooltip.Tooltips;
 
 public class BlockSelectorList extends SelectorList {
 
-	private final Consumer<ResourceLocation> selectionListener;
+	private final Consumer<Identifier> selectionListener;
 
-	public BlockSelectorList(int width, int height, Consumer<ResourceLocation> selectionListener) {
+	public BlockSelectorList(int width, int height, Consumer<Identifier> selectionListener) {
 		this(width, height, 0, 0, selectionListener);
 	}
 
-	public BlockSelectorList(int width, int height, int topBorder, int bottomBorder, Consumer<ResourceLocation> selectionListener) {
+	public BlockSelectorList(int width, int height, int topBorder, int bottomBorder, Consumer<Identifier> selectionListener) {
 		super(width, height, topBorder, bottomBorder);
 
 		this.selectionListener = selectionListener;
@@ -52,17 +52,17 @@ public class BlockSelectorList extends SelectorList {
 		}
 	}
 
-	public void add(ResourceLocation key) {
+	public void add(Identifier key) {
 		this.addChild(new BlockListEntry(this.getEffectiveWidth(), Button.DEFAULT_HEIGHT, key));
 	}
 
-	public void add(Collection<ResourceLocation> keys) {
-		for (ResourceLocation key : keys) {
+	public void add(Collection<Identifier> keys) {
+		for (Identifier key : keys) {
 			this.add(key);
 		}
 	}
 
-	public void setBlockFilter(Predicate<ResourceLocation> filter) {
+	public void setBlockFilter(Predicate<Identifier> filter) {
 		this.setFilter(e -> {
 			if (e instanceof BlockListEntry) {
 				BlockListEntry entry = (BlockListEntry)e;
@@ -75,10 +75,10 @@ public class BlockSelectorList extends SelectorList {
 
 	private class BlockListEntry extends AbstractElement {
 
-		private final ResourceLocation key;
+		private final Identifier key;
 		private final ItemStack icon;
 
-		protected BlockListEntry(int width, int height, ResourceLocation key) {
+		protected BlockListEntry(int width, int height, Identifier key) {
 			super(0, 0, width, height);
 
 			Block block = BuiltInRegistries.BLOCK.getOptional(key).orElse(null);

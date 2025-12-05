@@ -6,11 +6,11 @@ import java.util.function.UnaryOperator;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.Keybinds;
@@ -166,11 +166,11 @@ public class MeterControlsElement extends AbstractParentElement {
 		});
 		pos.addControl("dimension", new TextField(0, 0, 0, 0, Tooltips::empty, text -> {
 			try {
-				ResourceLocation dimension = ResourceLocation.parse(text);
+				Identifier dimension = Identifier.parse(text);
 				DimPos newPos = this.meter.getPos().relative(dimension);
 
 				this.changePos(newPos);
-			} catch (ResourceLocationException e) {
+			} catch (IdentifierException e) {
 
 			}
 		}, () -> this.meter.getPos().getDimension().toString()), SuggestionsProvider.resources(Registries.DIMENSION_TYPE, false));

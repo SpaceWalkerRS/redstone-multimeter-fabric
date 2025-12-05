@@ -2,7 +2,7 @@ package redstone.multimeter.common.network;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import redstone.multimeter.common.network.packets.*;
 import redstone.multimeter.registry.SupplierRegistry;
@@ -11,21 +11,21 @@ public class Packets {
 
 	private static final SupplierRegistry<RSMMPacket> REGISTRY;
 
-	public static ResourceLocation getChannel() {
+	public static Identifier getChannel() {
 		return REGISTRY.getRegistryKey();
 	}
 
-	public static ResourceLocation getKey(RSMMPacket packet) {
+	public static Identifier getKey(RSMMPacket packet) {
 		return REGISTRY.getKey(packet);
 	}
 
-	public static RSMMPacket create(ResourceLocation key) {
+	public static RSMMPacket create(Identifier key) {
 		return REGISTRY.get(key);
 	}
 
 	public static void encode(PacketWrapper wrapper, FriendlyByteBuf buffer) {
 		RSMMPacket packet = wrapper.packet();
-		ResourceLocation key = Packets.getKey(wrapper.packet());
+		Identifier key = Packets.getKey(wrapper.packet());
 
 		if (key == null) {
 			throw new IllegalStateException("Unable to encode packet: " + packet.getClass());
@@ -34,11 +34,11 @@ public class Packets {
 		CompoundTag data = new CompoundTag();
 		packet.encode(data);
 
-		buffer.writeResourceLocation(key);
+		buffer.writeIdentifier(key);
 		buffer.writeNbt(data);
 	}
 	public static PacketWrapper decode(FriendlyByteBuf buffer) {
-		ResourceLocation key = buffer.readResourceLocation();
+		Identifier key = buffer.readIdentifier();
 		RSMMPacket packet = Packets.create(key);
 
 		if (packet == null) {

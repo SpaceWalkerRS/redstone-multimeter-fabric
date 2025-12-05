@@ -10,8 +10,8 @@ import java.util.TreeSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 import redstone.multimeter.client.MultimeterClient;
 
@@ -46,7 +46,7 @@ public interface SuggestionsProvider {
 		};
 	}
 
-	static SuggestionsProvider resources(Collection<ResourceLocation> resources, boolean suggestAllOnBlankInput) {
+	static SuggestionsProvider resources(Collection<Identifier> resources, boolean suggestAllOnBlankInput) {
 		return input -> {
 			if (input.isBlank() && !suggestAllOnBlankInput) {
 				return Collections.emptyList();
@@ -78,7 +78,7 @@ public interface SuggestionsProvider {
 		return suggestions;
 	}
 
-	static List<String> suggestResources(String input, Collection<ResourceLocation> resources) {
+	static List<String> suggestResources(String input, Collection<Identifier> resources) {
 		Set<String> identifiersStart = new TreeSet<>();
 		Set<String> identifiersAnywhere = new TreeSet<>();
 		Set<String> namespacesStart = new TreeSet<>();
@@ -86,7 +86,7 @@ public interface SuggestionsProvider {
 
 		boolean hasSeparator = (input.indexOf(':') > 0);
 
-		for (ResourceLocation dimension : resources) {
+		for (Identifier dimension : resources) {
 			String identifier = dimension.toString();
 			String namespace = dimension.getNamespace() + ":";
 			String path = dimension.getPath();

@@ -20,7 +20,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.KeyMapping.Category;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import redstone.multimeter.RedstoneMultimeterMod;
 import redstone.multimeter.client.gui.element.input.KeyEvent;
@@ -64,7 +64,7 @@ public class Keybinds {
 			throw new IllegalStateException("Cannot register multiple keybind categories with the same name! (" + name + ")");
 		}
 
-		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(RedstoneMultimeterMod.NAMESPACE, name);
+		Identifier id = Identifier.fromNamespaceAndPath(RedstoneMultimeterMod.NAMESPACE, name);
 		Category category = Category.register(id);
 
 		CATEGORIES.put(name, category);

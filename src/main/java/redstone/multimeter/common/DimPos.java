@@ -6,27 +6,27 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 import redstone.multimeter.util.NbtUtils;
 
 public class DimPos {
 
-	private final ResourceLocation dimension;
+	private final Identifier dimension;
 	private final BlockPos pos;
 
-	public DimPos(ResourceLocation dimension, BlockPos pos) {
+	public DimPos(Identifier dimension, BlockPos pos) {
 		this.dimension = dimension;
 		this.pos = pos.immutable();
 	}
 
-	public DimPos(ResourceLocation dimension, int x, int y, int z) {
+	public DimPos(Identifier dimension, int x, int y, int z) {
 		this(dimension, new BlockPos(x, y, z));
 	}
 
 	public DimPos(Level level, BlockPos pos) {
-		this(level.dimension().location(), pos);
+		this(level.dimension().identifier(), pos);
 	}
 
 	@Override
@@ -49,15 +49,15 @@ public class DimPos {
 		return String.format("%s[%d, %d, %d]", dimension.toString(), pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	public ResourceLocation getDimension() {
+	public Identifier getDimension() {
 		return dimension;
 	}
 
 	public boolean is(Level level) {
-		return level.dimension().location().equals(dimension);
+		return level.dimension().identifier().equals(dimension);
 	}
 
-	public DimPos relative(ResourceLocation dimension) {
+	public DimPos relative(Identifier dimension) {
 		return new DimPos(dimension, pos);
 	}
 
@@ -92,7 +92,7 @@ public class DimPos {
 	public CompoundTag toNbt() {
 		CompoundTag nbt = new CompoundTag();
 
-		nbt.put("dim", NbtUtils.resourceLocationToNbt(dimension));
+		nbt.put("dim", NbtUtils.identifierToNbt(dimension));
 		nbt.putInt("x", pos.getX());
 		nbt.putInt("y", pos.getY());
 		nbt.putInt("z", pos.getZ());
@@ -101,7 +101,7 @@ public class DimPos {
 	}
 
 	public static DimPos fromNbt(CompoundTag nbt) {
-		ResourceLocation dimension = NbtUtils.nbtToResourceLocation(nbt.getCompound("dim").get());
+		Identifier dimension = NbtUtils.nbtToIdentifier(nbt.getCompound("dim").get());
 		int x = nbt.getInt("x").get();
 		int y = nbt.getInt("y").get();
 		int z = nbt.getInt("z").get();

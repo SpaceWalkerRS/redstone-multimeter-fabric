@@ -12,8 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -73,7 +73,7 @@ public class MeterRenderer {
 		boolean movable = meter.isMovable();
 
 		Camera camera = minecraft.gameRenderer.getMainCamera();
-		Vec3 cameraPos = camera.getPosition();
+		Vec3 cameraPos = camera.position();
 
 		double dx = pos.getX() - cameraPos.x;
 		double dy = pos.getY() - cameraPos.y;
@@ -118,7 +118,7 @@ public class MeterRenderer {
 		BlockPos pos = meter.getPos().getBlockPos();
 
 		Camera camera = minecraft.gameRenderer.getMainCamera();
-		Vec3 cameraPos = camera.getPosition();
+		Vec3 cameraPos = camera.position();
 
 		double dx = pos.getX() - cameraPos.x;
 		double dy = pos.getY() - cameraPos.y;
@@ -155,7 +155,7 @@ public class MeterRenderer {
 	}
 
 	private void renderMeterHighlight(BufferSource bufferSource, PoseStack poses, int color) {
-		VertexConsumer buffer = bufferSource.getBuffer(RenderType.debugQuads());
+		VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.debugQuads());
 		Matrix4f pose = poses.last().pose();
 
 		float r = ColorUtils.getRed(color) / (float) 0xFF;
@@ -167,8 +167,8 @@ public class MeterRenderer {
 	}
 
 	private void renderMeterOutline(BufferSource bufferSource, PoseStack poses, int color) {
-		VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
-		ShapeRenderer.renderShape(poses, buffer, OUTLINE_SHAPE, 0.0D, 0.0D, 0.0D, color);
+		VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.lines());
+		ShapeRenderer.renderShape(poses, buffer, OUTLINE_SHAPE, 0.0D, 0.0D, 0.0D, color, 0.0F);
 	}
 
 	private void drawBox(VertexConsumer buffer, Matrix4f pose, float r, float g, float b, float a) {

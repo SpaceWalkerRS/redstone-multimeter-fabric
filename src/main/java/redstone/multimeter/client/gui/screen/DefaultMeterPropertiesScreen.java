@@ -7,9 +7,9 @@ import java.util.function.UnaryOperator;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import redstone.multimeter.client.gui.element.BlockSelectorList;
 import redstone.multimeter.client.gui.element.ScrollableList;
@@ -43,11 +43,11 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	private static final int PROPERTIES_LIST_BOTTOM_BORDER = 3;
 
 	private final ClientMeterPropertiesManager meterPropertiesManager;
-	private final Map<ResourceLocation, EditableMeterProperties> defaults;
-	private final Map<ResourceLocation, EditableMeterProperties> overrides;
+	private final Map<Identifier, EditableMeterProperties> defaults;
+	private final Map<Identifier, EditableMeterProperties> overrides;
 
 	private Tab currentTab;
-	private ResourceLocation currentBlock;
+	private Identifier currentBlock;
 
 	private BlockSelectorList blockList;
 	private ScrollableList propertiesList;
@@ -63,14 +63,14 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		this.defaults = new HashMap<>();
 		this.overrides = new HashMap<>();
 
-		for (Entry<ResourceLocation, MeterProperties> entry : this.meterPropertiesManager.getDefaults().entrySet()) {
-			ResourceLocation key = entry.getKey();
+		for (Entry<Identifier, MeterProperties> entry : this.meterPropertiesManager.getDefaults().entrySet()) {
+			Identifier key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			this.defaults.put(key, new EditableMeterProperties(properties));
 		}
-		for (Entry<ResourceLocation, MeterProperties> entry : this.meterPropertiesManager.getOverrides().entrySet()) {
-			ResourceLocation key = entry.getKey();
+		for (Entry<Identifier, MeterProperties> entry : this.meterPropertiesManager.getOverrides().entrySet()) {
+			Identifier key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			this.overrides.put(key, new EditableMeterProperties(properties));
@@ -138,7 +138,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 			return true;
 		});
 		create = new TextField(x + 2 * (Button.DEFAULT_HEIGHT + 2), y, (listWidth - 2) - (4 + 2 * Button.DEFAULT_HEIGHT) - 2, Button.DEFAULT_HEIGHT, () -> nextBlockKey() == null ? Tooltips.translatable("rsmm.gui.defaultMeterProperties.createbar.invalid") : Tooltips.empty(), text -> {
-			ResourceLocation key = nextBlockKey();
+			Identifier key = nextBlockKey();
 			add.setActive(key != null && !key.getPath().isBlank());
 		}, null);
 		create.setHint(Texts.translatable("rsmm.gui.defaultMeterProperties.createbar.hint"));
@@ -228,7 +228,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		create.clear();
 	}
 
-	private void selectBlock(ResourceLocation key) {
+	private void selectBlock(Identifier key) {
 		currentBlock = key;
 
 		if (currentTab == Tab.OVERRIDES) {
@@ -402,7 +402,7 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 	}
 
 	private void add() {
-		ResourceLocation key = nextBlockKey();
+		Identifier key = nextBlockKey();
 
 		if (key != null && overrides.putIfAbsent(key, new EditableMeterProperties()) == null) {
 			selectTab(Tab.OVERRIDES);
@@ -417,15 +417,15 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		}
 	}
 
-	public ResourceLocation nextBlockKey() {
+	public Identifier nextBlockKey() {
 		try {
 			String name = create.getValue();
-			ResourceLocation key = ResourceLocation.parse(name);
+			Identifier key = Identifier.parse(name);
 
 			if (!overrides.containsKey(key)) {
 				return key;
 			}
-		} catch (ResourceLocationException e) {
+		} catch (IdentifierException e) {
 		}
 
 		return null;

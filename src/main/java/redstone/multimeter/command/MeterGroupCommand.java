@@ -36,7 +36,7 @@ public class MeterGroupCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
 		LiteralArgumentBuilder<CommandSourceStack> builder = Commands.
 			literal("metergroup").
-			requires(source -> isMultimeterClient(source)).
+			requires(source -> source.getServer() != null && isMultimeterClient(source)).
 			then(Commands.
 				literal("list").
 				executes(context -> list(context.getSource()))).

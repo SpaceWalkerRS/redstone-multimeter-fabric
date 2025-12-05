@@ -75,7 +75,7 @@ public abstract class ServerLevelMixin extends Level implements IServerLevel, Sc
 		)
 	)
 	private void startTickTaskTickLevel(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		rsmm$startTickTask(TickTask.TICK_LEVEL, dimension().location().toString());
+		rsmm$startTickTask(TickTask.TICK_LEVEL, dimension().identifier().toString());
 	}
 
 	@Inject(

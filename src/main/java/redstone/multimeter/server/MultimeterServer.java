@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -182,7 +182,7 @@ public class MultimeterServer {
 		return server.getAllLevels();
 	}
 
-	public ServerLevel getLevel(ResourceLocation key) {
+	public ServerLevel getLevel(Identifier key) {
 		return server.getLevel(ResourceKey.create(Registries.DIMENSION, key));
 	}
 

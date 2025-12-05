@@ -481,7 +481,7 @@ public class Multimeter {
 	 * at before teleporting to a meter.
 	 */
 	private void sendClickableReturnMessage(ServerLevel level, double _x, double _y, double _z, float _yaw, float _pitch, ServerPlayer player) {
-		String dimension = level.dimension().location().toString();
+		String dimension = level.dimension().identifier().toString();
 		String x = NUMBER_FORMAT.format(_x);
 		String y = NUMBER_FORMAT.format(_y);
 		String z = NUMBER_FORMAT.format(_z);

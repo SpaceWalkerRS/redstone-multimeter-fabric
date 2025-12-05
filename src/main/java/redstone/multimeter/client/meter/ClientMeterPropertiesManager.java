@@ -26,7 +26,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -52,9 +52,9 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 	private final MultimeterClient client;
 	private final Path dir;
-	private final Map<ResourceLocation, MeterProperties> defaults;
-	private final Map<ResourceLocation, MeterProperties> overrides;
-	private final Map<ResourceLocation, MeterProperties> cache;
+	private final Map<Identifier, MeterProperties> defaults;
+	private final Map<Identifier, MeterProperties> overrides;
+	private final Map<Identifier, MeterProperties> cache;
 
 	public ClientMeterPropertiesManager(MultimeterClient client) {
 		this.client = client;
@@ -118,22 +118,22 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	public Map<ResourceLocation, MeterProperties> getDefaults() {
+	public Map<Identifier, MeterProperties> getDefaults() {
 		return Collections.unmodifiableMap(defaults);
 	}
 
-	public Map<ResourceLocation, MeterProperties> getOverrides() {
+	public Map<Identifier, MeterProperties> getOverrides() {
 		return Collections.unmodifiableMap(overrides);
 	}
 
-	public <T extends MeterProperties> void update(Map<ResourceLocation, T> newOverrides) {
-		Map<ResourceLocation, MeterProperties> prev = new HashMap<>(overrides);
+	public <T extends MeterProperties> void update(Map<Identifier, T> newOverrides) {
+		Map<Identifier, MeterProperties> prev = new HashMap<>(overrides);
 
 		overrides.clear();
 		cache.clear();
 
-		for (Entry<ResourceLocation, T> entry : newOverrides.entrySet()) {
-			ResourceLocation key = entry.getKey();
+		for (Entry<Identifier, T> entry : newOverrides.entrySet()) {
+			Identifier key = entry.getKey();
 			MeterProperties properties = entry.getValue();
 
 			prev.remove(key);
@@ -142,13 +142,13 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 		save();
 
-		for (ResourceLocation key : prev.keySet()) {
+		for (Identifier key : prev.keySet()) {
 			deleteOverrideFile(key);
 		}
 	}
 
 	public MeterProperties getDefaultProperties(Block block) {
-		ResourceLocation key = BuiltInRegistries.BLOCK.getKey(block);
+		Identifier key = BuiltInRegistries.BLOCK.getKey(block);
 
 		if (key == null) {
 			return null; // we should never get here
@@ -156,7 +156,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 		return cache.computeIfAbsent(key, _key -> {
 			String namespace = key.getNamespace();
-			ResourceLocation defaultKey = ResourceLocation.fromNamespaceAndPath(namespace, DEFAULT_KEY);
+			Identifier defaultKey = Identifier.fromNamespaceAndPath(namespace, DEFAULT_KEY);
 
 			return new MutableMeterProperties().
 				fill(overrides.get(key)).
@@ -170,16 +170,16 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 	private void initDefaults() {
 		Set<String> namespaces = new HashSet<>();
 
-		for (ResourceLocation key : BuiltInRegistries.BLOCK.keySet()) {
+		for (Identifier key : BuiltInRegistries.BLOCK.keySet()) {
 			loadDefaultProperties(key);
 
 			if (namespaces.add(key.getNamespace())) {
-				loadDefaultProperties(ResourceLocation.fromNamespaceAndPath(key.getNamespace(), DEFAULT_KEY));
+				loadDefaultProperties(Identifier.fromNamespaceAndPath(key.getNamespace(), DEFAULT_KEY));
 			}
 		}
 	}
 
-	private void loadDefaultProperties(ResourceLocation key) {
+	private void loadDefaultProperties(Identifier key) {
 		String path = String.format("%s/%s/%s%s", RESOURCES_PATH, key.getNamespace(), key.getPath(), FILE_EXTENSION);
 		InputStream resource = getClass().getResourceAsStream(path);
 
@@ -221,11 +221,11 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		path = path.substring(0, path.length() - FILE_EXTENSION.length());
 
 		try (BufferedReader br = Files.newBufferedReader(file)) {
-			loadProperties(overrides, ResourceLocation.fromNamespaceAndPath(namespace, path), br);
+			loadProperties(overrides, Identifier.fromNamespaceAndPath(namespace, path), br);
 		}
 	}
 
-	private static void loadProperties(Map<ResourceLocation, MeterProperties> map, ResourceLocation key, Reader reader) {
+	private static void loadProperties(Map<Identifier, MeterProperties> map, Identifier key, Reader reader) {
 		JsonElement rawJson = GSON.fromJson(reader, JsonElement.class);
 
 		if (rawJson.isJsonObject()) {
@@ -238,8 +238,8 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 
 	public void save() {
 		try {
-			for (Entry<ResourceLocation, MeterProperties> entry : overrides.entrySet()) {
-				ResourceLocation key = entry.getKey();
+			for (Entry<Identifier, MeterProperties> entry : overrides.entrySet()) {
+				Identifier key = entry.getKey();
 				MeterProperties properties = entry.getValue();
 
 				saveUserOverrides(key, properties);
@@ -249,7 +249,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	private void saveUserOverrides(ResourceLocation key, MeterProperties properties) throws Exception {
+	private void saveUserOverrides(Identifier key, MeterProperties properties) throws Exception {
 		String namespace = key.getNamespace();
 		String path = key.getPath();
 
@@ -276,7 +276,7 @@ public class ClientMeterPropertiesManager extends MeterPropertiesManager {
 		}
 	}
 
-	private void deleteOverrideFile(ResourceLocation key) {
+	private void deleteOverrideFile(Identifier key) {
 		String namespace = key.getNamespace();
 		String path = key.getPath();
 
