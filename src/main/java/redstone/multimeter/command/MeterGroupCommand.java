@@ -36,7 +36,7 @@ public class MeterGroupCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
 		LiteralArgumentBuilder<CommandSourceStack> builder = Commands.
 			literal("metergroup").
-			requires(source -> source.getServer() != null && isMultimeterClient(source)).
+			requires(source -> isMultimeterClient(source)).
 			then(Commands.
 				literal("list").
 				executes(context -> list(context.getSource()))).
@@ -307,6 +307,11 @@ public class MeterGroupCommand {
 	private static boolean run(CommandSourceStack source, BiFunction<Multimeter, ServerPlayer, Boolean> command) {
 		ServerPlayer player = source.getPlayer();
 		MinecraftServer server = source.getServer();
+
+		if (server == null) {
+			return false;
+		}
+
 		MultimeterServer multimeterServer = ((IMinecraftServer)server).getMultimeterServer();
 		Multimeter multimeter = multimeterServer.getMultimeter();
 
