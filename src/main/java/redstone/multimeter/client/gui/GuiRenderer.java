@@ -2,7 +2,7 @@ package redstone.multimeter.client.gui;
 
 import com.mojang.blaze3d.platform.Window;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.world.item.ItemStack;
 
@@ -11,22 +11,22 @@ import redstone.multimeter.client.gui.text.Text;
 import redstone.multimeter.client.gui.texture.Texture;
 import redstone.multimeter.client.gui.texture.TextureRegion;
 import redstone.multimeter.client.gui.tooltip.Tooltip;
-import redstone.multimeter.mixin.client.GuiGraphicsAccessor;
+import redstone.multimeter.mixin.client.GuiGraphicsExtractorAccessor;
 
 public class GuiRenderer {
 
-	final GuiGraphics graphics;
+	final GuiGraphicsExtractor graphics;
 	final FontRenderer font;
 
 	public GuiRenderer(GuiRenderer delegate) {
 		this(delegate.graphics, delegate.font);
 	}
 
-	public GuiRenderer(GuiGraphics graphics) {
+	public GuiRenderer(GuiGraphicsExtractor graphics) {
 		this(graphics, MultimeterClient.INSTANCE.getFontRenderer());
 	}
 
-	private GuiRenderer(GuiGraphics graphics, FontRenderer font) {
+	private GuiRenderer(GuiGraphicsExtractor graphics, FontRenderer font) {
 		this.graphics = graphics;
 		this.font = font;
 
@@ -129,7 +129,7 @@ public class GuiRenderer {
 	}
 
 	public void blit(Texture t, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int color) {
-		((GuiGraphicsAccessor) this.graphics).rsmm$innerBlit(
+		((GuiGraphicsExtractorAccessor) this.graphics).rsmm$innerBlit(
 			RenderPipelines.GUI_TEXTURED,
 			t.location,
 			x0,
@@ -247,7 +247,7 @@ public class GuiRenderer {
 	}
 
 	public void renderItem(ItemStack item, int x, int y) {
-		this.graphics.renderFakeItem(item, x, y);
+		this.graphics.fakeItem(item, x, y);
 	}
 
 	public void drawString(String s, int x, int y) {

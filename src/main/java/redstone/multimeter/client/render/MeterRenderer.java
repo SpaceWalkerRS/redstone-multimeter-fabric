@@ -10,11 +10,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font.DisplayMode;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -140,7 +140,7 @@ public class MeterRenderer {
 			float x = -(minecraft.font.width(name) / 2.0F);
 			float y = 0;
 
-			minecraft.font.drawInBatch(name, x, y, ColorUtils.setAlpha(0xFFFFFF, 0xFF / dim), false, pose, bufferSource, DisplayMode.SEE_THROUGH, 0, LightTexture.pack(15, 15));
+			minecraft.font.drawInBatch(name, x, y, ColorUtils.setAlpha(0xFFFFFF, 0xFF / dim), false, pose, bufferSource, DisplayMode.SEE_THROUGH, 0, LightCoordsUtil.pack(15, 15));
 
 			poses.popPose();
 		}

@@ -450,6 +450,10 @@ public class MultimeterClient {
 	}
 
 	public void sendMessage(Text message, boolean actionBar) {
-		minecraft.player.displayClientMessage(message.resolve(), actionBar);
+		if (actionBar) {
+			minecraft.player.sendOverlayMessage(message.resolve());
+		} else {
+			minecraft.player.sendSystemMessage(message.resolve());
+		}
 	}
 }

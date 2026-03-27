@@ -17,7 +17,7 @@ import redstone.multimeter.common.network.PacketWrapper;
 public class ClientboundCustomPayloadPacketMixin {
 
 	@Inject(
-		method = "method_58270",
+		method = "lambda$static$1",
 		at = @At(
 			value = "HEAD"
 		)

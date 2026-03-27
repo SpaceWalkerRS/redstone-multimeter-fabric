@@ -30,16 +30,16 @@ repositories {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+//	mappings loom.officialMojangMappings()
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	include(modImplementation("de.siphalor.amecs-api:amecs-api-mc1.21.9:${project.amecs_version}") {
+	implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+	include(implementation("de.siphalor.amecs.amecs-key-modifiers:amecs-key-modifiers-mc26.1.0:${project.amecs_version}") {
 		exclude group: 'net.fabricmc'
 		exclude group: 'net.fabricmc.fabric-api'
 	})
 
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}+26.1"
 }
 
 processResources {
@@ -51,14 +51,14 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {

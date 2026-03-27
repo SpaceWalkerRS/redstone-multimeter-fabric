@@ -8,12 +8,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.dimension.end.EndDragonFight;
+import net.minecraft.world.level.dimension.end.EnderDragonFight;
 
 import redstone.multimeter.common.TickTask;
 import redstone.multimeter.interfaces.mixin.IServerLevel;
 
-@Mixin(EndDragonFight.class)
+@Mixin(EnderDragonFight.class)
 public class EndDragonFightMixin {
 
 	@Shadow @Final private ServerLevel level;

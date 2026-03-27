@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.text.Text;
@@ -19,7 +19,7 @@ public class FontRenderer {
 
 	final Font font;
 
-	GuiGraphics graphics;
+	GuiGraphicsExtractor graphics;
 
 	public FontRenderer(MultimeterClient client) {
 		Minecraft minecraft = client.getMinecraft();
@@ -32,43 +32,43 @@ public class FontRenderer {
 	}
 
 	public void draw(String s, int x, int y) {
-		this.graphics.drawString(this.font, s, x, y, 0xFFFFFFFF, false);
+		this.graphics.text(this.font, s, x, y, 0xFFFFFFFF, false);
 	}
 
 	public void draw(Text t, int x, int y) {
-		this.graphics.drawString(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, 0xFFFFFFFF), false);
+		this.graphics.text(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, 0xFFFFFFFF), false);
 	}
 
 	public void draw(String s, int x, int y, int color) {
-		this.graphics.drawString(this.font, s, x, y, color, false);
+		this.graphics.text(this.font, s, x, y, color, false);
 	}
 
 	public void draw(Text t, int x, int y, int color) {
-		this.graphics.drawString(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, color), false);
+		this.graphics.text(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, color), false);
 	}
 
 	public void drawWithShadow(String s, int x, int y) {
-		this.graphics.drawString(this.font, s, x, y, 0xFFFFFFFF, true);
+		this.graphics.text(this.font, s, x, y, 0xFFFFFFFF, true);
 	}
 
 	public void drawWithShadow(Text t, int x, int y) {
-		this.graphics.drawString(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, 0xFFFFFFFF), true);
+		this.graphics.text(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, 0xFFFFFFFF), true);
 	}
 
 	public void drawWithShadow(String s, int x, int y, int color) {
-		this.graphics.drawString(this.font, s, x, y, color, true);
+		this.graphics.text(this.font, s, x, y, color, true);
 	}
 
 	public void drawWithShadow(Text t, int x, int y, int color) {
-		this.graphics.drawString(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, color), true);
+		this.graphics.text(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, color), true);
 	}
 
 	public void draw(String s, int x, int y, int color, boolean shadow) {
-		this.graphics.drawString(this.font, s, x, y, color, shadow);
+		this.graphics.text(this.font, s, x, y, color, shadow);
 	}
 
 	public void draw(Text t, int x, int y, int color, boolean shadow) {
-		this.graphics.drawString(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, color), shadow);
+		this.graphics.text(this.font, t.buildFormattedString(), x, y, this.resolveColor(t, color), shadow);
 	}
 
 	private int resolveColor(Text t, int color) {

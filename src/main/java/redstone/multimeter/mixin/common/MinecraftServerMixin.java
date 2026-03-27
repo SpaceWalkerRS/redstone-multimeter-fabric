@@ -118,7 +118,7 @@ public class MinecraftServerMixin implements IMinecraftServer {
 		method = "tickChildren",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
 			args = "ldc=levels"
 		)
 	)

@@ -2,7 +2,7 @@ package redstone.multimeter.client.gui.screen;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -38,7 +38,7 @@ public class ScreenWrapper extends Screen {
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 		GuiRenderer renderer = new GuiRenderer(graphics);
 
 		screen.render(renderer, mouseX, mouseY);
@@ -129,7 +129,7 @@ public class ScreenWrapper extends Screen {
 
 	@Override
 	public final boolean charTyped(net.minecraft.client.input.CharacterEvent event) {
-		boolean consumed = screen.typeChar(CharacterEvent.type(event.codepoint(), event.modifiers()));
+		boolean consumed = screen.typeChar(CharacterEvent.type(event.codepoint(), 0));
 
 		if (consumed) {
 			mouseMoved(lastMouseX, lastMouseY);

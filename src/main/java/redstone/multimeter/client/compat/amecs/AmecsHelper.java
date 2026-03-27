@@ -4,10 +4,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import de.siphalor.amecs.api.KeyBindingUtils;
-import de.siphalor.amecs.api.KeyModifier;
-import de.siphalor.amecs.api.KeyModifiers;
-import de.siphalor.amecs.impl.ModifierPrefixTextProvider.Variation;
+import de.siphalor.amecs.key_modifiers.api.AmecsKeyModifier;
+import de.siphalor.amecs.key_modifiers.api.AmecsKeyModifierCombination;
+import de.siphalor.amecs.key_modifiers.api.AmecsKeyModifiers;
+import de.siphalor.amecs.key_modifiers.api.AmecsKeyModifiersApi;
+import de.siphalor.amecs.key_modifiers.impl.ModifierPrefixTextProvider.Variation;
 
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -20,17 +21,17 @@ public class AmecsHelper {
 
 	private static boolean isAmecsApiLoaded = FabricLoader.getInstance().isModLoaded("amecsapi");
 
-	public static Collection<KeyModifier> getKeyModifiers(KeyMapping keybind) {
-		KeyModifiers keyModifiers = KeyBindingUtils.getBoundModifiers(keybind);
+	public static Collection<AmecsKeyModifier> getKeyModifiers(KeyMapping keybind) {
+		AmecsKeyModifierCombination keyModifiers = AmecsKeyModifiersApi.getBoundModifiers(keybind);
 
 		if (keyModifiers.isUnset()) {
 			return Collections.emptyList();
 		}
 
-		Collection<KeyModifier> modifiers = new LinkedList<>();
+		Collection<AmecsKeyModifier> modifiers = new LinkedList<>();
 
-		for (KeyModifier modifier : KeyModifier.VALUES) {
-			if (modifier != KeyModifier.NONE && keyModifiers.get(modifier)) {
+		for (AmecsKeyModifier modifier : AmecsKeyModifiers.getAll()) {
+			if (keyModifiers.get(modifier)) {
 				modifiers.add(modifier);
 			}
 		}
@@ -38,11 +39,11 @@ public class AmecsHelper {
 		return modifiers;
 	}
 
-	public static Text getModifierName(KeyModifier modifier, Variation variation) {
+	public static Text getModifierName(AmecsKeyModifier modifier, Variation variation) {
 		return Texts.key(variation.getTranslatableComponent(modifier.getTranslationKey()));
 	}
 
-	public static Text getModifierName(KeyModifier modifier) {
+	public static Text getModifierName(AmecsKeyModifier modifier) {
 		return getModifierName(modifier, Variation.NORMAL);
 	}
 
@@ -50,7 +51,7 @@ public class AmecsHelper {
 		if (isAmecsApiLoaded) {
 			Text t = Texts.literal("");
 
-			for (KeyModifier modifier : getKeyModifiers(keybind)) {
+			for (AmecsKeyModifier modifier : getKeyModifiers(keybind)) {
 				t.
 					append(getModifierName(modifier)).
 					append(" + ");

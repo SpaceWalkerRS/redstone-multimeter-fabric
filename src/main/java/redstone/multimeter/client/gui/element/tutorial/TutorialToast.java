@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui.element.tutorial;
 import java.util.List;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
 
@@ -60,7 +60,7 @@ public class TutorialToast implements Toast {
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, Font font, long age) {
+	public void extractRenderState(GuiGraphicsExtractor graphics, Font font, long age) {
 		GuiRenderer renderer = new GuiRenderer(
 			graphics
 		);

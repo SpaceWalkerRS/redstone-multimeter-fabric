@@ -55,14 +55,14 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "resizeDisplay",
+		method = "resizeGui",
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.AFTER,
 			target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(I)V"
 		)
 	)
-	private void resizeDisplay(CallbackInfo ci) {
+	private void resizeGui(CallbackInfo ci) {
 		if (multimeterClient != null) {
 			multimeterClient.getHud().resetSize();
 		}

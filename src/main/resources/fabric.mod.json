@@ -35,7 +35,7 @@
 	],
 
 	"depends": {
-		"minecraft": "1.21.x"
+		"minecraft": "26.1.x"
 	},
 
 	"custom": {

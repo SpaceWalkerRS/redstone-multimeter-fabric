@@ -1,6 +1,6 @@
 package redstone.multimeter.mixin.client;
 
-import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Vector4f;
 
 import org.spongepowered.asm.mixin.Final;
@@ -20,12 +20,13 @@ import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.RenderBuffers;
+import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.render.MeterRenderer;
@@ -44,7 +45,7 @@ public class LevelRendererMixin {
 			target = "Lnet/minecraft/client/renderer/LevelRenderer;addWeatherPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"
 		)
 	)
-	private void renderMeters(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, Matrix4f cameraPose, Matrix4f projectionPose, Matrix4f projectionPoseForCulling, GpuBufferSlice fogParameters, Vector4f fogColor, boolean sky, CallbackInfo ci, @Local FrameGraphBuilder builder) {
+	private void renderMeters(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice fogParameters, Vector4f fogColor, boolean renderSky, ChunkSectionsToRender chunkSections, CallbackInfo ci, @Local FrameGraphBuilder builder) {
 		FramePass pass = builder.addPass("rsmm:meters");
 
 		targets.main = pass.readsAndWrites(targets.main);
