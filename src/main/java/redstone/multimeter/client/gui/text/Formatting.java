@@ -34,9 +34,11 @@ public enum Formatting {
 	final Integer color;
 
 	private Formatting(ChatFormatting formatting) {
+		net.minecraft.network.chat.TextColor color = net.minecraft.network.chat.TextColor.fromLegacyFormat(formatting);
+
 		this.resolved = formatting;
-		this.code = formatting.getChar();
-		this.color = formatting.getColor();
+		this.code = formatting.toString().charAt(1);
+		this.color = (color == null) ? null : color.getValue();
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public enum Formatting {
 	}
 
 	public static Formatting resolve(ChatFormatting formatting) {
-		return byCode(formatting.getChar());
+		return byCode(formatting.toString().charAt(1));
 	}
 
 	public static Formatting byCode(char code) {

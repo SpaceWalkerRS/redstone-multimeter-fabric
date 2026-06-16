@@ -57,7 +57,7 @@ public class OptionsScreen extends RSMMScreen {
 			return true;
 		});
 		Button controls = new BasicButton(x + 4, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Texts::guiControls, Tooltips::empty, (button, event) -> {
-			minecraft.setScreen(new ControlsScreen(wrapper, minecraft.options));
+			minecraft.setScreenAndShow(new ControlsScreen(wrapper, minecraft.options));
 			return true;
 		});
 

@@ -325,7 +325,7 @@ public class SuggestionsMenu extends AbstractElement {
 	}
 
 	private boolean fitsBelowInput() {
-		return this.input.getY() + this.input.getHeight() - 1 + this.getMaxHeight() <= MultimeterClient.MINECRAFT.screen.height;
+		return this.input.getY() + this.input.getHeight() - 1 + this.getMaxHeight() <= MultimeterClient.MINECRAFT.gui.screen().height;
 	}
 
 	public void updateSize() {

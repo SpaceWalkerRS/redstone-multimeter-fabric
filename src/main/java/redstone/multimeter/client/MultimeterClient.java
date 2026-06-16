@@ -418,8 +418,8 @@ public class MultimeterClient {
 	}
 
 	public RSMMScreen getScreen() {
-		if (minecraft.screen != null && minecraft.screen instanceof ScreenWrapper) {
-			ScreenWrapper screenWrapper = (ScreenWrapper)minecraft.screen;
+		if (minecraft.gui.screen() != null && minecraft.gui.screen() instanceof ScreenWrapper) {
+			ScreenWrapper screenWrapper = (ScreenWrapper)minecraft.gui.screen();
 			return screenWrapper.getScreen();
 		}
 
@@ -427,16 +427,16 @@ public class MultimeterClient {
 	}
 
 	public void openScreen(RSMMScreen screen) {
-		minecraft.setScreen(new ScreenWrapper(minecraft.screen, screen));
+		minecraft.setScreenAndShow(new ScreenWrapper(minecraft.gui.screen(), screen));
 		tutorial.onScreenOpened(screen);
 	}
 
 	public boolean hasScreenOpen() {
-		return minecraft.screen != null;
+		return minecraft.gui.screen() != null;
 	}
 
 	public boolean hasRSMMScreenOpen() {
-		return minecraft.screen != null && minecraft.screen instanceof ScreenWrapper;
+		return minecraft.gui.screen() != null && minecraft.gui.screen() instanceof ScreenWrapper;
 	}
 
 	public boolean hasMultimeterScreenOpen() {

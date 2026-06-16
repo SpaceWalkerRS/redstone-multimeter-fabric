@@ -45,7 +45,7 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "reloadResourcePacks(ZLnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/util/concurrent/CompletableFuture;",
+		method = "reloadResourcePacks(ZLnet/minecraft/client/GameLoadCookie;)Ljava/util/concurrent/CompletableFuture;",
 		at = @At(
 			value = "HEAD"
 		)

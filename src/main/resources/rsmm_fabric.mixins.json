@@ -69,7 +69,7 @@
 		"client.ClientLanguageMixin",
 		"client.ClientPacketListenerMixin",
 		"client.GuiGraphicsExtractorAccessor",
-		"client.GuiMixin",
+		"client.HudMixin",
 		"client.IntegratedServerMixin",
 		"client.KeyMappingMixin",
 		"client.LevelRendererMixin",

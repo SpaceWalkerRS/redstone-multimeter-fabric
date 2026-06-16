@@ -2,18 +2,16 @@ package redstone.multimeter.client.render;
 
 import java.util.function.Predicate;
 
-import org.joml.Matrix4f;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font.DisplayMode;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -39,20 +37,20 @@ public class MeterRenderer {
 		this.minecraft = this.client.getMinecraft();
 	}
 
-	public void renderMeterHighlights(PoseStack poses, BufferSource bufferSource) {
-		renderMeters(poses, bufferSource, this::shouldRenderHighlight, this::renderHighlight);
+	public void renderMeterHighlights(PoseStack poses, SubmitNodeCollector collector) {
+		renderMeters(poses, collector, this::shouldRenderHighlight, this::renderHighlight);
 	}
 
-	public void renderMeterNameTags(PoseStack poses, BufferSource bufferSource) {
-		renderMeters(poses, bufferSource, this::shouldRenderNameTag, this::renderNameTag);
+	public void renderMeterNameTags(PoseStack poses, SubmitNodeCollector collector) {
+		renderMeters(poses, collector, this::shouldRenderNameTag, this::renderNameTag);
 	}
 
-	private void renderMeters(PoseStack poses, BufferSource bufferSource, Predicate<Meter> predicate, MeterPartRenderer renderer) {
+	private void renderMeters(PoseStack poses, SubmitNodeCollector collector, Predicate<Meter> predicate, MeterPartRenderer renderer) {
 		ClientMeterGroup meterGroup = client.isPreviewing() ? client.getMeterGroupPreview() : client.getMeterGroup();
 
 		for (Meter meter : meterGroup.getMeters()) {
 			if (meter.isIn(minecraft.level) && predicate.test(meter)) {
-				renderer.render(poses, bufferSource, meter);
+				renderer.render(poses, collector, meter);
 			}
 		}
 	}
@@ -67,13 +65,13 @@ public class MeterRenderer {
 		};
 	}
 
-	private void renderHighlight(PoseStack poses, BufferSource bufferSource, Meter meter) {
+	private void renderHighlight(PoseStack poses, SubmitNodeCollector collector, Meter meter) {
 		BlockPos pos = meter.getPos().getBlockPos();
 		int color = meter.getColor();
 		boolean movable = meter.isMovable();
 
-		Camera camera = minecraft.gameRenderer.getMainCamera();
-		Vec3 cameraPos = camera.position();
+		Camera camera = minecraft.gameRenderer.mainCamera();
+		Vec3 cameraPos = minecraft.gameRenderer.gameRenderState().levelRenderState.cameraRenderState.pos;
 
 		double dx = pos.getX() - cameraPos.x;
 		double dy = pos.getY() - cameraPos.y;
@@ -88,10 +86,10 @@ public class MeterRenderer {
 			poses.pushPose();
 			poses.translate(dx, dy, dz);
 
-			renderMeterHighlight(bufferSource, poses, ColorUtils.setAlpha(color, 0x7F / dim));
+			renderMeterHighlight(collector, poses, ColorUtils.setAlpha(color, 0x7F / dim));
 
 			if (movable) {
-				renderMeterOutline(bufferSource, poses, ColorUtils.setAlpha(color, 0xFF / dim));
+				renderMeterOutline(collector, poses, ColorUtils.setAlpha(color, 0xFF / dim));
 			}
 
 			poses.popPose();
@@ -113,11 +111,11 @@ public class MeterRenderer {
 		};
 	}
 
-	private void renderNameTag(PoseStack poses, BufferSource bufferSource, Meter meter) {
-		String name = meter.getName();
+	private void renderNameTag(PoseStack poses, SubmitNodeCollector collector, Meter meter) {
+		Component name = Component.literal(meter.getName());
 		BlockPos pos = meter.getPos().getBlockPos();
 
-		Camera camera = minecraft.gameRenderer.getMainCamera();
+		Camera camera = minecraft.gameRenderer.mainCamera();
 		Vec3 cameraPos = camera.position();
 
 		double dx = pos.getX() - cameraPos.x;
@@ -135,12 +133,10 @@ public class MeterRenderer {
 			poses.mulPose(camera.rotation());
 			poses.scale(0.025F, -0.025F, 0.025F);
 
-			Matrix4f pose = poses.last().pose();
-
 			float x = -(minecraft.font.width(name) / 2.0F);
 			float y = 0;
 
-			minecraft.font.drawInBatch(name, x, y, ColorUtils.setAlpha(0xFFFFFF, 0xFF / dim), false, pose, bufferSource, DisplayMode.SEE_THROUGH, 0, LightCoordsUtil.pack(15, 15));
+			collector.submitText(poses, x, y, name.getVisualOrderText(), false, DisplayMode.SEE_THROUGH, LightCoordsUtil.pack(15, 15), ColorUtils.setAlpha(0xFFFFFF, 0xFF / dim), 0, 0);
 
 			poses.popPose();
 		}
@@ -154,24 +150,22 @@ public class MeterRenderer {
 		return !client.isPreviewing() && client.getHud().isFocusMode() && client.getHud().getFocussedMeter() != meter;
 	}
 
-	private void renderMeterHighlight(BufferSource bufferSource, PoseStack poses, int color) {
-		VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.debugQuads());
-		Matrix4f pose = poses.last().pose();
+	private void renderMeterHighlight(SubmitNodeCollector collector, PoseStack poses, int color) {
+		collector.submitCustomGeometry(poses, RenderTypes.debugQuads(), (pose, buffer) -> {
+			float r = ColorUtils.getRed(color) / (float) 0xFF;
+			float g = ColorUtils.getGreen(color) / (float) 0xFF;
+			float b = ColorUtils.getBlue(color) / (float) 0xFF;
+			float a = ColorUtils.getAlpha(color) / (float) 0xFF;
 
-		float r = ColorUtils.getRed(color) / (float) 0xFF;
-		float g = ColorUtils.getGreen(color) / (float) 0xFF;
-		float b = ColorUtils.getBlue(color) / (float) 0xFF;
-		float a = ColorUtils.getAlpha(color) / (float) 0xFF;
-
-		drawBox(buffer, pose, r, g, b, a);
+			drawBox(buffer, pose, r, g, b, a);
+		});
 	}
 
-	private void renderMeterOutline(BufferSource bufferSource, PoseStack poses, int color) {
-		VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.lines());
-		ShapeRenderer.renderShape(poses, buffer, OUTLINE_SHAPE, 0.0D, 0.0D, 0.0D, color, 0.0F);
+	private void renderMeterOutline(SubmitNodeCollector collector, PoseStack poses, int color) {
+		collector.submitShapeOutline(poses, OUTLINE_SHAPE, RenderTypes.lines(), color, 2.0F, true);
 	}
 
-	private void drawBox(VertexConsumer buffer, Matrix4f pose, float r, float g, float b, float a) {
+	private void drawBox(VertexConsumer buffer, PoseStack.Pose pose, float r, float g, float b, float a) {
 		// The box is slightly larger than 1x1 to prevent z-fighting
 		float c0 = -0.002F;
 		float c1 = 1.002F;
@@ -216,7 +210,7 @@ public class MeterRenderer {
 	@FunctionalInterface
 	private interface MeterPartRenderer {
 
-		void render(PoseStack poses, BufferSource bufferSource, Meter meter);
+		void render(PoseStack poses, SubmitNodeCollector collector, Meter meter);
 
 	}
 }

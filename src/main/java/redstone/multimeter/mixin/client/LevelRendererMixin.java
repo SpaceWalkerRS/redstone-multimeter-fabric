@@ -7,8 +7,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At.Shift;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.sugar.Local;
@@ -23,9 +23,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LevelTargetBundle;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.client.renderer.RenderBuffers;
-import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 
 import redstone.multimeter.client.MultimeterClient;
@@ -34,18 +33,18 @@ import redstone.multimeter.client.render.MeterRenderer;
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
 
-	@Shadow @Final private RenderBuffers renderBuffers;
+	@Shadow @Final private SubmitNodeStorage submitNodeStorage;
 	@Shadow @Final private LevelTargetBundle targets;
 
 	@Inject(
-		method = "renderLevel",
+		method = "render",
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.AFTER,
 			target = "Lnet/minecraft/client/renderer/LevelRenderer;addWeatherPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"
 		)
 	)
-	private void renderMeters(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice fogParameters, Vector4f fogColor, boolean renderSky, ChunkSectionsToRender chunkSections, CallbackInfo ci, @Local FrameGraphBuilder builder) {
+	private void renderMeters(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice fogParameters, Vector4f fogColor, boolean renderSky, CallbackInfo ci, @Local FrameGraphBuilder builder) {
 		FramePass pass = builder.addPass("rsmm:meters");
 
 		targets.main = pass.readsAndWrites(targets.main);
@@ -56,15 +55,13 @@ public class LevelRendererMixin {
 		pass.executes(() -> {
 			RenderSystem.setShaderFog(fogParameters);
 
-			BufferSource bufferSource = renderBuffers.bufferSource();
+			SubmitNodeCollector collector = this.submitNodeStorage;
 			MeterRenderer renderer = MultimeterClient.INSTANCE.getMeterRenderer();
 
 			PoseStack poses = new PoseStack();
 
-			renderer.renderMeterHighlights(poses, bufferSource);
-			renderer.renderMeterNameTags(poses, bufferSource);
-
-			bufferSource.endBatch();
+			renderer.renderMeterHighlights(poses, collector);
+			renderer.renderMeterNameTags(poses, collector);
 		});
 	}
 }

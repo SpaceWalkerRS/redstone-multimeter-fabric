@@ -200,7 +200,7 @@ public class Tutorial implements TutorialListener {
 
 	private void startStep() {
 		if (this.toast != null) {
-			this.minecraft.getToastManager().addToast(this.toast);
+			this.minecraft.gui.toastManager().addToast(this.toast);
 		}
 
 		this.time = 0;

@@ -69,13 +69,14 @@ public class TextColor {
 	}
 
 	public static TextColor resolve(net.minecraft.network.chat.TextColor color) {
-		ChatFormatting formatting = ChatFormatting.getByName(color.serialize());
-
-		if (formatting != null) {
-			return resolve(Formatting.resolve(formatting));
-		} else {
-			return new TextColor(color.getValue());
-		}
+//		ChatFormatting formatting = ChatFormatting.getByName(color.serialize());
+//
+//		if (formatting != null) {
+//			return resolve(Formatting.resolve(formatting));
+//		} else {
+//			return new TextColor(color.getValue());
+//		}
+		return new TextColor(color.getValue());
 	}
 
 	static TextColor resolve(Formatting formatting) {

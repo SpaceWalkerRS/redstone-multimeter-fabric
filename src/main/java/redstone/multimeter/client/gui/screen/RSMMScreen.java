@@ -108,7 +108,7 @@ public abstract class RSMMScreen extends AbstractParentElement {
 	}
 
 	public void close() {
-		minecraft.setScreen(wrapper.getParent());
+		minecraft.setScreenAndShow(wrapper.getParent());
 	}
 
 	protected boolean hasTransparentBackground() {
