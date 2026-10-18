@@ -121,12 +121,12 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V",
+		method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void disconnect(Screen screen, boolean transferring, CallbackInfo ci) {
+	private void disconnect(CallbackInfo ci) {
 		multimeterClient.onDisconnect();
 	}
 
