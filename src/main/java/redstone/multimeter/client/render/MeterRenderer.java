@@ -2,6 +2,8 @@ package redstone.multimeter.client.render;
 
 import java.util.function.Predicate;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
@@ -130,7 +132,7 @@ public class MeterRenderer {
 
 			poses.pushPose();
 			poses.translate(dx + 0.5D, dy + 0.75D, dz + 0.5D);
-			poses.mulPose(camera.rotation());
+			poses.mulPose(camera.rotation().get(new Matrix4f()));
 			poses.scale(0.025F, -0.025F, 0.025F);
 
 			float x = -(minecraft.font.width(name) / 2.0F);

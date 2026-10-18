@@ -1,8 +1,7 @@
 package redstone.multimeter.client.gui.element;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLMouse;
 
-import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.client.gui.CursorType;
 import redstone.multimeter.client.gui.GuiRenderer;
 import redstone.multimeter.client.gui.element.input.CharacterEvent;
@@ -78,6 +77,6 @@ public interface Element {
 	void update();
 
 	static void setCursor(CursorType type) {
-		GLFW.glfwSetCursor(MultimeterClient.MINECRAFT.getWindow().handle(), type.getCursor());
+		SDLMouse.SDL_SetCursor(type.getCursor());
 	}
 }

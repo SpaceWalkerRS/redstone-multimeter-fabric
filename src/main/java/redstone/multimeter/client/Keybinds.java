@@ -3,6 +3,7 @@ package redstone.multimeter.client;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -11,7 +12,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeyboard;
+import org.lwjgl.sdl.SDLScancode;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.InputConstants.Key;
@@ -158,7 +160,8 @@ public class Keybinds {
 
 	public static boolean isPressed(KeyMapping keybind) {
 		Key key = ((IKeyMapping)keybind).rsmm$getKey();
-		return key != null && GLFW.glfwGetKey(MultimeterClient.MINECRAFT.getWindow().handle(), key.getValue()) == GLFW.GLFW_PRESS;
+		ByteBuffer state = SDLKeyboard.SDL_GetKeyboardState();
+		return key != null && state != null && state.get(key.getValue()) != 0;
 	}
 
 	public static boolean matches(KeyMapping keybind, MouseEvent event) {
@@ -166,32 +169,32 @@ public class Keybinds {
 	}
 
 	public static boolean matches(KeyMapping keybind, KeyEvent event) {
-		return keybind.matches(new net.minecraft.client.input.KeyEvent(event.keyCode(), event.scanCode(), event.modifiers()));
+		return keybind.matches(new net.minecraft.client.input.KeyEvent(event.scanCode(), event.keyCode(), event.modifiers()));
 	}
 
 	static {
 		MAIN              = registerCategory("redstone_multimeter");
 		METER_EVENT_TYPES = registerCategory("meter_event_types");
 
-		TOGGLE_METER           = registerKeybind("toggleMeter"            , "Toggle Meter"          , MAIN, GLFW.GLFW_KEY_M);
-		RESET_METER            = registerKeybind("resetMeter"             , "Reset Meter"           , MAIN, GLFW.GLFW_KEY_B);
-		LOAD_METER_GROUP       = registerKeybind("loadMeterGroup"         , "Load Meter Group"      , MAIN, GLFW.GLFW_KEY_LEFT_BRACKET);
-		SAVE_METER_GROUP       = registerKeybind("saveMeterGroup"         , "Save Meter Group"      , MAIN, GLFW.GLFW_KEY_RIGHT_BRACKET);
-		PAUSE_TIMELINE         = registerKeybind("pauseTimeline"          , "Pause Meters"          , MAIN, GLFW.GLFW_KEY_N);
-		STEP_BACKWARD          = registerKeybind("stepBackwardTimeline"   , "Step Backward"         , MAIN, GLFW.GLFW_KEY_COMMA);
-		STEP_FORWARD           = registerKeybind("stepForwardTimeline"    , "Step Forward"          , MAIN, GLFW.GLFW_KEY_PERIOD);
-		SCROLL_HUD             = registerKeybind("scrollTimeline"         , "Scroll HUD"            , MAIN, GLFW.GLFW_KEY_LEFT_ALT);
-		TOGGLE_HUD             = registerKeybind("toggleHud"              , "Toggle HUD"            , MAIN, GLFW.GLFW_KEY_H);
-		TOGGLE_MARKER          = registerKeybind("toggleTickMarker"       , "Toggle Tick Marker"    , MAIN, GLFW.GLFW_KEY_Y);
-		TOGGLE_FOCUS_MODE      = registerKeybind("toggleFocusMode"        , "Toggle Focus Mode"     , MAIN, GLFW.GLFW_KEY_F);
-		OPEN_MULTIMETER_SCREEN = registerKeybind("openMultimeterScreen"   , "Open Multimeter Screen", MAIN, GLFW.GLFW_KEY_G);
-		OPEN_METER_CONTROLS    = registerKeybind("openMeterControlsScreen", "Open Meter Controls"   , MAIN, GLFW.GLFW_KEY_I);
-		OPEN_OPTIONS_MENU      = registerKeybind("openOptionsScreen"      , "Open Options Menu"     , MAIN, GLFW.GLFW_KEY_O);
-		VIEW_TICK_PHASE_TREE   = registerKeybind("openTickPhaseTreeScreen", "View Tick Phases"      , MAIN, GLFW.GLFW_KEY_U);
-		PRINT_LOGS             = registerKeybind("toggleLogPrinter"       , "Print Logs To File"    , MAIN, GLFW.GLFW_KEY_P);
+		TOGGLE_METER           = registerKeybind("toggleMeter"            , "Toggle Meter"          , MAIN, SDLScancode.SDL_SCANCODE_M);
+		RESET_METER            = registerKeybind("resetMeter"             , "Reset Meter"           , MAIN, SDLScancode.SDL_SCANCODE_B);
+		LOAD_METER_GROUP       = registerKeybind("loadMeterGroup"         , "Load Meter Group"      , MAIN, SDLScancode.SDL_SCANCODE_LEFTBRACKET);
+		SAVE_METER_GROUP       = registerKeybind("saveMeterGroup"         , "Save Meter Group"      , MAIN, SDLScancode.SDL_SCANCODE_RIGHTBRACKET);
+		PAUSE_TIMELINE         = registerKeybind("pauseTimeline"          , "Pause Meters"          , MAIN, SDLScancode.SDL_SCANCODE_N);
+		STEP_BACKWARD          = registerKeybind("stepBackwardTimeline"   , "Step Backward"         , MAIN, SDLScancode.SDL_SCANCODE_COMMA);
+		STEP_FORWARD           = registerKeybind("stepForwardTimeline"    , "Step Forward"          , MAIN, SDLScancode.SDL_SCANCODE_PERIOD);
+		SCROLL_HUD             = registerKeybind("scrollTimeline"         , "Scroll HUD"            , MAIN, SDLScancode.SDL_SCANCODE_LALT);
+		TOGGLE_HUD             = registerKeybind("toggleHud"              , "Toggle HUD"            , MAIN, SDLScancode.SDL_SCANCODE_H);
+		TOGGLE_MARKER          = registerKeybind("toggleTickMarker"       , "Toggle Tick Marker"    , MAIN, SDLScancode.SDL_SCANCODE_Y);
+		TOGGLE_FOCUS_MODE      = registerKeybind("toggleFocusMode"        , "Toggle Focus Mode"     , MAIN, SDLScancode.SDL_SCANCODE_F);
+		OPEN_MULTIMETER_SCREEN = registerKeybind("openMultimeterScreen"   , "Open Multimeter Screen", MAIN, SDLScancode.SDL_SCANCODE_G);
+		OPEN_METER_CONTROLS    = registerKeybind("openMeterControlsScreen", "Open Meter Controls"   , MAIN, SDLScancode.SDL_SCANCODE_I);
+		OPEN_OPTIONS_MENU      = registerKeybind("openOptionsScreen"      , "Open Options Menu"     , MAIN, SDLScancode.SDL_SCANCODE_O);
+		VIEW_TICK_PHASE_TREE   = registerKeybind("openTickPhaseTreeScreen", "View Tick Phases"      , MAIN, SDLScancode.SDL_SCANCODE_U);
+		PRINT_LOGS             = registerKeybind("toggleLogPrinter"       , "Print Logs To File"    , MAIN, SDLScancode.SDL_SCANCODE_P);
 
 		for (int index = 0; index < EventType.ALL.length; index++) {
-			TOGGLE_EVENT_TYPES[index] = registerKeybind("toggleMeterEventType." + EventType.byId(index).getKey(), String.format("Toggle \'%s\'", EventType.byId(index).getLegacyKey()), METER_EVENT_TYPES, GLFW.GLFW_KEY_UNKNOWN);
+			TOGGLE_EVENT_TYPES[index] = registerKeybind("toggleMeterEventType." + EventType.byId(index).getKey(), String.format("Toggle \'%s\'", EventType.byId(index).getLegacyKey()), METER_EVENT_TYPES, SDLScancode.SDL_SCANCODE_UNKNOWN);
 		}
 	}
 }

@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -97,7 +98,7 @@ public class ServerChunkCacheMixin {
 	}
 
 	@Inject(
-		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;J)V",
+		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;)V",
 		at = @At(
 			value = "INVOKE_STRING",
 			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
@@ -109,9 +110,11 @@ public class ServerChunkCacheMixin {
 	}
 
 	@Inject(
-		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;J)V",
+		method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;)V",
 		at = @At(
-			value = "TAIL"
+			value = "INVOKE",
+			shift = Shift.AFTER,
+			target = "Lnet/minecraft/server/level/ServerLevel;tickCustomSpawners(Z)V"
 		)
 	)
 	private void endTickTaskCustomMobSpawning(CallbackInfo ci) {

@@ -1,6 +1,5 @@
 package redstone.multimeter.mixin.client;
 
-import org.joml.Matrix4fc;
 import org.joml.Vector4f;
 
 import org.spongepowered.asm.mixin.Final;
@@ -13,14 +12,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.sugar.Local;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.framegraph.FramePass;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -41,16 +39,13 @@ public class LevelRendererMixin {
 		at = @At(
 			value = "INVOKE",
 			shift = Shift.AFTER,
-			target = "Lnet/minecraft/client/renderer/LevelRenderer;addWeatherPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"
+			target = "Lnet/minecraft/client/renderer/LevelRenderer;addMainPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;Z)V"
 		)
 	)
-	private void renderMeters(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice fogParameters, Vector4f fogColor, boolean renderSky, CallbackInfo ci, @Local FrameGraphBuilder builder) {
+	private void renderMeters(GraphicsResourceAllocator allocator, boolean renderOutline, CameraRenderState cameraState, GpuBufferSlice fogParameters, Vector4f fogColor, boolean renderSky, boolean consistentDepthRequired, CallbackInfo ci, @Local FrameGraphBuilder builder) {
 		FramePass pass = builder.addPass("rsmm:meters");
 
 		targets.main = pass.readsAndWrites(targets.main);
-		if (targets.translucent != null) {
-			targets.translucent = pass.readsAndWrites(targets.translucent);
-		}
 
 		pass.executes(() -> {
 			RenderSystem.setShaderFog(fogParameters);

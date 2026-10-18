@@ -54,7 +54,7 @@
 		"common.meterable.RedStoneOreBlockMixin",
 		"common.meterable.RedstoneTorchBlockMixin",
 		"common.meterable.RedstoneWallTorchBlockMixin",
-		"common.meterable.RedStoneWireBlockMixin",
+		"common.meterable.RedstoneWireBlockMixin",
 		"common.meterable.RepeaterBlockMixin",
 		"common.meterable.SculkSensorBlockMixin",
 		"common.meterable.TargetBlockMixin",

@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.hud.element;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.Keybinds;
@@ -113,10 +113,10 @@ public class MeterListRenderer extends AbstractElement {
 		}
 
 		switch (event.keyCode()) {
-		case GLFW.GLFW_KEY_UP:
+		case SDLKeycode.SDLK_UP:
 			moveSelection(InputHandler.isControlDown() ? -hud.getSelectedRow() : -1);
 			break;
-		case GLFW.GLFW_KEY_DOWN:
+		case SDLKeycode.SDLK_DOWN:
 			moveSelection(InputHandler.isControlDown() ? (hud.meters.size() - 1) - hud.getSelectedRow() : 1);
 			break;
 		default:

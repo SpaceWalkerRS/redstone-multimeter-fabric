@@ -34,12 +34,12 @@ dependencies {
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	include(implementation("de.siphalor.amecs.amecs-key-modifiers:amecs-key-modifiers-mc26.2.0:${project.amecs_version}") {
+	include(implementation("de.siphalor.amecs.amecs-key-modifiers:amecs-key-modifiers-mc26.3.0:${project.amecs_version}") {
 		exclude group: 'net.fabricmc'
 		exclude group: 'net.fabricmc.fabric-api'
 	})
 
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}+26.2"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}+26.3"
 }
 
 processResources {

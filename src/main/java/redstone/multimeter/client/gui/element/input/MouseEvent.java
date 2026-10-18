@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.element.input;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLMouse;
 
 public class MouseEvent {
 
@@ -27,11 +27,11 @@ public class MouseEvent {
 	}
 
 	public boolean isLeftButton() {
-		return this.button == GLFW.GLFW_MOUSE_BUTTON_LEFT;
+		return this.button == SDLMouse.SDL_BUTTON_LEFT;
 	}
 
 	public boolean isRightButton() {
-		return this.button == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+		return this.button == SDLMouse.SDL_BUTTON_RIGHT;
 	}
 
 	public static MouseEvent.Click click(double mouseX, double mouseY, int button, boolean doubleClick) {

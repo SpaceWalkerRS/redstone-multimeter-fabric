@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.util.Mth;
@@ -148,32 +148,32 @@ public class TextField extends AbstractButton {
 	@Override
 	public boolean keyPress(KeyEvent.Press event) {
 		switch (event.keyCode()) {
-		case GLFW.GLFW_KEY_LEFT_SHIFT:
-		case GLFW.GLFW_KEY_RIGHT_SHIFT:
+		case SDLKeycode.SDLK_LSHIFT:
+		case SDLKeycode.SDLK_RSHIFT:
 			this.startSelecting(SelectionMethod.KEYBOARD);
 			break;
-		case GLFW.GLFW_KEY_LEFT:
+		case SDLKeycode.SDLK_LEFT:
 			this.moveCursorFromKeyboard(-1);
 			break;
-		case GLFW.GLFW_KEY_RIGHT:
+		case SDLKeycode.SDLK_RIGHT:
 			this.moveCursorFromKeyboard(1);
 			break;
-		case GLFW.GLFW_KEY_UP:
-		case GLFW.GLFW_KEY_PAGE_UP:
+		case SDLKeycode.SDLK_UP:
+		case SDLKeycode.SDLK_PAGEUP:
 			this.setCursorFromKeyboard(0);
 			break;
-		case GLFW.GLFW_KEY_DOWN:
-		case GLFW.GLFW_KEY_PAGE_DOWN:
+		case SDLKeycode.SDLK_DOWN:
+		case SDLKeycode.SDLK_PAGEDOWN:
 			this.setCursorFromKeyboard(this.value.length());
 			break;
-		case GLFW.GLFW_KEY_BACKSPACE:
+		case SDLKeycode.SDLK_BACKSPACE:
 			this.erase(false);
 			break;
-		case GLFW.GLFW_KEY_DELETE:
+		case SDLKeycode.SDLK_DELETE:
 			this.erase(true);
 			break;
-		case GLFW.GLFW_KEY_ENTER:
-		case GLFW.GLFW_KEY_ESCAPE:
+		case SDLKeycode.SDLK_RETURN:
+		case SDLKeycode.SDLK_ESCAPE:
 			this.setFocused(false);
 			break;
 		default:
@@ -181,18 +181,18 @@ public class TextField extends AbstractButton {
 				break;
 			}
 			switch (event.keyCode()) {
-			case GLFW.GLFW_KEY_A:
+			case SDLKeycode.SDLK_A:
 				if (this.selectionMethod != SelectionMethod.MOUSE) {
 					this.selectAll();
 				}
 				break;
-			case GLFW.GLFW_KEY_C:
+			case SDLKeycode.SDLK_C:
 				this.copySelectionToClipboard(false);
 				break;
-			case GLFW.GLFW_KEY_X:
+			case SDLKeycode.SDLK_X:
 				this.copySelectionToClipboard(true);
 				break;
-			case GLFW.GLFW_KEY_V:
+			case SDLKeycode.SDLK_V:
 				this.pasteClipboard();
 				break;
 			default:
@@ -206,7 +206,7 @@ public class TextField extends AbstractButton {
 	public boolean keyRelease(KeyEvent.Release event) {
 		boolean consumed = false;
 
-		if (event.keyCode() == GLFW.GLFW_KEY_LEFT_SHIFT || event.keyCode() == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+		if (event.keyCode() == SDLKeycode.SDLK_LSHIFT || event.keyCode() == SDLKeycode.SDLK_RSHIFT) {
 			consumed = this.stopSelecting(SelectionMethod.KEYBOARD);
 		}
 

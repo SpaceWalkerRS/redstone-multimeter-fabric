@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 import net.minecraft.IdentifierException;
 import net.minecraft.client.KeyMapping;
@@ -107,7 +107,7 @@ public class MeterControlsElement extends AbstractParentElement {
 	public boolean keyPress(KeyEvent.Press event) {
 		boolean consumed = super.keyPress(event);
 
-		if (this.triedDeleting && event.keyCode() == GLFW.GLFW_KEY_ESCAPE) {
+		if (this.triedDeleting && event.keyCode() == SDLKeycode.SDLK_ESCAPE) {
 			this.undoTryDelete();
 			consumed = true;
 		}

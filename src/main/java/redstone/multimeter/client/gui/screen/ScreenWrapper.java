@@ -1,6 +1,6 @@
 package redstone.multimeter.client.gui.screen;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLScancode;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -104,11 +104,11 @@ public class ScreenWrapper extends Screen {
 
 	@Override
 	public final boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
-		if (screen.keyPress(KeyEvent.press(event.key(), event.scancode(), event.modifiers()))) {
+		if (screen.keyPress(KeyEvent.press(event.keycode(), event.key(), event.modifiers()))) {
 			mouseMoved(lastMouseX, lastMouseY);
 			return true;
 		}
-		if (screen.shouldCloseOnEsc() && event.key() == GLFW.GLFW_KEY_ESCAPE) {
+		if (screen.shouldCloseOnEsc() && event.key() == SDLScancode.SDL_SCANCODE_ESCAPE) {
 			screen.close();
 			return true;
 		}
@@ -118,7 +118,7 @@ public class ScreenWrapper extends Screen {
 
 	@Override
 	public final boolean keyReleased(net.minecraft.client.input.KeyEvent event) {
-		boolean consumed = screen.keyRelease(KeyEvent.release(event.key(), event.scancode(), event.modifiers()));
+		boolean consumed = screen.keyRelease(KeyEvent.release(event.keycode(), event.key(), event.modifiers()));
 
 		if (consumed) {
 			mouseMoved(lastMouseX, lastMouseY);

@@ -5,15 +5,15 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.RedstoneWireEvaluator;
 
 import redstone.multimeter.block.MeterableBlock;
 import redstone.multimeter.block.PowerSource;
 
-@Mixin(RedStoneWireBlock.class)
-public class RedStoneWireBlockMixin implements MeterableBlock, PowerSource {
+@Mixin(RedstoneWireBlock.class)
+public class RedstoneWireBlockMixin implements MeterableBlock, PowerSource {
 
 	@Shadow private RedstoneWireEvaluator evaluator;
 
@@ -29,11 +29,11 @@ public class RedStoneWireBlockMixin implements MeterableBlock, PowerSource {
 
 	@Override
 	public boolean rsmm$isActive(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(RedStoneWireBlock.POWER) > MIN_POWER;
+		return state.getValue(RedstoneWireBlock.POWER) > MIN_POWER;
 	}
 
 	@Override
 	public int rsmm$getPowerLevel(Level level, BlockPos pos, BlockState state) {
-		return state.getValue(RedStoneWireBlock.POWER);
+		return state.getValue(RedstoneWireBlock.POWER);
 	}
 }

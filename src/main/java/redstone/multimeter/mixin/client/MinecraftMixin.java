@@ -18,7 +18,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.screens.Screen;
 
 import redstone.multimeter.client.MultimeterClient;
 import redstone.multimeter.interfaces.mixin.IKeyMapping;
@@ -121,12 +120,12 @@ public class MinecraftMixin implements IMinecraft {
 	}
 
 	@Inject(
-		method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V",
+		method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V",
 		at = @At(
 			value = "HEAD"
 		)
 	)
-	private void disconnect(Screen screen, boolean transferring, CallbackInfo ci) {
+	private void disconnect(CallbackInfo ci) {
 		multimeterClient.onDisconnect();
 	}
 

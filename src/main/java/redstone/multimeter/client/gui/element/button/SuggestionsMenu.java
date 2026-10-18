@@ -3,7 +3,7 @@ package redstone.multimeter.client.gui.element.button;
 import java.util.Collections;
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 import net.minecraft.util.Mth;
 
@@ -228,13 +228,13 @@ public class SuggestionsMenu extends AbstractElement {
 
 	@Override
 	public boolean keyPress(KeyEvent.Press event) {
-		if (event.keyCode() == GLFW.GLFW_KEY_ESCAPE || event.keyCode() == GLFW.GLFW_KEY_ENTER) {
+		if (event.keyCode() == SDLKeycode.SDLK_ESCAPE || event.keyCode() == SDLKeycode.SDLK_RETURN) {
 			this.setFocused(false);
 		}
 
 		boolean consumed = false;
 
-		if (event.keyCode() == GLFW.GLFW_KEY_ESCAPE) {
+		if (event.keyCode() == SDLKeycode.SDLK_ESCAPE) {
 			this.setFocused(false);
 			consumed = true;
 		}
@@ -243,22 +243,22 @@ public class SuggestionsMenu extends AbstractElement {
 			consumed = true;
 
 			switch (event.keyCode()) {
-			case GLFW.GLFW_KEY_UP:
+			case SDLKeycode.SDLK_UP:
 				this.moveSelection(-1);
 				break;
-			case GLFW.GLFW_KEY_PAGE_UP:
+			case SDLKeycode.SDLK_PAGEUP:
 				this.setSelection(0);
 				break;
-			case GLFW.GLFW_KEY_DOWN:
+			case SDLKeycode.SDLK_DOWN:
 				this.moveSelection(1);
 				break;
-			case GLFW.GLFW_KEY_PAGE_DOWN:
+			case SDLKeycode.SDLK_PAGEDOWN:
 				this.setSelection(this.suggestions.size() - 1);
 				break;
-			case GLFW.GLFW_KEY_TAB:
-			case GLFW.GLFW_KEY_ENTER:
+			case SDLKeycode.SDLK_TAB:
+			case SDLKeycode.SDLK_RETURN:
 				this.useSelection();
-				if (event.keyCode() == GLFW.GLFW_KEY_ENTER) {
+				if (event.keyCode() == SDLKeycode.SDLK_RETURN) {
 					this.setFocused(false);
 				}
 				break;

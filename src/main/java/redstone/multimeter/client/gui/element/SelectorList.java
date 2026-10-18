@@ -2,7 +2,7 @@ package redstone.multimeter.client.gui.element;
 
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 import redstone.multimeter.client.InputHandler;
 import redstone.multimeter.client.gui.GuiRenderer;
@@ -60,15 +60,15 @@ public class SelectorList extends ScrollableList {
 
 		if (!consumed) {
 			switch (event.keyCode()) {
-			case GLFW.GLFW_KEY_TAB:
+			case SDLKeycode.SDLK_TAB:
 				return this.moveSelection(!InputHandler.isShiftDown(), false);
-			case GLFW.GLFW_KEY_UP:
+			case SDLKeycode.SDLK_UP:
 				return this.moveSelection(false, false);
-			case GLFW.GLFW_KEY_DOWN:
+			case SDLKeycode.SDLK_DOWN:
 				return this.moveSelection(true, false);
-			case GLFW.GLFW_KEY_PAGE_UP:
+			case SDLKeycode.SDLK_PAGEUP:
 				return this.moveSelection(false, true);
-			case GLFW.GLFW_KEY_PAGE_DOWN:
+			case SDLKeycode.SDLK_PAGEDOWN:
 				return this.moveSelection(true, true);
 			}
 		}

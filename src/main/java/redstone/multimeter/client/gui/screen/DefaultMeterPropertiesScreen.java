@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 import net.minecraft.IdentifierException;
 import net.minecraft.core.registries.Registries;
@@ -82,10 +82,10 @@ public class DefaultMeterPropertiesScreen extends RSMMScreen {
 		boolean consumed = super.keyPress(event) || blockList.keyPress(event);
 
 		if (!consumed) {
-			if (remove.isActive() && event.keyCode() == GLFW.GLFW_KEY_KP_SUBTRACT) {
+			if (remove.isActive() && event.keyCode() == SDLKeycode.SDLK_KP_MINUS) {
 				remove();
 				consumed = true;
-			} else if (add.isActive() && event.keyCode() == GLFW.GLFW_KEY_KP_ADD) {
+			} else if (add.isActive() && event.keyCode() == SDLKeycode.SDLK_KP_PLUS) {
 				add();
 				consumed = true;
 			}
